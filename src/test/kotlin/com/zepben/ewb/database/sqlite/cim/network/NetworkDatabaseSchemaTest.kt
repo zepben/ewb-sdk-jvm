@@ -271,6 +271,7 @@ class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkD
         // ############################
 
         validateSchema(SchemaServices.networkServicesOf(::CurrentRelay, CurrentRelay::fillFields))
+        validateSchema(SchemaServices.networkServicesOf(::DirectionalCurrentRelay, DirectionalCurrentRelay::fillFields))
 
         // #######################
         // # IEC61970 Base Scada #

@@ -21,8 +21,10 @@ import com.zepben.ewb.cim.iec61968.assets.Asset
 import com.zepben.ewb.cim.iec61968.assets.AssetOrganisationRole
 import com.zepben.ewb.cim.iec61968.assets.AssetOwner
 import com.zepben.ewb.cim.iec61968.assets.Streetlight
+import com.zepben.ewb.cim.iec61968.common.ElectronicAddress
 import com.zepben.ewb.cim.iec61968.common.Location
 import com.zepben.ewb.cim.iec61968.common.Organisation
+import com.zepben.ewb.cim.iec61968.common.TelephoneNumber
 import com.zepben.ewb.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
 import com.zepben.ewb.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.ewb.cim.iec61968.infiec61968.infassets.Pole
@@ -49,11 +51,15 @@ import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.ewb.database.sqlite.cim.network.NetworkDatabaseTables
 import com.zepben.ewb.database.sqlite.cim.tables.associations.*
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.assetinfo.TableRecloseDelays
+import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.common.TableContactDetailsElectronicAddresses
+import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.common.TableContactDetailsStreetAddresses
+import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.common.TableContactDetailsTelephoneNumbers
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61970.base.protection.TableProtectionRelayFunctionThresholds
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61970.base.protection.TableProtectionRelayFunctionTimeLimits
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61970.base.wires.TablePowerTransformerEndRatings
 import com.zepben.ewb.database.sqlite.cim.tables.iec61968.common.TableLocationStreetAddresses
 import com.zepben.ewb.database.sqlite.cim.tables.iec61968.common.TablePositionPoints
+import com.zepben.ewb.database.sqlite.cim.tables.iec61968.metering.TableUsagePointContactDetails
 import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.core.TableCurveData
 import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.wires.TablePhaseImpedanceData
 import com.zepben.ewb.services.common.testdata.fillFieldsCommon
@@ -146,8 +152,10 @@ internal class NetworkTranslatorTest : TranslatorTestBase<NetworkService>(
         // # IEC61968 Common #
         // ###################
 
+        // TODO: ValidationInfo(ElectronicAddress(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
         ValidationInfo(Location(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
         ValidationInfo(Organisation(), { fillFieldsCommon(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        // TODO: ValidationInfo(TelephoneNumber(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
 
         // #####################################
         // # IEC61968 infIEC61968 InfAssetInfo #
@@ -318,6 +326,9 @@ internal class NetworkTranslatorTest : TranslatorTestBase<NetworkService>(
             TableUsagePointsEndDevices::class,
 
             // Excluded array data
+            TableContactDetailsElectronicAddresses::class,
+            TableContactDetailsStreetAddresses::class,
+            TableContactDetailsTelephoneNumbers::class,
             TableCurveData::class,
             TableLocationStreetAddresses::class,
             TablePhaseImpedanceData::class,
@@ -327,6 +338,7 @@ internal class NetworkTranslatorTest : TranslatorTestBase<NetworkService>(
             TableProtectionRelayFunctionTimeLimits::class,
             TableProtectionRelayFunctionsSensors::class,
             TableRecloseDelays::class,
+            TableUsagePointContactDetails::class,
         )
 
 }

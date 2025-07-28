@@ -10,6 +10,7 @@ package com.zepben.ewb.services.network.translator
 
 import com.google.protobuf.NullValue
 import com.zepben.ewb.cim.extensions.iec61968.assetinfo.RelayInfo
+import com.zepben.ewb.cim.extensions.iec61968.common.ContactDetails
 import com.zepben.ewb.cim.extensions.iec61968.metering.PanDemandResponseFunction
 import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
@@ -46,10 +47,12 @@ import com.zepben.ewb.cim.iec61970.base.scada.RemoteSource
 import com.zepben.ewb.cim.iec61970.base.wires.*
 import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.ewb.services.common.*
+import com.zepben.ewb.services.common.extensions.internEmpty
 import com.zepben.ewb.services.common.translator.*
 import com.zepben.ewb.services.network.whenNetworkServiceObject
 import com.zepben.protobuf.nc.NetworkIdentifiedObject
 import com.zepben.protobuf.cim.extensions.iec61968.assetinfo.RelayInfo as PBRelayInfo
+import com.zepben.protobuf.cim.extensions.iec61968.common.ContactDetails as PBContactDetails
 import com.zepben.protobuf.cim.extensions.iec61968.metering.PanDemandResponseFunction as PBPanDemandResponseFunction
 import com.zepben.protobuf.cim.extensions.iec61970.base.core.Site as PBSite
 import com.zepben.protobuf.cim.extensions.iec61970.base.feeder.Loop as PBLoop
@@ -84,10 +87,12 @@ import com.zepben.protobuf.cim.iec61968.assets.AssetOrganisationRole as PBAssetO
 import com.zepben.protobuf.cim.iec61968.assets.AssetOwner as PBAssetOwner
 import com.zepben.protobuf.cim.iec61968.assets.Streetlight as PBStreetlight
 import com.zepben.protobuf.cim.iec61968.assets.Structure as PBStructure
+import com.zepben.protobuf.cim.iec61968.common.ElectronicAddress as PBElectronicAddress
 import com.zepben.protobuf.cim.iec61968.common.Location as PBLocation
 import com.zepben.protobuf.cim.iec61968.common.PositionPoint as PBPositionPoint
 import com.zepben.protobuf.cim.iec61968.common.StreetAddress as PBStreetAddress
 import com.zepben.protobuf.cim.iec61968.common.StreetDetail as PBStreetDetail
+import com.zepben.protobuf.cim.iec61968.common.TelephoneNumber as PBTelephoneNumber
 import com.zepben.protobuf.cim.iec61968.common.TownDetail as PBTownDetail
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo as PBCurrentTransformerInfo
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo as PBPotentialTransformerInfo
@@ -305,6 +310,35 @@ fun toPb(cim: RelayInfo, pb: PBRelayInfo.Builder): PBRelayInfo.Builder =
  * An extension for converting any RelayInfo into its protobuf counterpart.
  */
 fun RelayInfo.toPb(): PBRelayInfo = toPb(this, PBRelayInfo.newBuilder()).build()
+
+// ##############################
+// # Extensions IEC61968 Common #
+// ##############################
+
+/**
+ * Convert the [ContactDetails] into its protobuf counterpart.
+ *
+ * @param cim The [ContactDetails] to convert.
+ * @param pb The protobuf builder to populate.
+ * @return [pb] for fluent use.
+ */
+fun toPb(cim: ContactDetails, pb: PBContactDetails.Builder): PBContactDetails.Builder =
+    pb.apply {
+        cim.phoneNumbers?.forEach { toPb(it, addPhoneNumbersBuilder()) }
+        cim.contactAddress?.let { toPb(it, contactAddressBuilder) } ?: clearContactAddress()
+        cim.electronicAddresses?.forEach { toPb(it, addElectronicAddressesBuilder()) }
+
+        // TODO: remove
+        //cim.electronicAddresses?.forEach { addElectronicAddresses(toPb(it, electronicAddressesBuilderList)) } ?: clearElectronicAddresses()
+        //cim.electronicAddresses?.forEach { toPb(it, electronicAddressesBuilderList) } ?: clearElectronicAddresses()
+        //addAllElectronicAddresses(cim.electronicAddresses.forEach { toPb(it, electronicAddressesBuilderList) } )
+        contactType = cim.contactType
+        firstName = cim.firstName
+        lastName = cim.lastName
+        preferredContactMethod = mapContactMethodType.toPb(cim.preferredContactMethod)
+        businessName = cim.businessName
+    }
+
 
 // ################################
 // # Extensions IEC61968 Metering #
@@ -950,6 +984,20 @@ fun Streetlight.toPb(): PBStreetlight = toPb(this, PBStreetlight.newBuilder()).b
 // ###################
 
 /**
+ * Convert the [ElectronicAddress] into its protobuf counterpart.
+ *
+ * @param cim The [ElectronicAddress] to convert.
+ * @param pb The protobuf builder to populate.
+ * @return [pb] for fluent use.
+ */
+fun toPb(cim: ElectronicAddress, pb: PBElectronicAddress.Builder): PBElectronicAddress.Builder =
+    pb.apply {
+        email1 = cim.email1
+        isPrimary = cim.isPrimary ?: false
+        description = cim.description
+    }
+
+/**
  * Convert the [Location] into its protobuf counterpart.
  *
  * @param cim The [Location] to convert.
@@ -1008,6 +1056,26 @@ fun toPb(cim: StreetDetail, pb: PBStreetDetail.Builder): PBStreetDetail.Builder 
         suiteNumber = cim.suiteNumber
         type = cim.type
         displayAddress = cim.displayAddress
+    }
+
+/**
+ * Convert the [TelephoneNumber] into its protobuf counterpart.
+ *
+ * @param cim The [TelephoneNumber] to convert.
+ * @param pb The protobuf builder to populate.
+ * @return [pb] for fluent use.
+ */
+fun toPb(cim: TelephoneNumber, pb: PBTelephoneNumber.Builder): PBTelephoneNumber.Builder =
+    pb.apply {
+        areaCode = cim.areaCode
+        cityCode = cim.cityCode
+        countryCode = cim.countryCode
+        dialOut = cim.dialOut
+        extension = cim.extension
+        internationalPrefix = cim.internationalPrefix
+        localNumber = cim.localNumber
+        isPrimary = cim.isPrimary ?: false
+        description = cim.description
     }
 
 /**
@@ -1190,6 +1258,7 @@ fun toPb(cim: UsagePoint, pb: PBUsagePoint.Builder): PBUsagePoint.Builder =
         cim.equipment.forEach { addEquipmentMRIDs(it.mRID) }
         clearEndDeviceMRIDs()
         cim.endDevices.forEach { addEndDeviceMRIDs(it.mRID) }
+        cim.contacts.forEach { toPb(it, addContactsBuilder()) }
         toPb(cim, ioBuilder)
     }
 

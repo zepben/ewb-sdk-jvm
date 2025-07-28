@@ -46,7 +46,7 @@ class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject
     var approvedInverterCapacity: Int? = null
     var phaseCode: PhaseCode = PhaseCode.NONE
     @ZBEX
-    var contacts: MutableList<ContactDetails>? = null
+    private var _contacts: MutableList<ContactDetails>? = null
 
     private var _equipment: MutableList<Equipment>? = null
     private var _endDevices: MutableList<EndDevice>? = null
@@ -129,16 +129,31 @@ class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject
         return this
     }
 
+    val contacts: Collection<ContactDetails> get() = _contacts.asUnmodifiable()
+
+    /**
+     * All contacts for this [UsagePoint].
+     *
+     * @param id the ID of the required [ContactDetails]
+     * @return The [ContactDetails] with the specified [id] if it exists, otherwise null
+     */
+    fun getContact(id: String): ContactDetails? = _contacts?.firstOrNull { it.id == id }
+
     fun addContact(contact: ContactDetails): UsagePoint {
-        contacts = contacts ?: mutableListOf()
-        contacts!!.add(contact)
+        _contacts = _contacts ?: mutableListOf()
+        _contacts!!.add(contact)
         return this
     }
 
     fun removeContact(contact: ContactDetails): Boolean {
-        val ret = contacts?.remove(contact) == true
-        if (contacts.isNullOrEmpty()) contacts = null
+        val ret = _contacts?.remove(contact) == true
+        if (_contacts.isNullOrEmpty()) _contacts = null
         return ret
+    }
+
+    fun clearContacts(): UsagePoint {
+        _contacts = null
+        return this
     }
 
 }

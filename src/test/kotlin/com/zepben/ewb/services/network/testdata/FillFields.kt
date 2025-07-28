@@ -9,6 +9,8 @@
 package com.zepben.ewb.services.network.testdata
 
 import com.zepben.ewb.cim.extensions.iec61968.assetinfo.RelayInfo
+import com.zepben.ewb.cim.extensions.iec61968.common.ContactDetails
+import com.zepben.ewb.cim.extensions.iec61968.common.ContactMethodType
 import com.zepben.ewb.cim.extensions.iec61968.metering.PanDemandResponseFunction
 import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
@@ -627,6 +629,44 @@ fun UsagePoint.fillFields(service: NetworkService, includeRuntime: Boolean = tru
         addEndDevice(Meter().also {
             it.addUsagePoint(this)
             service.add(it)
+        })
+
+        addContact(ContactDetails().apply {
+            phoneNumbers = mutableListOf(
+                    TelephoneNumber(
+                        "01",
+                        "02",
+                        "03",
+                        "04",
+                        "05",
+                        "10",
+                        "12345678",
+                        false,
+                        "Telephone Number"
+                    )
+            )
+
+            contactAddress = StreetAddress(
+                "1234",
+                TownDetail("town", "state"),
+                "5678",
+                StreetDetail("a", "b", "c", "d", "e", "f", "g")
+            )
+
+            electronicAddresses = mutableListOf(
+                ElectronicAddress(
+                    "foo@zepben.com",
+                    true,
+                    "Contact foo from Zepben via this email."
+                )
+            )
+
+            contactType = "contact type"
+            firstName = "first"
+            lastName = "last"
+            preferredContactMethod = ContactMethodType.CALL
+            isPrimary = false
+            businessName = "business name"
         })
     }
 

@@ -24,29 +24,8 @@ object ChangeSet61NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
     )
 
     override fun populateStatements(): List<String> = listOf(
-        """INSERT INTO directional_current_relays (
-            mrid,
-            name,
-            description,
-            directional_characteristic_angle,
-            polarizing_quantity_type,
-            relay_element_phase,
-            minimum_pickup_current,
-            current_limit_1,
-            inverse_time_flag,
-            time_delay_1
-        ) VALUES (
-            'mrid',
-            'name',
-            'description',
-            '123.2', 
-            'UNKNOWN',
-            'ABCN',
-            '1.098',
-            '10.4',
-            'true',
-            '123'
-        );""".trimIndent(),
+
+        "INSERT INTO directional_current_relays (mrid, name, description, num_diagram_objects, num_controls, protection_kind, power_direction) VALUES ('mrid', 'name', 'description', 0, 0, 'UNKNOWN', 'power_direction');",
     )
 
     override fun validateChanges(statement: Statement) {
@@ -56,13 +35,10 @@ object ChangeSet61NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
                 assertThat(rs.getString("mrid"), equalTo("mrid"))
                 assertThat(rs.getString("name"), equalTo("name"))
                 assertThat(rs.getString("description"), equalTo("description"))
-                assertThat(rs.getString("directional_characteristic_angle"), equalTo("123.2"))
-                assertThat(rs.getString("polarizing_quantity_type"), equalTo("UNKNOWN"))
-                assertThat(rs.getString("relay_element_phase"), equalTo("ABCN"))
-                assertThat(rs.getString("minimum_pickup_current"), equalTo("1.098"))
-                assertThat(rs.getString("current_limit_1"), equalTo("10.4"))
-                assertThat(rs.getString("inverse_time_flag"), equalTo("true"))
-                assertThat(rs.getString("time_delay_1"), equalTo("123"))
+                assertThat(rs.getInt("num_diagram_objects"), equalTo(0))
+                assertThat(rs.getInt("num_controls"), equalTo(0))
+                assertThat(rs.getString("protection_kind"), equalTo("UNKNOWN"))
+                assertThat(rs.getString("power_direction"), equalTo("power_direction"))
             }
         )
     }

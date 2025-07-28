@@ -62,13 +62,13 @@ class ContactDetails(id: String = ""){
     @ZBEX
     var businessName: String? = null
 
-    fun addPhoneNumber(phoneNumber: TelephoneNumber): ContactDetails {
+    fun addTelephoneNumber(phoneNumber: TelephoneNumber): ContactDetails {
         phoneNumbers = phoneNumbers ?: mutableListOf()
         phoneNumbers!!.add(phoneNumber)
         return this
     }
 
-    fun removePhoneNumber(phoneNumber: TelephoneNumber): Boolean {
+    fun removeTelephoneNumber(phoneNumber: TelephoneNumber): Boolean {
         val ret = phoneNumbers?.remove(phoneNumber) == true
         if (phoneNumbers.isNullOrEmpty()) phoneNumbers = null
         return ret

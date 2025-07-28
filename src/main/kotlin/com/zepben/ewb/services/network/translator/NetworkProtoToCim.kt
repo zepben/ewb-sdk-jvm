@@ -13,7 +13,6 @@ import com.zepben.ewb.cim.extensions.iec61968.common.ContactDetails
 import com.zepben.ewb.cim.extensions.iec61968.common.ContactMethodType
 import com.zepben.ewb.cim.extensions.iec61968.metering.PanDemandResponseFunction
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.DirectionalCurrentRelay
-import com.zepben.ewb.cim.extensions.iec61970.base.protection.PolarizingQuantityType
 import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
@@ -220,8 +219,10 @@ fun NetworkService.addFromPb(pb: PBRelayInfo): RelayInfo? = tryAddOrNull(toCim(p
 fun toCim(pb: PBContactDetails): ContactDetails =
     ContactDetails(pb.id).apply {
         pb.phoneNumbersList.forEach {
-            addPhoneNumber(toCim(it))
+            addTelephoneNumber(toCim(it))
         }
+
+        contactAddress = toCim(pb.contactAddress)
 
         pb.electronicAddressesList.forEach {
             addElectronicAddress(toCim(it))
@@ -230,7 +231,7 @@ fun toCim(pb: PBContactDetails): ContactDetails =
         contactType = pb.contactType
         firstName = pb.firstName
         lastName = pb.lastName
-        preferredContactMethod = ContactMethodType.valueOf(pb.preferredContactMethod.name)
+        preferredContactMethod = mapContactMethodType.toCim(pb.preferredContactMethod)
         businessName = pb.businessName
     }
 

@@ -59,7 +59,7 @@ internal class MetricsEntryWriter(
 
         insert.setObject(table.JOB_ID.queryIndex, jobId)
         insert.setString(table.DATA_SOURCE.queryIndex, sourceName)
-        insert.setTimestamp(table.SOURCE_TIME.queryIndex, Timestamp.from(sourceMetadata.timestamp))
+        insert.setTimestamp(table.SOURCE_TIME.queryIndex, sourceMetadata.timestamp?.let { Timestamp.from(it) })
         insert.setObject(table.FILE_SHA.queryIndex, sourceMetadata.fileHash)
 
         return insert.tryExecuteSingleUpdate("job source")

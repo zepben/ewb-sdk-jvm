@@ -11,6 +11,7 @@ package com.zepben.ewb.database.postgres.metrics
 import com.zepben.ewb.metrics.*
 import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.every
+import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.verify
 import org.hamcrest.MatcherAssert.assertThat
@@ -19,6 +20,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.sqlite.SQLiteErrorCode
 import org.sqlite.SQLiteException
+import java.sql.Connection
+import java.sql.PreparedStatement
 import java.time.Instant
 import java.util.*
 
@@ -59,6 +62,40 @@ internal class MetricsWriterTest {
         assertThat(systemErr.log, containsString("Failed to write job source"))
         assertThat(systemErr.log, containsString("message"))
     }
+
+    @Test
+    internal fun `metrics entry writer can write source with null metadata timestamp`() {
+        val insert = mockk<PreparedStatement>().apply {
+            justRun { setObject(1, any()) }
+            justRun { setString(2, any()) }
+            justRun { setTimestamp(3, any()) }
+            justRun { setObject(4, any()) }
+            every { executeUpdate() } returns 1
+        }
+
+        MetricsEntryWriter(
+            MetricsDatabaseTables().apply {
+                prepareInsertStatements(
+                    mockk<Connection> {
+                        justRun { autoCommit = false }
+                        justRun { commit() }
+                        justRun { close() }
+                        every { prepareStatement(any()) } returns insert
+                    })
+            }
+        ).writeSource(UUID.randomUUID(), jobSource(timestampVal = null))
+
+        verify { insert.setTimestamp(3, null) }
+    }
+
+    private fun jobSource(keyVal: String = "", timestampVal: Instant? = Instant.EPOCH, fileHashVal: ByteArray = ByteArray(0)): JobSource =
+        mockk<JobSource>().apply {
+            every { key } returns keyVal
+            every { value } returns mockk<SourceMetadata>().apply {
+                every { timestamp } returns timestampVal
+                every { fileHash } returns fileHashVal
+            }
+        }
 
     @Test
     internal fun `metric failure message`() {

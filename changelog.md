@@ -100,6 +100,7 @@
 * None.
 
 ### Fixes
+* Fixed bug that would cause a null pointer exception when processing metrics job sources with a null metadata timestamp
 * Marked some extensions properties and classes with [ZBEX] that were missing them (might still be more). In addition to the ones moved into the extensions
   package:
   * `PhaseCode.Y`

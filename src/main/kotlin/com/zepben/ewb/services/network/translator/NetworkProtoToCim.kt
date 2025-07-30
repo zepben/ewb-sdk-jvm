@@ -9,7 +9,10 @@
 package com.zepben.ewb.services.network.translator
 
 import com.zepben.ewb.cim.extensions.iec61968.assetinfo.RelayInfo
+import com.zepben.ewb.cim.extensions.iec61968.common.ContactDetails
+import com.zepben.ewb.cim.extensions.iec61968.common.ContactMethodType
 import com.zepben.ewb.cim.extensions.iec61968.metering.PanDemandResponseFunction
+import com.zepben.ewb.cim.extensions.iec61970.base.protection.DirectionalCurrentRelay
 import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
@@ -43,7 +46,9 @@ import com.zepben.ewb.services.common.translator.toCim
 import com.zepben.ewb.services.common.translator.toInstant
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.protobuf.cim.extensions.iec61968.assetinfo.RelayInfo as PBRelayInfo
+import com.zepben.protobuf.cim.extensions.iec61968.common.ContactDetails as PBContactDetails
 import com.zepben.protobuf.cim.extensions.iec61968.metering.PanDemandResponseFunction as PBPanDemandResponseFunction
+import com.zepben.protobuf.cim.extensions.iec61970.base.protection.DirectionalCurrentRelay as PBDirectionalCurrentRelay
 import com.zepben.protobuf.cim.extensions.iec61970.base.core.Site as PBSite
 import com.zepben.protobuf.cim.extensions.iec61970.base.feeder.Loop as PBLoop
 import com.zepben.protobuf.cim.extensions.iec61970.base.feeder.LvFeeder as PBLvFeeder
@@ -76,11 +81,13 @@ import com.zepben.protobuf.cim.iec61968.assets.AssetOrganisationRole as PBAssetO
 import com.zepben.protobuf.cim.iec61968.assets.AssetOwner as PBAssetOwner
 import com.zepben.protobuf.cim.iec61968.assets.Streetlight as PBStreetlight
 import com.zepben.protobuf.cim.iec61968.assets.Structure as PBStructure
+import com.zepben.protobuf.cim.iec61968.common.ElectronicAddress as PBElectronicAddress
 import com.zepben.protobuf.cim.iec61968.common.Location as PBLocation
 import com.zepben.protobuf.cim.iec61968.common.Organisation as PBOrganisation
 import com.zepben.protobuf.cim.iec61968.common.PositionPoint as PBPositionPoint
 import com.zepben.protobuf.cim.iec61968.common.StreetAddress as PBStreetAddress
 import com.zepben.protobuf.cim.iec61968.common.StreetDetail as PBStreetDetail
+import com.zepben.protobuf.cim.iec61968.common.TelephoneNumber as PBTelephoneNumber
 import com.zepben.protobuf.cim.iec61968.common.TownDetail as PBTownDetail
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo as PBCurrentTransformerInfo
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo as PBPotentialTransformerInfo
@@ -206,6 +213,29 @@ fun toCim(pb: PBRelayInfo, networkService: NetworkService): RelayInfo =
 fun NetworkService.addFromPb(pb: PBRelayInfo): RelayInfo? = tryAddOrNull(toCim(pb, this))
 
 // ################################
+// # Extensions IEC61968 Common #
+// ################################
+
+fun toCim(pb: PBContactDetails): ContactDetails =
+    ContactDetails(pb.id).apply {
+        pb.phoneNumbersList.forEach {
+            addTelephoneNumber(toCim(it))
+        }
+
+        contactAddress = toCim(pb.contactAddress)
+
+        pb.electronicAddressesList.forEach {
+            addElectronicAddress(toCim(it))
+        }
+
+        contactType = pb.contactType
+        firstName = pb.firstName
+        lastName = pb.lastName
+        preferredContactMethod = mapContactMethodType.toCim(pb.preferredContactMethod)
+        businessName = pb.businessName
+    }
+
+// ################################
 // # Extensions IEC61968 Metering #
 // ################################
 
@@ -220,7 +250,8 @@ fun toCim(pb: PBPanDemandResponseFunction, networkService: NetworkService): PanD
     PanDemandResponseFunction(pb.mRID()).apply {
         kind = pb.kind?.let { k -> mapEndDeviceFunctionKind.toCim(k) } ?: EndDeviceFunctionKind.UNKNOWN
         applianceBitmask = pb.appliance.takeUnless { it == UNKNOWN_INT }
-        toCim(pb.edf, this, networkService)
+    }.also {
+        toCim(pb.edf, it, networkService)
     }
 
 
@@ -330,6 +361,31 @@ fun NetworkService.addFromPb(pb: PBEvChargingUnit): EvChargingUnit? = tryAddOrNu
 // #######################################
 // # Extensions IEC61970 Base Protection #
 // #######################################
+
+/**
+ * Convert the protobuf [PBDirectionalCurrentRelay] into its CIM counterpart.
+ *
+ * @param pb The protobuf [PBDirectionalCurentRelay] to convert.
+ * @param networkService The [NetworkService] the converted CIM object will be added too.
+ * @return The converted [pb] as a CIM [DirectionalCurrentRelay].
+ */
+fun toCim(pb: PBDirectionalCurrentRelay, networkService: NetworkService): DirectionalCurrentRelay =
+    DirectionalCurrentRelay(pb.mRID()).apply {
+        directionalCharacteristicAngle = pb.directionalCharacteristicAngle.takeUnless { it == UNKNOWN_DOUBLE }
+        polarizingQuantityType = mapPolarizingQuantityType.toCim(pb.polarizingQuantityType)
+        relayElementPhase = mapPhaseCode.toCim(pb.relayElementPhase)
+        minimumPickupCurrent = pb.minimumPickupCurrent.takeUnless { it == UNKNOWN_DOUBLE }
+        currentLimit1 = pb.currentLimit1.takeUnless { it == UNKNOWN_DOUBLE }
+        inverseTimeFlag = pb.inverseTimeFlagSet.takeUnless { pb.hasInverseTimeFlagNull() }
+        timeDelay1 = pb.timeDelay1.takeUnless { it == UNKNOWN_DOUBLE }
+    }.also {
+        toCim(pb.prf, it, networkService)
+    }
+
+/**
+ * An extension to add a converted copy of the protobuf [PBBatteryControl] to the [NetworkService].
+ */
+fun NetworkService.addFromPb(pb: PBDirectionalCurrentRelay): DirectionalCurrentRelay? = tryAddOrNull(toCim(pb, this))
 
 /**
  * Convert the protobuf [PBDistanceRelay] into its CIM counterpart.
@@ -862,6 +918,20 @@ fun NetworkService.addFromPb(pb: PBStreetlight): Streetlight? = tryAddOrNull(toC
 // ###################
 
 /**
+* Convert the protobuf [PBElectronicAddress] into its CIM counterpart.
+*
+* @param pb The protobuf [PBElectronicAddress] to convert.
+* @param networkService The [NetworkService] the converted CIM object will be added too.
+* @return The converted [pb] as a CIM [ElectronicAddress].
+*/
+fun toCim(pb: PBElectronicAddress): ElectronicAddress =
+    ElectronicAddress().apply {
+        email1 = pb.email1.internEmpty()
+        isPrimary = pb.isPrimary
+        description = pb.description.internEmpty()
+    }
+
+/**
  * Convert the protobuf [PBLocation] into its CIM counterpart.
  *
  * @param pb The protobuf [PBLocation] to convert.
@@ -913,6 +983,25 @@ fun toCim(pb: PBStreetDetail): StreetDetail =
         pb.suiteNumber.internEmpty(),
         pb.type.internEmpty(),
         pb.displayAddress.internEmpty()
+    )
+
+/**
+ * Convert the protobuf [PBTelephoneNumber] into its CIM counterpart.
+ *
+ * @param pb The protobuf [PBTelephoneNumber] to convert.
+ * @return The converted [pb] as a CIM [TelephoneNumber].
+ */
+fun toCim(pb: PBTelephoneNumber): TelephoneNumber =
+    TelephoneNumber(
+        pb.areaCode.internEmpty(),
+        pb.cityCode.internEmpty(),
+        pb.countryCode.internEmpty(),
+        pb.dialOut.internEmpty(),
+        pb.extension.internEmpty(),
+        pb.internationalPrefix.internEmpty(),
+        pb.localNumber.internEmpty(),
+        pb.isPrimary,
+        pb.description.internEmpty()
     )
 
 /**
@@ -1103,7 +1192,11 @@ fun toCim(pb: PBUsagePoint, networkService: NetworkService): UsagePoint =
             networkService.resolveOrDeferReference(Resolvers.endDevices(this), it)
         }
 
-        toCim(pb.io, this, networkService)
+        pb.contactsList.forEach {
+            addContact(toCim(it))
+        }
+    }.also {
+        toCim(pb.io, it, networkService)
     }
 
 /**
@@ -2980,6 +3073,14 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
     // #######################################
     // # Extensions IEC61970 Base Protection #
     // #######################################
+
+    /**
+     * Add a converted copy of the protobuf [DirectionalCurrentRelay] to the [NetworkService].
+     *
+     * @param pb The [PBDirectionalCurrentRelay] to convert.
+     * @return The converted [DirectionalCurrentRelay]
+     */
+    fun addFromPb(pb: PBDirectionalCurrentRelay): DirectionalCurrentRelay? = networkService.addFromPb(pb)
 
     /**
      * Add a converted copy of the protobuf [PBDistanceRelay] to the [NetworkService].

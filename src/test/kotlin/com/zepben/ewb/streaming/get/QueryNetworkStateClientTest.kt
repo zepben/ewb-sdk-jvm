@@ -8,7 +8,6 @@
 
 package com.zepben.ewb.streaming.get
 
-import com.zepben.evolve.streaming.get.NetworkStateIssues
 import com.zepben.ewb.metrics.NetworkMetrics
 import com.zepben.ewb.streaming.data.*
 import com.zepben.ewb.streaming.get.testservices.TestQueryNetworkStateService

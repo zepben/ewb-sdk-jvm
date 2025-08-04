@@ -28,6 +28,7 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.Rule
 import org.junit.jupiter.api.Test
+import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 
 internal class QueryNetworkStateServiceTest {
@@ -60,8 +61,8 @@ internal class QueryNetworkStateServiceTest {
     private val onCurrentStatesStatusInterface = mockk<QueryNetworkStateService.CurrentStatesStatusHandler> { justRun { handle(any()) } }
     private val onProcessingErrorInterface = mockk<QueryNetworkStateService.ProcessingErrorHandler> { justRun { handle(any()) } }
 
-    private val service = QueryNetworkStateService(onGetCurrentStates, onCurrentStatesStatus, onProcessingError)
-    private val serviceJava = QueryNetworkStateService(onGetCurrentStatesInterface, onCurrentStatesStatusInterface, onProcessingErrorInterface)
+    private val service = QueryNetworkStateService(onGetCurrentStates, onCurrentStatesStatus, LoggerFactory.getLogger(""), onProcessingError)
+    private val serviceJava = QueryNetworkStateService(onGetCurrentStatesInterface, onCurrentStatesStatusInterface, LoggerFactory.getLogger(""), onProcessingErrorInterface)
 
     @Test
     internal fun getCurrentStates() {

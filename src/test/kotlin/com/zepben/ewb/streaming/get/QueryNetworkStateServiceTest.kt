@@ -20,7 +20,7 @@ import com.zepben.protobuf.ns.GetCurrentStatesResponse
 import com.zepben.protobuf.ns.SetCurrentStatesResponse
 import com.zepben.testutils.exception.ExpectException.Companion.expect
 import io.grpc.Status
-import io.grpc.StatusRuntimeException
+import io.grpc.StatusException
 import io.grpc.stub.StreamObserver
 import io.grpc.testing.GrpcCleanupRule
 import io.mockk.*
@@ -89,8 +89,8 @@ internal class QueryNetworkStateServiceTest {
         val responseError = slot<Throwable>()
         verifySequence { responseObserver.onError(capture(responseError)) }
 
-        assertThat(responseError.captured, instanceOf(StatusRuntimeException::class.java))
-        (responseError.captured as StatusRuntimeException).status.let {
+        assertThat(responseError.captured, instanceOf(StatusException::class.java))
+        (responseError.captured as StatusException).status.let {
             assertThat(it.code, equalTo(Status.UNKNOWN.code))
             assertThat(it.cause, equalTo(error))
         }

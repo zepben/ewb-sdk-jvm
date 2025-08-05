@@ -86,7 +86,7 @@ class QueryNetworkStateClient(
             try {
                 results.add(CurrentStateEventBatch(response.messageId, response.eventList.map { CurrentStateEvent.fromPb(it) }))
             } catch (ex: Exception) {
-                logger.error("${response.messageId} could not be deserialised:", ex)
+                logger.debug("${response.messageId} could not be deserialised:", ex)
                 networkStateIssues.invalidBacklogEvent.track("${response.messageId} could not be deserialised ${ex.message}")
             }
         }
@@ -106,6 +106,8 @@ class QueryNetworkStateClient(
         } catch (ex: Exception) {
             logger.error("Failed to convert current state event: ${ex.message}", ex)
         }
+
+        logger.info("Finished retrieving backlog states")
         return results.asSequence()
     }
 

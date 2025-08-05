@@ -22,8 +22,11 @@ import com.zepben.protobuf.ns.QueryNetworkStateServiceGrpc
 import com.zepben.protobuf.ns.SetCurrentStatesResponse
 import io.grpc.Status
 import io.grpc.stub.StreamObserver
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 import java.util.stream.Stream
+import kotlin.jvm.javaClass
 import kotlin.streams.asSequence
 
 /**
@@ -43,6 +46,7 @@ import kotlin.streams.asSequence
 class QueryNetworkStateService(
     private val onGetCurrentStates: (from: LocalDateTime?, to: LocalDateTime?) -> Sequence<CurrentStateEventBatch>,
     private val onCurrentStatesStatus: (SetCurrentStatesStatus) -> Unit,
+    private val logger: Logger = LoggerFactory.getLogger("QueryNetworkStateService"),
     private val onProcessingError: (GrpcException) -> Unit = {},
 ) : QueryNetworkStateServiceGrpc.QueryNetworkStateServiceImplBase() {
 
@@ -96,11 +100,13 @@ class QueryNetworkStateService(
     constructor(
         onGetCurrentStates: GetCurrentStates,
         onCurrentStatesStatus: CurrentStatesStatusHandler,
+        logger: Logger,
         onProcessingError: ProcessingErrorHandler = ProcessingErrorHandler {},
     ) :
         this(
             { from, to -> onGetCurrentStates.get(from, to).asSequence() },
             { eventStatus -> onCurrentStatesStatus.handle(eventStatus) },
+            logger,
             { error -> onProcessingError.handle(error) }
         )
 
@@ -133,7 +139,11 @@ class QueryNetworkStateService(
 
             responseObserver.onCompleted()
         } catch (e: Throwable) {
-            responseObserver.onError(Status.fromThrowable(e).asRuntimeException())
+            responseObserver.onError(Status.fromThrowable(e)
+                .withDescription("Failed to query current state events, contact your administrator")
+                .asException()
+            )
+            logger.error("Failed to retrieve current state events: ", e)
         }
     }
 

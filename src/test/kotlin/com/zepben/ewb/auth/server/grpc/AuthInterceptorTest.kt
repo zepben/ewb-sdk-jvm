@@ -103,7 +103,7 @@ class AuthInterceptorTest {
             assertThat(status.description, equalTo("some message"))
         })
         var callWasMade = false
-        val sch = MockServerCallHandler<Int, Int> { _, metadata ->
+        val sch = MockServerCallHandler<Int, Int> { _, _ ->
             callWasMade = true
         }
         val authInterceptor = AuthInterceptor(ta, null) { _, _ ->

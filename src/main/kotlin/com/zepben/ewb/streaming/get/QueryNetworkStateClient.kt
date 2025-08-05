@@ -20,6 +20,7 @@ import com.zepben.protobuf.ns.GetCurrentStatesResponse
 import com.zepben.protobuf.ns.QueryNetworkStateServiceGrpc
 import io.grpc.CallCredentials
 import io.grpc.Channel
+import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -34,9 +35,11 @@ import kotlin.streams.asStream
  */
 class QueryNetworkStateClient(
     private val stub: QueryNetworkStateServiceGrpc.QueryNetworkStateServiceStub,
+    private val networkStateIssues: NetworkStateIssues,
     executor: ExecutorService?
 ) : GrpcClient(executor) {
 
+    private val logger = LoggerFactory.getLogger("QueryNetworkStateClient")
     /**
      * Create a [QueryNetworkStateClient]
      *
@@ -44,9 +47,10 @@ class QueryNetworkStateClient(
      * @param callCredentials [CallCredentials] to be attached to the stub.
      */
     @JvmOverloads
-    constructor(channel: Channel, callCredentials: CallCredentials? = null) :
+    constructor(channel: Channel, networkStateIssues: NetworkStateIssues, callCredentials: CallCredentials? = null) :
         this(
             QueryNetworkStateServiceGrpc.newStub(channel).apply { callCredentials?.let { withCallCredentials(it) } },
+            networkStateIssues,
             executor = Executors.newSingleThreadExecutor()
         )
 
@@ -57,9 +61,10 @@ class QueryNetworkStateClient(
      * @param callCredentials [CallCredentials] to be attached to the stub.
      */
     @JvmOverloads
-    constructor(channel: GrpcChannel, callCredentials: CallCredentials? = null) :
+    constructor(channel: GrpcChannel, networkStateIssues: NetworkStateIssues, callCredentials: CallCredentials? = null) :
         this(
             QueryNetworkStateServiceGrpc.newStub(channel.channel).apply { callCredentials?.let { withCallCredentials(it) } },
+            networkStateIssues,
             executor = Executors.newSingleThreadExecutor()
         )
 
@@ -77,18 +82,32 @@ class QueryNetworkStateClient(
     fun getCurrentStates(queryId: Long, from: LocalDateTime, to: LocalDateTime): Sequence<CurrentStateEventBatch> {
         val results = mutableListOf<CurrentStateEventBatch>()
         val responseObserver = AwaitableStreamObserver<GetCurrentStatesResponse> { response ->
-            results.add(CurrentStateEventBatch(response.messageId, response.eventList.map { CurrentStateEvent.fromPb(it) }))
+            logger.info("Retrieved event: ${response.messageId}")
+            try {
+                results.add(CurrentStateEventBatch(response.messageId, response.eventList.map { CurrentStateEvent.fromPb(it) }))
+            } catch (ex: Exception) {
+                logger.debug("${response.messageId} could not be deserialised:", ex)
+                networkStateIssues.invalidBacklogEvent.track("${response.messageId} could not be deserialised ${ex.message}")
+            }
         }
-        val request = GetCurrentStatesRequest.newBuilder().also {
-            it.messageId = queryId
-            it.fromTimestamp = from.toTimestamp()
-            it.toTimestamp = to.toTimestamp()
-        }.build()
 
-        stub.getCurrentStates(request, responseObserver)
+        try {
+            logger.info("Retrieving states from: $from until $to")
+            val request = GetCurrentStatesRequest.newBuilder().also {
+                it.messageId = queryId
+                it.fromTimestamp = from.toTimestamp()
+                it.toTimestamp = to.toTimestamp()
+            }.build()
 
-        responseObserver.await()
+            stub.getCurrentStates(request, responseObserver)
 
+            responseObserver.await()
+
+        } catch (ex: Exception) {
+            logger.error("Failed to convert current state event: ${ex.message}", ex)
+        }
+
+        logger.info("Finished retrieving backlog states")
         return results.asSequence()
     }
 

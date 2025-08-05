@@ -94,7 +94,7 @@
   * `com.zepben.evolve.conn` -> `com.zepben.ewb.conn`
 
 ### New Features
-* None.
+* Added `com.zepben.ewb.issues` package including `IssuesLog`, `IssueTracker` and `IssueTrackerGroup` for tracking issues.
 
 ### Enhancements
 * None.
@@ -133,6 +133,7 @@
   * `RegulatingControl.ratedCurrent`
   * `Sensor.relayFunctions`
   * `UsagePoint.approvedInverterCapacity`
+* QueryNetworkStateService will now correctly report processing errors in responses.
 
 ### Notes
 * None.

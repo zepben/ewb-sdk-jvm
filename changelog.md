@@ -97,7 +97,7 @@
 * Added `com.zepben.ewb.issues` package including `IssuesLog`, `IssueTracker` and `IssueTrackerGroup` for tracking issues.
 
 ### Enhancements
-* None.
+* Upgrade ewb-grpc to 1.0.0 to support customer level load results.
 
 ### Fixes
 * Fixed bug that would cause a null pointer exception when processing metrics job sources with a null metadata timestamp

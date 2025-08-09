@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.services.network.translator
 
+import com.zepben.ewb.cim.extensions.iec61968.common.ContactMethodType
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.*
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.BatteryControlMode
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.TransformerCoolingType
@@ -27,7 +28,9 @@ import com.zepben.ewb.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.ewb.cim.iec61970.base.wires.SynchronousMachineKind
 import com.zepben.ewb.services.common.translator.EnumMapper
 import com.zepben.ewb.services.network.tracing.feeder.FeederDirection
+import com.zepben.protobuf.cim.extensions.iec61968.common.ContactMethodType as PBContactMethodType
 import com.zepben.protobuf.cim.extensions.iec61970.base.protection.PowerDirectionKind as PBPowerDirectionKind
+import com.zepben.protobuf.cim.extensions.iec61970.base.protection.PolarizingQuantityType as PBPolarizingQuantityType
 import com.zepben.protobuf.cim.extensions.iec61970.base.protection.ProtectionKind as PBProtectionKind
 import com.zepben.protobuf.cim.extensions.iec61970.base.wires.BatteryControlMode as PBBatteryControlMode
 import com.zepben.protobuf.cim.extensions.iec61970.base.wires.TransformerCoolingType as PBTransformerCoolingType
@@ -56,7 +59,9 @@ internal val mapFeederDirection = EnumMapper(FeederDirection.entries, PBFeederDi
 internal val mapPhaseCode = EnumMapper(PhaseCode.entries, PBPhaseCode.entries)
 internal val mapPhaseShuntConnectionKind = EnumMapper(PhaseShuntConnectionKind.entries, PBPhaseShuntConnectionKind.entries)
 internal val mapPotentialTransformerKind = EnumMapper(PotentialTransformerKind.entries, PBPotentialTransformerKind.entries)
+internal val mapPolarizingQuantityType = EnumMapper(PolarizingQuantityType.entries, PBPolarizingQuantityType.entries)
 internal val mapPowerDirectionKind = EnumMapper(PowerDirectionKind.entries, PBPowerDirectionKind.entries)
+internal val mapContactMethodType = EnumMapper(ContactMethodType.entries, PBContactMethodType.entries)
 internal val mapProtectionKind = EnumMapper(ProtectionKind.entries, PBProtectionKind.entries)
 internal val mapRegulatingControlModeKind = EnumMapper(RegulatingControlModeKind.entries, PBRegulatingControlModeKind.entries)
 internal val mapSinglePhaseKind = EnumMapper(SinglePhaseKind.entries, PBSinglePhaseKind.entries)

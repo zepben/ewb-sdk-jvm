@@ -9,11 +9,13 @@
 package com.zepben.ewb.database.sqlite.cim.network
 
 import com.zepben.ewb.cim.extensions.iec61968.assetinfo.RelayInfo
+import com.zepben.ewb.cim.extensions.iec61968.common.ContactDetails
 import com.zepben.ewb.cim.extensions.iec61968.metering.PanDemandResponseFunction
 import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
 import com.zepben.ewb.cim.extensions.iec61970.base.generation.production.EvChargingUnit
+import com.zepben.ewb.cim.extensions.iec61970.base.protection.DirectionalCurrentRelay
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.DistanceRelay
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelayScheme
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelaySystem
@@ -133,6 +135,7 @@ internal class NetworkServiceWriter(
             writeEach<CurrentRelay>(writer::write) and
             writeEach<TapChangerControl>(writer::write) and
             writeEach<EvChargingUnit>(writer::write) and
+            writeEach<DirectionalCurrentRelay>(writer::write) and
             writeEach<DistanceRelay>(writer::write) and
             writeEach<ProtectionRelayScheme>(writer::write) and
             writeEach<ProtectionRelaySystem>(writer::write) and

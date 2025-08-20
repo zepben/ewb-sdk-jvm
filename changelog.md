@@ -169,6 +169,8 @@
 
 ### Enhancements
 * Upgrade ewb-grpc to 1.0.0 to support customer level load results.
+* `EquipmentTreeBuilder` will now calculate `leaves` when specified to do so.
+
 
 ### Fixes
 * Fixed bug that would cause a null pointer exception when processing metrics job sources with a null metadata timestamp

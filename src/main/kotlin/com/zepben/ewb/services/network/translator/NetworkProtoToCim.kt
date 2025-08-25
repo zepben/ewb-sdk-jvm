@@ -192,7 +192,7 @@ import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Circuit as PBCircuit
  */
 fun toCim(pb: PBRelayInfo, networkService: NetworkService): RelayInfo =
     RelayInfo(pb.mRID()).apply {
-        curveSetting = pb.curveSetting.takeIf { it.isNotBlank() }
+        curveSetting = pb.curveSettingSet.takeUnless { pb.hasCurveSettingNull() }
         recloseFast = pb.recloseFastSet.takeUnless { pb.hasRecloseFastNull() }
         pb.recloseDelaysList.forEach {
             addDelay(it)
@@ -219,7 +219,7 @@ fun NetworkService.addFromPb(pb: PBRelayInfo): RelayInfo? = tryAddOrNull(toCim(p
 fun toCim(pb: PBPanDemandResponseFunction, networkService: NetworkService): PanDemandResponseFunction =
     PanDemandResponseFunction(pb.mRID()).apply {
         kind = pb.kind?.let { k -> mapEndDeviceFunctionKind.toCim(k) } ?: EndDeviceFunctionKind.UNKNOWN
-        applianceBitmask = pb.appliance.takeUnless { it == UNKNOWN_INT }
+        applianceBitmask = pb.applianceSet.takeUnless { pb.hasApplianceNull() }
         toCim(pb.edf, this, networkService)
     }
 
@@ -340,15 +340,15 @@ fun NetworkService.addFromPb(pb: PBEvChargingUnit): EvChargingUnit? = tryAddOrNu
  */
 fun toCim(pb: PBDistanceRelay, networkService: NetworkService): DistanceRelay =
     DistanceRelay(pb.mRID()).apply {
-        backwardBlind = pb.backwardBlind.takeUnless { it == UNKNOWN_DOUBLE }
-        backwardReach = pb.backwardReach.takeUnless { it == UNKNOWN_DOUBLE }
-        backwardReactance = pb.backwardReactance.takeUnless { it == UNKNOWN_DOUBLE }
-        forwardBlind = pb.forwardBlind.takeUnless { it == UNKNOWN_DOUBLE }
-        forwardReach = pb.forwardReach.takeUnless { it == UNKNOWN_DOUBLE }
-        forwardReactance = pb.forwardReactance.takeUnless { it == UNKNOWN_DOUBLE }
-        operationPhaseAngle1 = pb.operationPhaseAngle1.takeUnless { it == UNKNOWN_DOUBLE }
-        operationPhaseAngle2 = pb.operationPhaseAngle2.takeUnless { it == UNKNOWN_DOUBLE }
-        operationPhaseAngle3 = pb.operationPhaseAngle3.takeUnless { it == UNKNOWN_DOUBLE }
+        backwardBlind = pb.backwardBlindSet.takeUnless { pb.hasBackwardBlindNull() }
+        backwardReach = pb.backwardReachSet.takeUnless { pb.hasBackwardReachNull() }
+        backwardReactance = pb.backwardReactanceSet.takeUnless { pb.hasBackwardReactanceNull() }
+        forwardBlind = pb.forwardBlindSet.takeUnless { pb.hasForwardBlindNull() }
+        forwardReach = pb.forwardReachSet.takeUnless { pb.hasForwardReachNull() }
+        forwardReactance = pb.forwardReactanceSet.takeUnless { pb.hasForwardReactanceNull() }
+        operationPhaseAngle1 = pb.operationPhaseAngle1Set.takeUnless { pb.hasOperationPhaseAngle1Null() }
+        operationPhaseAngle2 = pb.operationPhaseAngle2Set.takeUnless { pb.hasOperationPhaseAngle2Null() }
+        operationPhaseAngle3 = pb.operationPhaseAngle3Set.takeUnless { pb.hasOperationPhaseAngle3Null() }
         toCim(pb.prf, this, networkService)
     }
 
@@ -371,9 +371,9 @@ fun toCim(pb: PBProtectionRelayFunction, cim: ProtectionRelayFunction, networkSe
         pb.schemeMRIDsList.forEach { schemeMRID ->
             networkService.resolveOrDeferReference(Resolvers.schemes(this), schemeMRID)
         }
-        model = pb.model.takeIf { it.isNotBlank() }
+        model = pb.modelSet.takeIf { pb.hasModelNull() }
         reclosing = pb.reclosingSet.takeUnless { pb.hasReclosingNull() }
-        relayDelayTime = pb.relayDelayTime.takeUnless { it == UNKNOWN_DOUBLE }
+        relayDelayTime = pb.relayDelayTimeSet.takeUnless { pb.hasRelayDelayTimeNull() }
         protectionKind = mapProtectionKind.toCim(pb.protectionKind)
         directable = pb.directableSet.takeUnless { pb.hasDirectableNull() }
         powerDirection = mapPowerDirectionKind.toCim(pb.powerDirection)
@@ -424,7 +424,7 @@ fun toCim(pb: PBProtectionRelaySystem, networkService: NetworkService): Protecti
  * @return The converted [pb] as a CIM [RelaySetting].
  */
 fun toCim(pb: PBRelaySetting): RelaySetting =
-    RelaySetting(mapUnitSymbol.toCim(pb.unitSymbol), pb.value, pb.name.takeIf { it.isNotEmpty() })
+    RelaySetting(mapUnitSymbol.toCim(pb.unitSymbol), pb.valueSet, pb.nameSet.takeIf { pb.hasNameNull() })
 
 /**
  * Convert the protobuf [PBVoltageRelay] into its CIM counterpart.
@@ -471,9 +471,9 @@ fun NetworkService.addFromPb(pb: PBVoltageRelay): VoltageRelay? = tryAddOrNull(t
  */
 fun toCim(pb: PBBatteryControl, networkService: NetworkService): BatteryControl =
     BatteryControl(pb.mRID()).apply {
-        chargingRate = pb.chargingRate.takeUnless { it == UNKNOWN_DOUBLE }
-        dischargingRate = pb.dischargingRate.takeUnless { it == UNKNOWN_DOUBLE }
-        reservePercent = pb.reservePercent.takeUnless { it == UNKNOWN_DOUBLE }
+        chargingRate = pb.chargingRateSet.takeUnless { pb.hasChargingRateNull() }
+        dischargingRate = pb.dischargingRateSet.takeUnless { pb.hasDischargingRateNull() }
+        reservePercent = pb.reservePercentSet.takeUnless { pb.hasReservePercentNull() }
         pb.controlMode?.let { controlMode = mapBatteryControlMode.toCim(it) }
         toCim(pb.rc, this, networkService)
     }
@@ -520,11 +520,11 @@ fun toCim(pb: PBOverheadWireInfo, networkService: NetworkService): OverheadWireI
  */
 fun toCim(pb: PBNoLoadTest, networkService: NetworkService): NoLoadTest =
     NoLoadTest(pb.mRID()).apply {
-        energisedEndVoltage = pb.energisedEndVoltage.takeUnless { it == UNKNOWN_INT }
-        excitingCurrent = pb.excitingCurrent.takeUnless { it == UNKNOWN_DOUBLE }
-        excitingCurrentZero = pb.excitingCurrentZero.takeUnless { it == UNKNOWN_DOUBLE }
-        loss = pb.loss.takeUnless { it == UNKNOWN_INT }
-        lossZero = pb.lossZero.takeUnless { it == UNKNOWN_INT }
+        energisedEndVoltage = pb.energisedEndVoltageSet.takeUnless { pb.hasEnergisedEndVoltageNull() }
+        excitingCurrent = pb.excitingCurrentSet.takeUnless { pb.hasExcitingCurrentNull() }
+        excitingCurrentZero = pb.excitingCurrentZeroSet.takeUnless { pb.hasExcitingCurrentZeroNull() }
+        loss = pb.lossSet.takeUnless { pb.hasLossNull() }
+        lossZero = pb.lossZeroSet.takeUnless { pb.hasLossZeroNull() }
         toCim(pb.tt, this, networkService)
     }
 
@@ -537,11 +537,11 @@ fun toCim(pb: PBNoLoadTest, networkService: NetworkService): NoLoadTest =
  */
 fun toCim(pb: PBOpenCircuitTest, networkService: NetworkService): OpenCircuitTest =
     OpenCircuitTest(pb.mRID()).apply {
-        energisedEndStep = pb.energisedEndStep.takeUnless { it == UNKNOWN_INT }
-        energisedEndVoltage = pb.energisedEndVoltage.takeUnless { it == UNKNOWN_INT }
-        openEndStep = pb.openEndStep.takeUnless { it == UNKNOWN_INT }
-        openEndVoltage = pb.openEndVoltage.takeUnless { it == UNKNOWN_INT }
-        phaseShift = pb.phaseShift.takeUnless { it == UNKNOWN_DOUBLE }
+        energisedEndStep = pb.energisedEndStepSet.takeUnless { pb.hasEnergisedEndStepNull() }
+        energisedEndVoltage = pb.energisedEndVoltageSet.takeUnless { pb.hasEnergisedEndVoltageNull() }
+        openEndStep = pb.openEndStepSet.takeUnless { pb.hasOpenEndStepNull() }
+        openEndVoltage = pb.openEndVoltageSet.takeUnless { pb.hasOpenEndVoltageNull() }
+        phaseShift = pb.phaseShiftSet.takeUnless { pb.hasPhaseShiftNull() }
         toCim(pb.tt, this, networkService)
     }
 
@@ -569,16 +569,16 @@ fun toCim(pb: PBPowerTransformerInfo, networkService: NetworkService): PowerTran
  */
 fun toCim(pb: PBShortCircuitTest, networkService: NetworkService): ShortCircuitTest =
     ShortCircuitTest(pb.mRID()).apply {
-        current = pb.current.takeUnless { it == UNKNOWN_DOUBLE }
-        energisedEndStep = pb.energisedEndStep.takeUnless { it == UNKNOWN_INT }
-        groundedEndStep = pb.groundedEndStep.takeUnless { it == UNKNOWN_INT }
-        leakageImpedance = pb.leakageImpedance.takeUnless { it == UNKNOWN_DOUBLE }
-        leakageImpedanceZero = pb.leakageImpedanceZero.takeUnless { it == UNKNOWN_DOUBLE }
-        loss = pb.loss.takeUnless { it == UNKNOWN_INT }
-        lossZero = pb.lossZero.takeUnless { it == UNKNOWN_INT }
-        power = pb.power.takeUnless { it == UNKNOWN_INT }
-        voltage = pb.voltage.takeUnless { it == UNKNOWN_DOUBLE }
-        voltageOhmicPart = pb.voltageOhmicPart.takeUnless { it == UNKNOWN_DOUBLE }
+        current = pb.currentSet.takeUnless { pb.hasCurrentNull() }
+        energisedEndStep = pb.energisedEndStepSet.takeUnless { pb.hasEnergisedEndStepNull() }
+        groundedEndStep = pb.groundedEndStepSet.takeUnless { pb.hasGroundedEndStepNull() }
+        leakageImpedance = pb.leakageImpedanceSet.takeUnless { pb.hasLeakageImpedanceNull() }
+        leakageImpedanceZero = pb.leakageImpedanceZeroSet.takeUnless { pb.hasLeakageImpedanceZeroNull() }
+        loss = pb.lossSet.takeUnless { pb.hasLossNull() }
+        lossZero = pb.lossZeroSet.takeUnless { pb.hasLossZeroNull() }
+        power = pb.powerSet.takeUnless { pb.hasPowerNull() }
+        voltage = pb.voltageSet.takeUnless { pb.hasVoltageNull() }
+        voltageOhmicPart = pb.voltageOhmicPartSet.takeUnless { pb.hasVoltageOhmicPartNull() }
         toCim(pb.tt, this, networkService)
     }
 
@@ -592,10 +592,10 @@ fun toCim(pb: PBShortCircuitTest, networkService: NetworkService): ShortCircuitT
  */
 fun toCim(pb: PBShuntCompensatorInfo, networkService: NetworkService): ShuntCompensatorInfo =
     ShuntCompensatorInfo(pb.mRID()).apply {
-        maxPowerLoss = pb.maxPowerLoss.takeUnless { it == UNKNOWN_INT }
-        ratedCurrent = pb.ratedCurrent.takeUnless { it == UNKNOWN_INT }
-        ratedReactivePower = pb.ratedReactivePower.takeUnless { it == UNKNOWN_INT }
-        ratedVoltage = pb.ratedVoltage.takeUnless { it == UNKNOWN_INT }
+        maxPowerLoss = pb.maxPowerLossSet.takeUnless { pb.hasMaxPowerLossNull() }
+        ratedCurrent = pb.ratedCurrentSet.takeUnless { pb.hasRatedCurrentNull() }
+        ratedReactivePower = pb.ratedReactivePowerSet.takeUnless { pb.hasRatedReactivePowerNull() }
+        ratedVoltage = pb.ratedVoltageSet.takeUnless { pb.hasRatedVoltageNull() }
 
         toCim(pb.ai, this, networkService)
     }
@@ -609,7 +609,7 @@ fun toCim(pb: PBShuntCompensatorInfo, networkService: NetworkService): ShuntComp
  */
 fun toCim(pb: PBSwitchInfo, networkService: NetworkService): SwitchInfo =
     SwitchInfo(pb.mRID()).apply {
-        ratedInterruptingTime = pb.ratedInterruptingTime.takeUnless { it == UNKNOWN_DOUBLE }
+        ratedInterruptingTime = pb.ratedInterruptingTimeSet.takeUnless { pb.hasRatedInterruptingTimeNull() }
         toCim(pb.ai, this, networkService)
     }
 
@@ -623,14 +623,14 @@ fun toCim(pb: PBSwitchInfo, networkService: NetworkService): SwitchInfo =
 fun toCim(pb: PBTransformerEndInfo, networkService: NetworkService): TransformerEndInfo =
     TransformerEndInfo(pb.mRID()).apply {
         connectionKind = mapWindingConnection.toCim(pb.connectionKind)
-        emergencyS = pb.emergencyS.takeUnless { it == UNKNOWN_INT }
+        emergencyS = pb.emergencySSet.takeUnless { pb.hasEmergencySNull() }
         endNumber = pb.endNumber
-        insulationU = pb.insulationU.takeUnless { it == UNKNOWN_INT }
-        phaseAngleClock = pb.phaseAngleClock.takeUnless { it == UNKNOWN_INT }
-        r = pb.r.takeUnless { it == UNKNOWN_DOUBLE }
-        ratedS = pb.ratedS.takeUnless { it == UNKNOWN_INT }
-        ratedU = pb.ratedU.takeUnless { it == UNKNOWN_INT }
-        shortTermS = pb.shortTermS.takeUnless { it == UNKNOWN_INT }
+        insulationU = pb.insulationUSet.takeUnless { pb.hasInsulationUNull() }
+        phaseAngleClock = pb.phaseAngleClockSet.takeUnless { pb.hasPhaseAngleClockNull() }
+        r = pb.rSet.takeUnless { pb.hasRNull() }
+        ratedS = pb.ratedSSet.takeUnless { pb.hasRatedSNull() }
+        ratedU = pb.ratedUSet.takeUnless { pb.hasRatedUNull() }
+        shortTermS = pb.shortTermSSet.takeUnless { pb.hasShortTermSNull() }
 
         networkService.resolveOrDeferReference(Resolvers.transformerTankInfo(this), pb.transformerTankInfoMRID)
         networkService.resolveOrDeferReference(Resolvers.transformerStarImpedance(this), pb.transformerStarImpedanceMRID)
@@ -669,8 +669,8 @@ fun toCim(pb: PBTransformerTankInfo, networkService: NetworkService): Transforme
  */
 fun toCim(pb: PBTransformerTest, cim: TransformerTest, networkService: NetworkService): TransformerTest =
     cim.apply {
-        basePower = pb.basePower.takeUnless { it == UNKNOWN_INT }
-        temperature = pb.temperature.takeUnless { it == UNKNOWN_DOUBLE }
+        basePower = pb.basePowerSet.takeUnless { pb.hasBasePowerNull() }
+        temperature = pb.temperatureSet.takeUnless { pb.hasTemperatureNull() }
         toCim(pb.io, this, networkService)
     }
 
@@ -684,7 +684,7 @@ fun toCim(pb: PBTransformerTest, cim: TransformerTest, networkService: NetworkSe
  */
 fun toCim(pb: PBWireInfo, cim: WireInfo, networkService: NetworkService): WireInfo =
     cim.apply {
-        ratedCurrent = pb.ratedCurrent.takeUnless { it == UNKNOWN_INT }
+        ratedCurrent = pb.ratedCurrentSet.takeUnless { pb.hasRatedCurrentNull() }
         material = mapWireMaterialKind.toCim(pb.material)
         toCim(pb.ai, this, networkService)
     }
@@ -831,7 +831,7 @@ fun toCim(pb: PBAssetOwner, networkService: NetworkService): AssetOwner =
 fun toCim(pb: PBStreetlight, networkService: NetworkService): Streetlight =
     Streetlight(pb.mRID()).apply {
         lampKind = mapStreetlightLampKind.toCim(pb.lampKind)
-        lightRating = pb.lightRating.takeUnless { it == UNKNOWN_UINT }
+        lightRating = pb.lightRatingSet.takeUnless { pb.hasLightRatingNull() }
         networkService.resolveOrDeferReference(Resolvers.pole(this), pb.poleMRID)
         toCim(pb.at, this, networkService)
     }
@@ -892,9 +892,9 @@ fun toCim(pb: PBPositionPoint): PositionPoint =
  */
 fun toCim(pb: PBStreetAddress): StreetAddress =
     StreetAddress(
-        pb.postalCode.internEmpty(),
+        pb.postalCodeSet.takeUnless { pb.hasPostalCodeNull() },
         if (pb.hasTownDetail()) toCim(pb.townDetail) else null,
-        pb.poBox.internEmpty(),
+        pb.poBoxSet.takeUnless { pb.hasPoBoxNull() },
         if (pb.hasStreetDetail()) toCim(pb.streetDetail) else null
     )
 
@@ -906,13 +906,13 @@ fun toCim(pb: PBStreetAddress): StreetAddress =
  */
 fun toCim(pb: PBStreetDetail): StreetDetail =
     StreetDetail(
-        pb.buildingName.internEmpty(),
-        pb.floorIdentification.internEmpty(),
-        pb.name.internEmpty(),
-        pb.number.internEmpty(),
-        pb.suiteNumber.internEmpty(),
-        pb.type.internEmpty(),
-        pb.displayAddress.internEmpty()
+        pb.buildingNameSet.takeUnless { pb.hasBuildingNameNull() },
+        pb.floorIdentificationSet.takeUnless { pb.hasFloorIdentificationNull() },
+        pb.nameSet.takeUnless { pb.hasNameNull() },
+        pb.numberSet.takeUnless { pb.hasNumberNull() },
+        pb.suiteNumberSet.takeUnless { pb.hasSuiteNumberNull() },
+        pb.typeSet.takeUnless { pb.hasTypeNull() },
+        pb.displayAddressSet.takeUnless { pb.hasDisplayAddressNull() }
     )
 
 /**
@@ -922,7 +922,10 @@ fun toCim(pb: PBStreetDetail): StreetDetail =
  * @return The converted [pb] as a CIM [PositionPoint].
  */
 fun toCim(pb: PBTownDetail): TownDetail =
-    TownDetail(pb.name.internEmpty(), pb.stateOrProvince.internEmpty())
+    TownDetail(
+        pb.nameSet.takeUnless { pb.hasNameNull() },
+        pb.stateOrProvinceSet.takeUnless { pb.hasStateOrProvinceNull() }
+    )
 
 /**
  * An extension to add a converted copy of the protobuf [PBOrganisation] to the [NetworkService].
@@ -947,18 +950,18 @@ fun NetworkService.addFromPb(pb: PBLocation): Location? = tryAddOrNull(toCim(pb,
  */
 fun toCim(pb: PBCurrentTransformerInfo, networkService: NetworkService): CurrentTransformerInfo =
     CurrentTransformerInfo(pb.mRID()).apply {
-        accuracyClass = pb.accuracyClass.takeIf { it.isNotBlank() }
-        accuracyLimit = pb.accuracyLimit.takeUnless { it == UNKNOWN_DOUBLE }
-        coreCount = pb.coreCount.takeUnless { it == UNKNOWN_INT }
-        ctClass = pb.ctClass.takeIf { it.isNotBlank() }
-        kneePointVoltage = pb.kneePointVoltage.takeUnless { it == UNKNOWN_INT }
+        accuracyClass = pb.accuracyClassSet.takeIf { pb.hasAccuracyClassNull() }
+        accuracyLimit = pb.accuracyLimitSet.takeUnless { pb.hasAccuracyLimitNull() }
+        coreCount = pb.coreCountSet.takeUnless { pb.hasCoreCountNull() }
+        ctClass = pb.ctClassSet.takeIf { pb.hasCtClassNull() }
+        kneePointVoltage = pb.kneePointVoltageSet.takeUnless { pb.hasKneePointVoltageNull() }
         maxRatio = if (pb.hasMaxRatio()) toCim(pb.maxRatio) else null
         nominalRatio = if (pb.hasNominalRatio()) toCim(pb.nominalRatio) else null
-        primaryRatio = pb.primaryRatio.takeUnless { it == UNKNOWN_DOUBLE }
-        ratedCurrent = pb.ratedCurrent.takeUnless { it == UNKNOWN_INT }
-        secondaryFlsRating = pb.secondaryFlsRating.takeUnless { it == UNKNOWN_INT }
-        secondaryRatio = pb.secondaryRatio.takeUnless { it == UNKNOWN_DOUBLE }
-        usage = pb.usage.takeIf { it.isNotBlank() }
+        primaryRatio = pb.primaryRatioSet.takeUnless { pb.hasPrimaryRatioNull() }
+        ratedCurrent = pb.ratedCurrentSet.takeUnless { pb.hasRatedCurrentNull() }
+        secondaryFlsRating = pb.secondaryFlsRatingSet.takeUnless { pb.hasSecondaryFlsRatingNull() }
+        secondaryRatio = pb.secondaryRatioSet.takeUnless { pb.hasSecondaryRatioNull() }
+        usage = pb.usageSet.takeIf { pb.hasUsageNull() }
         toCim(pb.ai, this, networkService)
     }
 
@@ -971,12 +974,12 @@ fun toCim(pb: PBCurrentTransformerInfo, networkService: NetworkService): Current
  */
 fun toCim(pb: PBPotentialTransformerInfo, networkService: NetworkService): PotentialTransformerInfo =
     PotentialTransformerInfo(pb.mRID()).apply {
-        accuracyClass = pb.accuracyClass.takeIf { it.isNotBlank() }
+        accuracyClass = pb.accuracyClassSet.takeIf { pb.hasAccuracyClassNull() }
         nominalRatio = if (pb.hasNominalRatio()) toCim(pb.nominalRatio) else null
-        primaryRatio = pb.primaryRatio.takeUnless { it == UNKNOWN_DOUBLE }
-        ptClass = pb.ptClass.takeIf { it.isNotBlank() }
-        ratedVoltage = pb.ratedVoltage.takeUnless { it == UNKNOWN_INT }
-        secondaryRatio = pb.secondaryRatio.takeUnless { it == UNKNOWN_DOUBLE }
+        primaryRatio = pb.primaryRatioSet.takeUnless { pb.hasPrimaryRatioNull() }
+        ptClass = pb.ptClassSet.takeIf { pb.hasPtClassNull() }
+        ratedVoltage = pb.ratedVoltageSet.takeUnless { pb.hasRatedVoltageNull() }
+        secondaryRatio = pb.secondaryRatioSet.takeUnless { pb.hasSecondaryRatioNull() }
         toCim(pb.ai, this, networkService)
     }
 
@@ -1003,7 +1006,7 @@ fun NetworkService.addFromPb(pb: PBPotentialTransformerInfo): PotentialTransform
  */
 fun toCim(pb: PBPole, networkService: NetworkService): Pole =
     Pole(pb.mRID()).apply {
-        classification = pb.classification.internEmpty()
+        classification = pb.classificationSet.takeUnless { pb.hasClassificationNull() }
         pb.streetlightMRIDsList.forEach {
             networkService.resolveOrDeferReference(Resolvers.streetlights(this), it)
         }
@@ -1089,10 +1092,10 @@ fun toCim(pb: PBMeter, networkService: NetworkService): Meter =
 fun toCim(pb: PBUsagePoint, networkService: NetworkService): UsagePoint =
     UsagePoint(pb.mRID()).apply {
         networkService.resolveOrDeferReference(Resolvers.usagePointLocation(this), pb.usagePointLocationMRID)
-        isVirtual = pb.isVirtual
-        connectionCategory = pb.connectionCategory.takeIf { it.isNotBlank() }
-        ratedPower = pb.ratedPower.takeIf { it != UNKNOWN_INT }
-        approvedInverterCapacity = pb.approvedInverterCapacity.takeIf { it != UNKNOWN_INT }
+        isVirtual = pb.isVirtualSet.takeUnless { pb.hasIsVirtualNull() }
+        connectionCategory = pb.connectionCategorySet.takeIf { pb.hasConnectionCategoryNull() }
+        ratedPower = pb.ratedPowerSet.takeIf { pb.hasRatedPowerNull() }
+        approvedInverterCapacity = pb.approvedInverterCapacitySet.takeIf { pb.hasApprovedInverterCapacityNull() }
         phaseCode = mapPhaseCode.toCim(pb.phaseCode)
 
         pb.equipmentMRIDsList.forEach { equipmentMRID ->
@@ -1165,7 +1168,7 @@ fun toCim(pb: PBAuxiliaryEquipment, cim: AuxiliaryEquipment, networkService: Net
 fun toCim(pb: PBCurrentTransformer, networkService: NetworkService): CurrentTransformer =
     CurrentTransformer(pb.mRID()).apply {
         networkService.resolveOrDeferReference(Resolvers.assetInfo(this), pb.assetInfoMRID())
-        coreBurden = pb.coreBurden.takeUnless { it == UNKNOWN_INT }
+        coreBurden = pb.coreBurdenSet.takeUnless { pb.hasCoreBurdenNull() }
         toCim(pb.sn, this, networkService)
     }
 
@@ -1318,8 +1321,8 @@ fun toCim(pb: PBCurveData): CurveData =
     CurveData(
         pb.xValue,
         pb.y1Value,
-        pb.y2Value.takeUnless { it == UNKNOWN_FLOAT },
-        pb.y3Value.takeUnless { it == UNKNOWN_FLOAT }
+        pb.y2ValueSet.takeUnless { pb.hasY2ValueNull() },
+        pb.y3ValueSet.takeUnless { pb.hasY3ValueNull() }
     )
 
 /**
@@ -1422,7 +1425,7 @@ fun toCim(pb: PBPowerSystemResource, cim: PowerSystemResource, networkService: N
         pb.assetMRIDsList.forEach { assetMRID ->
             networkService.resolveOrDeferReference(Resolvers.assets(this), assetMRID)
         }
-        numControls = pb.numControls
+        numControls = pb.numControlsSet.takeUnless { pb.hasNumControlsNull() }
         toCim(pb.io, this, networkService)
     }
 
@@ -1545,22 +1548,22 @@ fun NetworkService.addFromPb(pb: PBTerminal): Terminal? = tryAddOrNull(toCim(pb,
  */
 fun toCim(pb: PBEquivalentBranch, networkService: NetworkService): EquivalentBranch =
     EquivalentBranch(pb.mRID()).apply {
-        negativeR12 = pb.negativeR12.takeUnless { it == UNKNOWN_DOUBLE }
-        negativeR21 = pb.negativeR21.takeUnless { it == UNKNOWN_DOUBLE }
-        negativeX12 = pb.negativeX12.takeUnless { it == UNKNOWN_DOUBLE }
-        negativeX21 = pb.negativeX21.takeUnless { it == UNKNOWN_DOUBLE }
-        positiveR12 = pb.positiveR12.takeUnless { it == UNKNOWN_DOUBLE }
-        positiveR21 = pb.positiveR21.takeUnless { it == UNKNOWN_DOUBLE }
-        positiveX12 = pb.positiveX12.takeUnless { it == UNKNOWN_DOUBLE }
-        positiveX21 = pb.positiveX21.takeUnless { it == UNKNOWN_DOUBLE }
-        r = pb.r.takeUnless { it == UNKNOWN_DOUBLE }
-        r21 = pb.r21.takeUnless { it == UNKNOWN_DOUBLE }
-        x = pb.x.takeUnless { it == UNKNOWN_DOUBLE }
-        x21 = pb.x21.takeUnless { it == UNKNOWN_DOUBLE }
-        zeroR12 = pb.zeroR12.takeUnless { it == UNKNOWN_DOUBLE }
-        zeroR21 = pb.zeroR21.takeUnless { it == UNKNOWN_DOUBLE }
-        zeroX12 = pb.zeroX12.takeUnless { it == UNKNOWN_DOUBLE }
-        zeroX21 = pb.zeroX21.takeUnless { it == UNKNOWN_DOUBLE }
+        negativeR12 = pb.negativeR12Set.takeUnless { pb.hasNegativeR12Null() }
+        negativeR21 = pb.negativeR21Set.takeUnless { pb.hasNegativeR21Null() }
+        negativeX12 = pb.negativeX12Set.takeUnless { pb.hasNegativeX12Null() }
+        negativeX21 = pb.negativeX21Set.takeUnless { pb.hasNegativeX21Null() }
+        positiveR12 = pb.positiveR12Set.takeUnless { pb.hasPositiveR12Null() }
+        positiveR21 = pb.positiveR21Set.takeUnless { pb.hasPositiveR21Null() }
+        positiveX12 = pb.positiveX12Set.takeUnless { pb.hasPositiveX12Null() }
+        positiveX21 = pb.positiveX21Set.takeUnless { pb.hasPositiveX21Null() }
+        r = pb.rSet.takeUnless { pb.hasRNull() }
+        r21 = pb.r21Set.takeUnless { pb.hasR21Null() }
+        x = pb.xSet.takeUnless { pb.hasXNull() }
+        x21 = pb.x21Set.takeUnless { pb.hasX21Null() }
+        zeroR12 = pb.zeroR12Set.takeUnless { pb.hasZeroR12Null() }
+        zeroR21 = pb.zeroR21Set.takeUnless { pb.hasZeroR21Null() }
+        zeroX12 = pb.zeroX12Set.takeUnless { pb.hasZeroX12Null() }
+        zeroX21 = pb.zeroX21Set.takeUnless { pb.hasZeroX21Null() }
         toCim(pb.ee, this, networkService)
     }
 
@@ -1594,8 +1597,8 @@ fun NetworkService.addFromPb(pb: PBEquivalentBranch): EquivalentBranch? = tryAdd
 fun toCim(pb: PBBatteryUnit, networkService: NetworkService): BatteryUnit =
     BatteryUnit(pb.mRID()).apply {
         batteryState = mapBatteryStateKind.toCim(pb.batteryState)
-        ratedE = pb.ratedE.takeUnless { it == UNKNOWN_LONG }
-        storedE = pb.storedE.takeUnless { it == UNKNOWN_LONG }
+        ratedE = pb.ratedESet.takeUnless { pb.hasRatedENull() }
+        storedE = pb.storedESet.takeUnless { pb.hasStoredENull() }
         pb.batteryControlMRIDsList.forEach {
             networkService.resolveOrDeferReference(Resolvers.batteryControls(this), it)
         }
@@ -1625,8 +1628,8 @@ fun toCim(pb: PBPhotoVoltaicUnit, networkService: NetworkService): PhotoVoltaicU
 fun toCim(pb: PBPowerElectronicsUnit, cim: PowerElectronicsUnit, networkService: NetworkService): PowerElectronicsUnit =
     cim.apply {
         networkService.resolveOrDeferReference(Resolvers.powerElectronicsConnection(this), pb.powerElectronicsConnectionMRID)
-        maxP = pb.maxP.takeUnless { it == UNKNOWN_INT }
-        minP = pb.minP.takeUnless { it == UNKNOWN_INT }
+        maxP = pb.maxPSet.takeUnless { pb.hasMaxPNull() }
+        minP = pb.minPSet.takeUnless { pb.hasMinPNull() }
         toCim(pb.eq, this, networkService)
     }
 
@@ -1683,7 +1686,7 @@ fun toCim(pb: PBAccumulator, networkService: NetworkService): Accumulator =
 fun toCim(pb: PBAnalog, networkService: NetworkService): Analog =
     Analog(pb.mRID()).apply {
         toCim(pb.measurement, this, networkService)
-        positiveFlowIn = pb.positiveFlowIn
+        positiveFlowIn = pb.positiveFlowInSet.takeUnless { pb.hasPositiveFlowInNull() }
     }
 
 /**
@@ -1774,9 +1777,9 @@ fun NetworkService.addFromPb(pb: PBDiscrete): Discrete? = tryAddOrNull(toCim(pb,
  */
 fun toCim(pb: PBCurrentRelay, networkService: NetworkService): CurrentRelay =
     CurrentRelay(pb.mRID()).apply {
-        currentLimit1 = pb.currentLimit1.takeUnless { it == UNKNOWN_DOUBLE }
+        currentLimit1 = pb.currentLimit1Set.takeUnless { pb.hasCurrentLimit1Null() }
         inverseTimeFlag = pb.inverseTimeFlagSet.takeUnless { pb.hasInverseTimeFlagNull() }
-        timeDelay1 = pb.timeDelay1.takeUnless { it == UNKNOWN_DOUBLE }
+        timeDelay1 = pb.timeDelay1Set.takeUnless { pb.hasTimeDelay1Null() }
         toCim(pb.prf, this, networkService)
     }
 
@@ -1868,7 +1871,7 @@ fun toCim(pb: PBAcLineSegment, networkService: NetworkService): AcLineSegment =
  */
 fun toCim(pb: PBBreaker, networkService: NetworkService): Breaker =
     Breaker(pb.mRID()).apply {
-        inTransitTime = pb.inTransitTime.takeUnless { it == UNKNOWN_DOUBLE }
+        inTransitTime = pb.inTransitTimeSet.takeUnless { pb.hasInTransitTimeNull() }
         toCim(pb.sw, this, networkService)
     }
 
@@ -1893,7 +1896,7 @@ fun toCim(pb: PBBusbarSection, networkService: NetworkService): BusbarSection =
  */
 fun toCim(pb: PBClamp, networkService: NetworkService): Clamp =
     Clamp(pb.mRID()).apply {
-        lengthFromTerminal1 = pb.lengthFromTerminal1.takeUnless { it == UNKNOWN_DOUBLE }
+        lengthFromTerminal1 = pb.lengthFromTerminal1Set.takeUnless { pb.hasLengthFromTerminal1Null() }
         networkService.resolveOrDeferReference(Resolvers.acLineSegment(this), pb.acLineSegmentMRID)
         toCim(pb.ce, this, networkService)
     }
@@ -1908,9 +1911,9 @@ fun toCim(pb: PBClamp, networkService: NetworkService): Clamp =
  */
 fun toCim(pb: PBConductor, cim: Conductor, networkService: NetworkService): Conductor =
     cim.apply {
-        length = pb.length.takeUnless { it == UNKNOWN_DOUBLE }
-        designTemperature = pb.designTemperature.takeUnless { it == UNKNOWN_INT }
-        designRating = pb.designRating.takeUnless { it == UNKNOWN_DOUBLE }
+        length = pb.lengthSet.takeUnless { pb.hasLengthNull() }
+        designTemperature = pb.designTemperatureSet.takeUnless { pb.hasDesignTemperatureNull() }
+        designRating = pb.designRatingSet.takeUnless { pb.hasDesignRatingNull() }
         networkService.resolveOrDeferReference(Resolvers.assetInfo(this), pb.assetInfoMRID())
         toCim(pb.ce, this, networkService)
     }
@@ -1935,7 +1938,7 @@ fun toCim(pb: PBConnector, cim: Connector, networkService: NetworkService): Conn
  */
 fun toCim(pb: PBCut, networkService: NetworkService): Cut =
     Cut(pb.mRID()).apply {
-        lengthFromTerminal1 = pb.lengthFromTerminal1.takeUnless { it == UNKNOWN_DOUBLE }
+        lengthFromTerminal1 = pb.lengthFromTerminal1Set.takeUnless { pb.hasLengthFromTerminal1Null() }
         networkService.resolveOrDeferReference(Resolvers.acLineSegment(this), pb.acLineSegmentMRID)
         toCim(pb.sw, this, networkService)
     }
@@ -1962,7 +1965,7 @@ fun toCim(pb: PBDisconnector, networkService: NetworkService): Disconnector =
  */
 fun toCim(pb: PBEarthFaultCompensator, cim: EarthFaultCompensator, networkService: NetworkService): EarthFaultCompensator =
     cim.apply {
-        r = pb.r.takeUnless { it == UNKNOWN_DOUBLE }
+        r = pb.rSet.takeUnless { pb.hasRNull() }
         toCim(pb.ce, this, networkService)
     }
 
@@ -1990,13 +1993,13 @@ fun toCim(pb: PBEnergyConsumer, networkService: NetworkService): EnergyConsumer 
         pb.energyConsumerPhasesMRIDsList.forEach { energyConsumerPhasesMRID ->
             networkService.resolveOrDeferReference(Resolvers.phases(this), energyConsumerPhasesMRID)
         }
-        customerCount = pb.customerCount.takeUnless { it == UNKNOWN_INT }
-        grounded = pb.grounded
-        p = pb.p.takeUnless { it == UNKNOWN_DOUBLE }
-        pFixed = pb.pFixed.takeUnless { it == UNKNOWN_DOUBLE }
+        customerCount = pb.customerCountSet.takeUnless { pb.hasCustomerCountNull() }
+        grounded = pb.groundedSet.takeUnless { pb.hasGroundedNull() }
+        p = pb.pSet.takeUnless { pb.hasPNull() }
+        pFixed = pb.pFixedSet.takeUnless { pb.hasPFixedNull() }
         phaseConnection = mapPhaseShuntConnectionKind.toCim(pb.phaseConnection)
-        q = pb.q.takeUnless { it == UNKNOWN_DOUBLE }
-        qFixed = pb.qFixed.takeUnless { it == UNKNOWN_DOUBLE }
+        q = pb.qSet.takeUnless { pb.hasQNull() }
+        qFixed = pb.qFixedSet.takeUnless { pb.hasQFixedNull() }
         toCim(pb.ec, this, networkService)
     }
 
@@ -2011,10 +2014,10 @@ fun toCim(pb: PBEnergyConsumerPhase, networkService: NetworkService): EnergyCons
     EnergyConsumerPhase(pb.mRID()).apply {
         networkService.resolveOrDeferReference(Resolvers.energyConsumer(this), pb.energyConsumerMRID)
         phase = mapSinglePhaseKind.toCim(pb.phase)
-        p = pb.p.takeUnless { it == UNKNOWN_DOUBLE }
-        pFixed = pb.pFixed.takeUnless { it == UNKNOWN_DOUBLE }
-        q = pb.q.takeUnless { it == UNKNOWN_DOUBLE }
-        qFixed = pb.qFixed.takeUnless { it == UNKNOWN_DOUBLE }
+        p = pb.pSet.takeUnless { pb.hasPNull() }
+        pFixed = pb.pFixedSet.takeUnless { pb.hasPFixedNull() }
+        q = pb.qSet.takeUnless { pb.hasQNull() }
+        qFixed = pb.qFixedSet.takeUnless { pb.hasQFixedNull() }
         toCim(pb.psr, this, networkService)
     }
 
@@ -2031,31 +2034,31 @@ fun toCim(pb: PBEnergySource, networkService: NetworkService): EnergySource =
             networkService.resolveOrDeferReference(Resolvers.phases(this), energySourcePhasesMRID)
         }
 
-        activePower = pb.activePower.takeUnless { it == UNKNOWN_DOUBLE }
-        reactivePower = pb.reactivePower.takeUnless { it == UNKNOWN_DOUBLE }
-        voltageAngle = pb.voltageAngle.takeUnless { it == UNKNOWN_DOUBLE }
-        voltageMagnitude = pb.voltageMagnitude.takeUnless { it == UNKNOWN_DOUBLE }
-        r = pb.r.takeUnless { it == UNKNOWN_DOUBLE }
-        x = pb.x.takeUnless { it == UNKNOWN_DOUBLE }
-        pMax = pb.pMax.takeUnless { it == UNKNOWN_DOUBLE }
-        pMin = pb.pMin.takeUnless { it == UNKNOWN_DOUBLE }
-        r0 = pb.r0.takeUnless { it == UNKNOWN_DOUBLE }
-        rn = pb.rn.takeUnless { it == UNKNOWN_DOUBLE }
-        x0 = pb.x0.takeUnless { it == UNKNOWN_DOUBLE }
-        xn = pb.xn.takeUnless { it == UNKNOWN_DOUBLE }
-        isExternalGrid = pb.isExternalGrid
-        rMin = pb.rMin.takeUnless { it == UNKNOWN_DOUBLE }
-        rnMin = pb.rnMin.takeUnless { it == UNKNOWN_DOUBLE }
-        r0Min = pb.r0Min.takeUnless { it == UNKNOWN_DOUBLE }
-        xMin = pb.xMin.takeUnless { it == UNKNOWN_DOUBLE }
-        xnMin = pb.xnMin.takeUnless { it == UNKNOWN_DOUBLE }
-        x0Min = pb.x0Min.takeUnless { it == UNKNOWN_DOUBLE }
-        rMax = pb.rMax.takeUnless { it == UNKNOWN_DOUBLE }
-        rnMax = pb.rnMax.takeUnless { it == UNKNOWN_DOUBLE }
-        r0Max = pb.r0Max.takeUnless { it == UNKNOWN_DOUBLE }
-        xMax = pb.xMax.takeUnless { it == UNKNOWN_DOUBLE }
-        xnMax = pb.xnMax.takeUnless { it == UNKNOWN_DOUBLE }
-        x0Max = pb.x0Max.takeUnless { it == UNKNOWN_DOUBLE }
+        activePower = pb.activePowerSet.takeUnless { pb.hasActivePowerNull() }
+        reactivePower = pb.reactivePowerSet.takeUnless { pb.hasReactivePowerNull() }
+        voltageAngle = pb.voltageAngleSet.takeUnless { pb.hasVoltageAngleNull() }
+        voltageMagnitude = pb.voltageMagnitudeSet.takeUnless { pb.hasVoltageMagnitudeNull() }
+        r = pb.rSet.takeUnless { pb.hasRNull() }
+        x = pb.xSet.takeUnless { pb.hasXNull() }
+        pMax = pb.pMaxSet.takeUnless { pb.hasPMaxNull() }
+        pMin = pb.pMinSet.takeUnless { pb.hasPMinNull() }
+        r0 = pb.r0Set.takeUnless { pb.hasR0Null() }
+        rn = pb.rnSet.takeUnless { pb.hasRnNull() }
+        x0 = pb.x0Set.takeUnless { pb.hasX0Null() }
+        xn = pb.xnSet.takeUnless { pb.hasXnNull() }
+        isExternalGrid = pb.isExternalGridSet.takeUnless { pb.hasIsExternalGridNull() }
+        rMin = pb.rMinSet.takeUnless { pb.hasRMinNull() }
+        rnMin = pb.rnMinSet.takeUnless { pb.hasRnMinNull() }
+        r0Min = pb.r0MinSet.takeUnless { pb.hasR0MinNull() }
+        xMin = pb.xMinSet.takeUnless { pb.hasXMinNull() }
+        xnMin = pb.xnMinSet.takeUnless { pb.hasXnMinNull() }
+        x0Min = pb.x0MinSet.takeUnless { pb.hasX0MinNull() }
+        rMax = pb.rMaxSet.takeUnless { pb.hasRMaxNull() }
+        rnMax = pb.rnMaxSet.takeUnless { pb.hasRnMaxNull() }
+        r0Max = pb.r0MaxSet.takeUnless { pb.hasR0MaxNull() }
+        xMax = pb.xMaxSet.takeUnless { pb.hasXMaxNull() }
+        xnMax = pb.xnMaxSet.takeUnless { pb.hasXnMaxNull() }
+        x0Max = pb.x0MaxSet.takeUnless { pb.hasX0MaxNull() }
 
         toCim(pb.ec, this, networkService)
     }
@@ -2120,7 +2123,7 @@ fun toCim(pb: PBGroundDisconnector, networkService: NetworkService): GroundDisco
  */
 fun toCim(pb: PBGroundingImpedance, networkService: NetworkService): GroundingImpedance =
     GroundingImpedance(pb.mRID()).apply {
-        x = pb.x.takeUnless { it == UNKNOWN_DOUBLE }
+        x = pb.xSet.takeUnless { pb.hasXNull() }
         toCim(pb.efc, this, networkService)
     }
 
@@ -2168,10 +2171,10 @@ fun toCim(pb: PBLine, cim: Line, networkService: NetworkService): Line =
  */
 fun toCim(pb: PBLinearShuntCompensator, networkService: NetworkService): LinearShuntCompensator =
     LinearShuntCompensator(pb.mRID()).apply {
-        b0PerSection = pb.b0PerSection.takeUnless { it == UNKNOWN_DOUBLE }
-        bPerSection = pb.bPerSection.takeUnless { it == UNKNOWN_DOUBLE }
-        g0PerSection = pb.g0PerSection.takeUnless { it == UNKNOWN_DOUBLE }
-        gPerSection = pb.gPerSection.takeUnless { it == UNKNOWN_DOUBLE }
+        b0PerSection = pb.b0PerSectionSet.takeUnless { pb.hasB0PerSectionNull() }
+        bPerSection = pb.bPerSectionSet.takeUnless { pb.hasBPerSectionNull() }
+        g0PerSection = pb.g0PerSectionSet.takeUnless { pb.hasG0PerSectionNull() }
+        gPerSection = pb.gPerSectionSet.takeUnless { pb.hasGPerSectionNull() }
         toCim(pb.sc, this, networkService)
     }
 
@@ -2231,14 +2234,14 @@ fun toCim(pb: PBPerLengthPhaseImpedance, networkService: NetworkService): PerLen
  */
 fun toCim(pb: PBPerLengthSequenceImpedance, networkService: NetworkService): PerLengthSequenceImpedance =
     PerLengthSequenceImpedance(pb.mRID()).apply {
-        r = pb.r.takeUnless { it == UNKNOWN_DOUBLE }
-        x = pb.x.takeUnless { it == UNKNOWN_DOUBLE }
-        r0 = pb.r0.takeUnless { it == UNKNOWN_DOUBLE }
-        x0 = pb.x0.takeUnless { it == UNKNOWN_DOUBLE }
-        bch = pb.bch.takeUnless { it == UNKNOWN_DOUBLE }
-        gch = pb.gch.takeUnless { it == UNKNOWN_DOUBLE }
-        b0ch = pb.b0Ch.takeUnless { it == UNKNOWN_DOUBLE }
-        g0ch = pb.g0Ch.takeUnless { it == UNKNOWN_DOUBLE }
+        r = pb.rSet.takeUnless { pb.hasRNull() }
+        x = pb.xSet.takeUnless { pb.hasXNull() }
+        r0 = pb.r0Set.takeUnless { pb.hasR0Null() }
+        x0 = pb.x0Set.takeUnless { pb.hasX0Null() }
+        bch = pb.bchSet.takeUnless { pb.hasBchNull() }
+        gch = pb.gchSet.takeUnless { pb.hasGchNull() }
+        b0ch = pb.b0ChSet.takeUnless { pb.hasB0ChNull() }
+        g0ch = pb.g0ChSet.takeUnless { pb.hasG0ChNull() }
         toCim(pb.pli, this, networkService)
     }
 
@@ -2251,7 +2254,7 @@ fun toCim(pb: PBPerLengthSequenceImpedance, networkService: NetworkService): Per
  */
 fun toCim(pb: PBPetersenCoil, networkService: NetworkService): PetersenCoil =
     PetersenCoil(pb.mRID()).apply {
-        xGroundNominal = pb.xGroundNominal.takeUnless { it == UNKNOWN_DOUBLE }
+        xGroundNominal = pb.xGroundNominalSet.takeUnless { pb.hasXGroundNominalNull() }
         toCim(pb.efc, this, networkService)
     }
 
@@ -2265,10 +2268,10 @@ fun toCim(pb: PBPhaseImpedanceData): com.zepben.ewb.cim.iec61970.base.wires.Phas
     com.zepben.ewb.cim.iec61970.base.wires.PhaseImpedanceData(
         mapSinglePhaseKind.toCim(pb.fromPhase),
         mapSinglePhaseKind.toCim(pb.toPhase),
-        pb.b.takeUnless { it == UNKNOWN_DOUBLE },
-        pb.g.takeUnless { it == UNKNOWN_DOUBLE },
-        pb.r.takeUnless { it == UNKNOWN_DOUBLE },
-        pb.x.takeUnless { it == UNKNOWN_DOUBLE },
+        pb.bSet.takeUnless { pb.hasBNull() },
+        pb.gSet.takeUnless { pb.hasGNull() },
+        pb.rSet.takeUnless { pb.hasRNull() },
+        pb.xSet.takeUnless { pb.hasXNull() }
     )
 
 /**
@@ -2286,37 +2289,37 @@ fun toCim(pb: PBPowerElectronicsConnection, networkService: NetworkService): Pow
         pb.powerElectronicsConnectionPhaseMRIDsList.forEach { powerElectronicsConnectionPhaseMRID ->
             networkService.resolveOrDeferReference(Resolvers.powerElectronicsConnectionPhase(this), powerElectronicsConnectionPhaseMRID)
         }
-        maxIFault = pb.maxIFault.takeUnless { it == UNKNOWN_INT }
-        maxQ = pb.maxQ.takeUnless { it == UNKNOWN_DOUBLE }
-        minQ = pb.minQ.takeUnless { it == UNKNOWN_DOUBLE }
-        p = pb.p.takeUnless { it == UNKNOWN_DOUBLE }
-        q = pb.q.takeUnless { it == UNKNOWN_DOUBLE }
-        ratedS = pb.ratedS.takeUnless { it == UNKNOWN_INT }
-        ratedU = pb.ratedU.takeUnless { it == UNKNOWN_INT }
-        inverterStandard = pb.inverterStandard.takeIf { it.isNotBlank() }
-        sustainOpOvervoltLimit = pb.sustainOpOvervoltLimit.takeUnless { it == UNKNOWN_INT }
-        stopAtOverFreq = pb.stopAtOverFreq.takeUnless { it == UNKNOWN_FLOAT }
-        stopAtUnderFreq = pb.stopAtUnderFreq.takeUnless { it == UNKNOWN_FLOAT }
+        maxIFault = pb.maxIFaultSet.takeUnless { pb.hasMaxIFaultNull() }
+        maxQ = pb.maxQSet.takeUnless { pb.hasMaxQNull() }
+        minQ = pb.minQSet.takeUnless { pb.hasMinQNull() }
+        p = pb.pSet.takeUnless { pb.hasPNull() }
+        q = pb.qSet.takeUnless { pb.hasQNull() }
+        ratedS = pb.ratedSSet.takeUnless { pb.hasRatedSNull() }
+        ratedU = pb.ratedUSet.takeUnless { pb.hasRatedUNull() }
+        inverterStandard = pb.inverterStandardSet.takeIf { pb.hasInverterStandardNull() }
+        sustainOpOvervoltLimit = pb.sustainOpOvervoltLimitSet.takeUnless { pb.hasSustainOpOvervoltLimitNull() }
+        stopAtOverFreq = pb.stopAtOverFreqSet.takeUnless { pb.hasStopAtOverFreqNull() }
+        stopAtUnderFreq = pb.stopAtUnderFreqSet.takeUnless { pb.hasStopAtUnderFreqNull() }
         invVoltWattRespMode = pb.invVoltWattRespModeSet.takeUnless { pb.hasInvVoltWattRespModeNull() }
-        invWattRespV1 = pb.invWattRespV1.takeUnless { it == UNKNOWN_INT }
-        invWattRespV2 = pb.invWattRespV2.takeUnless { it == UNKNOWN_INT }
-        invWattRespV3 = pb.invWattRespV3.takeUnless { it == UNKNOWN_INT }
-        invWattRespV4 = pb.invWattRespV4.takeUnless { it == UNKNOWN_INT }
-        invWattRespPAtV1 = pb.invWattRespPAtV1.takeUnless { it == UNKNOWN_FLOAT }
-        invWattRespPAtV2 = pb.invWattRespPAtV2.takeUnless { it == UNKNOWN_FLOAT }
-        invWattRespPAtV3 = pb.invWattRespPAtV3.takeUnless { it == UNKNOWN_FLOAT }
-        invWattRespPAtV4 = pb.invWattRespPAtV4.takeUnless { it == UNKNOWN_FLOAT }
+        invWattRespV1 = pb.invWattRespV1Set.takeUnless { pb.hasInvWattRespV1Null() }
+        invWattRespV2 = pb.invWattRespV2Set.takeUnless { pb.hasInvWattRespV2Null() }
+        invWattRespV3 = pb.invWattRespV3Set.takeUnless { pb.hasInvWattRespV3Null() }
+        invWattRespV4 = pb.invWattRespV4Set.takeUnless { pb.hasInvWattRespV4Null() }
+        invWattRespPAtV1 = pb.invWattRespPAtV1Set.takeUnless { pb.hasInvWattRespPAtV1Null() }
+        invWattRespPAtV2 = pb.invWattRespPAtV2Set.takeUnless { pb.hasInvWattRespPAtV2Null() }
+        invWattRespPAtV3 = pb.invWattRespPAtV3Set.takeUnless { pb.hasInvWattRespPAtV3Null() }
+        invWattRespPAtV4 = pb.invWattRespPAtV4Set.takeUnless { pb.hasInvWattRespPAtV4Null() }
         invVoltVarRespMode = pb.invVoltVarRespModeSet.takeUnless { pb.hasInvVoltVarRespModeNull() }
-        invVarRespV1 = pb.invVarRespV1.takeUnless { it == UNKNOWN_INT }
-        invVarRespV2 = pb.invVarRespV2.takeUnless { it == UNKNOWN_INT }
-        invVarRespV3 = pb.invVarRespV3.takeUnless { it == UNKNOWN_INT }
-        invVarRespV4 = pb.invVarRespV4.takeUnless { it == UNKNOWN_INT }
-        invVarRespQAtV1 = pb.invVarRespQAtV1.takeUnless { it == UNKNOWN_FLOAT }
-        invVarRespQAtV2 = pb.invVarRespQAtV2.takeUnless { it == UNKNOWN_FLOAT }
-        invVarRespQAtV3 = pb.invVarRespQAtV3.takeUnless { it == UNKNOWN_FLOAT }
-        invVarRespQAtV4 = pb.invVarRespQAtV4.takeUnless { it == UNKNOWN_FLOAT }
+        invVarRespV1 = pb.invVarRespV1Set.takeUnless { pb.hasInvVarRespV1Null() }
+        invVarRespV2 = pb.invVarRespV2Set.takeUnless { pb.hasInvVarRespV2Null() }
+        invVarRespV3 = pb.invVarRespV3Set.takeUnless { pb.hasInvVarRespV3Null() }
+        invVarRespV4 = pb.invVarRespV4Set.takeUnless { pb.hasInvVarRespV4Null() }
+        invVarRespQAtV1 = pb.invVarRespQAtV1Set.takeUnless { pb.hasInvVarRespQAtV1Null() }
+        invVarRespQAtV2 = pb.invVarRespQAtV2Set.takeUnless { pb.hasInvVarRespQAtV2Null() }
+        invVarRespQAtV3 = pb.invVarRespQAtV3Set.takeUnless { pb.hasInvVarRespQAtV3Null() }
+        invVarRespQAtV4 = pb.invVarRespQAtV4Set.takeUnless { pb.hasInvVarRespQAtV4Null() }
         invReactivePowerMode = pb.invReactivePowerModeSet.takeUnless { pb.hasInvReactivePowerModeNull() }
-        invFixReactivePower = pb.invFixReactivePower.takeUnless { it == UNKNOWN_FLOAT }
+        invFixReactivePower = pb.invFixReactivePowerSet.takeUnless { pb.hasInvFixReactivePowerNull() }
         toCim(pb.rce, this, networkService)
     }
 
@@ -2330,9 +2333,9 @@ fun toCim(pb: PBPowerElectronicsConnection, networkService: NetworkService): Pow
 fun toCim(pb: PBPowerElectronicsConnectionPhase, networkService: NetworkService): PowerElectronicsConnectionPhase =
     PowerElectronicsConnectionPhase(pb.mRID()).apply {
         networkService.resolveOrDeferReference(Resolvers.powerElectronicsConnection(this), pb.powerElectronicsConnectionMRID)
-        p = pb.p.takeUnless { it == UNKNOWN_DOUBLE }
+        p = pb.pSet.takeUnless { pb.hasPNull() }
         phase = mapSinglePhaseKind.toCim(pb.phase)
-        q = pb.q.takeUnless { it == UNKNOWN_DOUBLE }
+        q = pb.qSet.takeUnless { pb.hasQNull() }
         toCim(pb.psr, this, networkService)
     }
 
@@ -2349,7 +2352,7 @@ fun toCim(pb: PBPowerTransformer, networkService: NetworkService): PowerTransfor
             networkService.resolveOrDeferReference(Resolvers.ends(this), endMRID)
         }
         vectorGroup = mapVectorGroup.toCim(pb.vectorGroup)
-        transformerUtilisation = pb.transformerUtilisation.takeUnless { it == UNKNOWN_DOUBLE }
+        transformerUtilisation = pb.transformerUtilisationSet.takeUnless { pb.hasTransformerUtilisationNull() }
         constructionKind = mapTransformerConstructionKind.toCim(pb.constructionKind)
         function = mapTransformerFunctionKind.toCim(pb.function)
         networkService.resolveOrDeferReference(Resolvers.assetInfo(this), pb.assetInfoMRID())
@@ -2366,17 +2369,17 @@ fun toCim(pb: PBPowerTransformer, networkService: NetworkService): PowerTransfor
 fun toCim(pb: PBPowerTransformerEnd, networkService: NetworkService): PowerTransformerEnd =
     PowerTransformerEnd(pb.mRID()).apply {
         networkService.resolveOrDeferReference(Resolvers.powerTransformer(this), pb.powerTransformerMRID)
-        ratedU = pb.ratedU.takeUnless { it == UNKNOWN_INT }
-        r = pb.r.takeUnless { it == UNKNOWN_DOUBLE }
-        r0 = pb.r0.takeUnless { it == UNKNOWN_DOUBLE }
-        x = pb.x.takeUnless { it == UNKNOWN_DOUBLE }
-        x0 = pb.x0.takeUnless { it == UNKNOWN_DOUBLE }
+        ratedU = pb.ratedUSet.takeUnless { pb.hasRatedUNull() }
+        r = pb.rSet.takeUnless { pb.hasRNull() }
+        r0 = pb.r0Set.takeUnless { pb.hasR0Null() }
+        x = pb.xSet.takeUnless { pb.hasXNull() }
+        x0 = pb.x0Set.takeUnless { pb.hasX0Null() }
         connectionKind = mapWindingConnection.toCim(pb.connectionKind)
-        b = pb.b.takeUnless { it == UNKNOWN_DOUBLE }
-        b0 = pb.b0.takeUnless { it == UNKNOWN_DOUBLE }
-        g = pb.g.takeUnless { it == UNKNOWN_DOUBLE }
-        g0 = pb.g0.takeUnless { it == UNKNOWN_DOUBLE }
-        phaseAngleClock = pb.phaseAngleClock.takeUnless { it == UNKNOWN_INT }
+        b = pb.bSet.takeUnless { pb.hasBNull() }
+        b0 = pb.b0Set.takeUnless { pb.hasB0Null() }
+        g = pb.gSet.takeUnless { pb.hasGNull() }
+        g0 = pb.g0Set.takeUnless { pb.hasG0Null() }
+        phaseAngleClock = pb.phaseAngleClockSet.takeUnless { pb.hasPhaseAngleClockNull() }
 
         pb.ratingsList.forEach {
             addRating(toCim(it))
@@ -2397,7 +2400,7 @@ fun toCim(pb: PBProtectedSwitch, cim: ProtectedSwitch, networkService: NetworkSe
         pb.relayFunctionMRIDsList.forEach { relayFunctionMRID ->
             networkService.resolveOrDeferReference(Resolvers.relayFunctions(this), relayFunctionMRID)
         }
-        breakingCapacity = pb.breakingCapacity.takeUnless { it == UNKNOWN_INT }
+        breakingCapacity = pb.breakingCapacitySet.takeUnless { pb.hasBreakingCapacityNull() }
         toCim(pb.sw, this, networkService)
     }
 
@@ -2411,7 +2414,7 @@ fun toCim(pb: PBProtectedSwitch, cim: ProtectedSwitch, networkService: NetworkSe
 fun toCim(pb: PBRatioTapChanger, networkService: NetworkService): RatioTapChanger =
     RatioTapChanger(pb.mRID()).apply {
         networkService.resolveOrDeferReference(Resolvers.transformerEnd(this), pb.transformerEndMRID)
-        stepVoltageIncrement = pb.stepVoltageIncrement.takeUnless { it == UNKNOWN_DOUBLE }
+        stepVoltageIncrement = pb.stepVoltageIncrementSet.takeUnless { pb.hasStepVoltageIncrementNull() }
         toCim(pb.tc, this, networkService)
     }
 
@@ -2449,7 +2452,7 @@ fun toCim(pb: PBRecloser, networkService: NetworkService): Recloser =
  */
 fun toCim(pb: PBRegulatingCondEq, cim: RegulatingCondEq, networkService: NetworkService): RegulatingCondEq =
     cim.apply {
-        controlEnabled = pb.controlEnabled
+        controlEnabled = pb.controlEnabledSet.takeUnless { pb.hasControlEnabledNull() }
         networkService.resolveOrDeferReference(Resolvers.regulatingControl(this), pb.regulatingControlMRID)
         toCim(pb.ec, this, networkService)
     }
@@ -2467,18 +2470,18 @@ fun toCim(pb: PBRegulatingControl, cim: RegulatingControl, networkService: Netwo
         discrete = pb.discreteSet.takeUnless { pb.hasDiscreteNull() }
         mode = mapRegulatingControlModeKind.toCim(pb.mode)
         monitoredPhase = mapPhaseCode.toCim(pb.monitoredPhase)
-        targetDeadband = pb.targetDeadband.takeUnless { it == UNKNOWN_FLOAT }
-        targetValue = pb.targetValue.takeUnless { it == UNKNOWN_DOUBLE }
+        targetDeadband = pb.targetDeadbandSet.takeUnless { pb.hasTargetDeadbandNull() }
+        targetValue = pb.targetValueSet.takeUnless { pb.hasTargetValueNull() }
         enabled = pb.enabledSet.takeUnless { pb.hasEnabledNull() }
-        maxAllowedTargetValue = pb.maxAllowedTargetValue.takeUnless { it == UNKNOWN_DOUBLE }
-        minAllowedTargetValue = pb.minAllowedTargetValue.takeUnless { it == UNKNOWN_DOUBLE }
-        ratedCurrent = pb.ratedCurrent.takeUnless { it == UNKNOWN_DOUBLE }
+        maxAllowedTargetValue = pb.maxAllowedTargetValueSet.takeUnless { pb.hasMaxAllowedTargetValueNull() }
+        minAllowedTargetValue = pb.minAllowedTargetValueSet.takeUnless { pb.hasMinAllowedTargetValueNull() }
+        ratedCurrent = pb.ratedCurrentSet.takeUnless { pb.hasRatedCurrentNull() }
         networkService.resolveOrDeferReference(Resolvers.terminal(this), pb.terminalMRID)
         pb.regulatingCondEqMRIDsList.forEach {
             networkService.resolveOrDeferReference(Resolvers.regulatingCondEq(this), it)
         }
-        ctPrimary = pb.ctPrimary.takeUnless { it == UNKNOWN_DOUBLE }
-        minTargetDeadband = pb.minTargetDeadband.takeUnless { it == UNKNOWN_DOUBLE }
+        ctPrimary = pb.ctPrimarySet.takeUnless { pb.hasCtPrimaryNull() }
+        minTargetDeadband = pb.minTargetDeadbandSet.takeUnless { pb.hasMinTargetDeadbandNull() }
 
         toCim(pb.psr, this, networkService)
     }
@@ -2493,11 +2496,11 @@ fun toCim(pb: PBRegulatingControl, cim: RegulatingControl, networkService: Netwo
  */
 fun toCim(pb: PBRotatingMachine, cim: RotatingMachine, networkService: NetworkService): RotatingMachine =
     cim.apply {
-        ratedPowerFactor = pb.ratedPowerFactor.takeUnless { it == UNKNOWN_DOUBLE }
-        ratedS = pb.ratedS.takeUnless { it == UNKNOWN_DOUBLE }
-        ratedU = pb.ratedU.takeUnless { it == UNKNOWN_INT }
-        p = pb.p.takeUnless { it == UNKNOWN_DOUBLE }
-        q = pb.q.takeUnless { it == UNKNOWN_DOUBLE }
+        ratedPowerFactor = pb.ratedPowerFactorSet.takeUnless { pb.hasRatedPowerFactorNull() }
+        ratedS = pb.ratedSSet.takeUnless { pb.hasRatedSNull() }
+        ratedU = pb.ratedUSet.takeUnless { pb.hasRatedUNull() }
+        p = pb.pSet.takeUnless { pb.hasPNull() }
+        q = pb.qSet.takeUnless { pb.hasQNull() }
         toCim(pb.rce, this, networkService)
     }
 
@@ -2510,12 +2513,12 @@ fun toCim(pb: PBRotatingMachine, cim: RotatingMachine, networkService: NetworkSe
  */
 fun toCim(pb: PBSeriesCompensator, networkService: NetworkService): SeriesCompensator =
     SeriesCompensator(pb.mRID()).apply {
-        r = pb.r.takeUnless { it == UNKNOWN_DOUBLE }
-        r0 = pb.r0.takeUnless { it == UNKNOWN_DOUBLE }
-        x = pb.x.takeUnless { it == UNKNOWN_DOUBLE }
-        x0 = pb.x0.takeUnless { it == UNKNOWN_DOUBLE }
-        varistorRatedCurrent = pb.varistorRatedCurrent.takeUnless { it == UNKNOWN_INT }
-        varistorVoltageThreshold = pb.varistorVoltageThreshold.takeUnless { it == UNKNOWN_INT }
+        r = pb.rSet.takeUnless { pb.hasRNull() }
+        r0 = pb.r0Set.takeUnless { pb.hasR0Null() }
+        x = pb.xSet.takeUnless { pb.hasXNull() }
+        x0 = pb.x0Set.takeUnless { pb.hasX0Null() }
+        varistorRatedCurrent = pb.varistorRatedCurrentSet.takeUnless { pb.hasVaristorRatedCurrentNull() }
+        varistorVoltageThreshold = pb.varistorVoltageThresholdSet.takeUnless { pb.hasVaristorVoltageThresholdNull() }
         toCim(pb.ce, this, networkService)
     }
 
@@ -2530,9 +2533,9 @@ fun toCim(pb: PBSeriesCompensator, networkService: NetworkService): SeriesCompen
 fun toCim(pb: PBShuntCompensator, cim: ShuntCompensator, networkService: NetworkService): ShuntCompensator =
     cim.apply {
         networkService.resolveOrDeferReference(Resolvers.assetInfo(this), pb.assetInfoMRID())
-        sections = pb.sections.takeUnless { it == UNKNOWN_DOUBLE }
-        grounded = pb.grounded
-        nomU = pb.nomU.takeUnless { it == UNKNOWN_INT }
+        sections = pb.sectionsSet.takeUnless { pb.hasSectionsNull() }
+        grounded = pb.groundedSet.takeUnless { pb.hasGroundedNull() }
+        nomU = pb.nomUSet.takeUnless { pb.hasNomUNull() }
         phaseConnection = mapPhaseShuntConnectionKind.toCim(pb.phaseConnection)
         toCim(pb.rce, this, networkService)
     }
@@ -2546,11 +2549,11 @@ fun toCim(pb: PBShuntCompensator, cim: ShuntCompensator, networkService: Network
  */
 fun toCim(pb: PBStaticVarCompensator, networkService: NetworkService): StaticVarCompensator =
     StaticVarCompensator(pb.mRID()).apply {
-        capacitiveRating = pb.capacitiveRating.takeUnless { it == UNKNOWN_DOUBLE }
-        inductiveRating = pb.inductiveRating.takeUnless { it == UNKNOWN_DOUBLE }
-        q = pb.q.takeUnless { it == UNKNOWN_DOUBLE }
+        capacitiveRating = pb.capacitiveRatingSet.takeUnless { pb.hasCapacitiveRatingNull() }
+        inductiveRating = pb.inductiveRatingSet.takeUnless { pb.hasInductiveRatingNull() }
+        q = pb.qSet.takeUnless { pb.hasQNull() }
         pb.svcControlMode?.also { svcControlMode = mapSVCControlMode.toCim(it) }
-        voltageSetPoint = pb.voltageSetPoint.takeUnless { it == UNKNOWN_INT }
+        voltageSetPoint = pb.voltageSetPointSet.takeUnless { pb.hasVoltageSetPointNull() }
         toCim(pb.rce, this, networkService)
     }
 
@@ -2565,7 +2568,7 @@ fun toCim(pb: PBStaticVarCompensator, networkService: NetworkService): StaticVar
 fun toCim(pb: PBSwitch, cim: Switch, networkService: NetworkService): Switch =
     cim.apply {
         networkService.resolveOrDeferReference(Resolvers.assetInfo(this), pb.assetInfoMRID())
-        ratedCurrent = pb.ratedCurrent.takeUnless { it == UNKNOWN_DOUBLE }
+        ratedCurrent = pb.ratedCurrentSet.takeUnless { pb.hasRatedCurrentNull() }
         setNormallyOpen(pb.normalOpen)
         setOpen(pb.open)
         // when unganged support is added to protobuf
@@ -2586,25 +2589,25 @@ fun toCim(pb: PBSynchronousMachine, networkService: NetworkService): Synchronous
         pb.reactiveCapabilityCurveMRIDsList.forEach { reactiveCapabilityCurveMRID ->
             networkService.resolveOrDeferReference(Resolvers.reactiveCapabilityCurve(this), reactiveCapabilityCurveMRID)
         }
-        baseQ = pb.baseQ.takeUnless { it == UNKNOWN_DOUBLE }
-        condenserP = pb.condenserP.takeUnless { it == UNKNOWN_INT }
-        earthing = pb.earthing
-        earthingStarPointR = pb.earthingStarPointR.takeUnless { it == UNKNOWN_DOUBLE }
-        earthingStarPointX = pb.earthingStarPointX.takeUnless { it == UNKNOWN_DOUBLE }
-        ikk = pb.ikk.takeUnless { it == UNKNOWN_DOUBLE }
-        maxQ = pb.maxQ.takeUnless { it == UNKNOWN_DOUBLE }
-        maxU = pb.maxU.takeUnless { it == UNKNOWN_INT }
-        minQ = pb.minQ.takeUnless { it == UNKNOWN_DOUBLE }
-        minU = pb.minU.takeUnless { it == UNKNOWN_INT }
-        mu = pb.mu.takeUnless { it == UNKNOWN_DOUBLE }
-        r = pb.r.takeUnless { it == UNKNOWN_DOUBLE }
-        r0 = pb.r0.takeUnless { it == UNKNOWN_DOUBLE }
-        r2 = pb.r2.takeUnless { it == UNKNOWN_DOUBLE }
-        satDirectSubtransX = pb.satDirectSubtransX.takeUnless { it == UNKNOWN_DOUBLE }
-        satDirectSyncX = pb.satDirectSyncX.takeUnless { it == UNKNOWN_DOUBLE }
-        satDirectTransX = pb.satDirectTransX.takeUnless { it == UNKNOWN_DOUBLE }
-        x0 = pb.x0.takeUnless { it == UNKNOWN_DOUBLE }
-        x2 = pb.x2.takeUnless { it == UNKNOWN_DOUBLE }
+        baseQ = pb.baseQSet.takeUnless { pb.hasBaseQNull() }
+        condenserP = pb.condenserPSet.takeUnless { pb.hasCondenserPNull() }
+        earthing = pb.earthingSet.takeUnless { pb.hasEarthingNull() }
+        earthingStarPointR = pb.earthingStarPointRSet.takeUnless { pb.hasEarthingStarPointRNull() }
+        earthingStarPointX = pb.earthingStarPointXSet.takeUnless { pb.hasEarthingStarPointXNull() }
+        ikk = pb.ikkSet.takeUnless { pb.hasIkkNull() }
+        maxQ = pb.maxQSet.takeUnless { pb.hasMaxQNull() }
+        maxU = pb.maxUSet.takeUnless { pb.hasMaxUNull() }
+        minQ = pb.minQSet.takeUnless { pb.hasMinQNull() }
+        minU = pb.minUSet.takeUnless { pb.hasMinUNull() }
+        mu = pb.muSet.takeUnless { pb.hasMuNull() }
+        r = pb.rSet.takeUnless { pb.hasRNull() }
+        r0 = pb.r0Set.takeUnless { pb.hasR0Null() }
+        r2 = pb.r2Set.takeUnless { pb.hasR2Null() }
+        satDirectSubtransX = pb.satDirectSubtransXSet.takeUnless { pb.hasSatDirectSubtransXNull() }
+        satDirectSyncX = pb.satDirectSyncXSet.takeUnless { pb.hasSatDirectSyncXNull() }
+        satDirectTransX = pb.satDirectTransXSet.takeUnless { pb.hasSatDirectTransXNull() }
+        x0 = pb.x0Set.takeUnless { pb.hasX0Null() }
+        x2 = pb.x2Set.takeUnless { pb.hasX2Null() }
 
         type = mapSynchronousMachineKind.toCim(pb.type)
         operatingMode = mapSynchronousMachineKind.toCim(pb.operatingMode)
@@ -2621,13 +2624,13 @@ fun toCim(pb: PBSynchronousMachine, networkService: NetworkService): Synchronous
  */
 fun toCim(pb: PBTapChanger, cim: TapChanger, networkService: NetworkService): TapChanger =
     cim.apply {
-        highStep = pb.highStep.takeUnless { it == UNKNOWN_INT }
-        lowStep = pb.lowStep.takeUnless { it == UNKNOWN_INT }
-        step = pb.step.takeUnless { it == UNKNOWN_DOUBLE }
-        neutralStep = pb.neutralStep.takeUnless { it == UNKNOWN_INT }
-        neutralU = pb.neutralU.takeUnless { it == UNKNOWN_INT }
-        normalStep = pb.normalStep.takeUnless { it == UNKNOWN_INT }
-        controlEnabled = pb.controlEnabled
+        highStep = pb.highStepSet.takeUnless { pb.hasHighStepNull() }
+        lowStep = pb.lowStepSet.takeUnless { pb.hasLowStepNull() }
+        step = pb.stepSet.takeUnless { pb.hasStepNull() }
+        neutralStep = pb.neutralStepSet.takeUnless { pb.hasNeutralStepNull() }
+        neutralU = pb.neutralUSet.takeUnless { pb.hasNeutralUNull() }
+        normalStep = pb.normalStepSet.takeUnless { pb.hasNormalStepNull() }
+        controlEnabled = pb.controlEnabledSet.takeUnless { pb.hasControlEnabledNull() }
         networkService.resolveOrDeferReference(Resolvers.tapChangerControl(this), pb.tapChangerControlMRID)
         toCim(pb.psr, this, networkService)
     }
@@ -2641,16 +2644,16 @@ fun toCim(pb: PBTapChanger, cim: TapChanger, networkService: NetworkService): Ta
  */
 fun toCim(pb: PBTapChangerControl, networkService: NetworkService): TapChangerControl =
     TapChangerControl(pb.mRID()).apply {
-        limitVoltage = pb.limitVoltage.takeUnless { it == UNKNOWN_INT }
+        limitVoltage = pb.limitVoltageSet.takeUnless { pb.hasLimitVoltageNull() }
         lineDropCompensation = pb.lineDropCompensationSet.takeUnless { pb.hasLineDropCompensationNull() }
-        lineDropR = pb.lineDropR.takeUnless { it == UNKNOWN_DOUBLE }
-        lineDropX = pb.lineDropX.takeUnless { it == UNKNOWN_DOUBLE }
-        reverseLineDropR = pb.reverseLineDropR.takeUnless { it == UNKNOWN_DOUBLE }
-        reverseLineDropX = pb.reverseLineDropX.takeUnless { it == UNKNOWN_DOUBLE }
+        lineDropR = pb.lineDropRSet.takeUnless { pb.hasLineDropRNull() }
+        lineDropX = pb.lineDropXSet.takeUnless { pb.hasLineDropXNull() }
+        reverseLineDropR = pb.reverseLineDropRSet.takeUnless { pb.hasReverseLineDropRNull() }
+        reverseLineDropX = pb.reverseLineDropXSet.takeUnless { pb.hasReverseLineDropXNull() }
 
         forwardLDCBlocking = pb.forwardLDCBlockingSet.takeUnless { pb.hasForwardLDCBlockingNull() }
 
-        timeDelay = pb.timeDelay.takeUnless { it == UNKNOWN_DOUBLE }
+        timeDelay = pb.timeDelaySet.takeUnless { pb.hasTimeDelayNull() }
 
         coGenerationEnabled = pb.coGenerationEnabledSet.takeUnless { pb.hasCoGenerationEnabledNull() }
 
@@ -2672,9 +2675,9 @@ fun toCim(pb: PBTransformerEnd, cim: TransformerEnd, networkService: NetworkServ
         networkService.resolveOrDeferReference(Resolvers.ratioTapChanger(this), pb.ratioTapChangerMRID)
         networkService.resolveOrDeferReference(Resolvers.starImpedance(this), pb.starImpedanceMRID)
         endNumber = pb.endNumber
-        grounded = pb.grounded
-        rGround = pb.rGround.takeUnless { it == UNKNOWN_DOUBLE }
-        xGround = pb.xGround.takeUnless { it == UNKNOWN_DOUBLE }
+        grounded = pb.groundedSet.takeUnless { pb.hasGroundedNull() }
+        rGround = pb.rGroundSet.takeUnless { pb.hasRGroundNull() }
+        xGround = pb.xGroundSet.takeUnless { pb.hasXGroundNull() }
         toCim(pb.io, this, networkService)
     }
 
@@ -2697,10 +2700,10 @@ fun toCim(pb: PBTransformerEndRatedS): TransformerEndRatedS =
 fun toCim(pb: PBTransformerStarImpedance, networkService: NetworkService): TransformerStarImpedance =
     TransformerStarImpedance(pb.mRID()).apply {
         networkService.resolveOrDeferReference(Resolvers.transformerEndInfo(this), pb.transformerEndInfoMRID)
-        r = pb.r.takeUnless { it == UNKNOWN_DOUBLE }
-        r0 = pb.r0.takeUnless { it == UNKNOWN_DOUBLE }
-        x = pb.x.takeUnless { it == UNKNOWN_DOUBLE }
-        x0 = pb.x0.takeUnless { it == UNKNOWN_DOUBLE }
+        r = pb.rSet.takeUnless { pb.hasRNull() }
+        r0 = pb.r0Set.takeUnless { pb.hasR0Null() }
+        x = pb.xSet.takeUnless { pb.hasXNull() }
+        x0 = pb.xSet0.takeUnless { pb.hasXNull(*) }
         toCim(pb.io, this, networkService)
     }
 

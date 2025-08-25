@@ -35,7 +35,7 @@ abstract class ShuntCompensator(mRID: String = "") : RegulatingCondEq(mRID) {
 
     override var assetInfo: ShuntCompensatorInfo? = null
 
-    var grounded: Boolean = false
+    var grounded: Boolean? = null
     var nomU: Int? = null
     var phaseConnection: PhaseShuntConnectionKind = PhaseShuntConnectionKind.UNKNOWN
     var sections: Double? = null

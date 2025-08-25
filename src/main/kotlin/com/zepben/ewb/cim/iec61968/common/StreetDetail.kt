@@ -21,13 +21,13 @@ package com.zepben.ewb.cim.iec61968.common
  * @property displayAddress The address as it should be displayed to a user.
  */
 data class StreetDetail(
-    val buildingName: String = "",
-    val floorIdentification: String = "",
-    val name: String = "",
-    val number: String = "",
-    val suiteNumber: String = "",
-    val type: String = "",
-    val displayAddress: String = ""
+    val buildingName: String? = null,
+    val floorIdentification: String? = null,
+    val name: String? = null,
+    val number: String? = null,
+    val suiteNumber: String? = null,
+    val type: String? = null,
+    val displayAddress: String? = null
 ) {
 
     /**

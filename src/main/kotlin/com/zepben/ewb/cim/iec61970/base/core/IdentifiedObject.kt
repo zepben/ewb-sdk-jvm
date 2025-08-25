@@ -29,13 +29,13 @@ abstract class IdentifiedObject(mRID: String = "") {
     val mRID: String = mRID.ifEmpty { UUID.randomUUID().toString() }
     var name: String = ""
     var description: String = ""
-    var numDiagramObjects: Int = 0
+    var numDiagramObjects: Int? = null
 
     /**
      * @return True if this [IdentifiedObject] has at least 1 DiagramObject associated with it, false otherwise.
      */
     val hasDiagramObjects: Boolean
-        get() = numDiagramObjects > 0
+        get() = (numDiagramObjects ?: 0) > 0
 
     override fun toString(): String {
         return javaClass.simpleName + "{" +

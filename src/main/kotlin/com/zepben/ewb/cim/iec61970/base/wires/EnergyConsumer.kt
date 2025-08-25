@@ -30,7 +30,7 @@ class EnergyConsumer @JvmOverloads constructor(mRID: String = "") : EnergyConnec
 
     private var _energyConsumerPhases: MutableList<EnergyConsumerPhase>? = null
     var customerCount: Int? = null
-    var grounded: Boolean = false
+    var grounded: Boolean? = null
     var p: Double? = null
     var pFixed: Double? = null
     var phaseConnection: PhaseShuntConnectionKind = PhaseShuntConnectionKind.D

@@ -16,6 +16,7 @@ import com.zepben.ewb.cim.iec61970.base.core.Name
 import com.zepben.ewb.cim.iec61970.base.core.NameType
 import com.zepben.ewb.database.sql.BaseEntryWriter
 import com.zepben.ewb.database.sql.extensions.setInstant
+import com.zepben.ewb.database.sql.extensions.setNullableInt
 import com.zepben.ewb.database.sql.extensions.setNullableString
 import com.zepben.ewb.database.sqlite.cim.tables.iec61968.common.TableDocuments
 import com.zepben.ewb.database.sqlite.cim.tables.iec61968.common.TableOrganisationRoles
@@ -124,9 +125,9 @@ abstract class CimWriter(
         description: String
     ): Boolean {
         insert.setString(table.MRID.queryIndex, identifiedObject.mRID)
-        insert.setString(table.NAME.queryIndex, identifiedObject.name)
-        insert.setString(table.DESCRIPTION.queryIndex, identifiedObject.description)
-        insert.setInt(table.NUM_DIAGRAM_OBJECTS.queryIndex, identifiedObject.numDiagramObjects)
+        insert.setNullableString(table.NAME.queryIndex, identifiedObject.name)
+        insert.setNullableString(table.DESCRIPTION.queryIndex, identifiedObject.description)
+        insert.setNullableInt(table.NUM_DIAGRAM_OBJECTS.queryIndex, identifiedObject.numDiagramObjects)
 
         return insert.tryExecuteSingleUpdate(description)
     }

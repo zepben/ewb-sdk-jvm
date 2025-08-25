@@ -29,7 +29,7 @@ internal class NameTypeTest {
     @Test
     internal fun accessors() {
         val nt = NameType("nt")
-        assertThat(nt.description, equalTo(""))
+        assertThat(nt.description, nullValue())
 
         nt.description = "description"
         assertThat(nt.description, equalTo("description"))

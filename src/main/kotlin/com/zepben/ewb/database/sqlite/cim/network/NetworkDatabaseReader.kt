@@ -149,7 +149,7 @@ class NetworkDatabaseReader internal constructor(
             .toSet()
 
         val hasBeenAssignedToFeeder = { energySource: EnergySource ->
-            energySource.isExternalGrid
+            energySource.isExternalGrid ?: false
                 && energySource.isOnFeeder()
                 && Collections.disjoint(feederStartPoints, NetworkService.connectedEquipment(energySource).mapNotNull { it.to?.mRID })
         }

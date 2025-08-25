@@ -775,8 +775,8 @@ class NetworkCimWriter(
         streetAddress: StreetAddress,
         description: String
     ): Boolean {
-        insert.setString(table.POSTAL_CODE.queryIndex, streetAddress.postalCode)
-        insert.setString(table.PO_BOX.queryIndex, streetAddress.poBox)
+        insert.setNullableString(table.POSTAL_CODE.queryIndex, streetAddress.postalCode)
+        insert.setNullableString(table.PO_BOX.queryIndex, streetAddress.poBox)
 
         insertTownDetail(table, insert, streetAddress.townDetail)
         insertStreetDetail(table, insert, streetAddress.streetDetail)
@@ -872,7 +872,7 @@ class NetworkCimWriter(
         val table = databaseTables.getTable<TablePoles>()
         val insert = databaseTables.getInsert<TablePoles>()
 
-        insert.setString(table.CLASSIFICATION.queryIndex, pole.classification)
+        insert.setNullableString(table.CLASSIFICATION.queryIndex, pole.classification)
 
         return writeStructure(table, insert, pole, "pole")
     }
@@ -935,7 +935,7 @@ class NetworkCimWriter(
         val insert = databaseTables.getInsert<TableUsagePoints>()
 
         insert.setNullableString(table.LOCATION_MRID.queryIndex, usagePoint.usagePointLocation?.mRID)
-        insert.setBoolean(table.IS_VIRTUAL.queryIndex, usagePoint.isVirtual)
+        insert.setNullableBoolean(table.IS_VIRTUAL.queryIndex, usagePoint.isVirtual)
         insert.setNullableString(table.CONNECTION_CATEGORY.queryIndex, usagePoint.connectionCategory)
         insert.setNullableInt(table.RATED_POWER.queryIndex, usagePoint.ratedPower)
         insert.setNullableInt(table.APPROVED_INVERTER_CAPACITY.queryIndex, usagePoint.approvedInverterCapacity)
@@ -1203,7 +1203,7 @@ class NetworkCimWriter(
         description: String
     ): Boolean {
         insert.setNullableString(table.LOCATION_MRID.queryIndex, powerSystemResource.location?.mRID)
-        insert.setInt(table.NUM_CONTROLS.queryIndex, powerSystemResource.numControls)
+        insert.setNullableInt(table.NUM_CONTROLS.queryIndex, powerSystemResource.numControls)
 
         return writeIdentifiedObject(table, insert, powerSystemResource, description)
     }
@@ -1420,7 +1420,7 @@ class NetworkCimWriter(
         val table = databaseTables.getTable<TableAnalogs>()
         val insert = databaseTables.getInsert<TableAnalogs>()
 
-        insert.setBoolean(table.POSITIVE_FLOW_IN.queryIndex, analog.positiveFlowIn)
+        insert.setNullableBoolean(table.POSITIVE_FLOW_IN.queryIndex, analog.positiveFlowIn)
 
         return writeMeasurement(table, insert, analog, "analog")
     }
@@ -1709,7 +1709,7 @@ class NetworkCimWriter(
         val insert = databaseTables.getInsert<TableEnergyConsumers>()
 
         insert.setNullableInt(table.CUSTOMER_COUNT.queryIndex, energyConsumer.customerCount)
-        insert.setBoolean(table.GROUNDED.queryIndex, energyConsumer.grounded)
+        insert.setNullableBoolean(table.GROUNDED.queryIndex, energyConsumer.grounded)
         insert.setNullableDouble(table.P.queryIndex, energyConsumer.p)
         insert.setNullableDouble(table.Q.queryIndex, energyConsumer.q)
         insert.setNullableDouble(table.P_FIXED.queryIndex, energyConsumer.pFixed)
@@ -1767,7 +1767,7 @@ class NetworkCimWriter(
         insert.setNullableDouble(table.X.queryIndex, energySource.x)
         insert.setNullableDouble(table.X0.queryIndex, energySource.x0)
         insert.setNullableDouble(table.XN.queryIndex, energySource.xn)
-        insert.setBoolean(table.IS_EXTERNAL_GRID.queryIndex, energySource.isExternalGrid)
+        insert.setNullableBoolean(table.IS_EXTERNAL_GRID.queryIndex, energySource.isExternalGrid)
         insert.setNullableDouble(table.R_MIN.queryIndex, energySource.rMin)
         insert.setNullableDouble(table.RN_MIN.queryIndex, energySource.rnMin)
         insert.setNullableDouble(table.R0_MIN.queryIndex, energySource.r0Min)
@@ -2240,7 +2240,7 @@ class NetworkCimWriter(
         regulatingCondEq: RegulatingCondEq,
         description: String
     ): Boolean {
-        insert.setBoolean(table.CONTROL_ENABLED.queryIndex, regulatingCondEq.controlEnabled)
+        insert.setNullableBoolean(table.CONTROL_ENABLED.queryIndex, regulatingCondEq.controlEnabled)
         insert.setNullableString(table.REGULATING_CONTROL_MRID.queryIndex, regulatingCondEq.regulatingControl?.mRID)
 
         return writeEnergyConnection(table, insert, regulatingCondEq, description)
@@ -2316,7 +2316,7 @@ class NetworkCimWriter(
         description: String
     ): Boolean {
         insert.setNullableString(table.SHUNT_COMPENSATOR_INFO_MRID.queryIndex, shuntCompensator.assetInfo?.mRID)
-        insert.setBoolean(table.GROUNDED.queryIndex, shuntCompensator.grounded)
+        insert.setNullableBoolean(table.GROUNDED.queryIndex, shuntCompensator.grounded)
         insert.setNullableInt(table.NOM_U.queryIndex, shuntCompensator.nomU)
         insert.setNullableString(table.PHASE_CONNECTION.queryIndex, shuntCompensator.phaseConnection.name)
         insert.setNullableDouble(table.SECTIONS.queryIndex, shuntCompensator.sections)
@@ -2399,7 +2399,7 @@ class NetworkCimWriter(
 
     @Throws(SQLException::class)
     private fun writeTapChanger(table: TableTapChangers, insert: PreparedStatement, tapChanger: TapChanger, description: String): Boolean {
-        insert.setBoolean(table.CONTROL_ENABLED.queryIndex, tapChanger.controlEnabled)
+        insert.setNullableBoolean(table.CONTROL_ENABLED.queryIndex, tapChanger.controlEnabled)
         insert.setNullableInt(table.HIGH_STEP.queryIndex, tapChanger.highStep)
         insert.setNullableInt(table.LOW_STEP.queryIndex, tapChanger.lowStep)
         insert.setNullableInt(table.NEUTRAL_STEP.queryIndex, tapChanger.neutralStep)
@@ -2447,7 +2447,7 @@ class NetworkCimWriter(
         insert.setInt(table.END_NUMBER.queryIndex, transformerEnd.endNumber)
         insert.setNullableString(table.TERMINAL_MRID.queryIndex, transformerEnd.terminal?.mRID)
         insert.setNullableString(table.BASE_VOLTAGE_MRID.queryIndex, transformerEnd.baseVoltage?.mRID)
-        insert.setBoolean(table.GROUNDED.queryIndex, transformerEnd.grounded)
+        insert.setNullableBoolean(table.GROUNDED.queryIndex, transformerEnd.grounded)
         insert.setNullableDouble(table.R_GROUND.queryIndex, transformerEnd.rGround)
         insert.setNullableDouble(table.X_GROUND.queryIndex, transformerEnd.xGround)
         insert.setNullableString(table.STAR_IMPEDANCE_MRID.queryIndex, transformerEnd.starImpedance?.mRID)

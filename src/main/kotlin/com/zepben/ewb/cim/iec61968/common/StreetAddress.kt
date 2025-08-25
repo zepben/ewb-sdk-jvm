@@ -17,8 +17,8 @@ package com.zepben.ewb.cim.iec61968.common
  * @property streetDetail Street detail.
  */
 data class StreetAddress(
-    val postalCode: String = "",
+    val postalCode: String? = null,
     val townDetail: TownDetail? = null,
-    val poBox: String = "",
+    val poBox: String? = null,
     val streetDetail: StreetDetail? = null
 )

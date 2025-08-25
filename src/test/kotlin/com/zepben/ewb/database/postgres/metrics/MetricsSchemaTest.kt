@@ -76,7 +76,7 @@ internal class MetricsSchemaTest {
             networkMetrics[TotalNetworkContainer]["abc"] = 1.2
         },
         "network_container_metrics",
-        listOf(uuid, "GLOBAL", "", "TOTAL", "abc", 1.2)
+        listOf(uuid, "GLOBAL", null, "TOTAL", "abc", 1.2)
     )
 
     @Test
@@ -112,7 +112,7 @@ internal class MetricsSchemaTest {
 
     private fun baseJob() = IngestionJob(uuid, metadata = IngestionMetadata(Instant.EPOCH, "source", "application", "applicationVersion"))
 
-    private fun validateJob(expectedJob: IngestionJob, tableName: String, vararg rows: List<Any>) {
+    private fun validateJob(expectedJob: IngestionJob, tableName: String, vararg rows: List<Any?>) {
         val result = MetricsDatabaseWriter(::getConnection).write(expectedJob)
         assertThat("Database should have been written", result)
 

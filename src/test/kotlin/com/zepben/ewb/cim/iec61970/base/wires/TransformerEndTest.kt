@@ -35,7 +35,7 @@ internal class TransformerEndTest {
     internal fun accessorCoverage() {
         val transformerEnd = object : TransformerEnd() {}
 
-        assertThat(transformerEnd.grounded, equalTo(false))
+        assertThat(transformerEnd.grounded, nullValue())
         assertThat(transformerEnd.rGround, nullValue())
         assertThat(transformerEnd.xGround, nullValue())
         assertThat(transformerEnd.baseVoltage, nullValue())

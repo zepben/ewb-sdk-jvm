@@ -15,6 +15,7 @@ import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.core.Name
 import com.zepben.ewb.cim.iec61970.base.core.NameType
 import com.zepben.ewb.database.sql.extensions.getInstant
+import com.zepben.ewb.database.sql.extensions.getNullableInt
 import com.zepben.ewb.database.sql.extensions.getNullableString
 import com.zepben.ewb.database.sqlite.cim.tables.iec61968.common.TableDocuments
 import com.zepben.ewb.database.sqlite.cim.tables.iec61968.common.TableOrganisationRoles
@@ -58,12 +59,12 @@ internal abstract class CimReader<TService : BaseService> {
     @Throws(SQLException::class)
     protected fun readDocument(document: Document, table: TableDocuments, resultSet: ResultSet): Boolean {
         document.apply {
-            title = resultSet.getString(table.TITLE.queryIndex).emptyIfNull().internEmpty()
+            title = resultSet.getNullableString(table.TITLE.queryIndex)?.internEmpty()
             createdDateTime = resultSet.getInstant(table.CREATED_DATE_TIME.queryIndex)
-            authorName = resultSet.getString(table.AUTHOR_NAME.queryIndex).emptyIfNull().internEmpty()
-            type = resultSet.getString(table.TYPE.queryIndex).emptyIfNull().internEmpty()
-            status = resultSet.getString(table.STATUS.queryIndex).emptyIfNull().internEmpty()
-            comment = resultSet.getString(table.COMMENT.queryIndex).emptyIfNull().internEmpty()
+            authorName = resultSet.getNullableString(table.AUTHOR_NAME.queryIndex)?.internEmpty()
+            type = resultSet.getNullableString(table.TYPE.queryIndex)?.internEmpty()
+            status = resultSet.getNullableString(table.STATUS.queryIndex)?.internEmpty()
+            comment = resultSet.getNullableString(table.COMMENT.queryIndex)?.internEmpty()
         }
 
         return readIdentifiedObject(document, table, resultSet)
@@ -127,9 +128,9 @@ internal abstract class CimReader<TService : BaseService> {
     @Throws(SQLException::class)
     protected fun readIdentifiedObject(identifiedObject: IdentifiedObject, table: TableIdentifiedObjects, resultSet: ResultSet): Boolean {
         identifiedObject.apply {
-            name = resultSet.getString(table.NAME.queryIndex).emptyIfNull().internEmpty()
-            description = resultSet.getString(table.DESCRIPTION.queryIndex).emptyIfNull().internEmpty()
-            numDiagramObjects = resultSet.getInt(table.NUM_DIAGRAM_OBJECTS.queryIndex)
+            name = resultSet.getNullableString(table.NAME.queryIndex)?.internEmpty()
+            description = resultSet.getNullableString(table.DESCRIPTION.queryIndex)?.internEmpty()
+            numDiagramObjects = resultSet.getNullableInt(table.NUM_DIAGRAM_OBJECTS.queryIndex)
         }
 
         return true

@@ -45,7 +45,7 @@ internal class EnergySourceTest {
         assertThat(energySource.x, nullValue())
         assertThat(energySource.x0, nullValue())
         assertThat(energySource.xn, nullValue())
-        assertThat(energySource.isExternalGrid, equalTo(false))
+        assertThat(energySource.isExternalGrid, nullValue())
         assertThat(energySource.rMin, nullValue())
         assertThat(energySource.rnMin, nullValue())
         assertThat(energySource.r0Min, nullValue())

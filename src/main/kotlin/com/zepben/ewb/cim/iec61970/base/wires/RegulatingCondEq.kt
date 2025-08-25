@@ -15,7 +15,7 @@ package com.zepben.ewb.cim.iec61970.base.wires
  */
 abstract class RegulatingCondEq(mRID: String = "") : EnergyConnection(mRID) {
 
-    var controlEnabled: Boolean = true
+    var controlEnabled: Boolean? = null
     var regulatingControl: RegulatingControl? = null
         set(value) {
             field =

@@ -9,12 +9,12 @@
 package com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.meas
 
 import com.zepben.ewb.database.sql.Column
-import com.zepben.ewb.database.sql.Column.Nullable.NOT_NULL
+import com.zepben.ewb.database.sql.Column.Nullable.NULL
 
 @Suppress("PropertyName")
 class TableAnalogs : TableMeasurements() {
 
-    val POSITIVE_FLOW_IN: Column = Column(++columnIndex, "positive_flow_in", "BOOLEAN", NOT_NULL)
+    val POSITIVE_FLOW_IN: Column = Column(++columnIndex, "positive_flow_in", "BOOLEAN", NULL)
 
     override val name: String = "analogs"
 

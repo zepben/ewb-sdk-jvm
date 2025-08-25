@@ -26,7 +26,7 @@ class NameType(val name: String) {
     private var namesIndex: MutableMap<String, Name> = mutableMapOf()
     private var namesMultiIndex: MutableMap<String, MutableMap<IdentifiedObject, Name>> = mutableMapOf()
 
-    var description: String = ""
+    var description: String? = null
 
     /**
      * All names of this type.

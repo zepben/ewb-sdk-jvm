@@ -36,7 +36,7 @@ internal class UsagePointTest {
         val usagePoint = UsagePoint()
 
         assertThat(usagePoint.usagePointLocation, nullValue())
-        assertThat(usagePoint.isVirtual, equalTo(false))
+        assertThat(usagePoint.isVirtual, nullValue())
         assertThat(usagePoint.connectionCategory, nullValue())
         assertThat(usagePoint.ratedPower, nullValue())
         assertThat(usagePoint.approvedInverterCapacity, nullValue())

@@ -16,7 +16,7 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.core.TablePowerSy
 @Suppress("PropertyName")
 abstract class TableTapChangers : TablePowerSystemResources() {
 
-    val CONTROL_ENABLED: Column = Column(++columnIndex, "control_enabled", "BOOLEAN", NOT_NULL)
+    val CONTROL_ENABLED: Column = Column(++columnIndex, "control_enabled", "BOOLEAN", NULL)
     val HIGH_STEP: Column = Column(++columnIndex, "high_step", "INTEGER", NULL)
     val LOW_STEP: Column = Column(++columnIndex, "low_step", "INTEGER", NULL)
     val NEUTRAL_STEP: Column = Column(++columnIndex, "neutral_step", "INTEGER", NULL)

@@ -31,7 +31,7 @@ import com.zepben.ewb.cim.iec61970.base.core.PowerSystemResource
  */
 abstract class TapChanger(mRID: String = "") : PowerSystemResource(mRID) {
 
-    var controlEnabled: Boolean = true
+    var controlEnabled: Boolean? = null
 
     var tapChangerControl: TapChangerControl? = null
 

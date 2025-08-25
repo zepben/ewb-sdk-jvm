@@ -16,6 +16,6 @@ import com.zepben.ewb.database.sql.Column.Nullable.NULL
 abstract class TablePowerSystemResources : TableIdentifiedObjects() {
 
     val LOCATION_MRID: Column = Column(++columnIndex, "location_mrid", "TEXT", NULL)
-    val NUM_CONTROLS: Column = Column(++columnIndex, "num_controls", "INTEGER", NOT_NULL)
+    val NUM_CONTROLS: Column = Column(++columnIndex, "num_controls", "INTEGER", NULL)
 
 }

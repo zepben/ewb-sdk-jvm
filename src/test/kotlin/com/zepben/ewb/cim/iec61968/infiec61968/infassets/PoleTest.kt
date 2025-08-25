@@ -12,8 +12,7 @@ import com.zepben.ewb.cim.iec61968.assets.Streetlight
 import com.zepben.ewb.utils.PrivateCollectionValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -33,7 +32,7 @@ internal class PoleTest {
     internal fun accessorCoverage() {
         val pole = Pole("id")
 
-        assertThat(pole.classification, equalTo(""))
+        assertThat(pole.classification, nullValue())
 
         pole.classification = "classification"
 

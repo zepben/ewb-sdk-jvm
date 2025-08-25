@@ -16,11 +16,11 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.core.TableIdentif
 @Suppress("PropertyName")
 abstract class TableDocuments : TableIdentifiedObjects() {
 
-    val TITLE: Column = Column(++columnIndex, "title", "TEXT", NOT_NULL)
+    val TITLE: Column = Column(++columnIndex, "title", "TEXT", NULL)
     val CREATED_DATE_TIME: Column = Column(++columnIndex, "created_date_time", "TEXT", NULL)
-    val AUTHOR_NAME: Column = Column(++columnIndex, "author_name", "TEXT", NOT_NULL)
-    val TYPE: Column = Column(++columnIndex, "type", "TEXT", NOT_NULL)
-    val STATUS: Column = Column(++columnIndex, "status", "TEXT", NOT_NULL)
-    val COMMENT: Column = Column(++columnIndex, "comment", "TEXT", NOT_NULL)
+    val AUTHOR_NAME: Column = Column(++columnIndex, "author_name", "TEXT", NULL)
+    val TYPE: Column = Column(++columnIndex, "type", "TEXT", NULL)
+    val STATUS: Column = Column(++columnIndex, "status", "TEXT", NULL)
+    val COMMENT: Column = Column(++columnIndex, "comment", "TEXT", NULL)
 
 }

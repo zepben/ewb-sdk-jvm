@@ -13,7 +13,7 @@ package com.zepben.ewb.cim.iec61968.metering
  */
 class Meter @JvmOverloads constructor(mRID: String = "") : EndDevice(mRID) {
 
-    var companyMeterId: String
+    var companyMeterId: String?
         get() = name
         set(value) {
             name = value

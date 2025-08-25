@@ -24,10 +24,10 @@ import java.time.Instant
  */
 abstract class Document(mRID: String = "") : IdentifiedObject(mRID) {
 
-    var title: String = ""
+    var title: String? = null
     var createdDateTime: Instant? = null
-    var authorName: String = ""
-    var type: String = ""
-    var status: String = ""
-    var comment: String = ""
+    var authorName: String? = null
+    var type: String? = null
+    var status: String? = null
+    var comment: String? = null
 }

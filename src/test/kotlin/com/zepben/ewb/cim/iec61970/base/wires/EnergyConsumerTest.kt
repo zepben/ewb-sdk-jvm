@@ -34,7 +34,7 @@ internal class EnergyConsumerTest {
         val energyConsumer = EnergyConsumer()
 
         assertThat(energyConsumer.customerCount, nullValue())
-        assertThat(energyConsumer.grounded, equalTo(false))
+        assertThat(energyConsumer.grounded, nullValue())
         assertThat(energyConsumer.p, nullValue())
         assertThat(energyConsumer.pFixed, nullValue())
         assertThat(energyConsumer.phaseConnection, equalTo(PhaseShuntConnectionKind.D))

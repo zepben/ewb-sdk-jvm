@@ -33,7 +33,7 @@ internal class TapChangerTest {
     internal fun accessorCoverage() {
         val tapChanger = object : TapChanger() {}
 
-        assertThat(tapChanger.controlEnabled, equalTo(true))
+        assertThat(tapChanger.controlEnabled, nullValue())
         assertThat(tapChanger.highStep, nullValue())
         assertThat(tapChanger.lowStep, nullValue())
         assertThat(tapChanger.neutralStep, nullValue())

@@ -15,7 +15,7 @@ import com.zepben.ewb.database.sql.Column.Nullable.NULL
 @Suppress("PropertyName")
 abstract class TableStreetAddresses : TableTownDetails() {
 
-    val POSTAL_CODE: Column = Column(++columnIndex, "postal_code", "TEXT", NOT_NULL)
+    val POSTAL_CODE: Column = Column(++columnIndex, "postal_code", "TEXT", NULL)
     val PO_BOX: Column = Column(++columnIndex, "po_box", "TEXT", NULL)
     val BUILDING_NAME: Column = Column(++columnIndex, "building_name", "TEXT", NULL)
     val FLOOR_IDENTIFICATION: Column = Column(++columnIndex, "floor_identification", "TEXT", NULL)

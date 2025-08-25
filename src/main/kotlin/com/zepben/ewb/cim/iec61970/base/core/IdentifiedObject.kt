@@ -27,8 +27,8 @@ abstract class IdentifiedObject(mRID: String = "") {
     private var _names: MutableSet<Name>? = null
 
     val mRID: String = mRID.ifEmpty { UUID.randomUUID().toString() }
-    var name: String = ""
-    var description: String = ""
+    var name: String? = null
+    var description: String? = null
     var numDiagramObjects: Int? = null
 
     /**

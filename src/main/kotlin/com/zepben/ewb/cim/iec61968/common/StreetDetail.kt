@@ -36,13 +36,13 @@ data class StreetDetail(
      * @return true if all fields are empty, otherwise false
      */
     fun allFieldsEmpty(): Boolean = (
-        buildingName.isEmpty() &&
-            floorIdentification.isEmpty() &&
-            name.isEmpty() &&
-            number.isEmpty() &&
-            suiteNumber.isEmpty() &&
-            type.isEmpty() &&
-            displayAddress.isEmpty()
+        buildingName.isNullOrEmpty() &&
+            floorIdentification.isNullOrEmpty() &&
+            name.isNullOrEmpty() &&
+            number.isNullOrEmpty() &&
+            suiteNumber.isNullOrEmpty() &&
+            type.isNullOrEmpty() &&
+            displayAddress.isNullOrEmpty()
         )
 
 }

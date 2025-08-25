@@ -10,8 +10,7 @@ package com.zepben.ewb.cim.iec61968.metering
 
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -31,8 +30,8 @@ internal class MeterTest {
     internal fun accessorCoverage() {
         val meter = Meter()
 
-        assertThat(meter.companyMeterId, equalTo(""))
-        assertThat(meter.name, equalTo(""))
+        assertThat(meter.companyMeterId, nullValue())
+        assertThat(meter.name, nullValue())
 
         meter.name = "name"
 

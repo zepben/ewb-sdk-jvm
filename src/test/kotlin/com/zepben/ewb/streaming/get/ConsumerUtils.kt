@@ -34,32 +34,32 @@ object ConsumerUtils {
 
     fun buildFromBuilder(builder: Any, mRID: String): Any = buildFromBuilder(builder, "setMRID" to mRID)
 
-    fun buildFromBuilder(builder: Any, vararg props: Pair<String, Any>): Any = buildFromBuilder(builder, props.toMap())
+    fun buildFromBuilder(builder: Any, vararg props: Pair<String, Any?>): Any = buildFromBuilder(builder, props.toMap())
 
-    fun buildFromBuilder(builder: Any, props: Map<String, Any>): Any {
+    fun buildFromBuilder(builder: Any, props: Map<String, Any?>): Any {
         println("-> ${builder::class.java.enclosingClass.simpleName}.${builder::class.simpleName}")
 
         // Add any customisations required to build the object at a bare minimum
         if (builder is TapChanger.Builder)
-            builder.highStep = 1
+            builder.highStepSet = 1
 
         if (builder is PowerElectronicsConnection.Builder) {
-            builder.invWattRespV1 = 200
-            builder.invWattRespV2 = 216
-            builder.invWattRespV3 = 235
-            builder.invWattRespV4 = 244
-            builder.invWattRespPAtV1 = 0.0f
-            builder.invWattRespPAtV2 = 0.0f
-            builder.invWattRespPAtV3 = 0.0f
-            builder.invWattRespPAtV4 = 0.0f
-            builder.invVarRespV1 = 200
-            builder.invVarRespV2 = 200
-            builder.invVarRespV3 = 200
-            builder.invVarRespV4 = 200
-            builder.invVarRespQAtV1 = 0.0f
-            builder.invVarRespQAtV2 = 0.0f
-            builder.invVarRespQAtV3 = 0.0f
-            builder.invVarRespQAtV4 = 0.0f
+            builder.invWattRespV1Set = 200
+            builder.invWattRespV2Set = 216
+            builder.invWattRespV3Set = 235
+            builder.invWattRespV4Set = 244
+            builder.invWattRespPAtV1Set = 0.0f
+            builder.invWattRespPAtV2Set = 0.0f
+            builder.invWattRespPAtV3Set = 0.0f
+            builder.invWattRespPAtV4Set = 0.0f
+            builder.invVarRespV1Set = 200
+            builder.invVarRespV2Set = 200
+            builder.invVarRespV3Set = 200
+            builder.invVarRespV4Set = 200
+            builder.invVarRespQAtV1Set = 0.0f
+            builder.invVarRespQAtV2Set = 0.0f
+            builder.invVarRespQAtV3Set = 0.0f
+            builder.invVarRespQAtV4Set = 0.0f
         }
 
         props.forEach { (name, value) -> builder::class.declaredMemberFunctions.find { it.name == name }?.call(builder, value) }

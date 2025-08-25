@@ -31,12 +31,12 @@ internal class DocumentTest {
     internal fun accessorCoverage() {
         val document = object : Document() {}
 
-        assertThat(document.title, equalTo(""))
+        assertThat(document.title, nullValue())
         assertThat(document.createdDateTime, nullValue())
-        assertThat(document.authorName, equalTo(""))
-        assertThat(document.type, equalTo(""))
-        assertThat(document.status, equalTo(""))
-        assertThat(document.comment, equalTo(""))
+        assertThat(document.authorName, nullValue())
+        assertThat(document.type, nullValue())
+        assertThat(document.status, nullValue())
+        assertThat(document.comment, nullValue())
 
         document.apply {
             title = "title"

@@ -58,8 +58,8 @@ fun toCim(pb: PBOrganisationRole, cim: OrganisationRole, baseService: BaseServic
 
 fun toCim(pb: PBIdentifiedObject, cim: IdentifiedObject, baseService: BaseService): IdentifiedObject =
     cim.apply {
-        name = pb.nameSet.takeUnless { pb.hasNameNull() } ?: ""
-        description = pb.descriptionSet.takeUnless { pb.hasDescriptionNull() } ?: ""
+        name = pb.nameSet.takeUnless { pb.hasNameNull() }
+        description = pb.descriptionSet.takeUnless { pb.hasDescriptionNull() }
         numDiagramObjects = pb.numDiagramObjectsSet.takeUnless { pb.hasNumDiagramObjectsNull() }
         pb.namesList.forEach { entry ->
             val nameType = baseService.getNameType(entry.type) ?: NameType(entry.type).also { baseService.addNameType(it) }

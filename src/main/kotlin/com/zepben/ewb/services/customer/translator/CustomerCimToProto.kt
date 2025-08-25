@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.services.customer.translator
 
+import com.google.protobuf.NullValue
 import com.zepben.ewb.cim.iec61968.common.Agreement
 import com.zepben.ewb.cim.iec61968.customers.Customer
 import com.zepben.ewb.cim.iec61968.customers.CustomerAgreement
@@ -53,8 +54,8 @@ fun toPb(cim: Customer, pb: PBCustomer.Builder): PBCustomer.Builder =
         kind = mapCustomerKind.toPb(cim.kind)
         clearCustomerAgreementMRIDs()
         cim.agreements.forEach { addCustomerAgreementMRIDs(it.mRID) }
-        numEndDevices = cim.numEndDevices ?: UNKNOWN_INT
-        cim.specialNeed?.let { specialNeed = it } ?: clearSpecialNeed()
+        cim.numEndDevices?.also { numEndDevicesSet = it } ?: run { numEndDevicesNull = NullValue.NULL_VALUE }
+        cim.specialNeed?.let { specialNeedSet = it } ?: run { specialNeedNull = NullValue.NULL_VALUE }
         toPb(cim, orBuilder)
     }
 

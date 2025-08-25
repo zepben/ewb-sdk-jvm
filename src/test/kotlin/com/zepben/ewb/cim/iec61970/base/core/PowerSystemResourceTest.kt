@@ -36,7 +36,7 @@ internal class PowerSystemResourceTest {
 
         assertThat(powerSystemResource.assetInfo, nullValue())
         assertThat(powerSystemResource.location, nullValue())
-        assertThat(powerSystemResource.numControls, equalTo(0))
+        assertThat(powerSystemResource.numControls, nullValue())
         assertThat(powerSystemResource.hasControls(), equalTo(false))
 
         powerSystemResource.location = location

@@ -34,7 +34,7 @@ internal class ShuntCompensatorTest {
         val shuntCompensator = object : ShuntCompensator() {}
 
         assertThat(shuntCompensator.assetInfo, nullValue())
-        assertThat(shuntCompensator.grounded, equalTo(false))
+        assertThat(shuntCompensator.grounded, nullValue())
         assertThat(shuntCompensator.nomU, nullValue())
         assertThat(shuntCompensator.phaseConnection, equalTo(PhaseShuntConnectionKind.UNKNOWN))
         assertThat(shuntCompensator.sections, nullValue())

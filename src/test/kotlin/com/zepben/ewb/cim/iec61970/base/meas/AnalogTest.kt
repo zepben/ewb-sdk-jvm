@@ -13,6 +13,7 @@ import com.zepben.ewb.services.network.testdata.fillFields
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -31,7 +32,7 @@ internal class AnalogTest {
     @Test
     internal fun accessorCoverage() {
         val analog = Analog()
-        assertThat(analog.positiveFlowIn, equalTo(false))
+        assertThat(analog.positiveFlowIn, nullValue())
 
         analog.fillFields(NetworkService())
 

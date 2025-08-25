@@ -97,7 +97,7 @@ internal abstract class TranslatorTestBase<S : BaseService>(
         val cim = createService().addFromPb(pb)
 
         assertThat(cim.name, equalTo(pb.name))
-        assertThat(cim.description, equalTo(pb.description))
+        assertThat(cim.description, equalTo(pb.descriptionSet))
     }
 
     @Test
@@ -110,7 +110,7 @@ internal abstract class TranslatorTestBase<S : BaseService>(
         val cim = createService().apply { addNameType(nt) }.addFromPb(pb)
 
         assertThat(cim, sameInstance(nt))
-        assertThat(cim.description, equalTo(pb.description))
+        assertThat(cim.description, equalTo(pb.descriptionSet))
     }
 
     /**

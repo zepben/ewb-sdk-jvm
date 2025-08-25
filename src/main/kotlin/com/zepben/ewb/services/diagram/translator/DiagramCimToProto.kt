@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.services.diagram.translator
 
+import com.google.protobuf.NullValue
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.ewb.cim.iec61970.base.diagramlayout.DiagramObject
@@ -46,7 +47,7 @@ fun toPb(cim: DiagramObject, pb: PBDiagramObject.Builder): PBDiagramObject.Build
     pb.apply {
         cim.diagram?.let { diagramMRID = it.mRID } ?: clearDiagramMRID()
         cim.identifiedObjectMRID?.let { identifiedObjectMRID = it } ?: clearIdentifiedObjectMRID()
-        cim.style?.let { diagramObjectStyle = it } ?: clearDiagramObjectStyle()
+        cim.style?.let { diagramObjectStyleSet = it } ?: run { diagramObjectStyleNull = NullValue.NULL_VALUE }
         rotation = cim.rotation
         clearDiagramObjectPoints()
         cim.points.forEach { point -> addDiagramObjectPoints(toPb(point, PBDiagramObjectPoint.newBuilder())) }

@@ -16,7 +16,7 @@ import com.zepben.ewb.database.sql.Column.Nullable.NULL
 class TableEnergyConsumers : TableEnergyConnections() {
 
     val CUSTOMER_COUNT: Column = Column(++columnIndex, "customer_count", "INTEGER", NULL)
-    val GROUNDED: Column = Column(++columnIndex, "grounded", "BOOLEAN", NOT_NULL)
+    val GROUNDED: Column = Column(++columnIndex, "grounded", "BOOLEAN", NULL)
     val P: Column = Column(++columnIndex, "p", "NUMBER", NULL)
     val Q: Column = Column(++columnIndex, "q", "NUMBER", NULL)
     val P_FIXED: Column = Column(++columnIndex, "p_fixed", "NUMBER", NULL)

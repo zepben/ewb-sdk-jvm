@@ -111,11 +111,11 @@ internal class BaseServiceTest {
         validateForEach<AcLineSegment>(listOf(acLineSegment1, acLineSegment2))
 
         validateForEachFiltered<IdentifiedObject>(
-            { it.name.isEmpty() },
+            { it.name.isNullOrEmpty() },
             listOf(breaker1, acLineSegment2)
         )
-        validateForEachFiltered<Breaker>({ it.name.isEmpty() }, listOf(breaker1))
-        validateForEachFiltered<AcLineSegment>({ it.name.isEmpty() }, listOf(acLineSegment2))
+        validateForEachFiltered<Breaker>({ it.name.isNullOrEmpty() }, listOf(breaker1))
+        validateForEachFiltered<AcLineSegment>({ it.name.isNullOrEmpty() }, listOf(acLineSegment2))
     }
 
     @Test
@@ -130,9 +130,9 @@ internal class BaseServiceTest {
         assertThat(service.listOf(), containsInAnyOrder<IdentifiedObject>(breaker1, breaker2, acLineSegment1, acLineSegment2))
         assertThat(service.listOf(), containsInAnyOrder(breaker1, breaker2))
         assertThat(service.listOf(), containsInAnyOrder(acLineSegment1, acLineSegment2))
-        assertThat(service.listOf { it.name.isEmpty() }, containsInAnyOrder<IdentifiedObject>(breaker1, acLineSegment2))
-        assertThat(service.listOf { it.name.isEmpty() }, containsInAnyOrder(breaker1))
-        assertThat(service.listOf { it.name.isEmpty() }, containsInAnyOrder(acLineSegment2))
+        assertThat(service.listOf { it.name.isNullOrEmpty() }, containsInAnyOrder<IdentifiedObject>(breaker1, acLineSegment2))
+        assertThat(service.listOf { it.name.isNullOrEmpty() }, containsInAnyOrder(breaker1))
+        assertThat(service.listOf { it.name.isNullOrEmpty() }, containsInAnyOrder(acLineSegment2))
     }
 
     @Test
@@ -140,9 +140,9 @@ internal class BaseServiceTest {
         assertThat(service.setOf(), containsInAnyOrder<IdentifiedObject>(breaker1, breaker2, acLineSegment1, acLineSegment2))
         assertThat(service.setOf(), containsInAnyOrder(breaker1, breaker2))
         assertThat(service.setOf(), containsInAnyOrder(acLineSegment1, acLineSegment2))
-        assertThat(service.setOf { it.name.isEmpty() }, containsInAnyOrder<IdentifiedObject>(breaker1, acLineSegment2))
-        assertThat(service.setOf { it.name.isEmpty() }, containsInAnyOrder(breaker1))
-        assertThat(service.setOf { it.name.isEmpty() }, containsInAnyOrder(acLineSegment2))
+        assertThat(service.setOf { it.name.isNullOrEmpty() }, containsInAnyOrder<IdentifiedObject>(breaker1, acLineSegment2))
+        assertThat(service.setOf { it.name.isNullOrEmpty() }, containsInAnyOrder(breaker1))
+        assertThat(service.setOf { it.name.isNullOrEmpty() }, containsInAnyOrder(acLineSegment2))
     }
 
     @Test
@@ -159,14 +159,14 @@ internal class BaseServiceTest {
         assertThat(service.mapOf<AcLineSegment>().keys, containsInAnyOrder(acLineSegment1.mRID, acLineSegment2.mRID))
         assertThat(service.mapOf<AcLineSegment>().values, containsInAnyOrder(acLineSegment1, acLineSegment2))
 
-        assertThat(service.mapOf<IdentifiedObject> { it.name.isEmpty() }.keys, containsInAnyOrder(breaker1.mRID, acLineSegment2.mRID))
-        assertThat(service.mapOf<IdentifiedObject> { it.name.isEmpty() }.values, containsInAnyOrder(breaker1, acLineSegment2))
+        assertThat(service.mapOf<IdentifiedObject> { it.name.isNullOrEmpty() }.keys, containsInAnyOrder(breaker1.mRID, acLineSegment2.mRID))
+        assertThat(service.mapOf<IdentifiedObject> { it.name.isNullOrEmpty() }.values, containsInAnyOrder(breaker1, acLineSegment2))
 
-        assertThat(service.mapOf<Breaker> { it.name.isEmpty() }.keys, containsInAnyOrder(breaker1.mRID))
-        assertThat(service.mapOf<Breaker> { it.name.isEmpty() }.values, containsInAnyOrder(breaker1))
+        assertThat(service.mapOf<Breaker> { it.name.isNullOrEmpty() }.keys, containsInAnyOrder(breaker1.mRID))
+        assertThat(service.mapOf<Breaker> { it.name.isNullOrEmpty() }.values, containsInAnyOrder(breaker1))
 
-        assertThat(service.mapOf<AcLineSegment> { it.name.isEmpty() }.keys, containsInAnyOrder(acLineSegment2.mRID))
-        assertThat(service.mapOf<AcLineSegment> { it.name.isEmpty() }.values, containsInAnyOrder(acLineSegment2))
+        assertThat(service.mapOf<AcLineSegment> { it.name.isNullOrEmpty() }.keys, containsInAnyOrder(acLineSegment2.mRID))
+        assertThat(service.mapOf<AcLineSegment> { it.name.isNullOrEmpty() }.values, containsInAnyOrder(acLineSegment2))
     }
 
     @Test

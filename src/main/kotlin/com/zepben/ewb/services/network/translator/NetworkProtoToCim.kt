@@ -371,7 +371,7 @@ fun toCim(pb: PBProtectionRelayFunction, cim: ProtectionRelayFunction, networkSe
         pb.schemeMRIDsList.forEach { schemeMRID ->
             networkService.resolveOrDeferReference(Resolvers.schemes(this), schemeMRID)
         }
-        model = pb.modelSet.takeIf { pb.hasModelNull() }
+        model = pb.modelSet.takeUnless { pb.hasModelNull() }
         reclosing = pb.reclosingSet.takeUnless { pb.hasReclosingNull() }
         relayDelayTime = pb.relayDelayTimeSet.takeUnless { pb.hasRelayDelayTimeNull() }
         protectionKind = mapProtectionKind.toCim(pb.protectionKind)
@@ -424,7 +424,7 @@ fun toCim(pb: PBProtectionRelaySystem, networkService: NetworkService): Protecti
  * @return The converted [pb] as a CIM [RelaySetting].
  */
 fun toCim(pb: PBRelaySetting): RelaySetting =
-    RelaySetting(mapUnitSymbol.toCim(pb.unitSymbol), pb.valueSet, pb.nameSet.takeIf { pb.hasNameNull() })
+    RelaySetting(mapUnitSymbol.toCim(pb.unitSymbol), pb.value, pb.nameSet.takeUnless { pb.hasNameNull() })
 
 /**
  * Convert the protobuf [PBVoltageRelay] into its CIM counterpart.
@@ -950,10 +950,10 @@ fun NetworkService.addFromPb(pb: PBLocation): Location? = tryAddOrNull(toCim(pb,
  */
 fun toCim(pb: PBCurrentTransformerInfo, networkService: NetworkService): CurrentTransformerInfo =
     CurrentTransformerInfo(pb.mRID()).apply {
-        accuracyClass = pb.accuracyClassSet.takeIf { pb.hasAccuracyClassNull() }
+        accuracyClass = pb.accuracyClassSet.takeUnless { pb.hasAccuracyClassNull() }
         accuracyLimit = pb.accuracyLimitSet.takeUnless { pb.hasAccuracyLimitNull() }
         coreCount = pb.coreCountSet.takeUnless { pb.hasCoreCountNull() }
-        ctClass = pb.ctClassSet.takeIf { pb.hasCtClassNull() }
+        ctClass = pb.ctClassSet.takeUnless { pb.hasCtClassNull() }
         kneePointVoltage = pb.kneePointVoltageSet.takeUnless { pb.hasKneePointVoltageNull() }
         maxRatio = if (pb.hasMaxRatio()) toCim(pb.maxRatio) else null
         nominalRatio = if (pb.hasNominalRatio()) toCim(pb.nominalRatio) else null
@@ -961,7 +961,7 @@ fun toCim(pb: PBCurrentTransformerInfo, networkService: NetworkService): Current
         ratedCurrent = pb.ratedCurrentSet.takeUnless { pb.hasRatedCurrentNull() }
         secondaryFlsRating = pb.secondaryFlsRatingSet.takeUnless { pb.hasSecondaryFlsRatingNull() }
         secondaryRatio = pb.secondaryRatioSet.takeUnless { pb.hasSecondaryRatioNull() }
-        usage = pb.usageSet.takeIf { pb.hasUsageNull() }
+        usage = pb.usageSet.takeUnless { pb.hasUsageNull() }
         toCim(pb.ai, this, networkService)
     }
 
@@ -974,10 +974,10 @@ fun toCim(pb: PBCurrentTransformerInfo, networkService: NetworkService): Current
  */
 fun toCim(pb: PBPotentialTransformerInfo, networkService: NetworkService): PotentialTransformerInfo =
     PotentialTransformerInfo(pb.mRID()).apply {
-        accuracyClass = pb.accuracyClassSet.takeIf { pb.hasAccuracyClassNull() }
+        accuracyClass = pb.accuracyClassSet.takeUnless { pb.hasAccuracyClassNull() }
         nominalRatio = if (pb.hasNominalRatio()) toCim(pb.nominalRatio) else null
         primaryRatio = pb.primaryRatioSet.takeUnless { pb.hasPrimaryRatioNull() }
-        ptClass = pb.ptClassSet.takeIf { pb.hasPtClassNull() }
+        ptClass = pb.ptClassSet.takeUnless { pb.hasPtClassNull() }
         ratedVoltage = pb.ratedVoltageSet.takeUnless { pb.hasRatedVoltageNull() }
         secondaryRatio = pb.secondaryRatioSet.takeUnless { pb.hasSecondaryRatioNull() }
         toCim(pb.ai, this, networkService)
@@ -1093,9 +1093,9 @@ fun toCim(pb: PBUsagePoint, networkService: NetworkService): UsagePoint =
     UsagePoint(pb.mRID()).apply {
         networkService.resolveOrDeferReference(Resolvers.usagePointLocation(this), pb.usagePointLocationMRID)
         isVirtual = pb.isVirtualSet.takeUnless { pb.hasIsVirtualNull() }
-        connectionCategory = pb.connectionCategorySet.takeIf { pb.hasConnectionCategoryNull() }
-        ratedPower = pb.ratedPowerSet.takeIf { pb.hasRatedPowerNull() }
-        approvedInverterCapacity = pb.approvedInverterCapacitySet.takeIf { pb.hasApprovedInverterCapacityNull() }
+        connectionCategory = pb.connectionCategorySet.takeUnless { pb.hasConnectionCategoryNull() }
+        ratedPower = pb.ratedPowerSet.takeUnless { pb.hasRatedPowerNull() }
+        approvedInverterCapacity = pb.approvedInverterCapacitySet.takeUnless { pb.hasApprovedInverterCapacityNull() }
         phaseCode = mapPhaseCode.toCim(pb.phaseCode)
 
         pb.equipmentMRIDsList.forEach { equipmentMRID ->
@@ -2296,7 +2296,7 @@ fun toCim(pb: PBPowerElectronicsConnection, networkService: NetworkService): Pow
         q = pb.qSet.takeUnless { pb.hasQNull() }
         ratedS = pb.ratedSSet.takeUnless { pb.hasRatedSNull() }
         ratedU = pb.ratedUSet.takeUnless { pb.hasRatedUNull() }
-        inverterStandard = pb.inverterStandardSet.takeIf { pb.hasInverterStandardNull() }
+        inverterStandard = pb.inverterStandardSet.takeUnless { pb.hasInverterStandardNull() }
         sustainOpOvervoltLimit = pb.sustainOpOvervoltLimitSet.takeUnless { pb.hasSustainOpOvervoltLimitNull() }
         stopAtOverFreq = pb.stopAtOverFreqSet.takeUnless { pb.hasStopAtOverFreqNull() }
         stopAtUnderFreq = pb.stopAtUnderFreqSet.takeUnless { pb.hasStopAtUnderFreqNull() }
@@ -2703,7 +2703,7 @@ fun toCim(pb: PBTransformerStarImpedance, networkService: NetworkService): Trans
         r = pb.rSet.takeUnless { pb.hasRNull() }
         r0 = pb.r0Set.takeUnless { pb.hasR0Null() }
         x = pb.xSet.takeUnless { pb.hasXNull() }
-        x0 = pb.xSet0.takeUnless { pb.hasXNull(*) }
+        x0 = pb.x0Set.takeUnless { pb.hasXNull() }
         toCim(pb.io, this, networkService)
     }
 

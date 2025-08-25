@@ -45,7 +45,7 @@ fun toCim(pb: PBCustomer, customerService: CustomerService): Customer =
             customerService.resolveOrDeferReference(Resolvers.agreements(this), agreementMRID)
         }
         numEndDevices = pb.numEndDevicesSet.takeUnless { pb.hasNumEndDevicesNull() }
-        specialNeed = pb.specialNeedSet.takeIf { pb.hasSpecialNeedNull() }
+        specialNeed = pb.specialNeedSet.takeUnless { pb.hasSpecialNeedNull() }
         toCim(pb.or, this, customerService)
     }
 

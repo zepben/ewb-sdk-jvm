@@ -16,7 +16,7 @@ import com.zepben.ewb.database.sql.Column.Nullable.NULL
 abstract class TableShuntCompensators : TableRegulatingCondEq() {
 
     val SHUNT_COMPENSATOR_INFO_MRID: Column = Column(++columnIndex, "shunt_compensator_info_mrid", "TEXT", NULL)
-    val GROUNDED: Column = Column(++columnIndex, "grounded", "BOOLEAN", NOT_NULL)
+    val GROUNDED: Column = Column(++columnIndex, "grounded", "BOOLEAN", NULL)
     val NOM_U: Column = Column(++columnIndex, "nom_u", "INTEGER", NULL)
     val PHASE_CONNECTION: Column = Column(++columnIndex, "phase_connection", "TEXT", NOT_NULL)
     val SECTIONS: Column = Column(++columnIndex, "sections", "NUMBER", NULL)

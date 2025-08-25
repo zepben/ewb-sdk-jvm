@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.services.common.translator
 
+import com.google.protobuf.NullValue
 import com.zepben.ewb.cim.iec61968.common.Document
 import com.zepben.ewb.cim.iec61968.common.Organisation
 import com.zepben.ewb.cim.iec61968.common.OrganisationRole
@@ -27,12 +28,12 @@ import com.zepben.protobuf.cim.iec61970.base.core.NameType as PBNameType
 
 fun toPb(cim: Document, pb: PBDocument.Builder): PBDocument.Builder =
     pb.apply {
-        title = cim.title
+        cim.title?.also { titleSet = it } ?: run { titleNull = NullValue.NULL_VALUE }
         cim.createdDateTime.toTimestamp()?.let { createdDateTime = it } ?: clearCreatedDateTime()
-        type = cim.type
-        status = cim.status
-        comment = cim.comment
-        authorName = cim.authorName
+        cim.type?.also { typeSet = it } ?: run { typeNull = NullValue.NULL_VALUE }
+        cim.status?.also { statusSet = it } ?: run { statusNull = NullValue.NULL_VALUE }
+        cim.comment?.also { commentSet = it } ?: run { commentNull = NullValue.NULL_VALUE }
+        cim.authorName?.also { authorNameSet = it } ?: run { authorNameNull = NullValue.NULL_VALUE }
         toPb(cim, ioBuilder)
     }
 
@@ -53,23 +54,23 @@ fun Organisation.toPb(): PBOrganisation = toPb(this, PBOrganisation.newBuilder()
 
 fun toPb(cim: IdentifiedObject, pb: PBIdentifiedObject.Builder): PBIdentifiedObject.Builder =
     pb.apply {
-        pb.mrid = cim.mRID
-        pb.name = cim.name
-        pb.description = cim.description
-        pb.numDiagramObjects = cim.numDiagramObjects
+        mrid = cim.mRID
+        cim.name?.also { nameSet = it } ?: run { nameNull = NullValue.NULL_VALUE }
+        cim.description?.also { descriptionSet = it } ?: run { descriptionNull = NullValue.NULL_VALUE }
+        cim.numDiagramObjects?.also { numDiagramObjectsSet = it } ?: run { numDiagramObjectsNull = NullValue.NULL_VALUE }
         cim.names.forEach { name -> addNamesBuilder().also { toPb(name, it) } }
     }
 
 fun toPb(cim: Name, pb: PBName.Builder): PBName.Builder =
     pb.apply {
-        pb.name = cim.name
-        pb.type = cim.type.name
+        name = cim.name
+        type = cim.type.name
     }
 
 fun toPb(cim: NameType, pb: PBNameType.Builder): PBNameType.Builder =
     pb.apply {
-        pb.name = cim.name
-        pb.description = cim.description
+        name = cim.name
+        cim.description?.also { descriptionSet = it } ?: run { descriptionNull = NullValue.NULL_VALUE }
     }
 
 fun NameType.toPb(): PBNameType = toPb(this, PBNameType.newBuilder()).build()

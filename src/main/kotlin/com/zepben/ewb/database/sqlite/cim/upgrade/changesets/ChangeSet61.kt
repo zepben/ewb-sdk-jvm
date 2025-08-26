@@ -11,6 +11,7 @@ package com.zepben.ewb.database.sqlite.cim.upgrade.changesets
 import com.zepben.ewb.database.paths.DatabaseType
 import com.zepben.ewb.database.sqlite.cim.upgrade.Change
 import com.zepben.ewb.database.sqlite.cim.upgrade.ChangeSet
+import kotlin.collections.plus
 
 internal fun changeSet61() = ChangeSet(
     61,
@@ -26,34 +27,52 @@ internal fun changeSet61() = ChangeSet(
 
 @Suppress("ObjectPropertyName")
 private val `retype nonnull columns to null network` = Change(
-    powerSystemResource("ac_line_segments"),
+    powerSystemResource("ac_line_segments")
+        + poles("poles")
+        + usagePoints("usage_points")
+        + nameTypes("name_types")
+    ,
 
     // TODO: Every power system resource table needs the above.
     targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )
 
-fun powerSystemResource(tableName: String): List<String> =
+fun nameTypes(tableName: String): List<String> =
+    identifiedObject(tableName) +
+        alterToNullableColumn(tableName, "description")
+
+
+fun usagePoints(tableName: String): List<String> =
+    identifiedObject(tableName) +
+        alterToNullableColumn(tableName, "is_virtual")
+
+fun poles(tableName: String): List<String> =
+    identifiedObject("poles") +
+        alterToNullableColumn(tableName, "classification")
+
+fun identifiedObject(tableName: String): List<String> =
     listOf(
         "ALTER TABLE $tableName RENAME COLUMN name to name_old",
         "ALTER TABLE $tableName ADD COLUMN name TEXT",
         "UPDATE $tableName SET name = name_old",
+
         "DROP INDEX ac_line_segments_name",
         "CREATE INDEX ac_line_segments_name ON $tableName (name)",
         "ALTER TABLE $tableName DROP COLUMN name_old",
-
-        "ALTER TABLE $tableName RENAME COLUMN description to description_old",
-        "ALTER TABLE $tableName ADD COLUMN description TEXT",
-        "UPDATE $tableName SET description = description_old",
-
-        "ALTER TABLE $tableName RENAME COLUMN num_diagram_objects to num_diagram_objects_old",
-        "ALTER TABLE $tableName ADD COLUMN num_diagram_objects TEXT",
-        "UPDATE $tableName SET num_diagram_objects = num_diagram_objects_old",
-
-        "ALTER TABLE $tableName RENAME COLUMN num_controls to num_controls_old",
-        "ALTER TABLE $tableName ADD COLUMN num_controls TEXT",
-        "UPDATE $tableName SET num_controls = num_controls_old",
     )
 
+fun powerSystemResource(tableName: String): List<String> =
+    identifiedObject(tableName) +
+        alterToNullableColumn(tableName, "description") +
+        alterToNullableColumn(tableName, "num_diagram_objects") +
+        alterToNullableColumn(tableName, "num_controls")
+
+fun alterToNullableColumn(tableName: String, columnName: String): List<String> =
+    listOf(
+        "ALTER TABLE $tableName RENAME COLUMN $columnName to ${columnName}_old",
+        "ALTER TABLE $tableName ADD COLUMN $columnName TEXT",
+        "UPDATE $tableName SET $columnName = ${columnName}_old",
+    )
 
 @Suppress("ObjectPropertyName")
 private val `rename RegulatingControlModeKind UNKNOWN_CONTROL_MODE to UNKNOWN` = Change(

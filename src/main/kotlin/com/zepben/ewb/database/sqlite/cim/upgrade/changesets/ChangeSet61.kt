@@ -8,10 +8,7 @@
 
 package com.zepben.ewb.database.sqlite.cim.upgrade.changesets
 
-import com.zepben.ewb.cim.iec61968.common.StreetDetail
 import com.zepben.ewb.database.paths.DatabaseType
-import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.wires.TableTransformerEnds
-import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.wires.TableTransformerStarImpedances
 import com.zepben.ewb.database.sqlite.cim.upgrade.Change
 import com.zepben.ewb.database.sqlite.cim.upgrade.ChangeSet
 import com.zepben.ewb.database.sqlite.common.SqliteTable

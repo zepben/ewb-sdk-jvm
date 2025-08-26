@@ -33,23 +33,23 @@ private val `retype nonnull columns to null network` = Change(
         analog("analogs") +
         identifiedObject("asset_owners") +
         identifiedObject("base_voltages") +
-        powerSystemResource("battery_controls") +
+        powerSystemResourceNoIndex("battery_controls") +
         powerSystemResource("battery_units") +
         powerSystemResource("breakers") +
         powerSystemResource("busbar_sections") +
         identifiedObject("cable_info") +
         powerSystemResource("circuits") +
-        powerSystemResource("clamps") +
+        powerSystemResourceNoIndex("clamps") +
         identifiedObject("connectivity_nodes") +
         identifiedObject("controls") +
         powerSystemResource("current_relays") +
         identifiedObject("current_transformer_info") +
         powerSystemResource("current_transformers") +
-        document("customer_agreements") +
-        identifiedObject("customers") +
-        powerSystemResource("cuts") +
-        identifiedObject("diagram_objects") +
-        identifiedObject("diagrams") +
+        //document("customer_agreements") +
+        //identifiedObject("customers") +
+        powerSystemResourceNoIndex("cuts") +
+        //identifiedObject("diagram_objects") +
+        //identifiedObject("diagrams") +
         powerSystemResource("disconnectors") +
         identifiedObject("discretes") +
         powerSystemResource("distance_relays") +
@@ -64,7 +64,7 @@ private val `retype nonnull columns to null network` = Change(
         powerSystemResource("fuses") +
         identifiedObject("geographical_regions") +
         powerSystemResource("ground_disconnectors") +
-        powerSystemResource("grounding_impedances") +
+        powerSystemResourceNoIndex("grounding_impedances") +
         powerSystemResource("grounds") +
         powerSystemResource("jumpers") +
         powerSystemResource("junctions") +
@@ -81,10 +81,10 @@ private val `retype nonnull columns to null network` = Change(
         document("operational_restrictions") +
         identifiedObject("organisations") +
         identifiedObject("overhead_wire_info") +
-        identifiedObject("pan_demand_response_functions") +
-        identifiedObject("per_length_phase_impedances") +
+        identifiedObjectNoIndex("pan_demand_response_functions") +
+        identifiedObjectNoIndex("per_length_phase_impedances") +
         identifiedObject("per_length_sequence_impedances") +
-        powerSystemResource("petersen_coils") +
+        powerSystemResourceNoIndex("petersen_coils") +
         powerSystemResource("photo_voltaic_units") +
         identifiedObject("poles") +
         identifiedObject("potential_transformer_info") +
@@ -95,28 +95,27 @@ private val `retype nonnull columns to null network` = Change(
         transformerEnd("power_transformer_ends") +
         identifiedObject("power_transformer_info") +
         powerSystemResource("power_transformers") +
-        document("pricing_structures") +
+        //document("pricing_structures") +
         identifiedObject("protection_relay_schemes") +
         powerSystemResource("protection_relay_systems") +
         tapChanger("ratio_tap_changers") +
-        identifiedObject("reactive_capability_curves") +
+        identifiedObjectNoIndex("reactive_capability_curves") +
         powerSystemResource("reclosers") +
         identifiedObject("relay_info") +
         identifiedObject("remote_controls") +
         identifiedObject("remote_sources") +
-        regulatingCondEq("rotating_machines") +
         powerSystemResource("series_compensators") +
         identifiedObject("short_circuit_tests") +
         identifiedObject("shunt_compensator_info") +
         powerSystemResource("sites") +
-        regulatingCondEq("static_var_compensators") +
+        regulatingCondEqNoIndex("static_var_compensators") +
         identifiedObject("streetlights") +
         identifiedObject("sub_geographical_regions") +
         powerSystemResource("substations") +
         identifiedObject("switch_info") +
         synchronousMachine("synchronous_machines") +
         powerSystemResource("tap_changer_controls") +
-        document("tariffs") +
+        //document("tariffs") +
         identifiedObject("terminals") +
         identifiedObject("transformer_end_info") +
         identifiedObject("transformer_star_impedances") +
@@ -134,7 +133,7 @@ fun streetAddress(tableName: String): List<String> =
         alterToNullableColumn(tableName, "po_box") +
         alterToNullableColumn(tableName, "building_name") +
         alterToNullableColumn(tableName, "floor_identification") +
-        alterToNullableColumn(tableName, "street_name") +
+        alterToNullableColumn(tableName, "name") +
         alterToNullableColumn(tableName, "number") +
         alterToNullableColumn(tableName, "suite_number") +
         alterToNullableColumn(tableName, "type") +
@@ -143,7 +142,7 @@ fun streetAddress(tableName: String): List<String> =
 fun document(tableName: String): List<String> =
     identifiedObject(tableName) +
         alterToNullableColumn(tableName, "title") +
-        alterToNullableColumn(tableName, "author") +
+        alterToNullableColumn(tableName, "author_name") +
         alterToNullableColumn(tableName, "type") +
         alterToNullableColumn(tableName, "status")
 
@@ -156,12 +155,16 @@ fun tapChanger(tableName: String): List<String> =
         alterToNullableColumn(tableName, "control_enabled")
 
 fun synchronousMachine(tableName: String): List<String> =
-    identifiedObject(tableName) +
+    identifiedObjectNoIndex(tableName) +
         alterToNullableColumn(tableName, "earthing")
 
 fun shuntCompensator(tableName: String): List<String> =
     regulatingCondEq(tableName) +
         alterToNullableColumn(tableName, "grounded")
+
+fun regulatingCondEqNoIndex(tableName: String): List<String> =
+    powerSystemResourceNoIndex(tableName) +
+        alterToNullableColumn(tableName, "control_enabled")
 
 fun regulatingCondEq(tableName: String): List<String> =
     powerSystemResource(tableName) +
@@ -190,6 +193,10 @@ fun pole(tableName: String): List<String> =
     identifiedObject(tableName) +
         alterToNullableColumn(tableName, "classification")
 
+fun identifiedObjectNoIndex(tableName: String): List<String> =
+    alterToNullableColumn(tableName, "description") +
+    alterToNullableColumn(tableName, "num_diagram_objects")
+
 fun identifiedObject(tableName: String): List<String> =
     listOf(
         "ALTER TABLE $tableName RENAME COLUMN name to name_old",
@@ -199,8 +206,13 @@ fun identifiedObject(tableName: String): List<String> =
         "DROP INDEX ${tableName}_name",
         "CREATE INDEX ${tableName}_name ON $tableName (name)",
         "ALTER TABLE $tableName DROP COLUMN name_old",
-    ) + alterToNullableColumn(tableName, "description") +
+    ) +
+        alterToNullableColumn(tableName, "description") +
         alterToNullableColumn(tableName, "num_diagram_objects")
+
+fun powerSystemResourceNoIndex(tableName: String): List<String> =
+    identifiedObjectNoIndex(tableName) +
+        alterToNullableColumn(tableName, "num_controls")
 
 fun powerSystemResource(tableName: String): List<String> =
     identifiedObject(tableName) +
@@ -211,6 +223,7 @@ fun alterToNullableColumn(tableName: String, columnName: String): List<String> =
         "ALTER TABLE $tableName RENAME COLUMN $columnName to ${columnName}_old",
         "ALTER TABLE $tableName ADD COLUMN $columnName TEXT",
         "UPDATE $tableName SET $columnName = ${columnName}_old",
+        "ALTER TABLE $tableName DROP COLUMN ${columnName}_old"
     )
 
 @Suppress("ObjectPropertyName")

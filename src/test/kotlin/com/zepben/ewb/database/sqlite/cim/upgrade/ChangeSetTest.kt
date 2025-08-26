@@ -19,8 +19,10 @@ import com.zepben.ewb.database.sqlite.cim.upgrade.changesets.NoChanges
 import com.zepben.ewb.database.sqlite.cim.upgrade.changesets.combined.*
 import com.zepben.ewb.database.sqlite.cim.upgrade.changesets.customer.ChangeSet50CustomerValidator
 import com.zepben.ewb.database.sqlite.cim.upgrade.changesets.customer.ChangeSet54CustomerValidator
+import com.zepben.ewb.database.sqlite.cim.upgrade.changesets.customer.ChangeSet61CustomerValidator
 import com.zepben.ewb.database.sqlite.cim.upgrade.changesets.diagram.ChangeSet50DiagramValidator
 import com.zepben.ewb.database.sqlite.cim.upgrade.changesets.diagram.ChangeSet52DiagramValidator
+import com.zepben.ewb.database.sqlite.cim.upgrade.changesets.diagram.ChangeSet61DiagramValidator
 import com.zepben.ewb.database.sqlite.cim.upgrade.changesets.network.*
 import com.zepben.testutils.junit.SystemLogExtension
 import org.junit.jupiter.api.Test
@@ -61,7 +63,7 @@ internal class ChangeSetTest {
         NoChanges(DatabaseType.CUSTOMER, 58),
         NoChanges(DatabaseType.CUSTOMER, 59),
         NoChanges(DatabaseType.CUSTOMER, 60),
-        NoChanges(DatabaseType.DIAGRAM, 61),
+        ChangeSet61CustomerValidator
     ).associateBy { it.version }
 
     private val diagramChangeSetValidators = listOf(
@@ -76,7 +78,7 @@ internal class ChangeSetTest {
         NoChanges(DatabaseType.DIAGRAM, 58),
         NoChanges(DatabaseType.DIAGRAM, 59),
         NoChanges(DatabaseType.DIAGRAM, 60),
-        NoChanges(DatabaseType.DIAGRAM, 61),
+        ChangeSet61DiagramValidator,
     ).associateBy { it.version }
 
     private val networkChangeSetValidators = listOf(

@@ -37,16 +37,16 @@ internal class CustomerTranslatorTest : TranslatorTestBase<CustomerService>(
         // # IEC61968 Common #
         // ###################
 
-        ValidationInfo(Organisation(), { fillFieldsCommon(it) }, { addFromPb(csToPb.toPb(it)) }),
+        ValidationInfo(::Organisation, { fillFieldsCommon(it) }, { addFromPb(csToPb.toPb(it)) }),
 
         // ######################
         // # IEC61968 Customers #
         // ######################
 
-        ValidationInfo(Customer(), { fillFields(it) }, { addFromPb(csToPb.toPb(it)) }),
-        ValidationInfo(CustomerAgreement(), { fillFields(it) }, { addFromPb(csToPb.toPb(it)) }),
-        ValidationInfo(PricingStructure(), { fillFields(it) }, { addFromPb(csToPb.toPb(it)) }),
-        ValidationInfo(Tariff(), { fillFields(it) }, { addFromPb(csToPb.toPb(it)) })
+        ValidationInfo(::Customer, { fillFields(it) }, { addFromPb(csToPb.toPb(it)) }),
+        ValidationInfo(::CustomerAgreement, { fillFields(it) }, { addFromPb(csToPb.toPb(it)) }),
+        ValidationInfo(::PricingStructure, { fillFields(it) }, { addFromPb(csToPb.toPb(it)) }),
+        ValidationInfo(::Tariff, { fillFields(it) }, { addFromPb(csToPb.toPb(it)) })
     )
 
     override val excludedTables =

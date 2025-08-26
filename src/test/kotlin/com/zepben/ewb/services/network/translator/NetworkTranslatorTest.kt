@@ -77,202 +77,202 @@ internal class NetworkTranslatorTest : TranslatorTestBase<NetworkService>(
         // # Extensions IEC61968 Asset Info #
         // ##################################
 
-        ValidationInfo(RelayInfo(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::RelayInfo, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
 
         // ################################
         // # Extensions IEC61968 Metering #
         // ################################
 
-        ValidationInfo(PanDemandResponseFunction(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::PanDemandResponseFunction, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
 
         // #################################
         // # Extensions IEC61970 Base Core #
         // #################################
 
-        ValidationInfo(Site(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::Site, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
 
         // ###################################
         // # Extensions IEC61970 Base Feeder #
         // ###################################
 
-        ValidationInfo(Loop(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(LvFeeder(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::Loop, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::LvFeeder, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
 
         // ##################################################
         // # Extensions IEC61970 Base Generation Production #
         // ##################################################
 
-        ValidationInfo(EvChargingUnit(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::EvChargingUnit, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
 
         // #######################################
         // # Extensions IEC61970 Base Protection #
         // #######################################
 
-        ValidationInfo(DistanceRelay(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(ProtectionRelayScheme(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(ProtectionRelaySystem(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(VoltageRelay(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::DistanceRelay, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::ProtectionRelayScheme, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::ProtectionRelaySystem, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::VoltageRelay, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
 
         // ##################################
         // # Extensions IEC61970 Base Wires #
         // ##################################
 
-        ValidationInfo(BatteryControl(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::BatteryControl, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
 
         // #######################
         // # IEC61968 Asset Info #
         // #######################
 
-        ValidationInfo(CableInfo(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(NoLoadTest(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(OpenCircuitTest(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(OverheadWireInfo(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(PowerTransformerInfo(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(ShortCircuitTest(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(ShuntCompensatorInfo(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(SwitchInfo(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(TransformerEndInfo(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(TransformerTankInfo(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::CableInfo, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::NoLoadTest, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::OpenCircuitTest, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::OverheadWireInfo, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::PowerTransformerInfo, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::ShortCircuitTest, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::ShuntCompensatorInfo, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::SwitchInfo, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::TransformerEndInfo, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::TransformerTankInfo, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
 
         // ###################
         // # IEC61968 Assets #
         // ###################
 
-        ValidationInfo(AssetOwner(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(Streetlight(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::AssetOwner, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::Streetlight, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
 
         // ###################
         // # IEC61968 Common #
         // ###################
 
-        ValidationInfo(Location(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(Organisation(), { fillFieldsCommon(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::Location, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::Organisation, { fillFieldsCommon(it) }, { addFromPb(nsToPb.toPb(it)) }),
 
         // #####################################
         // # IEC61968 infIEC61968 InfAssetInfo #
         // #####################################
 
-        ValidationInfo(CurrentTransformerInfo(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(PotentialTransformerInfo(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::CurrentTransformerInfo, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::PotentialTransformerInfo, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
 
         // ##################################
         // # IEC61968 infIEC61968 InfAssets #
         // ##################################
 
-        ValidationInfo(Pole(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::Pole, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
 
         // #####################
         // # IEC61968 Metering #
         // #####################
 
-        ValidationInfo(Meter(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(UsagePoint(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::Meter, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::UsagePoint, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
 
         // #######################
         // # IEC61968 Operations #
         // #######################
 
-        ValidationInfo(OperationalRestriction(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::OperationalRestriction, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
 
         // #####################################
         // # IEC61970 Base Auxiliary Equipment #
         // #####################################
 
-        ValidationInfo(CurrentTransformer(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(FaultIndicator(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(PotentialTransformer(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::CurrentTransformer, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::FaultIndicator, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::PotentialTransformer, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
 
         // ######################
         // # IEC61970 Base Core #
         // ######################
 
-        ValidationInfo(BaseVoltage(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(ConnectivityNode(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(Feeder(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(GeographicalRegion(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(SubGeographicalRegion(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(Substation(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(Terminal(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::BaseVoltage, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::ConnectivityNode, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::Feeder, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::GeographicalRegion, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::SubGeographicalRegion, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::Substation, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::Terminal, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
 
         // #############################
         // # IEC61970 Base Equivalents #
         // #############################
 
-        ValidationInfo(EquivalentBranch(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::EquivalentBranch, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
 
         // ######################
         // # IEC61970 Base Meas #
         // ######################
 
-        ValidationInfo(Accumulator(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(Analog(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(Control(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(Discrete(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::Accumulator, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::Analog, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::Control, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::Discrete, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
 
         // ############################
         // # IEC61970 Base Protection #
         // ############################
 
-        ValidationInfo(CurrentRelay(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::CurrentRelay, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
 
         // #######################
         // # IEC61970 Base Scada #
         // #######################
 
-        ValidationInfo(RemoteControl(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(RemoteSource(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::RemoteControl, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::RemoteSource, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
 
         // #######################################
         // # IEC61970 Base Generation Production #
         // #######################################
 
-        ValidationInfo(BatteryUnit(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(PhotoVoltaicUnit(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(PowerElectronicsWindUnit(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::BatteryUnit, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::PhotoVoltaicUnit, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::PowerElectronicsWindUnit, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
 
         // #######################
         // # IEC61970 Base Wires #
         // #######################
 
-        ValidationInfo(AcLineSegment(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(Breaker(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(BusbarSection(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(Clamp(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(Cut(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(Disconnector(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(EnergyConsumer(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(EnergyConsumerPhase(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(EnergySource(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(EnergySourcePhase(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(Fuse(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(Ground(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(GroundDisconnector(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(GroundingImpedance(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(Jumper(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(Junction(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(LinearShuntCompensator(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(LoadBreakSwitch(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(PerLengthPhaseImpedance(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(PerLengthSequenceImpedance(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(PetersenCoil(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(PowerElectronicsConnection(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(PowerElectronicsConnectionPhase(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(PowerTransformer(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(PowerTransformerEnd(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(RatioTapChanger(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(ReactiveCapabilityCurve(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(Recloser(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(SeriesCompensator(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(StaticVarCompensator(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(SynchronousMachine(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(TransformerStarImpedance(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        ValidationInfo(TapChangerControl(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::AcLineSegment, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::Breaker, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::BusbarSection, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::Clamp, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::Cut, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::Disconnector, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::EnergyConsumer, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::EnergyConsumerPhase, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::EnergySource, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::EnergySourcePhase, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::Fuse, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::Ground, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::GroundDisconnector, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::GroundingImpedance, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::Jumper, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::Junction, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::LinearShuntCompensator, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::LoadBreakSwitch, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::PerLengthPhaseImpedance, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::PerLengthSequenceImpedance, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::PetersenCoil, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::PowerElectronicsConnection, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::PowerElectronicsConnectionPhase, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::PowerTransformer, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::PowerTransformerEnd, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::RatioTapChanger, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::ReactiveCapabilityCurve, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::Recloser, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::SeriesCompensator, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::StaticVarCompensator, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::SynchronousMachine, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::TransformerStarImpedance, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::TapChangerControl, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
 
         // ###############################
         // # IEC61970 InfIEC61970 Feeder #
         // ###############################
 
-        ValidationInfo(Circuit(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::Circuit, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
     )
 
     override val abstractCreators = mapOf<Class<*>, (String) -> IdentifiedObject>(

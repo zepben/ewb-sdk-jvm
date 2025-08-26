@@ -21,7 +21,9 @@ import com.zepben.ewb.services.customer.CustomerService
 import com.zepben.ewb.services.diagram.DiagramService
 import com.zepben.ewb.services.network.NetworkService
 import java.time.Instant
-import kotlin.reflect.full.createInstance
+import kotlin.reflect.KMutableProperty
+import kotlin.reflect.KVisibility
+import kotlin.reflect.full.*
 
 @Suppress("SameParameterValue")
 object SchemaServices {
@@ -43,6 +45,17 @@ object SchemaServices {
             }.also {
                 tryAdd(it)
             }
+
+            NameType("typeNullDescription").apply {
+            }.also {
+                addNameType(it)
+            }
+
+            NameType("typeEmptyDescription").apply {
+                description = ""
+            }.also {
+                addNameType(it)
+            }
         }
 
     fun createDataSourceTestServices(): MetadataCollection =
@@ -55,18 +68,21 @@ object SchemaServices {
         CustomerService().also { customerService ->
             customerService.tryAdd(factory("empty"))
             customerService.tryAdd(filler(factory("filled"), customerService, false))
+            customerService.tryAdd(factory("emptyNotNull").also { fillEmptys(it) })
         }
 
     fun <T : IdentifiedObject> diagramServicesOf(factory: (mRID: String) -> T, filler: (T, DiagramService, Boolean) -> T): DiagramService =
         DiagramService().also { diagramService ->
             diagramService.tryAdd(factory("empty"))
             diagramService.tryAdd(filler(factory("filled"), diagramService, false))
+            diagramService.tryAdd(factory("emptyNotNull").also { fillEmptys(it) })
         }
 
     fun <T : IdentifiedObject> networkServicesOf(factory: (mRID: String) -> T, filler: (T, NetworkService, Boolean) -> T): NetworkService =
         NetworkService().also { networkService ->
             networkService.tryAdd(factory("empty").also { fillRequired(networkService, it) })
             networkService.tryAdd(filler(factory("filled"), networkService, false))
+            networkService.tryAdd(factory("emptyNotNull").also { fillRequired(networkService, it); fillEmptys(it) })
         }
 
     private fun fillRequired(service: NetworkService, io: IdentifiedObject) {
@@ -85,6 +101,36 @@ object SchemaServices {
                 }
             }
         }
+    }
+
+
+    /**
+     * This functionality was created because there were a few strings that weren't nullable, and we were treating "" as null.
+     * We then converted them to nullable and wanted to ensure that nothing got broken by writing/reading these from the DB/protos.
+     *
+     * Will create an 'empty' type like a default constructor, but any nullable string property will be
+     * created with an empty string (""), and any nullable boolean will be created with false.
+     * We also specify numControls and numDiagramObjects explicitly, as these were previously not nullable but
+     * now are, and we set them to 0.
+     */
+    fun fillEmptys(io: IdentifiedObject) {
+        io::class.memberProperties
+            .filter { it.visibility == KVisibility.PUBLIC }
+            .filter { it.returnType.isMarkedNullable }
+            .filterNot { it.name.endsWith("MRID") }     // Ignore identifiedObjectMRID, customerMRID, etc
+            .filterIsInstance<KMutableProperty<*>>()
+            .forEach { prop ->
+                if (prop.returnType.withNullability(false).isSubtypeOf(String::class.createType())) {
+                    prop.setter.call(io, "")
+                }
+
+                if (prop.returnType.withNullability(false).isSubtypeOf(Boolean::class.createType())) {
+                    prop.setter.call(io, false)
+                }
+
+                if (prop.name == "numDiagramObjects" || prop.name == "numControls")
+                    prop.setter.call(io, 0)
+            }
     }
 
 }

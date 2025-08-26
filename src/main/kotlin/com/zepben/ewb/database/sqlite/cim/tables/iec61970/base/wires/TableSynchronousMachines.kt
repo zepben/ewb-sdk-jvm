@@ -47,7 +47,7 @@ class TableSynchronousMachines : com.zepben.ewb.database.sqlite.cim.tables.iec61
 
     val BASE_Q: Column = Column(++columnIndex, "base_q", "NUMBER", NULL)
     val CONDENSER_P: Column = Column(++columnIndex, "condenser_p", "INTEGER", NULL)
-    val EARTHING: Column = Column(++columnIndex, "earthing", "BOOLEAN", NOT_NULL)
+    val EARTHING: Column = Column(++columnIndex, "earthing", "BOOLEAN", NULL)
     val EARTHING_STAR_POINT_R: Column = Column(++columnIndex, "earthing_star_point_r", "NUMBER", NULL)
     val EARTHING_STAR_POINT_X: Column = Column(++columnIndex, "earthing_star_point_x", "NUMBER", NULL)
     val IKK: Column = Column(++columnIndex, "ikk", "NUMBER", NULL)

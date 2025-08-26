@@ -45,4 +45,19 @@ data class StreetDetail(
             displayAddress.isNullOrEmpty()
         )
 
+    /**
+     * Check to see if all fields of this [StreetDetail] are null
+     *
+     * @return true if all fields are null, otherwise false
+     */
+    fun allFieldsNull(): Boolean = (
+        buildingName == null &&
+            floorIdentification == null &&
+            name == null &&
+            number == null &&
+            suiteNumber == null &&
+            type == null &&
+            displayAddress == null
+        )
+
 }

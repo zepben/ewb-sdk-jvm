@@ -920,14 +920,14 @@ internal class NetworkCimReader : CimReader<NetworkService>() {
             resultSet.getNullableString(table.SUITE_NUMBER.queryIndex)?.internEmpty(),
             resultSet.getNullableString(table.TYPE.queryIndex)?.internEmpty(),
             resultSet.getNullableString(table.DISPLAY_ADDRESS.queryIndex)?.internEmpty()
-        ).takeUnless { it.allFieldsEmpty() }
+        ).takeUnless { it.allFieldsNull() }
 
     @Throws(SQLException::class)
     private fun readTownDetail(table: TableTownDetails, resultSet: ResultSet): TownDetail? =
         TownDetail(
-            resultSet.getString(table.TOWN_NAME.queryIndex)?.internEmpty(),
-            resultSet.getString(table.STATE_OR_PROVINCE.queryIndex)?.internEmpty()
-        ).takeUnless { it.allFieldsNullOrEmpty() }
+            resultSet.getNullableString(table.TOWN_NAME.queryIndex)?.internEmpty(),
+            resultSet.getNullableString(table.STATE_OR_PROVINCE.queryIndex)?.internEmpty()
+        ).takeUnless { it.allFieldsNull() }
 
     // #####################################
     // # IEC61968 infIEC61968 InfAssetInfo #

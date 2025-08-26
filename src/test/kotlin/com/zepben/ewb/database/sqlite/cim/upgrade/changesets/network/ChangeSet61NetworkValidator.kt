@@ -132,11 +132,7 @@ object ChangeSet61NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
         `validate powerSystemResource` (statement, "current_relays")
         `validate identifiedObject` (statement, "current_transformer_info")
         `validate powerSystemResource` (statement, "current_transformers")
-        //`validate document` (statement, "customer_agreements")
-        //`validate identifiedObject` (statement, "customers")
         `validate powerSystemResource` (statement, "cuts")
-        //`validate identifiedObject` (statement, "diagram_objects")
-        //`validate identifiedObject` (statement, "diagrams")
         `validate powerSystemResource` (statement, "disconnectors")
         `validate identifiedObject` (statement, "discretes")
         `validate powerSystemResource` (statement, "distance_relays")
@@ -182,7 +178,6 @@ object ChangeSet61NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
         `validate transformerEnd` (statement, "power_transformer_ends")
         `validate identifiedObject` (statement, "power_transformer_info")
         `validate powerSystemResource` (statement, "power_transformers")
-        //`validate document` (statement, "pricing_structures")
         `validate identifiedObject` (statement, "protection_relay_schemes")
         `validate powerSystemResource` (statement, "protection_relay_systems")
         `validate tapChanger` (statement, "ratio_tap_changers")
@@ -191,7 +186,6 @@ object ChangeSet61NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
         `validate identifiedObject` (statement, "relay_info")
         `validate identifiedObject` (statement, "remote_controls")
         `validate identifiedObject` (statement, "remote_sources")
-        //`validate regulatingCondEq` (statement, "rotating_machines")
         `validate powerSystemResource` (statement, "series_compensators")
         `validate identifiedObject` (statement, "short_circuit_tests")
         `validate identifiedObject` (statement, "shunt_compensator_info")
@@ -203,7 +197,6 @@ object ChangeSet61NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
         `validate identifiedObject` (statement, "switch_info")
         `validate synchronousMachine` (statement, "synchronous_machines")
         `validate powerSystemResource` (statement, "tap_changer_controls")
-        //`validate document` (statement, "tariffs")
         `validate identifiedObject` (statement, "terminals")
         `validate identifiedObject` (statement, "transformer_end_info")
         `validate identifiedObject` (statement, "transformer_star_impedances")
@@ -630,7 +623,6 @@ object ChangeSet61NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
             statement,
             "SELECT postal_code, po_box, building_name, floor_identification, name, number, suite_number, type, display_address FROM location_street_addresses",
             { rs ->
-                // TODO
                 assertThat(rs.getString("postal_code"), equalTo("2505"))
                 assertThat(rs.getString("po_box"), equalTo("po_box"))
                 assertThat(rs.getString("building_name"), equalTo("not_a_building"))

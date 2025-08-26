@@ -26,4 +26,11 @@ data class TownDetail(
      */
     fun allFieldsNullOrEmpty(): Boolean = name.isNullOrEmpty() && stateOrProvince.isNullOrEmpty()
 
+    /**
+     * Check to see if all fields of this [TownDetail] are null
+     *
+     * @return true if all fields are null, otherwise false
+     */
+    fun allFieldsNull(): Boolean = name == null && stateOrProvince == null
+
 }

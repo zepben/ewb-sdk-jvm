@@ -21,8 +21,7 @@ import com.zepben.ewb.cim.iec61968.assets.Asset
 import com.zepben.ewb.cim.iec61968.assets.AssetOrganisationRole
 import com.zepben.ewb.cim.iec61968.assets.AssetOwner
 import com.zepben.ewb.cim.iec61968.assets.Streetlight
-import com.zepben.ewb.cim.iec61968.common.Location
-import com.zepben.ewb.cim.iec61968.common.Organisation
+import com.zepben.ewb.cim.iec61968.common.*
 import com.zepben.ewb.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
 import com.zepben.ewb.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.ewb.cim.iec61968.infiec61968.infassets.Pole
@@ -61,6 +60,9 @@ import com.zepben.ewb.services.common.translator.TranslatorTestBase
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.NetworkServiceComparator
 import com.zepben.ewb.services.network.testdata.fillFields
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.anEmptyMap
+import org.junit.jupiter.api.Test
 
 internal class NetworkTranslatorTest : TranslatorTestBase<NetworkService>(
     ::NetworkService,
@@ -327,5 +329,23 @@ internal class NetworkTranslatorTest : TranslatorTestBase<NetworkService>(
             TableProtectionRelayFunctionsSensors::class,
             TableRecloseDelays::class,
         )
+
+    /**
+     * We're only testing filled StreetDetails above - so this tests the empty and null cases as well.
+     */
+    @Test
+    internal fun translatesStreetAddress() {
+        val nulls = StreetAddress(townDetail = TownDetail(), streetDetail = StreetDetail())
+        val emptys = StreetAddress(postalCode = "", poBox = "", townDetail = TownDetail("", ""), streetDetail = StreetDetail("", "", "", "", "", "", ""))
+        val locationEmptys = Location(mRID = "loc1").apply { mainAddress = emptys }
+        val locationNulls = Location(mRID = "loc1").apply { mainAddress = nulls }
+        val comparator = NetworkServiceComparator()
+
+        val emptyDifferences = comparator.compare(locationEmptys, createService().addFromPb(nsToPb.toPb(locationEmptys))!!).differences
+        assertThat("Failed to convert empty ${locationEmptys::class.simpleName}:${emptyDifferences}", emptyDifferences, anEmptyMap())
+
+        val nullDifferences = comparator.compare(locationNulls, createService().addFromPb(nsToPb.toPb(locationNulls))!!).differences
+        assertThat("Failed to convert empty ${locationNulls::class.simpleName}:${nullDifferences}", nullDifferences, anEmptyMap())
+    }
 
 }

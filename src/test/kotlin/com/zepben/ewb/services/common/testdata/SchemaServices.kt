@@ -46,8 +46,7 @@ object SchemaServices {
                 tryAdd(it)
             }
 
-            NameType("typeNullDescription").apply {
-            }.also {
+            NameType("typeNullDescription").also {
                 addNameType(it)
             }
 

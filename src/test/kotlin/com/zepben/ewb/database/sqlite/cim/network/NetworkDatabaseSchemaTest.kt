@@ -350,4 +350,25 @@ class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkD
         }
     }
 
+    @Test
+    internal fun `reads street address with empty string fields`() {
+        // This test is here to make sure the database reading correctly removes the parts of street addresses that are not filled out.
+        val emptys = StreetAddress(postalCode = "", poBox = "", townDetail = TownDetail("", ""), streetDetail = StreetDetail("", "", "", "", "", "", ""))
+        val writeService = NetworkService().apply {
+            add(
+                Location(mRID = "loc1").apply {
+                    mainAddress = emptys
+                }
+            )
+        }
+
+        validateWriteRead(writeService) { readService ->
+            assertThat(
+                "Expected a street address with all empty strings for every property",
+                readService.get<Location>("loc1")!!.mainAddress,
+                equalTo(emptys)
+            )
+        }
+    }
+
 }

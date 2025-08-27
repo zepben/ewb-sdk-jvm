@@ -27,7 +27,7 @@ class TableEnergySources : TableEnergyConnections() {
     val X: Column = Column(++columnIndex, "x", "NUMBER", NULL)
     val X0: Column = Column(++columnIndex, "x0", "NUMBER", NULL)
     val XN: Column = Column(++columnIndex, "xn", "NUMBER", NULL)
-    val IS_EXTERNAL_GRID: Column = Column(++columnIndex, "is_external_grid", "BOOLEAN", NOT_NULL)
+    val IS_EXTERNAL_GRID: Column = Column(++columnIndex, "is_external_grid", "BOOLEAN", NULL)
     val R_MIN: Column = Column(++columnIndex, "r_min", "NUMBER", NULL)
     val RN_MIN: Column = Column(++columnIndex, "rn_min", "NUMBER", NULL)
     val R0_MIN: Column = Column(++columnIndex, "r0_min", "NUMBER", NULL)

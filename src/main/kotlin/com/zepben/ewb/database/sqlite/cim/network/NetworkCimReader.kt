@@ -904,30 +904,30 @@ internal class NetworkCimReader : CimReader<NetworkService>() {
     @Throws(SQLException::class)
     private fun readStreetAddress(table: TableStreetAddresses, resultSet: ResultSet): StreetAddress =
         StreetAddress(
-            resultSet.getString(table.POSTAL_CODE.queryIndex).emptyIfNull().internEmpty(),
+            resultSet.getNullableString(table.POSTAL_CODE.queryIndex)?.internEmpty(),
             readTownDetail(table, resultSet),
-            resultSet.getString(table.PO_BOX.queryIndex).emptyIfNull().internEmpty(),
+            resultSet.getNullableString(table.PO_BOX.queryIndex)?.internEmpty(),
             readStreetDetail(table, resultSet)
         )
 
     @Throws(SQLException::class)
     private fun readStreetDetail(table: TableStreetAddresses, resultSet: ResultSet): StreetDetail? =
         StreetDetail(
-            resultSet.getString(table.BUILDING_NAME.queryIndex).emptyIfNull().internEmpty(),
-            resultSet.getString(table.FLOOR_IDENTIFICATION.queryIndex).emptyIfNull().internEmpty(),
-            resultSet.getString(table.STREET_NAME.queryIndex).emptyIfNull().internEmpty(),
-            resultSet.getString(table.NUMBER.queryIndex).emptyIfNull().internEmpty(),
-            resultSet.getString(table.SUITE_NUMBER.queryIndex).emptyIfNull().internEmpty(),
-            resultSet.getString(table.TYPE.queryIndex).emptyIfNull().internEmpty(),
-            resultSet.getString(table.DISPLAY_ADDRESS.queryIndex).emptyIfNull().internEmpty()
-        ).takeUnless { it.allFieldsEmpty() }
+            resultSet.getNullableString(table.BUILDING_NAME.queryIndex)?.internEmpty(),
+            resultSet.getNullableString(table.FLOOR_IDENTIFICATION.queryIndex)?.internEmpty(),
+            resultSet.getNullableString(table.STREET_NAME.queryIndex)?.internEmpty(),
+            resultSet.getNullableString(table.NUMBER.queryIndex)?.internEmpty(),
+            resultSet.getNullableString(table.SUITE_NUMBER.queryIndex)?.internEmpty(),
+            resultSet.getNullableString(table.TYPE.queryIndex)?.internEmpty(),
+            resultSet.getNullableString(table.DISPLAY_ADDRESS.queryIndex)?.internEmpty()
+        ).takeUnless { it.allFieldsNull() }
 
     @Throws(SQLException::class)
     private fun readTownDetail(table: TableTownDetails, resultSet: ResultSet): TownDetail? =
         TownDetail(
-            resultSet.getString(table.TOWN_NAME.queryIndex)?.internEmpty(),
-            resultSet.getString(table.STATE_OR_PROVINCE.queryIndex)?.internEmpty()
-        ).takeUnless { it.allFieldsNullOrEmpty() }
+            resultSet.getNullableString(table.TOWN_NAME.queryIndex)?.internEmpty(),
+            resultSet.getNullableString(table.STATE_OR_PROVINCE.queryIndex)?.internEmpty()
+        ).takeUnless { it.allFieldsNull() }
 
     // #####################################
     // # IEC61968 infIEC61968 InfAssetInfo #
@@ -1008,7 +1008,7 @@ internal class NetworkCimReader : CimReader<NetworkService>() {
     fun read(service: NetworkService, table: TablePoles, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val pole = Pole(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
 
-        pole.classification = resultSet.getString(table.CLASSIFICATION.queryIndex).emptyIfNull().internEmpty()
+        pole.classification = resultSet.getNullableString(table.CLASSIFICATION.queryIndex)?.internEmpty()
 
         return readStructure(service, pole, table, resultSet) && service.addOrThrow(pole)
     }
@@ -1072,7 +1072,7 @@ internal class NetworkCimReader : CimReader<NetworkService>() {
     fun read(service: NetworkService, table: TableUsagePoints, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val usagePoint = UsagePoint(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             usagePointLocation = service.ensureGet(resultSet.getNullableString(table.LOCATION_MRID.queryIndex), typeNameAndMRID())
-            isVirtual = resultSet.getBoolean(table.IS_VIRTUAL.queryIndex)
+            isVirtual = resultSet.getNullableBoolean(table.IS_VIRTUAL.queryIndex)
             connectionCategory = resultSet.getNullableString(table.CONNECTION_CATEGORY.queryIndex)
             ratedPower = resultSet.getNullableInt(table.RATED_POWER.queryIndex)
             approvedInverterCapacity = resultSet.getNullableInt(table.APPROVED_INVERTER_CAPACITY.queryIndex)
@@ -1368,7 +1368,7 @@ internal class NetworkCimReader : CimReader<NetworkService>() {
     ): Boolean {
         powerSystemResource.apply {
             location = service.ensureGet(resultSet.getNullableString(table.LOCATION_MRID.queryIndex), typeNameAndMRID())
-            numControls = resultSet.getInt(table.NUM_CONTROLS.queryIndex)
+            numControls = resultSet.getNullableInt(table.NUM_CONTROLS.queryIndex)
         }
 
         return readIdentifiedObject(powerSystemResource, table, resultSet)
@@ -1618,7 +1618,7 @@ internal class NetworkCimReader : CimReader<NetworkService>() {
     @Throws(SQLException::class)
     fun read(service: NetworkService, table: TableAnalogs, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val meas = Analog(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
-            positiveFlowIn = resultSet.getBoolean(table.POSITIVE_FLOW_IN.queryIndex)
+            positiveFlowIn = resultSet.getNullableBoolean(table.POSITIVE_FLOW_IN.queryIndex)
         }
 
         return readMeasurement(service, meas, table, resultSet) && service.addOrThrow(meas)
@@ -1937,7 +1937,7 @@ internal class NetworkCimReader : CimReader<NetworkService>() {
     fun read(service: NetworkService, table: TableEnergyConsumers, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val energyConsumer = EnergyConsumer(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             customerCount = resultSet.getNullableInt(table.CUSTOMER_COUNT.queryIndex)
-            grounded = resultSet.getBoolean(table.GROUNDED.queryIndex)
+            grounded = resultSet.getNullableBoolean(table.GROUNDED.queryIndex)
             p = resultSet.getNullableDouble(table.P.queryIndex)
             q = resultSet.getNullableDouble(table.Q.queryIndex)
             pFixed = resultSet.getNullableDouble(table.P_FIXED.queryIndex)
@@ -2002,7 +2002,7 @@ internal class NetworkCimReader : CimReader<NetworkService>() {
             x = resultSet.getNullableDouble(table.X.queryIndex)
             x0 = resultSet.getNullableDouble(table.X0.queryIndex)
             xn = resultSet.getNullableDouble(table.XN.queryIndex)
-            isExternalGrid = resultSet.getBoolean(table.IS_EXTERNAL_GRID.queryIndex)
+            isExternalGrid = resultSet.getNullableBoolean(table.IS_EXTERNAL_GRID.queryIndex)
             rMin = resultSet.getNullableDouble(table.R_MIN.queryIndex)
             rnMin = resultSet.getNullableDouble(table.RN_MIN.queryIndex)
             r0Min = resultSet.getNullableDouble(table.R0_MIN.queryIndex)
@@ -2526,7 +2526,7 @@ internal class NetworkCimReader : CimReader<NetworkService>() {
         resultSet: ResultSet
     ): Boolean {
         regulatingCondEq.apply {
-            controlEnabled = resultSet.getBoolean(table.CONTROL_ENABLED.queryIndex)
+            controlEnabled = resultSet.getNullableBoolean(table.CONTROL_ENABLED.queryIndex)
             // We use a resolver here because there is an ordering conflict between terminals, RegulatingCondEq, and RegulatingControls
             // We check this resolver has actually been resolved in the afterServiceRead of the database read and throw there if it hasn't.
             service.resolveOrDeferReference(Resolvers.regulatingControl(this), resultSet.getNullableString(table.REGULATING_CONTROL_MRID.queryIndex))
@@ -2615,7 +2615,7 @@ internal class NetworkCimReader : CimReader<NetworkService>() {
                 typeNameAndMRID()
             )
 
-            grounded = resultSet.getBoolean(table.GROUNDED.queryIndex)
+            grounded = resultSet.getNullableBoolean(table.GROUNDED.queryIndex)
             nomU = resultSet.getNullableInt(table.NOM_U.queryIndex)
             phaseConnection = PhaseShuntConnectionKind.valueOf(resultSet.getString(table.PHASE_CONNECTION.queryIndex))
             sections = resultSet.getNullableDouble(table.SECTIONS.queryIndex)
@@ -2703,7 +2703,7 @@ internal class NetworkCimReader : CimReader<NetworkService>() {
     @Throws(SQLException::class)
     private fun readTapChanger(service: NetworkService, tapChanger: TapChanger, table: TableTapChangers, resultSet: ResultSet): Boolean {
         tapChanger.apply {
-            controlEnabled = resultSet.getBoolean(table.CONTROL_ENABLED.queryIndex)
+            controlEnabled = resultSet.getNullableBoolean(table.CONTROL_ENABLED.queryIndex)
             highStep = resultSet.getNullableInt(table.HIGH_STEP.queryIndex)
             lowStep = resultSet.getNullableInt(table.LOW_STEP.queryIndex)
             neutralStep = resultSet.getNullableInt(table.NEUTRAL_STEP.queryIndex)
@@ -2749,7 +2749,7 @@ internal class NetworkCimReader : CimReader<NetworkService>() {
         transformerEnd.apply {
             terminal = service.ensureGet(resultSet.getNullableString(table.TERMINAL_MRID.queryIndex), typeNameAndMRID())
             baseVoltage = service.ensureGet(resultSet.getNullableString(table.BASE_VOLTAGE_MRID.queryIndex), typeNameAndMRID())
-            grounded = resultSet.getBoolean(table.GROUNDED.queryIndex)
+            grounded = resultSet.getNullableBoolean(table.GROUNDED.queryIndex)
             rGround = resultSet.getNullableDouble(table.R_GROUND.queryIndex)
             xGround = resultSet.getNullableDouble(table.X_GROUND.queryIndex)
             starImpedance = service.ensureGet(resultSet.getNullableString(table.STAR_IMPEDANCE_MRID.queryIndex), typeNameAndMRID())

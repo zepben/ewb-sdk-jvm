@@ -21,13 +21,13 @@ package com.zepben.ewb.cim.iec61968.common
  * @property displayAddress The address as it should be displayed to a user.
  */
 data class StreetDetail(
-    val buildingName: String = "",
-    val floorIdentification: String = "",
-    val name: String = "",
-    val number: String = "",
-    val suiteNumber: String = "",
-    val type: String = "",
-    val displayAddress: String = ""
+    val buildingName: String? = null,
+    val floorIdentification: String? = null,
+    val name: String? = null,
+    val number: String? = null,
+    val suiteNumber: String? = null,
+    val type: String? = null,
+    val displayAddress: String? = null
 ) {
 
     /**
@@ -36,13 +36,28 @@ data class StreetDetail(
      * @return true if all fields are empty, otherwise false
      */
     fun allFieldsEmpty(): Boolean = (
-        buildingName.isEmpty() &&
-            floorIdentification.isEmpty() &&
-            name.isEmpty() &&
-            number.isEmpty() &&
-            suiteNumber.isEmpty() &&
-            type.isEmpty() &&
-            displayAddress.isEmpty()
+        buildingName.isNullOrEmpty() &&
+            floorIdentification.isNullOrEmpty() &&
+            name.isNullOrEmpty() &&
+            number.isNullOrEmpty() &&
+            suiteNumber.isNullOrEmpty() &&
+            type.isNullOrEmpty() &&
+            displayAddress.isNullOrEmpty()
+        )
+
+    /**
+     * Check to see if all fields of this [StreetDetail] are null
+     *
+     * @return true if all fields are null, otherwise false
+     */
+    fun allFieldsNull(): Boolean = (
+        buildingName == null &&
+            floorIdentification == null &&
+            name == null &&
+            number == null &&
+            suiteNumber == null &&
+            type == null &&
+            displayAddress == null
         )
 
 }

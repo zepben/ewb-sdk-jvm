@@ -36,7 +36,7 @@ import com.zepben.ewb.services.common.extensions.validateReference
 class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mRID) {
 
     var usagePointLocation: Location? = null
-    var isVirtual: Boolean = false
+    var isVirtual: Boolean? = null
     var connectionCategory: String? = null
     var ratedPower: Int? = null
 

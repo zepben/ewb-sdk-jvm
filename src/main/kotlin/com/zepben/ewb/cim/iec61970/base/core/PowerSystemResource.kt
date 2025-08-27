@@ -31,12 +31,12 @@ abstract class PowerSystemResource(mRID: String = "") : IdentifiedObject(mRID) {
     private var _assets: MutableList<Asset>? = null
     open val assetInfo: AssetInfo? get() = null
     var location: Location? = null
-    var numControls: Int = 0
+    var numControls: Int? = null
 
     /**
      * @return True if this [PowerSystemResource] has at least 1 Control associated with it, false otherwise.
      */
-    fun hasControls(): Boolean = numControls > 0
+    fun hasControls(): Boolean = (numControls ?: 0) > 0
 
     /**
      * All assets represented by this power system resource. For example, multiple conductor assets are electrically modelled as a single AC line segment.

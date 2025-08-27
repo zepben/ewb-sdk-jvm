@@ -34,7 +34,7 @@ internal class RegulatingCondEqTest {
     internal fun accessorCoverage() {
         val regulatingCondEq = object : RegulatingCondEq() {}
 
-        assertThat(regulatingCondEq.controlEnabled, equalTo(true))
+        assertThat(regulatingCondEq.controlEnabled, nullValue())
         assertThat(regulatingCondEq.regulatingControl, nullValue())
 
         regulatingCondEq.fillFields(NetworkService())

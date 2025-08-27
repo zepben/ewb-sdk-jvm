@@ -92,6 +92,27 @@
 * The `evolve-conn` dependency has been incorporated into the SDK with the following package changes:
   * `com.zepben.auth` -> `com.zepben.ewb.auth`
   * `com.zepben.evolve.conn` -> `com.zepben.ewb.conn`
+* The following CIM fields have been made nullable. Note if previously accessing these fields you will now have to handle them potentially being null.
+  * Analog.positiveFlowIn
+  * Document.*
+  * EnergyConsumer.grounded
+  * EnergySource.isExternalGrid
+  * IdentifiedObject.name
+  * IdentifiedObject.description
+  * IdentifiedObject.numDiagramObjects
+  * Meter.companyMeterId
+  * NameType.description
+  * Pole.classification
+  * PowerSystemResource.numControls
+  * RegulatingCondEq.controlEnabled
+  * ShuntCompensator.grounded
+  * StreetAddress.postalCode
+  * StreetAddress.poBox
+  * StreetDetail.*
+  * SynchronousMachine.earthing
+  * TapChanger.controlEnabled
+  * TransformerEnd.grounded
+  * UsagePoint.isVirtual
 
 ### New Features
 * Added `com.zepben.ewb.issues` package including `IssuesLog`, `IssueTracker` and `IssueTrackerGroup` for tracking issues.

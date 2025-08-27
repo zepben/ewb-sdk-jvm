@@ -11,8 +11,8 @@ package com.zepben.ewb.services.common.extensions
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 
 
-fun IdentifiedObject.nameAndMRID(): String = if (name.isBlank()) mRID else "'$name' [$mRID]"
-fun IdentifiedObject.typeNameAndMRID(): String = if (name.isBlank()) "${javaClass.simpleName} $mRID" else "${javaClass.simpleName} $name [$mRID]"
+fun IdentifiedObject.nameAndMRID(): String = if (name.isNullOrBlank()) mRID else "'$name' [$mRID]"
+fun IdentifiedObject.typeNameAndMRID(): String = if (name.isNullOrBlank()) "${javaClass.simpleName} $mRID" else "${javaClass.simpleName} $name [$mRID]"
 
 internal fun <T : IdentifiedObject> Iterable<T>?.getByMRID(mRID: String): T? {
     return this?.firstOrNull { it.mRID == mRID }

@@ -32,8 +32,8 @@ internal class DiagramTranslatorTest : TranslatorTestBase<DiagramService>(
         // # IEC61970 Base Diagram Layout #
         // ################################
 
-        ValidationInfo(Diagram(), { fillFields(it) }, { addFromPb(dsToPb.toPb(it)) }),
-        ValidationInfo(DiagramObject(), { fillFields(it) }, { addFromPb(dsToPb.toPb(it)) })
+        ValidationInfo(::Diagram, { fillFields(it) }, { addFromPb(dsToPb.toPb(it)) }),
+        ValidationInfo(::DiagramObject, { fillFields(it) }, { addFromPb(dsToPb.toPb(it)) })
     )
 
     override val excludedTables =

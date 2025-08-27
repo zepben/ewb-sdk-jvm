@@ -76,9 +76,9 @@ class BaseServiceJavaTest {
         validateForEach(Breaker.class, Arrays.asList(breaker1, breaker2));
         validateForEach(AcLineSegment.class, Arrays.asList(acLineSegment1, acLineSegment2));
 
-        validateForEachFiltered(IdentifiedObject.class, it -> it.getName().isEmpty(), Arrays.asList(breaker1, acLineSegment2));
-        validateForEachFiltered(Breaker.class, it -> it.getName().isEmpty(), Collections.singletonList(breaker1));
-        validateForEachFiltered(AcLineSegment.class, it -> it.getName().isEmpty(), Collections.singletonList(acLineSegment2));
+        validateForEachFiltered(IdentifiedObject.class, it -> it.getName() == null, Arrays.asList(breaker1, acLineSegment2));
+        validateForEachFiltered(Breaker.class, it -> it.getName() == null, Collections.singletonList(breaker1));
+        validateForEachFiltered(AcLineSegment.class, it -> it.getName() == null, Collections.singletonList(acLineSegment2));
     }
 
     @Test
@@ -94,9 +94,9 @@ class BaseServiceJavaTest {
         assertThat(service.listOf(Breaker.class), containsInAnyOrder(breaker1, breaker2));
         assertThat(service.listOf(AcLineSegment.class), containsInAnyOrder(acLineSegment1, acLineSegment2));
 
-        assertThat(service.listOf(IdentifiedObject.class, it -> it.getName().isEmpty()), containsInAnyOrder(breaker1, acLineSegment2));
-        assertThat(service.listOf(Breaker.class, it -> it.getName().isEmpty()), containsInAnyOrder(breaker1));
-        assertThat(service.listOf(AcLineSegment.class, it -> it.getName().isEmpty()), containsInAnyOrder(acLineSegment2));
+        assertThat(service.listOf(IdentifiedObject.class, it -> it.getName() == null), containsInAnyOrder(breaker1, acLineSegment2));
+        assertThat(service.listOf(Breaker.class, it -> it.getName() == null), containsInAnyOrder(breaker1));
+        assertThat(service.listOf(AcLineSegment.class, it -> it.getName() == null), containsInAnyOrder(acLineSegment2));
     }
 
     @Test
@@ -105,9 +105,9 @@ class BaseServiceJavaTest {
         assertThat(service.setOf(Breaker.class), containsInAnyOrder(breaker1, breaker2));
         assertThat(service.setOf(AcLineSegment.class), containsInAnyOrder(acLineSegment1, acLineSegment2));
 
-        assertThat(service.setOf(IdentifiedObject.class, it -> it.getName().isEmpty()), containsInAnyOrder(breaker1, acLineSegment2));
-        assertThat(service.setOf(Breaker.class, it -> it.getName().isEmpty()), containsInAnyOrder(breaker1));
-        assertThat(service.setOf(AcLineSegment.class, it -> it.getName().isEmpty()), containsInAnyOrder(acLineSegment2));
+        assertThat(service.setOf(IdentifiedObject.class, it -> it.getName() == null), containsInAnyOrder(breaker1, acLineSegment2));
+        assertThat(service.setOf(Breaker.class, it -> it.getName() == null), containsInAnyOrder(breaker1));
+        assertThat(service.setOf(AcLineSegment.class, it -> it.getName() == null), containsInAnyOrder(acLineSegment2));
     }
 
     @Test
@@ -119,12 +119,12 @@ class BaseServiceJavaTest {
         assertThat(service.mapOf(Breaker.class).values(), containsInAnyOrder(breaker1, breaker2));
         assertThat(service.mapOf(AcLineSegment.class).values(), containsInAnyOrder(acLineSegment1, acLineSegment2));
 
-        assertThat(service.mapOf(IdentifiedObject.class, it -> it.getName().isEmpty()).keySet(), containsInAnyOrder(breaker1.getMRID(), acLineSegment2.getMRID()));
-        assertThat(service.mapOf(Breaker.class, it -> it.getName().isEmpty()).keySet(), containsInAnyOrder(breaker1.getMRID()));
-        assertThat(service.mapOf(AcLineSegment.class, it -> it.getName().isEmpty()).keySet(), containsInAnyOrder(acLineSegment2.getMRID()));
-        assertThat(service.mapOf(IdentifiedObject.class, it -> it.getName().isEmpty()).values(), containsInAnyOrder(breaker1, acLineSegment2));
-        assertThat(service.mapOf(Breaker.class, it -> it.getName().isEmpty()).values(), containsInAnyOrder(breaker1));
-        assertThat(service.mapOf(AcLineSegment.class, it -> it.getName().isEmpty()).values(), containsInAnyOrder(acLineSegment2));
+        assertThat(service.mapOf(IdentifiedObject.class, it -> it.getName() == null).keySet(), containsInAnyOrder(breaker1.getMRID(), acLineSegment2.getMRID()));
+        assertThat(service.mapOf(Breaker.class, it -> it.getName() == null).keySet(), containsInAnyOrder(breaker1.getMRID()));
+        assertThat(service.mapOf(AcLineSegment.class, it -> it.getName() == null).keySet(), containsInAnyOrder(acLineSegment2.getMRID()));
+        assertThat(service.mapOf(IdentifiedObject.class, it -> it.getName() == null).values(), containsInAnyOrder(breaker1, acLineSegment2));
+        assertThat(service.mapOf(Breaker.class, it -> it.getName() == null).values(), containsInAnyOrder(breaker1));
+        assertThat(service.mapOf(AcLineSegment.class, it -> it.getName() == null).values(), containsInAnyOrder(acLineSegment2));
     }
 
     private <T extends IdentifiedObject> T create(BaseService baseService, Supplier<T> supplier) {

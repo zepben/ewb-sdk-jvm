@@ -9,6 +9,10 @@
 package com.zepben.ewb.services.common.translator
 
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
+import com.zepben.ewb.cim.iec61968.common.Location
+import com.zepben.ewb.cim.iec61968.common.StreetAddress
+import com.zepben.ewb.cim.iec61968.common.StreetDetail
+import com.zepben.ewb.cim.iec61968.common.TownDetail
 import com.zepben.ewb.cim.iec61968.operations.OperationalRestriction
 import com.zepben.ewb.cim.iec61970.base.core.*
 import com.zepben.ewb.database.sqlite.cim.CimDatabaseTables
@@ -19,6 +23,7 @@ import com.zepben.ewb.database.sqlite.common.SqliteTable
 import com.zepben.ewb.database.sqlite.common.SqliteTableVersion
 import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.common.BaseServiceComparator
+import com.zepben.ewb.services.common.testdata.SchemaServices
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -29,7 +34,7 @@ import kotlin.reflect.KClass
 import com.zepben.protobuf.cim.iec61970.base.core.NameType as PBNameType
 
 internal abstract class TranslatorTestBase<S : BaseService>(
-    private val createService: () -> S,
+    val createService: () -> S,
     private val comparator: BaseServiceComparator,
     private val databaseTables: CimDatabaseTables,
     private val addFromPb: S.(PBNameType) -> NameType,
@@ -94,10 +99,25 @@ internal abstract class TranslatorTestBase<S : BaseService>(
             description = "nt1 desc"
         }.toPb()
 
+        // These two are just testing to make sure nullability of description translates correctly
+        // after we added nullability
+        val pbNullDesc = NameType("nt1 name null desc").toPb()
+        val pbEmptyDesc = NameType("nt1 name").apply {
+            description = ""
+        }.toPb()
+
         val cim = createService().addFromPb(pb)
+        val cimNullDesc = createService().addFromPb(pbNullDesc)
+        val cimEmptyDesc = createService().addFromPb(pbEmptyDesc)
 
         assertThat(cim.name, equalTo(pb.name))
-        assertThat(cim.description, equalTo(pb.description))
+        assertThat(cim.description, equalTo(pb.descriptionSet))
+
+        assertThat(cimNullDesc.name, equalTo(pbNullDesc.name))
+        assertThat(cimNullDesc.description, nullValue())
+
+        assertThat(cimEmptyDesc.name, equalTo(pbEmptyDesc.name))
+        assertThat(cimEmptyDesc.description, equalTo(pbEmptyDesc.descriptionSet))
     }
 
     @Test
@@ -110,7 +130,7 @@ internal abstract class TranslatorTestBase<S : BaseService>(
         val cim = createService().apply { addNameType(nt) }.addFromPb(pb)
 
         assertThat(cim, sameInstance(nt))
-        assertThat(cim.description, equalTo(pb.description))
+        assertThat(cim.description, equalTo(pb.descriptionSet))
     }
 
     /**
@@ -122,16 +142,24 @@ internal abstract class TranslatorTestBase<S : BaseService>(
      * @property translate The callback that performs the translation from CIM to protobuf and back.
      */
     protected inner class ValidationInfo<T : IdentifiedObject>(
-        val cim: T,
+        cimFactory: () -> T,
         val filler: T.(S) -> Unit,
         val translate: S.(T) -> T?
     ) {
+
+        val cim = cimFactory()
+        private val cimEmptys = cimFactory()
 
         override fun toString(): String = "ValidationInfo<${cim::class.simpleName}>"
 
         fun validate() {
             val blankDifferences = comparator.compare(cim, translate(createService(), cim)!!).differences
             assertThat("Failed to convert blank ${cim::class.simpleName}:${blankDifferences}", blankDifferences, anEmptyMap())
+
+            // Replace nullable strings and booleans with "" and false and translate + compare
+            SchemaServices.fillEmptys(cimEmptys)
+            val emptyDifferences = comparator.compare(cimEmptys, translate(createService(), cimEmptys)!!).differences
+            assertThat("Failed to convert empty ${cimEmptys::class.simpleName}:${emptyDifferences}", emptyDifferences, anEmptyMap())
 
             cim.filler(createService())
             removeUnsentReferences()

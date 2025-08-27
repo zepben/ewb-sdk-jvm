@@ -43,4 +43,13 @@ internal class TownDetailTest {
         assertThat(TownDetail(stateOrProvince = "value").allFieldsNullOrEmpty(), equalTo(false))
     }
 
+    @Test
+    internal fun testAllFieldsNull() {
+        assertThat(TownDetail().allFieldsNull(), equalTo(true))
+        assertThat(TownDetail("", "").allFieldsNull(), equalTo(false))
+
+        assertThat(TownDetail(name = "value").allFieldsNull(), equalTo(false))
+        assertThat(TownDetail(stateOrProvince = "value").allFieldsNull(), equalTo(false))
+    }
+
 }

@@ -51,7 +51,7 @@ class SynchronousMachine @JvmOverloads constructor(mRID: String = "") : Rotating
 
     var baseQ: Double? = null
     var condenserP: Int? = null
-    var earthing: Boolean = false
+    var earthing: Boolean? = false
     var earthingStarPointR: Double? = null
     var earthingStarPointX: Double? = null
     var ikk: Double? = null

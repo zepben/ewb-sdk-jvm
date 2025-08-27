@@ -12,8 +12,10 @@ import com.zepben.ewb.database.postgres.metrics.tables.TableJobSources
 import com.zepben.ewb.database.postgres.metrics.tables.TableJobs
 import com.zepben.ewb.database.postgres.metrics.tables.TableNetworkContainerMetrics
 import com.zepben.ewb.database.sql.BaseEntryWriter
+import com.zepben.ewb.database.sql.extensions.setNullableString
 import com.zepben.ewb.metrics.*
 import java.sql.Timestamp
+import java.sql.Types.VARCHAR
 import java.util.*
 
 /**
@@ -81,13 +83,13 @@ internal class MetricsEntryWriter(
         when (container) {
             is TotalNetworkContainer -> {
                 insert.setString(table.HIERARCHY_ID.queryIndex, "GLOBAL")
-                insert.setString(table.HIERARCHY_NAME.queryIndex, "")
+                insert.setNull(table.HIERARCHY_NAME.queryIndex, VARCHAR)
                 insert.setString(table.CONTAINER_TYPE.queryIndex, "TOTAL")
             }
 
             is PartialNetworkContainer -> {
                 insert.setString(table.HIERARCHY_ID.queryIndex, container.mRID)
-                insert.setString(table.HIERARCHY_NAME.queryIndex, container.name)
+                insert.setNullableString(table.HIERARCHY_NAME.queryIndex, container.name)
                 insert.setString(table.CONTAINER_TYPE.queryIndex, container.level.name)
             }
         }

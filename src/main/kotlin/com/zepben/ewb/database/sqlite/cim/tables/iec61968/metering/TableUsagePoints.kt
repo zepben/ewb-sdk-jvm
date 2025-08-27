@@ -17,7 +17,7 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.core.TableIdentif
 class TableUsagePoints : TableIdentifiedObjects() {
 
     val LOCATION_MRID: Column = Column(++columnIndex, "location_mrid", "TEXT", NULL)
-    val IS_VIRTUAL: Column = Column(++columnIndex, "is_virtual", "BOOLEAN")
+    val IS_VIRTUAL: Column = Column(++columnIndex, "is_virtual", "BOOLEAN", NULL)
     val CONNECTION_CATEGORY: Column = Column(++columnIndex, "connection_category", "TEXT", NULL)
     val RATED_POWER: Column = Column(++columnIndex, "rated_power", "INTEGER", NULL)
     val APPROVED_INVERTER_CAPACITY: Column = Column(++columnIndex, "approved_inverter_capacity", "INTEGER", NULL)

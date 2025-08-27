@@ -52,4 +52,16 @@ internal class StreetDetailTest {
         assertThat("allFieldsEmpty() should return false for nonempty displayAddress", !StreetDetail(displayAddress = "value").allFieldsEmpty())
     }
 
+    @Test
+    internal fun testAllFieldsNull() {
+        assertThat("allFieldsNull should return true for empty StreetDetail", StreetDetail().allFieldsNull())
+
+        assertThat("allFieldsNull() should return false for nonempty buildingName", !StreetDetail(buildingName = "value").allFieldsNull())
+        assertThat("allFieldsNull() should return false for nonempty floorIdentification", !StreetDetail(floorIdentification = "value").allFieldsNull())
+        assertThat("allFieldsNull() should return false for nonempty name", !StreetDetail(name = "value").allFieldsNull())
+        assertThat("allFieldsNull() should return false for nonempty number", !StreetDetail(number = "value").allFieldsNull())
+        assertThat("allFieldsNull() should return false for nonempty suiteNumber", !StreetDetail(suiteNumber = "value").allFieldsNull())
+        assertThat("allFieldsNull() should return false for nonempty type", !StreetDetail(type = "value").allFieldsNull())
+        assertThat("allFieldsNull() should return false for nonempty displayAddress", !StreetDetail(displayAddress = "value").allFieldsNull())
+    }
 }

@@ -32,12 +32,12 @@ import com.zepben.protobuf.cim.iec61970.base.core.NameType as PBNameType
 
 fun toCim(pb: PBDocument, cim: Document, baseService: BaseService): Document =
     cim.apply {
-        title = pb.title.internEmpty()
+        title = pb.titleSet.takeUnless { pb.hasTitleNull() }
         createdDateTime = pb.createdDateTime.toInstant()
-        authorName = pb.authorName.internEmpty()
-        type = pb.type.internEmpty()
-        status = pb.status.internEmpty()
-        comment = pb.comment.internEmpty()
+        authorName = pb.authorNameSet.takeUnless { pb.hasAuthorNameNull() }
+        type = pb.typeSet.takeUnless { pb.hasTypeNull() }
+        status = pb.statusSet.takeUnless { pb.hasStatusNull() }
+        comment = pb.commentSet.takeUnless { pb.hasCommentNull() }
         toCim(pb.io, this, baseService)
     }
 
@@ -58,9 +58,9 @@ fun toCim(pb: PBOrganisationRole, cim: OrganisationRole, baseService: BaseServic
 
 fun toCim(pb: PBIdentifiedObject, cim: IdentifiedObject, baseService: BaseService): IdentifiedObject =
     cim.apply {
-        name = pb.name.internEmpty()
-        description = pb.description.internEmpty()
-        numDiagramObjects = pb.numDiagramObjects
+        name = pb.nameSet.takeUnless { pb.hasNameNull() }
+        description = pb.descriptionSet.takeUnless { pb.hasDescriptionNull() }
+        numDiagramObjects = pb.numDiagramObjectsSet.takeUnless { pb.hasNumDiagramObjectsNull() }
         pb.namesList.forEach { entry ->
             val nameType = baseService.getNameType(entry.type) ?: NameType(entry.type).also { baseService.addNameType(it) }
             this.addName(nameType, entry.name)
@@ -72,6 +72,6 @@ fun toCim(pb: PBIdentifiedObject, cim: IdentifiedObject, baseService: BaseServic
 //
 fun toCim(pb: PBNameType, baseService: BaseService): NameType =
     (baseService.getNameType(pb.name) ?: NameType(pb.name).also { baseService.addNameType(it) })
-        .apply { description = pb.description }
+        .apply { description = pb.descriptionSet.takeUnless { pb.hasDescriptionNull() } }
 
 abstract class BaseProtoToCim

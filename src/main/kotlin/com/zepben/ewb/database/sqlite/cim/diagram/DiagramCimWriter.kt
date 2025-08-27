@@ -11,6 +11,7 @@ package com.zepben.ewb.database.sqlite.cim.diagram
 import com.zepben.ewb.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.ewb.cim.iec61970.base.diagramlayout.DiagramObject
 import com.zepben.ewb.cim.iec61970.base.diagramlayout.DiagramObjectPoint
+import com.zepben.ewb.database.sql.extensions.setNullableDouble
 import com.zepben.ewb.database.sql.extensions.setNullableString
 import com.zepben.ewb.database.sqlite.cim.CimWriter
 import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.diagramlayout.TableDiagramObjectPoints
@@ -82,7 +83,7 @@ class DiagramCimWriter(
         val table = databaseTables.getTable<TableDiagramObjectPoints>()
         val insert = databaseTables.getInsert<TableDiagramObjectPoints>()
 
-        insert.setNullableString(table.DIAGRAM_OBJECT_MRID.queryIndex, diagramObject.mRID)
+        insert.setString(table.DIAGRAM_OBJECT_MRID.queryIndex, diagramObject.mRID)
         insert.setInt(table.SEQUENCE_NUMBER.queryIndex, sequenceNumber)
         insert.setDouble(table.X_POSITION.queryIndex, diagramObjectPoint.xPosition)
         insert.setDouble(table.Y_POSITION.queryIndex, diagramObjectPoint.yPosition)

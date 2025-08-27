@@ -32,9 +32,9 @@ internal class IdentifiedObjectTest {
         val identifiedObject = object : IdentifiedObject("id") {}
 
         assertThat(identifiedObject.mRID, equalTo("id"))
-        assertThat(identifiedObject.name, equalTo(""))
-        assertThat(identifiedObject.description, equalTo(""))
-        assertThat(identifiedObject.numDiagramObjects, equalTo(0))
+        assertThat(identifiedObject.name, nullValue())
+        assertThat(identifiedObject.description, nullValue())
+        assertThat(identifiedObject.numDiagramObjects, nullValue())
 
         identifiedObject.name = "name"
         identifiedObject.description = "description"

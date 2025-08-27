@@ -22,7 +22,7 @@ sealed interface NetworkContainer
 data class PartialNetworkContainer(
     val level: NetworkLevel,
     val mRID: String,
-    val name: String
+    val name: String?
 ) : NetworkContainer
 
 /**

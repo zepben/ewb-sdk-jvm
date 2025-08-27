@@ -19,7 +19,7 @@ abstract class TableTransformerEnds : TableIdentifiedObjects() {
     val END_NUMBER: Column = Column(++columnIndex, "end_number", "INTEGER", NOT_NULL)
     val TERMINAL_MRID: Column = Column(++columnIndex, "terminal_mrid", "TEXT", NULL)
     val BASE_VOLTAGE_MRID: Column = Column(++columnIndex, "base_voltage_mrid", "TEXT", NULL)
-    val GROUNDED: Column = Column(++columnIndex, "grounded", "BOOLEAN", NOT_NULL)
+    val GROUNDED: Column = Column(++columnIndex, "grounded", "BOOLEAN", NULL)
     val R_GROUND: Column = Column(++columnIndex, "r_ground", "NUMBER", NULL)
     val X_GROUND: Column = Column(++columnIndex, "x_ground", "NUMBER", NULL)
     val STAR_IMPEDANCE_MRID: Column = Column(++columnIndex, "star_impedance_mrid", "TEXT", NULL)

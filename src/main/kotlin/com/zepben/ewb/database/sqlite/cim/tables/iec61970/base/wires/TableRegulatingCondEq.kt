@@ -15,7 +15,7 @@ import com.zepben.ewb.database.sql.Column.Nullable.NULL
 @Suppress("PropertyName")
 abstract class TableRegulatingCondEq : TableEnergyConnections() {
 
-    val CONTROL_ENABLED: Column = Column(++columnIndex, "control_enabled", "BOOLEAN", NOT_NULL)
+    val CONTROL_ENABLED: Column = Column(++columnIndex, "control_enabled", "BOOLEAN", NULL)
     val REGULATING_CONTROL_MRID: Column = Column(++columnIndex, "regulating_control_mrid", "TEXT", NULL)
 
 }

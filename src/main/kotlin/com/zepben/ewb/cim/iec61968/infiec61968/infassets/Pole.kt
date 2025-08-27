@@ -22,7 +22,7 @@ class Pole @JvmOverloads constructor(mRID: String = "") : Structure(mRID) {
     /**
      * Pole class: 1, 2, 3, 4, 5, 6, 7, H1, H2, Other, Unknown.
      */
-    var classification: String = ""
+    var classification: String? = null
 
     private var _streetlights: MutableList<Streetlight>? = null
 

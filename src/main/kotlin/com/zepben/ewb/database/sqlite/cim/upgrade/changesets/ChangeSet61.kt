@@ -19,6 +19,8 @@ internal fun changeSet61() = ChangeSet(
     listOf(
         // Network Change
         `retype nonnull columns to null network`,
+        `retype nonnull columns to null diagram`,
+        `retype nonnull columns to null customer`,
     )
 )
 
@@ -45,11 +47,7 @@ private val `retype nonnull columns to null network` = Change(
         powerSystemResource("current_relays") +
         identifiedObject("current_transformer_info") +
         powerSystemResource("current_transformers") +
-        //document("customer_agreements") +
-        //identifiedObject("customers") +
         powerSystemResourceNoIndex("cuts") +
-        //identifiedObject("diagram_objects") +
-        //identifiedObject("diagrams") +
         powerSystemResource("disconnectors") +
         identifiedObject("discretes") +
         powerSystemResource("distance_relays") +
@@ -95,7 +93,6 @@ private val `retype nonnull columns to null network` = Change(
         transformerEnd("power_transformer_ends") +
         identifiedObject("power_transformer_info") +
         powerSystemResource("power_transformers") +
-        //document("pricing_structures") +
         identifiedObject("protection_relay_schemes") +
         powerSystemResource("protection_relay_systems") +
         tapChanger("ratio_tap_changers") +
@@ -115,7 +112,6 @@ private val `retype nonnull columns to null network` = Change(
         identifiedObject("switch_info") +
         synchronousMachine("synchronous_machines") +
         powerSystemResource("tap_changer_controls") +
-        //document("tariffs") +
         identifiedObject("terminals") +
         identifiedObject("transformer_end_info") +
         identifiedObject("transformer_star_impedances") +
@@ -126,6 +122,24 @@ private val `retype nonnull columns to null network` = Change(
 
     // TODO: Every power system resource table needs the above.
     targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+)
+
+@Suppress("ObjectPropertyName")
+private val `retype nonnull columns to null diagram` = Change(
+    identifiedObject("diagram_objects") +
+        identifiedObject("diagrams") +
+        alterToNullableColumn("diagram_object_points", "x_position") +
+        alterToNullableColumn("diagram_object_points", "y_position"),
+    targetDatabases = setOf(DatabaseType.DIAGRAM)
+)
+
+@Suppress("ObjectPropertyName")
+private val `retype nonnull columns to null customer` = Change(
+    document("customer_agreements") +
+        identifiedObject("customers") +
+        document("pricing_structures") +
+        document("tariffs"),
+    targetDatabases = setOf(DatabaseType.CUSTOMER)
 )
 
 fun streetAddress(tableName: String): List<String> =
@@ -225,32 +239,3 @@ fun alterToNullableColumn(tableName: String, columnName: String): List<String> =
         "UPDATE $tableName SET $columnName = ${columnName}_old",
         "ALTER TABLE $tableName DROP COLUMN ${columnName}_old"
     )
-
-@Suppress("ObjectPropertyName")
-private val `rename RegulatingControlModeKind UNKNOWN_CONTROL_MODE to UNKNOWN` = Change(
-    listOf(
-        "UPDATE battery_controls SET mode = 'UNKNOWN' WHERE mode = 'UNKNOWN_CONTROL_MODE'",
-        "UPDATE tap_changer_controls SET mode = 'UNKNOWN' WHERE mode = 'UNKNOWN_CONTROL_MODE'",
-    ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
-)
-
-@Suppress("ObjectPropertyName")
-private val `rename TransformerCoolingType UNKNOWN_COOLING_TYPE to UNKNOWN` = Change(
-    listOf(
-        "UPDATE power_transformer_end_ratings SET cooling_type = 'UNKNOWN' WHERE cooling_type = 'UNKNOWN_COOLING_TYPE'",
-    ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
-)
-
-@Suppress("ObjectPropertyName")
-private val `rename WindingConnection UNKNOWN_WINDING to UNKNOWN` = Change(
-    listOf(
-        "UPDATE power_transformer_ends SET connection_kind = 'UNKNOWN' WHERE connection_kind = 'UNKNOWN_WINDING'",
-        "UPDATE transformer_end_info SET connection_kind = 'UNKNOWN' WHERE connection_kind = 'UNKNOWN_WINDING'",
-    ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
-)
-
-fun tablesToUpdate(): List<SqliteTable> = mutableListOf(
-)

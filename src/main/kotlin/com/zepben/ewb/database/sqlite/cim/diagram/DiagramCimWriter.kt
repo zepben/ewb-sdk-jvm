@@ -85,8 +85,8 @@ class DiagramCimWriter(
 
         insert.setString(table.DIAGRAM_OBJECT_MRID.queryIndex, diagramObject.mRID)
         insert.setInt(table.SEQUENCE_NUMBER.queryIndex, sequenceNumber)
-        insert.setNullableDouble(table.X_POSITION.queryIndex, diagramObjectPoint.xPosition)
-        insert.setNullableDouble(table.Y_POSITION.queryIndex, diagramObjectPoint.yPosition)
+        insert.setDouble(table.X_POSITION.queryIndex, diagramObjectPoint.xPosition)
+        insert.setDouble(table.Y_POSITION.queryIndex, diagramObjectPoint.yPosition)
 
         return insert.tryExecuteSingleUpdate("diagram object point")
     }

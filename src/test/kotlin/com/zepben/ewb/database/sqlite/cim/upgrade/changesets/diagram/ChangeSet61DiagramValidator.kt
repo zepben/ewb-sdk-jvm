@@ -14,7 +14,6 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import java.sql.Statement
 
-// TODO: This needs all the data model changes verified
 object ChangeSet61DiagramValidator : ChangeSetValidator(DatabaseType.NETWORK_MODEL, 61) {
 
     //
@@ -24,6 +23,7 @@ object ChangeSet61DiagramValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
     override fun setUpStatements(): List<String> = listOf(
         *`populate identifiedObjectRotation` ("diagram_objects"),
         *`populate identifiedObject` ("diagrams"),
+        *`populate diagram object points`()
     )
 
     // There are no table changes, so no need to populate anything.
@@ -32,6 +32,7 @@ object ChangeSet61DiagramValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
     override fun validateChanges(statement: Statement) {
         `validate identifiedObject` (statement, "diagram_objects")
         `validate identifiedObject` (statement, "diagrams")
+        `validate diagram object points`(statement)
     }
 
     override fun tearDownStatements(): List<String> =
@@ -51,6 +52,13 @@ object ChangeSet61DiagramValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
         """.trimIndent()
     )
 
+    private fun `populate diagram object points`() = arrayOf(
+        """
+           INSERT INTO diagram_object_points (diagram_object_mrid, sequence_number, x_position, y_position)
+           VALUES ('id1', 1, 0.0, 0.0)
+        """.trimIndent()
+    )
+
     private fun `validate identifiedObject`(statement: Statement, table: String) {
         validateRows(
             statement, "SELECT mrid, name, description, num_diagram_objects FROM $table",
@@ -59,6 +67,18 @@ object ChangeSet61DiagramValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
                 assertThat(rs.getString("name"), equalTo("name"))
                 assertThat(rs.getString("description"), equalTo("desc"))
                 assertThat(rs.getInt("num_diagram_objects"), equalTo(1))
+            }
+        )
+    }
+
+    private fun `validate diagram object points`(statement: Statement) {
+        validateRows(
+            statement, "SELECT diagram_object_mrid, sequence_number, x_position, y_position FROM diagram_object_points",
+            { rs ->
+                assertThat(rs.getString("diagram_object_mrid"), equalTo("id1"))
+                assertThat(rs.getInt("sequence_number"), equalTo(1))
+                assertThat(rs.getDouble("x_position"), equalTo(0.0))
+                assertThat(rs.getDouble("y_position"), equalTo(0.0))
             }
         )
     }

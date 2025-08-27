@@ -147,7 +147,7 @@ internal abstract class TranslatorTestBase<S : BaseService>(
         val translate: S.(T) -> T?
     ) {
 
-        val cim = cimFactory()
+        private val cim = cimFactory()
         private val cimEmptys = cimFactory()
 
         override fun toString(): String = "ValidationInfo<${cim::class.simpleName}>"

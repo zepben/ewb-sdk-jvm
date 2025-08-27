@@ -32,6 +32,16 @@ abstract class IdentifiedObject(mRID: String = "") {
     var numDiagramObjects: Int? = null
 
     /**
+     * Helper function to fall back to MRID if name isn't present
+     */
+    val nameOrMRID: String get() = name ?: mRID
+
+    /**
+     * Helper function to fall back to an empty string if name isn't present
+     */
+    val nameOrEmpty: String get() = name ?: ""
+
+    /**
      * @return True if this [IdentifiedObject] has at least 1 DiagramObject associated with it, false otherwise.
      */
     val hasDiagramObjects: Boolean

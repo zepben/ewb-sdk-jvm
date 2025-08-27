@@ -2,6 +2,7 @@
 
 | Version                | Released            |
 |------------------------|---------------------|
+|[1.0.0](#100)| `27 August 2025` |
 |[0.29.0](#v0290)| `05 June 2025` |
 |[0.28.0](#v0280)| `28 April 2025` |
 |[0.27.0](#v0270)| `24 April 2025` |
@@ -39,6 +40,169 @@
 ---
 
 NOTE: This library is not yet stable, and breaking changes should be expected until a 1.0.0 release.
+
+---
+
+## [1.0.0]
+
+### Breaking Changes
+* Renamed the package to `com.zepben.ewb`. You will need to update all your imports `com.zepben.evolve.*` -> `com.zepben.ewb.*`. This also updates the maven
+  artifact:
+  ```xml
+  <dependency>
+      <groupId>com.zepben</groupId>
+      <artifactId>ewb-sdk</artifactId>
+  </dependency>
+  ```
+* Relocated the following classes into the Zepben extensions area, marking them as [ZBEX]:
+  * `DistanceRelay`: `cim.iec61970.base.protection` -> `cim.extensions.iec61970.base.protection`.
+  * `EvChargingUnit`: `cim.iec61970.infiec61970.wires.generation.production` -> `cim.extensions.iec61970.base.generation.production`.
+  * `Loop`: `cim.iec61970.infiec61970.feeder` -> `cim.extensions.iec61970.base.feeder`.
+  * `LvFeeder`: `cim.iec61970.infiec61970.feeder` -> `cim.extensions.iec61970.base.feeder`.
+  * `PowerDirectionKind`: `cim.iec61970.infiec61970.protection` -> `cim.extensions.iec61970.base.protection`.
+  * `ProtectionKind`: `cim.iec61970.infiec61970.protection` -> `cim.extensions.iec61970.base.protection`.
+  * `ProtectionRelayFunction`: `cim.iec61970.base.protection` -> `cim.extensions.iec61970.base.protection`.
+  * `ProtectionRelayScheme`: `cim.iec61970.base.protection` -> `cim.extensions.iec61970.base.protection`.
+  * `ProtectionRelaySystem`: `cim.iec61970.base.protection` -> `cim.extensions.iec61970.base.protection`.
+  * `RelayInfo`: `cim.iec61968.infiec61968.infassetinfo` -> `cim.extensions.iec61968.assetinfo`.
+  * `RelaySetting`: `cim.iec61970.base.protection` -> `cim.extensions.iec61970.base.protection`.
+  * `Site`: `cim.iec61970.base.core` -> `cim.extensions.iec61970.base.core`.
+  * `TransformerCoolingType`: `cim.iec61970.base.wires` -> `cim.extensions.iec61970.base.wires`.
+  * `TransformerEndRatedS`: `cim.iec61970.base.wires` -> `cim.extensions.iec61970.base.wires`.
+  * `VectorGroup`: `cim.iec61970.base.wires` -> `cim.extensions.iec61970.base.wires`.
+  * `VoltageRelay`: `cim.iec61970.base.protection` -> `cim.extensions.iec61970.base.protection`.
+  * `WindingConnection`: `cim.iec61970.base.wires.winding` -> `cim.iec61970.base.wires`.
+* Relocated the following classes that were in the wrong packages:
+  * `Pole`: `cim.iec61968.assets` -> `cim.iec61968.infiec61968.infassets`.
+  * `StreetlightLampKind`: `cim.iec61968.assets` -> `cim.iec61968.infiec61968.infassets`.
+  * All classes in the incorrectly located `cim.iec61970.base.wires.generation.production` -> `cim.iec61970.base.generation.production`.
+* The protobuf implementation has the following changes, which will only have an impact if you are using protobuf directly:
+  * Updated the values of the following enums to conform to Protobuf standard naming:
+    * `BatteryControlMode`
+    * `BatteryStateKind`
+    * `CustomerKind`
+    * `DiagramStyle`
+    * `EndDeviceFunctionKind`
+    * `FeederDirection`
+    * `IncludedEnergizedContainers`
+    * `IncludedEnergizingContainers`
+    * `LogLevel`
+    * `LogSource`
+    * `NetworkState`
+    * `OrientationKind`
+    * `PhaseCode`
+    * `PhaseShuntConnectionKind`
+    * `PotentialTransformerKind`
+    * `PowerDirectionKind`
+    * `ProtectionKind`
+    * `RegulatingControlModeKind`
+    * `SinglePhaseKind`
+    * `StreetlightLampKind`
+    * `SVCControlMode`
+    * `SwitchAction`
+    * `SynchronousMachineKind`
+    * `TransformerConstructionKind`
+    * `TransformerCoolingType`
+    * `TransformerFunctionKind`
+    * `UnitSymbol`
+    * `VectorGroup`
+    * `WindingConnection`
+    * `WireMaterialKind`
+  * Renumbered the protobuf fields for:
+    * `AcLineSegment`
+    * `Control`
+    * `Diagram`
+    * `TransformerEnd`
+* Renamed the following enum values:
+  * `PowerDirectionKind.UNKNOWN_DIRECTION` -> `PowerDirectionKind.UNKNOWN`
+  * `RegulatingControlModeKind.UNKNOWN_CONTROL_MODE` -> `RegulatingControlModeKind.UNKNOWN`
+  * `TransformerCoolingType.UNKNOWN_COOLING_TYPE` -> `TransformerCoolingType.UNKNOWN`
+  * `WindingConnection.UNKNOWN_WINDING` -> `WindingConnection.UNKNOWN`
+* Added `TransformerFunctionKind.UNKNOWN` to allow distinction between an unknown function, and a function that is not covered by the enum (i.e. `other`). This
+  addition has changed the order of the enum values, with `other` now being the last entry, instead of the first.
+* `NetworkConsumerClient` no longer uses the protobuf `IncludedEnergizedContainers`, `IncludedEnergizingContainers` and `NetworkState` enums directly, it now
+  uses SDK versions of these enums. To use these enums you will need to update your imports, and use the simplified versions of the enum values:
+  * `IncludedEnergizedContainers` from package `com.zepben.ewb.streaming.get`.
+    * `EXCLUDE_ENERGIZED_CONTAINERS` -> `NONE`.
+    * `INCLUDE_ENERGIZED_FEEDERS` -> `FEEDERS`.
+    * `INCLUDE_ENERGIZED_LV_FEEDERS` -> `LV_FEEDERS`.
+  * `IncludedEnergizingContainers` from package `com.zepben.ewb.streaming.get`.
+    * `EXCLUDE_ENERGIZING_CONTAINERS` -> `NONE`.
+    * `INCLUDE_ENERGIZING_FEEDERS` -> `FEEDERS`.
+    * `INCLUDE_ENERGIZING_SUBSTATIONS` -> `SUBSTATIONS`.
+  * `NetworkState` from package `com.zepben.ewb.services.network`.
+    * `ALL_NETWORK_STATE` -> `ALL`.
+    * `NORMAL_NETWORK_STATE` -> `NORMAL`.
+    * `CURRENT_NETWORK_STATE` -> `CURRENT`.
+* The `evolve-conn` dependency has been incorporated into the SDK with the following package changes:
+  * `com.zepben.auth` -> `com.zepben.ewb.auth`
+  * `com.zepben.evolve.conn` -> `com.zepben.ewb.conn`
+* The following CIM fields have been made nullable. Note if previously accessing these fields you will now have to handle them potentially being null.
+  * Analog.positiveFlowIn
+  * Document.*
+  * EnergyConsumer.grounded
+  * EnergySource.isExternalGrid
+  * IdentifiedObject.name
+  * IdentifiedObject.description
+  * IdentifiedObject.numDiagramObjects
+  * Meter.companyMeterId
+  * NameType.description
+  * Pole.classification
+  * PowerSystemResource.numControls
+  * RegulatingCondEq.controlEnabled
+  * ShuntCompensator.grounded
+  * StreetAddress.postalCode
+  * StreetAddress.poBox
+  * StreetDetail.*
+  * SynchronousMachine.earthing
+  * TapChanger.controlEnabled
+  * TransformerEnd.grounded
+  * UsagePoint.isVirtual
+
+### New Features
+* Added `com.zepben.ewb.issues` package including `IssuesLog`, `IssueTracker` and `IssueTrackerGroup` for tracking issues.
+
+### Enhancements
+* Upgrade ewb-grpc to 1.0.0 to support customer level load results.
+
+### Fixes
+* Fixed bug that would cause a null pointer exception when processing metrics job sources with a null metadata timestamp
+* Marked some extensions properties and classes with [ZBEX] that were missing them (might still be more). In addition to the ones moved into the extensions
+  package:
+  * `PhaseCode.Y`
+  * `PhaseCode.YN`
+  * `PowerElectronicsConnection.inverterStandard`
+  * `PowerElectronicsConnection.sustainOpOvervoltLimit`
+  * `PowerElectronicsConnection.stopAtOverFreq`
+  * `PowerElectronicsConnection.stopAtUnderFreq`
+  * `PowerElectronicsConnection.invVoltWattRespMode`
+  * `PowerElectronicsConnection.invWattRespV1`
+  * `PowerElectronicsConnection.invWattRespV2`
+  * `PowerElectronicsConnection.invWattRespV3`
+  * `PowerElectronicsConnection.invWattRespV4`
+  * `PowerElectronicsConnection.invWattRespPAtV1`
+  * `PowerElectronicsConnection.invWattRespPAtV2`
+  * `PowerElectronicsConnection.invWattRespPAtV3`
+  * `PowerElectronicsConnection.invWattRespPAtV4`
+  * `PowerElectronicsConnection.invVoltVarRespMode`
+  * `PowerElectronicsConnection.invVarRespV1`
+  * `PowerElectronicsConnection.invVarRespV2`
+  * `PowerElectronicsConnection.invVarRespV3`
+  * `PowerElectronicsConnection.invVarRespV4`
+  * `PowerElectronicsConnection.invVarRespQAtV1`
+  * `PowerElectronicsConnection.invVarRespQAtV2`
+  * `PowerElectronicsConnection.invVarRespQAtV3`
+  * `PowerElectronicsConnection.invVarRespQAtV4`
+  * `PowerElectronicsConnection.invReactivePowerMode`
+  * `PowerElectronicsConnection.invFixReactivePower`
+  * `PowerTransformerEnd.ratings`
+  * `RegulatingControl.ratedCurrent`
+  * `Sensor.relayFunctions`
+  * `UsagePoint.approvedInverterCapacity`
+* QueryNetworkStateService will now correctly report processing errors in responses.
+
+### Notes
+* None.
 
 ---
 

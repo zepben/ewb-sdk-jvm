@@ -109,14 +109,16 @@ object SchemaServices {
      *
      * Will create an 'empty' type like a default constructor, but any nullable string property will be
      * created with an empty string (""), and any nullable boolean will be created with false.
+     *
      * We also specify numControls and numDiagramObjects explicitly, as these were previously not nullable but
-     * now are, and we set them to 0.
+     * now are, and we set them to 0. We don't do this for all integers as many (TapChanger and PowerElectronicsConnection) settings
+     * have range restrictions on them where a default of 0 won't work.
      */
     fun fillEmptys(io: IdentifiedObject) {
         io::class.memberProperties
             .filter { it.visibility == KVisibility.PUBLIC }
             .filter { it.returnType.isMarkedNullable }
-            .filterNot { it.name.endsWith("MRID") }     // Ignore identifiedObjectMRID, customerMRID, etc
+            .filterNot { it.name.uppercase().endsWith("MRID") }     // Ignore identifiedObjectMRID, customerMRID, etc
             .filterIsInstance<KMutableProperty<*>>()
             .forEach { prop ->
                 if (prop.returnType.withNullability(false).isSubtypeOf(String::class.createType())) {
@@ -127,7 +129,7 @@ object SchemaServices {
                     prop.setter.call(io, false)
                 }
 
-                if (prop.name == "numDiagramObjects" || prop.name == "numControls")
+                if (prop.name == "numDiagramObjects" || prop.name == "numControls" || prop.name == "numEndDevices")
                     prop.setter.call(io, 0)
             }
     }

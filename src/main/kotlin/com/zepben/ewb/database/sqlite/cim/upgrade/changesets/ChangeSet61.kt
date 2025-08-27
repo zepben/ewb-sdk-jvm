@@ -120,7 +120,6 @@ private val `retype nonnull columns to null network` = Change(
         powerSystemResource("voltage_relays")
     ,
 
-    // TODO: Every power system resource table needs the above.
     targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )
 

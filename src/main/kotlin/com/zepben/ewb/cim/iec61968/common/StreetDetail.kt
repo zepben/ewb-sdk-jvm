@@ -8,6 +8,8 @@
 
 package com.zepben.ewb.cim.iec61968.common
 
+import com.zepben.ewb.cim.extensions.ZBEX
+
 /**
  * Street details, in the context of address.
  *
@@ -19,6 +21,7 @@ package com.zepben.ewb.cim.iec61968.common
  * @property suiteNumber Number of the apartment or suite.
  * @property type Type of street. Examples include: street, circle, boulevard, avenue, road, drive, etc.
  * @property displayAddress The address as it should be displayed to a user.
+ * @property buildingNumber [ZBEX] The number of the building.
  */
 data class StreetDetail(
     val buildingName: String? = null,
@@ -27,7 +30,8 @@ data class StreetDetail(
     val number: String? = null,
     val suiteNumber: String? = null,
     val type: String? = null,
-    val displayAddress: String? = null
+    val displayAddress: String? = null,
+    @ZBEX val buildingNumber: String? = null,
 ) {
 
     /**
@@ -42,7 +46,8 @@ data class StreetDetail(
             number.isNullOrEmpty() &&
             suiteNumber.isNullOrEmpty() &&
             type.isNullOrEmpty() &&
-            displayAddress.isNullOrEmpty()
+            displayAddress.isNullOrEmpty() &&
+            buildingNumber.isNullOrEmpty()
         )
 
     /**
@@ -57,7 +62,8 @@ data class StreetDetail(
             number == null &&
             suiteNumber == null &&
             type == null &&
-            displayAddress == null
+            displayAddress == null &&
+            buildingNumber == null
         )
 
 }

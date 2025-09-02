@@ -332,11 +332,11 @@ fun toPb(cim: ContactDetails, pb: PBContactDetails.Builder): PBContactDetails.Bu
         //cim.electronicAddresses?.forEach { addElectronicAddresses(toPb(it, electronicAddressesBuilderList)) } ?: clearElectronicAddresses()
         //cim.electronicAddresses?.forEach { toPb(it, electronicAddressesBuilderList) } ?: clearElectronicAddresses()
         //addAllElectronicAddresses(cim.electronicAddresses.forEach { toPb(it, electronicAddressesBuilderList) } )
-        contactType = cim.contactType
-        firstName = cim.firstName
-        lastName = cim.lastName
+        cim.contactType?.let {contactTypeSet = it } ?: run { contactTypeNull = NullValue.NULL_VALUE }
+        cim.firstName?.let { firstNameSet = it } ?: run { firstNameNull = NullValue.NULL_VALUE }
+        cim.lastName?.let { lastNameSet = it } ?: run { lastNameNull = NullValue.NULL_VALUE }
         preferredContactMethod = mapContactMethodType.toPb(cim.preferredContactMethod)
-        businessName = cim.businessName
+        cim.businessName?.let { businessNameSet = it } ?: run { businessNameNull = NullValue.NULL_VALUE }
     }
 
 
@@ -470,13 +470,13 @@ fun EvChargingUnit.toPb(): PBEvChargingUnit = toPb(this, PBEvChargingUnit.newBui
  */
 fun toPb(cim: DirectionalCurrentRelay, pb: PBDirectionalCurrentRelay.Builder): PBDirectionalCurrentRelay.Builder =
     pb.apply {
-        directionalCharacteristicAngle = cim.directionalCharacteristicAngle ?: UNKNOWN_DOUBLE
+        cim.directionalCharacteristicAngle?.let { directionalCharacteristicAngleSet = it } ?: run { directionalCharacteristicAngleNull = NullValue.NULL_VALUE }
         polarizingQuantityType = mapPolarizingQuantityType.toPb(cim.polarizingQuantityType)
         relayElementPhase = mapPhaseCode.toPb(cim.relayElementPhase)
-        minimumPickupCurrent = cim.minimumPickupCurrent ?: UNKNOWN_DOUBLE
-        currentLimit1 = cim.currentLimit1 ?: UNKNOWN_DOUBLE
+        cim.minimumPickupCurrent?.let { minimumPickupCurrentSet = it } ?: run { minimumPickupCurrentNull = NullValue.NULL_VALUE }
+        cim.currentLimit1?.let { currentLimit1Set = it } ?: run { currentLimit1Null = NullValue.NULL_VALUE }
         cim.inverseTimeFlag?.also { inverseTimeFlagSet = it } ?: run { inverseTimeFlagNull = NullValue.NULL_VALUE }
-        timeDelay1 = cim.timeDelay1 ?: UNKNOWN_DOUBLE
+        cim.timeDelay1?.let { timeDelay1Set = it } ?: run { timeDelay1Null = NullValue.NULL_VALUE }
         toPb(cim, prfBuilder)
     }
 
@@ -992,9 +992,9 @@ fun Streetlight.toPb(): PBStreetlight = toPb(this, PBStreetlight.newBuilder()).b
  */
 fun toPb(cim: ElectronicAddress, pb: PBElectronicAddress.Builder): PBElectronicAddress.Builder =
     pb.apply {
-        email1 = cim.email1
-        isPrimary = cim.isPrimary ?: false
-        description = cim.description
+        cim.email1?.let { email1Set = it } ?: run { email1Null = NullValue.NULL_VALUE }
+        cim.isPrimary?.let { isPrimarySet = it } ?: run { isPrimaryNull = NullValue.NULL_VALUE }
+        cim.description?.let { descriptionSet = it } ?: run { descriptionNull = NullValue.NULL_VALUE }
     }
 
 /**
@@ -1067,15 +1067,15 @@ fun toPb(cim: StreetDetail, pb: PBStreetDetail.Builder): PBStreetDetail.Builder 
  */
 fun toPb(cim: TelephoneNumber, pb: PBTelephoneNumber.Builder): PBTelephoneNumber.Builder =
     pb.apply {
-        areaCode = cim.areaCode
-        cityCode = cim.cityCode
-        countryCode = cim.countryCode
-        dialOut = cim.dialOut
-        extension = cim.extension
-        internationalPrefix = cim.internationalPrefix
-        localNumber = cim.localNumber
-        isPrimary = cim.isPrimary ?: false
-        description = cim.description
+        cim.areaCode?.let { areaCodeSet = it } ?: run { areaCodeNull = NullValue.NULL_VALUE }
+        cim.cityCode?.let { cityCodeSet = it } ?: run { cityCodeNull = NullValue.NULL_VALUE }
+        cim.countryCode?.let { countryCodeSet = it } ?: run { countryCodeNull = NullValue.NULL_VALUE }
+        cim.dialOut?.let { dialOutSet = it } ?: run { dialOutNull = NullValue.NULL_VALUE }
+        cim.extension?.let { extensionSet = it } ?: run { extensionNull = NullValue.NULL_VALUE }
+        cim.internationalPrefix?.let { internationalPrefixSet = it } ?: run { internationalPrefixNull = NullValue.NULL_VALUE }
+        cim.localNumber?.let { localNumberSet = it } ?: run { localNumberNull = NullValue.NULL_VALUE }
+        cim.isPrimary?.let { isPrimarySet = it } ?: run { isPrimaryNull = NullValue.NULL_VALUE }
+        cim.description?.let { descriptionSet = it } ?: run { descriptionNull = NullValue.NULL_VALUE }
     }
 
 /**

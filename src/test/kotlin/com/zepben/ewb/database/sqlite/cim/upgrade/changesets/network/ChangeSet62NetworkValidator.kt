@@ -14,7 +14,7 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import java.sql.Statement
 
-object ChangeSet62NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MODEL, 61) {
+object ChangeSet62NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MODEL, 62) {
 
     //
     // NOTE: In the validators we are only checking the columns that were actually changed.

@@ -228,11 +228,11 @@ fun toCim(pb: PBContactDetails): ContactDetails =
             addElectronicAddress(toCim(it))
         }
 
-        contactType = pb.contactType
-        firstName = pb.firstName
-        lastName = pb.lastName
+        contactType = pb.contactTypeSet.takeUnless { pb.hasContactTypeNull() }
+        firstName = pb.firstNameSet.takeUnless { pb.hasFirstNameNull() }
+        lastName = pb.lastNameSet.takeUnless { pb.hasLastNameNull() }
         preferredContactMethod = mapContactMethodType.toCim(pb.preferredContactMethod)
-        businessName = pb.businessName
+        businessName = pb.businessNameSet.takeUnless { pb.hasBusinessNameNull() }
     }
 
 // ################################
@@ -371,13 +371,13 @@ fun NetworkService.addFromPb(pb: PBEvChargingUnit): EvChargingUnit? = tryAddOrNu
  */
 fun toCim(pb: PBDirectionalCurrentRelay, networkService: NetworkService): DirectionalCurrentRelay =
     DirectionalCurrentRelay(pb.mRID()).apply {
-        directionalCharacteristicAngle = pb.directionalCharacteristicAngle.takeUnless { it == UNKNOWN_DOUBLE }
+        directionalCharacteristicAngle = pb.directionalCharacteristicAngleSet.takeUnless { pb.hasDirectionalCharacteristicAngleNull() }
         polarizingQuantityType = mapPolarizingQuantityType.toCim(pb.polarizingQuantityType)
         relayElementPhase = mapPhaseCode.toCim(pb.relayElementPhase)
-        minimumPickupCurrent = pb.minimumPickupCurrent.takeUnless { it == UNKNOWN_DOUBLE }
-        currentLimit1 = pb.currentLimit1.takeUnless { it == UNKNOWN_DOUBLE }
+        minimumPickupCurrent = pb.minimumPickupCurrentSet.takeUnless { pb.hasMinimumPickupCurrentNull() }
+        currentLimit1 = pb.currentLimit1Set.takeUnless { pb.hasCurrentLimit1Null() }
         inverseTimeFlag = pb.inverseTimeFlagSet.takeUnless { pb.hasInverseTimeFlagNull() }
-        timeDelay1 = pb.timeDelay1.takeUnless { it == UNKNOWN_DOUBLE }
+        timeDelay1 = pb.timeDelay1Set.takeUnless { pb.hasTimeDelay1Null() }
     }.also {
         toCim(pb.prf, it, networkService)
     }
@@ -926,9 +926,9 @@ fun NetworkService.addFromPb(pb: PBStreetlight): Streetlight? = tryAddOrNull(toC
 */
 fun toCim(pb: PBElectronicAddress): ElectronicAddress =
     ElectronicAddress().apply {
-        email1 = pb.email1.internEmpty()
-        isPrimary = pb.isPrimary
-        description = pb.description.internEmpty()
+        email1 = pb.email1Set.takeUnless { pb.hasEmail1Null() }
+        isPrimary = pb.isPrimarySet.takeUnless { pb.hasIsPrimaryNull() }
+        description = pb.descriptionSet.takeUnless { pb.hasDescriptionNull() }
     }
 
 /**
@@ -993,15 +993,15 @@ fun toCim(pb: PBStreetDetail): StreetDetail =
  */
 fun toCim(pb: PBTelephoneNumber): TelephoneNumber =
     TelephoneNumber(
-        pb.areaCode.internEmpty(),
-        pb.cityCode.internEmpty(),
-        pb.countryCode.internEmpty(),
-        pb.dialOut.internEmpty(),
-        pb.extension.internEmpty(),
-        pb.internationalPrefix.internEmpty(),
-        pb.localNumber.internEmpty(),
-        pb.isPrimary,
-        pb.description.internEmpty()
+        pb.areaCodeSet.takeUnless { pb.hasAreaCodeNull() },
+        pb.cityCodeSet.takeUnless { pb.hasCityCodeNull() },
+        pb.countryCodeSet.takeUnless { pb.hasCountryCodeNull() },
+        pb.dialOutSet.takeUnless { pb.hasDialOutNull() },
+        pb.extensionSet.takeUnless { pb.hasExtensionNull() },
+        pb.internationalPrefixSet.takeUnless { pb.hasInternationalPrefixSet() },
+        pb.localNumberSet.takeUnless { pb.hasLocalNumberNull() },
+        pb.isPrimarySet.takeUnless { pb.hasIsPrimaryNull() },
+        pb.descriptionSet.takeUnless { pb.hasDescriptionNull() }
     )
 
 /**

@@ -54,7 +54,7 @@ class ContactDetails(id: String = ""){
     var lastName: String? = null
 
     @ZBEX
-    var preferredContactMethod: ContactMethodType = ContactMethodType.UNKNOWN;
+    var preferredContactMethod: ContactMethodType = ContactMethodType.UNKNOWN
 
     @ZBEX
     var isPrimary: Boolean? = null

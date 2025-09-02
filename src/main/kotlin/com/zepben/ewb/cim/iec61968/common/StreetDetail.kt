@@ -8,6 +8,8 @@
 
 package com.zepben.ewb.cim.iec61968.common
 
+import com.zepben.ewb.cim.extensions.ZBEX
+
 /**
  * Street details, in the context of address.
  *
@@ -28,7 +30,8 @@ data class StreetDetail(
     val number: String? = null,
     val suiteNumber: String? = null,
     val type: String? = null,
-    val displayAddress: String? = null
+    val displayAddress: String? = null,
+    @ZBEX
     val buildingNumber: Int? = null
 ) {
 

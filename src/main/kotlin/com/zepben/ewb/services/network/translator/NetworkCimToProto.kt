@@ -1189,6 +1189,8 @@ fun toPb(cim: UsagePoint, pb: PBUsagePoint.Builder): PBUsagePoint.Builder =
         cim.equipment.forEach { addEquipmentMRIDs(it.mRID) }
         clearEndDeviceMRIDs()
         cim.endDevices.forEach { addEndDeviceMRIDs(it.mRID) }
+        clearContacts()
+        cim.contacts.forEach { addContacts(it.toPb()) }
         toPb(cim, ioBuilder)
     }
 

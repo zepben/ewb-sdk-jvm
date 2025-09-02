@@ -19,6 +19,8 @@ import com.zepben.ewb.cim.extensions.ZBEX
  * @property dialOut (if applicable) Dial out code, for instance to call outside an enterprise.
  * @property extension (if applicable) Extension for this telephone number.
  * @property internationalPrefix (if applicable) Prefix used when calling an international number.
+ * @property ituPhone Phone number according to ITU E.164. Will return `null` if a valid
+ * @property partialItuPhone As much of the phone number according to ITU E.164 that could be formatted based on the given fields.
  * @property localNumber Main (local) part of this telephone number.
  * @property isPrimary [ZBEX] Is this phone number the primary number?
  * @property description [ZBEX] Description for phone number, e.g: home, work, mobile.
@@ -35,6 +37,23 @@ data class TelephoneNumber(
     @ZBEX val description: String? = null,
 ) {
 
-    //todo irn?
+    private val maybeItuFormattedPhone = buildString {
+        countryCode?.also { append(it) }
+        areaCode?.trimStart('0')?.also { append(it) }
+        cityCode?.also { append(it) }
+        localNumber?.also { append(it) }
+    }
+
+    val ituPhone: String? = maybeItuFormattedPhone.takeIf { (cityCode != null) && (it.length < 15) }
+    val partialItuPhone: String? = maybeItuFormattedPhone.takeIf { ituPhone == null }
+
+    override fun toString(): String =
+        "$description: ${
+            listOfNotNull(
+                dialOut,
+                internationalPrefix?.let { "$it$maybeItuFormattedPhone" } ?: maybeItuFormattedPhone,
+                extension?.let { "ext $it" }
+            ).joinToString(separator = " ")
+        } [primary: $isPrimary]"
 
 }

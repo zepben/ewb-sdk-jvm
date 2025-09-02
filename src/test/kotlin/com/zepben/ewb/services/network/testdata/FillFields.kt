@@ -9,6 +9,7 @@
 package com.zepben.ewb.services.network.testdata
 
 import com.zepben.ewb.cim.extensions.iec61968.assetinfo.RelayInfo
+import com.zepben.ewb.cim.extensions.iec61968.common.ContactDetails
 import com.zepben.ewb.cim.extensions.iec61968.metering.PanDemandResponseFunction
 import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
@@ -60,6 +61,24 @@ fun RelayInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true
     curveSetting = "curveSetting"
     recloseFast = true
     addDelays(1.0, 2.0, 3.0)
+
+    return this
+}
+
+// ##############################
+// # Extensions IEC61968 Common #
+// ##############################
+
+fun ContactDetails.fillFields(service: NetworkService): ContactDetails {
+    _phoneNumbers: MutableList<TelephoneNumber>? = null
+    contactAddress: StreetAddress? = null
+    _electronicAddresses: MutableList<ElectronicAddress>? = null
+    contactTypeSet: String? = null
+    firstNameSet: String? = null
+    lastNameSet: String? = null
+    preferredContactMethod: ContactMethodType = ContactMethodType.UNKNOWN
+    isPrimarySet: Boolean? = null
+    businessNameSet: String? = null
 
     return this
 }

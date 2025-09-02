@@ -37,4 +37,9 @@ abstract class TableContactDetails : SqliteTable() {
     val IS_PRIMARY: Column = Column(++columnIndex, "is_primary", BOOLEAN, NULL)
     val BUSINESS_NAME: Column = Column(++columnIndex, "business_name", STRING, NULL)
 
+    override val uniqueIndexColumns: MutableList<List<Column>> =
+        super.uniqueIndexColumns.apply {
+            add(listOf(ID))
+        }
+
 }

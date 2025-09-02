@@ -15,9 +15,10 @@ import com.zepben.ewb.cim.iec61968.customers.CustomerAgreement
 import com.zepben.ewb.cim.iec61968.customers.PricingStructure
 import com.zepben.ewb.cim.iec61968.customers.Tariff
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
-import com.zepben.ewb.services.common.UNKNOWN_INT
+import com.zepben.ewb.cim.iec61970.base.domain.DateTimeInterval
 import com.zepben.ewb.services.common.translator.BaseCimToProto
 import com.zepben.ewb.services.common.translator.toPb
+import com.zepben.ewb.services.common.translator.toTimestamp
 import com.zepben.ewb.services.customer.whenCustomerServiceObject
 import com.zepben.protobuf.cc.CustomerIdentifiedObject
 import com.zepben.protobuf.cim.iec61968.common.Agreement as PBAgreement
@@ -25,6 +26,7 @@ import com.zepben.protobuf.cim.iec61968.customers.Customer as PBCustomer
 import com.zepben.protobuf.cim.iec61968.customers.CustomerAgreement as PBCustomerAgreement
 import com.zepben.protobuf.cim.iec61968.customers.PricingStructure as PBPricingStructure
 import com.zepben.protobuf.cim.iec61968.customers.Tariff as PBTariff
+import com.zepben.protobuf.cim.iec61970.base.domain.DateTimeInterval as PBDateTimeInterval
 
 fun customerIdentifiedObject(identifiedObject: IdentifiedObject): CustomerIdentifiedObject =
     CustomerIdentifiedObject.newBuilder().apply {
@@ -43,7 +45,10 @@ fun customerIdentifiedObject(identifiedObject: IdentifiedObject): CustomerIdenti
 // ###################
 
 fun toPb(cim: Agreement, pb: PBAgreement.Builder): PBAgreement.Builder =
-    pb.apply { toPb(cim, docBuilder) }
+    pb.apply {
+        cim.validityInterval?.also { validityIntervalSet = it.toPb() } ?: run { validityIntervalNull = NullValue.NULL_VALUE }
+        toPb(cim, docBuilder)
+    }
 
 // ######################
 // # IEC61968 Customers #
@@ -81,6 +86,18 @@ fun Customer.toPb(): PBCustomer = toPb(this, PBCustomer.newBuilder()).build()
 fun CustomerAgreement.toPb(): PBCustomerAgreement = toPb(this, PBCustomerAgreement.newBuilder()).build()
 fun PricingStructure.toPb(): PBPricingStructure = toPb(this, PBPricingStructure.newBuilder()).build()
 fun Tariff.toPb(): PBTariff = toPb(this, PBTariff.newBuilder()).build()
+
+// ########################
+// # IEC61970 Base Domain #
+// ########################
+
+fun toPb(cim: DateTimeInterval, pb: PBDateTimeInterval.Builder): PBDateTimeInterval.Builder =
+    pb.apply {
+        cim.end?.also { pb.endSet = it.toTimestamp() } ?: run { pb.endNull = NullValue.NULL_VALUE }
+        cim.start?.also { pb.startSet = it.toTimestamp() } ?: run { pb.startNull = NullValue.NULL_VALUE }
+    }
+
+fun DateTimeInterval.toPb(): PBDateTimeInterval = toPb(this, PBDateTimeInterval.newBuilder()).build()
 
 // #################################
 // # Class for Java friendly usage #

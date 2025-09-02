@@ -164,6 +164,23 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
     // #######################################
 
     @Test
+    internal fun compareDirectionalCurrentRelay() {
+        compareProtectionRelayFunction { DirectionalCurrentRelay(it) }
+
+        comparatorValidator.validateProperty(DirectionalCurrentRelay::directionalCharacteristicAngle, { DirectionalCurrentRelay(it) }, { 1.1 }, { 2.2 })
+        comparatorValidator.validateProperty(
+            DirectionalCurrentRelay::polarizingQuantityType,
+            { DirectionalCurrentRelay(it) },
+            { PolarizingQuantityType.SELF_PHASE_VOLTAGE },
+            { PolarizingQuantityType.NEGATIVE_SEQUENCE_VOLTAGE })
+        comparatorValidator.validateProperty(DirectionalCurrentRelay::relayElementPhase, { DirectionalCurrentRelay(it) }, { PhaseCode.A }, { PhaseCode.B })
+        comparatorValidator.validateProperty(DirectionalCurrentRelay::minimumPickupCurrent, { DirectionalCurrentRelay(it) }, { 1.1 }, { 2.2 })
+        comparatorValidator.validateProperty(DirectionalCurrentRelay::currentLimit1, { DirectionalCurrentRelay(it) }, { 1.1 }, { 2.2 })
+        comparatorValidator.validateProperty(DirectionalCurrentRelay::inverseTimeFlag, { DirectionalCurrentRelay(it) }, { true }, { false })
+        comparatorValidator.validateProperty(DirectionalCurrentRelay::timeDelay1, { DirectionalCurrentRelay(it) }, { 1.1 }, { 2.2 })
+    }
+
+    @Test
     internal fun compareDistanceRelay() {
         compareProtectionRelayFunction { DistanceRelay(it) }
 
@@ -1259,9 +1276,9 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             PerLengthPhaseImpedance::data,
             PerLengthPhaseImpedance::addData,
             { PerLengthPhaseImpedance(it) },
-            { com.zepben.ewb.cim.iec61970.base.wires.PhaseImpedanceData(SinglePhaseKind.A, SinglePhaseKind.B, 1.0, 2.0, 3.0, 4.0) },
-            { com.zepben.ewb.cim.iec61970.base.wires.PhaseImpedanceData(SinglePhaseKind.A, SinglePhaseKind.C, 1.0, 2.0, 3.0, 4.0) },
-            { com.zepben.ewb.cim.iec61970.base.wires.PhaseImpedanceData(SinglePhaseKind.A, SinglePhaseKind.B, 2.0, 3.0, 4.0, 5.0) },
+            { PhaseImpedanceData(SinglePhaseKind.A, SinglePhaseKind.B, 1.0, 2.0, 3.0, 4.0) },
+            { PhaseImpedanceData(SinglePhaseKind.A, SinglePhaseKind.C, 1.0, 2.0, 3.0, 4.0) },
+            { PhaseImpedanceData(SinglePhaseKind.A, SinglePhaseKind.B, 2.0, 3.0, 4.0, 5.0) },
         )
     }
 

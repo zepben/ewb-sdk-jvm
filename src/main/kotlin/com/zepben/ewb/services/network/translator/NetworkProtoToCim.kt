@@ -36,8 +36,7 @@ import com.zepben.ewb.cim.iec61970.base.scada.RemotePoint
 import com.zepben.ewb.cim.iec61970.base.scada.RemoteSource
 import com.zepben.ewb.cim.iec61970.base.wires.*
 import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
-import com.zepben.ewb.services.common.*
-import com.zepben.ewb.services.common.extensions.internEmpty
+import com.zepben.ewb.services.common.Resolvers
 import com.zepben.ewb.services.common.translator.BaseProtoToCim
 import com.zepben.ewb.services.common.translator.toCim
 import com.zepben.ewb.services.common.translator.toInstant
@@ -48,6 +47,7 @@ import com.zepben.protobuf.cim.extensions.iec61970.base.core.Site as PBSite
 import com.zepben.protobuf.cim.extensions.iec61970.base.feeder.Loop as PBLoop
 import com.zepben.protobuf.cim.extensions.iec61970.base.feeder.LvFeeder as PBLvFeeder
 import com.zepben.protobuf.cim.extensions.iec61970.base.generation.production.EvChargingUnit as PBEvChargingUnit
+import com.zepben.protobuf.cim.extensions.iec61970.base.protection.DirectionalCurrentRelay as PBDirectionalCurrentRelay
 import com.zepben.protobuf.cim.extensions.iec61970.base.protection.DistanceRelay as PBDistanceRelay
 import com.zepben.protobuf.cim.extensions.iec61970.base.protection.ProtectionRelayFunction as PBProtectionRelayFunction
 import com.zepben.protobuf.cim.extensions.iec61970.base.protection.ProtectionRelayScheme as PBProtectionRelayScheme
@@ -332,6 +332,25 @@ fun NetworkService.addFromPb(pb: PBEvChargingUnit): EvChargingUnit? = tryAddOrNu
 // #######################################
 
 /**
+ * Convert the protobuf [PBDirectionalCurrentRelay] into its CIM counterpart.
+ *
+ * @param pb The protobuf [PBDirectionalCurrentRelay] to convert.
+ * @param networkService The [NetworkService] the converted CIM object will be added too.
+ * @return The converted [pb] as a CIM [DirectionalCurrentRelay].
+ */
+fun toCim(pb: PBDirectionalCurrentRelay, networkService: NetworkService): DirectionalCurrentRelay =
+    DirectionalCurrentRelay(pb.mRID()).apply {
+        directionalCharacteristicAngle = pb.directionalCharacteristicAngleSet.takeUnless { pb.hasDirectionalCharacteristicAngleNull() }
+        polarizingQuantityType = mapPolarizingQuantityType.toCim(pb.polarizingQuantityType)
+        relayElementPhase = mapPhaseCode.toCim(pb.relayElementPhase)
+        minimumPickupCurrent = pb.minimumPickupCurrentSet.takeUnless { pb.hasMinimumPickupCurrentNull() }
+        currentLimit1 = pb.currentLimit1Set.takeUnless { pb.hasCurrentLimit1Null() }
+        inverseTimeFlag = pb.inverseTimeFlagSet.takeUnless { pb.hasInverseTimeFlagNull() }
+        timeDelay1 = pb.timeDelay1Set.takeUnless { pb.hasTimeDelay1Null() }
+        toCim(pb.prf, this, networkService)
+    }
+
+/**
  * Convert the protobuf [PBDistanceRelay] into its CIM counterpart.
  *
  * @param pb The protobuf [PBDistanceRelay] to convert.
@@ -437,6 +456,11 @@ fun toCim(pb: PBVoltageRelay, networkService: NetworkService): VoltageRelay =
     VoltageRelay(pb.mRID()).apply {
         toCim(pb.prf, this, networkService)
     }
+
+/**
+ * An extension to add a converted copy of the protobuf [PBDirectionalCurrentRelay] to the [NetworkService].
+ */
+fun NetworkService.addFromPb(pb: PBDirectionalCurrentRelay): DirectionalCurrentRelay? = tryAddOrNull(toCim(pb, this))
 
 /**
  * An extension to add a converted copy of the protobuf [PBDistanceRelay] to the [NetworkService].
@@ -2264,8 +2288,8 @@ fun toCim(pb: PBPetersenCoil, networkService: NetworkService): PetersenCoil =
  * @param pb The protobuf [PBPhaseImpedanceData] to convert.
  * @return The converted [pb] as a CIM [PhaseImpedanceData].
  */
-fun toCim(pb: PBPhaseImpedanceData): com.zepben.ewb.cim.iec61970.base.wires.PhaseImpedanceData =
-    com.zepben.ewb.cim.iec61970.base.wires.PhaseImpedanceData(
+fun toCim(pb: PBPhaseImpedanceData): PhaseImpedanceData =
+    PhaseImpedanceData(
         mapSinglePhaseKind.toCim(pb.fromPhase),
         mapSinglePhaseKind.toCim(pb.toPhase),
         pb.bSet.takeUnless { pb.hasBNull() },
@@ -2983,6 +3007,14 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
     // #######################################
     // # Extensions IEC61970 Base Protection #
     // #######################################
+
+    /**
+     * Add a converted copy of the protobuf [PBDirectionalCurrentRelay] to the [NetworkService].
+     *
+     * @param pb The [PBDirectionalCurrentRelay] to convert.
+     * @return The converted [DirectionalCurrentRelay]
+     */
+    fun addFromPb(pb: PBDirectionalCurrentRelay): DirectionalCurrentRelay? = networkService.addFromPb(pb)
 
     /**
      * Add a converted copy of the protobuf [PBDistanceRelay] to the [NetworkService].

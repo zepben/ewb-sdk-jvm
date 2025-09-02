@@ -45,7 +45,6 @@ import com.zepben.ewb.cim.iec61970.base.scada.RemotePoint
 import com.zepben.ewb.cim.iec61970.base.scada.RemoteSource
 import com.zepben.ewb.cim.iec61970.base.wires.*
 import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
-import com.zepben.ewb.services.common.*
 import com.zepben.ewb.services.common.translator.*
 import com.zepben.ewb.services.network.whenNetworkServiceObject
 import com.zepben.protobuf.nc.NetworkIdentifiedObject
@@ -55,6 +54,7 @@ import com.zepben.protobuf.cim.extensions.iec61970.base.core.Site as PBSite
 import com.zepben.protobuf.cim.extensions.iec61970.base.feeder.Loop as PBLoop
 import com.zepben.protobuf.cim.extensions.iec61970.base.feeder.LvFeeder as PBLvFeeder
 import com.zepben.protobuf.cim.extensions.iec61970.base.generation.production.EvChargingUnit as PBEvChargingUnit
+import com.zepben.protobuf.cim.extensions.iec61970.base.protection.DirectionalCurrentRelay as PBDirectionalCurrentRelay
 import com.zepben.protobuf.cim.extensions.iec61970.base.protection.DistanceRelay as PBDistanceRelay
 import com.zepben.protobuf.cim.extensions.iec61970.base.protection.ProtectionRelayFunction as PBProtectionRelayFunction
 import com.zepben.protobuf.cim.extensions.iec61970.base.protection.ProtectionRelayScheme as PBProtectionRelayScheme
@@ -277,6 +277,7 @@ fun networkIdentifiedObject(identifiedObject: IdentifiedObject): NetworkIdentifi
             isPerLengthPhaseImpedance = { perLengthPhaseImpedance = it.toPb() },
             isCut = { cut = it.toPb() },
             isClamp = { clamp = it.toPb() },
+            isDirectionalCurrentRelay = { directionalCurrentRelay = it.toPb() },
         )
     }.build()
 
@@ -426,6 +427,25 @@ fun EvChargingUnit.toPb(): PBEvChargingUnit = toPb(this, PBEvChargingUnit.newBui
 // #######################################
 
 /**
+ * Convert the [DirectionalCurrentRelay] into its protobuf counterpart.
+ *
+ * @param cim The [DirectionalCurrentRelay] to convert.
+ * @param pb The protobuf builder to populate.
+ * @return [pb] for fluent use.
+ */
+fun toPb(cim: DirectionalCurrentRelay, pb: PBDirectionalCurrentRelay.Builder): PBDirectionalCurrentRelay.Builder =
+    pb.apply {
+        cim.directionalCharacteristicAngle?.also { directionalCharacteristicAngleSet = it } ?: run { directionalCharacteristicAngleNull = NullValue.NULL_VALUE }
+        polarizingQuantityType = mapPolarizingQuantityType.toPb(cim.polarizingQuantityType)
+        relayElementPhase = mapPhaseCode.toPb(cim.relayElementPhase)
+        cim.minimumPickupCurrent?.also { minimumPickupCurrentSet = it } ?: run { minimumPickupCurrentNull = NullValue.NULL_VALUE }
+        cim.currentLimit1?.also { currentLimit1Set = it } ?: run { currentLimit1Null = NullValue.NULL_VALUE }
+        cim.inverseTimeFlag?.also { inverseTimeFlagSet = it } ?: run { inverseTimeFlagNull = NullValue.NULL_VALUE }
+        cim.timeDelay1?.also { timeDelay1Set = it } ?: run { timeDelay1Null = NullValue.NULL_VALUE }
+        toPb(cim, prfBuilder)
+    }
+
+/**
  * Convert the [DistanceRelay] into its protobuf counterpart.
  *
  * @param cim The [DistanceRelay] to convert.
@@ -521,6 +541,11 @@ fun toPb(cim: VoltageRelay, pb: PBVoltageRelay.Builder): PBVoltageRelay.Builder 
     pb.apply {
         toPb(cim, prfBuilder)
     }
+
+/**
+ * An extension for converting any DirectionalCurrentRelay into its protobuf counterpart.
+ */
+fun DirectionalCurrentRelay.toPb(): PBDirectionalCurrentRelay = toPb(this, PBDirectionalCurrentRelay.newBuilder()).build()
 
 /**
  * An extension for converting any DistanceRelay into its protobuf counterpart.
@@ -2943,6 +2968,14 @@ class NetworkCimToProto : BaseCimToProto() {
     // #######################################
     // # Extensions IEC61970 Base Protection #
     // #######################################
+
+    /**
+     * Convert the [DirectionalCurrentRelay] into its protobuf counterpart.
+     *
+     * @param cim The [DirectionalCurrentRelay] to convert.
+     * @return The protobuf form of [cim].
+     */
+    fun toPb(cim: DirectionalCurrentRelay): PBDirectionalCurrentRelay = cim.toPb()
 
     /**
      * Convert the [DistanceRelay] into its protobuf counterpart.

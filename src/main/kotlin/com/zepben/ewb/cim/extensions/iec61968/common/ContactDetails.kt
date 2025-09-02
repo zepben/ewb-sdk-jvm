@@ -21,7 +21,7 @@ import java.util.*
  * @property phoneNumbers [ZBEX] Phone numbers.
  * @property contactAddress [ZBEX] Contact address, potentially different than 'streetAddress' (e.g., another city).
  * @property electronicAddresses [ZBEX] Electronic addresses.
- * @property contactTypeSet [ZBEX] The type of contact, e.g Account Owner.
+ * @property contactTypeSet [ZBEX] The type of contact, e.g. Account Owner.
  * @property firstNameSet [ZBEX] First name of the contact.
  * @property lastNameSet [ZBEX] Last name of the contact.
  * @property preferredContactMethod [ZBEX] The preferred contact method for this contact.

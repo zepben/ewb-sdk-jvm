@@ -14,10 +14,7 @@ import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
 import com.zepben.ewb.cim.extensions.iec61970.base.generation.production.EvChargingUnit
-import com.zepben.ewb.cim.extensions.iec61970.base.protection.DistanceRelay
-import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelayScheme
-import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelaySystem
-import com.zepben.ewb.cim.extensions.iec61970.base.protection.VoltageRelay
+import com.zepben.ewb.cim.extensions.iec61970.base.protection.*
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.BatteryControl
 import com.zepben.ewb.cim.iec61968.assetinfo.*
 import com.zepben.ewb.cim.iec61968.assets.AssetOwner
@@ -153,6 +150,7 @@ internal class NetworkServiceUtilsTest {
         isPerLengthPhaseImpedance: (PerLengthPhaseImpedance) -> String,
         isCut: (Cut) -> String,
         isClamp: (Clamp) -> String,
+        isDirectionalCurrentRelay: (DirectionalCurrentRelay) -> String,
         isOther: (IdentifiedObject) -> String
     ): String = whenNetworkServiceObject(
         identifiedObject,
@@ -242,6 +240,7 @@ internal class NetworkServiceUtilsTest {
         isPerLengthPhaseImpedance = isPerLengthPhaseImpedance,
         isCut = isCut,
         isClamp = isClamp,
+        isDirectionalCurrentRelay = isDirectionalCurrentRelay,
         isOther = isOther
     )
 

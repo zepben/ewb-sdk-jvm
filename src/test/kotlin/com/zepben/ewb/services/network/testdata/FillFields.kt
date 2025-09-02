@@ -168,6 +168,20 @@ fun EvChargingUnit.fillFields(service: NetworkService, includeRuntime: Boolean =
 // # Extension IEC61970 Base Protection #
 // ######################################
 
+fun DirectionalCurrentRelay.fillFields(service: NetworkService, includeRuntime: Boolean = true): DirectionalCurrentRelay {
+    (this as ProtectionRelayFunction).fillFields(service, includeRuntime)
+
+    directionalCharacteristicAngle = 1.1
+    polarizingQuantityType = PolarizingQuantityType.QUADRATURE_VOLTAGE
+    relayElementPhase = PhaseCode.XYN
+    minimumPickupCurrent = 4.4
+    currentLimit1 = 5.5
+    inverseTimeFlag = true
+    timeDelay1 = 7.7
+
+    return this
+}
+
 fun DistanceRelay.fillFields(service: NetworkService, includeRuntime: Boolean = true): DistanceRelay {
     (this as ProtectionRelayFunction).fillFields(service, includeRuntime)
 
@@ -1350,9 +1364,9 @@ fun PerLengthPhaseImpedance.fillFields(service: NetworkService, includeRuntime: 
 
     for (i in 0..1)
         addData(
-            com.zepben.ewb.cim.iec61970.base.wires.PhaseImpedanceData(
-                SinglePhaseKind.get(i),
-                SinglePhaseKind.get(i),
+            PhaseImpedanceData(
+                SinglePhaseKind[i],
+                SinglePhaseKind[i],
                 i.toDouble(),
                 i.toDouble(),
                 i.toDouble(),

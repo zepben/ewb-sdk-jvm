@@ -19,7 +19,7 @@ import com.zepben.ewb.cim.iec61970.base.core.PhaseCode
  * @property relayElementPhase [ZBEX] The phase associated with this directional relay element. This helps in selecting the correct 'self-phase' or other phase-derived.
  * @property minimumPickupCurrent [ZBEX] The minimum current magnitude required for the directional element to operate reliably and determine direction. This might be different from the main pickupCurrent for the overcurrent function.
  * @property currentLimit1 [ZBEX] Current limit number 1 for inverse time pickup in amperes.
- * @property inverseTimeFlagSet [ZBEX] Set true if the current relay has inverse time characteristic.
+ * @property inverseTimeFlag [ZBEX] Set true if the current relay has inverse time characteristic.
  * @property timeDelay1 [ZBEX] Inverse time delay number 1 for current limit number 1 in seconds.
  */
 @ZBEX
@@ -41,7 +41,7 @@ class DirectionalCurrentRelay @JvmOverloads constructor(mRID: String = "") : Pro
     var currentLimit1: Double? = null
 
     @ZBEX
-    var inverseTimeFlagSet: Boolean? = null
+    var inverseTimeFlag: Boolean? = null
 
     @ZBEX
     var timeDelay1: Double? = null

@@ -10,6 +10,7 @@ package com.zepben.ewb.services.network.testdata
 
 import com.zepben.ewb.cim.extensions.iec61968.assetinfo.RelayInfo
 import com.zepben.ewb.cim.extensions.iec61968.common.ContactDetails
+import com.zepben.ewb.cim.extensions.iec61968.common.ContactMethodType
 import com.zepben.ewb.cim.extensions.iec61968.metering.PanDemandResponseFunction
 import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
@@ -69,16 +70,46 @@ fun RelayInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true
 // # Extensions IEC61968 Common #
 // ##############################
 
-fun ContactDetails.fillFields(service: NetworkService): ContactDetails {
-    _phoneNumbers: MutableList<TelephoneNumber>? = null
-    contactAddress: StreetAddress? = null
-    _electronicAddresses: MutableList<ElectronicAddress>? = null
-    contactTypeSet: String? = null
-    firstNameSet: String? = null
-    lastNameSet: String? = null
-    preferredContactMethod: ContactMethodType = ContactMethodType.UNKNOWN
-    isPrimarySet: Boolean? = null
-    businessNameSet: String? = null
+fun ContactDetails.fillFields(): ContactDetails {
+    contactAddress = StreetAddress(
+        postalCode = "1",
+        townDetail = TownDetail(name = "2", stateOrProvince = "3"),
+        poBox = "4",
+        streetDetail = StreetDetail(
+            buildingName = "5",
+            floorIdentification = "6",
+            name = "7",
+            number = "8",
+            suiteNumber = "9",
+            type = "10",
+            displayAddress = "11"
+        )
+    )
+    contactTypeSet = "12"
+    firstNameSet = "13"
+    lastNameSet = "14"
+    preferredContactMethod = ContactMethodType.LETTER
+    isPrimarySet = true
+    businessNameSet = "15"
+
+    @Suppress("unused")
+    for (i in 0..1) {
+        addPhoneNumber(
+            TelephoneNumber(
+                areaCode = "1",
+                cityCode = "2",
+                countryCode = "3",
+                dialOut = "4",
+                extension = "5",
+                internationalPrefix = "6",
+                localNumber = "7",
+                isPrimary = true,
+                description = "8"
+            )
+        )
+
+        addElectronicAddress(ElectronicAddress(email1 = "1", isPrimary = true, description = "2"))
+    }
 
     return this
 }
@@ -646,6 +677,8 @@ fun UsagePoint.fillFields(service: NetworkService, includeRuntime: Boolean = tru
             it.addUsagePoint(this)
             service.add(it)
         })
+
+        addContact(ContactDetails())
     }
 
     return this

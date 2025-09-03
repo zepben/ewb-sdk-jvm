@@ -150,7 +150,7 @@ fun <T, R> KProperty1<in T, List<R>>.compareIndexedValueCollection(
     return differences.nullIfEmpty()
 }
 
-fun <T, R, K : Comparable<K>> KProperty1<in T, List<R>>.compareUnorderedValueCollection(
+fun <T, R, K : Comparable<K>> KProperty1<in T, Collection<R>>.compareUnorderedValueCollection(
     source: T,
     target: T,
     keySelector: (R) -> K

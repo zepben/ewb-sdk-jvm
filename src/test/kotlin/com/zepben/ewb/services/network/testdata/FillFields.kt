@@ -85,12 +85,12 @@ fun ContactDetails.fillFields(): ContactDetails {
             displayAddress = "11"
         )
     )
-    contactTypeSet = "12"
-    firstNameSet = "13"
-    lastNameSet = "14"
+    contactType = "12"
+    firstName = "13"
+    lastName = "14"
     preferredContactMethod = ContactMethodType.LETTER
-    isPrimarySet = true
-    businessNameSet = "15"
+    isPrimary = true
+    businessName = "15"
 
     @Suppress("unused")
     for (i in 0..1) {

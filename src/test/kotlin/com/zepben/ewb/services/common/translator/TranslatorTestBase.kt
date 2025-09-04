@@ -9,10 +9,6 @@
 package com.zepben.ewb.services.common.translator
 
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
-import com.zepben.ewb.cim.iec61968.common.Location
-import com.zepben.ewb.cim.iec61968.common.StreetAddress
-import com.zepben.ewb.cim.iec61968.common.StreetDetail
-import com.zepben.ewb.cim.iec61968.common.TownDetail
 import com.zepben.ewb.cim.iec61968.operations.OperationalRestriction
 import com.zepben.ewb.cim.iec61970.base.core.*
 import com.zepben.ewb.database.sqlite.cim.CimDatabaseTables
@@ -67,19 +63,24 @@ internal abstract class TranslatorTestBase<S : BaseService>(
         SqliteTableVersion::class,
         TableMetadataDataSources::class,
         TableNameTypes::class,
-        TableNames::class
+        TableNames::class,
     )
 
     @Test
     internal fun `converts all types correctly`() {
         if (validationInfo.size != (databaseTables.tables.keys - excludedTables).size) {
             val actual = validationInfo.map { it.cim::class.simpleName!! }.toSet()
-            val expected = (databaseTables.tables.keys - excludedTables).map { it.simpleName!!.removePrefix("Table").removeSuffix("s") }.toSet()
+            val expected = (databaseTables.tables.keys - excludedTables).map { it.simpleName!!.removePrefix("Table") }.toSet()
+
+            val potentialSuffixes = listOf("", "s", "es")
+            val actualWithSuffixes = actual.flatMap { potentialSuffixes.map { suffix -> "$it$suffix" } }.toSet()
+            val expectedWithoutSuffixes = expected.flatMap { potentialSuffixes.map { suffix -> it.removeSuffix(suffix) } }.toSet()
+
             fail(
                 "The number of items being validated did not match the number of items written to the database. Did you forget to validate an item, " +
                     "or to exclude the table if it was an association or array data?" +
-                    formatValidationError("Unexpected", actual - expected) +
-                    formatValidationError("Missing", expected - actual)
+                    formatValidationError("Unexpected", actual - expectedWithoutSuffixes) +
+                    formatValidationError("Missing", expected - actualWithSuffixes)
             )
         }
 

@@ -9,6 +9,7 @@
 package com.zepben.ewb.services.network.translator
 
 import com.zepben.ewb.cim.extensions.iec61968.assetinfo.RelayInfo
+import com.zepben.ewb.cim.extensions.iec61968.common.ContactDetails
 import com.zepben.ewb.cim.extensions.iec61968.metering.PanDemandResponseFunction
 import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
@@ -42,6 +43,7 @@ import com.zepben.ewb.services.common.translator.toCim
 import com.zepben.ewb.services.common.translator.toInstant
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.protobuf.cim.extensions.iec61968.assetinfo.RelayInfo as PBRelayInfo
+import com.zepben.protobuf.cim.extensions.iec61968.common.ContactDetails as PBContactDetails
 import com.zepben.protobuf.cim.extensions.iec61968.metering.PanDemandResponseFunction as PBPanDemandResponseFunction
 import com.zepben.protobuf.cim.extensions.iec61970.base.core.Site as PBSite
 import com.zepben.protobuf.cim.extensions.iec61970.base.feeder.Loop as PBLoop
@@ -76,11 +78,13 @@ import com.zepben.protobuf.cim.iec61968.assets.AssetOrganisationRole as PBAssetO
 import com.zepben.protobuf.cim.iec61968.assets.AssetOwner as PBAssetOwner
 import com.zepben.protobuf.cim.iec61968.assets.Streetlight as PBStreetlight
 import com.zepben.protobuf.cim.iec61968.assets.Structure as PBStructure
+import com.zepben.protobuf.cim.iec61968.common.ElectronicAddress as PBElectronicAddress
 import com.zepben.protobuf.cim.iec61968.common.Location as PBLocation
 import com.zepben.protobuf.cim.iec61968.common.Organisation as PBOrganisation
 import com.zepben.protobuf.cim.iec61968.common.PositionPoint as PBPositionPoint
 import com.zepben.protobuf.cim.iec61968.common.StreetAddress as PBStreetAddress
 import com.zepben.protobuf.cim.iec61968.common.StreetDetail as PBStreetDetail
+import com.zepben.protobuf.cim.iec61968.common.TelephoneNumber as PBTelephoneNumber
 import com.zepben.protobuf.cim.iec61968.common.TownDetail as PBTownDetail
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo as PBCurrentTransformerInfo
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo as PBPotentialTransformerInfo
@@ -205,6 +209,29 @@ fun toCim(pb: PBRelayInfo, networkService: NetworkService): RelayInfo =
  */
 fun NetworkService.addFromPb(pb: PBRelayInfo): RelayInfo? = tryAddOrNull(toCim(pb, this))
 
+// ##############################
+// # Extensions IEC61968 Common #
+// ##############################
+
+/**
+ * Convert the protobuf [PBContactDetails] into its CIM counterpart.
+ *
+ * @param pb The protobuf [PBContactDetails] to convert.
+ * @return The converted [pb] as a CIM [ContactDetails].
+ */
+fun toCim(pb: PBContactDetails): ContactDetails =
+    ContactDetails(pb.id).apply {
+        pb.phoneNumbersList.forEach { addPhoneNumber(toCim(it)) }
+        contactAddress = if (pb.hasContactAddress()) toCim(pb.contactAddress) else null
+        pb.electronicAddressesList.forEach { addElectronicAddress(toCim(it)) }
+        contactType = pb.contactTypeSet.takeUnless { pb.hasContactTypeNull() }
+        firstName = pb.firstNameSet.takeUnless { pb.hasFirstNameNull() }
+        lastName = pb.lastNameSet.takeUnless { pb.hasLastNameNull() }
+        preferredContactMethod = mapContactMethodType.toCim(pb.preferredContactMethod)
+        isPrimary = pb.isPrimarySet.takeUnless { pb.hasIsPrimaryNull() }
+        businessName = pb.businessNameSet.takeUnless { pb.hasBusinessNameNull() }
+    }
+
 // ################################
 // # Extensions IEC61968 Metering #
 // ################################
@@ -222,7 +249,6 @@ fun toCim(pb: PBPanDemandResponseFunction, networkService: NetworkService): PanD
         applianceBitmask = pb.applianceSet.takeUnless { pb.hasApplianceNull() }
         toCim(pb.edf, this, networkService)
     }
-
 
 /**
  * An extension to add a converted copy of the protobuf [PBPanDemandResponseFunction] to the [NetworkService].
@@ -606,7 +632,6 @@ fun toCim(pb: PBShortCircuitTest, networkService: NetworkService): ShortCircuitT
         toCim(pb.tt, this, networkService)
     }
 
-
 /**
  * Convert the protobuf [PBShuntCompensatorInfo] into its CIM counterpart.
  *
@@ -885,6 +910,13 @@ fun NetworkService.addFromPb(pb: PBStreetlight): Streetlight? = tryAddOrNull(toC
 // # IEC61968 Common #
 // ###################
 
+private fun toCim(pb: PBElectronicAddress): ElectronicAddress =
+    ElectronicAddress(
+        pb.email1Set.takeUnless { pb.hasEmail1Null() },
+        pb.isPrimarySet.takeUnless { pb.hasIsPrimaryNull() },
+        pb.descriptionSet.takeUnless { pb.hasDescriptionNull() },
+    )
+
 /**
  * Convert the protobuf [PBLocation] into its CIM counterpart.
  *
@@ -936,7 +968,21 @@ fun toCim(pb: PBStreetDetail): StreetDetail =
         pb.numberSet.takeUnless { pb.hasNumberNull() },
         pb.suiteNumberSet.takeUnless { pb.hasSuiteNumberNull() },
         pb.typeSet.takeUnless { pb.hasTypeNull() },
-        pb.displayAddressSet.takeUnless { pb.hasDisplayAddressNull() }
+        pb.displayAddressSet.takeUnless { pb.hasDisplayAddressNull() },
+        pb.buildingNumberSet.takeUnless { pb.hasBuildingNumberNull() },
+    )
+
+private fun toCim(pb: PBTelephoneNumber): TelephoneNumber =
+    TelephoneNumber(
+        pb.areaCodeSet.takeUnless { pb.hasAreaCodeNull() },
+        pb.cityCodeSet.takeUnless { pb.hasCityCodeNull() },
+        pb.countryCodeSet.takeUnless { pb.hasCountryCodeNull() },
+        pb.dialOutSet.takeUnless { pb.hasDialOutNull() },
+        pb.extensionSet.takeUnless { pb.hasExtensionNull() },
+        pb.internationalPrefixSet.takeUnless { pb.hasInternationalPrefixNull() },
+        pb.localNumberSet.takeUnless { pb.hasLocalNumberNull() },
+        pb.isPrimarySet.takeUnless { pb.hasIsPrimaryNull() },
+        pb.descriptionSet.takeUnless { pb.hasDescriptionNull() },
     )
 
 /**
@@ -948,7 +994,8 @@ fun toCim(pb: PBStreetDetail): StreetDetail =
 fun toCim(pb: PBTownDetail): TownDetail =
     TownDetail(
         pb.nameSet.takeUnless { pb.hasNameNull() },
-        pb.stateOrProvinceSet.takeUnless { pb.hasStateOrProvinceNull() }
+        pb.stateOrProvinceSet.takeUnless { pb.hasStateOrProvinceNull() },
+        pb.countrySet.takeUnless { pb.hasCountryNull() },
     )
 
 /**
@@ -1129,6 +1176,8 @@ fun toCim(pb: PBUsagePoint, networkService: NetworkService): UsagePoint =
         pb.endDeviceMRIDsList.forEach {
             networkService.resolveOrDeferReference(Resolvers.endDevices(this), it)
         }
+
+        pb.contactsList.forEach { addContact(toCim(it)) }
 
         toCim(pb.io, this, networkService)
     }

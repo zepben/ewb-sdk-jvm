@@ -28,7 +28,7 @@ import com.zepben.ewb.database.sqlite.common.SqliteTable
  * @property DESCRIPTION A column storing the description for phone number, e.g: home, work, mobile.
  */
 @Suppress("PropertyName")
-abstract class TableTelephoneNumber : SqliteTable() {
+abstract class TableTelephoneNumbers : SqliteTable() {
 
     val AREA_CODE: Column = Column(++columnIndex, "area_code", STRING, NULL)
     val CITY_CODE: Column = Column(++columnIndex, "city_code", STRING, NULL)

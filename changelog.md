@@ -1,7 +1,7 @@
 # Zepben EWB SDK changelog
 ## [1.1.0] - UNRELEASED
 ### Breaking Changes
-* None.
+* `Timestamp.toInstant()` and `Instant.toTimestamp()` have been removed from the public API. If you were using them, you will need to copy the implementation.
 
 ### New Features
 * None.

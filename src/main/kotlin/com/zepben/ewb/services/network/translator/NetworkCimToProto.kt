@@ -322,6 +322,7 @@ fun RelayInfo.toPb(): PBRelayInfo = toPb(this, PBRelayInfo.newBuilder()).build()
  */
 fun toPb(cim: ContactDetails, pb: PBContactDetails.Builder): PBContactDetails.Builder =
     pb.apply {
+        id = cim.id
         clearPhoneNumbers()
         cim.phoneNumbers.forEach { addPhoneNumbers(it.toPb()) }
         cim.contactAddress?.also { toPb(it, contactAddressBuilder) } ?: clearContactAddress()
@@ -1056,6 +1057,7 @@ fun toPb(cim: StreetDetail, pb: PBStreetDetail.Builder): PBStreetDetail.Builder 
         cim.suiteNumber?.also { suiteNumberSet = it } ?: run { suiteNumberNull = NullValue.NULL_VALUE }
         cim.type?.also { typeSet = it } ?: run { typeNull = NullValue.NULL_VALUE }
         cim.displayAddress?.also { displayAddressSet = it } ?: run { displayAddressNull = NullValue.NULL_VALUE }
+        cim.buildingNumber?.also { buildingNumberSet = it } ?: run { buildingNumberNull = NullValue.NULL_VALUE }
     }
 
 /**
@@ -1089,6 +1091,7 @@ fun toPb(cim: TownDetail, pb: PBTownDetail.Builder): PBTownDetail.Builder =
     pb.apply {
         cim.name?.also { nameSet = it } ?: run { nameNull = NullValue.NULL_VALUE }
         cim.stateOrProvince?.also { stateOrProvinceSet = it } ?: run { stateOrProvinceNull = NullValue.NULL_VALUE }
+        cim.country?.also { countrySet = it } ?: run { countryNull = NullValue.NULL_VALUE }
     }
 
 /**
@@ -1485,7 +1488,7 @@ fun toPb(cim: Equipment, pb: PBEquipment.Builder): PBEquipment.Builder =
         inService = cim.inService
         normallyInService = cim.normallyInService
 
-        cim.commissionedDate.toTimestamp()?.also { commissionedDate = it } ?: clearCommissionedDate()
+        cim.commissionedDate?.also { commissionedDate = it.toTimestamp() } ?: clearCommissionedDate()
 
         clearEquipmentContainerMRIDs()
         cim.containers.forEach { addEquipmentContainerMRIDs(it.mRID) }
@@ -2989,6 +2992,18 @@ class NetworkCimToProto : BaseCimToProto() {
      * @return The protobuf form of [cim].
      */
     fun toPb(cim: RelayInfo): PBRelayInfo = cim.toPb()
+
+    // ##############################
+    // # Extensions IEC61968 Common #
+    // ##############################
+
+    /**
+     * Convert the [ContactDetails] into its protobuf counterpart.
+     *
+     * @param cim The [ContactDetails] to convert.
+     * @return The protobuf form of [cim].
+     */
+    fun toPb(cim: ContactDetails): PBContactDetails = cim.toPb()
 
     // ################################
     // # Extensions IEC61968 Metering #

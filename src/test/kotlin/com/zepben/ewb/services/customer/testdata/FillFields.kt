@@ -61,6 +61,8 @@ fun CustomerAgreement.fillFields(service: CustomerService, includeRuntime: Boole
     for (i in 0..1)
         addPricingStructure(PricingStructure().also { service.add(it) })
 
+    validityInterval = DateTimeInterval(Instant.ofEpochSecond(1), Instant.ofEpochSecond(2))
+
     return this
 }
 

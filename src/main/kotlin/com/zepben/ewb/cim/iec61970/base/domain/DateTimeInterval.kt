@@ -13,18 +13,18 @@ import java.time.Instant
 /**
  * Interval between two date and time points, where the interval includes the start time but excludes end time.
  *
- * @property end End date and time of this interval. The end date and time where the interval is defined up to, but excluded.
  * @property start Start date and time of this interval. The start date and time is included in the defined interval.
+ * @property end End date and time of this interval. The end date and time where the interval is defined up to, but excluded.
  */
 data class DateTimeInterval(
-    val end: Instant? = null,
     val start: Instant? = null,
+    val end: Instant? = null,
 ) {
 
     init {
-        require((end != null) || (start != null)) { "You must provide a start or end time."}
+        require((end != null) || (start != null)) { "You must provide a start or end time." }
         if ((start != null) && (end != null))
-            require(start < end) { "The start time must be before the end time."}
+            require(start < end) { "The start time must be before the end time." }
     }
 
 }

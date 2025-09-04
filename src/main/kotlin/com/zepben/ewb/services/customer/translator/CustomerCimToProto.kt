@@ -93,8 +93,8 @@ fun Tariff.toPb(): PBTariff = toPb(this, PBTariff.newBuilder()).build()
 
 fun toPb(cim: DateTimeInterval, pb: PBDateTimeInterval.Builder): PBDateTimeInterval.Builder =
     pb.apply {
-        cim.end?.also { pb.endSet = it.toTimestamp() } ?: run { pb.endNull = NullValue.NULL_VALUE }
         cim.start?.also { pb.startSet = it.toTimestamp() } ?: run { pb.startNull = NullValue.NULL_VALUE }
+        cim.end?.also { pb.endSet = it.toTimestamp() } ?: run { pb.endNull = NullValue.NULL_VALUE }
     }
 
 fun DateTimeInterval.toPb(): PBDateTimeInterval = toPb(this, PBDateTimeInterval.newBuilder()).build()

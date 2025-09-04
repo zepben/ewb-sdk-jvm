@@ -143,8 +143,8 @@ fun CustomerService.addFromPb(pb: PBNameType): NameType = toCim(pb, this)
 
 private fun toCim(pb: PBDateTimeInterval): DateTimeInterval =
     DateTimeInterval(
+        start = pb.startSet.takeUnless { pb.hasStartNull() }?.toInstant(),
         end = pb.endSet.takeUnless { pb.hasEndNull() }?.toInstant(),
-        start = pb.startSet.takeUnless { pb.hasStartNull() }?.toInstant()
     )
 
 // #################################

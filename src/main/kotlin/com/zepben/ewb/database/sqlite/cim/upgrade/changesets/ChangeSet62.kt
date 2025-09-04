@@ -33,9 +33,9 @@ internal fun changeSet62() = ChangeSet(
 @Suppress("ObjectPropertyName")
 private val `create usage_points_contact_details table` = Change(
     listOf(
-        "CREATE TABLE usage_points_contact_details (id TEXT NOT NULL, contact_type TEXT NULL, first_name TEXT NULL, last_name TEXT NULL, preferred_contact_method TEXT NULL, is_primary BOOLEAN NULL, business_name TEXT NULL, usage_point_id TEXT NOT NULL);",
+        "CREATE TABLE usage_points_contact_details (id TEXT NOT NULL, contact_type TEXT NULL, first_name TEXT NULL, last_name TEXT NULL, preferred_contact_method TEXT NULL, is_primary BOOLEAN NULL, business_name TEXT NULL, usage_point_mrid TEXT NOT NULL);",
         "CREATE UNIQUE INDEX usage_points_contact_details_id ON usage_points_contact_details (id);",
-        "CREATE INDEX usage_points_contact_details_usage_point_id ON usage_points_contact_details (usage_point_id);",
+        "CREATE INDEX usage_points_contact_details_usage_point_mrid ON usage_points_contact_details (usage_point_mrid);",
     ),
     targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )
@@ -80,7 +80,7 @@ private val `create directional_current_relays table` = Change(
 @Suppress("ObjectPropertyName")
 private val `add validity interval fields to agreements table` = Change(
     listOf(
-        "ALTER TABLE customer_agreements ADD validity_interval_end TEXT NULL, validity_interval_start TEXT NULL;",
+        "ALTER TABLE customer_agreements ADD validity_interval_start TEXT NULL, validity_interval_end TEXT NULL;",
     ),
     targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )

@@ -22,7 +22,7 @@ import com.zepben.ewb.database.sqlite.common.SqliteTable
  * @property DESCRIPTION A column storing a description for this email, e.g: work, personal.
  */
 @Suppress("PropertyName")
-abstract class TableElectronicAddress : SqliteTable() {
+abstract class TableElectronicAddresses : SqliteTable() {
 
     val EMAIL_1: Column = Column(++columnIndex, "email_1", STRING, NULL)
     val IS_PRIMARY: Column = Column(++columnIndex, "is_primary", BOOLEAN, NULL)

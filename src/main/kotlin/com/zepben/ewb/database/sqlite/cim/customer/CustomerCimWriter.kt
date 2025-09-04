@@ -44,10 +44,8 @@ class CustomerCimWriter(
     @Suppress("SameParameterValue")
     @Throws(SQLException::class)
     private fun writeAgreement(table: TableAgreements, insert: PreparedStatement, agreement: Agreement, description: String): Boolean {
-        agreement.validityInterval?.apply {
-            insert.setInstant(table.VALIDITY_INTERVAL_START.queryIndex, start)
-            insert.setInstant(table.VALIDITY_INTERVAL_END.queryIndex, end)
-        }
+        insert.setInstant(table.VALIDITY_INTERVAL_START.queryIndex, agreement.validityInterval?.start)
+        insert.setInstant(table.VALIDITY_INTERVAL_END.queryIndex, agreement.validityInterval?.end)
 
         return writeDocument(table, insert, agreement, description)
     }

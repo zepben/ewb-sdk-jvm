@@ -13,7 +13,7 @@ import com.zepben.ewb.database.sql.Column.Nullable.NOT_NULL
 import com.zepben.ewb.database.sql.Column.Nullable.NULL
 import com.zepben.ewb.database.sql.Column.Type.BOOLEAN
 import com.zepben.ewb.database.sql.Column.Type.STRING
-import com.zepben.ewb.database.sqlite.common.SqliteTable
+import com.zepben.ewb.database.sqlite.cim.tables.iec61968.common.TableStreetAddresses
 
 /**
  * A class representing the ContactDetails columns required for the database table.
@@ -27,7 +27,7 @@ import com.zepben.ewb.database.sqlite.common.SqliteTable
  * @property BUSINESS_NAME A column storing the business name of this contact.
  */
 @Suppress("PropertyName")
-abstract class TableContactDetails : SqliteTable() {
+abstract class TableContactDetails : TableStreetAddresses() {
 
     val ID: Column = Column(++columnIndex, "id", STRING, NOT_NULL)
     val CONTACT_TYPE: Column = Column(++columnIndex, "contact_type", STRING, NULL)

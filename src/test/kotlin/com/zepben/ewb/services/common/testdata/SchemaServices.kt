@@ -8,12 +8,10 @@
 
 package com.zepben.ewb.services.common.testdata
 
+import com.zepben.ewb.cim.iec61968.metering.ControlledAppliance
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.core.NameType
-import com.zepben.ewb.cim.iec61970.base.wires.EnergyConsumer
-import com.zepben.ewb.cim.iec61970.base.wires.EnergyConsumerPhase
-import com.zepben.ewb.cim.iec61970.base.wires.EnergySource
-import com.zepben.ewb.cim.iec61970.base.wires.EnergySourcePhase
+import com.zepben.ewb.cim.iec61970.base.wires.*
 import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.common.meta.DataSource
 import com.zepben.ewb.services.common.meta.MetadataCollection
@@ -121,17 +119,47 @@ object SchemaServices {
             .filterNot { it.name.uppercase().endsWith("MRID") }     // Ignore identifiedObjectMRID, customerMRID, etc
             .filterIsInstance<KMutableProperty<*>>()
             .forEach { prop ->
-                if (prop.returnType.withNullability(false).isSubtypeOf(String::class.createType())) {
-                    prop.setter.call(io, "")
+                val value = prop.findKnownNonEmpty(io) ?: when {
+                    prop.isNullableOf<String>() -> ""
+                    prop.isNullableOf<Boolean>() -> false
+                    prop.isNullableOf<Int>() -> 0
+                    prop.isNullableOf<Float>() -> 0.0f
+                    prop.isNullableOf<Double>() -> 0.0
+                    // We don't need to worry about references to other objects, they are covered by `filled`.
+                    prop.isNullableOf<IdentifiedObject>() -> null
+                    prop.isNullableOf<Instant>() -> Instant.ofEpochSecond(0)
+                    prop.isNullableOf<ControlledAppliance>() -> ControlledAppliance(0)
+                    else -> throw IllegalStateException("INTERNAL ERROR: You forgot to add an empty value mapper for ${prop.returnType} - used by ${io::class.simpleName}.${prop.name}")
                 }
 
-                if (prop.returnType.withNullability(false).isSubtypeOf(Boolean::class.createType())) {
-                    prop.setter.call(io, false)
-                }
-
-                if (prop.name == "numDiagramObjects" || prop.name == "numControls" || prop.name == "numEndDevices")
-                    prop.setter.call(io, 0)
+                prop.setter.call(io, value)
             }
+    }
+
+    private inline fun <reified T> KMutableProperty<*>.isNullableOf(): Boolean =
+        returnType.withNullability(false).isSubtypeOf(T::class.createType())
+
+    private fun KMutableProperty<*>.findKnownNonEmpty(io: IdentifiedObject): Any? {
+        return tryIdentifiedObjectNonEmpty()
+            ?: tryPowerElectronicsConnectionNonEmpty(io)
+    }
+
+    private fun KMutableProperty<*>.tryIdentifiedObjectNonEmpty(): Any? {
+        return (when (name) {
+            "numDiagramObjects", "numControls", "numEndDevices" -> 0
+            else -> null
+        })
+    }
+
+    private fun KMutableProperty<*>.tryPowerElectronicsConnectionNonEmpty(io: IdentifiedObject): Any? {
+        if (io !is PowerElectronicsConnection)
+            return null
+
+        return (when (name) {
+            "invVarRespV1", "invVarRespV2", "invVarRespV3", "invVarRespV4" -> 200
+            "invVarRespQAtV1", "invVarRespQAtV2", "invVarRespQAtV3", "invVarRespQAtV4" -> 0.0f
+            else -> null
+        })
     }
 
 }

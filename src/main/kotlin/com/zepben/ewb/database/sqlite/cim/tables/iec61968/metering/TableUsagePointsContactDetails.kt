@@ -16,18 +16,18 @@ import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.common.Tabl
 /**
  * A class representing the UsagePoint to ContactDetails association columns required for the database table.
  *
- * @property USAGE_POINT_ID A column that stores the identifier of the usage point associated with the contact details.
+ * @property USAGE_POINT_MRID A column that stores the identifier of the usage point associated with the contact details.
  */
 @Suppress("PropertyName")
 class TableUsagePointsContactDetails : TableContactDetails() {
 
-    val USAGE_POINT_ID: Column = Column(++columnIndex, "usage_point_id", STRING, NOT_NULL)
+    val USAGE_POINT_MRID: Column = Column(++columnIndex, "usage_point_mrid", STRING, NOT_NULL)
 
     override val name: String = "usage_points_contact_details"
 
     override val nonUniqueIndexColumns: MutableList<List<Column>> =
         super.nonUniqueIndexColumns.apply {
-            add(listOf(USAGE_POINT_ID))
+            add(listOf(USAGE_POINT_MRID))
         }
 
 }

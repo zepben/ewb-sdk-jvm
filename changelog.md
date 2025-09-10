@@ -10,7 +10,8 @@
 * None.
 
 ### Fixes
-* None.
+* Fixed a bug in the LV feeder assignment when processing sites in the current state of the network. This prevented LV feeders on switches (rather than the
+  transformer) from being assigned to the current state energising feeder.
 
 ### Notes
 * None.

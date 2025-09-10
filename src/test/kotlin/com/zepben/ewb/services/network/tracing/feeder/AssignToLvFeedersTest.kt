@@ -317,61 +317,65 @@ internal class AssignToLvFeedersTest {
 
     @Test
     internal fun `lv feeders detect back feeds for dist substation sites`() {
-        //
-        //                1--c2--21 b3 2
-        // 1 tx0 21--c1--2
-        //                1--c4--21 b5 21--c6--21 b7 2
-        //
-        val network = TestNetworkBuilder()
-            .fromPowerTransformer(endActions = listOf({ ratedU = hvBaseVoltage.nominalVoltage }, { ratedU = lvBaseVoltage.nominalVoltage })) // tx0
-            .toAcls { baseVoltage = lvBaseVoltage } // c1
-            .toAcls { baseVoltage = lvBaseVoltage } // c2
-            .toBreaker { baseVoltage = lvBaseVoltage } // b3
-            .fromAcls { baseVoltage = lvBaseVoltage } // c4
-            .toBreaker { baseVoltage = lvBaseVoltage } // b5
-            .toAcls { baseVoltage = lvBaseVoltage } // c6
-            .toBreaker { baseVoltage = lvBaseVoltage } // b7
-            .connect("c1", "c4", 2, 1)
-            .addLvFeeder("tx0") // lvf8
-            .addLvFeeder("b3") // lvf9
-            .addLvFeeder("b5") // lvf10
-            .addLvFeeder("b7", 1) // lvf11
-            .addSite("tx0", "c1", "c2", "b3", "c4", "b5") // site12
-            .network
+        fun runWithOperators(operators: NetworkStateOperators) {
+            //
+            //                1--c2--21 b3 2
+            // 1 tx0 21--c1--2
+            //                1--c4--21 b5 21--c6--21 b7 2
+            //
+            val network = TestNetworkBuilder()
+                .fromPowerTransformer(endActions = listOf({ ratedU = hvBaseVoltage.nominalVoltage }, { ratedU = lvBaseVoltage.nominalVoltage })) // tx0
+                .toAcls { baseVoltage = lvBaseVoltage } // c1
+                .toAcls { baseVoltage = lvBaseVoltage } // c2
+                .toBreaker { baseVoltage = lvBaseVoltage } // b3
+                .fromAcls { baseVoltage = lvBaseVoltage } // c4
+                .toBreaker { baseVoltage = lvBaseVoltage } // b5
+                .toAcls { baseVoltage = lvBaseVoltage } // c6
+                .toBreaker { baseVoltage = lvBaseVoltage } // b7
+                .connect("c1", "c4", 2, 1)
+                .addLvFeeder("tx0") // lvf8
+                .addLvFeeder("b3") // lvf9
+                .addLvFeeder("b5") // lvf10
+                .addLvFeeder("b7", 1) // lvf11
+                .addSite("tx0", "c1", "c2", "b3", "c4", "b5") // site12
+                .network
 
-        val operators = NetworkStateOperators.NORMAL
-        val b7 = network.get<Breaker>("b7")!!
+            val b7 = network.get<Breaker>("b7")!!
 
-        val feeder = Feeder()
-        val lvFeeder8 = network.get<LvFeeder>("lvf8")!!.also { operators.associateEnergizingFeeder(feeder, it) }
-        val lvFeeder9 = network.get<LvFeeder>("lvf9")!!.also { operators.associateEnergizingFeeder(feeder, it) }
-        val lvFeeder10 = network.get<LvFeeder>("lvf10")!!.also { operators.associateEnergizingFeeder(feeder, it) }
+            val feeder = Feeder()
+            val lvFeeder8 = network.get<LvFeeder>("lvf8")!!.also { operators.associateEnergizingFeeder(feeder, it) }
+            val lvFeeder9 = network.get<LvFeeder>("lvf9")!!.also { operators.associateEnergizingFeeder(feeder, it) }
+            val lvFeeder10 = network.get<LvFeeder>("lvf10")!!.also { operators.associateEnergizingFeeder(feeder, it) }
 
-        // We create an LV feeder to assign from b7 with its associated energizing feeder, which we will test is assigned to all LV feeders
-        // in the dist substation site, not just the one on b5.
-        val backFeed = Feeder()
-        val lvFeeder = LvFeeder().also { operators.associateEnergizingFeeder(backFeed, it) }
+            // We create an LV feeder to assign from b7 with its associated energizing feeder, which we will test is assigned to all LV feeders
+            // in the dist substation site, not just the one on b5.
+            val backFeed = Feeder()
+            val lvFeeder = LvFeeder().also { operators.associateEnergizingFeeder(backFeed, it) }
 
-        assignToLvFeeders.run(
-            b7.terminals.first(),
-            network.lvFeederStartPoints,
-            terminalToAuxEquipment = emptyMap(),
-            listOf(lvFeeder),
-            operators
-        )
+            assignToLvFeeders.run(
+                b7.terminals.first(),
+                network.lvFeederStartPoints,
+                terminalToAuxEquipment = emptyMap(),
+                listOf(lvFeeder),
+                operators
+            )
 
-        // Make sure the LV feeder traced stopped at the first LV feeder head.
-        assertThat(lvFeeder.equipment.map { it.mRID }, containsInAnyOrder("b7", "c6", "b5"))
+            // Make sure the LV feeder traced stopped at the first LV feeder head.
+            assertThat(operators.getEquipment(lvFeeder).map { it.mRID }, containsInAnyOrder("b7", "c6", "b5"))
 
-        // Make sure both feeders are now considered to be energizing all LV feeders.
-        assertThat(feeder.normalEnergizedLvFeeders, containsInAnyOrder(lvFeeder, lvFeeder8, lvFeeder9, lvFeeder10))
-        assertThat(backFeed.normalEnergizedLvFeeders, containsInAnyOrder(lvFeeder, lvFeeder8, lvFeeder9, lvFeeder10))
+            // Make sure both feeders are now considered to be energizing all LV feeders.
+            assertThat(operators.getEnergizedLvFeeders(feeder), containsInAnyOrder(lvFeeder, lvFeeder8, lvFeeder9, lvFeeder10))
+            assertThat(operators.getEnergizedLvFeeders(backFeed), containsInAnyOrder(lvFeeder, lvFeeder8, lvFeeder9, lvFeeder10))
 
-        // Make sure all LV feeders are now considered to be energized by both feeders.
-        assertThat(lvFeeder.normalEnergizingFeeders, containsInAnyOrder(feeder, backFeed))
-        assertThat(lvFeeder8.normalEnergizingFeeders, containsInAnyOrder(feeder, backFeed))
-        assertThat(lvFeeder9.normalEnergizingFeeders, containsInAnyOrder(feeder, backFeed))
-        assertThat(lvFeeder10.normalEnergizingFeeders, containsInAnyOrder(feeder, backFeed))
+            // Make sure all LV feeders are now considered to be energized by both feeders.
+            assertThat(operators.getEnergizingFeeders(lvFeeder), containsInAnyOrder(feeder, backFeed))
+            assertThat(operators.getEnergizingFeeders(lvFeeder8), containsInAnyOrder(feeder, backFeed))
+            assertThat(operators.getEnergizingFeeders(lvFeeder9), containsInAnyOrder(feeder, backFeed))
+            assertThat(operators.getEnergizingFeeders(lvFeeder10), containsInAnyOrder(feeder, backFeed))
+        }
+
+        runWithOperators(NetworkStateOperators.NORMAL)
+        runWithOperators(NetworkStateOperators.CURRENT)
     }
 
     @Test

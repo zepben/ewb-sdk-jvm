@@ -187,7 +187,11 @@ class AssignToLvFeeders(
         private fun ConductingEquipment.findLvFeeders(lvFeederStartPoints: Set<ConductingEquipment>): Iterable<LvFeeder> {
             // Check to see if the LV feeder head is part of a dist transformer site. If so, we want to find all LV feeders on any equipment
             // in the site, not just the LV feeder of the head we found.
-            val sites = getFilteredContainers<Site>(stateOperators)
+            //
+            // NOTE: Sites aren't added to the current state containers, so they will always need to be looked up from the normal containers,
+            //       regardless of the state operators being used.
+            //
+            val sites = containers.filterIsInstance<Site>()
             return if (sites.isNotEmpty())
                 sites.findLvFeeders(lvFeederStartPoints, stateOperators)
             else

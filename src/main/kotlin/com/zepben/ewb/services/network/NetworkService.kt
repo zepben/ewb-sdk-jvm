@@ -73,7 +73,7 @@ class NetworkService(metadata: MetadataCollection = MetadataCollection()) : Base
     // ##################################
 
     fun add(relayInfo: RelayInfo): Boolean = super.add(relayInfo)
-    fun remove(relayInfo: RelayInfo): Boolean = super.remove(relayInfo)
+    fun remove(relayInfo: RelayInfo, cascade: Boolean = false): Boolean = super.removeInternal(relayInfo, cascade)
 
     // ################################
     // # Extensions IEC61968 Metering #
@@ -87,40 +87,40 @@ class NetworkService(metadata: MetadataCollection = MetadataCollection()) : Base
     // #################################
 
     fun add(site: Site): Boolean = super.add(site)
-    fun remove(site: Site): Boolean = super.remove(site)
+    fun remove(site: Site, cascade: Boolean = false): Boolean = super.removeInternal(site, cascade)
 
     // ###################################
     // # Extensions IEC61970 Base Feeder #
     // ###################################
 
     fun add(loop: Loop): Boolean = super.add(loop)
-    fun remove(loop: Loop): Boolean = super.remove(loop)
+    fun remove(loop: Loop, cascade: Boolean = false): Boolean = super.removeInternal(loop, cascade)
 
     fun add(lvFeeder: LvFeeder): Boolean = super.add(lvFeeder)
-    fun remove(lvFeeder: LvFeeder): Boolean = super.remove(lvFeeder)
+    fun remove(lvFeeder: LvFeeder, cascade: Boolean = false): Boolean = super.removeInternal(lvFeeder, cascade)
 
     // ##################################################
     // # Extensions IEC61970 Base Generation Production #
     // ##################################################
 
     fun add(evChargingUnit: EvChargingUnit): Boolean = super.add(evChargingUnit)
-    fun remove(evChargingUnit: EvChargingUnit): Boolean = super.remove(evChargingUnit)
+    fun remove(evChargingUnit: EvChargingUnit, cascade: Boolean = false): Boolean = super.removeInternal(evChargingUnit, cascade)
 
     // #######################################
     // # Extensions IEC61970 Base Protection #
     // #######################################
 
     fun add(distanceRelay: DistanceRelay): Boolean = super.add(distanceRelay)
-    fun remove(distanceRelay: DistanceRelay): Boolean = super.remove(distanceRelay)
+    fun remove(distanceRelay: DistanceRelay, cascade: Boolean = false): Boolean = super.removeInternal(distanceRelay, cascade)
 
     fun add(protectionRelayScheme: ProtectionRelayScheme): Boolean = super.add(protectionRelayScheme)
-    fun remove(protectionRelayScheme: ProtectionRelayScheme): Boolean = super.remove(protectionRelayScheme)
+    fun remove(protectionRelayScheme: ProtectionRelayScheme, cascade: Boolean = false): Boolean = super.removeInternal(protectionRelayScheme, cascade)
 
     fun add(protectionRelaySystem: ProtectionRelaySystem): Boolean = super.add(protectionRelaySystem)
-    fun remove(protectionRelaySystem: ProtectionRelaySystem): Boolean = super.remove(protectionRelaySystem)
+    fun remove(protectionRelaySystem: ProtectionRelaySystem, cascade: Boolean = false): Boolean = super.removeInternal(protectionRelaySystem, cascade)
 
     fun add(voltageRelay: VoltageRelay): Boolean = super.add(voltageRelay)
-    fun remove(voltageRelay: VoltageRelay): Boolean = super.remove(voltageRelay)
+    fun remove(voltageRelay: VoltageRelay, cascade: Boolean = false): Boolean = super.removeInternal(voltageRelay, cascade)
 
     // ##################################
     // # Extensions IEC61970 Base Wires #
@@ -170,9 +170,6 @@ class NetworkService(metadata: MetadataCollection = MetadataCollection()) : Base
     fun add(assetOwner: AssetOwner): Boolean = super.add(assetOwner)
     fun remove(assetOwner: AssetOwner, cascade: Boolean = false): Boolean = super.removeInternal(assetOwner, cascade)
 
-    fun add(pole: Pole): Boolean = super.add(pole)
-    fun remove(pole: Pole, cascade: Boolean = false): Boolean = super.removeInternal(pole, cascade)
-
     fun add(streetlight: Streetlight): Boolean = super.add(streetlight)
     fun remove(streetlight: Streetlight, cascade: Boolean = false): Boolean = super.removeInternal(streetlight, cascade)
 
@@ -190,9 +187,6 @@ class NetworkService(metadata: MetadataCollection = MetadataCollection()) : Base
     // # IEC61968 infIEC61968 InfAssetInfo #
     // #####################################
 
-    fun add(relayInfo: RelayInfo): Boolean = super.add(relayInfo)
-    fun remove(relayInfo: RelayInfo, cascade: Boolean = false): Boolean = super.removeInternal(relayInfo, cascade)
-
     fun add(currentTransformerInfo: CurrentTransformerInfo): Boolean = super.add(currentTransformerInfo)
     fun remove(currentTransformerInfo: CurrentTransformerInfo, cascade: Boolean = false): Boolean = super.removeInternal(currentTransformerInfo, cascade)
 
@@ -204,7 +198,7 @@ class NetworkService(metadata: MetadataCollection = MetadataCollection()) : Base
     // ##################################
 
     fun add(pole: Pole): Boolean = super.add(pole)
-    fun remove(pole: Pole): Boolean = super.remove(pole)
+    fun remove(pole: Pole, cascade: Boolean = false): Boolean = super.removeInternal(pole, cascade)
 
     // #####################
     // # IEC61968 Metering #
@@ -251,9 +245,6 @@ class NetworkService(metadata: MetadataCollection = MetadataCollection()) : Base
 
     fun add(geographicalRegion: GeographicalRegion): Boolean = super.add(geographicalRegion)
     fun remove(geographicalRegion: GeographicalRegion, cascade: Boolean = false): Boolean = super.removeInternal(geographicalRegion, cascade)
-
-    fun add(site: Site): Boolean = super.add(site)
-    fun remove(site: Site, cascade: Boolean = false): Boolean = super.removeInternal(site, cascade)
 
     fun add(subGeographicalRegion: SubGeographicalRegion): Boolean = super.add(subGeographicalRegion)
     fun remove(subGeographicalRegion: SubGeographicalRegion, cascade: Boolean = false): Boolean = super.removeInternal(subGeographicalRegion, cascade)
@@ -302,18 +293,6 @@ class NetworkService(metadata: MetadataCollection = MetadataCollection()) : Base
 
     fun add(currentRelay: CurrentRelay): Boolean = super.add(currentRelay)
     fun remove(currentRelay: CurrentRelay, cascade: Boolean = false): Boolean = super.removeInternal(currentRelay, cascade)
-
-    fun add(distanceRelay: DistanceRelay): Boolean = super.add(distanceRelay)
-    fun remove(distanceRelay: DistanceRelay, cascade: Boolean = false): Boolean = super.removeInternal(distanceRelay, cascade)
-
-    fun add(protectionRelayScheme: ProtectionRelayScheme): Boolean = super.add(protectionRelayScheme)
-    fun remove(protectionRelayScheme: ProtectionRelayScheme, cascade: Boolean = false): Boolean = super.removeInternal(protectionRelayScheme, cascade)
-
-    fun add(protectionRelaySystem: ProtectionRelaySystem): Boolean = super.add(protectionRelaySystem)
-    fun remove(protectionRelaySystem: ProtectionRelaySystem, cascade: Boolean = false): Boolean = super.removeInternal(protectionRelaySystem, cascade)
-
-    fun add(voltageRelay: VoltageRelay): Boolean = super.add(voltageRelay)
-    fun remove(voltageRelay: VoltageRelay, cascade: Boolean = false): Boolean = super.removeInternal(voltageRelay, cascade)
 
     // #######################
     // # IEC61970 Base Scada #
@@ -447,19 +426,6 @@ class NetworkService(metadata: MetadataCollection = MetadataCollection()) : Base
 
     fun add(circuit: Circuit): Boolean = super.add(circuit)
     fun remove(circuit: Circuit, cascade: Boolean = false): Boolean = super.removeInternal(circuit, cascade)
-
-    fun add(loop: Loop): Boolean = super.add(loop)
-    fun remove(loop: Loop, cascade: Boolean = false): Boolean = super.removeInternal(loop, cascade)
-
-    fun add(lvFeeder: LvFeeder): Boolean = super.add(lvFeeder)
-    fun remove(lvFeeder: LvFeeder, cascade: Boolean = false): Boolean = super.removeInternal(lvFeeder, cascade)
-
-    // ###############################
-    // # IEC61970 InfIEC61970 WIRES.GENERATION.PRODUCTION #
-    // ###############################
-
-    fun add(evChargingUnit: EvChargingUnit): Boolean = super.add(evChargingUnit)
-    fun remove(evChargingUnit: EvChargingUnit, cascade: Boolean = false): Boolean = super.removeInternal(evChargingUnit, cascade)
 
     /**
      * Get all measurements of type [T] associated with the given [mRID].

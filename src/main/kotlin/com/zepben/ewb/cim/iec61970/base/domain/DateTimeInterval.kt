@@ -24,7 +24,7 @@ data class DateTimeInterval(
     init {
         require((end != null) || (start != null)) { "You must provide a start or end time." }
         if ((start != null) && (end != null))
-            require(start < end) { "The start time must be before the end time." }
+            require(start <= end) { "The start time must be before the end time." }
     }
 
 }

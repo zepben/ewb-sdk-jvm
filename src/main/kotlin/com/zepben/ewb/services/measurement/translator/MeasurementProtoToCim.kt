@@ -42,7 +42,9 @@ fun toCim(pb: PBDiscreteValue): DiscreteValue =
     }
 
 fun toCim(pb: PBMeasurementValue, cim: MeasurementValue): MeasurementValue =
-    cim.apply { timeStamp = pb.timeStamp.toInstant() }
+    cim.apply {
+        timeStamp = pb.timeStampSet.takeUnless { pb.hasTimeStampNull() }?.toInstant()
+    }
 
 
 fun MeasurementService.addFromPb(pb: PBAccumulatorValue): AccumulatorValue = toCim(pb).also { add(it) }

@@ -15,7 +15,6 @@ import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.core.NameType
 import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.common.Resolvers
-import com.zepben.ewb.services.common.extensions.internEmpty
 import com.zepben.protobuf.cim.iec61968.common.Document as PBDocument
 import com.zepben.protobuf.cim.iec61968.common.Organisation as PBOrganisation
 import com.zepben.protobuf.cim.iec61968.common.OrganisationRole as PBOrganisationRole
@@ -33,7 +32,7 @@ import com.zepben.protobuf.cim.iec61970.base.core.NameType as PBNameType
 fun toCim(pb: PBDocument, cim: Document, baseService: BaseService): Document =
     cim.apply {
         title = pb.titleSet.takeUnless { pb.hasTitleNull() }
-        createdDateTime = pb.createdDateTime.toInstant()
+        createdDateTime = pb.createdDateTimeSet.takeUnless { pb.hasCreatedDateTimeNull() }?.toInstant()
         authorName = pb.authorNameSet.takeUnless { pb.hasAuthorNameNull() }
         type = pb.typeSet.takeUnless { pb.hasTypeNull() }
         status = pb.statusSet.takeUnless { pb.hasStatusNull() }

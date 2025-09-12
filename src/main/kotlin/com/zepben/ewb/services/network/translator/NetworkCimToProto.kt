@@ -1488,7 +1488,7 @@ fun toPb(cim: Equipment, pb: PBEquipment.Builder): PBEquipment.Builder =
         inService = cim.inService
         normallyInService = cim.normallyInService
 
-        cim.commissionedDate?.also { commissionedDate = it.toTimestamp() } ?: clearCommissionedDate()
+        cim.commissionedDate?.also { commissionedDateSet = it.toTimestamp() } ?: run { commissionedDateNull = NullValue.NULL_VALUE }
 
         clearEquipmentContainerMRIDs()
         cim.containers.forEach { addEquipmentContainerMRIDs(it.mRID) }

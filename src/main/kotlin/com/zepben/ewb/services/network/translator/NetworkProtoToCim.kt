@@ -1410,7 +1410,7 @@ fun toCim(pb: PBEquipment, cim: Equipment, networkService: NetworkService): Equi
     cim.apply {
         inService = pb.inService
         normallyInService = pb.normallyInService
-        commissionedDate = pb.commissionedDate.toInstant()
+        commissionedDate = pb.commissionedDateSet.takeUnless { pb.hasCommissionedDateNull() }?.toInstant()
 
         pb.equipmentContainerMRIDsList.forEach { equipmentContainerMRID ->
             networkService.resolveOrDeferReference(Resolvers.containers(this), equipmentContainerMRID)

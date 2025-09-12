@@ -10,6 +10,7 @@ package com.zepben.ewb.services.network.translator
 
 import com.google.protobuf.NullValue
 import com.zepben.ewb.cim.extensions.iec61968.assetinfo.RelayInfo
+import com.zepben.ewb.cim.extensions.iec61968.common.ContactDetails
 import com.zepben.ewb.cim.extensions.iec61968.metering.PanDemandResponseFunction
 import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
@@ -46,15 +47,18 @@ import com.zepben.ewb.cim.iec61970.base.scada.RemoteSource
 import com.zepben.ewb.cim.iec61970.base.wires.*
 import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.ewb.services.common.*
+import com.zepben.ewb.services.common.extensions.internEmpty
 import com.zepben.ewb.services.common.translator.*
 import com.zepben.ewb.services.network.whenNetworkServiceObject
 import com.zepben.protobuf.nc.NetworkIdentifiedObject
 import com.zepben.protobuf.cim.extensions.iec61968.assetinfo.RelayInfo as PBRelayInfo
+import com.zepben.protobuf.cim.extensions.iec61968.common.ContactDetails as PBContactDetails
 import com.zepben.protobuf.cim.extensions.iec61968.metering.PanDemandResponseFunction as PBPanDemandResponseFunction
 import com.zepben.protobuf.cim.extensions.iec61970.base.core.Site as PBSite
 import com.zepben.protobuf.cim.extensions.iec61970.base.feeder.Loop as PBLoop
 import com.zepben.protobuf.cim.extensions.iec61970.base.feeder.LvFeeder as PBLvFeeder
 import com.zepben.protobuf.cim.extensions.iec61970.base.generation.production.EvChargingUnit as PBEvChargingUnit
+import com.zepben.protobuf.cim.extensions.iec61970.base.protection.DirectionalCurrentRelay as PBDirectionalCurrentRelay
 import com.zepben.protobuf.cim.extensions.iec61970.base.protection.DistanceRelay as PBDistanceRelay
 import com.zepben.protobuf.cim.extensions.iec61970.base.protection.ProtectionRelayFunction as PBProtectionRelayFunction
 import com.zepben.protobuf.cim.extensions.iec61970.base.protection.ProtectionRelayScheme as PBProtectionRelayScheme
@@ -83,10 +87,12 @@ import com.zepben.protobuf.cim.iec61968.assets.AssetOrganisationRole as PBAssetO
 import com.zepben.protobuf.cim.iec61968.assets.AssetOwner as PBAssetOwner
 import com.zepben.protobuf.cim.iec61968.assets.Streetlight as PBStreetlight
 import com.zepben.protobuf.cim.iec61968.assets.Structure as PBStructure
+import com.zepben.protobuf.cim.iec61968.common.ElectronicAddress as PBElectronicAddress
 import com.zepben.protobuf.cim.iec61968.common.Location as PBLocation
 import com.zepben.protobuf.cim.iec61968.common.PositionPoint as PBPositionPoint
 import com.zepben.protobuf.cim.iec61968.common.StreetAddress as PBStreetAddress
 import com.zepben.protobuf.cim.iec61968.common.StreetDetail as PBStreetDetail
+import com.zepben.protobuf.cim.iec61968.common.TelephoneNumber as PBTelephoneNumber
 import com.zepben.protobuf.cim.iec61968.common.TownDetail as PBTownDetail
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo as PBCurrentTransformerInfo
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo as PBPotentialTransformerInfo
@@ -277,6 +283,7 @@ fun networkIdentifiedObject(identifiedObject: IdentifiedObject): NetworkIdentifi
             isPerLengthPhaseImpedance = { perLengthPhaseImpedance = it.toPb() },
             isCut = { cut = it.toPb() },
             isClamp = { clamp = it.toPb() },
+            isDirectionalCurrentRelay = { directionalCurrentRelay = it.toPb() },
         )
     }.build()
 
@@ -303,6 +310,35 @@ fun toPb(cim: RelayInfo, pb: PBRelayInfo.Builder): PBRelayInfo.Builder =
  * An extension for converting any RelayInfo into its protobuf counterpart.
  */
 fun RelayInfo.toPb(): PBRelayInfo = toPb(this, PBRelayInfo.newBuilder()).build()
+
+// ##############################
+// # Extensions IEC61968 Common #
+// ##############################
+
+/**
+ * Convert the [ContactDetails] into its protobuf counterpart.
+ *
+ * @param cim The [ContactDetails] to convert.
+ * @param pb The protobuf builder to populate.
+ * @return [pb] for fluent use.
+ */
+fun toPb(cim: ContactDetails, pb: PBContactDetails.Builder): PBContactDetails.Builder =
+    pb.apply {
+        cim.phoneNumbers?.forEach { toPb(it, addPhoneNumbersBuilder()) }
+        cim.contactAddress?.let { toPb(it, contactAddressBuilder) } ?: clearContactAddress()
+        cim.electronicAddresses?.forEach { toPb(it, addElectronicAddressesBuilder()) }
+
+        // TODO: remove
+        //cim.electronicAddresses?.forEach { addElectronicAddresses(toPb(it, electronicAddressesBuilderList)) } ?: clearElectronicAddresses()
+        //cim.electronicAddresses?.forEach { toPb(it, electronicAddressesBuilderList) } ?: clearElectronicAddresses()
+        //addAllElectronicAddresses(cim.electronicAddresses.forEach { toPb(it, electronicAddressesBuilderList) } )
+        cim.contactType?.let {contactTypeSet = it } ?: run { contactTypeNull = NullValue.NULL_VALUE }
+        cim.firstName?.let { firstNameSet = it } ?: run { firstNameNull = NullValue.NULL_VALUE }
+        cim.lastName?.let { lastNameSet = it } ?: run { lastNameNull = NullValue.NULL_VALUE }
+        preferredContactMethod = mapContactMethodType.toPb(cim.preferredContactMethod)
+        cim.businessName?.let { businessNameSet = it } ?: run { businessNameNull = NullValue.NULL_VALUE }
+    }
+
 
 // ################################
 // # Extensions IEC61968 Metering #
@@ -426,6 +462,25 @@ fun EvChargingUnit.toPb(): PBEvChargingUnit = toPb(this, PBEvChargingUnit.newBui
 // #######################################
 
 /**
+ * Convert the [DirectionalCurrentRelay] into its protobuf counterpart.
+ *
+ * @param cim The [DirectionalCurrentRelay] to convert.
+ * @param pb The protobuf builder to populate.
+ * @return [pb] for fluent use.
+ */
+fun toPb(cim: DirectionalCurrentRelay, pb: PBDirectionalCurrentRelay.Builder): PBDirectionalCurrentRelay.Builder =
+    pb.apply {
+        cim.directionalCharacteristicAngle?.let { directionalCharacteristicAngleSet = it } ?: run { directionalCharacteristicAngleNull = NullValue.NULL_VALUE }
+        polarizingQuantityType = mapPolarizingQuantityType.toPb(cim.polarizingQuantityType)
+        relayElementPhase = mapPhaseCode.toPb(cim.relayElementPhase)
+        cim.minimumPickupCurrent?.let { minimumPickupCurrentSet = it } ?: run { minimumPickupCurrentNull = NullValue.NULL_VALUE }
+        cim.currentLimit1?.let { currentLimit1Set = it } ?: run { currentLimit1Null = NullValue.NULL_VALUE }
+        cim.inverseTimeFlag?.also { inverseTimeFlagSet = it } ?: run { inverseTimeFlagNull = NullValue.NULL_VALUE }
+        cim.timeDelay1?.let { timeDelay1Set = it } ?: run { timeDelay1Null = NullValue.NULL_VALUE }
+        toPb(cim, prfBuilder)
+    }
+
+/**
  * Convert the [DistanceRelay] into its protobuf counterpart.
  *
  * @param cim The [DistanceRelay] to convert.
@@ -521,6 +576,11 @@ fun toPb(cim: VoltageRelay, pb: PBVoltageRelay.Builder): PBVoltageRelay.Builder 
     pb.apply {
         toPb(cim, prfBuilder)
     }
+
+/**
+ * An extension for converting any DirectionalCurrentRelay into its protobuf counterpart.
+ */
+fun DirectionalCurrentRelay.toPb(): PBDirectionalCurrentRelay = toPb(this, PBDirectionalCurrentRelay.newBuilder()).build()
 
 /**
  * An extension for converting any DistanceRelay into its protobuf counterpart.
@@ -924,6 +984,20 @@ fun Streetlight.toPb(): PBStreetlight = toPb(this, PBStreetlight.newBuilder()).b
 // ###################
 
 /**
+ * Convert the [ElectronicAddress] into its protobuf counterpart.
+ *
+ * @param cim The [ElectronicAddress] to convert.
+ * @param pb The protobuf builder to populate.
+ * @return [pb] for fluent use.
+ */
+fun toPb(cim: ElectronicAddress, pb: PBElectronicAddress.Builder): PBElectronicAddress.Builder =
+    pb.apply {
+        cim.email1?.let { email1Set = it } ?: run { email1Null = NullValue.NULL_VALUE }
+        cim.isPrimary?.let { isPrimarySet = it } ?: run { isPrimaryNull = NullValue.NULL_VALUE }
+        cim.description?.let { descriptionSet = it } ?: run { descriptionNull = NullValue.NULL_VALUE }
+    }
+
+/**
  * Convert the [Location] into its protobuf counterpart.
  *
  * @param cim The [Location] to convert.
@@ -982,6 +1056,26 @@ fun toPb(cim: StreetDetail, pb: PBStreetDetail.Builder): PBStreetDetail.Builder 
         cim.suiteNumber?.also { suiteNumberSet = it } ?: run { suiteNumberNull = NullValue.NULL_VALUE }
         cim.type?.also { typeSet = it } ?: run { typeNull = NullValue.NULL_VALUE }
         cim.displayAddress?.also { displayAddressSet = it } ?: run { displayAddressNull = NullValue.NULL_VALUE }
+    }
+
+/**
+ * Convert the [TelephoneNumber] into its protobuf counterpart.
+ *
+ * @param cim The [TelephoneNumber] to convert.
+ * @param pb The protobuf builder to populate.
+ * @return [pb] for fluent use.
+ */
+fun toPb(cim: TelephoneNumber, pb: PBTelephoneNumber.Builder): PBTelephoneNumber.Builder =
+    pb.apply {
+        cim.areaCode?.let { areaCodeSet = it } ?: run { areaCodeNull = NullValue.NULL_VALUE }
+        cim.cityCode?.let { cityCodeSet = it } ?: run { cityCodeNull = NullValue.NULL_VALUE }
+        cim.countryCode?.let { countryCodeSet = it } ?: run { countryCodeNull = NullValue.NULL_VALUE }
+        cim.dialOut?.let { dialOutSet = it } ?: run { dialOutNull = NullValue.NULL_VALUE }
+        cim.extension?.let { extensionSet = it } ?: run { extensionNull = NullValue.NULL_VALUE }
+        cim.internationalPrefix?.let { internationalPrefixSet = it } ?: run { internationalPrefixNull = NullValue.NULL_VALUE }
+        cim.localNumber?.let { localNumberSet = it } ?: run { localNumberNull = NullValue.NULL_VALUE }
+        cim.isPrimary?.let { isPrimarySet = it } ?: run { isPrimaryNull = NullValue.NULL_VALUE }
+        cim.description?.let { descriptionSet = it } ?: run { descriptionNull = NullValue.NULL_VALUE }
     }
 
 /**
@@ -1164,6 +1258,7 @@ fun toPb(cim: UsagePoint, pb: PBUsagePoint.Builder): PBUsagePoint.Builder =
         cim.equipment.forEach { addEquipmentMRIDs(it.mRID) }
         clearEndDeviceMRIDs()
         cim.endDevices.forEach { addEndDeviceMRIDs(it.mRID) }
+        cim.contacts.forEach { toPb(it, addContactsBuilder()) }
         toPb(cim, ioBuilder)
     }
 
@@ -2943,6 +3038,14 @@ class NetworkCimToProto : BaseCimToProto() {
     // #######################################
     // # Extensions IEC61970 Base Protection #
     // #######################################
+
+    /**
+     * Convert the [DirectionalCurrentRelay] into its protobuf counterpart.
+     *
+     * @param cim The [DirectionalCurrentRelay] to convert.
+     * @return The protobuf form of [cim].
+     */
+    fun toPb(cim: DirectionalCurrentRelay): PBDirectionalCurrentRelay = cim.toPb()
 
     /**
      * Convert the [DistanceRelay] into its protobuf counterpart.

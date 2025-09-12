@@ -63,7 +63,8 @@ internal class ChangeSetTest {
         NoChanges(DatabaseType.CUSTOMER, 58),
         NoChanges(DatabaseType.CUSTOMER, 59),
         NoChanges(DatabaseType.CUSTOMER, 60),
-        ChangeSet61CustomerValidator
+        ChangeSet61CustomerValidator,
+        NoChanges(DatabaseType.CUSTOMER, 62),
     ).associateBy { it.version }
 
     private val diagramChangeSetValidators = listOf(
@@ -79,6 +80,7 @@ internal class ChangeSetTest {
         NoChanges(DatabaseType.DIAGRAM, 59),
         NoChanges(DatabaseType.DIAGRAM, 60),
         ChangeSet61DiagramValidator,
+        NoChanges(DatabaseType.DIAGRAM, 62),
     ).associateBy { it.version }
 
     private val networkChangeSetValidators = listOf(
@@ -94,6 +96,7 @@ internal class ChangeSetTest {
         ChangeSet59NetworkValidator,
         ChangeSet60NetworkValidator,
         ChangeSet61NetworkValidator,
+        ChangeSet62NetworkValidator,
     ).associateBy { it.version }
 
     @Test

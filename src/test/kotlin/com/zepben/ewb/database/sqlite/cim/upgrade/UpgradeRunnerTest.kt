@@ -134,6 +134,7 @@ internal class UpgradeRunnerTest {
             assertThat(preSplitChangeSets.maxOf { it.number }, equalTo(postSplitChangeSets.minOf { it.number } - 1))
 
             // If upgrades are supported, make sure they are all registered in the correct order.
+            // If your tests fail on this with extra `actual` results, you forgot to increment src/com/zepben/ewb/database/sqlite/cim/tables/TableCimVersion.kt
             if (actualChangeSets.isNotEmpty())
                 assertThat(actualChangeSets.map { it.number }, equalTo((actualChangeSets.minOf { it.number }..tableCimVersion.supportedVersion).toList()))
         }

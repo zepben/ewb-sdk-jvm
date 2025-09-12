@@ -15,7 +15,6 @@ import com.zepben.ewb.cim.iec61968.customers.CustomerAgreement
 import com.zepben.ewb.cim.iec61968.customers.PricingStructure
 import com.zepben.ewb.cim.iec61968.customers.Tariff
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
-import com.zepben.ewb.services.common.UNKNOWN_INT
 import com.zepben.ewb.services.common.translator.BaseCimToProto
 import com.zepben.ewb.services.common.translator.toPb
 import com.zepben.ewb.services.customer.whenCustomerServiceObject

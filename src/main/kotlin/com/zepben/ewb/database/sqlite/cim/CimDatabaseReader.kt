@@ -34,6 +34,7 @@ abstract class CimDatabaseReader<TTables : CimDatabaseTables, TService : BaseSer
     private val databaseTables: TTables,
     private val createMetadataReader: (TTables, Connection) -> MetadataCollectionReader,
     private val createServiceReader: (TTables, Connection) -> BaseServiceReader<TService>,
+    private val afterServiceReadExtension: ((TService) -> Boolean)? = null
 ) {
 
     protected val logger: Logger = LoggerFactory.getLogger(javaClass)
@@ -53,20 +54,20 @@ abstract class CimDatabaseReader<TTables : CimDatabaseTables, TService : BaseSer
         }
         logger.info("Unresolved references were all resolved during read.")
 
-        return true
+        return afterServiceReadExtension?.invoke(service) ?: true
     }
 
     /**
      * Read the database.
      */
-    fun read(service: TService): Boolean =
+    fun read(service: TService, afterServiceReadFunction: Boolean? = true): Boolean =
         try {
             require(!hasBeenUsed) { "You can only use the database reader once." }
             hasBeenUsed = true
 
             beforeRead()
                 && readService(service)
-                && afterServiceRead(service)
+                && if (afterServiceReadFunction ?: true) afterServiceRead(service) else true
         } catch (e: Exception) {
             logger.error("Unable to read database: " + e.message)
             false

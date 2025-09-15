@@ -52,14 +52,12 @@ class NetworkDatabaseReader internal constructor(
     private val phaseInferrer: PhaseInferrer,
     private val assignToFeeders: AssignToFeeders,
     private val assignToLvFeeders: AssignToLvFeeders,
-    afterServiceReadExtension: ((NetworkService) -> Boolean)? = null
 ) : CimDatabaseReader<NetworkDatabaseTables, NetworkService>(
     connection,
     databaseDescription,
     databaseTables,
     createMetadataReader,
     createServiceReader,
-    afterServiceReadExtension
 ) {
 
     @JvmOverloads
@@ -67,7 +65,6 @@ class NetworkDatabaseReader internal constructor(
         connection: Connection,
         databaseDescription: String,
         inferPhases: Boolean = true,
-        afterServiceReadExtension: ((NetworkService) -> Boolean)? = null
     ) : this(
         connection,
         databaseDescription,
@@ -80,7 +77,6 @@ class NetworkDatabaseReader internal constructor(
         Tracing.phaseInferrer(),
         Tracing.assignEquipmentToFeeders(),
         Tracing.assignEquipmentToLvFeeders(),
-        afterServiceReadExtension
     )
 
     override fun afterServiceRead(service: NetworkService): Boolean =

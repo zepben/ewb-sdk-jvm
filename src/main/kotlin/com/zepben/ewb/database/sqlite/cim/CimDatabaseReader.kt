@@ -34,7 +34,6 @@ abstract class CimDatabaseReader<TTables : CimDatabaseTables, TService : BaseSer
     private val databaseTables: TTables,
     private val createMetadataReader: (TTables, Connection) -> MetadataCollectionReader,
     private val createServiceReader: (TTables, Connection) -> BaseServiceReader<TService>,
-    private val afterServiceReadExtension: ((TService) -> Boolean)? = null
 ) {
 
     protected val logger: Logger = LoggerFactory.getLogger(javaClass)
@@ -54,7 +53,7 @@ abstract class CimDatabaseReader<TTables : CimDatabaseTables, TService : BaseSer
         }
         logger.info("Unresolved references were all resolved during read.")
 
-        return afterServiceReadExtension?.invoke(service) ?: true
+        return true
     }
 
     /**

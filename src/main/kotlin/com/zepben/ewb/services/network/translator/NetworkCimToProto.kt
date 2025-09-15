@@ -305,7 +305,7 @@ fun toPb(cim: RelayInfo, pb: PBRelayInfo.Builder): PBRelayInfo.Builder =
     }
 
 /**
- * An extension for converting any RelayInfo into its protobuf counterpart.
+ * An extension for converting any [RelayInfo] into its protobuf counterpart.
  */
 fun RelayInfo.toPb(): PBRelayInfo = toPb(this, PBRelayInfo.newBuilder()).build()
 
@@ -337,7 +337,7 @@ fun toPb(cim: ContactDetails, pb: PBContactDetails.Builder): PBContactDetails.Bu
     }
 
 /**
- * An extension for converting any ContactDetails into its protobuf counterpart.
+ * An extension for converting any [ContactDetails] into its protobuf counterpart.
  */
 fun ContactDetails.toPb(): PBContactDetails = toPb(this, PBContactDetails.newBuilder()).build()
 
@@ -360,7 +360,7 @@ fun toPb(cim: PanDemandResponseFunction, pb: PBPanDemandResponseFunction.Builder
     }
 
 /**
- * An extension for converting any PanDemandResponseFunction into its protobuf counterpart.
+ * An extension for converting any [PanDemandResponseFunction] into its protobuf counterpart.
  */
 fun PanDemandResponseFunction.toPb(): PBPanDemandResponseFunction = toPb(this, PBPanDemandResponseFunction.newBuilder()).build()
 
@@ -379,7 +379,7 @@ fun toPb(cim: Site, pb: PBSite.Builder): PBSite.Builder =
     pb.apply { toPb(cim, ecBuilder) }
 
 /**
- * An extension for converting any Site into its protobuf counterpart.
+ * An extension for converting any [Site] into its protobuf counterpart.
  */
 fun Site.toPb(): PBSite = toPb(this, PBSite.newBuilder()).build()
 
@@ -428,12 +428,12 @@ fun toPb(cim: LvFeeder, pb: PBLvFeeder.Builder): PBLvFeeder.Builder =
     }
 
 /**
- * An extension for converting any Loop into its protobuf counterpart.
+ * An extension for converting any [Loop] into its protobuf counterpart.
  */
 fun Loop.toPb(): PBLoop = toPb(this, PBLoop.newBuilder()).build()
 
 /**
- * An extension for converting any LvFeeder into its protobuf counterpart.
+ * An extension for converting any [LvFeeder] into its protobuf counterpart.
  */
 fun LvFeeder.toPb(): PBLvFeeder = toPb(this, PBLvFeeder.newBuilder()).build()
 
@@ -454,7 +454,7 @@ fun toPb(cim: EvChargingUnit, pb: PBEvChargingUnit.Builder): PBEvChargingUnit.Bu
     }
 
 /**
- * An extension for converting any EvChargingUnit into its protobuf counterpart.
+ * An extension for converting any [EvChargingUnit] into its protobuf counterpart.
  */
 fun EvChargingUnit.toPb(): PBEvChargingUnit = toPb(this, PBEvChargingUnit.newBuilder()).build()
 
@@ -579,27 +579,27 @@ fun toPb(cim: VoltageRelay, pb: PBVoltageRelay.Builder): PBVoltageRelay.Builder 
     }
 
 /**
- * An extension for converting any DirectionalCurrentRelay into its protobuf counterpart.
+ * An extension for converting any [DirectionalCurrentRelay] into its protobuf counterpart.
  */
 fun DirectionalCurrentRelay.toPb(): PBDirectionalCurrentRelay = toPb(this, PBDirectionalCurrentRelay.newBuilder()).build()
 
 /**
- * An extension for converting any DistanceRelay into its protobuf counterpart.
+ * An extension for converting any [DistanceRelay] into its protobuf counterpart.
  */
 fun DistanceRelay.toPb(): PBDistanceRelay = toPb(this, PBDistanceRelay.newBuilder()).build()
 
 /**
- * An extension for converting any ProtectionRelayScheme into its protobuf counterpart.
+ * An extension for converting any [ProtectionRelayScheme] into its protobuf counterpart.
  */
 fun ProtectionRelayScheme.toPb(): PBProtectionRelayScheme = toPb(this, PBProtectionRelayScheme.newBuilder()).build()
 
 /**
- * An extension for converting any ProtectionRelaySystem into its protobuf counterpart.
+ * An extension for converting any [ProtectionRelaySystem] into its protobuf counterpart.
  */
 fun ProtectionRelaySystem.toPb(): PBProtectionRelaySystem = toPb(this, PBProtectionRelaySystem.newBuilder()).build()
 
 /**
- * An extension for converting any VoltageRelay into its protobuf counterpart.
+ * An extension for converting any [VoltageRelay] into its protobuf counterpart.
  */
 fun VoltageRelay.toPb(): PBVoltageRelay = toPb(this, PBVoltageRelay.newBuilder()).build()
 
@@ -624,7 +624,7 @@ fun toPb(cim: BatteryControl, pb: PBBatteryControl.Builder): PBBatteryControl.Bu
     }
 
 /**
- * An extension for converting any BatteryControl into its protobuf counterpart.
+ * An extension for converting any [BatteryControl] into its protobuf counterpart.
  */
 fun BatteryControl.toPb(): PBBatteryControl = toPb(this, PBBatteryControl.newBuilder()).build()
 
@@ -826,52 +826,52 @@ fun toPb(cim: WireInfo, pb: PBWireInfo.Builder): PBWireInfo.Builder =
     }
 
 /**
- * An extension for converting any CableInfo into its protobuf counterpart.
+ * An extension for converting any [CableInfo] into its protobuf counterpart.
  */
 fun CableInfo.toPb(): PBCableInfo = toPb(this, PBCableInfo.newBuilder()).build()
 
 /**
- * An extension for converting any NoLoadTest into its protobuf counterpart.
+ * An extension for converting any [NoLoadTest] into its protobuf counterpart.
  */
 fun NoLoadTest.toPb(): PBNoLoadTest = toPb(this, PBNoLoadTest.newBuilder()).build()
 
 /**
- * An extension for converting any OpenCircuitTest into its protobuf counterpart.
+ * An extension for converting any [OpenCircuitTest] into its protobuf counterpart.
  */
 fun OpenCircuitTest.toPb(): PBOpenCircuitTest = toPb(this, PBOpenCircuitTest.newBuilder()).build()
 
 /**
- * An extension for converting any OverheadWireInfo into its protobuf counterpart.
+ * An extension for converting any [OverheadWireInfo] into its protobuf counterpart.
  */
 fun OverheadWireInfo.toPb(): PBOverheadWireInfo = toPb(this, PBOverheadWireInfo.newBuilder()).build()
 
 /**
- * An extension for converting any PowerTransformerInfo into its protobuf counterpart.
+ * An extension for converting any [PowerTransformerInfo] into its protobuf counterpart.
  */
 fun PowerTransformerInfo.toPb(): PBPowerTransformerInfo = toPb(this, PBPowerTransformerInfo.newBuilder()).build()
 
 /**
- * An extension for converting any ShortCircuitTest into its protobuf counterpart.
+ * An extension for converting any [ShortCircuitTest] into its protobuf counterpart.
  */
 fun ShortCircuitTest.toPb(): PBShortCircuitTest = toPb(this, PBShortCircuitTest.newBuilder()).build()
 
 /**
- * An extension for converting any ShuntCompensatorInfo into its protobuf counterpart.
+ * An extension for converting any [ShuntCompensatorInfo] into its protobuf counterpart.
  */
 fun ShuntCompensatorInfo.toPb(): PBShuntCompensatorInfo = toPb(this, PBShuntCompensatorInfo.newBuilder()).build()
 
 /**
- * An extension for converting any SwitchInfo into its protobuf counterpart.
+ * An extension for converting any [SwitchInfo] into its protobuf counterpart.
  */
 fun SwitchInfo.toPb(): PBSwitchInfo = toPb(this, PBSwitchInfo.newBuilder()).build()
 
 /**
- * An extension for converting any TransformerEndInfo into its protobuf counterpart.
+ * An extension for converting any [TransformerEndInfo] into its protobuf counterpart.
  */
 fun TransformerEndInfo.toPb(): PBTransformerEndInfo = toPb(this, PBTransformerEndInfo.newBuilder()).build()
 
 /**
- * An extension for converting any TransformerTankInfo into its protobuf counterpart.
+ * An extension for converting any [TransformerTankInfo] into its protobuf counterpart.
  */
 fun TransformerTankInfo.toPb(): PBTransformerTankInfo = toPb(this, PBTransformerTankInfo.newBuilder()).build()
 
@@ -971,12 +971,12 @@ fun toPb(cim: Structure, pb: PBStructure.Builder): PBStructure.Builder =
     pb.apply { toPb(cim, acBuilder) }
 
 /**
- * An extension for converting any AssetOwner into its protobuf counterpart.
+ * An extension for converting any [AssetOwner] into its protobuf counterpart.
  */
 fun AssetOwner.toPb(): PBAssetOwner = toPb(this, PBAssetOwner.newBuilder()).build()
 
 /**
- * An extension for converting any Streetlight into its protobuf counterpart.
+ * An extension for converting any [Streetlight] into its protobuf counterpart.
  */
 fun Streetlight.toPb(): PBStreetlight = toPb(this, PBStreetlight.newBuilder()).build()
 
@@ -1095,17 +1095,17 @@ fun toPb(cim: TownDetail, pb: PBTownDetail.Builder): PBTownDetail.Builder =
     }
 
 /**
- * An extension for converting any ElectronicAddress into its protobuf counterpart.
+ * An extension for converting any [ElectronicAddress] into its protobuf counterpart.
  */
 fun ElectronicAddress.toPb(): PBElectronicAddress = toPb(this, PBElectronicAddress.newBuilder()).build()
 
 /**
- * An extension for converting any Location into its protobuf counterpart.
+ * An extension for converting any [Location] into its protobuf counterpart.
  */
 fun Location.toPb(): PBLocation = toPb(this, PBLocation.newBuilder()).build()
 
 /**
- * An extension for converting any TelephoneNumber into its protobuf counterpart.
+ * An extension for converting any [TelephoneNumber] into its protobuf counterpart.
  */
 fun TelephoneNumber.toPb(): PBTelephoneNumber = toPb(this, PBTelephoneNumber.newBuilder()).build()
 
@@ -1156,12 +1156,12 @@ fun toPb(cim: PotentialTransformerInfo, pb: PBPotentialTransformerInfo.Builder):
     }
 
 /**
- * An extension for converting any CurrentTransformerInfo into its protobuf counterpart.
+ * An extension for converting any [CurrentTransformerInfo] into its protobuf counterpart.
  */
 fun CurrentTransformerInfo.toPb(): PBCurrentTransformerInfo = toPb(this, PBCurrentTransformerInfo.newBuilder()).build()
 
 /**
- * An extension for converting any PotentialTransformerInfo into its protobuf counterpart.
+ * An extension for converting any [PotentialTransformerInfo] into its protobuf counterpart.
  */
 fun PotentialTransformerInfo.toPb(): PBPotentialTransformerInfo = toPb(this, PBPotentialTransformerInfo.newBuilder()).build()
 
@@ -1185,7 +1185,7 @@ fun toPb(cim: Pole, pb: PBPole.Builder): PBPole.Builder =
     }
 
 /**
- * An extension for converting any Pole into its protobuf counterpart.
+ * An extension for converting any [Pole] into its protobuf counterpart.
  */
 fun Pole.toPb(): PBPole = toPb(this, PBPole.newBuilder()).build()
 
@@ -1277,12 +1277,12 @@ fun toPb(cim: UsagePoint, pb: PBUsagePoint.Builder): PBUsagePoint.Builder =
     }
 
 /**
- * An extension for converting any Meter into its protobuf counterpart.
+ * An extension for converting any [Meter] into its protobuf counterpart.
  */
 fun Meter.toPb(): PBMeter = toPb(this, PBMeter.newBuilder()).build()
 
 /**
- * An extension for converting any UsagePoint into its protobuf counterpart.
+ * An extension for converting any [UsagePoint] into its protobuf counterpart.
  */
 fun UsagePoint.toPb(): PBUsagePoint = toPb(this, PBUsagePoint.newBuilder()).build()
 
@@ -1301,7 +1301,7 @@ fun toPb(cim: OperationalRestriction, pb: PBOperationalRestriction.Builder): PBO
     pb.apply { toPb(cim, docBuilder) }
 
 /**
- * An extension for converting any OperationalRestriction into its protobuf counterpart.
+ * An extension for converting any [OperationalRestriction] into its protobuf counterpart.
  */
 fun OperationalRestriction.toPb(): PBOperationalRestriction = toPb(this, PBOperationalRestriction.newBuilder()).build()
 
@@ -1372,17 +1372,17 @@ fun toPb(cim: Sensor, pb: PBSensor.Builder): PBSensor.Builder =
     }
 
 /**
- * An extension for converting any CurrentTransformer into its protobuf counterpart.
+ * An extension for converting any [CurrentTransformer] into its protobuf counterpart.
  */
 fun CurrentTransformer.toPb(): PBCurrentTransformer = toPb(this, PBCurrentTransformer.newBuilder()).build()
 
 /**
- * An extension for converting any FaultIndicator into its protobuf counterpart.
+ * An extension for converting any [FaultIndicator] into its protobuf counterpart.
  */
 fun FaultIndicator.toPb(): PBFaultIndicator = toPb(this, PBFaultIndicator.newBuilder()).build()
 
 /**
- * An extension for converting any PotentialTransformer into its protobuf counterpart.
+ * An extension for converting any [PotentialTransformer] into its protobuf counterpart.
  */
 fun PotentialTransformer.toPb(): PBPotentialTransformer = toPb(this, PBPotentialTransformer.newBuilder()).build()
 
@@ -1624,42 +1624,42 @@ fun toPb(cim: Terminal, pb: PBTerminal.Builder): PBTerminal.Builder =
     }
 
 /**
- * An extension for converting any BaseVoltage into its protobuf counterpart.
+ * An extension for converting any [BaseVoltage] into its protobuf counterpart.
  */
 fun BaseVoltage.toPb(): PBBaseVoltage = toPb(this, PBBaseVoltage.newBuilder()).build()
 
 /**
- * An extension for converting any ConnectivityNode into its protobuf counterpart.
+ * An extension for converting any [ConnectivityNode] into its protobuf counterpart.
  */
 fun ConnectivityNode.toPb(): PBConnectivityNode = toPb(this, PBConnectivityNode.newBuilder()).build()
 
 /**
- * An extension for converting any CurveData into its protobuf counterpart.
+ * An extension for converting any [CurveData] into its protobuf counterpart.
  */
 fun CurveData.toPb(): PBCurveData = toPb(this, PBCurveData.newBuilder()).build()
 
 /**
- * An extension for converting any Feeder into its protobuf counterpart.
+ * An extension for converting any [Feeder] into its protobuf counterpart.
  */
 fun Feeder.toPb(): PBFeeder = toPb(this, PBFeeder.newBuilder()).build()
 
 /**
- * An extension for converting any GeographicalRegion into its protobuf counterpart.
+ * An extension for converting any [GeographicalRegion] into its protobuf counterpart.
  */
 fun GeographicalRegion.toPb(): PBGeographicalRegion = toPb(this, PBGeographicalRegion.newBuilder()).build()
 
 /**
- * An extension for converting any SubGeographicalRegion into its protobuf counterpart.
+ * An extension for converting any [SubGeographicalRegion] into its protobuf counterpart.
  */
 fun SubGeographicalRegion.toPb(): PBSubGeographicalRegion = toPb(this, PBSubGeographicalRegion.newBuilder()).build()
 
 /**
- * An extension for converting any Substation into its protobuf counterpart.
+ * An extension for converting any [Substation] into its protobuf counterpart.
  */
 fun Substation.toPb(): PBSubstation = toPb(this, PBSubstation.newBuilder()).build()
 
 /**
- * An extension for converting any Terminal into its protobuf counterpart.
+ * An extension for converting any [Terminal] into its protobuf counterpart.
  */
 fun Terminal.toPb(): PBTerminal = toPb(this, PBTerminal.newBuilder()).build()
 
@@ -1706,7 +1706,7 @@ fun toPb(cim: EquivalentEquipment, pb: PBEquivalentEquipment.Builder): PBEquival
     pb.apply { toPb(cim, ceBuilder) }
 
 /**
- * An extension for converting any EquivalentBranch into its protobuf counterpart.
+ * An extension for converting any [EquivalentBranch] into its protobuf counterpart.
  */
 fun EquivalentBranch.toPb(): PBEquivalentBranch = toPb(this, PBEquivalentBranch.newBuilder()).build()
 
@@ -1770,17 +1770,17 @@ fun toPb(cim: PowerElectronicsWindUnit, pb: PBPowerElectronicsWindUnit.Builder):
     }
 
 /**
- * An extension for converting any BatteryUnit into its protobuf counterpart.
+ * An extension for converting any [BatteryUnit] into its protobuf counterpart.
  */
 fun BatteryUnit.toPb(): PBBatteryUnit = toPb(this, PBBatteryUnit.newBuilder()).build()
 
 /**
- * An extension for converting any PhotoVoltaicUnit into its protobuf counterpart.
+ * An extension for converting any [PhotoVoltaicUnit] into its protobuf counterpart.
  */
 fun PhotoVoltaicUnit.toPb(): PBPhotoVoltaicUnit = toPb(this, PBPhotoVoltaicUnit.newBuilder()).build()
 
 /**
- * An extension for converting any PowerElectronicsWindUnit into its protobuf counterpart.
+ * An extension for converting any [PowerElectronicsWindUnit] into its protobuf counterpart.
  */
 fun PowerElectronicsWindUnit.toPb(): PBPowerElectronicsWindUnit = toPb(this, PBPowerElectronicsWindUnit.newBuilder()).build()
 
@@ -1860,22 +1860,22 @@ fun toPb(cim: Measurement, pb: PBMeasurement.Builder): PBMeasurement.Builder =
     }
 
 /**
- * An extension for converting any Accumulator into its protobuf counterpart.
+ * An extension for converting any [Accumulator] into its protobuf counterpart.
  */
 fun Accumulator.toPb(): PBAccumulator = toPb(this, PBAccumulator.newBuilder()).build()
 
 /**
- * An extension for converting any Analog into its protobuf counterpart.
+ * An extension for converting any [Analog] into its protobuf counterpart.
  */
 fun Analog.toPb(): PBAnalog = toPb(this, PBAnalog.newBuilder()).build()
 
 /**
- * An extension for converting any Control into its protobuf counterpart.
+ * An extension for converting any [Control] into its protobuf counterpart.
  */
 fun Control.toPb(): PBControl = toPb(this, PBControl.newBuilder()).build()
 
 /**
- * An extension for converting any Discrete into its protobuf counterpart.
+ * An extension for converting any [Discrete] into its protobuf counterpart.
  */
 fun Discrete.toPb(): PBDiscrete = toPb(this, PBDiscrete.newBuilder()).build()
 
@@ -1899,7 +1899,7 @@ fun toPb(cim: CurrentRelay, pb: PBCurrentRelay.Builder): PBCurrentRelay.Builder 
     }
 
 /**
- * An extension for converting any CurrentRelay into its protobuf counterpart.
+ * An extension for converting any [CurrentRelay] into its protobuf counterpart.
  */
 fun CurrentRelay.toPb(): PBCurrentRelay = toPb(this, PBCurrentRelay.newBuilder()).build()
 
@@ -1944,12 +1944,12 @@ fun toPb(cim: RemoteSource, pb: PBRemoteSource.Builder): PBRemoteSource.Builder 
     }
 
 /**
- * An extension for converting any RemoteControl into its protobuf counterpart.
+ * An extension for converting any [RemoteControl] into its protobuf counterpart.
  */
 fun RemoteControl.toPb(): PBRemoteControl = toPb(this, PBRemoteControl.newBuilder()).build()
 
 /**
- * An extension for converting any RemoteSource into its protobuf counterpart.
+ * An extension for converting any [RemoteSource] into its protobuf counterpart.
  */
 fun RemoteSource.toPb(): PBRemoteSource = toPb(this, PBRemoteSource.newBuilder()).build()
 
@@ -2779,167 +2779,167 @@ fun toPb(cim: TransformerStarImpedance, pb: PBTransformerStarImpedance.Builder):
     }
 
 /**
- * An extension for converting any AcLineSegment into its protobuf counterpart.
+ * An extension for converting any [AcLineSegment] into its protobuf counterpart.
  */
 fun AcLineSegment.toPb(): PBAcLineSegment = toPb(this, PBAcLineSegment.newBuilder()).build()
 
 /**
- * An extension for converting any Breaker into its protobuf counterpart.
+ * An extension for converting any [Breaker] into its protobuf counterpart.
  */
 fun Breaker.toPb(): PBBreaker = toPb(this, PBBreaker.newBuilder()).build()
 
 /**
- * An extension for converting any BusbarSection into its protobuf counterpart.
+ * An extension for converting any [BusbarSection] into its protobuf counterpart.
  */
 fun BusbarSection.toPb(): PBBusbarSection = toPb(this, PBBusbarSection.newBuilder()).build()
 
 /**
- * An extension for converting any Clamp into its protobuf counterpart.
+ * An extension for converting any [Clamp] into its protobuf counterpart.
  */
 fun Clamp.toPb(): PBClamp = toPb(this, PBClamp.newBuilder()).build()
 
 /**
- * An extension for converting any Cut into its protobuf counterpart.
+ * An extension for converting any [Cut] into its protobuf counterpart.
  */
 fun Cut.toPb(): PBCut = toPb(this, PBCut.newBuilder()).build()
 
 /**
- * An extension for converting any Disconnector into its protobuf counterpart.
+ * An extension for converting any [Disconnector] into its protobuf counterpart.
  */
 fun Disconnector.toPb(): PBDisconnector = toPb(this, PBDisconnector.newBuilder()).build()
 
 /**
- * An extension for converting any EnergyConsumer into its protobuf counterpart.
+ * An extension for converting any [EnergyConsumer] into its protobuf counterpart.
  */
 fun EnergyConsumer.toPb(): PBEnergyConsumer = toPb(this, PBEnergyConsumer.newBuilder()).build()
 
 /**
- * An extension for converting any EnergyConsumerPhase into its protobuf counterpart.
+ * An extension for converting any [EnergyConsumerPhase] into its protobuf counterpart.
  */
 fun EnergyConsumerPhase.toPb(): PBEnergyConsumerPhase = toPb(this, PBEnergyConsumerPhase.newBuilder()).build()
 
 /**
- * An extension for converting any EnergySource into its protobuf counterpart.
+ * An extension for converting any [EnergySource] into its protobuf counterpart.
  */
 fun EnergySource.toPb(): PBEnergySource = toPb(this, PBEnergySource.newBuilder()).build()
 
 /**
- * An extension for converting any EnergySourcePhase into its protobuf counterpart.
+ * An extension for converting any [EnergySourcePhase] into its protobuf counterpart.
  */
 fun EnergySourcePhase.toPb(): PBEnergySourcePhase = toPb(this, PBEnergySourcePhase.newBuilder()).build()
 
 /**
- * An extension for converting any Fuse into its protobuf counterpart.
+ * An extension for converting any [Fuse] into its protobuf counterpart.
  */
 fun Fuse.toPb(): PBFuse = toPb(this, PBFuse.newBuilder()).build()
 
 /**
- * An extension for converting any Ground into its protobuf counterpart.
+ * An extension for converting any [Ground] into its protobuf counterpart.
  */
 fun Ground.toPb(): PBGround = toPb(this, PBGround.newBuilder()).build()
 
 /**
- * An extension for converting any GroundDisconnector into its protobuf counterpart.
+ * An extension for converting any [GroundDisconnector] into its protobuf counterpart.
  */
 fun GroundDisconnector.toPb(): PBGroundDisconnector = toPb(this, PBGroundDisconnector.newBuilder()).build()
 
 /**
- * An extension for converting any GroundingImpedance into its protobuf counterpart.
+ * An extension for converting any [GroundingImpedance] into its protobuf counterpart.
  */
 fun GroundingImpedance.toPb(): PBGroundingImpedance = toPb(this, PBGroundingImpedance.newBuilder()).build()
 
 /**
- * An extension for converting any Jumper into its protobuf counterpart.
+ * An extension for converting any [Jumper] into its protobuf counterpart.
  */
 fun Jumper.toPb(): PBJumper = toPb(this, PBJumper.newBuilder()).build()
 
 /**
- * An extension for converting any Junction into its protobuf counterpart.
+ * An extension for converting any [Junction] into its protobuf counterpart.
  */
 fun Junction.toPb(): PBJunction = toPb(this, PBJunction.newBuilder()).build()
 
 /**
- * An extension for converting any LinearShuntCompensator into its protobuf counterpart.
+ * An extension for converting any [LinearShuntCompensator] into its protobuf counterpart.
  */
 fun LinearShuntCompensator.toPb(): PBLinearShuntCompensator = toPb(this, PBLinearShuntCompensator.newBuilder()).build()
 
 /**
- * An extension for converting any LoadBreakSwitch into its protobuf counterpart.
+ * An extension for converting any [LoadBreakSwitch] into its protobuf counterpart.
  */
 fun LoadBreakSwitch.toPb(): PBLoadBreakSwitch = toPb(this, PBLoadBreakSwitch.newBuilder()).build()
 
 /**
- * An extension for converting any PerLengthPhaseImpedance into its protobuf counterpart.
+ * An extension for converting any [PerLengthPhaseImpedance] into its protobuf counterpart.
  */
 fun PerLengthPhaseImpedance.toPb(): PBPerLengthPhaseImpedance = toPb(this, PBPerLengthPhaseImpedance.newBuilder()).build()
 
 /**
- * An extension for converting any PerLengthSequenceImpedance into its protobuf counterpart.
+ * An extension for converting any [PerLengthSequenceImpedance] into its protobuf counterpart.
  */
 fun PerLengthSequenceImpedance.toPb(): PBPerLengthSequenceImpedance = toPb(this, PBPerLengthSequenceImpedance.newBuilder()).build()
 
 /**
- * An extension for converting any PetersenCoil into its protobuf counterpart.
+ * An extension for converting any [PetersenCoil] into its protobuf counterpart.
  */
 fun PetersenCoil.toPb(): PBPetersenCoil = toPb(this, PBPetersenCoil.newBuilder()).build()
 
 /**
- * An extension for converting any PowerElectronicsConnection into its protobuf counterpart.
+ * An extension for converting any [PowerElectronicsConnection] into its protobuf counterpart.
  */
 fun PowerElectronicsConnection.toPb(): PBPowerElectronicsConnection = toPb(this, PBPowerElectronicsConnection.newBuilder()).build()
 
 /**
- * An extension for converting any PowerElectronicsConnectionPhase into its protobuf counterpart.
+ * An extension for converting any [PowerElectronicsConnectionPhase] into its protobuf counterpart.
  */
 fun PowerElectronicsConnectionPhase.toPb(): PBPowerElectronicsConnectionPhase = toPb(this, PBPowerElectronicsConnectionPhase.newBuilder()).build()
 
 /**
- * An extension for converting any PowerTransformer into its protobuf counterpart.
+ * An extension for converting any [PowerTransformer] into its protobuf counterpart.
  */
 fun PowerTransformer.toPb(): PBPowerTransformer = toPb(this, PBPowerTransformer.newBuilder()).build()
 
 /**
- * An extension for converting any PowerTransformerEnd into its protobuf counterpart.
+ * An extension for converting any [PowerTransformerEnd] into its protobuf counterpart.
  */
 fun PowerTransformerEnd.toPb(): PBPowerTransformerEnd = toPb(this, PBPowerTransformerEnd.newBuilder()).build()
 
 /**
- * An extension for converting any RatioTapChanger into its protobuf counterpart.
+ * An extension for converting any [RatioTapChanger] into its protobuf counterpart.
  */
 fun RatioTapChanger.toPb(): PBRatioTapChanger = toPb(this, PBRatioTapChanger.newBuilder()).build()
 
 /**
- * An extension for converting any ReactiveCapabilityCurve into its protobuf counterpart.
+ * An extension for converting any [ReactiveCapabilityCurve] into its protobuf counterpart.
  */
 fun ReactiveCapabilityCurve.toPb(): PBReactiveCapabilityCurve = toPb(this, PBReactiveCapabilityCurve.newBuilder()).build()
 
 /**
- * An extension for converting any Recloser into its protobuf counterpart.
+ * An extension for converting any [Recloser] into its protobuf counterpart.
  */
 fun Recloser.toPb(): PBRecloser = toPb(this, PBRecloser.newBuilder()).build()
 
 /**
- * An extension for converting any SeriesCompensator into its protobuf counterpart.
+ * An extension for converting any [SeriesCompensator] into its protobuf counterpart.
  */
 fun SeriesCompensator.toPb(): PBSeriesCompensator = toPb(this, PBSeriesCompensator.newBuilder()).build()
 
 /**
- * An extension for converting any StaticVarCompensator into its protobuf counterpart.
+ * An extension for converting any [StaticVarCompensator] into its protobuf counterpart.
  */
 fun StaticVarCompensator.toPb(): PBStaticVarCompensator = toPb(this, PBStaticVarCompensator.newBuilder()).build()
 
 /**
- * An extension for converting any SynchronousMachine into its protobuf counterpart.
+ * An extension for converting any [SynchronousMachine] into its protobuf counterpart.
  */
 fun SynchronousMachine.toPb(): PBSynchronousMachine = toPb(this, PBSynchronousMachine.newBuilder()).build()
 
 /**
- * An extension for converting any TapChangerControl into its protobuf counterpart.
+ * An extension for converting any [TapChangerControl] into its protobuf counterpart.
  */
 fun TapChangerControl.toPb(): PBTapChangerControl = toPb(this, PBTapChangerControl.newBuilder()).build()
 
 /**
- * An extension for converting any TransformerStarImpedance into its protobuf counterpart.
+ * An extension for converting any [TransformerStarImpedance] into its protobuf counterpart.
  */
 fun TransformerStarImpedance.toPb(): PBTransformerStarImpedance = toPb(this, PBTransformerStarImpedance.newBuilder()).build()
 
@@ -2968,7 +2968,7 @@ fun toPb(cim: Circuit, pb: PBCircuit.Builder): PBCircuit.Builder =
     }
 
 /**
- * An extension for converting any Circuit into its protobuf counterpart.
+ * An extension for converting any [Circuit] into its protobuf counterpart.
  */
 fun Circuit.toPb(): PBCircuit = toPb(this, PBCircuit.newBuilder()).build()
 

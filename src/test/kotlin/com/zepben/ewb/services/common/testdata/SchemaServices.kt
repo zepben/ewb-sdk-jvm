@@ -23,7 +23,6 @@ import com.zepben.ewb.services.common.meta.MetadataCollection
 import com.zepben.ewb.services.customer.CustomerService
 import com.zepben.ewb.services.diagram.DiagramService
 import com.zepben.ewb.services.network.NetworkService
-import org.slf4j.LoggerFactory
 import java.time.Instant
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KVisibility
@@ -31,8 +30,6 @@ import kotlin.reflect.full.*
 
 @Suppress("SameParameterValue")
 object SchemaServices {
-
-    private val logger = LoggerFactory.getLogger(javaClass)
 
     inline fun <reified S : BaseService, reified IO : IdentifiedObject> createNameTestService(): S =
         S::class.createInstance().apply {

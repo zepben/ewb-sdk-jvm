@@ -11,8 +11,6 @@ package com.zepben.ewb.database.sqlite.cim.upgrade.changesets
 import com.zepben.ewb.database.paths.DatabaseType
 import com.zepben.ewb.database.sqlite.cim.upgrade.Change
 import com.zepben.ewb.database.sqlite.cim.upgrade.ChangeSet
-import com.zepben.ewb.database.sqlite.common.SqliteTable
-import kotlin.collections.plus
 
 internal fun changeSet61() = ChangeSet(
     61,
@@ -117,8 +115,7 @@ private val `retype nonnull columns to null network` = Change(
         identifiedObject("transformer_star_impedances") +
         identifiedObject("transformer_tank_info") +
         usagePoint("usage_points") +
-        powerSystemResource("voltage_relays")
-    ,
+        powerSystemResource("voltage_relays"),
 
     targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )
@@ -141,7 +138,8 @@ private val `retype nonnull columns to null customer` = Change(
     targetDatabases = setOf(DatabaseType.CUSTOMER)
 )
 
-fun streetAddress(tableName: String): List<String> =
+@Suppress("SameParameterValue")
+private fun streetAddress(tableName: String): List<String> =
     alterToNullableColumn(tableName, "postal_code") +
         alterToNullableColumn(tableName, "po_box") +
         alterToNullableColumn(tableName, "building_name") +
@@ -152,86 +150,92 @@ fun streetAddress(tableName: String): List<String> =
         alterToNullableColumn(tableName, "type") +
         alterToNullableColumn(tableName, "display_address")
 
-fun document(tableName: String): List<String> =
+private fun document(tableName: String): List<String> =
     identifiedObject(tableName) +
         alterToNullableColumn(tableName, "title") +
         alterToNullableColumn(tableName, "author_name") +
         alterToNullableColumn(tableName, "type") +
         alterToNullableColumn(tableName, "status")
 
-fun transformerEnd(tableName: String): List<String> =
-    identifiedObject(tableName)+
+@Suppress("SameParameterValue")
+private fun transformerEnd(tableName: String): List<String> =
+    identifiedObject(tableName) +
         alterToNullableColumn(tableName, "grounded")
 
-fun tapChanger(tableName: String): List<String> =
-    powerSystemResource(tableName)+
+@Suppress("SameParameterValue")
+private fun tapChanger(tableName: String): List<String> =
+    powerSystemResource(tableName) +
         alterToNullableColumn(tableName, "control_enabled")
 
-fun synchronousMachine(tableName: String): List<String> =
+@Suppress("SameParameterValue")
+private fun synchronousMachine(tableName: String): List<String> =
     identifiedObjectNoIndex(tableName) +
         alterToNullableColumn(tableName, "earthing")
 
-fun shuntCompensator(tableName: String): List<String> =
+@Suppress("SameParameterValue")
+private fun shuntCompensator(tableName: String): List<String> =
     regulatingCondEq(tableName) +
         alterToNullableColumn(tableName, "grounded")
 
-fun regulatingCondEqNoIndex(tableName: String): List<String> =
+@Suppress("SameParameterValue")
+private fun regulatingCondEqNoIndex(tableName: String): List<String> =
     powerSystemResourceNoIndex(tableName) +
         alterToNullableColumn(tableName, "control_enabled")
 
-fun regulatingCondEq(tableName: String): List<String> =
+private fun regulatingCondEq(tableName: String): List<String> =
     powerSystemResource(tableName) +
         alterToNullableColumn(tableName, "control_enabled")
 
-fun energySource(tableName: String): List<String> =
+@Suppress("SameParameterValue")
+private fun energySource(tableName: String): List<String> =
     powerSystemResource(tableName) +
         alterToNullableColumn(tableName, "is_external_grid")
 
-fun energyConsumer(tableName: String): List<String> =
+@Suppress("SameParameterValue")
+private fun energyConsumer(tableName: String): List<String> =
     powerSystemResource(tableName) +
         alterToNullableColumn(tableName, "grounded")
 
-fun analog(tableName: String): List<String> =
+@Suppress("SameParameterValue")
+private fun analog(tableName: String): List<String> =
     identifiedObject(tableName) +
         alterToNullableColumn(tableName, "positive_flow_in")
 
-fun nameType(tableName: String): List<String> =
+@Suppress("SameParameterValue")
+private fun nameType(tableName: String): List<String> =
     alterToNullableColumn(tableName, "description")
 
-fun usagePoint(tableName: String): List<String> =
+@Suppress("SameParameterValue")
+private fun usagePoint(tableName: String): List<String> =
     identifiedObject(tableName) +
         alterToNullableColumn(tableName, "is_virtual")
 
-fun pole(tableName: String): List<String> =
-    identifiedObject(tableName) +
-        alterToNullableColumn(tableName, "classification")
-
-fun identifiedObjectNoIndex(tableName: String): List<String> =
+private fun identifiedObjectNoIndex(tableName: String): List<String> =
     alterToNullableColumn(tableName, "description") +
-    alterToNullableColumn(tableName, "num_diagram_objects")
-
-fun identifiedObject(tableName: String): List<String> =
-    listOf(
-        "ALTER TABLE $tableName RENAME COLUMN name to name_old",
-        "ALTER TABLE $tableName ADD COLUMN name TEXT",
-        "UPDATE $tableName SET name = name_old",
-
-        "DROP INDEX ${tableName}_name",
-        "CREATE INDEX ${tableName}_name ON $tableName (name)",
-        "ALTER TABLE $tableName DROP COLUMN name_old",
-    ) +
-        alterToNullableColumn(tableName, "description") +
         alterToNullableColumn(tableName, "num_diagram_objects")
 
-fun powerSystemResourceNoIndex(tableName: String): List<String> =
+private fun identifiedObject(tableName: String): List<String> =
+// It has been observed that this index has been dropped on some tables in the wild. e.g. NorthPower where it is suspected to be a side effect of
+    // scripts that are run on their data post the extract from PoF.
+    listOf(
+        "DROP INDEX IF EXISTS ${tableName}_name",
+    ) +
+        alterToNullableColumn(tableName, "name") +
+        alterToNullableColumn(tableName, "description") +
+        alterToNullableColumn(tableName, "num_diagram_objects") +
+        listOf(
+            "CREATE INDEX ${tableName}_name ON $tableName (name)",
+        )
+
+private fun powerSystemResourceNoIndex(tableName: String): List<String> =
     identifiedObjectNoIndex(tableName) +
         alterToNullableColumn(tableName, "num_controls")
 
-fun powerSystemResource(tableName: String): List<String> =
+private fun powerSystemResource(tableName: String): List<String> =
     identifiedObject(tableName) +
         alterToNullableColumn(tableName, "num_controls")
 
-fun alterToNullableColumn(tableName: String, columnName: String): List<String> =
+private fun alterToNullableColumn(tableName: String, columnName: String): List<String> =
     listOf(
         "ALTER TABLE $tableName RENAME COLUMN $columnName to ${columnName}_old",
         "ALTER TABLE $tableName ADD COLUMN $columnName TEXT",

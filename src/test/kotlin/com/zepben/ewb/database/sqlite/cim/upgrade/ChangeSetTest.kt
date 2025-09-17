@@ -28,10 +28,11 @@ import com.zepben.testutils.junit.SystemLogExtension
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.slf4j.LoggerFactory
-import org.sqlite.SQLiteException
 import java.io.File
 import java.sql.Connection
 import java.sql.DriverManager.getConnection
+import java.sql.Statement
+import kotlin.test.fail
 
 @Suppress("SqlResolve", "SameParameterValue")
 internal class ChangeSetTest {
@@ -165,22 +166,14 @@ internal class ChangeSetTest {
                     }
 
                     logger.info("Preparing for update ${cs.number}.")
-                    validator.setUpStatements().forEach {
-                        stmt.executeUpdate(it)
-                    }
+                    validator.setUpStatements().executeAll(stmt)
 
                     stmt.executeUpdate("BEGIN TRANSACTION")
                     stmt.executeUpdate("PRAGMA foreign_keys=ON")
                     runner.runUpgrade(cs, stmt, versionUpdateStatement, type)
 
                     logger.info("Populating after update ${cs.number}.")
-                    validator.populateStatements().forEach {
-                        try {
-                            stmt.executeUpdate(it)
-                        } catch (e: SQLiteException) {
-                            throw SQLiteException("Failed executing update error was: ${e.message}\n Query was: $it: ", e.resultCode)
-                        }
-                    }
+                    validator.populateStatements().executeAll(stmt)
                     stmt.executeUpdate("PRAGMA foreign_key_check")
                     stmt.executeUpdate("COMMIT")
 
@@ -202,6 +195,18 @@ internal class ChangeSetTest {
         }
 
         conn.close()
+    }
+
+    private fun List<String>.executeAll(stmt: Statement) {
+        val errors = mapNotNull {
+            runCatching {
+                stmt.executeUpdate(it)
+            }.exceptionOrNull()?.let { ex -> it to ex }
+        }
+
+        if (errors.isNotEmpty()) {
+            fail("Failures in SQL:\n   ${errors.joinToString(separator = "\n   ") { (query, ex) -> "Error: ${ex.message}, Query: $query" }}")
+        }
     }
 
 }

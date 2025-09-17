@@ -145,7 +145,11 @@ class UpgradeRunner @JvmOverloads constructor(
         changeSet.preCommandHooks.filter { type in it.targetDatabases }.forEach { it(statement) }
 
         changeSet.commands.filter { type in it.targetDatabases }.flatMap { it.commands }.forEach {
-            statement.executeUpdate(it)
+            try {
+                statement.executeUpdate(it)
+            } catch (ex: Exception) {
+                throw IllegalStateException("Invalid upgrade script: $it", ex)
+            }
         }
 
         changeSet.postCommandHooks.filter { type in it.targetDatabases }.forEach { it(statement) }

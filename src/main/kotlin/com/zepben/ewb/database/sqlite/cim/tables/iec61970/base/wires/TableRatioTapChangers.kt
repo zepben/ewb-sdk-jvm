@@ -19,9 +19,10 @@ class TableRatioTapChangers : TableTapChangers() {
 
     override val name: String = "ratio_tap_changers"
 
-    override val uniqueIndexColumns: MutableList<List<Column>> =
-        super.uniqueIndexColumns.apply {
-            add(listOf(TRANSFORMER_END_MRID))
-        }
+    init {
+        addUniqueIndexes(
+            listOf(TRANSFORMER_END_MRID)
+        )
+    }
 
 }

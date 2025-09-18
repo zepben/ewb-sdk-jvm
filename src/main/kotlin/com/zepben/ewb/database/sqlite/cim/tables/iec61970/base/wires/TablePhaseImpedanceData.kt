@@ -26,13 +26,14 @@ class TablePhaseImpedanceData : SqliteTable() {
 
     override val name: String = "phase_impedance_data"
 
-    override val uniqueIndexColumns: MutableList<List<Column>> =
-        super.uniqueIndexColumns.apply {
-            add(listOf(PER_LENGTH_PHASE_IMPEDANCE_MRID, FROM_PHASE, TO_PHASE))
-        }
+    init {
+        addUniqueIndexes(
+            listOf(PER_LENGTH_PHASE_IMPEDANCE_MRID, FROM_PHASE, TO_PHASE)
+        )
 
-    override val nonUniqueIndexColumns: MutableList<List<Column>> =
-        super.nonUniqueIndexColumns.apply {
-            add(listOf(PER_LENGTH_PHASE_IMPEDANCE_MRID))
-        }
+        addNonUniqueIndexes(
+            listOf(PER_LENGTH_PHASE_IMPEDANCE_MRID)
+        )
+    }
+
 }

@@ -61,17 +61,37 @@ abstract class SqlTable internal constructor() {
     /**
      * A list of column groups that require a unique index in the database.
      */
-    protected open val uniqueIndexColumns: MutableList<List<Column>> = mutableListOf()
+    protected val uniqueIndexColumns: List<List<Column>> by lazy { _uniqueIndexColumns.toList() }
+    private val _uniqueIndexColumns = mutableListOf<List<Column>>()
 
     /**
      * A list of column groups that require a non-unique index in the database.
      */
-    protected open val nonUniqueIndexColumns: MutableList<List<Column>> = mutableListOf()
+    protected val nonUniqueIndexColumns: List<List<Column>> by lazy { _nonUniqueIndexColumns.toList() }
+    private val _nonUniqueIndexColumns = mutableListOf<List<Column>>()
 
     /**
      * The columns in this table, sorted by their index. Reflection is used to generate this collection.
      */
     protected val columnSet: SortedSet<Column> by lazy { createColumnSet(this::class, this) }
+
+    /**
+     * Add the given indexes to the unique index collection.
+     *
+     * @param indexes A list of column groups that require a unique index in the database.
+     */
+    protected fun addUniqueIndexes(vararg indexes: List<Column>) {
+        _uniqueIndexColumns.addAll(indexes)
+    }
+
+    /**
+     * Add the given indexes to the non-unique index collection.
+     *
+     * @param indexes A list of column groups that require a unique index in the database.
+     */
+    protected fun addNonUniqueIndexes(vararg indexes: List<Column>) {
+        _nonUniqueIndexColumns.addAll(indexes)
+    }
 
     /**
      * The names of the columns in this table, sorted by their index.

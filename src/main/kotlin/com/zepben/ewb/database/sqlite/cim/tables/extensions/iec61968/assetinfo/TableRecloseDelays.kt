@@ -21,17 +21,17 @@ class TableRecloseDelays : SqliteTable() {
 
     override val name: String = "reclose_delays"
 
-    override val uniqueIndexColumns: MutableList<List<Column>> =
-        super.uniqueIndexColumns.apply {
-            add(listOf(RELAY_INFO_MRID, SEQUENCE_NUMBER))
-        }
-
-    override val nonUniqueIndexColumns: MutableList<List<Column>> =
-        super.nonUniqueIndexColumns.apply {
-            add(listOf(RELAY_INFO_MRID))
-        }
-
     override val selectSql: String =
         "${super.selectSql} ORDER BY relay_info_mrid, sequence_number ASC;"
+
+    init {
+        addUniqueIndexes(
+            listOf(RELAY_INFO_MRID, SEQUENCE_NUMBER)
+        )
+
+        addNonUniqueIndexes(
+            listOf(RELAY_INFO_MRID)
+        )
+    }
 
 }

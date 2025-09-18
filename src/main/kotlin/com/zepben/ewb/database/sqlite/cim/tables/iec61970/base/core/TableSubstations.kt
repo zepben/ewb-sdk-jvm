@@ -18,9 +18,10 @@ class TableSubstations : TableEquipmentContainers() {
 
     override val name: String = "substations"
 
-    override val nonUniqueIndexColumns: MutableList<List<Column>> =
-        super.nonUniqueIndexColumns.apply {
-            add(listOf(SUB_GEOGRAPHICAL_REGION_MRID))
-        }
+    init {
+        addNonUniqueIndexes(
+            listOf(SUB_GEOGRAPHICAL_REGION_MRID)
+        )
+    }
 
 }

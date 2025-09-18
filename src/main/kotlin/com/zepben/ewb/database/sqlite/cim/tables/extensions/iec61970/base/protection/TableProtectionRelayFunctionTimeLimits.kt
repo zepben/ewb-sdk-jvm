@@ -21,14 +21,14 @@ class TableProtectionRelayFunctionTimeLimits : SqliteTable() {
 
     override val name: String = "protection_relay_function_time_limits"
 
-    override val uniqueIndexColumns: MutableList<List<Column>> =
-        super.uniqueIndexColumns.apply {
-            add(listOf(PROTECTION_RELAY_FUNCTION_MRID, SEQUENCE_NUMBER))
-        }
+    init {
+        addUniqueIndexes(
+            listOf(PROTECTION_RELAY_FUNCTION_MRID, SEQUENCE_NUMBER)
+        )
 
-    override val nonUniqueIndexColumns: MutableList<List<Column>> =
-        super.nonUniqueIndexColumns.apply {
-            add(listOf(PROTECTION_RELAY_FUNCTION_MRID))
-        }
+        addNonUniqueIndexes(
+            listOf(PROTECTION_RELAY_FUNCTION_MRID)
+        )
+    }
 
 }

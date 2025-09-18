@@ -20,7 +20,7 @@ abstract class PostgresTable internal constructor() : SqlTable() {
 
     override val createIndexesSql: Collection<String> by lazy { uniqueIndexColumns.toCreateIndexSql(true) + nonUniqueIndexColumns.toCreateIndexSql(false) }
 
-    private fun MutableList<List<Column>>.toCreateIndexSql(isUnique: Boolean): List<String> =
+    private fun List<List<Column>>.toCreateIndexSql(isUnique: Boolean): List<String> =
         map { indexCols ->
             "CREATE ${if (isUnique) "UNIQUE " else ""}INDEX " +
                 "${name}_${indexCols.joinToString("_") { it.name }} " +

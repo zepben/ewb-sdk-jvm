@@ -23,9 +23,10 @@ class TablePowerElectronicsConnectionPhases : TablePowerSystemResources() {
 
     override val name: String = "power_electronics_connection_phases"
 
-    override val nonUniqueIndexColumns: MutableList<List<Column>> =
-        super.nonUniqueIndexColumns.apply {
-            add(listOf(POWER_ELECTRONICS_CONNECTION_MRID))
-        }
+    init {
+        addNonUniqueIndexes(
+            listOf(POWER_ELECTRONICS_CONNECTION_MRID)
+        )
+    }
 
 }

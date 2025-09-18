@@ -19,10 +19,11 @@ class TableTransformerTankInfo : TableAssetInfo() {
 
     override val name: String = "transformer_tank_info"
 
-    override val nonUniqueIndexColumns: MutableList<List<Column>> =
-        super.nonUniqueIndexColumns.apply {
-            add(listOf(POWER_TRANSFORMER_INFO_MRID))
-        }
+    init {
+        addNonUniqueIndexes(
+            listOf(POWER_TRANSFORMER_INFO_MRID)
+        )
+    }
 
 
 }

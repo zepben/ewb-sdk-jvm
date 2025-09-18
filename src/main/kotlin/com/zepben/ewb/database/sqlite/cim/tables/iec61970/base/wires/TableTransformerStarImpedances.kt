@@ -23,9 +23,10 @@ class TableTransformerStarImpedances : TableIdentifiedObjects() {
 
     override val name: String = "transformer_star_impedances"
 
-    override val uniqueIndexColumns: MutableList<List<Column>> =
-        super.uniqueIndexColumns.apply {
-            add(listOf(TRANSFORMER_END_INFO_MRID))
-        }
+    init {
+        addUniqueIndexes(
+            listOf(TRANSFORMER_END_INFO_MRID)
+        )
+    }
 
 }

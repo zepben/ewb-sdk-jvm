@@ -21,14 +21,14 @@ class TablePowerTransformerEndRatings : SqliteTable() {
 
     override val name: String = "power_transformer_end_ratings"
 
-    override val uniqueIndexColumns: MutableList<List<Column>> =
-        super.uniqueIndexColumns.apply {
-            add(listOf(POWER_TRANSFORMER_END_MRID, COOLING_TYPE))
-        }
+    init {
+        addUniqueIndexes(
+            listOf(POWER_TRANSFORMER_END_MRID, COOLING_TYPE)
+        )
 
-    override val nonUniqueIndexColumns: MutableList<List<Column>> =
-        super.nonUniqueIndexColumns.apply {
-            add(listOf(POWER_TRANSFORMER_END_MRID))
-        }
+        addNonUniqueIndexes(
+            listOf(POWER_TRANSFORMER_END_MRID)
+        )
+    }
 
 }

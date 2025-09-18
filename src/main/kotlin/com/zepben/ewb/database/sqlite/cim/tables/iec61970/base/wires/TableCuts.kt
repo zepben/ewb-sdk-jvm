@@ -26,9 +26,10 @@ class TableCuts : TableSwitches() {
 
     override val name: String = "cuts"
 
-    override val nonUniqueIndexColumns: MutableList<List<Column>> =
-        super.uniqueIndexColumns.apply {
-            add(listOf(AC_LINE_SEGMENT_MRID))
-        }
+    init {
+        addNonUniqueIndexes(
+            listOf(AC_LINE_SEGMENT_MRID)
+        )
+    }
 
 }

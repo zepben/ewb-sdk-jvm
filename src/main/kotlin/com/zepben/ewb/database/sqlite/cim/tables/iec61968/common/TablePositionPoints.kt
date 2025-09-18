@@ -22,9 +22,10 @@ class TablePositionPoints : SqliteTable() {
 
     override val name: String = "position_points"
 
-    override val uniqueIndexColumns: MutableList<List<Column>> =
-        super.uniqueIndexColumns.apply {
-            add(listOf(LOCATION_MRID, SEQUENCE_NUMBER))
-        }
+    init {
+        addUniqueIndexes(
+            listOf(LOCATION_MRID, SEQUENCE_NUMBER)
+        )
+    }
 
 }

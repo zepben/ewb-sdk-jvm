@@ -18,9 +18,10 @@ class TableSubGeographicalRegions : TableIdentifiedObjects() {
 
     override val name: String = "sub_geographical_regions"
 
-    override val nonUniqueIndexColumns: MutableList<List<Column>> =
-        super.nonUniqueIndexColumns.apply {
-            add(listOf(GEOGRAPHICAL_REGION_MRID))
-        }
+    init {
+        addNonUniqueIndexes(
+            listOf(GEOGRAPHICAL_REGION_MRID)
+        )
+    }
 
 }

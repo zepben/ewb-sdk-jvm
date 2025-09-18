@@ -26,15 +26,15 @@ class TablePricingStructuresTariffs : SqliteTable() {
 
     override val name: String = "pricing_structures_tariffs"
 
-    override val uniqueIndexColumns: MutableList<List<Column>> =
-        super.uniqueIndexColumns.apply {
-            add(listOf(PRICING_STRUCTURE_MRID, TARIFF_MRID))
-        }
+    init {
+        addUniqueIndexes(
+            listOf(PRICING_STRUCTURE_MRID, TARIFF_MRID)
+        )
 
-    override val nonUniqueIndexColumns: MutableList<List<Column>> =
-        super.nonUniqueIndexColumns.apply {
-            add(listOf(PRICING_STRUCTURE_MRID))
-            add(listOf(TARIFF_MRID))
-        }
+        addNonUniqueIndexes(
+            listOf(PRICING_STRUCTURE_MRID),
+            listOf(TARIFF_MRID)
+        )
+    }
 
 }

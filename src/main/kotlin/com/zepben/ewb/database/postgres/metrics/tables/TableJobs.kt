@@ -19,16 +19,18 @@ class TableJobs : MultiJobTable() {
     val APPLICATION: Column = Column(++columnIndex, "application", "TEXT", NOT_NULL)
     val APPLICATION_VERSION: Column = Column(++columnIndex, "application_version", "TEXT", NOT_NULL)
 
-    override val uniqueIndexColumns: MutableList<List<Column>> = mutableListOf(
-        listOf(JOB_ID)
-    )
-
-    override val nonUniqueIndexColumns: MutableList<List<Column>> = mutableListOf(
-        listOf(INGEST_TIME),
-        listOf(SOURCE),
-        listOf(APPLICATION, APPLICATION_VERSION)
-    )
-
     override val name: String = "jobs"
+
+    init {
+        addUniqueIndexes(
+            listOf(JOB_ID)
+        )
+
+        addNonUniqueIndexes(
+            listOf(INGEST_TIME),
+            listOf(SOURCE),
+            listOf(APPLICATION, APPLICATION_VERSION)
+        )
+    }
 
 }

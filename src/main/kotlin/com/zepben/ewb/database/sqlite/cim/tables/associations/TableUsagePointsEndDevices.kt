@@ -26,15 +26,15 @@ class TableUsagePointsEndDevices : SqliteTable() {
 
     override val name: String = "usage_points_end_devices"
 
-    override val uniqueIndexColumns: MutableList<List<Column>> =
-        super.uniqueIndexColumns.apply {
-            add(listOf(USAGE_POINT_MRID, END_DEVICE_MRID))
-        }
+    init {
+        addUniqueIndexes(
+            listOf(USAGE_POINT_MRID, END_DEVICE_MRID)
+        )
 
-    override val nonUniqueIndexColumns: MutableList<List<Column>> =
-        super.nonUniqueIndexColumns.apply {
-            add(listOf(USAGE_POINT_MRID))
-            add(listOf(END_DEVICE_MRID))
-        }
+        addNonUniqueIndexes(
+            listOf(USAGE_POINT_MRID),
+            listOf(END_DEVICE_MRID)
+        )
+    }
 
 }

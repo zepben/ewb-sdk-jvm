@@ -26,15 +26,15 @@ class TableBatteryUnitsBatteryControls : SqliteTable() {
 
     override val name: String = "battery_units_battery_controls"
 
-    override val uniqueIndexColumns: MutableList<List<Column>> =
-        super.uniqueIndexColumns.apply {
-            add(listOf(BATTERY_UNIT_MRID, BATTERY_CONTROL_MRID))
-        }
+    init {
+        addUniqueIndexes(
+            listOf(BATTERY_UNIT_MRID, BATTERY_CONTROL_MRID)
+        )
 
-    override val nonUniqueIndexColumns: MutableList<List<Column>> =
-        super.nonUniqueIndexColumns.apply {
-            add(listOf(BATTERY_UNIT_MRID))
-            add(listOf(BATTERY_CONTROL_MRID))
-        }
+        addNonUniqueIndexes(
+            listOf(BATTERY_UNIT_MRID),
+            listOf(BATTERY_CONTROL_MRID)
+        )
+    }
 
 }

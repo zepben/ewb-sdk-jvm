@@ -19,9 +19,10 @@ class TableCircuits : TableLines() {
 
     override val name: String = "circuits"
 
-    override val nonUniqueIndexColumns: MutableList<List<Column>> =
-        super.nonUniqueIndexColumns.apply {
-            add(listOf(LOOP_MRID))
-        }
+    init {
+        addNonUniqueIndexes(
+            listOf(LOOP_MRID)
+        )
+    }
 
 }

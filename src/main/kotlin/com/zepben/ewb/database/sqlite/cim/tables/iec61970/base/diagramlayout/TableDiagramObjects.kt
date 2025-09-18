@@ -23,10 +23,11 @@ class TableDiagramObjects : TableIdentifiedObjects() {
 
     override val name: String = "diagram_objects"
 
-    override val nonUniqueIndexColumns: MutableList<List<Column>> =
-        super.nonUniqueIndexColumns.apply {
-            add(listOf(IDENTIFIED_OBJECT_MRID))
-            add(listOf(DIAGRAM_MRID))
-        }
+    init {
+        addNonUniqueIndexes(
+            listOf(IDENTIFIED_OBJECT_MRID),
+            listOf(DIAGRAM_MRID)
+        )
+    }
 
 }

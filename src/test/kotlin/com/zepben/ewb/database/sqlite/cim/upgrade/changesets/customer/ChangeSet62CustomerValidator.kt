@@ -16,7 +16,7 @@ import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.nullValue
 import java.sql.Statement
 
-object ChangeSet61CustomerValidator : ChangeSetValidator(DatabaseType.CUSTOMER, 61) {
+object ChangeSet62CustomerValidator : ChangeSetValidator(DatabaseType.CUSTOMER, 62) {
 
     //
     // NOTE: We are utilising the SQLite feature of being able to put any type of data into a column by putting string into all fields. This stops us
@@ -24,8 +24,7 @@ object ChangeSet61CustomerValidator : ChangeSetValidator(DatabaseType.CUSTOMER, 
     //
 
     //
-    // NOTE: Some columns were incorrectly left as `NOT NULL` in the v61 changeset, so the tests here will validate against thet. The fixes for these
-    //       columns have been added in change set 62 as we already had databases in the wild on v61 before this was detected.
+    // NOTE: This is a repeat of ChangeSet61CustomerValidator with the `should_be_nullable` fields being converted to nulls.
     //
 
     override fun setUpStatements(): List<String> = listOf(
@@ -37,11 +36,11 @@ object ChangeSet61CustomerValidator : ChangeSetValidator(DatabaseType.CUSTOMER, 
     )
 
     override fun populateStatements(): List<String> = listOf(
-        "INSERT INTO customer_agreements (mrid, name, description, num_diagram_objects, title, created_date_time, author_name, type, status, comment, customer_mrid) VALUES ('mrid_2', null, null, null, null, null, null, null, null, 'should_be_nullable', null);",
+        "INSERT INTO customer_agreements (mrid, name, description, num_diagram_objects, title, created_date_time, author_name, type, status, comment, customer_mrid) VALUES ('mrid_2', null, null, null, null, null, null, null, null, null, null);",
         "INSERT INTO customers (mrid, name, description, num_diagram_objects, organisation_mrid, kind, num_end_devices, special_need) VALUES ('mrid_2', null, null, null, null, 'kind_2', null, null);",
-        "INSERT INTO organisations (mrid, name, description, num_diagram_objects) VALUES ('mrid_2', 'should_be_nullable', 'should_be_nullable', 'should_be_nullable');",
-        "INSERT INTO pricing_structures (mrid, name, description, num_diagram_objects, title, created_date_time, author_name, type, status, comment) VALUES ('mrid_2', null, null, null, null, null, null, null, null, 'should_be_nullable');",
-        "INSERT INTO tariffs (mrid, name, description, num_diagram_objects, title, created_date_time, author_name, type, status, comment) VALUES ('mrid_2', null, null, null, null, null, null, null, null, 'should_be_nullable');",
+        "INSERT INTO organisations (mrid, name, description, num_diagram_objects) VALUES ('mrid_2', null, null, null);",
+        "INSERT INTO pricing_structures (mrid, name, description, num_diagram_objects, title, created_date_time, author_name, type, status, comment) VALUES ('mrid_2', null, null, null, null, null, null, null, null, null);",
+        "INSERT INTO tariffs (mrid, name, description, num_diagram_objects, title, created_date_time, author_name, type, status, comment) VALUES ('mrid_2', null, null, null, null, null, null, null, null, null);",
     )
 
     override fun validateChanges(statement: Statement) {
@@ -50,6 +49,8 @@ object ChangeSet61CustomerValidator : ChangeSetValidator(DatabaseType.CUSTOMER, 
         `validate organisations`(statement)
         `validate pricing_structures`(statement)
         `validate tariffs`(statement)
+
+        `validate indexes`(statement)
     }
 
     override fun tearDownStatements(): List<String> =
@@ -87,7 +88,7 @@ object ChangeSet61CustomerValidator : ChangeSetValidator(DatabaseType.CUSTOMER, 
                 assertThat(rs.getNullableString("author_name"), nullValue())
                 assertThat(rs.getNullableString("type"), nullValue())
                 assertThat(rs.getNullableString("status"), nullValue())
-                assertThat(rs.getString("comment"), equalTo("should_be_nullable"))
+                assertThat(rs.getNullableString("comment"), nullValue())
                 assertThat(rs.getNullableString("customer_mrid"), nullValue())
             }
         )
@@ -130,9 +131,9 @@ object ChangeSet61CustomerValidator : ChangeSetValidator(DatabaseType.CUSTOMER, 
             },
             { rs ->
                 assertThat(rs.getString("mrid"), equalTo("mrid_2"))
-                assertThat(rs.getString("name"), equalTo("should_be_nullable"))
-                assertThat(rs.getString("description"), equalTo("should_be_nullable"))
-                assertThat(rs.getString("num_diagram_objects"), equalTo("should_be_nullable"))
+                assertThat(rs.getNullableString("name"), nullValue())
+                assertThat(rs.getNullableString("description"), nullValue())
+                assertThat(rs.getNullableString("num_diagram_objects"), nullValue())
             }
         )
     }
@@ -162,7 +163,7 @@ object ChangeSet61CustomerValidator : ChangeSetValidator(DatabaseType.CUSTOMER, 
                 assertThat(rs.getNullableString("author_name"), nullValue())
                 assertThat(rs.getNullableString("type"), nullValue())
                 assertThat(rs.getNullableString("status"), nullValue())
-                assertThat(rs.getString("comment"), equalTo("should_be_nullable"))
+                assertThat(rs.getNullableString("comment"), nullValue())
             }
         )
     }
@@ -192,8 +193,36 @@ object ChangeSet61CustomerValidator : ChangeSetValidator(DatabaseType.CUSTOMER, 
                 assertThat(rs.getNullableString("author_name"), nullValue())
                 assertThat(rs.getNullableString("type"), nullValue())
                 assertThat(rs.getNullableString("status"), nullValue())
-                assertThat(rs.getString("comment"), equalTo("should_be_nullable"))
+                assertThat(rs.getNullableString("comment"), nullValue())
             }
+        )
+    }
+
+    private fun `validate indexes`(statement: Statement) {
+        ensureIndexes(
+            statement,
+            "name_types_name",
+            "names_identified_object_mrid_name_type_name_name",
+            "names_identified_object_mrid",
+            "names_name",
+            "names_name_type_name",
+            "customer_agreements_mrid",
+            "customer_agreements_name",
+            "customer_agreements_customer_mrid",
+            "customer_agreements_pricing_structures_customer_agreement_mrid_pricing_structure_mrid",
+            "customer_agreements_pricing_structures_customer_agreement_mrid",
+            "customer_agreements_pricing_structures_pricing_structure_mrid",
+            "customers_mrid",
+            "customers_name",
+            "organisations_mrid",
+            "organisations_name",
+            "pricing_structures_mrid",
+            "pricing_structures_name",
+            "pricing_structures_tariffs_pricing_structure_mrid_tariff_mrid",
+            "pricing_structures_tariffs_pricing_structure_mrid",
+            "pricing_structures_tariffs_tariff_mrid",
+            "tariffs_mrid",
+            "tariffs_name",
         )
     }
 

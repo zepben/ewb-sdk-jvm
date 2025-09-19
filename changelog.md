@@ -45,6 +45,10 @@
 ### Notes
 * None.
 
+## [1.0.1] - 2025-09-19
+### Fixes
+* Fixed a bug in the LV feeder assignment when processing sites in the current state of the network. This prevented LV feeders on switches (rather than the
+
 ## [1.0.0] - 2025-08-27
 ### Breaking Changes
 * Renamed the package to `com.zepben.ewb`. You will need to update all your imports `com.zepben.evolve.*` -> `com.zepben.ewb.*`. This also updates the maven

@@ -1,7 +1,8 @@
 # Zepben EWB SDK changelog
 ## [1.1.0] - UNRELEASED
 ### Breaking Changes
-* None.
+* Discrepancies in the v61 upgrade scripts and the schema creation objects have been fixed. This includes correcting the types of some columns, changing the
+  nullability of some columns and adding missing indexes.
 
 ### New Features
 * None.
@@ -12,6 +13,8 @@
 ### Fixes
 * Fixed a bug in the LV feeder assignment when processing sites in the current state of the network. This prevented LV feeders on switches (rather than the
   transformer) from being assigned to the current state energising feeder.
+* Indexes have been fixed in the database schema. Many were missing due to not calling `super`, so the method of adding indexes has been reworked to prevent
+  this in the future.
 
 ### Notes
 * None.

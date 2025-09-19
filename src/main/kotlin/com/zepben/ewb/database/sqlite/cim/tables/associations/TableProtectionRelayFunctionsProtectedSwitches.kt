@@ -26,15 +26,15 @@ class TableProtectionRelayFunctionsProtectedSwitches : SqliteTable() {
 
     override val name: String = "protection_relay_functions_protected_switches"
 
-    override val uniqueIndexColumns: MutableList<List<Column>> =
-        super.uniqueIndexColumns.apply {
-            add(listOf(PROTECTION_RELAY_FUNCTION_MRID, PROTECTED_SWITCH_MRID))
-        }
+    init {
+        addUniqueIndexes(
+            listOf(PROTECTION_RELAY_FUNCTION_MRID, PROTECTED_SWITCH_MRID)
+        )
 
-    override val nonUniqueIndexColumns: MutableList<List<Column>> =
-        super.nonUniqueIndexColumns.apply {
-            add(listOf(PROTECTION_RELAY_FUNCTION_MRID))
-            add(listOf(PROTECTED_SWITCH_MRID))
-        }
+        addNonUniqueIndexes(
+            listOf(PROTECTION_RELAY_FUNCTION_MRID),
+            listOf(PROTECTED_SWITCH_MRID)
+        )
+    }
 
 }

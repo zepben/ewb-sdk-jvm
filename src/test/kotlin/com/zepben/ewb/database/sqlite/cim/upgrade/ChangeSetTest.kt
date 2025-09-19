@@ -20,18 +20,21 @@ import com.zepben.ewb.database.sqlite.cim.upgrade.changesets.combined.*
 import com.zepben.ewb.database.sqlite.cim.upgrade.changesets.customer.ChangeSet50CustomerValidator
 import com.zepben.ewb.database.sqlite.cim.upgrade.changesets.customer.ChangeSet54CustomerValidator
 import com.zepben.ewb.database.sqlite.cim.upgrade.changesets.customer.ChangeSet61CustomerValidator
+import com.zepben.ewb.database.sqlite.cim.upgrade.changesets.customer.ChangeSet62CustomerValidator
 import com.zepben.ewb.database.sqlite.cim.upgrade.changesets.diagram.ChangeSet50DiagramValidator
 import com.zepben.ewb.database.sqlite.cim.upgrade.changesets.diagram.ChangeSet52DiagramValidator
 import com.zepben.ewb.database.sqlite.cim.upgrade.changesets.diagram.ChangeSet61DiagramValidator
+import com.zepben.ewb.database.sqlite.cim.upgrade.changesets.diagram.ChangeSet62DiagramValidator
 import com.zepben.ewb.database.sqlite.cim.upgrade.changesets.network.*
 import com.zepben.testutils.junit.SystemLogExtension
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.slf4j.LoggerFactory
-import org.sqlite.SQLiteException
 import java.io.File
 import java.sql.Connection
 import java.sql.DriverManager.getConnection
+import java.sql.Statement
+import kotlin.test.fail
 
 @Suppress("SqlResolve", "SameParameterValue")
 internal class ChangeSetTest {
@@ -63,7 +66,8 @@ internal class ChangeSetTest {
         NoChanges(DatabaseType.CUSTOMER, 58),
         NoChanges(DatabaseType.CUSTOMER, 59),
         NoChanges(DatabaseType.CUSTOMER, 60),
-        ChangeSet61CustomerValidator
+        ChangeSet61CustomerValidator,
+        ChangeSet62CustomerValidator,
     ).associateBy { it.version }
 
     private val diagramChangeSetValidators = listOf(
@@ -79,6 +83,7 @@ internal class ChangeSetTest {
         NoChanges(DatabaseType.DIAGRAM, 59),
         NoChanges(DatabaseType.DIAGRAM, 60),
         ChangeSet61DiagramValidator,
+        ChangeSet62DiagramValidator,
     ).associateBy { it.version }
 
     private val networkChangeSetValidators = listOf(
@@ -94,6 +99,7 @@ internal class ChangeSetTest {
         ChangeSet59NetworkValidator,
         ChangeSet60NetworkValidator,
         ChangeSet61NetworkValidator,
+        ChangeSet62NetworkValidator,
     ).associateBy { it.version }
 
     @Test
@@ -165,22 +171,14 @@ internal class ChangeSetTest {
                     }
 
                     logger.info("Preparing for update ${cs.number}.")
-                    validator.setUpStatements().forEach {
-                        stmt.executeUpdate(it)
-                    }
+                    validator.setUpStatements().executeAll(stmt)
 
                     stmt.executeUpdate("BEGIN TRANSACTION")
                     stmt.executeUpdate("PRAGMA foreign_keys=ON")
                     runner.runUpgrade(cs, stmt, versionUpdateStatement, type)
 
                     logger.info("Populating after update ${cs.number}.")
-                    validator.populateStatements().forEach {
-                        try {
-                            stmt.executeUpdate(it)
-                        } catch (e: SQLiteException) {
-                            throw SQLiteException("Failed executing update error was: ${e.message}\n Query was: $it: ", e.resultCode)
-                        }
-                    }
+                    validator.populateStatements().executeAll(stmt)
                     stmt.executeUpdate("PRAGMA foreign_key_check")
                     stmt.executeUpdate("COMMIT")
 
@@ -202,6 +200,18 @@ internal class ChangeSetTest {
         }
 
         conn.close()
+    }
+
+    private fun List<String>.executeAll(stmt: Statement) {
+        val errors = mapNotNull {
+            runCatching {
+                stmt.executeUpdate(it)
+            }.exceptionOrNull()?.let { ex -> it to ex }
+        }
+
+        if (errors.isNotEmpty()) {
+            fail("Failures in SQL:\n   ${errors.joinToString(separator = "\n   ") { (query, ex) -> "Error: ${ex.message}, Query: $query" }}")
+        }
     }
 
 }

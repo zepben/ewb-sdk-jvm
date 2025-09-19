@@ -19,9 +19,10 @@ class TableCustomerAgreements : TableAgreements() {
 
     override val name: String = "customer_agreements"
 
-    override val nonUniqueIndexColumns: MutableList<List<Column>> =
-        super.nonUniqueIndexColumns.apply {
-            add(listOf(CUSTOMER_MRID))
-        }
+    init {
+        addNonUniqueIndexes(
+            listOf(CUSTOMER_MRID)
+        )
+    }
 
 }

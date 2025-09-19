@@ -19,14 +19,14 @@ class TableLocationStreetAddresses : TableStreetAddresses() {
 
     override val name: String = "location_street_addresses"
 
-    override val uniqueIndexColumns: MutableList<List<Column>> =
-        super.uniqueIndexColumns.apply {
-            add(listOf(LOCATION_MRID, ADDRESS_FIELD))
-        }
+    init {
+        addUniqueIndexes(
+            listOf(LOCATION_MRID, ADDRESS_FIELD)
+        )
 
-    override val nonUniqueIndexColumns: MutableList<List<Column>> =
-        super.nonUniqueIndexColumns.apply {
-            add(listOf(LOCATION_MRID))
-        }
+        addNonUniqueIndexes(
+            listOf(LOCATION_MRID)
+        )
+    }
 
 }

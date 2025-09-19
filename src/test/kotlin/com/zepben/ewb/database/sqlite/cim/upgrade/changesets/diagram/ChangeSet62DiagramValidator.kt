@@ -16,7 +16,7 @@ import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.nullValue
 import java.sql.Statement
 
-object ChangeSet61DiagramValidator : ChangeSetValidator(DatabaseType.DIAGRAM, 61) {
+object ChangeSet62DiagramValidator : ChangeSetValidator(DatabaseType.DIAGRAM, 62) {
 
     //
     // NOTE: We are utilising the SQLite feature of being able to put any type of data into a column by putting string into all fields. This stops us
@@ -39,6 +39,8 @@ object ChangeSet61DiagramValidator : ChangeSetValidator(DatabaseType.DIAGRAM, 61
         `validate diagram_object_points`(statement)
         `validate diagram_objects`(statement)
         `validate diagrams`(statement)
+
+        `validate indexes`(statement)
     }
 
     override fun tearDownStatements(): List<String> = listOf(
@@ -53,8 +55,8 @@ object ChangeSet61DiagramValidator : ChangeSetValidator(DatabaseType.DIAGRAM, 61
             { rs ->
                 assertThat(rs.getString("diagram_object_mrid"), equalTo("diagram_object_mrid_1"))
                 assertThat(rs.getString("sequence_number"), equalTo("sequence_number_1"))
-                assertThat(rs.getNullableString("x_position"), nullValue())
-                assertThat(rs.getNullableString("y_position"), nullValue())
+                assertThat(rs.getDouble("x_position"), equalTo(0.0))
+                assertThat(rs.getDouble("y_position"), equalTo(0.0))
             },
             { rs ->
                 assertThat(rs.getString("diagram_object_mrid"), equalTo("diagram_object_mrid_2"))
@@ -110,6 +112,25 @@ object ChangeSet61DiagramValidator : ChangeSetValidator(DatabaseType.DIAGRAM, 61
                 assertThat(rs.getString("diagram_style"), equalTo("diagram_style_2"))
                 assertThat(rs.getString("orientation_kind"), equalTo("orientation_kind_2"))
             }
+        )
+    }
+
+    private fun `validate indexes`(statement: Statement) {
+        ensureIndexes(
+            statement,
+            "name_types_name",
+            "names_identified_object_mrid_name_type_name_name",
+            "names_identified_object_mrid",
+            "names_name",
+            "names_name_type_name",
+            "diagram_object_points_diagram_object_mrid_sequence_number",
+            "diagram_object_points_diagram_object_mrid",
+            "diagram_objects_mrid",
+            "diagram_objects_name",
+            "diagram_objects_identified_object_mrid",
+            "diagram_objects_diagram_mrid",
+            "diagrams_mrid",
+            "diagrams_name",
         )
     }
 

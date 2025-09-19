@@ -34,14 +34,15 @@ class TableTransformerEndInfo : TableAssetInfo() {
 
     override val name: String = "transformer_end_info"
 
-    override val nonUniqueIndexColumns: MutableList<List<Column>> =
-        super.nonUniqueIndexColumns.apply {
-            add(listOf(TRANSFORMER_TANK_INFO_MRID))
-            add(listOf(ENERGISED_END_NO_LOAD_TESTS))
-            add(listOf(ENERGISED_END_SHORT_CIRCUIT_TESTS))
-            add(listOf(GROUNDED_END_SHORT_CIRCUIT_TESTS))
-            add(listOf(OPEN_END_OPEN_CIRCUIT_TESTS))
-            add(listOf(ENERGISED_END_OPEN_CIRCUIT_TESTS))
-        }
+    init {
+        addNonUniqueIndexes(
+            listOf(TRANSFORMER_TANK_INFO_MRID),
+            listOf(ENERGISED_END_NO_LOAD_TESTS),
+            listOf(ENERGISED_END_SHORT_CIRCUIT_TESTS),
+            listOf(GROUNDED_END_SHORT_CIRCUIT_TESTS),
+            listOf(OPEN_END_OPEN_CIRCUIT_TESTS),
+            listOf(ENERGISED_END_OPEN_CIRCUIT_TESTS)
+        )
+    }
 
 }

@@ -33,13 +33,14 @@ class TableCurveData : SqliteTable() {
 
     override val name: String = "curve_data"
 
-    override val uniqueIndexColumns: MutableList<List<Column>> =
-        super.uniqueIndexColumns.apply {
-            add(listOf(CURVE_MRID, X_VALUE))
-        }
+    init {
+        addUniqueIndexes(
+            listOf(CURVE_MRID, X_VALUE)
+        )
 
-    override val nonUniqueIndexColumns: MutableList<List<Column>> =
-        super.nonUniqueIndexColumns.apply {
-            add(listOf(CURVE_MRID))
-        }
+        addNonUniqueIndexes(
+            listOf(CURVE_MRID)
+        )
+    }
+
 }

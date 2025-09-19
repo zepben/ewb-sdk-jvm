@@ -25,14 +25,14 @@ class TableEnergyConsumerPhases : TablePowerSystemResources() {
 
     override val name: String = "energy_consumer_phases"
 
-    override val uniqueIndexColumns: MutableList<List<Column>> =
-        super.uniqueIndexColumns.apply {
-            add(listOf(ENERGY_CONSUMER_MRID, PHASE))
-        }
+    init {
+        addUniqueIndexes(
+            listOf(ENERGY_CONSUMER_MRID, PHASE)
+        )
 
-    override val nonUniqueIndexColumns: MutableList<List<Column>> =
-        super.nonUniqueIndexColumns.apply {
-            add(listOf(ENERGY_CONSUMER_MRID))
-        }
+        addNonUniqueIndexes(
+            listOf(ENERGY_CONSUMER_MRID)
+        )
+    }
 
 }

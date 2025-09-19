@@ -22,11 +22,12 @@ abstract class TableMeasurements : TableIdentifiedObjects() {
     val PHASES: Column = Column(++columnIndex, "phases", "TEXT", NOT_NULL)
     val UNIT_SYMBOL: Column = Column(++columnIndex, "unit_symbol", "TEXT", NOT_NULL)
 
-    override val nonUniqueIndexColumns: MutableList<List<Column>> =
-        super.nonUniqueIndexColumns.apply {
-            add(listOf(POWER_SYSTEM_RESOURCE_MRID))
-            add(listOf(REMOTE_SOURCE_MRID))
-            add(listOf(TERMINAL_MRID))
-        }
+    init {
+        addNonUniqueIndexes(
+            listOf(POWER_SYSTEM_RESOURCE_MRID),
+            listOf(REMOTE_SOURCE_MRID),
+            listOf(TERMINAL_MRID)
+        )
+    }
 
 }

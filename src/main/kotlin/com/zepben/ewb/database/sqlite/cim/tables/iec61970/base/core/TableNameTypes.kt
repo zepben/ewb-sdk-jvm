@@ -21,8 +21,10 @@ class TableNameTypes : SqliteTable() {
 
     override val name: String = "name_types"
 
-    override val uniqueIndexColumns: MutableList<List<Column>> = mutableListOf(
-        listOf(NAME)
-    )
+    init {
+        addUniqueIndexes(
+            listOf(NAME)
+        )
+    }
 
 }

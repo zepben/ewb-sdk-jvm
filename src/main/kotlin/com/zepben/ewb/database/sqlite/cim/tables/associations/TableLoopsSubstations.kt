@@ -28,15 +28,15 @@ class TableLoopsSubstations : SqliteTable() {
 
     override val name: String = "loops_substations"
 
-    override val uniqueIndexColumns: MutableList<List<Column>> =
-        super.uniqueIndexColumns.apply {
-            add(listOf(LOOP_MRID, SUBSTATION_MRID))
-        }
+    init {
+        addUniqueIndexes(
+            listOf(LOOP_MRID, SUBSTATION_MRID)
+        )
 
-    override val nonUniqueIndexColumns: MutableList<List<Column>> =
-        super.nonUniqueIndexColumns.apply {
-            add(listOf(LOOP_MRID))
-            add(listOf(SUBSTATION_MRID))
-        }
+        addNonUniqueIndexes(
+            listOf(LOOP_MRID),
+            listOf(SUBSTATION_MRID)
+        )
+    }
 
 }

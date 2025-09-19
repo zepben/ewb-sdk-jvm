@@ -27,8 +27,10 @@ class TableClamps : TableConductingEquipment() {
 
     override val name: String = "clamps"
 
-    override val nonUniqueIndexColumns: MutableList<List<Column>> = mutableListOf(
-        listOf(AC_LINE_SEGMENT_MRID)
-    )
+    init {
+        addNonUniqueIndexes(
+            listOf(AC_LINE_SEGMENT_MRID)
+        )
+    }
 
 }

@@ -26,15 +26,15 @@ class TableSynchronousMachinesReactiveCapabilityCurves : SqliteTable() {
 
     override val name: String = "synchronous_machines_reactive_capability_curves"
 
-    override val uniqueIndexColumns: MutableList<List<Column>> =
-        super.uniqueIndexColumns.apply {
-            add(listOf(SYNCHRONOUS_MACHINE_MRID, REACTIVE_CAPABILITY_CURVE_MRID))
-        }
+    init {
+        addUniqueIndexes(
+            listOf(SYNCHRONOUS_MACHINE_MRID, REACTIVE_CAPABILITY_CURVE_MRID)
+        )
 
-    override val nonUniqueIndexColumns: MutableList<List<Column>> =
-        super.nonUniqueIndexColumns.apply {
-            add(listOf(SYNCHRONOUS_MACHINE_MRID))
-            add(listOf(REACTIVE_CAPABILITY_CURVE_MRID))
-        }
+        addNonUniqueIndexes(
+            listOf(SYNCHRONOUS_MACHINE_MRID),
+            listOf(REACTIVE_CAPABILITY_CURVE_MRID)
+        )
+    }
 
 }

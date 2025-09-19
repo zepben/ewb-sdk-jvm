@@ -21,14 +21,16 @@ class TableNames : SqliteTable() {
 
     override val name: String = "names"
 
-    override val uniqueIndexColumns: MutableList<List<Column>> = mutableListOf(
-        listOf(IDENTIFIED_OBJECT_MRID, NAME_TYPE_NAME, NAME)
-    )
+    init {
+        addUniqueIndexes(
+            listOf(IDENTIFIED_OBJECT_MRID, NAME_TYPE_NAME, NAME)
+        )
 
-    override val nonUniqueIndexColumns: MutableList<List<Column>> = mutableListOf(
-        listOf(IDENTIFIED_OBJECT_MRID),
-        listOf(NAME),
-        listOf(NAME_TYPE_NAME)
-    )
+        addNonUniqueIndexes(
+            listOf(IDENTIFIED_OBJECT_MRID),
+            listOf(NAME),
+            listOf(NAME_TYPE_NAME)
+        )
+    }
 
 }

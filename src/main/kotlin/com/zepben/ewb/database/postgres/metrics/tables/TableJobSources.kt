@@ -19,14 +19,16 @@ class TableJobSources : MultiJobTable() {
     val SOURCE_TIME: Column = Column(++columnIndex, "source_time", "TIMESTAMP", NULL)
     val FILE_SHA: Column = Column(++columnIndex, "file_sha", "BYTEA", NULL)
 
-    override val uniqueIndexColumns: MutableList<List<Column>> = mutableListOf(
-        listOf(JOB_ID, DATA_SOURCE)
-    )
-
-    override val nonUniqueIndexColumns: MutableList<List<Column>> = mutableListOf(
-        listOf(FILE_SHA)
-    )
-
     override val name: String = "job_sources"
+
+    init {
+        addUniqueIndexes(
+            listOf(JOB_ID, DATA_SOURCE)
+        )
+
+        addNonUniqueIndexes(
+            listOf(FILE_SHA)
+        )
+    }
 
 }

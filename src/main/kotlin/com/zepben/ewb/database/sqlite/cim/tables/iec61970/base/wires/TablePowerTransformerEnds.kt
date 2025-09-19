@@ -30,14 +30,14 @@ class TablePowerTransformerEnds : TableTransformerEnds() {
 
     override val name: String = "power_transformer_ends"
 
-    override val uniqueIndexColumns: MutableList<List<Column>> =
-        super.uniqueIndexColumns.apply {
-            add(listOf(POWER_TRANSFORMER_MRID, END_NUMBER))
-        }
+    init {
+        addUniqueIndexes(
+            listOf(POWER_TRANSFORMER_MRID, END_NUMBER)
+        )
 
-    override val nonUniqueIndexColumns: MutableList<List<Column>> =
-        super.nonUniqueIndexColumns.apply {
-            add(listOf(POWER_TRANSFORMER_MRID))
-        }
+        addNonUniqueIndexes(
+            listOf(POWER_TRANSFORMER_MRID)
+        )
+    }
 
 }

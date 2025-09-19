@@ -22,14 +22,14 @@ class TableTerminals : TableAcDcTerminals() {
 
     override val name: String = "terminals"
 
-    override val uniqueIndexColumns: MutableList<List<Column>> =
-        super.uniqueIndexColumns.apply {
-            add(listOf(CONDUCTING_EQUIPMENT_MRID, SEQUENCE_NUMBER))
-        }
+    init {
+        addUniqueIndexes(
+            listOf(CONDUCTING_EQUIPMENT_MRID, SEQUENCE_NUMBER)
+        )
 
-    override val nonUniqueIndexColumns: MutableList<List<Column>> =
-        super.nonUniqueIndexColumns.apply {
-            add(listOf(CONNECTIVITY_NODE_MRID))
-        }
+        addNonUniqueIndexes(
+            listOf(CONNECTIVITY_NODE_MRID)
+        )
+    }
 
 }

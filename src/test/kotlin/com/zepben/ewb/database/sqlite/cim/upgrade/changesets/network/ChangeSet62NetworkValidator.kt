@@ -16,7 +16,7 @@ import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.nullValue
 import java.sql.Statement
 
-object ChangeSet61NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MODEL, 61) {
+object ChangeSet62NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MODEL, 62) {
 
     //
     // NOTE: We are utilising the SQLite feature of being able to put any type of data into a column by putting string into all fields. This stops us
@@ -24,8 +24,7 @@ object ChangeSet61NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
     //
 
     //
-    // NOTE: Some columns were incorrectly left as `NOT NULL` in the v61 changeset, so the tests here will validate against thet. The fixes for these
-    //       columns have been added in change set 62 as we already had databases in the wild on v61 before this was detected.
+    // NOTE: This is a repeat of ChangeSet61CustomerValidator with the `should_be_nullable` fields being converted to nulls.
     //
 
     override fun setUpStatements(): List<String> = listOf(
@@ -130,19 +129,19 @@ object ChangeSet61NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
         "INSERT INTO analogs (mrid, name, description, num_diagram_objects, power_system_resource_mrid, remote_source_mrid, terminal_mrid, phases, unit_symbol, positive_flow_in) VALUES ('mrid_2', null, null, null, null, null, null, 'phases_2', 'unit_symbol_2', null);",
         "INSERT INTO asset_owners (mrid, name, description, num_diagram_objects, organisation_mrid) VALUES ('mrid_2', null, null, null, null);",
         "INSERT INTO base_voltages (mrid, name, description, num_diagram_objects, nominal_voltage) VALUES ('mrid_2', null, null, null, 'nominal_voltage_2');",
-        "INSERT INTO battery_controls (mrid, name, description, num_diagram_objects, location_mrid, num_controls, discrete, mode, monitored_phase, target_deadband, target_value, enabled, max_allowed_target_value, min_allowed_target_value, rated_current, terminal_mrid, ct_primary, min_target_deadband, charging_rate, discharging_rate, reserve_percent, control_mode) VALUES ('mrid_2', 'should_be_nullable', null, null, null, null, null, 'mode_2', 'monitored_phase_2', null, null, null, null, null, null, null, null, null, null, null, null, 'control_mode_2');",
+        "INSERT INTO battery_controls (mrid, name, description, num_diagram_objects, location_mrid, num_controls, discrete, mode, monitored_phase, target_deadband, target_value, enabled, max_allowed_target_value, min_allowed_target_value, rated_current, terminal_mrid, ct_primary, min_target_deadband, charging_rate, discharging_rate, reserve_percent, control_mode) VALUES ('mrid_2', null, null, null, null, null, null, 'mode_2', 'monitored_phase_2', null, null, null, null, null, null, null, null, null, null, null, null, 'control_mode_2');",
         "INSERT INTO battery_units (mrid, name, description, num_diagram_objects, location_mrid, num_controls, normally_in_service, in_service, commissioned_date, power_electronics_connection_mrid, max_p, min_p, battery_state, rated_e, stored_e) VALUES ('mrid_2', null, null, null, null, null, null, null, null, null, null, null, 'battery_state_2', null, null);",
         "INSERT INTO breakers (mrid, name, description, num_diagram_objects, location_mrid, num_controls, normally_in_service, in_service, commissioned_date, base_voltage_mrid, normal_open, open, rated_current, switch_info_mrid, breaking_capacity, in_transit_time) VALUES ('mrid_2', null, null, null, null, null, null, null, null, null, 'normal_open_2', 'open_2', null, null, null, null);",
         "INSERT INTO busbar_sections (mrid, name, description, num_diagram_objects, location_mrid, num_controls, normally_in_service, in_service, commissioned_date, base_voltage_mrid) VALUES ('mrid_2', null, null, null, null, null, null, null, null, null);",
         "INSERT INTO cable_info (mrid, name, description, num_diagram_objects, rated_current, material) VALUES ('mrid_2', null, null, null, null, 'material_2');",
         "INSERT INTO circuits (mrid, name, description, num_diagram_objects, location_mrid, num_controls, loop_mrid) VALUES ('mrid_2', null, null, null, null, null, null);",
-        "INSERT INTO clamps (mrid, name, description, num_diagram_objects, location_mrid, num_controls, normally_in_service, in_service, commissioned_date, base_voltage_mrid, length_from_terminal_1, ac_line_segment_mrid) VALUES ('mrid_2', 'should_be_nullable', null, null, null, null, null, null, null, null, null, null);",
+        "INSERT INTO clamps (mrid, name, description, num_diagram_objects, location_mrid, num_controls, normally_in_service, in_service, commissioned_date, base_voltage_mrid, length_from_terminal_1, ac_line_segment_mrid) VALUES ('mrid_2', null, null, null, null, null, null, null, null, null, null, null);",
         "INSERT INTO connectivity_nodes (mrid, name, description, num_diagram_objects) VALUES ('mrid_2', null, null, null);",
         "INSERT INTO controls (mrid, name, description, num_diagram_objects, power_system_resource_mrid) VALUES ('mrid_2', null, null, null, null);",
         "INSERT INTO current_relays (mrid, name, description, num_diagram_objects, location_mrid, num_controls, model, reclosing, relay_delay_time, protection_kind, directable, power_direction, relay_info_mrid, current_limit_1, inverse_time_flag, time_delay_1) VALUES ('mrid_2', null, null, null, null, null, null, null, null, 'protection_kind_2', null, 'power_direction_2', null, null, null, null);",
         "INSERT INTO current_transformer_info (mrid, name, description, num_diagram_objects, accuracy_class, accuracy_limit, core_count, ct_class, knee_point_voltage, max_ratio_denominator, max_ratio_numerator, nominal_ratio_denominator, nominal_ratio_numerator, primary_ratio, rated_current, secondary_fls_rating, secondary_ratio, usage) VALUES ('mrid_2', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);",
         "INSERT INTO current_transformers (mrid, name, description, num_diagram_objects, location_mrid, num_controls, normally_in_service, in_service, commissioned_date, terminal_mrid, current_transformer_info_mrid, core_burden) VALUES ('mrid_2', null, null, null, null, null, null, null, null, null, null, null);",
-        "INSERT INTO cuts (mrid, name, description, num_diagram_objects, location_mrid, num_controls, normally_in_service, in_service, commissioned_date, base_voltage_mrid, normal_open, open, rated_current, switch_info_mrid, length_from_terminal_1, ac_line_segment_mrid) VALUES ('mrid_2', 'should_be_nullable', null, null, null, null, null, null, null, null, 'normal_open_2', 'open_2', null, null, null, null);",
+        "INSERT INTO cuts (mrid, name, description, num_diagram_objects, location_mrid, num_controls, normally_in_service, in_service, commissioned_date, base_voltage_mrid, normal_open, open, rated_current, switch_info_mrid, length_from_terminal_1, ac_line_segment_mrid) VALUES ('mrid_2', null, null, null, null, null, null, null, null, null, 'normal_open_2', 'open_2', null, null, null, null);",
         "INSERT INTO disconnectors (mrid, name, description, num_diagram_objects, location_mrid, num_controls, normally_in_service, in_service, commissioned_date, base_voltage_mrid, normal_open, open, rated_current, switch_info_mrid) VALUES ('mrid_2', null, null, null, null, null, null, null, null, null, 'normal_open_2', 'open_2', null, null);",
         "INSERT INTO discretes (mrid, name, description, num_diagram_objects, power_system_resource_mrid, remote_source_mrid, terminal_mrid, phases, unit_symbol) VALUES ('mrid_2', null, null, null, null, null, null, 'phases_2', 'unit_symbol_2');",
         "INSERT INTO distance_relays (mrid, name, description, num_diagram_objects, location_mrid, num_controls, model, reclosing, relay_delay_time, protection_kind, directable, power_direction, relay_info_mrid, backward_blind, backward_reach, backward_reactance, forward_blind, forward_reach, forward_reactance, operation_phase_angle1, operation_phase_angle2, operation_phase_angle3) VALUES ('mrid_2', null, null, null, null, null, null, null, null, 'protection_kind_2', null, 'power_direction_2', null, null, null, null, null, null, null, null, null, null);",
@@ -158,7 +157,7 @@ object ChangeSet61NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
         "INSERT INTO geographical_regions (mrid, name, description, num_diagram_objects) VALUES ('mrid_2', null, null, null);",
         "INSERT INTO grounds (mrid, name, description, num_diagram_objects, location_mrid, num_controls, normally_in_service, in_service, commissioned_date, base_voltage_mrid) VALUES ('mrid_2', null, null, null, null, null, null, null, null, null);",
         "INSERT INTO ground_disconnectors (mrid, name, description, num_diagram_objects, location_mrid, num_controls, normally_in_service, in_service, commissioned_date, base_voltage_mrid, normal_open, open, rated_current, switch_info_mrid) VALUES ('mrid_2', null, null, null, null, null, null, null, null, null, 'normal_open_2', 'open_2', null, null);",
-        "INSERT INTO grounding_impedances (mrid, name, description, num_diagram_objects, location_mrid, num_controls, normally_in_service, in_service, commissioned_date, base_voltage_mrid, r, x) VALUES ('mrid_2', 'should_be_nullable', null, null, null, null, null, null, null, null, null, null);",
+        "INSERT INTO grounding_impedances (mrid, name, description, num_diagram_objects, location_mrid, num_controls, normally_in_service, in_service, commissioned_date, base_voltage_mrid, r, x) VALUES ('mrid_2', null, null, null, null, null, null, null, null, null, null, null);",
         "INSERT INTO jumpers (mrid, name, description, num_diagram_objects, location_mrid, num_controls, normally_in_service, in_service, commissioned_date, base_voltage_mrid, normal_open, open, rated_current, switch_info_mrid) VALUES ('mrid_2', null, null, null, null, null, null, null, null, null, 'normal_open_2', 'open_2', null, null);",
         "INSERT INTO junctions (mrid, name, description, num_diagram_objects, location_mrid, num_controls, normally_in_service, in_service, commissioned_date, base_voltage_mrid) VALUES ('mrid_2', null, null, null, null, null, null, null, null, null);",
         "INSERT INTO linear_shunt_compensators (mrid, name, description, num_diagram_objects, location_mrid, num_controls, normally_in_service, in_service, commissioned_date, base_voltage_mrid, control_enabled, regulating_control_mrid, shunt_compensator_info_mrid, grounded, nom_u, phase_connection, sections, b0_per_section, b_per_section, g0_per_section, g_per_section) VALUES ('mrid_2', null, null, null, null, null, null, null, null, null, null, null, null, null, null, 'phase_connection_2', null, null, null, null, null);",
@@ -169,15 +168,15 @@ object ChangeSet61NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
         "INSERT INTO meters (mrid, name, description, num_diagram_objects, location_mrid, customer_mrid, service_location_mrid) VALUES ('mrid_2', null, null, null, null, null, null);",
         "INSERT INTO no_load_tests (mrid, name, description, num_diagram_objects, base_power, temperature, energised_end_voltage, exciting_current, exciting_current_zero, loss, loss_zero) VALUES ('mrid_2', null, null, null, null, null, null, null, null, null, null);",
         "INSERT INTO open_circuit_tests (mrid, name, description, num_diagram_objects, base_power, temperature, energised_end_step, energised_end_voltage, open_end_step, open_end_voltage, phase_shift) VALUES ('mrid_2', null, null, null, null, null, null, null, null, null, null);",
-        "INSERT INTO operational_restrictions (mrid, name, description, num_diagram_objects, title, created_date_time, author_name, type, status, comment) VALUES ('mrid_2', null, null, null, null, null, null, null, null, 'should_be_nullable');",
+        "INSERT INTO operational_restrictions (mrid, name, description, num_diagram_objects, title, created_date_time, author_name, type, status, comment) VALUES ('mrid_2', null, null, null, null, null, null, null, null, null);",
         "INSERT INTO organisations (mrid, name, description, num_diagram_objects) VALUES ('mrid_2', null, null, null);",
         "INSERT INTO overhead_wire_info (mrid, name, description, num_diagram_objects, rated_current, material) VALUES ('mrid_2', null, null, null, null, 'material_2');",
-        "INSERT INTO pan_demand_response_functions (mrid, name, description, num_diagram_objects, enabled, kind, appliance) VALUES ('mrid_2', 'should_be_nullable', null, null, null, null, null);",
-        "INSERT INTO per_length_phase_impedances (mrid, name, description, num_diagram_objects) VALUES ('mrid_2', 'should_be_nullable', null, null);",
+        "INSERT INTO pan_demand_response_functions (mrid, name, description, num_diagram_objects, enabled, kind, appliance) VALUES ('mrid_2', null, null, null, null, null, null);",
+        "INSERT INTO per_length_phase_impedances (mrid, name, description, num_diagram_objects) VALUES ('mrid_2', null, null, null);",
         "INSERT INTO per_length_sequence_impedances (mrid, name, description, num_diagram_objects, r, x, r0, x0, bch, gch, b0ch, g0ch) VALUES ('mrid_2', null, null, null, null, null, null, null, null, null, null, null);",
-        "INSERT INTO petersen_coils (mrid, name, description, num_diagram_objects, location_mrid, num_controls, normally_in_service, in_service, commissioned_date, base_voltage_mrid, r, x_ground_nominal) VALUES ('mrid_2', 'should_be_nullable', null, null, null, null, null, null, null, null, null, null);",
+        "INSERT INTO petersen_coils (mrid, name, description, num_diagram_objects, location_mrid, num_controls, normally_in_service, in_service, commissioned_date, base_voltage_mrid, r, x_ground_nominal) VALUES ('mrid_2', null, null, null, null, null, null, null, null, null, null, null);",
         "INSERT INTO photo_voltaic_units (mrid, name, description, num_diagram_objects, location_mrid, num_controls, normally_in_service, in_service, commissioned_date, power_electronics_connection_mrid, max_p, min_p) VALUES ('mrid_2', null, null, null, null, null, null, null, null, null, null, null);",
-        "INSERT INTO poles (mrid, name, description, num_diagram_objects, location_mrid, classification) VALUES ('mrid_2', null, null, null, null, 'should_be_nullable');",
+        "INSERT INTO poles (mrid, name, description, num_diagram_objects, location_mrid, classification) VALUES ('mrid_2', null, null, null, null, null);",
         "INSERT INTO potential_transformer_info (mrid, name, description, num_diagram_objects, accuracy_class, nominal_ratio_denominator, nominal_ratio_numerator, primary_ratio, pt_class, rated_voltage, secondary_ratio) VALUES ('mrid_2', null, null, null, null, null, null, null, null, null, null);",
         "INSERT INTO potential_transformers (mrid, name, description, num_diagram_objects, location_mrid, num_controls, normally_in_service, in_service, commissioned_date, terminal_mrid, potential_transformer_info_mrid, type) VALUES ('mrid_2', null, null, null, null, null, null, null, null, null, null, 'type_2');",
         "INSERT INTO power_electronics_connections (mrid, name, description, num_diagram_objects, location_mrid, num_controls, normally_in_service, in_service, commissioned_date, base_voltage_mrid, control_enabled, regulating_control_mrid, max_i_fault, max_q, min_q, p, q, rated_s, rated_u, inverter_standard, sustain_op_overvolt_limit, stop_at_over_freq, stop_at_under_freq, inv_volt_watt_resp_mode, inv_watt_resp_v1, inv_watt_resp_v2, inv_watt_resp_v3, inv_watt_resp_v4, inv_watt_resp_p_at_v1, inv_watt_resp_p_at_v2, inv_watt_resp_p_at_v3, inv_watt_resp_p_at_v4, inv_volt_var_resp_mode, inv_var_resp_v1, inv_var_resp_v2, inv_var_resp_v3, inv_var_resp_v4, inv_var_resp_q_at_v1, inv_var_resp_q_at_v2, inv_var_resp_q_at_v3, inv_var_resp_q_at_v4, inv_reactive_power_mode, inv_fix_reactive_power) VALUES ('mrid_2', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);",
@@ -189,7 +188,7 @@ object ChangeSet61NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
         "INSERT INTO protection_relay_schemes (mrid, name, description, num_diagram_objects, system_mrid) VALUES ('mrid_2', null, null, null, null);",
         "INSERT INTO protection_relay_systems (mrid, name, description, num_diagram_objects, location_mrid, num_controls, normally_in_service, in_service, commissioned_date, protection_kind) VALUES ('mrid_2', null, null, null, null, null, null, null, null, 'protection_kind_2');",
         "INSERT INTO ratio_tap_changers (mrid, name, description, num_diagram_objects, location_mrid, num_controls, control_enabled, high_step, low_step, neutral_step, neutral_u, normal_step, step, tap_changer_control_mrid, transformer_end_mrid, step_voltage_increment) VALUES ('mrid_2', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);",
-        "INSERT INTO reactive_capability_curves (mrid, name, description, num_diagram_objects) VALUES ('mrid_2', 'should_be_nullable', null, null);",
+        "INSERT INTO reactive_capability_curves (mrid, name, description, num_diagram_objects) VALUES ('mrid_2', null, null, null);",
         "INSERT INTO reclosers (mrid, name, description, num_diagram_objects, location_mrid, num_controls, normally_in_service, in_service, commissioned_date, base_voltage_mrid, normal_open, open, rated_current, switch_info_mrid, breaking_capacity) VALUES ('mrid_2', null, null, null, null, null, null, null, null, null, 'normal_open_2', 'open_2', null, null, null);",
         "INSERT INTO relay_info (mrid, name, description, num_diagram_objects, curve_setting, reclose_fast) VALUES ('mrid_2', null, null, null, null, null);",
         "INSERT INTO remote_controls (mrid, name, description, num_diagram_objects, control_mrid) VALUES ('mrid_2', null, null, null, null);",
@@ -201,9 +200,9 @@ object ChangeSet61NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
         "INSERT INTO streetlights (mrid, name, description, num_diagram_objects, location_mrid, pole_mrid, lamp_kind, light_rating) VALUES ('mrid_2', null, null, null, null, null, 'lamp_kind_2', null);",
         "INSERT INTO sub_geographical_regions (mrid, name, description, num_diagram_objects, geographical_region_mrid) VALUES ('mrid_2', null, null, null, null);",
         "INSERT INTO substations (mrid, name, description, num_diagram_objects, location_mrid, num_controls, sub_geographical_region_mrid) VALUES ('mrid_2', null, null, null, null, null, null);",
-        "INSERT INTO static_var_compensators (mrid, name, description, num_diagram_objects, location_mrid, num_controls, normally_in_service, in_service, commissioned_date, base_voltage_mrid, control_enabled, regulating_control_mrid, capacitive_rating, inductive_rating, q, svc_control_mode, voltage_set_point) VALUES ('mrid_2', 'should_be_nullable', null, null, null, null, null, null, null, null, null, null, null, null, null, 'svc_control_mode_2', null);",
+        "INSERT INTO static_var_compensators (mrid, name, description, num_diagram_objects, location_mrid, num_controls, normally_in_service, in_service, commissioned_date, base_voltage_mrid, control_enabled, regulating_control_mrid, capacitive_rating, inductive_rating, q, svc_control_mode, voltage_set_point) VALUES ('mrid_2', null, null, null, null, null, null, null, null, null, null, null, null, null, null, 'svc_control_mode_2', null);",
         "INSERT INTO switch_info (mrid, name, description, num_diagram_objects, rated_interrupting_time) VALUES ('mrid_2', null, null, null, null);",
-        "INSERT INTO synchronous_machines (mrid, name, description, num_diagram_objects, location_mrid, num_controls, normally_in_service, in_service, commissioned_date, base_voltage_mrid, control_enabled, regulating_control_mrid, rated_power_factor, rated_s, rated_u, p, q, base_q, condenser_p, earthing, earthing_star_point_r, earthing_star_point_x, ikk, max_q, max_u, min_q, min_u, mu, r, r0, r2, sat_direct_subtrans_x, sat_direct_sync_x, sat_direct_trans_x, x0, x2, type, operating_mode) VALUES ('mrid_2', 'should_be_nullable', null, null, null, 'should_be_nullable', null, null, null, null, 'should_be_nullable', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 'type_2', 'operating_mode_2');",
+        "INSERT INTO synchronous_machines (mrid, name, description, num_diagram_objects, location_mrid, num_controls, normally_in_service, in_service, commissioned_date, base_voltage_mrid, control_enabled, regulating_control_mrid, rated_power_factor, rated_s, rated_u, p, q, base_q, condenser_p, earthing, earthing_star_point_r, earthing_star_point_x, ikk, max_q, max_u, min_q, min_u, mu, r, r0, r2, sat_direct_subtrans_x, sat_direct_sync_x, sat_direct_trans_x, x0, x2, type, operating_mode) VALUES ('mrid_2', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 'type_2', 'operating_mode_2');",
         "INSERT INTO tap_changer_controls (mrid, name, description, num_diagram_objects, location_mrid, num_controls, discrete, mode, monitored_phase, target_deadband, target_value, enabled, max_allowed_target_value, min_allowed_target_value, rated_current, terminal_mrid, ct_primary, min_target_deadband, limit_voltage, line_drop_compensation, line_drop_r, line_drop_x, reverse_line_drop_r, reverse_line_drop_x, forward_ldc_blocking, time_delay, co_generation_enabled) VALUES ('mrid_2', null, null, null, null, null, null, 'mode_2', 'monitored_phase_2', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);",
         "INSERT INTO terminals (mrid, name, description, num_diagram_objects, conducting_equipment_mrid, sequence_number, connectivity_node_mrid, phases) VALUES ('mrid_2', null, null, null, null, 'sequence_number_2', null, 'phases_2');",
         "INSERT INTO transformer_end_info (mrid, name, description, num_diagram_objects, connection_kind, emergency_s, end_number, insulation_u, phase_angle_clock, r, rated_s, rated_u, short_term_s, transformer_tank_info_mrid, energised_end_no_load_tests, energised_end_short_circuit_tests, grounded_end_short_circuit_tests, open_end_open_circuit_tests, energised_end_open_circuit_tests) VALUES ('mrid_2', null, null, null, 'connection_kind_2', null, 'end_number_2', null, null, null, null, null, null, null, null, null, null, null, null);",
@@ -311,6 +310,8 @@ object ChangeSet61NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
         `validate location_street_addresses`(statement)
         `validate phase_impedance_data`(statement)
         `validate protection_relay_function_thresholds`(statement)
+
+        `validate indexes`(statement)
     }
 
     override fun tearDownStatements(): List<String> =
@@ -577,7 +578,7 @@ object ChangeSet61NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
                 assertThat(rs.getString("control_mode"), equalTo("control_mode_1"))
             }, { rs ->
                 assertThat(rs.getString("mrid"), equalTo("mrid_2"))
-                assertThat(rs.getString("name"), equalTo("should_be_nullable"))
+                assertThat(rs.getNullableString("name"), nullValue())
                 assertThat(rs.getNullableString("description"), nullValue())
                 assertThat(rs.getNullableString("num_diagram_objects"), nullValue())
                 assertThat(rs.getNullableString("location_mrid"), nullValue())
@@ -779,7 +780,7 @@ object ChangeSet61NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
                 assertThat(rs.getString("ac_line_segment_mrid"), equalTo("ac_line_segment_mrid_1"))
             }, { rs ->
                 assertThat(rs.getString("mrid"), equalTo("mrid_2"))
-                assertThat(rs.getString("name"), equalTo("should_be_nullable"))
+                assertThat(rs.getNullableString("name"), nullValue())
                 assertThat(rs.getNullableString("description"), nullValue())
                 assertThat(rs.getNullableString("num_diagram_objects"), nullValue())
                 assertThat(rs.getNullableString("location_mrid"), nullValue())
@@ -977,7 +978,7 @@ object ChangeSet61NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
                 assertThat(rs.getString("ac_line_segment_mrid"), equalTo("ac_line_segment_mrid_1"))
             }, { rs ->
                 assertThat(rs.getString("mrid"), equalTo("mrid_2"))
-                assertThat(rs.getString("name"), equalTo("should_be_nullable"))
+                assertThat(rs.getNullableString("name"), nullValue())
                 assertThat(rs.getNullableString("description"), nullValue())
                 assertThat(rs.getNullableString("num_diagram_objects"), nullValue())
                 assertThat(rs.getNullableString("location_mrid"), nullValue())
@@ -1597,7 +1598,7 @@ object ChangeSet61NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
                 assertThat(rs.getString("x"), equalTo("x_1"))
             }, { rs ->
                 assertThat(rs.getString("mrid"), equalTo("mrid_2"))
-                assertThat(rs.getString("name"), equalTo("should_be_nullable"))
+                assertThat(rs.getNullableString("name"), nullValue())
                 assertThat(rs.getNullableString("description"), nullValue())
                 assertThat(rs.getNullableString("num_diagram_objects"), nullValue())
                 assertThat(rs.getNullableString("location_mrid"), nullValue())
@@ -1945,7 +1946,7 @@ object ChangeSet61NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
                 assertThat(rs.getNullableString("author_name"), nullValue())
                 assertThat(rs.getNullableString("type"), nullValue())
                 assertThat(rs.getNullableString("status"), nullValue())
-                assertThat(rs.getString("comment"), equalTo("should_be_nullable"))
+                assertThat(rs.getNullableString("comment"), nullValue())
             }
         )
     }
@@ -2004,7 +2005,7 @@ object ChangeSet61NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
                 assertThat(rs.getString("appliance"), equalTo("appliance_1"))
             }, { rs ->
                 assertThat(rs.getString("mrid"), equalTo("mrid_2"))
-                assertThat(rs.getString("name"), equalTo("should_be_nullable"))
+                assertThat(rs.getNullableString("name"), nullValue())
                 assertThat(rs.getNullableString("description"), nullValue())
                 assertThat(rs.getNullableString("num_diagram_objects"), nullValue())
                 assertThat(rs.getNullableString("enabled"), nullValue())
@@ -2025,7 +2026,7 @@ object ChangeSet61NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
                 assertThat(rs.getString("num_diagram_objects"), equalTo("num_diagram_objects_1"))
             }, { rs ->
                 assertThat(rs.getString("mrid"), equalTo("mrid_2"))
-                assertThat(rs.getString("name"), equalTo("should_be_nullable"))
+                assertThat(rs.getNullableString("name"), nullValue())
                 assertThat(rs.getNullableString("description"), nullValue())
                 assertThat(rs.getNullableString("num_diagram_objects"), nullValue())
             }
@@ -2085,7 +2086,7 @@ object ChangeSet61NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
                 assertThat(rs.getString("x_ground_nominal"), equalTo("x_ground_nominal_1"))
             }, { rs ->
                 assertThat(rs.getString("mrid"), equalTo("mrid_2"))
-                assertThat(rs.getString("name"), equalTo("should_be_nullable"))
+                assertThat(rs.getNullableString("name"), nullValue())
                 assertThat(rs.getNullableString("description"), nullValue())
                 assertThat(rs.getNullableString("num_diagram_objects"), nullValue())
                 assertThat(rs.getNullableString("location_mrid"), nullValue())
@@ -2151,7 +2152,7 @@ object ChangeSet61NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
                 assertThat(rs.getNullableString("description"), nullValue())
                 assertThat(rs.getNullableString("num_diagram_objects"), nullValue())
                 assertThat(rs.getNullableString("location_mrid"), nullValue())
-                assertThat(rs.getString("classification"), equalTo("should_be_nullable"))
+                assertThat(rs.getNullableString("classification"), nullValue())
             }
         )
     }
@@ -2599,7 +2600,7 @@ object ChangeSet61NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
                 assertThat(rs.getString("num_diagram_objects"), equalTo("num_diagram_objects_1"))
             }, { rs ->
                 assertThat(rs.getString("mrid"), equalTo("mrid_2"))
-                assertThat(rs.getString("name"), equalTo("should_be_nullable"))
+                assertThat(rs.getNullableString("name"), nullValue())
                 assertThat(rs.getNullableString("description"), nullValue())
                 assertThat(rs.getNullableString("num_diagram_objects"), nullValue())
             }
@@ -2934,7 +2935,7 @@ object ChangeSet61NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
                 assertThat(rs.getString("voltage_set_point"), equalTo("voltage_set_point_1"))
             }, { rs ->
                 assertThat(rs.getString("mrid"), equalTo("mrid_2"))
-                assertThat(rs.getString("name"), equalTo("should_be_nullable"))
+                assertThat(rs.getNullableString("name"), nullValue())
                 assertThat(rs.getNullableString("description"), nullValue())
                 assertThat(rs.getNullableString("num_diagram_objects"), nullValue())
                 assertThat(rs.getNullableString("location_mrid"), nullValue())
@@ -3019,16 +3020,16 @@ object ChangeSet61NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
                 assertThat(rs.getString("operating_mode"), equalTo("operating_mode_1"))
             }, { rs ->
                 assertThat(rs.getString("mrid"), equalTo("mrid_2"))
-                assertThat(rs.getString("name"), equalTo("should_be_nullable"))
+                assertThat(rs.getNullableString("name"), nullValue())
                 assertThat(rs.getNullableString("description"), nullValue())
                 assertThat(rs.getNullableString("num_diagram_objects"), nullValue())
                 assertThat(rs.getNullableString("location_mrid"), nullValue())
-                assertThat(rs.getString("num_controls"), equalTo("should_be_nullable"))
+                assertThat(rs.getNullableString("num_controls"), nullValue())
                 assertThat(rs.getNullableString("normally_in_service"), nullValue())
                 assertThat(rs.getNullableString("in_service"), nullValue())
                 assertThat(rs.getNullableString("commissioned_date"), nullValue())
                 assertThat(rs.getNullableString("base_voltage_mrid"), nullValue())
-                assertThat(rs.getString("control_enabled"), equalTo("should_be_nullable"))
+                assertThat(rs.getNullableString("control_enabled"), nullValue())
                 assertThat(rs.getNullableString("regulating_control_mrid"), nullValue())
                 assertThat(rs.getNullableString("rated_power_factor"), nullValue())
                 assertThat(rs.getNullableString("rated_s"), nullValue())
@@ -3390,6 +3391,285 @@ object ChangeSet61NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
                 assertThat(rs.getString("value"), equalTo("value_2"))
                 assertThat(rs.getNullableString("name"), nullValue())
             }
+        )
+    }
+
+    private fun `validate indexes`(statement: Statement) {
+        ensureIndexes(
+            statement,
+            "name_types_name",
+            "names_identified_object_mrid_name_type_name_name",
+            "names_identified_object_mrid",
+            "names_name",
+            "names_name_type_name",
+            "ac_line_segments_mrid",
+            "ac_line_segments_name",
+            "accumulators_mrid",
+            "accumulators_name",
+            "accumulators_power_system_resource_mrid",
+            "accumulators_remote_source_mrid",
+            "accumulators_terminal_mrid",
+            "analogs_mrid",
+            "analogs_name",
+            "analogs_power_system_resource_mrid",
+            "analogs_remote_source_mrid",
+            "analogs_terminal_mrid",
+            "asset_organisation_roles_assets_asset_organisation_role_mrid_asset_mrid",
+            "asset_organisation_roles_assets_asset_organisation_role_mrid",
+            "asset_organisation_roles_assets_asset_mrid",
+            "assets_power_system_resources_asset_mrid_power_system_resource_mrid",
+            "assets_power_system_resources_asset_mrid",
+            "assets_power_system_resources_power_system_resource_mrid",
+            "asset_owners_mrid",
+            "asset_owners_name",
+            "base_voltages_mrid",
+            "base_voltages_name",
+            "battery_controls_mrid",
+            "battery_controls_name",
+            "battery_units_mrid",
+            "battery_units_name",
+            "battery_units_power_electronics_connection_mrid",
+            "battery_units_battery_controls_battery_unit_mrid_battery_control_mrid",
+            "battery_units_battery_controls_battery_unit_mrid",
+            "battery_units_battery_controls_battery_control_mrid",
+            "breakers_mrid",
+            "breakers_name",
+            "busbar_sections_mrid",
+            "busbar_sections_name",
+            "cable_info_mrid",
+            "cable_info_name",
+            "circuits_mrid",
+            "circuits_name",
+            "circuits_loop_mrid",
+            "circuits_substations_circuit_mrid_substation_mrid",
+            "circuits_substations_circuit_mrid",
+            "circuits_substations_substation_mrid",
+            "circuits_terminals_circuit_mrid_terminal_mrid",
+            "circuits_terminals_circuit_mrid",
+            "circuits_terminals_terminal_mrid",
+            "clamps_mrid",
+            "clamps_name",
+            "clamps_ac_line_segment_mrid",
+            "connectivity_nodes_mrid",
+            "connectivity_nodes_name",
+            "controls_mrid",
+            "controls_name",
+            "current_relays_mrid",
+            "current_relays_name",
+            "current_transformer_info_mrid",
+            "current_transformer_info_name",
+            "current_transformers_mrid",
+            "current_transformers_name",
+            "curve_data_curve_mrid_x_value",
+            "curve_data_curve_mrid",
+            "cuts_mrid",
+            "cuts_name",
+            "cuts_ac_line_segment_mrid",
+            "disconnectors_mrid",
+            "disconnectors_name",
+            "discretes_mrid",
+            "discretes_name",
+            "discretes_power_system_resource_mrid",
+            "discretes_remote_source_mrid",
+            "discretes_terminal_mrid",
+            "distance_relays_mrid",
+            "distance_relays_name",
+            "end_devices_end_device_functions_end_device_mrid_end_device_function_mrid",
+            "end_devices_end_device_functions_end_device_mrid",
+            "end_devices_end_device_functions_end_device_function_mrid",
+            "energy_consumer_phases_mrid",
+            "energy_consumer_phases_energy_consumer_mrid_phase",
+            "energy_consumer_phases_name",
+            "energy_consumer_phases_energy_consumer_mrid",
+            "energy_consumers_mrid",
+            "energy_consumers_name",
+            "energy_source_phases_mrid",
+            "energy_source_phases_energy_source_mrid_phase",
+            "energy_source_phases_name",
+            "energy_source_phases_energy_source_mrid",
+            "energy_sources_mrid",
+            "energy_sources_name",
+            "equipment_equipment_containers_equipment_mrid_equipment_container_mrid",
+            "equipment_equipment_containers_equipment_mrid",
+            "equipment_equipment_containers_equipment_container_mrid",
+            "equipment_operational_restrictions_equipment_mrid_operational_restriction_mrid",
+            "equipment_operational_restrictions_equipment_mrid",
+            "equipment_operational_restrictions_operational_restriction_mrid",
+            "equipment_usage_points_equipment_mrid_usage_point_mrid",
+            "equipment_usage_points_equipment_mrid",
+            "equipment_usage_points_usage_point_mrid",
+            "equivalent_branches_mrid",
+            "equivalent_branches_name",
+            "ev_charging_units_mrid",
+            "ev_charging_units_name",
+            "ev_charging_units_power_electronics_connection_mrid",
+            "fault_indicators_mrid",
+            "fault_indicators_name",
+            "feeders_mrid",
+            "feeders_name",
+            "feeders_normal_energizing_substation_mrid",
+            "fuses_mrid",
+            "fuses_name",
+            "geographical_regions_mrid",
+            "geographical_regions_name",
+            "grounds_mrid",
+            "grounds_name",
+            "ground_disconnectors_mrid",
+            "ground_disconnectors_name",
+            "grounding_impedances_mrid",
+            "grounding_impedances_name",
+            "jumpers_mrid",
+            "jumpers_name",
+            "junctions_mrid",
+            "junctions_name",
+            "linear_shunt_compensators_mrid",
+            "linear_shunt_compensators_name",
+            "load_break_switches_mrid",
+            "load_break_switches_name",
+            "location_street_addresses_location_mrid_address_field",
+            "location_street_addresses_location_mrid",
+            "locations_mrid",
+            "locations_name",
+            "loops_mrid",
+            "loops_name",
+            "loops_substations_loop_mrid_substation_mrid",
+            "loops_substations_loop_mrid",
+            "loops_substations_substation_mrid",
+            "lv_feeders_mrid",
+            "lv_feeders_name",
+            "meters_mrid",
+            "meters_name",
+            "no_load_tests_mrid",
+            "no_load_tests_name",
+            "open_circuit_tests_mrid",
+            "open_circuit_tests_name",
+            "operational_restrictions_mrid",
+            "operational_restrictions_name",
+            "organisations_mrid",
+            "organisations_name",
+            "overhead_wire_info_mrid",
+            "overhead_wire_info_name",
+            "pan_demand_response_functions_mrid",
+            "pan_demand_response_functions_name",
+            "per_length_phase_impedances_mrid",
+            "per_length_phase_impedances_name",
+            "per_length_sequence_impedances_mrid",
+            "per_length_sequence_impedances_name",
+            "phase_impedance_data_per_length_phase_impedance_mrid_from_phase_to_phase",
+            "phase_impedance_data_per_length_phase_impedance_mrid",
+            "petersen_coils_mrid",
+            "petersen_coils_name",
+            "photo_voltaic_units_mrid",
+            "photo_voltaic_units_name",
+            "photo_voltaic_units_power_electronics_connection_mrid",
+            "poles_mrid",
+            "poles_name",
+            "position_points_location_mrid_sequence_number",
+            "potential_transformer_info_mrid",
+            "potential_transformer_info_name",
+            "potential_transformers_mrid",
+            "potential_transformers_name",
+            "power_electronics_connections_mrid",
+            "power_electronics_connections_name",
+            "power_electronics_connection_phases_mrid",
+            "power_electronics_connection_phases_name",
+            "power_electronics_connection_phases_power_electronics_connection_mrid",
+            "power_electronics_wind_units_mrid",
+            "power_electronics_wind_units_name",
+            "power_electronics_wind_units_power_electronics_connection_mrid",
+            "power_transformer_ends_mrid",
+            "power_transformer_ends_power_transformer_mrid_end_number",
+            "power_transformer_ends_name",
+            "power_transformer_ends_star_impedance_mrid",
+            "power_transformer_ends_power_transformer_mrid",
+            "power_transformer_end_ratings_power_transformer_end_mrid_cooling_type",
+            "power_transformer_end_ratings_power_transformer_end_mrid",
+            "power_transformer_info_mrid",
+            "power_transformer_info_name",
+            "power_transformers_mrid",
+            "power_transformers_name",
+            "protection_relay_function_thresholds_protection_relay_function_mrid_sequence_number",
+            "protection_relay_function_thresholds_protection_relay_function_mrid",
+            "protection_relay_function_time_limits_protection_relay_function_mrid_sequence_number",
+            "protection_relay_function_time_limits_protection_relay_function_mrid",
+            "protection_relay_functions_protected_switches_protection_relay_function_mrid_protected_switch_mrid",
+            "protection_relay_functions_protected_switches_protection_relay_function_mrid",
+            "protection_relay_functions_protected_switches_protected_switch_mrid",
+            "protection_relay_functions_sensors_protection_relay_function_mrid_sensor_mrid",
+            "protection_relay_functions_sensors_protection_relay_function_mrid",
+            "protection_relay_functions_sensors_sensor_mrid",
+            "protection_relay_schemes_mrid",
+            "protection_relay_schemes_name",
+            "protection_relay_schemes_protection_relay_functions_protection_relay_scheme_mrid_protection_relay_function_mrid",
+            "protection_relay_schemes_protection_relay_functions_protection_relay_scheme_mrid",
+            "protection_relay_schemes_protection_relay_functions_protection_relay_function_mrid",
+            "protection_relay_systems_mrid",
+            "protection_relay_systems_name",
+            "ratio_tap_changers_mrid",
+            "ratio_tap_changers_transformer_end_mrid",
+            "ratio_tap_changers_name",
+            "reactive_capability_curves_mrid",
+            "reactive_capability_curves_name",
+            "reclosers_mrid",
+            "reclosers_name",
+            "reclose_delays_relay_info_mrid_sequence_number",
+            "reclose_delays_relay_info_mrid",
+            "relay_info_mrid",
+            "relay_info_name",
+            "remote_controls_mrid",
+            "remote_controls_name",
+            "remote_sources_mrid",
+            "remote_sources_name",
+            "series_compensators_mrid",
+            "series_compensators_name",
+            "short_circuit_tests_mrid",
+            "short_circuit_tests_name",
+            "shunt_compensator_info_mrid",
+            "shunt_compensator_info_name",
+            "sites_mrid",
+            "sites_name",
+            "streetlights_mrid",
+            "streetlights_name",
+            "sub_geographical_regions_mrid",
+            "sub_geographical_regions_name",
+            "sub_geographical_regions_geographical_region_mrid",
+            "substations_mrid",
+            "substations_name",
+            "substations_sub_geographical_region_mrid",
+            "static_var_compensators_mrid",
+            "static_var_compensators_name",
+            "switch_info_mrid",
+            "switch_info_name",
+            "synchronous_machines_mrid",
+            "synchronous_machines_name",
+            "synchronous_machines_reactive_capability_curves_synchronous_machine_mrid_reactive_capability_curve_mrid",
+            "synchronous_machines_reactive_capability_curves_synchronous_machine_mrid",
+            "synchronous_machines_reactive_capability_curves_reactive_capability_curve_mrid",
+            "tap_changer_controls_mrid",
+            "tap_changer_controls_name",
+            "terminals_mrid",
+            "terminals_conducting_equipment_mrid_sequence_number",
+            "terminals_name",
+            "terminals_connectivity_node_mrid",
+            "transformer_end_info_mrid",
+            "transformer_end_info_name",
+            "transformer_end_info_transformer_tank_info_mrid",
+            "transformer_end_info_energised_end_no_load_tests",
+            "transformer_end_info_energised_end_short_circuit_tests",
+            "transformer_end_info_grounded_end_short_circuit_tests",
+            "transformer_end_info_open_end_open_circuit_tests",
+            "transformer_end_info_energised_end_open_circuit_tests",
+            "transformer_star_impedances_mrid",
+            "transformer_star_impedances_transformer_end_info_mrid",
+            "transformer_star_impedances_name",
+            "transformer_tank_info_mrid",
+            "transformer_tank_info_name",
+            "transformer_tank_info_power_transformer_info_mrid",
+            "usage_points_mrid",
+            "usage_points_name",
+            "usage_points_end_devices_usage_point_mrid_end_device_mrid",
+            "usage_points_end_devices_usage_point_mrid",
+            "usage_points_end_devices_end_device_mrid",
         )
     }
 

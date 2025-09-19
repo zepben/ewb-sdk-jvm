@@ -26,15 +26,15 @@ class TableEquipmentOperationalRestrictions : SqliteTable() {
 
     override val name: String = "equipment_operational_restrictions"
 
-    override val uniqueIndexColumns: MutableList<List<Column>> =
-        super.uniqueIndexColumns.apply {
-            add(listOf(EQUIPMENT_MRID, OPERATIONAL_RESTRICTION_MRID))
-        }
+    init {
+        addUniqueIndexes(
+            listOf(EQUIPMENT_MRID, OPERATIONAL_RESTRICTION_MRID)
+        )
 
-    override val nonUniqueIndexColumns: MutableList<List<Column>> =
-        super.nonUniqueIndexColumns.apply {
-            add(listOf(EQUIPMENT_MRID))
-            add(listOf(OPERATIONAL_RESTRICTION_MRID))
-        }
+        addNonUniqueIndexes(
+            listOf(EQUIPMENT_MRID),
+            listOf(OPERATIONAL_RESTRICTION_MRID)
+        )
+    }
 
 }

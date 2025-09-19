@@ -20,9 +20,10 @@ class TableFeeders : TableEquipmentContainers() {
 
     override val name: String = "feeders"
 
-    override val nonUniqueIndexColumns: MutableList<List<Column>> =
-        super.nonUniqueIndexColumns.apply {
-            add(listOf(NORMAL_ENERGIZING_SUBSTATION_MRID))
-        }
+    init {
+        addNonUniqueIndexes(
+            listOf(NORMAL_ENERGIZING_SUBSTATION_MRID)
+        )
+    }
 
 }

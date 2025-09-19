@@ -20,14 +20,14 @@ class TableEnergySourcePhases : TablePowerSystemResources() {
 
     override val name: String = "energy_source_phases"
 
-    override val uniqueIndexColumns: MutableList<List<Column>> =
-        super.uniqueIndexColumns.apply {
-            add(listOf(ENERGY_SOURCE_MRID, PHASE))
-        }
+    init {
+        addUniqueIndexes(
+            listOf(ENERGY_SOURCE_MRID, PHASE)
+        )
 
-    override val nonUniqueIndexColumns: MutableList<List<Column>> =
-        super.nonUniqueIndexColumns.apply {
-            add(listOf(ENERGY_SOURCE_MRID))
-        }
+        addNonUniqueIndexes(
+            listOf(ENERGY_SOURCE_MRID)
+        )
+    }
 
 }

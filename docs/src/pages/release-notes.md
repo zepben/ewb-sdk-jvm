@@ -2,6 +2,7 @@
 
 | Version                | Released            |
 |------------------------|---------------------|
+|[1.0.1](#101)| `19 September 2025` |
 |[1.0.0](#100)| `27 August 2025` |
 |[0.29.0](#v0290)| `05 June 2025` |
 |[0.28.0](#v0280)| `28 April 2025` |
@@ -40,6 +41,26 @@
 ---
 
 NOTE: This library is not yet stable, and breaking changes should be expected until a 1.0.0 release.
+
+---
+
+## [1.0.1]
+
+### Breaking Changes
+* None.
+
+### New Features
+* None.
+
+### Enhancements
+* None.
+
+### Fixes
+* Fixed a bug in the LV feeder assignment when processing sites in the current state of the network. This prevented LV feeders on switches (rather than the
+  transformer) from being assigned to the current state energising feeder.
+
+### Notes
+* None.
 
 ---
 

@@ -12,8 +12,10 @@ import com.zepben.ewb.cim.iec61968.common.Agreement
 import com.zepben.ewb.cim.iec61968.common.Document
 import com.zepben.ewb.cim.iec61968.common.OrganisationRole
 import com.zepben.ewb.cim.iec61968.customers.*
+import com.zepben.ewb.cim.iec61970.base.domain.DateTimeInterval
 import com.zepben.ewb.services.common.testdata.fillFieldsCommon
 import com.zepben.ewb.services.customer.CustomerService
+import java.time.Instant
 
 // ###################
 // # IEC61968 Common #
@@ -21,6 +23,9 @@ import com.zepben.ewb.services.customer.CustomerService
 
 fun Agreement.fillFields(service: CustomerService, includeRuntime: Boolean = true): Agreement {
     (this as Document).fillFieldsCommon(service, includeRuntime)
+
+    validityInterval = DateTimeInterval(start = Instant.ofEpochSecond(1), end = Instant.ofEpochSecond(2))
+
     return this
 }
 
@@ -55,6 +60,8 @@ fun CustomerAgreement.fillFields(service: CustomerService, includeRuntime: Boole
 
     for (i in 0..1)
         addPricingStructure(PricingStructure().also { service.add(it) })
+
+    validityInterval = DateTimeInterval(Instant.ofEpochSecond(1), Instant.ofEpochSecond(2))
 
     return this
 }

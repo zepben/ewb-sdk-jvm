@@ -8,8 +8,17 @@
 
 package com.zepben.ewb.cim.iec61968.common
 
+import com.zepben.ewb.cim.iec61970.base.domain.DateTimeInterval
+
 /**
  * Formal agreement between two parties defining the terms and conditions for a set of services. The specifics of
  * the services are, in turn, defined via one or more service agreements.
  */
-abstract class Agreement(mRID: String = "") : Document(mRID)
+abstract class Agreement(mRID: String = "") : Document(mRID) {
+
+    /**
+     * Date and time interval this agreement is valid (from going into effect to termination).
+     */
+    var validityInterval: DateTimeInterval? = null
+
+}

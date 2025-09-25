@@ -10,6 +10,8 @@ package com.zepben.ewb.database.sqlite.cim.customer
 
 import com.zepben.ewb.cim.iec61968.common.Agreement
 import com.zepben.ewb.cim.iec61968.customers.*
+import com.zepben.ewb.cim.iec61970.base.domain.DateTimeInterval
+import com.zepben.ewb.database.sql.extensions.getInstant
 import com.zepben.ewb.database.sql.extensions.getNullableInt
 import com.zepben.ewb.database.sql.extensions.getNullableString
 import com.zepben.ewb.database.sqlite.cim.CimReader
@@ -37,6 +39,13 @@ internal class CustomerCimReader : CimReader<CustomerService>() {
 
     @Throws(SQLException::class)
     private fun readAgreement(agreement: Agreement, table: TableAgreements, resultSet: ResultSet): Boolean {
+        agreement.apply {
+            val start = resultSet.getInstant(table.VALIDITY_INTERVAL_START.queryIndex)
+            val end = resultSet.getInstant(table.VALIDITY_INTERVAL_END.queryIndex)
+
+            if ((start != null) || (end != null))
+                validityInterval = DateTimeInterval(start, end)
+        }
         return readDocument(agreement, table, resultSet)
     }
 

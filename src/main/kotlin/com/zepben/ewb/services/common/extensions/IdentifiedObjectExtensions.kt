@@ -24,11 +24,14 @@ internal fun <T : IdentifiedObject> Iterable<T>?.getByMRID(mRID: String): T? {
     return this?.firstOrNull { it.mRID == mRID }
 }
 
-internal fun IdentifiedObject.validateReference(other: IdentifiedObject, getter: (String) -> IdentifiedObject?, typeDescription: String): Boolean {
-    val getResult = getter(other.mRID)
+internal fun IdentifiedObject.validateReference(other: IdentifiedObject, getter: (String) -> IdentifiedObject?, typeDescription: String): Boolean =
+    validateReference(other, IdentifiedObject::mRID, getter) { "$typeDescription with mRID ${other.mRID}" }
+
+internal fun <T> IdentifiedObject.validateReference(other: T, getIdentifier: T.() -> String, getter: (String) -> T?, describeOther: () -> String): Boolean {
+    val getResult = getter(other.getIdentifier())
     if (getResult == other)
         return true
 
-    require((getResult == null) || (getResult == other)) { "$typeDescription with mRID ${other.mRID} already exists in ${typeNameAndMRID()}." }
+    require((getResult == null) || (getResult == other)) { "${describeOther()} already exists in ${typeNameAndMRID()}." }
     return false
 }

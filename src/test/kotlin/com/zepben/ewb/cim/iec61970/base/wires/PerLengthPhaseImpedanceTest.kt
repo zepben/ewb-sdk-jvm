@@ -9,6 +9,7 @@
 package com.zepben.ewb.cim.iec61970.base.wires
 
 import com.zepben.ewb.utils.PrivateCollectionValidator
+import com.zepben.ewb.utils.PrivateCollectionValidator.DuplicateBehaviour
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -43,7 +44,8 @@ internal class PerLengthPhaseImpedanceTest {
             PerLengthPhaseImpedance::addData,
             PerLengthPhaseImpedance::removeData,
             PerLengthPhaseImpedance::clearData,
-            { Key(it.fromPhase, it.toPhase) }
+            { Key(it.fromPhase, it.toPhase) },
+            DuplicateBehaviour.THROWS,
         )
     }
 

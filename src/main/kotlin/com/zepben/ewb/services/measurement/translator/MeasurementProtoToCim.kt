@@ -11,6 +11,7 @@ package com.zepben.ewb.services.measurement.translator
 import com.zepben.ewb.cim.iec61970.base.meas.*
 import com.zepben.ewb.services.common.translator.toInstant
 import com.zepben.ewb.services.measurement.MeasurementService
+import com.zepben.protobuf.cim.iec61970.base.core.Equipment
 import com.zepben.protobuf.cim.iec61970.base.meas.AccumulatorValue as PBAccumulatorValue
 import com.zepben.protobuf.cim.iec61970.base.meas.AnalogValue as PBAnalogValue
 import com.zepben.protobuf.cim.iec61970.base.meas.DiscreteValue as PBDiscreteValue
@@ -67,7 +68,9 @@ fun toCim(pb: PBDiscreteValue): DiscreteValue =
  * @return The converted [pb] as a CIM [MeasurementValue].
  */
 fun toCim(pb: PBMeasurementValue, cim: MeasurementValue): MeasurementValue =
-    cim.apply { timeStamp = pb.timeStamp.toInstant() }
+    cim.apply {
+        timeStamp = pb.timeStampSet.takeUnless { pb.hasTimeStampNull() }?.toInstant()
+    }
 
 
 /**

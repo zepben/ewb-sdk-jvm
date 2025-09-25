@@ -28,28 +28,31 @@ internal class TownDetailTest {
 
     @Test
     internal fun accessorCoverage() {
-        val townDetail = TownDetail("name", "stateOrProvince")
+        val townDetail = TownDetail("name", "stateOrProvince", "country")
 
         assertThat(townDetail.name, equalTo("name"))
         assertThat(townDetail.stateOrProvince, equalTo("stateOrProvince"))
+        assertThat(townDetail.country, equalTo("country"))
     }
 
     @Test
     internal fun testAllFieldsNullOrEmpty() {
         assertThat(TownDetail().allFieldsNullOrEmpty(), equalTo(true))
-        assertThat(TownDetail("", "").allFieldsNullOrEmpty(), equalTo(true))
+        assertThat(TownDetail("", "", "").allFieldsNullOrEmpty(), equalTo(true))
 
         assertThat(TownDetail(name = "value").allFieldsNullOrEmpty(), equalTo(false))
         assertThat(TownDetail(stateOrProvince = "value").allFieldsNullOrEmpty(), equalTo(false))
+        assertThat(TownDetail(country = "value").allFieldsNullOrEmpty(), equalTo(false))
     }
 
     @Test
     internal fun testAllFieldsNull() {
         assertThat(TownDetail().allFieldsNull(), equalTo(true))
-        assertThat(TownDetail("", "").allFieldsNull(), equalTo(false))
+        assertThat(TownDetail("", "", "").allFieldsNull(), equalTo(false))
 
         assertThat(TownDetail(name = "value").allFieldsNull(), equalTo(false))
         assertThat(TownDetail(stateOrProvince = "value").allFieldsNull(), equalTo(false))
+        assertThat(TownDetail(country = "value").allFieldsNull(), equalTo(false))
     }
 
 }

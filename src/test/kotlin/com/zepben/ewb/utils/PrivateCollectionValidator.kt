@@ -68,7 +68,7 @@ internal class PrivateCollectionValidator {
         /**
          * Validate the internal collection for an associated object that is not an [IdentifiedObject] that has no order significance.
          */
-        internal fun <T : IdentifiedObject, U : Any, K : Any> validateUnordered(
+        internal fun <T, U : Any, K : Any> validateUnordered(
             createIt: () -> T,
             createOther: (Int) -> U,
             getAll: (T) -> Collection<U>,
@@ -77,13 +77,15 @@ internal class PrivateCollectionValidator {
             add: (T, U) -> T,
             remove: (T, U) -> Boolean,
             clear: (T) -> T,
-            getKey: (U) -> K
+            getKey: (U) -> K,
+            duplicateBehaviour: DuplicateBehaviour,
         ) {
             val it = createIt()
             val other1 = createOther(1)
             val other2 = createOther(2)
             val other3 = createOther(3)
             val otherDuplicateKey = createOther(1)
+            val others = listOf(other1, other2, other3)
 
             require(other1 !is IdentifiedObject) { "do not use this function with identified 'other', use one of the other variants instead." }
 
@@ -99,7 +101,11 @@ internal class PrivateCollectionValidator {
                 remove,
                 clear,
                 validateCollection = ::assertUnordered,
-                performDuplicateValidation = createDuplicatesThrowValidator(it, expectedDuplicateErrors, add),
+                performDuplicateValidation = when (duplicateBehaviour) {
+                    DuplicateBehaviour.THROWS -> createDuplicatesThrowValidator(it, expectedDuplicateErrors, add)
+                    DuplicateBehaviour.SUPPORTED -> createDuplicatesSupportedValidator(it, others, getAll, num, add, remove, ::assertUnordered)
+                    DuplicateBehaviour.IGNORED -> createDuplicatesIgnoredValidator(it, others, getAll, num, add, ::assertUnordered)
+                },
                 beforeRemovalValidation = {
                     assertThat(getByKey(it, getKey(other1)), equalTo(other1))
                     assertThat(getByKey(it, getKey(other2)), equalTo(other2))
@@ -385,6 +391,43 @@ internal class PrivateCollectionValidator {
             others.forEach { duplicate -> assertThat("Should be able to remove the duplicate", remove(it, duplicate)) }
         }
 
+        private fun <T, U> createDuplicatesIgnoredValidator(
+            it: T,
+            others: List<U>,
+            getAll: (T) -> Collection<U>,
+            num: (T) -> Int,
+            add: (T, U) -> T,
+            validateCollection: (Collection<U>, List<U>) -> Unit,
+        ): () -> Unit = {
+            //
+            // NOTE: Adding duplicate data classes should have no effect.
+            //
+            others.forEach { duplicate -> add(it, duplicate) }
+
+            assertThat(num(it), equalTo(others.size))
+            validateCollection(getAll(it), others)
+        }
+
+    }
+
+    /**
+     * How the private collection handles duplicates.
+     */
+    internal enum class DuplicateBehaviour {
+        /**
+         * Different objects with common IDs are expected to throw.
+         */
+        THROWS,
+
+        /**
+         * The collection has no concept of IDs, or duplicates, and just accepts the new value.
+         */
+        SUPPORTED,
+
+        /**
+         * Any attempt to add a duplicates is detected and just ignored.
+         */
+        IGNORED
     }
 
 }

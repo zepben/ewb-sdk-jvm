@@ -36,7 +36,7 @@ import com.zepben.protobuf.cim.iec61970.base.core.NameType as PBNameType
 fun toPb(cim: Document, pb: PBDocument.Builder): PBDocument.Builder =
     pb.apply {
         cim.title?.also { titleSet = it } ?: run { titleNull = NullValue.NULL_VALUE }
-        cim.createdDateTime.toTimestamp()?.let { createdDateTime = it } ?: clearCreatedDateTime()
+        cim.createdDateTime?.toTimestamp()?.let { createdDateTimeSet = it } ?: run { createdDateTimeNull = NullValue.NULL_VALUE }
         cim.type?.also { typeSet = it } ?: run { typeNull = NullValue.NULL_VALUE }
         cim.status?.also { statusSet = it } ?: run { statusNull = NullValue.NULL_VALUE }
         cim.comment?.also { commentSet = it } ?: run { commentNull = NullValue.NULL_VALUE }

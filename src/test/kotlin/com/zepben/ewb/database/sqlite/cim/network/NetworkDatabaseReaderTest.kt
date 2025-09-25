@@ -34,7 +34,7 @@ internal class NetworkDatabaseReaderTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     private val databaseFile = "databaseFile"
     private val service = spyk(NetworkService())

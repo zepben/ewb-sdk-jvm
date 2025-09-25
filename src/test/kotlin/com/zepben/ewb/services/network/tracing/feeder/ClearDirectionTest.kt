@@ -27,7 +27,7 @@ class ClearDirectionTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     private val clearDirection = ClearDirection(debugLogger = null)
     private val stateOperators = NetworkStateOperators.NORMAL

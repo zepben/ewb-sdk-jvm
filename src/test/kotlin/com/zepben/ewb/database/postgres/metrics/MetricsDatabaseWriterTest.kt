@@ -10,12 +10,14 @@ package com.zepben.ewb.database.postgres.metrics
 
 import com.zepben.ewb.database.postgres.common.PostgresTableVersion
 import com.zepben.ewb.metrics.IngestionJob
+import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.verify
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.api.io.TempDir
 import java.nio.file.Path
 import java.sql.Connection
@@ -25,6 +27,10 @@ import kotlin.io.path.exists
 import kotlin.io.path.notExists
 
 internal class MetricsDatabaseWriterTest {
+
+    @JvmField
+    @RegisterExtension
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @TempDir
     lateinit var modelPath: Path

@@ -19,11 +19,12 @@ internal class RecloserTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun constructorCoverage() {
         assertThat(Recloser().mRID, not(equalTo("")))
         assertThat(Recloser("id").mRID, equalTo("id"))
     }
+
 }

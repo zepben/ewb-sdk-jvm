@@ -21,7 +21,7 @@ class ServicesTest {
 
     @JvmField
     @RegisterExtension
-    var systemOut: SystemLogExtension = SystemLogExtension.SYSTEM_OUT.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     private val expectedNs = NetworkService()
     private val expectedDs = DiagramService()

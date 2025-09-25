@@ -23,7 +23,7 @@ internal class UsagePointTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun constructorCoverage() {
@@ -79,4 +79,5 @@ internal class UsagePointTest {
             UsagePoint::clearEquipment
         )
     }
+
 }

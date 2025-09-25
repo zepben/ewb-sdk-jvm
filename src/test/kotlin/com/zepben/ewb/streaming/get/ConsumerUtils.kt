@@ -16,9 +16,12 @@ import io.grpc.Status
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.nullValue
+import org.slf4j.LoggerFactory
 import kotlin.reflect.full.declaredMemberFunctions
 
 object ConsumerUtils {
+
+    private val logger = LoggerFactory.getLogger(javaClass)
 
     fun forEachBuilder(obj: Any, action: (Any) -> Unit) {
         obj::class.declaredMemberFunctions
@@ -37,7 +40,7 @@ object ConsumerUtils {
     fun buildFromBuilder(builder: Any, vararg props: Pair<String, Any?>): Any = buildFromBuilder(builder, props.toMap())
 
     fun buildFromBuilder(builder: Any, props: Map<String, Any?>): Any {
-        println("-> ${builder::class.java.enclosingClass.simpleName}.${builder::class.simpleName}")
+        logger.warn("-> ${builder::class.java.enclosingClass.simpleName}.${builder::class.simpleName}")
 
         // Add any customisations required to build the object at a bare minimum
         if (builder is TapChanger.Builder)

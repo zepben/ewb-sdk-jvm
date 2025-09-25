@@ -26,7 +26,7 @@ internal abstract class BaseServiceComparatorTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     protected abstract val comparatorValidator: ServiceComparatorValidator<out BaseService, out BaseServiceComparator>
 

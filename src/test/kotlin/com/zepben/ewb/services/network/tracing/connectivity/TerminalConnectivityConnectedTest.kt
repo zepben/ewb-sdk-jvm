@@ -24,7 +24,7 @@ internal class TerminalConnectivityConnectedTest {
 
     @JvmField
     @RegisterExtension
-    var systemOut: SystemLogExtension = SystemLogExtension.SYSTEM_OUT.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     val networkService = NetworkService()
     val connectivity = TerminalConnectivityConnected

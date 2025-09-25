@@ -19,11 +19,12 @@ internal class RemotePointTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun constructorCoverage() {
         assertThat(object : RemotePoint() {}.mRID, not(equalTo("")))
         assertThat(object : RemotePoint("id") {}.mRID, equalTo("id"))
     }
+
 }

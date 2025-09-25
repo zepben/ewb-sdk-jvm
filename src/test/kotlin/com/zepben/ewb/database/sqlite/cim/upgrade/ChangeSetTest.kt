@@ -41,7 +41,7 @@ internal class ChangeSetTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -103,10 +103,13 @@ internal class ChangeSetTest {
     ).associateBy { it.version }
 
     @Test
-    internal fun `test change sets`() {
+    internal fun `test pre-split change sets`() {
         // All pre-split change sets are for the network database, as that is the only database that existed.
         validateChangeSets(createBaseCombinedDB(), preSplitChangeSetValidators, UpgradeRunner::preSplitChangeSets, DatabaseType.NETWORK_MODEL)
+    }
 
+    @Test
+    internal fun `test customer change sets`() {
         validateChangeSets(
             createBaseDB(DatabaseType.CUSTOMER),
             customerChangeSetValidators,
@@ -114,6 +117,10 @@ internal class ChangeSetTest {
             DatabaseType.CUSTOMER,
             CustomerDatabaseTables()
         )
+    }
+
+    @Test
+    internal fun `test diagram change sets`() {
         validateChangeSets(
             createBaseDB(DatabaseType.DIAGRAM),
             diagramChangeSetValidators,
@@ -121,6 +128,10 @@ internal class ChangeSetTest {
             DatabaseType.DIAGRAM,
             DiagramDatabaseTables()
         )
+    }
+
+    @Test
+    internal fun `test network change sets`() {
         validateChangeSets(
             createBaseDB(DatabaseType.NETWORK_MODEL),
             networkChangeSetValidators,

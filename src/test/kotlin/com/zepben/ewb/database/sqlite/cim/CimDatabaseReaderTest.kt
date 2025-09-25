@@ -25,7 +25,7 @@ internal class CimDatabaseReaderTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     private val metadata = MetadataCollection()
     private val service = object : BaseService("service name", metadata) {}

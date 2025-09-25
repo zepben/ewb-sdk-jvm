@@ -20,17 +20,17 @@ internal class EndDeviceTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(object : com.zepben.ewb.cim.iec61968.metering.EndDevice() {}.mRID, not(equalTo("")))
-        assertThat(object : com.zepben.ewb.cim.iec61968.metering.EndDevice("id") {}.mRID, equalTo("id"))
+        assertThat(object : EndDevice() {}.mRID, not(equalTo("")))
+        assertThat(object : EndDevice("id") {}.mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val endDevice = object : com.zepben.ewb.cim.iec61968.metering.EndDevice() {}
+        val endDevice = object : EndDevice() {}
         val location = Location()
 
         assertThat(endDevice.customerMRID, nullValue())
@@ -48,28 +48,29 @@ internal class EndDeviceTest {
     @Test
     internal fun usagePoints() {
         PrivateCollectionValidator.validateUnordered(
-            { object : com.zepben.ewb.cim.iec61968.metering.EndDevice() {} },
+            { object : EndDevice() {} },
             ::UsagePoint,
-            com.zepben.ewb.cim.iec61968.metering.EndDevice::usagePoints,
-            com.zepben.ewb.cim.iec61968.metering.EndDevice::numUsagePoints,
-            com.zepben.ewb.cim.iec61968.metering.EndDevice::getUsagePoint,
-            com.zepben.ewb.cim.iec61968.metering.EndDevice::addUsagePoint,
-            com.zepben.ewb.cim.iec61968.metering.EndDevice::removeUsagePoint,
-            com.zepben.ewb.cim.iec61968.metering.EndDevice::clearUsagePoints
+            EndDevice::usagePoints,
+            EndDevice::numUsagePoints,
+            EndDevice::getUsagePoint,
+            EndDevice::addUsagePoint,
+            EndDevice::removeUsagePoint,
+            EndDevice::clearUsagePoints
         )
     }
 
     @Test
     internal fun endDeviceFunctions() {
         PrivateCollectionValidator.validateUnordered(
-            { object : com.zepben.ewb.cim.iec61968.metering.EndDevice() {} },
-            { id -> object : com.zepben.ewb.cim.iec61968.metering.EndDeviceFunction(id) {} },
-            com.zepben.ewb.cim.iec61968.metering.EndDevice::functions,
-            com.zepben.ewb.cim.iec61968.metering.EndDevice::numFunctions,
-            com.zepben.ewb.cim.iec61968.metering.EndDevice::getFunction,
-            com.zepben.ewb.cim.iec61968.metering.EndDevice::addFunction,
-            com.zepben.ewb.cim.iec61968.metering.EndDevice::removeFunction,
-            com.zepben.ewb.cim.iec61968.metering.EndDevice::clearFunctions
+            { object : EndDevice() {} },
+            { id -> object : EndDeviceFunction(id) {} },
+            EndDevice::functions,
+            EndDevice::numFunctions,
+            EndDevice::getFunction,
+            EndDevice::addFunction,
+            EndDevice::removeFunction,
+            EndDevice::clearFunctions
         )
     }
+
 }

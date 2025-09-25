@@ -20,7 +20,7 @@ internal class NominalPhasePathTest {
 
     @JvmField
     @RegisterExtension
-    var systemOut: SystemLogExtension = SystemLogExtension.SYSTEM_OUT.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     private val nominalPhasePath1 = NominalPhasePath(SinglePhaseKind.A, SinglePhaseKind.B)
     private val nominalPhasePath2 = NominalPhasePath(SinglePhaseKind.C, SinglePhaseKind.N)

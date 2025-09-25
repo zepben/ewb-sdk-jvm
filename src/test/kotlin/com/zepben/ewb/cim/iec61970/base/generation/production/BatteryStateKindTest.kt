@@ -8,7 +8,6 @@
 
 package com.zepben.ewb.cim.iec61970.base.generation.production
 
-import com.zepben.ewb.cim.iec61970.base.generation.production.BatteryStateKind
 import com.zepben.ewb.cim.validateEnum
 import com.zepben.testutils.junit.SystemLogExtension
 import org.junit.jupiter.api.Test
@@ -19,7 +18,7 @@ internal class BatteryStateKindTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun validateVsPb() {

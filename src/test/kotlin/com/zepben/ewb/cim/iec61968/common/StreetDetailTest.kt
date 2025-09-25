@@ -19,7 +19,7 @@ internal class StreetDetailTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun constructorCoverage() {
@@ -64,4 +64,5 @@ internal class StreetDetailTest {
         assertThat("allFieldsNull() should return false for nonempty type", !StreetDetail(type = "value").allFieldsNull())
         assertThat("allFieldsNull() should return false for nonempty displayAddress", !StreetDetail(displayAddress = "value").allFieldsNull())
     }
+
 }

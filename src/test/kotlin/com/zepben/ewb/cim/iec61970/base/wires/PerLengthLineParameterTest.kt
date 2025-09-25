@@ -19,11 +19,12 @@ internal class PerLengthLineParameterTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun constructorCoverage() {
         assertThat(object : PerLengthLineParameter() {}.mRID, not(equalTo("")))
         assertThat(object : PerLengthLineParameter("id") {}.mRID, equalTo("id"))
     }
+
 }

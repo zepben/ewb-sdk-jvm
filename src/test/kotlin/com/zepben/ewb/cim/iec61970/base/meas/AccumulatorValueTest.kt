@@ -18,7 +18,7 @@ import org.junit.jupiter.api.extension.RegisterExtension
 internal class AccumulatorValueTest {
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun accessorCoverage() {
@@ -36,4 +36,5 @@ internal class AccumulatorValueTest {
         assertThat(mv.value, equalTo(measValue))
         assertThat(mv.accumulatorMRID, equalTo(measMRID))
     }
+
 }

@@ -2028,10 +2028,7 @@ class NetworkCimWriter(
     }
 
     @Throws(SQLException::class)
-    private fun writePhaseImpedanceData(
-        perLengthPhaseImpedance: PerLengthPhaseImpedance,
-        phaseImpedanceData: com.zepben.ewb.cim.iec61970.base.wires.PhaseImpedanceData
-    ): Boolean {
+    private fun writePhaseImpedanceData(perLengthPhaseImpedance: PerLengthPhaseImpedance, phaseImpedanceData: PhaseImpedanceData): Boolean {
         val table = databaseTables.getTable<TablePhaseImpedanceData>()
         val insert = databaseTables.getInsert<TablePhaseImpedanceData>()
 
@@ -2270,12 +2267,7 @@ class NetworkCimWriter(
     }
 
     @Throws(SQLException::class)
-    private fun writeRotatingMachine(
-        table: com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.wires.TableRotatingMachines,
-        insert: PreparedStatement,
-        rotatingMachine: RotatingMachine,
-        description: String
-    ): Boolean {
+    private fun writeRotatingMachine(table: TableRotatingMachines, insert: PreparedStatement, rotatingMachine: RotatingMachine, description: String): Boolean {
         insert.setNullableDouble(table.RATED_POWER_FACTOR.queryIndex, rotatingMachine.ratedPowerFactor)
         insert.setNullableDouble(table.RATED_S.queryIndex, rotatingMachine.ratedS)
         insert.setNullableInt(table.RATED_U.queryIndex, rotatingMachine.ratedU)

@@ -48,6 +48,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.*
+import org.slf4j.LoggerFactory
 import java.util.concurrent.Executors
 import com.zepben.protobuf.nc.NetworkIdentifiedObject as NIO
 
@@ -56,7 +57,9 @@ internal class NetworkConsumerClientTest {
 
     @JvmField
     @RegisterExtension
-    var systemOut: SystemLogExtension = SystemLogExtension.SYSTEM_OUT.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+
+    private val logger = LoggerFactory.getLogger(javaClass)
 
     @JvmField
     @Rule
@@ -785,7 +788,7 @@ internal class NetworkConsumerClientTest {
         mRID: String
     ): GetIdentifiedObjectsResponse {
         buildFromBuilder(subClassBuilder, mRID)
-        println(identifiedObjectBuilder)
+        logger.info("$identifiedObjectBuilder")
 
         val responseBuilder = GetIdentifiedObjectsResponse.newBuilder()
 
@@ -954,7 +957,7 @@ internal class NetworkConsumerClientTest {
         assertThat(actual, notNullValue())
         val differences = NetworkServiceComparator().compare(actual!!, expectedService)
 
-        println(differences)
+        logger.info("$differences")
 
         assertThat("missing from source", differences.missingFromSource(), empty())
         assertThat("missing from target", differences.missingFromTarget(), empty())

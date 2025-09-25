@@ -19,11 +19,12 @@ internal class OverheadWireInfoTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun constructorCoverage() {
         assertThat(OverheadWireInfo().mRID, not(equalTo("")))
         assertThat(OverheadWireInfo("id").mRID, equalTo("id"))
     }
+
 }

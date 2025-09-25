@@ -35,7 +35,7 @@ internal class BaseServiceTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     internal class TestBaseService : BaseService("test", MetadataCollection()) {
         fun add(obj: Junction) = super.add(obj)
@@ -181,6 +181,7 @@ internal class BaseServiceTest {
         val resolver = Resolvers.conductingEquipment(terminal)
         val unresolvedReference = UnresolvedReference(terminal, "j1", resolver.resolver, resolver.reverseResolver)
 
+        assertThat("should have unresolved reference", service.hasUnresolvedReferences())
         assertThat(service.unresolvedReferences().toList(), contains(unresolvedReference))
         assertThat(service.getUnresolvedReferenceMrids(Resolvers.conductingEquipment(terminal)), contains("j1"))
         assertThat(service.getUnresolvedReferencesFrom(terminal.mRID).toList(), contains(unresolvedReference))
@@ -192,6 +193,7 @@ internal class BaseServiceTest {
             service.resolveOrDeferReference(Resolvers.terminals(junction), terminal.mRID)
         )
 
+        assertThat("shouldn't have unresolved references", !service.hasUnresolvedReferences())
         assertThat(service.unresolvedReferences().toList(), empty())
         assertThat(service.getUnresolvedReferenceMrids(Resolvers.conductingEquipment(terminal)), empty())
         assertThat(service.getUnresolvedReferenceMrids(Resolvers.terminals(junction)), empty())

@@ -19,11 +19,12 @@ internal class CableInfoTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun constructorCoverage() {
         assertThat(CableInfo().mRID, not(equalTo("")))
         assertThat(CableInfo("id").mRID, equalTo("id"))
     }
+
 }

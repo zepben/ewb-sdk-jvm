@@ -15,7 +15,6 @@ import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.core.NameType
 import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.common.Resolvers
-import com.zepben.ewb.services.common.extensions.internEmpty
 import com.zepben.protobuf.cim.iec61968.common.Document as PBDocument
 import com.zepben.protobuf.cim.iec61968.common.Organisation as PBOrganisation
 import com.zepben.protobuf.cim.iec61968.common.OrganisationRole as PBOrganisationRole
@@ -30,6 +29,14 @@ import com.zepben.protobuf.cim.iec61970.base.core.NameType as PBNameType
 // # IEC61968 Common #
 // ###################
 
+/**
+ * Convert the protobuf [PBDocument] into its CIM counterpart.
+ *
+ * @param pb The protobuf [PBDocument] to convert.
+ * @param cim The CIM [Document] to populate.
+ * @param baseService The [BaseService] the converted CIM object will be added too.
+ * @return The converted [pb] as a CIM [Document].
+ */
 fun toCim(pb: PBDocument, cim: Document, baseService: BaseService): Document =
     cim.apply {
         title = pb.titleSet.takeUnless { pb.hasTitleNull() }
@@ -41,11 +48,26 @@ fun toCim(pb: PBDocument, cim: Document, baseService: BaseService): Document =
         toCim(pb.io, this, baseService)
     }
 
+/**
+ * Convert the protobuf [PBOrganisation] into its CIM counterpart.
+ *
+ * @param pb The protobuf [PBOrganisation] to convert.
+ * @param baseService The [BaseService] the converted CIM object will be added too.
+ * @return The converted [pb] as a CIM [Organisation].
+ */
 fun toCim(pb: PBOrganisation, baseService: BaseService): Organisation =
     Organisation(pb.mRID()).apply {
         toCim(pb.io, this, baseService)
     }
 
+/**
+ * Convert the protobuf [PBOrganisationRole] into its CIM counterpart.
+ *
+ * @param pb The protobuf [PBOrganisationRole] to convert.
+ * @param cim The CIM [OrganisationRole] to populate.
+ * @param baseService The [BaseService] the converted CIM object will be added too.
+ * @return The converted [pb] as a CIM [OrganisationRole].
+ */
 fun toCim(pb: PBOrganisationRole, cim: OrganisationRole, baseService: BaseService): OrganisationRole =
     cim.apply {
         baseService.resolveOrDeferReference(Resolvers.organisation(this), pb.organisationMRID)
@@ -56,6 +78,14 @@ fun toCim(pb: PBOrganisationRole, cim: OrganisationRole, baseService: BaseServic
 // # IEC61970 Base Core #
 // ######################
 
+/**
+ * Convert the protobuf [PBIdentifiedObject] into its CIM counterpart.
+ *
+ * @param pb The protobuf [PBIdentifiedObject] to convert.
+ * @param cim The CIM [IdentifiedObject] to populate.
+ * @param baseService The [BaseService] the converted CIM object will be added too.
+ * @return The converted [pb] as a CIM [IdentifiedObject].
+ */
 fun toCim(pb: PBIdentifiedObject, cim: IdentifiedObject, baseService: BaseService): IdentifiedObject =
     cim.apply {
         name = pb.nameSet.takeUnless { pb.hasNameNull() }
@@ -70,8 +100,18 @@ fun toCim(pb: PBIdentifiedObject, cim: IdentifiedObject, baseService: BaseServic
 //
 // NOTE: We always update the description in case the name type was created from the name embedded in an IdentifiedObject.
 //
+/**
+ * Convert the protobuf [PBNameType] into its CIM counterpart.
+ *
+ * @param pb The protobuf [PBNameType] to convert.
+ * @param baseService The [BaseService] the converted CIM object will be added too.
+ * @return The converted [pb] as a CIM [NameType].
+ */
 fun toCim(pb: PBNameType, baseService: BaseService): NameType =
     (baseService.getNameType(pb.name) ?: NameType(pb.name).also { baseService.addNameType(it) })
         .apply { description = pb.descriptionSet.takeUnless { pb.hasDescriptionNull() } }
 
+/**
+ * The base helper class for Java friendly convertion from protobuf objects to their CIM counterparts.
+ */
 abstract class BaseProtoToCim

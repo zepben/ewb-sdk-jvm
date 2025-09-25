@@ -21,7 +21,7 @@ internal class EarthFaultCompensatorTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun constructorCoverage() {
@@ -39,4 +39,5 @@ internal class EarthFaultCompensatorTest {
 
         assertThat(earthFaultCompensator.r, equalTo(1.0))
     }
+
 }

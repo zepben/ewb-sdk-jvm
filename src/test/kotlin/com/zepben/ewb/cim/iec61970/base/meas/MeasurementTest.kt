@@ -20,7 +20,7 @@ import org.junit.jupiter.api.extension.RegisterExtension
 internal class MeasurementTest {
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun constructorCoverage() {
@@ -51,4 +51,5 @@ internal class MeasurementTest {
         assertThat(measurement.phases, equalTo(PhaseCode.XYN))
         assertThat(measurement.unitSymbol, equalTo(UnitSymbol.BAR))
     }
+
 }

@@ -26,6 +26,9 @@ import kotlin.reflect.full.memberFunctions
 import kotlin.reflect.full.superclasses
 import kotlin.reflect.jvm.isAccessible
 
+/**
+ * The base class for comparing services.
+ */
 abstract class BaseServiceComparator {
 
     @Suppress("UNCHECKED_CAST")
@@ -101,6 +104,15 @@ abstract class BaseServiceComparator {
         return differences
     }
 
+    /**
+     * Compare two objects, returning the difference.
+     *
+     * @param source The first object to compare.
+     * @param target The second object to compare.
+     * @return The [ObjectDifference] between the [source] and [target].
+     * @throws IllegalArgumentException If the [source] and [target] objects aren't pf the same type, or
+     * if their type hasn't been registered with the comparator
+     */
     @Suppress("UNCHECKED_CAST")
     fun <T : Any> compare(source: T, target: T): ObjectDifference<T> {
         val sourceType = getComparableType(source::class)
@@ -112,6 +124,12 @@ abstract class BaseServiceComparator {
         }.call(this, source, target) as ObjectDifference<T>
     }
 
+    /**
+     * Compare the [IdentifiedObject] members.
+     *
+     * @receiver The [ObjectDifference] to populate with any differences.
+     * @return The [ObjectDifference] being populated for fluent use.
+     */
     protected fun ObjectDifference<out IdentifiedObject>.compareIdentifiedObject(): ObjectDifference<out IdentifiedObject> = apply {
         compareValues(IdentifiedObject::mRID, IdentifiedObject::name, IdentifiedObject::description, IdentifiedObject::numDiagramObjects)
         compareNames(IdentifiedObject::names)
@@ -141,18 +159,36 @@ abstract class BaseServiceComparator {
             addIfDifferent(NameType::names.name, differences.nullIfEmpty())
         }
 
+    /**
+     * Compare the [Document] members.
+     *
+     * @receiver The [ObjectDifference] to populate with any differences.
+     * @return The [ObjectDifference] being populated for fluent use.
+     */
     protected fun ObjectDifference<out Document>.compareDocument(): ObjectDifference<out Document> =
         apply {
             compareIdentifiedObject()
             compareValues(Document::title, Document::createdDateTime, Document::authorName, Document::type, Document::status, Document::comment)
         }
 
+    /**
+     * Compare the [OrganisationRole] members.
+     *
+     * @receiver The [ObjectDifference] to populate with any differences.
+     * @return The [ObjectDifference] being populated for fluent use.
+     */
     protected fun ObjectDifference<out OrganisationRole>.compareOrganisationRole(): ObjectDifference<out OrganisationRole> =
         apply {
             compareIdentifiedObject()
             compareIdReferences(OrganisationRole::organisation)
         }
 
+    /**
+     * Compare the [Organisation] members.
+     *
+     * @receiver The [ObjectDifference] to populate with any differences.
+     * @return The [ObjectDifference] being populated for fluent use.
+     */
     // Used via reflection
     @Suppress("Unused")
     protected fun compareOrganisation(source: Organisation, target: Organisation): ObjectDifference<Organisation> =
@@ -172,6 +208,13 @@ abstract class BaseServiceComparator {
             .firstOrNull()
     }
 
+    /**
+     * Compare the values of the given [properties].
+     *
+     * @param properties The member properties to compare.
+     * @receiver The [ObjectDifference] to populate with any differences.
+     * @return The [ObjectDifference] being populated for fluent use.
+     */
     fun <T> ObjectDifference<T>.compareValues(
         vararg properties: KProperty1<in T, *>
     ): ObjectDifference<T> {
@@ -179,6 +222,15 @@ abstract class BaseServiceComparator {
         return this
     }
 
+    /**
+     * Compare the given [properties] by checking they reference an object with the same mRID. Differences
+     * in the referenced object won't be reported here, instead only being reported when the referenced
+     * objects are compared.
+     *
+     * @param properties The member properties to compare.
+     * @receiver The [ObjectDifference] to populate with any differences.
+     * @return The [ObjectDifference] being populated for fluent use.
+     */
     fun <T : IdentifiedObject, R : IdentifiedObject> ObjectDifference<T>.compareIdReferences(
         vararg properties: KProperty1<in T, R?>
     ): ObjectDifference<T> {
@@ -193,6 +245,15 @@ abstract class BaseServiceComparator {
         return this
     }
 
+    /**
+     * Compare the given [properties] by checking they are a [Collection] of references to objects with the
+     * same mRIDs, in any order. Differences in the referenced object won't be reported here, instead only
+     * being reported when the referenced objects are compared.
+     *
+     * @param properties The member properties to compare.
+     * @receiver The [ObjectDifference] to populate with any differences.
+     * @return The [ObjectDifference] being populated for fluent use.
+     */
     fun <T : IdentifiedObject, R : IdentifiedObject> ObjectDifference<T>.compareIdReferenceCollections(
         vararg properties: KProperty1<in T, Collection<R>>
     ): ObjectDifference<T> {
@@ -200,6 +261,15 @@ abstract class BaseServiceComparator {
         return this
     }
 
+    /**
+     * Compare the given [properties] by checking they are a [Collection] of references to objects with the
+     * same mRIDs, in the same order. Differences in the referenced object won't be reported here, instead
+     * only being reported when the referenced objects are compared.
+     *
+     * @param properties The member properties to compare.
+     * @receiver The [ObjectDifference] to populate with any differences.
+     * @return The [ObjectDifference] being populated for fluent use.
+     */
     fun <T : IdentifiedObject, R : IdentifiedObject> ObjectDifference<T>.compareIndexedIdReferenceCollections(
         vararg properties: KProperty1<in T, List<R>>
     ): ObjectDifference<T> {
@@ -207,6 +277,13 @@ abstract class BaseServiceComparator {
         return this
     }
 
+    /**
+     * Compare the given [properties] by checking their values are the same, in the same order.
+     *
+     * @param properties The member properties to compare.
+     * @receiver The [ObjectDifference] to populate with any differences.
+     * @return The [ObjectDifference] being populated for fluent use.
+     */
     fun <T> ObjectDifference<T>.compareIndexedValueCollections(
         vararg properties: KProperty1<in T, List<*>>
     ): ObjectDifference<T> {
@@ -214,6 +291,15 @@ abstract class BaseServiceComparator {
         return this
     }
 
+    /**
+     * Compare the given [property] by checking its values are the same, in any order.
+     *
+     * @param property The member property to compare.
+     * @param keySelector A function to extract a comparable key from the objects in the collection, used to
+     * determine which elements should be compared to each other.
+     * @receiver The [ObjectDifference] to populate with any differences.
+     * @return The [ObjectDifference] being populated for fluent use.
+     */
     fun <T, R, K : Comparable<K>> ObjectDifference<T>.compareUnorderedValueCollection(
         property: KProperty1<in T, List<R>>,
         keySelector: (R) -> K
@@ -222,9 +308,16 @@ abstract class BaseServiceComparator {
         return this
     }
 
+    /**
+     * Adds a difference in a property, if there was one, to the overall collection of differences.
+     *
+     * @param name The name of the property being compared.
+     * @param difference The difference in the property if there was one, otherwise `null`
+     */
     fun <T> ObjectDifference<T>.addIfDifferent(name: String, difference: Difference?) {
         if (difference != null) {
             differences[name] = difference
         }
     }
+
 }

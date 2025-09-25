@@ -26,7 +26,7 @@ internal class SwitchTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun constructorCoverage() {
@@ -178,4 +178,5 @@ internal class SwitchTest {
             { assertThat("Phase C normally open", switch.isNormallyOpen(SPK.C), equalTo(cOpen)) },
             { assertThat("Phase N normally open", switch.isNormallyOpen(SPK.N), equalTo(nOpen)) })
     }
+
 }

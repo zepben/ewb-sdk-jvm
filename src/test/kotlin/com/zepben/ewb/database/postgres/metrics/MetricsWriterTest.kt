@@ -29,7 +29,7 @@ internal class MetricsWriterTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     private val metadata = IngestionMetadata(Instant.EPOCH, "N/A", "test", "0.0.0")
     private val job = IngestionJob(UUID.randomUUID(), metadata).apply {

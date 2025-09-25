@@ -23,7 +23,7 @@ internal class IssueTrackerGroupTest {
 
     @JvmField
     @RegisterExtension
-    var systemOut: SystemLogExtension = SystemLogExtension.SYSTEM_OUT.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     private val trackerGroup = TrackerGroup()
     private val subTrackerGroup = SubTrackerGroup()

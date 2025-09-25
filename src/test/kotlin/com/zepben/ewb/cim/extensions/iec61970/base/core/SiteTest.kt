@@ -19,11 +19,12 @@ internal class SiteTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun constructorCoverage() {
         assertThat(Site().mRID, not(equalTo("")))
         assertThat(Site("id").mRID, equalTo("id"))
     }
+
 }

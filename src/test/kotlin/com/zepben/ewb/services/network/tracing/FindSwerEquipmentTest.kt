@@ -28,7 +28,7 @@ internal class FindSwerEquipmentTest {
 
     @JvmField
     @RegisterExtension
-    var systemOut: SystemLogExtension = SystemLogExtension.SYSTEM_OUT.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     private val stateOperators = spy(NetworkStateOperators.NORMAL)
     private val findSwerEquipment = FindSwerEquipment(debugLogger = null)

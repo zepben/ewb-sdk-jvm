@@ -53,14 +53,13 @@ object ChangeSet62CustomerValidator : ChangeSetValidator(DatabaseType.CUSTOMER, 
         `validate indexes`(statement)
     }
 
-    override fun tearDownStatements(): List<String> =
-        listOf(
-            "DELETE from customer_agreements;",
-            "DELETE from customers;",
-            "DELETE from organisations;",
-            "DELETE from pricing_structures;",
-            "DELETE from tariffs;",
-        )
+    override fun tearDownStatements(): List<String> = listOf(
+        "DELETE from customer_agreements;",
+        "DELETE from customers;",
+        "DELETE from organisations;",
+        "DELETE from pricing_structures;",
+        "DELETE from tariffs;",
+    )
 
     private fun `validate customer_agreements`(statement: Statement) {
         validateRows(

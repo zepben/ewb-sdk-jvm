@@ -171,9 +171,9 @@ abstract class BaseService(
 
         return clazz.java.cast(
             objectsByType.values
-            .asSequence()
-            .mapNotNull { it[mRID] }
-            .firstOrNull()
+                .asSequence()
+                .mapNotNull { it[mRID] }
+                .firstOrNull()
         )
     }
 
@@ -624,4 +624,5 @@ abstract class BaseService(
             }
             .toMap()
     }
+
 }

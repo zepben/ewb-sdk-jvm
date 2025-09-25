@@ -29,7 +29,7 @@ internal class PhaseInferrerTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     private val phaseInferrer = PhaseInferrer(debugLogger = null)
 
@@ -494,4 +494,5 @@ internal class PhaseInferrerTest {
 
         assertThat(inferredPhases, containsInAnyOrder(*expectedInferred.toTypedArray()))
     }
+
 }

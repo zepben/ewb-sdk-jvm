@@ -19,11 +19,12 @@ internal class FaultIndicatorTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun constructorCoverage() {
         assertThat(FaultIndicator().mRID, not(equalTo("")))
         assertThat(FaultIndicator("id").mRID, equalTo("id"))
     }
+
 }

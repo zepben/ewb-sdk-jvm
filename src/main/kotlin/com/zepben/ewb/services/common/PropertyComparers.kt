@@ -12,6 +12,14 @@ import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.core.Name
 import kotlin.reflect.KProperty1
 
+/**
+ * Compare the values of the given property between [source] and [target].
+ *
+ * @receiver The property to compare.
+ * @param source The first object to compare.
+ * @param target The second object to compare.
+ * @return The [ValueDifference] if there were any differences, otherwise `null`.
+ */
 fun <T, R> KProperty1<in T, R?>.compareValues(source: T?, target: T?): ValueDifference? {
     val sVal = source?.let { this.get(source) }
     val tVal = target?.let { this.get(target) }
@@ -34,6 +42,15 @@ fun <T, R> KProperty1<in T, R?>.compareValues(source: T?, target: T?): ValueDiff
     }
 }
 
+/**
+ * Compare the values of the given property between [source] and [target], with a customer comparison.
+ *
+ * @receiver The property to compare.
+ * @param source The first object to compare.
+ * @param target The second object to compare.
+ * @param toComparable Convert the value returned by the property into a new comparable object.
+ * @return The [ValueDifference] if there were any differences, otherwise `null`.
+ */
 fun <T, R, C> KProperty1<in T, R?>.compareValues(source: T?, target: T?, toComparable: (R) -> C): ValueDifference? {
     val sVal = source?.let { this.get(source) }
     val tVal = target?.let { this.get(target) }
@@ -47,6 +64,14 @@ fun <T, R, C> KProperty1<in T, R?>.compareValues(source: T?, target: T?, toCompa
     }
 }
 
+/**
+ * Compare the mRID references of the given property between [source] and [target].
+ *
+ * @receiver The property to compare.
+ * @param source The first object to compare.
+ * @param target The second object to compare.
+ * @return The [ReferenceDifference] if there were any differences, otherwise `null`.
+ */
 fun <T, R : IdentifiedObject> KProperty1<in T, R?>.compareIdReference(source: T?, target: T?): ReferenceDifference? {
     val sRef: R? = source?.let { this.get(source) }
     val tRef: R? = target?.let { this.get(target) }
@@ -58,6 +83,14 @@ fun <T, R : IdentifiedObject> KProperty1<in T, R?>.compareIdReference(source: T?
     }
 }
 
+/**
+ * Compare the mRID references of all items in a collection, in any order, from the given property between [source] and [target].
+ *
+ * @receiver The property to compare.
+ * @param source The first object to compare.
+ * @param target The second object to compare.
+ * @return The [CollectionDifference] if there were any differences, otherwise `null`.
+ */
 fun <T, R : IdentifiedObject> KProperty1<in T, Collection<R>>.compareIdReferenceCollection(source: T, target: T): CollectionDifference? {
     val differences = CollectionDifference()
     val sourceCollection = this.get(source)
@@ -80,6 +113,14 @@ fun <T, R : IdentifiedObject> KProperty1<in T, Collection<R>>.compareIdReference
     return differences.nullIfEmpty()
 }
 
+/**
+ * Compare the [Name] collection from the given property between [source] and [target].
+ *
+ * @receiver The property to compare.
+ * @param source The first object to compare.
+ * @param target The second object to compare.
+ * @return The [CollectionDifference] if there were any differences, otherwise `null`.
+ */
 fun <T : IdentifiedObject> KProperty1<in T, Collection<Name>>.compareNames(source: T, target: T): CollectionDifference? {
     data class NameTypeName(val nameType: String, val name: String)
 
@@ -104,6 +145,14 @@ fun <T : IdentifiedObject> KProperty1<in T, Collection<Name>>.compareNames(sourc
     return differences.nullIfEmpty()
 }
 
+/**
+ * Compare the mRID references of all items in a collection, ensuring the same order, from the given property between [source] and [target].
+ *
+ * @receiver The property to compare.
+ * @param source The first object to compare.
+ * @param target The second object to compare.
+ * @return The [CollectionDifference] if there were any differences, otherwise `null`.
+ */
 fun <T, R : IdentifiedObject> KProperty1<in T, List<R>>.compareIndexedIdReferenceCollection(
     source: T,
     target: T
@@ -127,6 +176,14 @@ fun <T, R : IdentifiedObject> KProperty1<in T, List<R>>.compareIndexedIdReferenc
     return differences.nullIfEmpty()
 }
 
+/**
+ * Compare the values of a collection, ensuring the same order, from the given property between [source] and [target].
+ *
+ * @receiver The property to compare.
+ * @param source The first object to compare.
+ * @param target The second object to compare.
+ * @return The [CollectionDifference] if there were any differences, otherwise `null`.
+ */
 fun <T, R> KProperty1<in T, List<R>>.compareIndexedValueCollection(
     source: T,
     target: T
@@ -150,7 +207,16 @@ fun <T, R> KProperty1<in T, List<R>>.compareIndexedValueCollection(
     return differences.nullIfEmpty()
 }
 
-fun <T, R, K : Comparable<K>> KProperty1<in T, List<R>>.compareUnorderedValueCollection(
+/**
+ * Compare the values of a collection, in any order, from the given property between [source] and [target].
+ *
+ * @receiver The property to compare.
+ * @param source The first object to compare.
+ * @param target The second object to compare.
+ * @param keySelector A function to return a "key" from the item, that can be used to compare values.
+ * @return The [CollectionDifference] if there were any differences, otherwise `null`.
+ */
+fun <T, R, K : Comparable<K>> KProperty1<in T, Collection<R>>.compareUnorderedValueCollection(
     source: T,
     target: T,
     keySelector: (R) -> K

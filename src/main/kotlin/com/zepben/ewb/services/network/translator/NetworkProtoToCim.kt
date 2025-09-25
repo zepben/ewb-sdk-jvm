@@ -36,8 +36,7 @@ import com.zepben.ewb.cim.iec61970.base.scada.RemotePoint
 import com.zepben.ewb.cim.iec61970.base.scada.RemoteSource
 import com.zepben.ewb.cim.iec61970.base.wires.*
 import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
-import com.zepben.ewb.services.common.*
-import com.zepben.ewb.services.common.extensions.internEmpty
+import com.zepben.ewb.services.common.Resolvers
 import com.zepben.ewb.services.common.translator.BaseProtoToCim
 import com.zepben.ewb.services.common.translator.toCim
 import com.zepben.ewb.services.common.translator.toInstant
@@ -222,7 +221,6 @@ fun toCim(pb: PBPanDemandResponseFunction, networkService: NetworkService): PanD
         applianceBitmask = pb.applianceSet.takeUnless { pb.hasApplianceNull() }
         toCim(pb.edf, this, networkService)
     }
-
 
 /**
  * An extension to add a converted copy of the protobuf [PBPanDemandResponseFunction] to the [NetworkService].
@@ -581,7 +579,6 @@ fun toCim(pb: PBShortCircuitTest, networkService: NetworkService): ShortCircuitT
         voltageOhmicPart = pb.voltageOhmicPartSet.takeUnless { pb.hasVoltageOhmicPartNull() }
         toCim(pb.tt, this, networkService)
     }
-
 
 /**
  * Convert the protobuf [PBShuntCompensatorInfo] into its CIM counterpart.
@@ -2264,8 +2261,8 @@ fun toCim(pb: PBPetersenCoil, networkService: NetworkService): PetersenCoil =
  * @param pb The protobuf [PBPhaseImpedanceData] to convert.
  * @return The converted [pb] as a CIM [PhaseImpedanceData].
  */
-fun toCim(pb: PBPhaseImpedanceData): com.zepben.ewb.cim.iec61970.base.wires.PhaseImpedanceData =
-    com.zepben.ewb.cim.iec61970.base.wires.PhaseImpedanceData(
+fun toCim(pb: PBPhaseImpedanceData): PhaseImpedanceData =
+    PhaseImpedanceData(
         mapSinglePhaseKind.toCim(pb.fromPhase),
         mapSinglePhaseKind.toCim(pb.toPhase),
         pb.bSet.takeUnless { pb.hasBNull() },

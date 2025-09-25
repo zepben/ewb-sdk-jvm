@@ -18,7 +18,7 @@ internal class RatioTapChangerTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun constructorCoverage() {
@@ -40,4 +40,5 @@ internal class RatioTapChangerTest {
         assertThat(ratioTapChanger.transformerEnd, equalTo(transformerEnd))
         assertThat(ratioTapChanger.stepVoltageIncrement, equalTo(1.23))
     }
+
 }

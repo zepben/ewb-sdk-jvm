@@ -19,7 +19,7 @@ internal class DocumentTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun constructorCoverage() {
@@ -54,4 +54,5 @@ internal class DocumentTest {
         assertThat(document.status, equalTo("status"))
         assertThat(document.comment, equalTo("comment"))
     }
+
 }

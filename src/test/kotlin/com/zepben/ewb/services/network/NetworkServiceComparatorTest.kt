@@ -1259,9 +1259,9 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             PerLengthPhaseImpedance::data,
             PerLengthPhaseImpedance::addData,
             { PerLengthPhaseImpedance(it) },
-            { com.zepben.ewb.cim.iec61970.base.wires.PhaseImpedanceData(SinglePhaseKind.A, SinglePhaseKind.B, 1.0, 2.0, 3.0, 4.0) },
-            { com.zepben.ewb.cim.iec61970.base.wires.PhaseImpedanceData(SinglePhaseKind.A, SinglePhaseKind.C, 1.0, 2.0, 3.0, 4.0) },
-            { com.zepben.ewb.cim.iec61970.base.wires.PhaseImpedanceData(SinglePhaseKind.A, SinglePhaseKind.B, 2.0, 3.0, 4.0, 5.0) },
+            { PhaseImpedanceData(SinglePhaseKind.A, SinglePhaseKind.B, 1.0, 2.0, 3.0, 4.0) },
+            { PhaseImpedanceData(SinglePhaseKind.A, SinglePhaseKind.C, 1.0, 2.0, 3.0, 4.0) },
+            { PhaseImpedanceData(SinglePhaseKind.A, SinglePhaseKind.B, 2.0, 3.0, 4.0, 5.0) },
         )
     }
 

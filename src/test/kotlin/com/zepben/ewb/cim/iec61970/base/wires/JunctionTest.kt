@@ -19,11 +19,12 @@ internal class JunctionTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun constructorCoverage() {
         assertThat(Junction().mRID, not(equalTo("")))
         assertThat(Junction("id").mRID, equalTo("id"))
     }
+
 }

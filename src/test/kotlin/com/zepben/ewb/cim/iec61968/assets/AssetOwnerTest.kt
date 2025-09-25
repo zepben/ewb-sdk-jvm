@@ -19,11 +19,12 @@ internal class AssetOwnerTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun constructorCoverage() {
         assertThat(AssetOwner().mRID, not(equalTo("")))
         assertThat(AssetOwner("id").mRID, equalTo("id"))
     }
+
 }

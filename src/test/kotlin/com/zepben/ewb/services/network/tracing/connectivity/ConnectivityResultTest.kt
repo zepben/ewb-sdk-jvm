@@ -23,7 +23,7 @@ internal class ConnectivityResultTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     private val asset1: ConductingEquipment = Junction("asset1").apply {
         name = "asset 1"
@@ -77,4 +77,5 @@ internal class ConnectivityResultTest {
         assertThat(cr1.hashCode(), equalTo(cr1Dup.hashCode()))
         assertThat(cr1.toString(), not(emptyString()))
     }
+
 }

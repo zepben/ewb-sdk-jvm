@@ -9,10 +9,6 @@
 package com.zepben.ewb.services.common.translator
 
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
-import com.zepben.ewb.cim.iec61968.common.Location
-import com.zepben.ewb.cim.iec61968.common.StreetAddress
-import com.zepben.ewb.cim.iec61968.common.StreetDetail
-import com.zepben.ewb.cim.iec61968.common.TownDetail
 import com.zepben.ewb.cim.iec61968.operations.OperationalRestriction
 import com.zepben.ewb.cim.iec61970.base.core.*
 import com.zepben.ewb.database.sqlite.cim.CimDatabaseTables
@@ -43,7 +39,7 @@ internal abstract class TranslatorTestBase<S : BaseService>(
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     /**
      * The list of things to validate.
@@ -67,7 +63,7 @@ internal abstract class TranslatorTestBase<S : BaseService>(
         SqliteTableVersion::class,
         TableMetadataDataSources::class,
         TableNameTypes::class,
-        TableNames::class
+        TableNames::class,
     )
 
     @Test

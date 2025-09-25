@@ -19,6 +19,7 @@ import com.zepben.protobuf.ns.GetCurrentStatesRequest
 import com.zepben.protobuf.ns.GetCurrentStatesResponse
 import com.zepben.protobuf.ns.SetCurrentStatesResponse
 import com.zepben.testutils.exception.ExpectException.Companion.expect
+import com.zepben.testutils.junit.SystemLogExtension
 import io.grpc.Status
 import io.grpc.StatusException
 import io.grpc.stub.StreamObserver
@@ -28,10 +29,15 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.Rule
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 
 internal class QueryNetworkStateServiceTest {
+
+    @JvmField
+    @RegisterExtension
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @JvmField
     @Rule

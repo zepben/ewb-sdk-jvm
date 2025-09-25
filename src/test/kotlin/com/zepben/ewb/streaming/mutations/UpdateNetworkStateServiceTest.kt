@@ -16,6 +16,7 @@ import com.zepben.ewb.streaming.data.*
 import com.zepben.protobuf.ns.SetCurrentStatesRequest
 import com.zepben.protobuf.ns.SetCurrentStatesResponse
 import com.zepben.protobuf.ns.UpdateNetworkStateServiceGrpc
+import com.zepben.testutils.junit.SystemLogExtension
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
 import io.grpc.inprocess.InProcessChannelBuilder
@@ -29,6 +30,7 @@ import org.hamcrest.Matchers.*
 import org.junit.Rule
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.extension.RegisterExtension
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
@@ -40,6 +42,10 @@ import com.zepben.protobuf.ns.data.SwitchAction as PBSwitchAction
 import com.zepben.protobuf.ns.data.SwitchStateEvent as PBSwitchStateEvent
 
 internal class UpdateNetworkStateServiceTest {
+
+    @JvmField
+    @RegisterExtension
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @JvmField
     @Rule

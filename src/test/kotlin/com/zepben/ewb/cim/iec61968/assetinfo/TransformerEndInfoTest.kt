@@ -26,7 +26,7 @@ internal class TransformerEndInfoTest {
 
     @JvmField
     @RegisterExtension
-    var systemOut: SystemLogExtension = SystemLogExtension.SYSTEM_OUT.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun constructorCoverage() {
@@ -168,4 +168,5 @@ internal class TransformerEndInfoTest {
             assertThat(info.calculateResistanceReactanceFromTests(), equalTo(expectedRr))
         } ?: assertThat(info.calculateResistanceReactanceFromTests(), nullValue())
     }
+
 }

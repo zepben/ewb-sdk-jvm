@@ -25,13 +25,40 @@ import io.mockk.verify
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
+import java.lang.IllegalArgumentException
 import java.util.*
+import kotlin.test.assertContains
 
 internal class EquipmentTreeBuilderTest {
     @JvmField
     @RegisterExtension
     val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+
+    @Test
+    fun `accessing leaves when not calculated throws exception`() {
+        val builder = EquipmentTreeBuilder()
+        assertThrows<IllegalArgumentException> { builder.leaves }
+    }
+
+    @Test
+    fun `test equipment tree builder leaves`() {
+        val n = LoopingNetwork.create()
+
+        n.get<ConductingEquipment>("j0")!!.addFeederDirections().also { DirectionLogger.trace(it) }
+
+        val treeBuilder = EquipmentTreeBuilder(calculateLeaves = true)
+        Tracing.networkTraceBranching()
+            .addCondition { downstream() }
+            .addStepAction(treeBuilder)
+            .run(n.get<ConductingEquipment>("j1")!!)
+
+        listOf(n.get<ConductingEquipment>("j5"), n.get<ConductingEquipment>("j13")).forEach {
+            assert(it in treeBuilder.leaves.map { leaf -> leaf.identifiedObject }.toSet())
+        }
+
+    }
 
     @Test
     fun `computes initial value`() {

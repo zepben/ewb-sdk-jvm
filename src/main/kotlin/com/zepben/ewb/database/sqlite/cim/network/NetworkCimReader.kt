@@ -1041,43 +1041,43 @@ internal class NetworkCimReader : CimReader<NetworkService>() {
     @Throws(SQLException::class)
     private fun readStreetAddress(table: TableStreetAddresses, resultSet: ResultSet): StreetAddress =
         StreetAddress(
-            resultSet.getNullableString(table.POSTAL_CODE.queryIndex)?.internEmpty(),
+            resultSet.getNullableString(table.POSTAL_CODE.queryIndex),
             readTownDetail(table, resultSet),
-            resultSet.getNullableString(table.PO_BOX.queryIndex)?.internEmpty(),
+            resultSet.getNullableString(table.PO_BOX.queryIndex),
             readStreetDetail(table, resultSet)
         )
 
     @Throws(SQLException::class)
     private fun readStreetDetail(table: TableStreetAddresses, resultSet: ResultSet): StreetDetail? =
         StreetDetail(
-            resultSet.getNullableString(table.BUILDING_NAME.queryIndex)?.internEmpty(),
-            resultSet.getNullableString(table.FLOOR_IDENTIFICATION.queryIndex)?.internEmpty(),
-            resultSet.getNullableString(table.STREET_NAME.queryIndex)?.internEmpty(),
-            resultSet.getNullableString(table.NUMBER.queryIndex)?.internEmpty(),
-            resultSet.getNullableString(table.SUITE_NUMBER.queryIndex)?.internEmpty(),
-            resultSet.getNullableString(table.TYPE.queryIndex)?.internEmpty(),
-            resultSet.getNullableString(table.DISPLAY_ADDRESS.queryIndex)?.internEmpty()
+            resultSet.getNullableString(table.BUILDING_NAME.queryIndex),
+            resultSet.getNullableString(table.FLOOR_IDENTIFICATION.queryIndex),
+            resultSet.getNullableString(table.STREET_NAME.queryIndex),
+            resultSet.getNullableString(table.NUMBER.queryIndex),
+            resultSet.getNullableString(table.SUITE_NUMBER.queryIndex),
+            resultSet.getNullableString(table.TYPE.queryIndex),
+            resultSet.getNullableString(table.DISPLAY_ADDRESS.queryIndex)
         ).takeUnless { it.allFieldsNull() }
 
     @Throws(SQLException::class)
     private fun readTelephoneNumber(table: TableTelephoneNumbers, resultSet: ResultSet): TelephoneNumber =
         TelephoneNumber(
-            resultSet.getString(table.AREA_CODE.queryIndex).emptyIfNull().internEmpty(),
-            resultSet.getString(table.CITY_CODE.queryIndex).emptyIfNull().internEmpty(),
-            resultSet.getString(table.COUNTRY_CODE.queryIndex).emptyIfNull().internEmpty(),
-            resultSet.getString(table.DIAL_OUT.queryIndex).emptyIfNull().internEmpty(),
-            resultSet.getString(table.EXTENSION.queryIndex).emptyIfNull().internEmpty(),
-            resultSet.getString(table.INTERNATIONAL_PREFIX.queryIndex).emptyIfNull().internEmpty(),
-            resultSet.getString(table.LOCAL_NUMBER.queryIndex).emptyIfNull().internEmpty(),
+            resultSet.getString(table.AREA_CODE.queryIndex),
+            resultSet.getString(table.CITY_CODE.queryIndex),
+            resultSet.getString(table.COUNTRY_CODE.queryIndex),
+            resultSet.getString(table.DIAL_OUT.queryIndex),
+            resultSet.getString(table.EXTENSION.queryIndex),
+            resultSet.getString(table.INTERNATIONAL_PREFIX.queryIndex),
+            resultSet.getString(table.LOCAL_NUMBER.queryIndex),
             resultSet.getBoolean(table.IS_PRIMARY.queryIndex),
-            resultSet.getString(table.DESCRIPTION.queryIndex).emptyIfNull().internEmpty(),
+            resultSet.getString(table.DESCRIPTION.queryIndex),
         )
 
     @Throws(SQLException::class)
     private fun readTownDetail(table: TableTownDetails, resultSet: ResultSet): TownDetail? =
         TownDetail(
-            resultSet.getNullableString(table.TOWN_NAME.queryIndex)?.internEmpty(),
-            resultSet.getNullableString(table.STATE_OR_PROVINCE.queryIndex)?.internEmpty()
+            resultSet.getNullableString(table.TOWN_NAME.queryIndex),
+            resultSet.getNullableString(table.STATE_OR_PROVINCE.queryIndex)
         ).takeUnless { it.allFieldsNull() }
 
     // #####################################
@@ -1159,7 +1159,7 @@ internal class NetworkCimReader : CimReader<NetworkService>() {
     fun read(service: NetworkService, table: TablePoles, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val pole = Pole(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
 
-        pole.classification = resultSet.getNullableString(table.CLASSIFICATION.queryIndex)?.internEmpty()
+        pole.classification = resultSet.getNullableString(table.CLASSIFICATION.queryIndex)
 
         return readStructure(service, pole, table, resultSet) && service.addOrThrow(pole)
     }

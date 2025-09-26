@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.database.sql.extensions
 
+import com.zepben.ewb.services.common.extensions.internEmpty
 import java.sql.ResultSet
 import java.time.Instant
 
@@ -15,7 +16,7 @@ internal fun ResultSet.getNullableBoolean(queryIndex: Int): Boolean? =
     getBoolean(queryIndex).takeUnless { wasNull() }
 
 internal fun ResultSet.getNullableString(queryIndex: Int): String? =
-    getString(queryIndex).takeUnless { wasNull() }
+    getString(queryIndex).takeUnless { wasNull() }?.internEmpty()
 
 internal fun ResultSet.getNullableDouble(queryIndex: Int): Double? {
     // Annoyingly getDouble will return 0.0 for string values, so we need to check all 0.0's for NaN.

@@ -57,7 +57,7 @@ class NetworkDatabaseReader internal constructor(
     databaseDescription,
     databaseTables,
     createMetadataReader,
-    createServiceReader
+    createServiceReader,
 ) {
 
     @JvmOverloads

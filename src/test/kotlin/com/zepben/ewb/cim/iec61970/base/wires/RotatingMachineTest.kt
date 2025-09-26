@@ -21,7 +21,7 @@ internal class RotatingMachineTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun constructorCoverage() {
@@ -47,4 +47,5 @@ internal class RotatingMachineTest {
         assertThat(rotatingMachine.p, equalTo(4.4))
         assertThat(rotatingMachine.q, equalTo(5.5))
     }
+
 }

@@ -18,7 +18,7 @@ internal class LinearShuntCompensatorTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun constructorCoverage() {
@@ -45,4 +45,5 @@ internal class LinearShuntCompensatorTest {
         assertThat(linearShuntCompensator.g0PerSection, equalTo(3.3))
         assertThat(linearShuntCompensator.gPerSection, equalTo(4.4))
     }
+
 }

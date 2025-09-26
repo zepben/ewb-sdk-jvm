@@ -19,11 +19,12 @@ internal class JumperTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun constructorCoverage() {
         assertThat(Jumper().mRID, not(equalTo("")))
         assertThat(Jumper("id").mRID, equalTo("id"))
     }
+
 }

@@ -20,6 +20,12 @@ import com.zepben.protobuf.cim.iec61970.base.meas.MeasurementValue as PBMeasurem
 // # IEC61970 Base Meas #
 // ######################
 
+/**
+ * Convert the protobuf [PBAccumulatorValue] into its CIM counterpart.
+ *
+ * @param pb The protobuf [PBAccumulatorValue] to convert.
+ * @return The converted [pb] as a CIM [AccumulatorValue].
+ */
 fun toCim(pb: PBAccumulatorValue): AccumulatorValue =
     AccumulatorValue().apply {
         accumulatorMRID = pb.accumulatorMRID.takeIf { it.isNotBlank() }
@@ -27,6 +33,12 @@ fun toCim(pb: PBAccumulatorValue): AccumulatorValue =
         toCim(pb.mv, this)
     }
 
+/**
+ * Convert the protobuf [PBAnalogValue] into its CIM counterpart.
+ *
+ * @param pb The protobuf [PBAnalogValue] to convert.
+ * @return The converted [pb] as a CIM [AnalogValue].
+ */
 fun toCim(pb: PBAnalogValue): AnalogValue =
     AnalogValue().apply {
         analogMRID = pb.analogMRID.takeIf { it.isNotBlank() }
@@ -34,6 +46,12 @@ fun toCim(pb: PBAnalogValue): AnalogValue =
         toCim(pb.mv, this)
     }
 
+/**
+ * Convert the protobuf [PBDiscreteValue] into its CIM counterpart.
+ *
+ * @param pb The protobuf [PBDiscreteValue] to convert.
+ * @return The converted [pb] as a CIM [DiscreteValue].
+ */
 fun toCim(pb: PBDiscreteValue): DiscreteValue =
     DiscreteValue().apply {
         discreteMRID = pb.discreteMRID.takeIf { it.isNotBlank() }
@@ -41,19 +59,44 @@ fun toCim(pb: PBDiscreteValue): DiscreteValue =
         toCim(pb.mv, this)
     }
 
+/**
+ * Convert the protobuf [PBMeasurementValue] into its CIM counterpart.
+ *
+ * @param pb The protobuf [PBMeasurementValue] to convert.
+ * @param cim The CIM [MeasurementValue] to populate.
+ * @return The converted [pb] as a CIM [MeasurementValue].
+ */
 fun toCim(pb: PBMeasurementValue, cim: MeasurementValue): MeasurementValue =
     cim.apply { timeStamp = pb.timeStamp.toInstant() }
 
 
+/**
+ * An extension to add a converted copy of the protobuf [PBAccumulatorValue] to the [MeasurementService].
+ */
 fun MeasurementService.addFromPb(pb: PBAccumulatorValue): AccumulatorValue = toCim(pb).also { add(it) }
+
+/**
+ * An extension to add a converted copy of the protobuf [PBAnalogValue] to the [MeasurementService].
+ */
 fun MeasurementService.addFromPb(pb: PBAnalogValue): AnalogValue = toCim(pb).also { add(it) }
+
+/**
+ * An extension to add a converted copy of the protobuf [PBDiscreteValue] to the [MeasurementService].
+ */
 fun MeasurementService.addFromPb(pb: PBDiscreteValue): DiscreteValue = toCim(pb).also { add(it) }
 
 // #################################
 // # Class for Java friendly usage #
 // #################################
 
-// This will be left unused until we have a measurement consumer client.
+/**
+ * A helper class for Java friendly convertion from protobuf objects to their CIM counterparts.
+ *
+ * @property measurementService The [MeasurementService] all converted objects should be added to.
+ */
+//
+// NOTE: This will be left unused until we have a measurement consumer client.
+//
 @Suppress("Unused")
 class MeasurementProtoToCim(private val measurementService: MeasurementService) {
 
@@ -61,8 +104,28 @@ class MeasurementProtoToCim(private val measurementService: MeasurementService) 
     // # IEC61970 Base Meas #
     // ######################
 
+    /**
+     * Add a converted copy of the protobuf [PBAnalogValue] to the [MeasurementService].
+     *
+     * @param pb The [PBAnalogValue] to convert.
+     * @return The converted [AnalogValue]
+     */
     fun addFromPb(pb: PBAnalogValue): AnalogValue = measurementService.addFromPb(pb)
+
+    /**
+     * Add a converted copy of the protobuf [PBAccumulatorValue] to the [MeasurementService].
+     *
+     * @param pb The [PBAccumulatorValue] to convert.
+     * @return The converted [AccumulatorValue]
+     */
     fun addFromPb(pb: PBAccumulatorValue): AccumulatorValue = measurementService.addFromPb(pb)
+
+    /**
+     * Add a converted copy of the protobuf [PBDiscreteValue] to the [MeasurementService].
+     *
+     * @param pb The [PBDiscreteValue] to convert.
+     * @return The converted [DiscreteValue]
+     */
     fun addFromPb(pb: PBDiscreteValue): DiscreteValue = measurementService.addFromPb(pb)
 
 }

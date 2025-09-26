@@ -19,11 +19,12 @@ internal class AcDcTerminalTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun constructorCoverage() {
         assertThat(object : AcDcTerminal() {}.mRID, not(equalTo("")))
         assertThat(object : AcDcTerminal("id") {}.mRID, equalTo("id"))
     }
+
 }

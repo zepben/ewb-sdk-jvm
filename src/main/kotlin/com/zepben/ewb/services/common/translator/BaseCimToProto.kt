@@ -26,6 +26,13 @@ import com.zepben.protobuf.cim.iec61970.base.core.NameType as PBNameType
 // # IEC61968 Common #
 // ###################
 
+/**
+ * Convert the [Document] into its protobuf counterpart.
+ *
+ * @param cim The [Document] to convert.
+ * @param pb The protobuf builder to populate.
+ * @return [pb] for fluent use.
+ */
 fun toPb(cim: Document, pb: PBDocument.Builder): PBDocument.Builder =
     pb.apply {
         cim.title?.also { titleSet = it } ?: run { titleNull = NullValue.NULL_VALUE }
@@ -37,21 +44,45 @@ fun toPb(cim: Document, pb: PBDocument.Builder): PBDocument.Builder =
         toPb(cim, ioBuilder)
     }
 
+/**
+ * Convert the [Organisation] into its protobuf counterpart.
+ *
+ * @param cim The [Organisation] to convert.
+ * @param pb The protobuf builder to populate.
+ * @return [pb] for fluent use.
+ */
 fun toPb(cim: Organisation, pb: PBOrganisation.Builder): PBOrganisation.Builder =
     pb.apply { toPb(cim, ioBuilder) }
 
+/**
+ * Convert the [OrganisationRole] into its protobuf counterpart.
+ *
+ * @param cim The [OrganisationRole] to convert.
+ * @param pb The protobuf builder to populate.
+ * @return [pb] for fluent use.
+ */
 fun toPb(cim: OrganisationRole, pb: PBOrganisationRole.Builder): PBOrganisationRole.Builder =
     pb.apply {
         cim.organisation?.mRID?.let { organisationMRID = it } ?: clearOrganisationMRID()
         toPb(cim, ioBuilder)
     }
 
+/**
+ * An extension for converting any [Organisation] into its protobuf counterpart.
+ */
 fun Organisation.toPb(): PBOrganisation = toPb(this, PBOrganisation.newBuilder()).build()
 
 // ######################
 // # IEC61970 Base Core #
 // ######################
 
+/**
+ * Convert the [IdentifiedObject] into its protobuf counterpart.
+ *
+ * @param cim The [IdentifiedObject] to convert.
+ * @param pb The protobuf builder to populate.
+ * @return [pb] for fluent use.
+ */
 fun toPb(cim: IdentifiedObject, pb: PBIdentifiedObject.Builder): PBIdentifiedObject.Builder =
     pb.apply {
         mrid = cim.mRID
@@ -61,36 +92,68 @@ fun toPb(cim: IdentifiedObject, pb: PBIdentifiedObject.Builder): PBIdentifiedObj
         cim.names.forEach { name -> addNamesBuilder().also { toPb(name, it) } }
     }
 
+/**
+ * Convert the [Name] into its protobuf counterpart.
+ *
+ * @param cim The [Name] to convert.
+ * @param pb The protobuf builder to populate.
+ * @return [pb] for fluent use.
+ */
 fun toPb(cim: Name, pb: PBName.Builder): PBName.Builder =
     pb.apply {
         name = cim.name
         type = cim.type.name
     }
 
+/**
+ * Convert the [NameType] into its protobuf counterpart.
+ *
+ * @param cim The [NameType] to convert.
+ * @param pb The protobuf builder to populate.
+ * @return [pb] for fluent use.
+ */
 fun toPb(cim: NameType, pb: PBNameType.Builder): PBNameType.Builder =
     pb.apply {
         name = cim.name
         cim.description?.also { descriptionSet = it } ?: run { descriptionNull = NullValue.NULL_VALUE }
     }
 
+/**
+ * An extension for converting any [NameType] into its protobuf counterpart.
+ */
 fun NameType.toPb(): PBNameType = toPb(this, PBNameType.newBuilder()).build()
 
 // #################################
 // # Class for Java friendly usage #
 // #################################
 
+/**
+ * The base helper class for Java friendly convertion from CIM objects to their protobuf counterparts.
+ */
 abstract class BaseCimToProto {
 
     // ###################
     // # IEC61968 Common #
     // ###################
 
+    /**
+     * Convert the [Organisation] into its protobuf counterpart.
+     *
+     * @param organisation The [Organisation] to convert.
+     * @return The protobuf form of [organisation].
+     */
     fun toPb(organisation: Organisation): PBOrganisation = organisation.toPb()
 
     // ######################
     // # IEC61970 Base Core #
     // ######################
 
+    /**
+     * Convert the [NameType] into its protobuf counterpart.
+     *
+     * @param nameType The [NameType] to convert.
+     * @return The protobuf form of [nameType].
+     */
     fun toPb(nameType: NameType): PBNameType = nameType.toPb()
 
 }

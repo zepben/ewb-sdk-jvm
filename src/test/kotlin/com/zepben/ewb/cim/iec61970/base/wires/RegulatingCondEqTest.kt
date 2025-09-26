@@ -22,7 +22,7 @@ internal class RegulatingCondEqTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun constructorCoverage() {
@@ -54,4 +54,5 @@ internal class RegulatingCondEqTest {
         }.toThrow<IllegalStateException>().withMessage("regulatingControl has already been set to $regControl. Cannot set this field again")
         assertThat(regulatingCondEq.regulatingControl, equalTo(regControl))
     }
+
 }

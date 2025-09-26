@@ -17,8 +17,19 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 
 
+/**
+ * Extract the mRID from the composed classes.
+ */
 fun OrganisationRole.mRID(): String = io.mrid
+
+/**
+ * Extract the mRID from the composed classes.
+ */
 fun Document.mRID(): String = io.mrid
+
+/**
+ * Extract the mRID from the composed classes.
+ */
 fun Organisation.mRID(): String = io.mrid
 
 fun Timestamp.toInstant(): Instant? = if (seconds == 0L && nanos == 0) null else Instant.ofEpochSecond(seconds, nanos.toLong())

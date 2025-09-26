@@ -19,11 +19,12 @@ internal class ReactiveCapabilityCurveTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun constructorCoverage() {
         assertThat(ReactiveCapabilityCurve().mRID, not(equalTo("")))
         assertThat(ReactiveCapabilityCurve("id").mRID, equalTo("id"))
     }
+
 }

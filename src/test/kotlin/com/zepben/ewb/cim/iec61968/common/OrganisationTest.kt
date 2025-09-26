@@ -19,11 +19,12 @@ internal class OrganisationTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun constructorCoverage() {
         assertThat(Organisation().mRID, not(equalTo("")))
         assertThat(Organisation("id").mRID, equalTo("id"))
     }
+
 }

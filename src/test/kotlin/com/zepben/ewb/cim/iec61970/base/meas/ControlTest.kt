@@ -19,7 +19,7 @@ internal class ControlTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun constructorCoverage() {
@@ -41,4 +41,5 @@ internal class ControlTest {
         assertThat(control.powerSystemResourceMRID, equalTo("powerSystemResourceMRID"))
         assertThat(control.remoteControl, equalTo(remoteControl))
     }
+
 }

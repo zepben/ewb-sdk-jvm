@@ -39,7 +39,7 @@ internal class AssignToLvFeedersTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     val hvBaseVoltage = BaseVoltage().apply { nominalVoltage = 11000 }
     val lvBaseVoltage = BaseVoltage().apply { nominalVoltage = 400 }

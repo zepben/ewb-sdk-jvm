@@ -23,7 +23,7 @@ internal class AwaitableStreamObserverTest {
 
     @JvmField
     @RegisterExtension
-    var systemOut: SystemLogExtension = SystemLogExtension.SYSTEM_OUT.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     private val processor = mock<(Int) -> Unit>()
     private val streamObserver = AwaitableStreamObserver(processor)

@@ -21,7 +21,7 @@ internal class CustomerServiceWriterTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     private val customerService = CustomerService()
     private val cimWriter = mockk<CustomerCimWriter> { every { write(any<Customer>()) } returns true }

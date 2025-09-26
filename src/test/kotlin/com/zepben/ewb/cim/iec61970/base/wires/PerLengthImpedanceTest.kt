@@ -19,11 +19,12 @@ internal class PerLengthImpedanceTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun constructorCoverage() {
         assertThat(object : PerLengthImpedance() {}.mRID, not(equalTo("")))
         assertThat(object : PerLengthImpedance("id") {}.mRID, equalTo("id"))
     }
+
 }

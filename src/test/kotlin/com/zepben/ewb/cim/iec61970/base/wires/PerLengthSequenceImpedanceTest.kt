@@ -18,7 +18,7 @@ internal class PerLengthSequenceImpedanceTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun constructorCoverage() {
@@ -57,4 +57,5 @@ internal class PerLengthSequenceImpedanceTest {
         assertThat(perLengthSequenceImpedance.b0ch, equalTo(7.0))
         assertThat(perLengthSequenceImpedance.g0ch, equalTo(8.0))
     }
+
 }

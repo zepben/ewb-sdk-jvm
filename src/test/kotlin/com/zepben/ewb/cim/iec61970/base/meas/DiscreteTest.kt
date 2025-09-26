@@ -18,11 +18,12 @@ import org.junit.jupiter.api.extension.RegisterExtension
 internal class DiscreteTest {
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun constructorCoverage() {
         assertThat(Discrete().mRID, not(equalTo("")))
         assertThat(Discrete("id").mRID, equalTo("id"))
     }
+
 }

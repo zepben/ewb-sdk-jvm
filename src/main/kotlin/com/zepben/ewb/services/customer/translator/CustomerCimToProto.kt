@@ -15,7 +15,6 @@ import com.zepben.ewb.cim.iec61968.customers.CustomerAgreement
 import com.zepben.ewb.cim.iec61968.customers.PricingStructure
 import com.zepben.ewb.cim.iec61968.customers.Tariff
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
-import com.zepben.ewb.services.common.UNKNOWN_INT
 import com.zepben.ewb.services.common.translator.BaseCimToProto
 import com.zepben.ewb.services.common.translator.toPb
 import com.zepben.ewb.services.customer.whenCustomerServiceObject
@@ -26,6 +25,9 @@ import com.zepben.protobuf.cim.iec61968.customers.CustomerAgreement as PBCustome
 import com.zepben.protobuf.cim.iec61968.customers.PricingStructure as PBPricingStructure
 import com.zepben.protobuf.cim.iec61968.customers.Tariff as PBTariff
 
+/**
+ * Convert the [IdentifiedObject] to a [CustomerIdentifiedObject] representation.
+ */
 fun customerIdentifiedObject(identifiedObject: IdentifiedObject): CustomerIdentifiedObject =
     CustomerIdentifiedObject.newBuilder().apply {
         whenCustomerServiceObject(
@@ -42,6 +44,13 @@ fun customerIdentifiedObject(identifiedObject: IdentifiedObject): CustomerIdenti
 // # IEC61968 Common #
 // ###################
 
+/**
+ * Convert the [Agreement] into its protobuf counterpart.
+ *
+ * @param cim The [Agreement] to convert.
+ * @param pb The protobuf builder to populate.
+ * @return [pb] for fluent use.
+ */
 fun toPb(cim: Agreement, pb: PBAgreement.Builder): PBAgreement.Builder =
     pb.apply { toPb(cim, docBuilder) }
 
@@ -49,6 +58,13 @@ fun toPb(cim: Agreement, pb: PBAgreement.Builder): PBAgreement.Builder =
 // # IEC61968 Customers #
 // ######################
 
+/**
+ * Convert the [Customer] into its protobuf counterpart.
+ *
+ * @param cim The [Customer] to convert.
+ * @param pb The protobuf builder to populate.
+ * @return [pb] for fluent use.
+ */
 fun toPb(cim: Customer, pb: PBCustomer.Builder): PBCustomer.Builder =
     pb.apply {
         kind = mapCustomerKind.toPb(cim.kind)
@@ -59,6 +75,13 @@ fun toPb(cim: Customer, pb: PBCustomer.Builder): PBCustomer.Builder =
         toPb(cim, orBuilder)
     }
 
+/**
+ * Convert the [CustomerAgreement] into its protobuf counterpart.
+ *
+ * @param cim The [CustomerAgreement] to convert.
+ * @param pb The protobuf builder to populate.
+ * @return [pb] for fluent use.
+ */
 fun toPb(cim: CustomerAgreement, pb: PBCustomerAgreement.Builder): PBCustomerAgreement.Builder =
     pb.apply {
         cim.customer?.let { customerMRID = it.mRID } ?: clearCustomerMRID()
@@ -67,6 +90,13 @@ fun toPb(cim: CustomerAgreement, pb: PBCustomerAgreement.Builder): PBCustomerAgr
         toPb(cim, agrBuilder)
     }
 
+/**
+ * Convert the [PricingStructure] into its protobuf counterpart.
+ *
+ * @param cim The [PricingStructure] to convert.
+ * @param pb The protobuf builder to populate.
+ * @return [pb] for fluent use.
+ */
 fun toPb(cim: PricingStructure, pb: PBPricingStructure.Builder): PBPricingStructure.Builder =
     pb.apply {
         clearTariffMRIDs()
@@ -74,27 +104,79 @@ fun toPb(cim: PricingStructure, pb: PBPricingStructure.Builder): PBPricingStruct
         toPb(cim, docBuilder)
     }
 
+/**
+ * Convert the [Tariff] into its protobuf counterpart.
+ *
+ * @param cim The [Tariff] to convert.
+ * @param pb The protobuf builder to populate.
+ * @return [pb] for fluent use.
+ */
 fun toPb(cim: Tariff, pb: PBTariff.Builder): PBTariff.Builder =
     pb.apply { toPb(cim, docBuilder) }
 
+/**
+ * An extension for converting any [Customer] into its protobuf counterpart.
+ */
 fun Customer.toPb(): PBCustomer = toPb(this, PBCustomer.newBuilder()).build()
+
+/**
+ * An extension for converting any [CustomerAgreement] into its protobuf counterpart.
+ */
 fun CustomerAgreement.toPb(): PBCustomerAgreement = toPb(this, PBCustomerAgreement.newBuilder()).build()
+
+/**
+ * An extension for converting any [PricingStructure] into its protobuf counterpart.
+ */
 fun PricingStructure.toPb(): PBPricingStructure = toPb(this, PBPricingStructure.newBuilder()).build()
+
+/**
+ * An extension for converting any [Tariff] into its protobuf counterpart.
+ */
 fun Tariff.toPb(): PBTariff = toPb(this, PBTariff.newBuilder()).build()
 
 // #################################
 // # Class for Java friendly usage #
 // #################################
 
+/**
+ * A helper class for Java friendly convertion from CIM objects to their protobuf counterparts.
+ */
 class CustomerCimToProto : BaseCimToProto() {
 
     // ######################
     // # IEC61968 Customers #
     // ######################
 
+    /**
+     * Convert the [Customer] into its protobuf counterpart.
+     *
+     * @param cim The [Customer] to convert.
+     * @return The protobuf form of [cim].
+     */
     fun toPb(cim: Customer): PBCustomer = cim.toPb()
+
+    /**
+     * Convert the [CustomerAgreement] into its protobuf counterpart.
+     *
+     * @param cim The [CustomerAgreement] to convert.
+     * @return The protobuf form of [cim].
+     */
     fun toPb(cim: CustomerAgreement): PBCustomerAgreement = cim.toPb()
+
+    /**
+     * Convert the [PricingStructure] into its protobuf counterpart.
+     *
+     * @param cim The [PricingStructure] to convert.
+     * @return The protobuf form of [cim].
+     */
     fun toPb(cim: PricingStructure): PBPricingStructure = cim.toPb()
+
+    /**
+     * Convert the [Tariff] into its protobuf counterpart.
+     *
+     * @param cim The [Tariff] to convert.
+     * @return The protobuf form of [cim].
+     */
     fun toPb(cim: Tariff): PBTariff = cim.toPb()
 
 }

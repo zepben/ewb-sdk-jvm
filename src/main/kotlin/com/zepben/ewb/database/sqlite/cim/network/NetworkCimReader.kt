@@ -2296,7 +2296,7 @@ internal class NetworkCimReader : CimReader<NetworkService>() {
             service.getOrThrow<PerLengthPhaseImpedance>(perLengthPhaseImpedanceMRID, "PerLengthPhaseImpedance to PhaseImpedanceData association $id")
 
         perLengthPhaseImpedance.addData(
-            com.zepben.ewb.cim.iec61970.base.wires.PhaseImpedanceData(
+            PhaseImpedanceData(
                 SinglePhaseKind.valueOf(resultSet.getString(table.FROM_PHASE.queryIndex)),
                 SinglePhaseKind.valueOf(resultSet.getString(table.TO_PHASE.queryIndex)),
                 resultSet.getNullableDouble(table.B.queryIndex),
@@ -2561,12 +2561,7 @@ internal class NetworkCimReader : CimReader<NetworkService>() {
     }
 
     @Throws(SQLException::class)
-    private fun readRotatingMachine(
-        service: NetworkService,
-        rotatingMachine: RotatingMachine,
-        table: com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.wires.TableRotatingMachines,
-        resultSet: ResultSet
-    ): Boolean {
+    private fun readRotatingMachine(service: NetworkService, rotatingMachine: RotatingMachine, table: TableRotatingMachines, resultSet: ResultSet): Boolean {
         rotatingMachine.apply {
             ratedPowerFactor = resultSet.getNullableDouble(table.RATED_POWER_FACTOR.queryIndex)
             ratedS = resultSet.getNullableDouble(table.RATED_S.queryIndex)

@@ -21,7 +21,7 @@ internal class TapChangerTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun constructorCoverage() {
@@ -97,4 +97,5 @@ internal class TapChangerTest {
             .toThrow<IllegalStateException>()
             .withMessage("step [4.0] must be between high step [3] and low step [-3].")
     }
+
 }

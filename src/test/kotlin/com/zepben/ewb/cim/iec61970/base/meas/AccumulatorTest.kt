@@ -18,11 +18,12 @@ import org.junit.jupiter.api.extension.RegisterExtension
 internal class AccumulatorTest {
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun constructorCoverage() {
         assertThat(Accumulator().mRID, not(equalTo("")))
         assertThat(Accumulator("id").mRID, equalTo("id"))
     }
+
 }

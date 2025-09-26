@@ -19,7 +19,7 @@ internal class BaseVoltageTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun constructorCoverage() {
@@ -32,4 +32,5 @@ internal class BaseVoltageTest {
         val baseVoltage = BaseVoltage().apply { nominalVoltage = 900 }
         assertThat(baseVoltage.nominalVoltage, equalTo(900))
     }
+
 }

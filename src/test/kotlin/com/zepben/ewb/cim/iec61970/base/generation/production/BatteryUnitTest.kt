@@ -21,7 +21,7 @@ internal class BatteryUnitTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun constructorCoverage() {
@@ -73,4 +73,5 @@ internal class BatteryUnitTest {
 
         assertThat(batteryUnit.getControl(BatteryControlMode.UNKNOWN), equalTo(batteryControl))
     }
+
 }

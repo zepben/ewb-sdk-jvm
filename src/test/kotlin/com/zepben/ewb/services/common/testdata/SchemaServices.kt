@@ -102,7 +102,6 @@ object SchemaServices {
         }
     }
 
-
     /**
      * This functionality was created because there were a few strings that weren't nullable, and we were treating "" as null.
      * We then converted them to nullable and wanted to ensure that nothing got broken by writing/reading these from the DB/protos.

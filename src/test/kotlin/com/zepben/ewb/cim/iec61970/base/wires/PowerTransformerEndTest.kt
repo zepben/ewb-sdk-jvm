@@ -30,7 +30,7 @@ internal class PowerTransformerEndTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     private val si = mock<TransformerStarImpedance>()
     private val info = mock<PowerTransformerInfo>()

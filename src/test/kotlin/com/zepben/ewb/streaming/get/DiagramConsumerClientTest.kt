@@ -42,6 +42,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.*
+import org.slf4j.LoggerFactory
 import java.util.concurrent.Executors
 import com.zepben.protobuf.dc.DiagramIdentifiedObject as DIO
 
@@ -49,7 +50,9 @@ internal class DiagramConsumerClientTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+
+    private val logger = LoggerFactory.getLogger(javaClass)
 
     @JvmField
     @Rule
@@ -336,7 +339,7 @@ internal class DiagramConsumerClientTest {
         mRID: String
     ): GetIdentifiedObjectsResponse {
         buildFromBuilder(subClassBuilder, mRID)
-        println(identifiedObjectBuilder)
+        logger.info("$identifiedObjectBuilder")
 
         val responseBuilder = GetIdentifiedObjectsResponse.newBuilder()
         responseBuilder.addIdentifiedObjects(identifiedObjectBuilder.build())

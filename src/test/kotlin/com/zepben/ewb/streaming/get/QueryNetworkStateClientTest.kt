@@ -14,6 +14,7 @@ import com.zepben.ewb.streaming.get.testservices.TestQueryNetworkStateService
 import com.zepben.ewb.streaming.grpc.GrpcChannel
 import com.zepben.ewb.streaming.grpc.TokenCallCredentials
 import com.zepben.protobuf.ns.QueryNetworkStateServiceGrpc
+import com.zepben.testutils.junit.SystemLogExtension
 import io.grpc.inprocess.InProcessChannelBuilder
 import io.grpc.inprocess.InProcessServerBuilder
 import io.grpc.testing.GrpcCleanupRule
@@ -26,12 +27,17 @@ import org.hamcrest.Matchers.instanceOf
 import org.junit.Rule
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertTimeoutPreemptively
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.slf4j.LoggerFactory
 import java.time.Duration
 import java.time.LocalDateTime
 import kotlin.streams.toList
 
 internal class QueryNetworkStateClientTest {
+
+    @JvmField
+    @RegisterExtension
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @JvmField
     @Rule

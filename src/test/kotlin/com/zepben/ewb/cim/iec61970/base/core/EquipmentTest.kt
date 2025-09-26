@@ -26,7 +26,7 @@ internal class EquipmentTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun constructorCoverage() {
@@ -142,4 +142,5 @@ internal class EquipmentTest {
         assertThat(equipment.currentLvFeeders, containsInAnyOrder(lvFeeder3, lvFeeder4))
         assertThat(equipment.substations, containsInAnyOrder(substation1, substation2))
     }
+
 }

@@ -19,11 +19,12 @@ internal class TariffTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun constructorCoverage() {
         assertThat(Tariff().mRID, not(equalTo("")))
         assertThat(Tariff("id").mRID, equalTo("id"))
     }
+
 }

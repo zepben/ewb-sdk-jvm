@@ -20,7 +20,7 @@ internal class StreetlightTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun constructorCoverage() {
@@ -47,4 +47,5 @@ internal class StreetlightTest {
         assertThat(streetlight.lampKind, equalTo(StreetlightLampKind.HIGH_PRESSURE_SODIUM))
         assertThat(streetlight.lightRating, equalTo(1))
     }
+
 }

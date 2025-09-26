@@ -25,6 +25,7 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.slf4j.LoggerFactory
 import java.lang.reflect.Modifier
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -33,7 +34,9 @@ class NetworkCimWriterTest {
 
     @JvmField
     @RegisterExtension
-    var systemOut: SystemLogExtension = SystemLogExtension.SYSTEM_OUT.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+
+    private val logger = LoggerFactory.getLogger(javaClass)
 
     @Test
     internal fun `only exports equipment for expected equipment containers`() {
@@ -79,11 +82,11 @@ class NetworkCimWriterTest {
         writer.write(junction)
 
         shouldExport.forEach {
-            println("Check collection entry for ${it::class.simpleName} was exported...")
+            logger.info("Check collection entry for ${it::class.simpleName} was exported...")
             verify(exactly = 1) { insert.setString(table.EQUIPMENT_CONTAINER_MRID.queryIndex, it.mRID) }
         }
         shouldIgnore.forEach {
-            println("Check collection entry for ${it::class.simpleName} was ignored...")
+            logger.info("Check collection entry for ${it::class.simpleName} was ignored...")
             verify(exactly = 0) { insert.setString(table.EQUIPMENT_CONTAINER_MRID.queryIndex, it.mRID) }
         }
     }

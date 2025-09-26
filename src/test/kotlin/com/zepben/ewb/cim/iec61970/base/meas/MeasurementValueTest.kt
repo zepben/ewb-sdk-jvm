@@ -19,7 +19,7 @@ import java.time.Instant
 internal class MeasurementValueTest {
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     @Throws(IllegalStateException::class)
@@ -32,4 +32,5 @@ internal class MeasurementValueTest {
         mv.timeStamp = timeStamp
         assertThat(mv.timeStamp, equalTo(timeStamp))
     }
+
 }

@@ -18,7 +18,7 @@ internal class EnergySourcePhaseTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun constructorCoverage() {
@@ -42,4 +42,5 @@ internal class EnergySourcePhaseTest {
         assertThat(energySourcePhase.energySource, equalTo(energySource))
         assertThat(energySourcePhase.phase, equalTo(SinglePhaseKind.B))
     }
+
 }

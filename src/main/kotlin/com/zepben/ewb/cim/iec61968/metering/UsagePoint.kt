@@ -65,6 +65,12 @@ class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject
      */
     fun getEquipment(mRID: String): Equipment? = _equipment?.getByMRID(mRID)
 
+    /**
+     * Add an [Equipment] to this [UsagePoint].
+     *
+     * @param equipment The [Equipment] to add.
+     * @return This [UsagePoint] for fluent use.
+     */
     fun addEquipment(equipment: Equipment): UsagePoint {
         if (validateReference(equipment, ::getEquipment, "An Equipment"))
             return this
@@ -75,12 +81,23 @@ class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject
         return this
     }
 
+    /**
+     * Remove an [Equipment] from this [UsagePoint].
+     *
+     * @param equipment The [Equipment] to remove.
+     * @return true if the [Equipment] was removed.
+     */
     fun removeEquipment(equipment: Equipment): Boolean {
         val ret = _equipment?.remove(equipment) == true
         if (_equipment.isNullOrEmpty()) _equipment = null
         return ret
     }
 
+    /**
+     * Clear all [Equipment] from this [UsagePoint].
+     *
+     * @return This [UsagePoint] for fluent use.
+     */
     fun clearEquipment(): UsagePoint {
         _equipment = null
         return this
@@ -104,6 +121,12 @@ class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject
      */
     fun getEndDevice(mRID: String): EndDevice? = _endDevices?.getByMRID(mRID)
 
+    /**
+     * Add an [EndDevice] to this [UsagePoint].
+     *
+     * @param endDevice The [EndDevice] to add.
+     * @return This [UsagePoint] for fluent use.
+     */
     fun addEndDevice(endDevice: EndDevice): UsagePoint {
         if (validateReference(endDevice, ::getEndDevice, "An EndDevice"))
             return this
@@ -114,14 +137,26 @@ class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject
         return this
     }
 
+    /**
+     * Remove an [EndDevice] from this [UsagePoint].
+     *
+     * @param endDevice The [EndDevice] to remove.
+     * @return true if the [EndDevice] was removed.
+     */
     fun removeEndDevice(endDevice: EndDevice): Boolean {
         val ret = _endDevices?.remove(endDevice) == true
         if (_endDevices.isNullOrEmpty()) _endDevices = null
         return ret
     }
 
+    /**
+     * Clear all [EndDevice]'s from this [UsagePoint].
+     *
+     * @return This [UsagePoint] for fluent use.
+     */
     fun clearEndDevices(): UsagePoint {
         _endDevices = null
         return this
     }
+
 }

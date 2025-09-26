@@ -1350,9 +1350,9 @@ fun PerLengthPhaseImpedance.fillFields(service: NetworkService, includeRuntime: 
 
     for (i in 0..1)
         addData(
-            com.zepben.ewb.cim.iec61970.base.wires.PhaseImpedanceData(
-                SinglePhaseKind.get(i),
-                SinglePhaseKind.get(i),
+            PhaseImpedanceData(
+                SinglePhaseKind[i],
+                SinglePhaseKind[i],
                 i.toDouble(),
                 i.toDouble(),
                 i.toDouble(),

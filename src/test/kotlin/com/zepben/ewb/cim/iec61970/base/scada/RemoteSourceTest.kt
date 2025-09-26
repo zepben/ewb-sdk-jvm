@@ -19,7 +19,7 @@ internal class RemoteSourceTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun constructorCoverage() {
@@ -38,4 +38,5 @@ internal class RemoteSourceTest {
 
         assertThat(remoteSource.measurement, equalTo(measurement))
     }
+
 }

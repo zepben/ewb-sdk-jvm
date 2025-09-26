@@ -19,7 +19,7 @@ internal class PerLengthPhaseImpedanceTest {
 
     @JvmField
     @RegisterExtension
-    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun constructorCoverage() {
@@ -36,16 +36,7 @@ internal class PerLengthPhaseImpedanceTest {
 
         PrivateCollectionValidator.validateUnordered(
             ::PerLengthPhaseImpedance,
-            {
-                com.zepben.ewb.cim.iec61970.base.wires.PhaseImpedanceData(
-                    SinglePhaseKind.get(it),
-                    SinglePhaseKind.get(it + 1),
-                    it.toDouble(),
-                    it.toDouble(),
-                    it.toDouble(),
-                    it.toDouble()
-                )
-            },
+            { PhaseImpedanceData(SinglePhaseKind[it], SinglePhaseKind[it + 1], it.toDouble()) },
             PerLengthPhaseImpedance::data,
             PerLengthPhaseImpedance::numData,
             { it, (from, to) -> it.getData(from, to) },
@@ -58,13 +49,13 @@ internal class PerLengthPhaseImpedanceTest {
 
     @Test
     internal fun `diagonals returns only diagonals`() {
-        val pi1 = com.zepben.ewb.cim.iec61970.base.wires.PhaseImpedanceData(SinglePhaseKind.A, SinglePhaseKind.B)
-        val pi2 = com.zepben.ewb.cim.iec61970.base.wires.PhaseImpedanceData(SinglePhaseKind.A, SinglePhaseKind.C)
-        val pi3 = com.zepben.ewb.cim.iec61970.base.wires.PhaseImpedanceData(SinglePhaseKind.B, SinglePhaseKind.C)
+        val pi1 = PhaseImpedanceData(SinglePhaseKind.A, SinglePhaseKind.B)
+        val pi2 = PhaseImpedanceData(SinglePhaseKind.A, SinglePhaseKind.C)
+        val pi3 = PhaseImpedanceData(SinglePhaseKind.B, SinglePhaseKind.C)
 
-        val pid1 = com.zepben.ewb.cim.iec61970.base.wires.PhaseImpedanceData(SinglePhaseKind.A, SinglePhaseKind.A)
-        val pid2 = com.zepben.ewb.cim.iec61970.base.wires.PhaseImpedanceData(SinglePhaseKind.B, SinglePhaseKind.B)
-        val pid3 = com.zepben.ewb.cim.iec61970.base.wires.PhaseImpedanceData(SinglePhaseKind.C, SinglePhaseKind.C)
+        val pid1 = PhaseImpedanceData(SinglePhaseKind.A, SinglePhaseKind.A)
+        val pid2 = PhaseImpedanceData(SinglePhaseKind.B, SinglePhaseKind.B)
+        val pid3 = PhaseImpedanceData(SinglePhaseKind.C, SinglePhaseKind.C)
 
         PerLengthPhaseImpedance().apply {
             addData(pi1)

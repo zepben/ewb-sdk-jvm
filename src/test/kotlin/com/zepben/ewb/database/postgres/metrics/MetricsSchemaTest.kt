@@ -26,7 +26,7 @@ internal class MetricsSchemaTest {
 
     @JvmField
     @RegisterExtension
-    val systemOut: SystemLogExtension = SystemLogExtension.SYSTEM_OUT.captureLog().muteOnSuccess()
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     private val uuid = UUID.randomUUID()
 

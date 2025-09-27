@@ -16,12 +16,20 @@ package com.zepben.ewb.database.sql
  * @property type The data type of column. Supported data types depend on the implementation of SQL of being targeted (e.g. Postgres).
  * @property nullable How the nullability of the column is specified when creating the table.
  */
-class Column @JvmOverloads internal constructor(
+class Column @Deprecated("Use the `Type` variant of the constructor instead.") internal constructor(
     val queryIndex: Int,
     val name: String,
     val type: String,
     val nullable: Nullable = Nullable.NONE
 ) {
+
+    @Suppress("DEPRECATION")
+    internal constructor(
+        queryIndex: Int,
+        name: String,
+        type: Type,
+        nullable: Nullable = Nullable.NONE
+    ) : this(queryIndex, name, type.sqlite, nullable)
 
     /**
      * Ways of specifying whether a column is nullable.
@@ -41,6 +49,33 @@ class Column @JvmOverloads internal constructor(
          * Column is explicitly nullable via the NULL constraint.
          */
         NULL
+    }
+
+    /**
+     * Ways of specifying the columns data type.
+     *
+     * @property sqlite The type definition for the column when creating it in Sqlite.
+     */
+    enum class Type(val sqlite: String) {
+        /**
+         * The column stores a string.
+         */
+        STRING(sqlite = "TEXT"),
+
+        /**
+         * The column stores an integer.
+         */
+        INTEGER(sqlite = "INTEGER"),
+
+        /**
+         * The column stores a double.
+         */
+        DOUBLE(sqlite = "NUMBER"),
+
+        /**
+         * The column stores a boolean.
+         */
+        BOOLEAN(sqlite = "BOOLEAN"),
     }
 
     init {

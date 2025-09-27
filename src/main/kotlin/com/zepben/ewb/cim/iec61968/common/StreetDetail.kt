@@ -31,8 +31,7 @@ data class StreetDetail(
     val suiteNumber: String? = null,
     val type: String? = null,
     val displayAddress: String? = null,
-    @ZBEX
-    val buildingNumber: Int? = null
+    @ZBEX val buildingNumber: String? = null,
 ) {
 
     /**
@@ -41,13 +40,14 @@ data class StreetDetail(
      * @return true if all fields are empty, otherwise false
      */
     fun allFieldsEmpty(): Boolean = (
-        buildingName.isNullOrEmpty() &&
-            floorIdentification.isNullOrEmpty() &&
-            name.isNullOrEmpty() &&
-            number.isNullOrEmpty() &&
-            suiteNumber.isNullOrEmpty() &&
-            type.isNullOrEmpty() &&
-            displayAddress.isNullOrEmpty()
+        buildingName.isNullOrEmpty()
+            && floorIdentification.isNullOrEmpty()
+            && name.isNullOrEmpty()
+            && number.isNullOrEmpty()
+            && suiteNumber.isNullOrEmpty()
+            && type.isNullOrEmpty()
+            && displayAddress.isNullOrEmpty()
+            && buildingNumber.isNullOrEmpty()
         )
 
     /**
@@ -56,13 +56,14 @@ data class StreetDetail(
      * @return true if all fields are null, otherwise false
      */
     fun allFieldsNull(): Boolean = (
-        buildingName == null &&
-            floorIdentification == null &&
-            name == null &&
-            number == null &&
-            suiteNumber == null &&
-            type == null &&
-            displayAddress == null
+        buildingName == null
+            && floorIdentification == null
+            && name == null
+            && number == null
+            && suiteNumber == null
+            && type == null
+            && displayAddress == null
+            && buildingNumber == null
         )
 
 }

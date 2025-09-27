@@ -10,18 +10,25 @@ package com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.common
 
 import com.zepben.ewb.database.sql.Column
 import com.zepben.ewb.database.sql.Column.Nullable.NOT_NULL
+import com.zepben.ewb.database.sql.Column.Type.STRING
 import com.zepben.ewb.database.sqlite.cim.tables.iec61968.common.TableTelephoneNumbers
 
+/**
+ * A class representing the `ContactDetails` to `TelephoneNumber` association columns required for the database table.
+ *
+ * @property CONTACT_DETAILS_ID A column that stores the identifier of the contact details associated with the telephone number.
+ */
 @Suppress("PropertyName")
 class TableContactDetailsTelephoneNumbers : TableTelephoneNumbers() {
 
-    val CONTACT_DETAILS_ID: Column = Column(++columnIndex, "contact_details_id", "TEXT", NOT_NULL)
+    val CONTACT_DETAILS_ID: Column = Column(++columnIndex, "contact_details_id", STRING, NOT_NULL)
 
     override val name: String = "contact_details_telephone_numbers"
 
-    override val nonUniqueIndexColumns: MutableList<List<Column>> =
-        super.nonUniqueIndexColumns.apply {
-            add(listOf(CONTACT_DETAILS_ID))
-        }
+    init {
+        addNonUniqueIndexes(
+            listOf(CONTACT_DETAILS_ID)
+        )
+    }
 
 }

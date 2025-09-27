@@ -13,18 +13,12 @@ import com.zepben.ewb.cim.extensions.ZBEX
 /**
  * Electronic address information.
  *
- * @property email1 (if applicable) Area or region code.
- * @property isPrimary [ZBEX] Is this phone number the primary number?
- * @property description [ZBEX] Description for phone number, e.g: home, work, mobile.
+ * @property email1 Primary email address.
+ * @property isPrimary [ZBEX] Whether this email is the primary email address of the contact.
+ * @property description [ZBEX] A description for this email, e.g: work, personal.
  */
-data class ElectronicAddress (
-
-    var email1: String? = null,
-
-    @ZBEX
-    var isPrimary: Boolean? = null,
-
-    @ZBEX
-    var description: String? = null
-
+data class ElectronicAddress(
+    val email1: String? = null,
+    @ZBEX val isPrimary: Boolean? = null,
+    @ZBEX val description: String? = null,
 )

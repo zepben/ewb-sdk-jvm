@@ -18,6 +18,6 @@ import com.zepben.ewb.cim.iec61970.base.domain.DateTimeInterval
  */
 abstract class Agreement(mRID: String = "") : Document(mRID) {
 
-    val validityInterval: DateTimeInterval? = null
+    var validityInterval: DateTimeInterval? = null
 
 }

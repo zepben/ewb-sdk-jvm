@@ -301,7 +301,7 @@ abstract class BaseServiceComparator {
      * @return The [ObjectDifference] being populated for fluent use.
      */
     fun <T, R, K : Comparable<K>> ObjectDifference<T>.compareUnorderedValueCollection(
-        property: KProperty1<in T, List<R>>,
+        property: KProperty1<in T, Collection<R>>,
         keySelector: (R) -> K
     ): ObjectDifference<T> {
         addIfDifferent(property.name, property.compareUnorderedValueCollection(source, target, keySelector))

@@ -322,21 +322,24 @@ fun RelayInfo.toPb(): PBRelayInfo = toPb(this, PBRelayInfo.newBuilder()).build()
  */
 fun toPb(cim: ContactDetails, pb: PBContactDetails.Builder): PBContactDetails.Builder =
     pb.apply {
-        cim.phoneNumbers?.forEach { toPb(it, addPhoneNumbersBuilder()) }
-        cim.contactAddress?.let { toPb(it, contactAddressBuilder) } ?: clearContactAddress()
-        cim.electronicAddresses?.forEach { toPb(it, addElectronicAddressesBuilder()) }
-
-        // TODO: remove
-        //cim.electronicAddresses?.forEach { addElectronicAddresses(toPb(it, electronicAddressesBuilderList)) } ?: clearElectronicAddresses()
-        //cim.electronicAddresses?.forEach { toPb(it, electronicAddressesBuilderList) } ?: clearElectronicAddresses()
-        //addAllElectronicAddresses(cim.electronicAddresses.forEach { toPb(it, electronicAddressesBuilderList) } )
-        cim.contactType?.let { contactTypeSet = it } ?: run { contactTypeNull = NullValue.NULL_VALUE }
-        cim.firstName?.let { firstNameSet = it } ?: run { firstNameNull = NullValue.NULL_VALUE }
-        cim.lastName?.let { lastNameSet = it } ?: run { lastNameNull = NullValue.NULL_VALUE }
+        id = cim.id
+        clearPhoneNumbers()
+        cim.phoneNumbers.forEach { addPhoneNumbers(it.toPb()) }
+        cim.contactAddress?.also { toPb(it, contactAddressBuilder) } ?: clearContactAddress()
+        clearElectronicAddresses()
+        cim.electronicAddresses.forEach { addElectronicAddresses(it.toPb()) }
+        cim.contactType?.also { contactTypeSet = it } ?: run { contactTypeNull = NullValue.NULL_VALUE }
+        cim.firstName?.also { firstNameSet = it } ?: run { firstNameNull = NullValue.NULL_VALUE }
+        cim.lastName?.also { lastNameSet = it } ?: run { lastNameNull = NullValue.NULL_VALUE }
         preferredContactMethod = mapContactMethodType.toPb(cim.preferredContactMethod)
-        cim.businessName?.let { businessNameSet = it } ?: run { businessNameNull = NullValue.NULL_VALUE }
+        cim.isPrimary?.also { isPrimarySet = it } ?: run { isPrimaryNull = NullValue.NULL_VALUE }
+        cim.businessName?.also { businessNameSet = it } ?: run { businessNameNull = NullValue.NULL_VALUE }
     }
 
+/**
+ * An extension for converting any [ContactDetails] into its protobuf counterpart.
+ */
+fun ContactDetails.toPb(): PBContactDetails = toPb(this, PBContactDetails.newBuilder()).build()
 
 // ################################
 // # Extensions IEC61968 Metering #
@@ -468,13 +471,13 @@ fun EvChargingUnit.toPb(): PBEvChargingUnit = toPb(this, PBEvChargingUnit.newBui
  */
 fun toPb(cim: DirectionalCurrentRelay, pb: PBDirectionalCurrentRelay.Builder): PBDirectionalCurrentRelay.Builder =
     pb.apply {
-        cim.directionalCharacteristicAngle?.let { directionalCharacteristicAngleSet = it } ?: run { directionalCharacteristicAngleNull = NullValue.NULL_VALUE }
+        cim.directionalCharacteristicAngle?.also { directionalCharacteristicAngleSet = it } ?: run { directionalCharacteristicAngleNull = NullValue.NULL_VALUE }
         polarizingQuantityType = mapPolarizingQuantityType.toPb(cim.polarizingQuantityType)
         relayElementPhase = mapPhaseCode.toPb(cim.relayElementPhase)
-        cim.minimumPickupCurrent?.let { minimumPickupCurrentSet = it } ?: run { minimumPickupCurrentNull = NullValue.NULL_VALUE }
-        cim.currentLimit1?.let { currentLimit1Set = it } ?: run { currentLimit1Null = NullValue.NULL_VALUE }
+        cim.minimumPickupCurrent?.also { minimumPickupCurrentSet = it } ?: run { minimumPickupCurrentNull = NullValue.NULL_VALUE }
+        cim.currentLimit1?.also { currentLimit1Set = it } ?: run { currentLimit1Null = NullValue.NULL_VALUE }
         cim.inverseTimeFlag?.also { inverseTimeFlagSet = it } ?: run { inverseTimeFlagNull = NullValue.NULL_VALUE }
-        cim.timeDelay1?.let { timeDelay1Set = it } ?: run { timeDelay1Null = NullValue.NULL_VALUE }
+        cim.timeDelay1?.also { timeDelay1Set = it } ?: run { timeDelay1Null = NullValue.NULL_VALUE }
         toPb(cim, prfBuilder)
     }
 
@@ -576,7 +579,7 @@ fun toPb(cim: VoltageRelay, pb: PBVoltageRelay.Builder): PBVoltageRelay.Builder 
     }
 
 /**
- * An extension for converting any DirectionalCurrentRelay into its protobuf counterpart.
+ * An extension for converting any [DirectionalCurrentRelay] into its protobuf counterpart.
  */
 fun DirectionalCurrentRelay.toPb(): PBDirectionalCurrentRelay = toPb(this, PBDirectionalCurrentRelay.newBuilder()).build()
 
@@ -990,9 +993,9 @@ fun Streetlight.toPb(): PBStreetlight = toPb(this, PBStreetlight.newBuilder()).b
  */
 fun toPb(cim: ElectronicAddress, pb: PBElectronicAddress.Builder): PBElectronicAddress.Builder =
     pb.apply {
-        cim.email1?.let { email1Set = it } ?: run { email1Null = NullValue.NULL_VALUE }
-        cim.isPrimary?.let { isPrimarySet = it } ?: run { isPrimaryNull = NullValue.NULL_VALUE }
-        cim.description?.let { descriptionSet = it } ?: run { descriptionNull = NullValue.NULL_VALUE }
+        cim.email1?.also { email1Set = it } ?: run { email1Null = NullValue.NULL_VALUE }
+        cim.isPrimary?.also { isPrimarySet = it } ?: run { isPrimaryNull = NullValue.NULL_VALUE }
+        cim.description?.also { descriptionSet = it } ?: run { descriptionNull = NullValue.NULL_VALUE }
     }
 
 /**
@@ -1054,6 +1057,7 @@ fun toPb(cim: StreetDetail, pb: PBStreetDetail.Builder): PBStreetDetail.Builder 
         cim.suiteNumber?.also { suiteNumberSet = it } ?: run { suiteNumberNull = NullValue.NULL_VALUE }
         cim.type?.also { typeSet = it } ?: run { typeNull = NullValue.NULL_VALUE }
         cim.displayAddress?.also { displayAddressSet = it } ?: run { displayAddressNull = NullValue.NULL_VALUE }
+        cim.buildingNumber?.also { buildingNumberSet = it } ?: run { buildingNumberNull = NullValue.NULL_VALUE }
     }
 
 /**
@@ -1065,15 +1069,15 @@ fun toPb(cim: StreetDetail, pb: PBStreetDetail.Builder): PBStreetDetail.Builder 
  */
 fun toPb(cim: TelephoneNumber, pb: PBTelephoneNumber.Builder): PBTelephoneNumber.Builder =
     pb.apply {
-        cim.areaCode?.let { areaCodeSet = it } ?: run { areaCodeNull = NullValue.NULL_VALUE }
-        cim.cityCode?.let { cityCodeSet = it } ?: run { cityCodeNull = NullValue.NULL_VALUE }
-        cim.countryCode?.let { countryCodeSet = it } ?: run { countryCodeNull = NullValue.NULL_VALUE }
-        cim.dialOut?.let { dialOutSet = it } ?: run { dialOutNull = NullValue.NULL_VALUE }
-        cim.extension?.let { extensionSet = it } ?: run { extensionNull = NullValue.NULL_VALUE }
-        cim.internationalPrefix?.let { internationalPrefixSet = it } ?: run { internationalPrefixNull = NullValue.NULL_VALUE }
-        cim.localNumber?.let { localNumberSet = it } ?: run { localNumberNull = NullValue.NULL_VALUE }
-        cim.isPrimary?.let { isPrimarySet = it } ?: run { isPrimaryNull = NullValue.NULL_VALUE }
-        cim.description?.let { descriptionSet = it } ?: run { descriptionNull = NullValue.NULL_VALUE }
+        cim.areaCode?.also { areaCodeSet = it } ?: run { areaCodeNull = NullValue.NULL_VALUE }
+        cim.cityCode?.also { cityCodeSet = it } ?: run { cityCodeNull = NullValue.NULL_VALUE }
+        cim.countryCode?.also { countryCodeSet = it } ?: run { countryCodeNull = NullValue.NULL_VALUE }
+        cim.dialOut?.also { dialOutSet = it } ?: run { dialOutNull = NullValue.NULL_VALUE }
+        cim.extension?.also { extensionSet = it } ?: run { extensionNull = NullValue.NULL_VALUE }
+        cim.internationalPrefix?.also { internationalPrefixSet = it } ?: run { internationalPrefixNull = NullValue.NULL_VALUE }
+        cim.localNumber?.also { localNumberSet = it } ?: run { localNumberNull = NullValue.NULL_VALUE }
+        cim.isPrimary?.also { isPrimarySet = it } ?: run { isPrimaryNull = NullValue.NULL_VALUE }
+        cim.description?.also { descriptionSet = it } ?: run { descriptionNull = NullValue.NULL_VALUE }
     }
 
 /**
@@ -1087,12 +1091,23 @@ fun toPb(cim: TownDetail, pb: PBTownDetail.Builder): PBTownDetail.Builder =
     pb.apply {
         cim.name?.also { nameSet = it } ?: run { nameNull = NullValue.NULL_VALUE }
         cim.stateOrProvince?.also { stateOrProvinceSet = it } ?: run { stateOrProvinceNull = NullValue.NULL_VALUE }
+        cim.country?.also { countrySet = it } ?: run { countryNull = NullValue.NULL_VALUE }
     }
+
+/**
+ * An extension for converting any [ElectronicAddress] into its protobuf counterpart.
+ */
+fun ElectronicAddress.toPb(): PBElectronicAddress = toPb(this, PBElectronicAddress.newBuilder()).build()
 
 /**
  * An extension for converting any [Location] into its protobuf counterpart.
  */
 fun Location.toPb(): PBLocation = toPb(this, PBLocation.newBuilder()).build()
+
+/**
+ * An extension for converting any [TelephoneNumber] into its protobuf counterpart.
+ */
+fun TelephoneNumber.toPb(): PBTelephoneNumber = toPb(this, PBTelephoneNumber.newBuilder()).build()
 
 // #####################################
 // # IEC61968 infIEC61968 InfAssetInfo #
@@ -1256,7 +1271,8 @@ fun toPb(cim: UsagePoint, pb: PBUsagePoint.Builder): PBUsagePoint.Builder =
         cim.equipment.forEach { addEquipmentMRIDs(it.mRID) }
         clearEndDeviceMRIDs()
         cim.endDevices.forEach { addEndDeviceMRIDs(it.mRID) }
-        cim.contacts.forEach { toPb(it, addContactsBuilder()) }
+        clearContacts()
+        cim.contacts.forEach { addContacts(it.toPb()) }
         toPb(cim, ioBuilder)
     }
 
@@ -1472,7 +1488,7 @@ fun toPb(cim: Equipment, pb: PBEquipment.Builder): PBEquipment.Builder =
         inService = cim.inService
         normallyInService = cim.normallyInService
 
-        cim.commissionedDate.toTimestamp()?.let { commissionedDate = it } ?: clearCommissionedDate()
+        cim.commissionedDate?.also { commissionedDateSet = it.toTimestamp() } ?: run { commissionedDateNull = NullValue.NULL_VALUE }
 
         clearEquipmentContainerMRIDs()
         cim.containers.forEach { addEquipmentContainerMRIDs(it.mRID) }
@@ -2976,6 +2992,18 @@ class NetworkCimToProto : BaseCimToProto() {
      * @return The protobuf form of [cim].
      */
     fun toPb(cim: RelayInfo): PBRelayInfo = cim.toPb()
+
+    // ##############################
+    // # Extensions IEC61968 Common #
+    // ##############################
+
+    /**
+     * Convert the [ContactDetails] into its protobuf counterpart.
+     *
+     * @param cim The [ContactDetails] to convert.
+     * @return The protobuf form of [cim].
+     */
+    fun toPb(cim: ContactDetails): PBContactDetails = cim.toPb()
 
     // ################################
     // # Extensions IEC61968 Metering #

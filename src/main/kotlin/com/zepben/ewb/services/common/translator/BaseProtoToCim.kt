@@ -40,7 +40,7 @@ import com.zepben.protobuf.cim.iec61970.base.core.NameType as PBNameType
 fun toCim(pb: PBDocument, cim: Document, baseService: BaseService): Document =
     cim.apply {
         title = pb.titleSet.takeUnless { pb.hasTitleNull() }
-        createdDateTime = pb.createdDateTime.toInstant()
+        createdDateTime = pb.createdDateTimeSet.takeUnless { pb.hasCreatedDateTimeNull() }?.toInstant()
         authorName = pb.authorNameSet.takeUnless { pb.hasAuthorNameNull() }
         type = pb.typeSet.takeUnless { pb.hasTypeNull() }
         status = pb.statusSet.takeUnless { pb.hasStatusNull() }

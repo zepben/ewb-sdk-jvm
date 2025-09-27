@@ -67,7 +67,9 @@ fun toCim(pb: PBDiscreteValue): DiscreteValue =
  * @return The converted [pb] as a CIM [MeasurementValue].
  */
 fun toCim(pb: PBMeasurementValue, cim: MeasurementValue): MeasurementValue =
-    cim.apply { timeStamp = pb.timeStamp.toInstant() }
+    cim.apply {
+        timeStamp = pb.timeStampSet.takeUnless { pb.hasTimeStampNull() }?.toInstant()
+    }
 
 
 /**

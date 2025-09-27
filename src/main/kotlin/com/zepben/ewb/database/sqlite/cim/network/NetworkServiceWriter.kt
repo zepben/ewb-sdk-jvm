@@ -9,17 +9,12 @@
 package com.zepben.ewb.database.sqlite.cim.network
 
 import com.zepben.ewb.cim.extensions.iec61968.assetinfo.RelayInfo
-import com.zepben.ewb.cim.extensions.iec61968.common.ContactDetails
 import com.zepben.ewb.cim.extensions.iec61968.metering.PanDemandResponseFunction
 import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
 import com.zepben.ewb.cim.extensions.iec61970.base.generation.production.EvChargingUnit
-import com.zepben.ewb.cim.extensions.iec61970.base.protection.DirectionalCurrentRelay
-import com.zepben.ewb.cim.extensions.iec61970.base.protection.DistanceRelay
-import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelayScheme
-import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelaySystem
-import com.zepben.ewb.cim.extensions.iec61970.base.protection.VoltageRelay
+import com.zepben.ewb.cim.extensions.iec61970.base.protection.*
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.BatteryControl
 import com.zepben.ewb.cim.iec61968.assetinfo.*
 import com.zepben.ewb.cim.iec61968.assets.AssetOwner

@@ -13,10 +13,12 @@ package com.zepben.ewb.cim.iec61968.common
  *
  * @property name Town name.
  * @property stateOrProvince Name of the state or province.
+ * @property country Name of the country.
  */
 data class TownDetail(
     val name: String? = null,
-    val stateOrProvince: String? = null
+    val stateOrProvince: String? = null,
+    val country: String? = null,
 ) {
 
     /**
@@ -24,13 +26,19 @@ data class TownDetail(
      *
      * @return true if all fields are null or empty, otherwise false
      */
-    fun allFieldsNullOrEmpty(): Boolean = name.isNullOrEmpty() && stateOrProvince.isNullOrEmpty()
+    fun allFieldsNullOrEmpty(): Boolean =
+        name.isNullOrEmpty()
+            && stateOrProvince.isNullOrEmpty()
+            && country.isNullOrEmpty()
 
     /**
      * Check to see if all fields of this [TownDetail] are null
      *
      * @return true if all fields are null, otherwise false
      */
-    fun allFieldsNull(): Boolean = name == null && stateOrProvince == null
+    fun allFieldsNull(): Boolean =
+        name == null
+            && stateOrProvince == null
+            && country == null
 
 }

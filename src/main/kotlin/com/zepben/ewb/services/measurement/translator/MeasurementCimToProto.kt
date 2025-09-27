@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.services.measurement.translator
 
+import com.google.protobuf.NullValue
 import com.zepben.ewb.cim.iec61970.base.meas.AccumulatorValue
 import com.zepben.ewb.cim.iec61970.base.meas.AnalogValue
 import com.zepben.ewb.cim.iec61970.base.meas.DiscreteValue
@@ -74,7 +75,7 @@ fun toPb(cim: DiscreteValue, pb: PBDiscreteValue.Builder): PBDiscreteValue.Build
  */
 fun toPb(cim: MeasurementValue, pb: PBMeasurementValue.Builder): PBMeasurementValue.Builder =
     pb.apply {
-        cim.timeStamp?.let { timeStamp = it.toTimestamp() } ?: clearTimeStamp()
+        cim.timeStamp?.let { timeStampSet = it.toTimestamp() } ?: run { timeStampNull = NullValue.NULL_VALUE }
     }
 
 /**

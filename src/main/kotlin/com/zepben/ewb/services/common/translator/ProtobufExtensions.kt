@@ -32,15 +32,13 @@ fun Document.mRID(): String = io.mrid
  */
 fun Organisation.mRID(): String = io.mrid
 
-fun Timestamp.toInstant(): Instant? = if (seconds == 0L && nanos == 0) null else Instant.ofEpochSecond(seconds, nanos.toLong())
-fun Instant?.toTimestamp(): Timestamp? {
-    return this?.let {
-        Timestamp.newBuilder().apply {
-            seconds = epochSecond
-            nanos = nano
-        }.build()
-    }
+internal fun Timestamp.toInstant(): Instant = Instant.ofEpochSecond(seconds, nanos.toLong())
+internal fun Instant.toTimestamp(): Timestamp {
+    return Timestamp.newBuilder().apply {
+        seconds = epochSecond
+        nanos = nano
+    }.build()
 }
 
-internal fun Timestamp.toLocalDateTime(): LocalDateTime? = toInstant()?.let { LocalDateTime.ofInstant(it, ZoneOffset.UTC) }
-internal fun LocalDateTime?.toTimestamp(): Timestamp? = this?.toInstant(ZoneOffset.UTC)?.toTimestamp()
+internal fun Timestamp.toLocalDateTime(): LocalDateTime = LocalDateTime.ofInstant(toInstant(), ZoneOffset.UTC)
+internal fun LocalDateTime.toTimestamp(): Timestamp = toInstant(ZoneOffset.UTC).toTimestamp()

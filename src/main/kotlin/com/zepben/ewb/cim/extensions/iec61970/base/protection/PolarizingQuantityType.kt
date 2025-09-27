@@ -11,16 +11,8 @@ package com.zepben.ewb.cim.extensions.iec61970.base.protection
 import com.zepben.ewb.cim.extensions.ZBEX
 
 /**
- * [ZBEX]
- * Defines the type of polarizing quantity used by the directional relay. This informs how the relay determines the
- * reference voltage from the Voltage transformers associated with its parent ProtectionEquipment.
- *
- * @property UNKNOWN [ZBEX] Type is unknown.
- * @property SELF_PHASE_VOLTAGE [ZBEX] Uses the voltage of the same phase as the current element (e.g., Va for an Ia element).
- * @property QUADRATURE_VOLTAGE [ZBEX] Uses a quadrature voltage (e.g., Vbc for an Ia element, specific convention applies).
- * @property ZERO_SEQUENCE_VOLTAGE [ZBEX] Uses the zero sequence voltage (Vo), derived from three phase voltages.
- * @property NEGATIVE_SEQUENCE_VOLTAGE [ZBEX] Uses the negative sequence voltage (V2), derived from three phase voltages.
- * @property POSITIVE_SEQUENCE_VOLTAGE [ZBEX] Uses the positive sequence voltage (V1), derived from three phase voltages.
+ * [ZBEX] Defines the type of polarizing quantity used by the directional relay. This informs how the relay
+ * determines the reference voltage from the Voltage transformers associated with its parent ProtectionEquipment.
  */
 @ZBEX
 enum class PolarizingQuantityType {
@@ -59,6 +51,6 @@ enum class PolarizingQuantityType {
      * [ZBEX] Uses the positive sequence voltage (V1), derived from three phase voltages.
      */
     @ZBEX
-    POSITIVE_SEQUENCE_VOLTAGE
+    POSITIVE_SEQUENCE_VOLTAGE,
 
 }

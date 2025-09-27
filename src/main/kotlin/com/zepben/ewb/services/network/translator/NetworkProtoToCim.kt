@@ -209,26 +209,26 @@ fun toCim(pb: PBRelayInfo, networkService: NetworkService): RelayInfo =
  */
 fun NetworkService.addFromPb(pb: PBRelayInfo): RelayInfo? = tryAddOrNull(toCim(pb, this))
 
-// ################################
+// ##############################
 // # Extensions IEC61968 Common #
-// ################################
+// ##############################
 
+/**
+ * Convert the protobuf [PBContactDetails] into its CIM counterpart.
+ *
+ * @param pb The protobuf [PBContactDetails] to convert.
+ * @return The converted [pb] as a CIM [ContactDetails].
+ */
 fun toCim(pb: PBContactDetails): ContactDetails =
     ContactDetails(pb.id).apply {
-        pb.phoneNumbersList.forEach {
-            addTelephoneNumber(toCim(it))
-        }
-
-        contactAddress = toCim(pb.contactAddress)
-
-        pb.electronicAddressesList.forEach {
-            addElectronicAddress(toCim(it))
-        }
-
+        pb.phoneNumbersList.forEach { addPhoneNumber(toCim(it)) }
+        contactAddress = if (pb.hasContactAddress()) toCim(pb.contactAddress) else null
+        pb.electronicAddressesList.forEach { addElectronicAddress(toCim(it)) }
         contactType = pb.contactTypeSet.takeUnless { pb.hasContactTypeNull() }
         firstName = pb.firstNameSet.takeUnless { pb.hasFirstNameNull() }
         lastName = pb.lastNameSet.takeUnless { pb.hasLastNameNull() }
         preferredContactMethod = mapContactMethodType.toCim(pb.preferredContactMethod)
+        isPrimary = pb.isPrimarySet.takeUnless { pb.hasIsPrimaryNull() }
         businessName = pb.businessNameSet.takeUnless { pb.hasBusinessNameNull() }
     }
 
@@ -361,7 +361,7 @@ fun NetworkService.addFromPb(pb: PBEvChargingUnit): EvChargingUnit? = tryAddOrNu
 /**
  * Convert the protobuf [PBDirectionalCurrentRelay] into its CIM counterpart.
  *
- * @param pb The protobuf [PBDirectionalCurentRelay] to convert.
+ * @param pb The protobuf [PBDirectionalCurrentRelay] to convert.
  * @param networkService The [NetworkService] the converted CIM object will be added too.
  * @return The converted [pb] as a CIM [DirectionalCurrentRelay].
  */
@@ -377,11 +377,6 @@ fun toCim(pb: PBDirectionalCurrentRelay, networkService: NetworkService): Direct
     }.also {
         toCim(pb.prf, it, networkService)
     }
-
-/**
- * An extension to add a converted copy of the protobuf [PBBatteryControl] to the [NetworkService].
- */
-fun NetworkService.addFromPb(pb: PBDirectionalCurrentRelay): DirectionalCurrentRelay? = tryAddOrNull(toCim(pb, this))
 
 /**
  * Convert the protobuf [PBDistanceRelay] into its CIM counterpart.
@@ -489,6 +484,11 @@ fun toCim(pb: PBVoltageRelay, networkService: NetworkService): VoltageRelay =
     VoltageRelay(pb.mRID()).apply {
         toCim(pb.prf, this, networkService)
     }
+
+/**
+ * An extension to add a converted copy of the protobuf [PBDirectionalCurrentRelay] to the [NetworkService].
+ */
+fun NetworkService.addFromPb(pb: PBDirectionalCurrentRelay): DirectionalCurrentRelay? = tryAddOrNull(toCim(pb, this))
 
 /**
  * An extension to add a converted copy of the protobuf [PBDistanceRelay] to the [NetworkService].
@@ -912,19 +912,12 @@ fun NetworkService.addFromPb(pb: PBStreetlight): Streetlight? = tryAddOrNull(toC
 // # IEC61968 Common #
 // ###################
 
-/**
-* Convert the protobuf [PBElectronicAddress] into its CIM counterpart.
-*
-* @param pb The protobuf [PBElectronicAddress] to convert.
-* @param networkService The [NetworkService] the converted CIM object will be added too.
-* @return The converted [pb] as a CIM [ElectronicAddress].
-*/
-fun toCim(pb: PBElectronicAddress): ElectronicAddress =
-    ElectronicAddress().apply {
-        email1 = pb.email1Set.takeUnless { pb.hasEmail1Null() }
-        isPrimary = pb.isPrimarySet.takeUnless { pb.hasIsPrimaryNull() }
-        description = pb.descriptionSet.takeUnless { pb.hasDescriptionNull() }
-    }
+private fun toCim(pb: PBElectronicAddress): ElectronicAddress =
+    ElectronicAddress(
+        pb.email1Set.takeUnless { pb.hasEmail1Null() },
+        pb.isPrimarySet.takeUnless { pb.hasIsPrimaryNull() },
+        pb.descriptionSet.takeUnless { pb.hasDescriptionNull() },
+    )
 
 /**
  * Convert the protobuf [PBLocation] into its CIM counterpart.
@@ -977,26 +970,21 @@ fun toCim(pb: PBStreetDetail): StreetDetail =
         pb.numberSet.takeUnless { pb.hasNumberNull() },
         pb.suiteNumberSet.takeUnless { pb.hasSuiteNumberNull() },
         pb.typeSet.takeUnless { pb.hasTypeNull() },
-        pb.displayAddressSet.takeUnless { pb.hasDisplayAddressNull() }
+        pb.displayAddressSet.takeUnless { pb.hasDisplayAddressNull() },
+        pb.buildingNumberSet.takeUnless { pb.hasBuildingNumberNull() },
     )
 
-/**
- * Convert the protobuf [PBTelephoneNumber] into its CIM counterpart.
- *
- * @param pb The protobuf [PBTelephoneNumber] to convert.
- * @return The converted [pb] as a CIM [TelephoneNumber].
- */
-fun toCim(pb: PBTelephoneNumber): TelephoneNumber =
+private fun toCim(pb: PBTelephoneNumber): TelephoneNumber =
     TelephoneNumber(
         pb.areaCodeSet.takeUnless { pb.hasAreaCodeNull() },
         pb.cityCodeSet.takeUnless { pb.hasCityCodeNull() },
         pb.countryCodeSet.takeUnless { pb.hasCountryCodeNull() },
         pb.dialOutSet.takeUnless { pb.hasDialOutNull() },
         pb.extensionSet.takeUnless { pb.hasExtensionNull() },
-        pb.internationalPrefixSet.takeUnless { pb.hasInternationalPrefixSet() },
+        pb.internationalPrefixSet.takeUnless { pb.hasInternationalPrefixNull() },
         pb.localNumberSet.takeUnless { pb.hasLocalNumberNull() },
         pb.isPrimarySet.takeUnless { pb.hasIsPrimaryNull() },
-        pb.descriptionSet.takeUnless { pb.hasDescriptionNull() }
+        pb.descriptionSet.takeUnless { pb.hasDescriptionNull() },
     )
 
 /**
@@ -1008,7 +996,8 @@ fun toCim(pb: PBTelephoneNumber): TelephoneNumber =
 fun toCim(pb: PBTownDetail): TownDetail =
     TownDetail(
         pb.nameSet.takeUnless { pb.hasNameNull() },
-        pb.stateOrProvinceSet.takeUnless { pb.hasStateOrProvinceNull() }
+        pb.stateOrProvinceSet.takeUnless { pb.hasStateOrProvinceNull() },
+        pb.countrySet.takeUnless { pb.hasCountryNull() },
     )
 
 /**
@@ -1190,9 +1179,7 @@ fun toCim(pb: PBUsagePoint, networkService: NetworkService): UsagePoint =
             networkService.resolveOrDeferReference(Resolvers.endDevices(this), it)
         }
 
-        pb.contactsList.forEach {
-            addContact(toCim(it))
-        }
+        pb.contactsList.forEach { addContact(toCim(it)) }
     }.also {
         toCim(pb.io, it, networkService)
     }
@@ -1425,7 +1412,7 @@ fun toCim(pb: PBEquipment, cim: Equipment, networkService: NetworkService): Equi
     cim.apply {
         inService = pb.inService
         normallyInService = pb.normallyInService
-        commissionedDate = pb.commissionedDate.toInstant()
+        commissionedDate = pb.commissionedDateSet.takeUnless { pb.hasCommissionedDateNull() }?.toInstant()
 
         pb.equipmentContainerMRIDsList.forEach { equipmentContainerMRID ->
             networkService.resolveOrDeferReference(Resolvers.containers(this), equipmentContainerMRID)
@@ -3073,7 +3060,7 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
     // #######################################
 
     /**
-     * Add a converted copy of the protobuf [DirectionalCurrentRelay] to the [NetworkService].
+     * Add a converted copy of the protobuf [PBDirectionalCurrentRelay] to the [NetworkService].
      *
      * @param pb The [PBDirectionalCurrentRelay] to convert.
      * @return The converted [DirectionalCurrentRelay]

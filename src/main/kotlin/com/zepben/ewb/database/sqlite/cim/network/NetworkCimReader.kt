@@ -65,11 +65,7 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61968.common.*
 import com.zepben.ewb.database.sqlite.cim.tables.iec61968.infiec61968.infassetinfo.TableCurrentTransformerInfo
 import com.zepben.ewb.database.sqlite.cim.tables.iec61968.infiec61968.infassetinfo.TablePotentialTransformerInfo
 import com.zepben.ewb.database.sqlite.cim.tables.iec61968.infiec61968.infassets.TablePoles
-import com.zepben.ewb.database.sqlite.cim.tables.iec61968.metering.TableEndDeviceFunctions
-import com.zepben.ewb.database.sqlite.cim.tables.iec61968.metering.TableEndDevices
-import com.zepben.ewb.database.sqlite.cim.tables.iec61968.metering.TableMeters
-import com.zepben.ewb.database.sqlite.cim.tables.iec61968.metering.TableUsagePointContactDetails
-import com.zepben.ewb.database.sqlite.cim.tables.iec61968.metering.TableUsagePoints
+import com.zepben.ewb.database.sqlite.cim.tables.iec61968.metering.*
 import com.zepben.ewb.database.sqlite.cim.tables.iec61968.operations.TableOperationalRestrictions
 import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.auxiliaryequipment.*
 import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.core.*
@@ -97,7 +93,18 @@ import java.sql.SQLException
 /**
  * A class for reading the [NetworkService] tables from the database.
  */
-internal class NetworkCimReader : CimReader<NetworkService>() {
+internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
+
+    //
+    // NOTE: Since `ContactDetails` aren't an `IdentifiedObject`, we can't store them directly in the `NetworkService`. For now, we will
+    //       just keep a local cache during load. In the future we might decide to store them in a public fashion in the service, but this
+    //       is likely to only be when we want to author the `ContactDetails`, or reuse them between places and require a lookup.
+    //
+    private val contactDetailsById = mutableMapOf<String, ContactDetails>()
+
+    override fun close() {
+        contactDetailsById.clear()
+    }
 
     // ##################################
     // # Extensions IEC61968 Asset Info #
@@ -152,92 +159,87 @@ internal class NetworkCimReader : CimReader<NetworkService>() {
     // # Extensions IEC61968 Common #
     // ##############################
 
-    // FIXME: this is needed as there is no way to look up objects that arent [IdentifiedObjects] from the network
-    private val contactDetailsById = mutableMapOf<String, ContactDetails>()
-
     @Throws(SQLException::class)
-    private fun readContactDetails(contactDetails: ContactDetails, table: TableContactDetails, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    private fun readContactDetails(contactDetails: ContactDetails, table: TableContactDetails, resultSet: ResultSet): Boolean {
         contactDetails.apply {
-            contactType = resultSet.getString(table.CONTACT_TYPE.queryIndex)
-            firstName = resultSet.getString(table.FIRST_NAME.queryIndex)
-            lastName = resultSet.getString(table.LAST_NAME.queryIndex)
+            contactType = resultSet.getNullableString(table.CONTACT_TYPE.queryIndex)
+            firstName = resultSet.getNullableString(table.FIRST_NAME.queryIndex)
+            lastName = resultSet.getNullableString(table.LAST_NAME.queryIndex)
             preferredContactMethod = ContactMethodType.valueOf(resultSet.getString(table.PREFERRED_CONTACT_METHOD.queryIndex))
-            isPrimary = resultSet.getBoolean(table.IS_PRIMARY.queryIndex)
-            businessName = resultSet.getString(table.BUSINESS_NAME.queryIndex)
+            isPrimary = resultSet.getNullableBoolean(table.IS_PRIMARY.queryIndex)
+            businessName = resultSet.getNullableString(table.BUSINESS_NAME.queryIndex)
+        }.also {
+            contactDetailsById[it.id] = it
         }
-        contactDetailsById[contactDetails.id] = contactDetails
 
         return true
     }
 
     /**
-     * Create a [ElectronicAddress] and populate its fields from [TableContactDetailsElectronicAddresses].
+     * Create an [ElectronicAddress], populate its fields from [TableContactDetailsElectronicAddresses], and add it to the specified [ContactDetails].
      *
-     * @param service The [NetworkService] used to store any items read from the database.
-     * @param table The database table to read the [ContactDetails] fields from.
-     * @param resultSet The record in the database table containing the fields for this [ContactDetails].
-     * @param setIdentifier A callback to register the mRID of this [ContactDetails] for logging purposes.
+     * @param service Unused, just here to conform to the required interface.
+     * @param table The database table to read the [ElectronicAddress] fields from.
+     * @param resultSet The record in the database table containing the fields for this [ElectronicAddress].
+     * @param setIdentifier A callback to register the mRID of this [ElectronicAddress] for logging purposes.
      *
-     * @return true if the [ContactDetails] was successfully read from the database and added to the service.
+     * @return true if the [ElectronicAddress] was successfully read from the database and added to the [ContactDetails].
      * @throws SQLException For any errors encountered reading from the database.
-     *
      */
+    @Suppress("UNUSED_PARAMETER")
     @Throws(SQLException::class)
     fun read(service: NetworkService, table: TableContactDetailsElectronicAddresses, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val contactDetailsId = resultSet.getString(table.CONTACT_DETAILS_ID.queryIndex)
-        setIdentifier("${contactDetailsId}-ElectronicAddress")
 
-        val contactDetails = contactDetailsById[contactDetailsId] ?: throw MRIDLookupException("Failed to find ${ContactDetails::class.simpleName} with ID $contactDetailsId while looking up ElectronicAddress")
-
-        contactDetails.addElectronicAddress(readElectronicAddress(table, resultSet))
+        contactDetailsById.getOrThrow(contactDetailsId, setIdentifier("$contactDetailsId electronic address")).apply {
+            addElectronicAddress(readElectronicAddress(table, resultSet))
+        }
 
         return true
     }
 
     /**
-     * Create a [StreetAddress] and populate its fields from [TableContactDetailsStreetAddresses].
+     * Create a [StreetAddress], populate its fields from [TableContactDetailsStreetAddresses], and add it to the specified [ContactDetails].
      *
-     * @param service The [NetworkService] used to store any items read from the database.
-     * @param table The database table to read the [ContactDetails] fields from.
-     * @param resultSet The record in the database table containing the fields for this [ContactDetails].
-     * @param setIdentifier A callback to register the mRID of this [ContactDetails] for logging purposes.
+     * @param service Unused, just here to conform to the required interface.
+     * @param table The database table to read the [StreetAddress] fields from.
+     * @param resultSet The record in the database table containing the fields for this [StreetAddress].
+     * @param setIdentifier A callback to register the mRID of this [StreetAddress] for logging purposes.
      *
-     * @return true if the [ContactDetails] was successfully read from the database and added to the service.
+     * @return true if the [StreetAddress] was successfully read from the database and added to the [ContactDetails].
      * @throws SQLException For any errors encountered reading from the database.
-     *
      */
+    @Suppress("UNUSED_PARAMETER")
     @Throws(SQLException::class)
     fun read(service: NetworkService, table: TableContactDetailsStreetAddresses, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val contactDetailsId = resultSet.getString(table.CONTACT_DETAILS_ID.queryIndex)
-        setIdentifier("${contactDetailsId}-StreetAddress")
 
-        val contactDetails = contactDetailsById[contactDetailsId] ?: throw MRIDLookupException("Failed to find ${ContactDetails::class.simpleName} with ID $contactDetailsId while looking up StreetAddress")
-
-        contactDetails.contactAddress = readStreetAddress(table, resultSet)
+        contactDetailsById.getOrThrow(contactDetailsId, setIdentifier("$contactDetailsId electronic address")).apply {
+            contactAddress = readStreetAddress(table, resultSet)
+        }
 
         return true
     }
 
     /**
-     * Create a [TelephoneNumber] and populate its fields from [TableContactDetailsTelephoneNumbers].
+     * Create an [TelephoneNumber], populate its fields from [TableContactDetailsTelephoneNumbers], and add it to the specified [ContactDetails].
      *
-     * @param service The [NetworkService] used to store any items read from the database.
-     * @param table The database table to read the [ContactDetails] fields from.
-     * @param resultSet The record in the database table containing the fields for this [ContactDetails].
-     * @param setIdentifier A callback to register the mRID of this [ContactDetails] for logging purposes.
+     * @param service Unused, just here to conform to the required interface.
+     * @param table The database table to read the [TelephoneNumber] fields from.
+     * @param resultSet The record in the database table containing the fields for this [TelephoneNumber].
+     * @param setIdentifier A callback to register the mRID of this [TelephoneNumber] for logging purposes.
      *
-     * @return true if the [ContactDetails] was successfully read from the database and added to the service.
+     * @return true if the [TelephoneNumber] was successfully read from the database and added to the [ContactDetails].
      * @throws SQLException For any errors encountered reading from the database.
-     *
      */
+    @Suppress("UNUSED_PARAMETER")
     @Throws(SQLException::class)
     fun read(service: NetworkService, table: TableContactDetailsTelephoneNumbers, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val contactDetailsId = resultSet.getString(table.CONTACT_DETAILS_ID.queryIndex)
-        setIdentifier("${contactDetailsId}-TelephoneNumber")
 
-        val contactDetails = contactDetailsById[contactDetailsId] ?: throw MRIDLookupException("Failed to find ${ContactDetails::class.simpleName} with ID $contactDetailsId while looking up TelephoneNumber")
-
-        contactDetails.addTelephoneNumber(readTelephoneNumber(table, resultSet))
+        contactDetailsById.getOrThrow(contactDetailsId, setIdentifier("$contactDetailsId electronic address")).apply {
+            addPhoneNumber(readTelephoneNumber(table, resultSet))
+        }
 
         return true
     }
@@ -384,7 +386,6 @@ internal class NetworkCimReader : CimReader<NetworkService>() {
         }
 
         return readProtectionRelayFunction(service, directionalCurrentRelay, table, resultSet) && service.addOrThrow(directionalCurrentRelay)
-
     }
 
     /**
@@ -959,9 +960,9 @@ internal class NetworkCimReader : CimReader<NetworkService>() {
     @Throws(SQLException::class)
     private fun readElectronicAddress(table: TableElectronicAddresses, resultSet: ResultSet): ElectronicAddress =
         ElectronicAddress(
-            resultSet.getString(table.EMAIL_1.queryIndex).emptyIfNull().internEmpty(),
-            resultSet.getBoolean(table.IS_PRIMARY.queryIndex),
-            resultSet.getString(table.DESCRIPTION.queryIndex).emptyIfNull().internEmpty(),
+            email1 = resultSet.getNullableString(table.EMAIL_1.queryIndex),
+            isPrimary = resultSet.getNullableBoolean(table.IS_PRIMARY.queryIndex),
+            description = resultSet.getNullableString(table.DESCRIPTION.queryIndex),
         )
 
     /**
@@ -1056,28 +1057,30 @@ internal class NetworkCimReader : CimReader<NetworkService>() {
             resultSet.getNullableString(table.NUMBER.queryIndex),
             resultSet.getNullableString(table.SUITE_NUMBER.queryIndex),
             resultSet.getNullableString(table.TYPE.queryIndex),
-            resultSet.getNullableString(table.DISPLAY_ADDRESS.queryIndex)
+            resultSet.getNullableString(table.DISPLAY_ADDRESS.queryIndex),
+            resultSet.getNullableString(table.BUILDING_NUMBER.queryIndex),
         ).takeUnless { it.allFieldsNull() }
 
     @Throws(SQLException::class)
     private fun readTelephoneNumber(table: TableTelephoneNumbers, resultSet: ResultSet): TelephoneNumber =
         TelephoneNumber(
-            resultSet.getString(table.AREA_CODE.queryIndex),
-            resultSet.getString(table.CITY_CODE.queryIndex),
-            resultSet.getString(table.COUNTRY_CODE.queryIndex),
-            resultSet.getString(table.DIAL_OUT.queryIndex),
-            resultSet.getString(table.EXTENSION.queryIndex),
-            resultSet.getString(table.INTERNATIONAL_PREFIX.queryIndex),
-            resultSet.getString(table.LOCAL_NUMBER.queryIndex),
-            resultSet.getBoolean(table.IS_PRIMARY.queryIndex),
-            resultSet.getString(table.DESCRIPTION.queryIndex),
+            resultSet.getNullableString(table.AREA_CODE.queryIndex),
+            resultSet.getNullableString(table.CITY_CODE.queryIndex),
+            resultSet.getNullableString(table.COUNTRY_CODE.queryIndex),
+            resultSet.getNullableString(table.DIAL_OUT.queryIndex),
+            resultSet.getNullableString(table.EXTENSION.queryIndex),
+            resultSet.getNullableString(table.INTERNATIONAL_PREFIX.queryIndex),
+            resultSet.getNullableString(table.LOCAL_NUMBER.queryIndex),
+            resultSet.getNullableBoolean(table.IS_PRIMARY.queryIndex),
+            resultSet.getNullableString(table.DESCRIPTION.queryIndex),
         )
 
     @Throws(SQLException::class)
     private fun readTownDetail(table: TableTownDetails, resultSet: ResultSet): TownDetail? =
         TownDetail(
             resultSet.getNullableString(table.TOWN_NAME.queryIndex),
-            resultSet.getNullableString(table.STATE_OR_PROVINCE.queryIndex)
+            resultSet.getNullableString(table.STATE_OR_PROVINCE.queryIndex),
+            resultSet.getNullableString(table.COUNTRY.queryIndex),
         ).takeUnless { it.allFieldsNull() }
 
     // #####################################
@@ -1209,32 +1212,6 @@ internal class NetworkCimReader : CimReader<NetworkService>() {
     }
 
     /**
-     * Create a [ContactDetails] and populate its fields from [TableUsagePointContactDetails].
-     *
-     * @param service The [NetworkService] used to store any items read from the database.
-     * @param table The database table to read the [UsagePoint] fields from.
-     * @param resultSet The record in the database table containing the fields for this [UsagePoint].
-     * @param setIdentifier A callback to register the mRID of this [UsagePoint] for logging purposes.
-     *
-     * @return true if the [UsagePoint] was successfully read from the database and added to the service.
-     * @throws SQLException For any errors encountered reading from the database.
-     *
-     */
-    @Throws(SQLException::class)
-    fun read(service: NetworkService, table: TableUsagePointContactDetails, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
-        val usagePointMrid = setIdentifier(resultSet.getString(table.USAGE_POINT_MRID.queryIndex))
-        val contactDetailsId = resultSet.getString(table.ID.queryIndex)
-        val id = setIdentifier("$usagePointMrid-to-${contactDetailsId}")
-
-        val contactDetails = ContactDetails(contactDetailsId)
-        val usagePoint = service.getOrThrow<UsagePoint>(usagePointMrid, "UsagePoint to ContactDetails association $id")
-
-        usagePoint.addContact(contactDetails)
-
-        return readContactDetails(contactDetails, table, resultSet, setIdentifier)
-    }
-
-    /**
      * Create a [UsagePoint] and populate its fields from [TableUsagePoints].
      *
      * @param service The [NetworkService] used to store any items read from the database.
@@ -1257,6 +1234,33 @@ internal class NetworkCimReader : CimReader<NetworkService>() {
         }
 
         return readIdentifiedObject(usagePoint, table, resultSet) && service.addOrThrow(usagePoint)
+    }
+
+    /**
+     * Create a [ContactDetails] and populate its fields from [TableUsagePointsContactDetails].
+     *
+     * @param service The [NetworkService] used to store any items read from the database.
+     * @param table The database table to read the [ContactDetails] fields from.
+     * @param resultSet The record in the database table containing the fields for this [ContactDetails].
+     * @param setIdentifier A callback to register the mRID of this [ContactDetails] for logging purposes.
+     *
+     * @return true if the [ContactDetails] was successfully read from the database and added to the service.
+     * @throws SQLException For any errors encountered reading from the database.
+     */
+    @Throws(SQLException::class)
+    fun read(service: NetworkService, table: TableUsagePointsContactDetails, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val usagePointMrid = setIdentifier(resultSet.getString(table.USAGE_POINT_MRID.queryIndex))
+        val contactDetailsId = resultSet.getString(table.ID.queryIndex)
+        val id = setIdentifier("$usagePointMrid-to-${contactDetailsId}")
+
+        val usagePoint = service.getOrThrow<UsagePoint>(usagePointMrid, "UsagePoint to ContactDetails association $id")
+        val contactDetails = ContactDetails(contactDetailsId)
+
+        return readContactDetails(contactDetails, table, resultSet).also {
+            // We add the contact after it has been populated to ensure the `equals` check in the `addContact` works as intended.
+            usagePoint.addContact(contactDetails)
+        }
+
     }
 
     // #######################
@@ -3432,6 +3436,11 @@ internal class NetworkCimReader : CimReader<NetworkService>() {
         usagePoint.addEndDevice(endDevice)
 
         return true
+    }
+
+    @Throws(MRIDLookupException::class)
+    private fun Map<String, ContactDetails>.getOrThrow(id: String?, typeNameAndMRID: String): ContactDetails {
+        return get(id) ?: throw MRIDLookupException("Failed to find ContactDetails with id $id for $typeNameAndMRID")
     }
 
 }

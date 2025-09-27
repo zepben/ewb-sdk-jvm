@@ -35,8 +35,8 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61968.infiec61968.infassetin
 import com.zepben.ewb.database.sqlite.cim.tables.iec61968.infiec61968.infassetinfo.TablePotentialTransformerInfo
 import com.zepben.ewb.database.sqlite.cim.tables.iec61968.infiec61968.infassets.TablePoles
 import com.zepben.ewb.database.sqlite.cim.tables.iec61968.metering.TableMeters
-import com.zepben.ewb.database.sqlite.cim.tables.iec61968.metering.TableUsagePointContactDetails
 import com.zepben.ewb.database.sqlite.cim.tables.iec61968.metering.TableUsagePoints
+import com.zepben.ewb.database.sqlite.cim.tables.iec61968.metering.TableUsagePointsContactDetails
 import com.zepben.ewb.database.sqlite.cim.tables.iec61968.operations.TableOperationalRestrictions
 import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.auxiliaryequipment.TableCurrentTransformers
 import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.auxiliaryequipment.TableFaultIndicators
@@ -96,7 +96,7 @@ internal class NetworkServiceReader(
             readEach<TableMeters>(service, reader::read) and
             readEach<TableEndDevicesEndDeviceFunctions>(service, reader::read) and
             readEach<TableUsagePoints>(service, reader::read) and
-            readEach<TableUsagePointContactDetails>(service, reader::read) and
+            readEach<TableUsagePointsContactDetails>(service, reader::read) and
             readEach<TableContactDetailsElectronicAddresses>(service, reader::read) and
             readEach<TableContactDetailsStreetAddresses>(service, reader::read) and
             readEach<TableContactDetailsTelephoneNumbers>(service, reader::read) and

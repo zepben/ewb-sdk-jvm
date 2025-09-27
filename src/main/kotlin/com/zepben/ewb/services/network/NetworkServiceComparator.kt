@@ -9,6 +9,7 @@
 package com.zepben.ewb.services.network
 
 import com.zepben.ewb.cim.extensions.iec61968.assetinfo.RelayInfo
+import com.zepben.ewb.cim.extensions.iec61968.common.ContactDetails
 import com.zepben.ewb.cim.extensions.iec61968.metering.PanDemandResponseFunction
 import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
@@ -483,6 +484,8 @@ class NetworkServiceComparator @JvmOverloads constructor(
                 UsagePoint::approvedInverterCapacity,
                 UsagePoint::phaseCode
             )
+            compareUnorderedValueCollection(UsagePoint::contacts, ContactDetails::id)
+
             if (options.compareLvSimplification)
                 compareIdReferenceCollections(UsagePoint::equipment, UsagePoint::endDevices)
         }

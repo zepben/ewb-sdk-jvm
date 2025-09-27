@@ -11,13 +11,7 @@ package com.zepben.ewb.cim.extensions.iec61968.common
 import com.zepben.ewb.cim.extensions.ZBEX
 
 /**
- * [ZBEX]
- * The method to use to make contact with a person or company.
- *
- * @property UNKNOWN [ZBEX] Unknown contact method type.
- * @property EMAIL [ZBEX] Contact via email using the primary email address.
- * @property CALL [ZBEX] Contact by call using the primary phone number.
- * @property LETTER [ZBEX] Letter by post to the contact address is the method of contact.
+ * [ZBEX] The method to use to make contact with a person or company.
  */
 @ZBEX
 enum class ContactMethodType {
@@ -29,7 +23,7 @@ enum class ContactMethodType {
     UNKNOWN,
 
     /**
-     *  [ZBEX] Contact via email using the primary email address.
+     * [ZBEX] Contact via email using the primary email address.
      */
     @ZBEX
     EMAIL,
@@ -44,6 +38,6 @@ enum class ContactMethodType {
      * [ZBEX] Letter by post to the contact address is the method of contact.
      */
     @ZBEX
-    LETTER
+    LETTER,
 
 }

@@ -630,7 +630,7 @@ class NetworkConsumerClient(
             PERLENGTHPHASEIMPEDANCE -> extractResult(io.perLengthPhaseImpedance.mRID()) { addFromPb(io.perLengthPhaseImpedance) }
             CUT -> extractResult(io.cut.mRID()) { addFromPb(io.cut) }
             CLAMP -> extractResult(io.clamp.mRID()) { addFromPb(io.clamp) }
-            DIRECTIONALCURRENTRELAY -> extractResult(io.directionalCurrentRelay.mRID()) { addFromPb(io.directionalCurrentRelay)}
+            DIRECTIONALCURRENTRELAY -> extractResult(io.directionalCurrentRelay.mRID()) { addFromPb(io.directionalCurrentRelay) }
             OTHER, IDENTIFIEDOBJECT_NOT_SET, null -> throw UnsupportedOperationException(
                 "Identified object type ${io.identifiedObjectCase} is not supported by the network service"
             )

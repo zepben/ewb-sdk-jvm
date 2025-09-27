@@ -12,7 +12,6 @@ import com.zepben.ewb.database.sqlite.cim.CimDatabaseTables
 import com.zepben.ewb.database.sqlite.cim.tables.associations.*
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.assetinfo.TableRecloseDelays
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.assetinfo.TableRelayInfo
-import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.common.TableContactDetails
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.common.TableContactDetailsElectronicAddresses
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.common.TableContactDetailsStreetAddresses
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.common.TableContactDetailsTelephoneNumbers
@@ -35,8 +34,8 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61968.infiec61968.infassetin
 import com.zepben.ewb.database.sqlite.cim.tables.iec61968.infiec61968.infassetinfo.TablePotentialTransformerInfo
 import com.zepben.ewb.database.sqlite.cim.tables.iec61968.infiec61968.infassets.TablePoles
 import com.zepben.ewb.database.sqlite.cim.tables.iec61968.metering.TableMeters
-import com.zepben.ewb.database.sqlite.cim.tables.iec61968.metering.TableUsagePointContactDetails
 import com.zepben.ewb.database.sqlite.cim.tables.iec61968.metering.TableUsagePoints
+import com.zepben.ewb.database.sqlite.cim.tables.iec61968.metering.TableUsagePointsContactDetails
 import com.zepben.ewb.database.sqlite.cim.tables.iec61968.operations.TableOperationalRestrictions
 import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.auxiliaryequipment.TableCurrentTransformers
 import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.auxiliaryequipment.TableFaultIndicators
@@ -175,8 +174,8 @@ class NetworkDatabaseTables : CimDatabaseTables() {
             TableTransformerStarImpedances(),
             TableTransformerTankInfo(),
             TableUsagePoints(),
-            TableUsagePointContactDetails(),
             TableUsagePointsEndDevices(),
+            TableUsagePointsContactDetails(),
             TableVoltageRelays()
         )
 

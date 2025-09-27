@@ -19,42 +19,41 @@ import com.zepben.ewb.cim.extensions.ZBEX
  * @property dialOut (if applicable) Dial out code, for instance to call outside an enterprise.
  * @property extension (if applicable) Extension for this telephone number.
  * @property internationalPrefix (if applicable) Prefix used when calling an international number.
+ * @property ituPhone Phone number according to ITU E.164. Will return `null` if a valid
+ * @property partialItuPhone As much of the phone number according to ITU E.164 that could be formatted based on the given fields.
  * @property localNumber Main (local) part of this telephone number.
  * @property isPrimary [ZBEX] Is this phone number the primary number?
  * @property description [ZBEX] Description for phone number, e.g: home, work, mobile.
  */
-data class TelephoneNumber (
+data class TelephoneNumber(
+    val areaCode: String? = null,
+    val cityCode: String? = null,
+    val countryCode: String? = null,
+    val dialOut: String? = null,
+    val extension: String? = null,
+    val internationalPrefix: String? = null,
+    val localNumber: String? = null,
+    @ZBEX val isPrimary: Boolean? = null,
+    @ZBEX val description: String? = null,
+) {
 
-    var areaCode: String? = null,
-
-    var cityCode: String? = null,
-
-    var countryCode: String? = null,
-
-    var dialOut: String? = null,
-
-    var extension: String? = null,
-
-    var internationalPrefix: String? = null,
-
-    var localNumber: String? = null,
-
-    @ZBEX
-    var isPrimary: Boolean? = null,
-
-    @ZBEX
-    var description: String? = null
-){
-
-    /**
-     * Phone number according to ITU E.164.
-     */
-    var ituPhone = buildString {
-        internationalPrefix?.let { append(it) }
-        countryCode?.let { append(it).append(" ") }
-        areaCode?.trimStart('0')?.let { append(it).append(" ") }
-        cityCode?.let { append(it).append(" ") }
-        append(localNumber)
+    private val maybeItuFormattedPhone = buildString {
+        countryCode?.also { append(it) }
+        areaCode?.trimStart('0')?.also { append(it) }
+        cityCode?.also { append(it) }
+        localNumber?.also { append(it) }
     }
+
+    val ituPhone: String? = maybeItuFormattedPhone.takeIf { (countryCode != null) && (it.length <= 15) }
+    val partialItuPhone: String? = maybeItuFormattedPhone.takeIf { ituPhone == null }
+
+    override fun toString(): String =
+        "$description: ${
+            listOfNotNull(
+                dialOut,
+                internationalPrefix?.let { "$it$maybeItuFormattedPhone" } ?: maybeItuFormattedPhone,
+                extension?.let { "ext $it" }
+            ).joinToString(separator = " ")
+        } [primary: $isPrimary]"
 
 }

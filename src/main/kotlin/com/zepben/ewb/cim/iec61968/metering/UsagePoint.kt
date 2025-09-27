@@ -45,11 +45,10 @@ class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject
     @ZBEX
     var approvedInverterCapacity: Int? = null
     var phaseCode: PhaseCode = PhaseCode.NONE
-    @ZBEX
-    private var _contacts: MutableList<ContactDetails>? = null
 
     private var _equipment: MutableList<Equipment>? = null
     private var _endDevices: MutableList<EndDevice>? = null
+    private var _contacts: MutableList<ContactDetails>? = null
 
     /**
      *  All equipment connecting this usage point to the electrical grid. The returned collection is read only
@@ -163,28 +162,56 @@ class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject
         return this
     }
 
+    @ZBEX
     val contacts: Collection<ContactDetails> get() = _contacts.asUnmodifiable()
 
     /**
-     * All contacts for this [UsagePoint].
+     * Get the number of entries in the [ContactDetails] collection.
+     */
+    fun numContacts(): Int = _contacts?.size ?: 0
+
+    /**
+     * All end devices at this usage point.
      *
      * @param id the ID of the required [ContactDetails]
      * @return The [ContactDetails] with the specified [id] if it exists, otherwise null
      */
     fun getContact(id: String): ContactDetails? = _contacts?.firstOrNull { it.id == id }
 
+
+    /**
+     * Add a [ContactDetails] to this [UsagePoint].
+     *
+     * @param contact The [ContactDetails] to add.
+     * @return This [UsagePoint] for fluent use.
+     */
     fun addContact(contact: ContactDetails): UsagePoint {
+        if (validateReference(contact, ContactDetails::id, ::getContact) { "A ContactDetails with ID ${contact.id}" })
+            return this
+
         _contacts = _contacts ?: mutableListOf()
         _contacts!!.add(contact)
+
         return this
     }
 
+    /**
+     * Remove a [ContactDetails] from this [UsagePoint].
+     *
+     * @param contact The [ContactDetails] to remove.
+     * @return true if the [ContactDetails] were removed.
+     */
     fun removeContact(contact: ContactDetails): Boolean {
         val ret = _contacts?.remove(contact) == true
         if (_contacts.isNullOrEmpty()) _contacts = null
         return ret
     }
 
+    /**
+     * Clear all [ContactDetails] from this [UsagePoint].
+     *
+     * @return This [UsagePoint] for fluent use.
+     */
     fun clearContacts(): UsagePoint {
         _contacts = null
         return this

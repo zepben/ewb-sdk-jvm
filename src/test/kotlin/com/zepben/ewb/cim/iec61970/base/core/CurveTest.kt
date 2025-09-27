@@ -10,6 +10,7 @@ package com.zepben.ewb.cim.iec61970.base.core
 
 import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 import com.zepben.ewb.utils.PrivateCollectionValidator
+import com.zepben.ewb.utils.PrivateCollectionValidator.DuplicateBehaviour
 import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
@@ -42,7 +43,8 @@ internal class CurveTest {
             Curve::addData,
             Curve::removeData,
             Curve::clearData,
-            CurveData::xValue
+            CurveData::xValue,
+            DuplicateBehaviour.THROWS,
         )
     }
 

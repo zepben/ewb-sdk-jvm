@@ -49,7 +49,6 @@ import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.ewb.services.common.testdata.fillFieldsCommon
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.tracing.feeder.FeederDirection
-import org.apache.commons.collections4.functors.TruePredicate
 import java.time.Instant
 import java.util.*
 
@@ -63,6 +62,54 @@ fun RelayInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true
     curveSetting = "curveSetting"
     recloseFast = true
     addDelays(1.0, 2.0, 3.0)
+
+    return this
+}
+
+// ##############################
+// # Extensions IEC61968 Common #
+// ##############################
+
+fun ContactDetails.fillFields(): ContactDetails {
+    contactAddress = StreetAddress(
+        postalCode = "1",
+        townDetail = TownDetail(name = "2", stateOrProvince = "3"),
+        poBox = "4",
+        streetDetail = StreetDetail(
+            buildingName = "5",
+            floorIdentification = "6",
+            name = "7",
+            number = "8",
+            suiteNumber = "9",
+            type = "10",
+            displayAddress = "11"
+        )
+    )
+    contactType = "12"
+    firstName = "13"
+    lastName = "14"
+    preferredContactMethod = ContactMethodType.LETTER
+    isPrimary = true
+    businessName = "15"
+
+    @Suppress("unused")
+    for (i in 0..1) {
+        addPhoneNumber(
+            TelephoneNumber(
+                areaCode = "$i-1",
+                cityCode = "2",
+                countryCode = "3",
+                dialOut = "4",
+                extension = "5",
+                internationalPrefix = "6",
+                localNumber = "7",
+                isPrimary = true,
+                description = "8"
+            )
+        )
+
+        addElectronicAddress(ElectronicAddress(email1 = "$i-1", isPrimary = true, description = "2"))
+    }
 
     return this
 }
@@ -631,43 +678,7 @@ fun UsagePoint.fillFields(service: NetworkService, includeRuntime: Boolean = tru
             service.add(it)
         })
 
-        addContact(ContactDetails().apply {
-            phoneNumbers = mutableListOf(
-                    TelephoneNumber(
-                        "01",
-                        "02",
-                        "03",
-                        "04",
-                        "05",
-                        "10",
-                        "12345678",
-                        false,
-                        "Telephone Number"
-                    )
-            )
-
-            contactAddress = StreetAddress(
-                "1234",
-                TownDetail("town", "state"),
-                "5678",
-                StreetDetail("a", "b", "c", "d", "e", "f", "g")
-            )
-
-            electronicAddresses = mutableListOf(
-                ElectronicAddress(
-                    "foo@zepben.com",
-                    true,
-                    "Contact foo from Zepben via this email."
-                )
-            )
-
-            contactType = "contact type"
-            firstName = "first"
-            lastName = "last"
-            preferredContactMethod = ContactMethodType.CALL
-            isPrimary = false
-            businessName = "business name"
-        })
+        addContact(ContactDetails().fillFields())
     }
 
     return this
@@ -898,7 +909,7 @@ fun GeographicalRegion.fillFields(service: NetworkService, includeRuntime: Boole
     return this
 }
 
-private fun PowerSystemResource.fillFields(service: NetworkService, includeRuntime: Boolean = true): PowerSystemResource {
+fun PowerSystemResource.fillFields(service: NetworkService, includeRuntime: Boolean = true): PowerSystemResource {
     (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
 
     location = Location().apply { addPoint(PositionPoint(3.3, 4.4)) }.also { service.add(it) }

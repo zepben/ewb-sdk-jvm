@@ -168,8 +168,12 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         compareProtectionRelayFunction { DirectionalCurrentRelay(it) }
 
         comparatorValidator.validateProperty(DirectionalCurrentRelay::directionalCharacteristicAngle, { DirectionalCurrentRelay(it) }, { 1.1 }, { 2.2 })
-        comparatorValidator.validateProperty(DirectionalCurrentRelay::polarizingQuantityType,{ DirectionalCurrentRelay(it) }, { PolarizingQuantityType.NEGATIVE_SEQUENCE_VOLTAGE }, { PolarizingQuantityType.QUADRATURE_VOLTAGE })
-        comparatorValidator.validateProperty(DirectionalCurrentRelay::relayElementPhase, { DirectionalCurrentRelay(it) }, { PhaseCode.ABCN }, { PhaseCode.NONE })
+        comparatorValidator.validateProperty(
+            DirectionalCurrentRelay::polarizingQuantityType,
+            { DirectionalCurrentRelay(it) },
+            { PolarizingQuantityType.NEGATIVE_SEQUENCE_VOLTAGE },
+            { PolarizingQuantityType.QUADRATURE_VOLTAGE })
+        comparatorValidator.validateProperty(DirectionalCurrentRelay::relayElementPhase, { DirectionalCurrentRelay(it) }, { PhaseCode.A }, { PhaseCode.B })
         comparatorValidator.validateProperty(DirectionalCurrentRelay::minimumPickupCurrent, { DirectionalCurrentRelay(it) }, { 1.1 }, { 2.2 })
         comparatorValidator.validateProperty(DirectionalCurrentRelay::currentLimit1, { DirectionalCurrentRelay(it) }, { 1.1 }, { 2.2 })
         comparatorValidator.validateProperty(DirectionalCurrentRelay::inverseTimeFlag, { DirectionalCurrentRelay(it) }, { true }, { false })

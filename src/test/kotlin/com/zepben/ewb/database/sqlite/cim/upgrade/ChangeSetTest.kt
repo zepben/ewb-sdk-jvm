@@ -17,10 +17,7 @@ import com.zepben.ewb.database.sqlite.cim.tables.tableCimVersion
 import com.zepben.ewb.database.sqlite.cim.upgrade.changesets.ChangeSetValidator
 import com.zepben.ewb.database.sqlite.cim.upgrade.changesets.NoChanges
 import com.zepben.ewb.database.sqlite.cim.upgrade.changesets.combined.*
-import com.zepben.ewb.database.sqlite.cim.upgrade.changesets.customer.ChangeSet50CustomerValidator
-import com.zepben.ewb.database.sqlite.cim.upgrade.changesets.customer.ChangeSet54CustomerValidator
-import com.zepben.ewb.database.sqlite.cim.upgrade.changesets.customer.ChangeSet61CustomerValidator
-import com.zepben.ewb.database.sqlite.cim.upgrade.changesets.customer.ChangeSet62CustomerValidator
+import com.zepben.ewb.database.sqlite.cim.upgrade.changesets.customer.*
 import com.zepben.ewb.database.sqlite.cim.upgrade.changesets.diagram.ChangeSet50DiagramValidator
 import com.zepben.ewb.database.sqlite.cim.upgrade.changesets.diagram.ChangeSet52DiagramValidator
 import com.zepben.ewb.database.sqlite.cim.upgrade.changesets.diagram.ChangeSet61DiagramValidator
@@ -68,7 +65,7 @@ internal class ChangeSetTest {
         NoChanges(DatabaseType.CUSTOMER, 60),
         ChangeSet61CustomerValidator,
         ChangeSet62CustomerValidator,
-        NoChanges(DatabaseType.CUSTOMER, 63),
+        ChangeSet63CustomerValidator,
     ).associateBy { it.version }
 
     private val diagramChangeSetValidators = listOf(

@@ -84,7 +84,7 @@ internal class UpdateNetworkStateClientTest {
 
             requests.allValues.flatMap { it.eventList }.apply {
                 assertThat(map { it.eventId }, contains(*switchStateEvents.map { it.eventId }.toTypedArray()))
-                assertThat(map { it.timestamp }, contains(*switchStateEvents.map { it.timestamp.toTimestamp() }.toTypedArray()))
+                assertThat(map { it.timestamp }, contains(*switchStateEvents.map { it.timestamp?.toTimestamp() }.toTypedArray()))
                 assertThat(map { it.switch.action.name }, contains(*switchStateEvents.map { endsWith(it.action.name) }.toTypedArray()))
                 assertThat(map { it.switch.phases.name }, contains(*switchStateEvents.map { endsWith(it.phases.name) }.toTypedArray()))
             }

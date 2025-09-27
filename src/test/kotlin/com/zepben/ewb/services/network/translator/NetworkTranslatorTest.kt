@@ -56,7 +56,7 @@ import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61970.base.protec
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61970.base.wires.TablePowerTransformerEndRatings
 import com.zepben.ewb.database.sqlite.cim.tables.iec61968.common.TableLocationStreetAddresses
 import com.zepben.ewb.database.sqlite.cim.tables.iec61968.common.TablePositionPoints
-import com.zepben.ewb.database.sqlite.cim.tables.iec61968.metering.TableUsagePointContactDetails
+import com.zepben.ewb.database.sqlite.cim.tables.iec61968.metering.TableUsagePointsContactDetails
 import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.core.TableCurveData
 import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.wires.TablePhaseImpedanceData
 import com.zepben.ewb.services.common.testdata.fillFieldsCommon
@@ -152,10 +152,8 @@ internal class NetworkTranslatorTest : TranslatorTestBase<NetworkService>(
         // # IEC61968 Common #
         // ###################
 
-        // FIXME: ValidationInfo(::ElectronicAddress, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
         ValidationInfo(::Location, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
         ValidationInfo(::Organisation, { fillFieldsCommon(it) }, { addFromPb(nsToPb.toPb(it)) }),
-        // FIXME: ValidationInfo(::TelephoneNumber, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
 
         // #####################################
         // # IEC61968 infIEC61968 InfAssetInfo #
@@ -338,7 +336,7 @@ internal class NetworkTranslatorTest : TranslatorTestBase<NetworkService>(
             TableProtectionRelayFunctionTimeLimits::class,
             TableProtectionRelayFunctionsSensors::class,
             TableRecloseDelays::class,
-            TableUsagePointContactDetails::class,
+            TableUsagePointsContactDetails::class,
         )
 
     /**

@@ -204,7 +204,7 @@ internal class QueryNetworkStateServiceTest {
             assertThat(messageId, equalTo(expectedBatch.batchId))
 
             assertThat(eventList.map { it.eventId }, contains(*expectedBatch.events.map { it.eventId }.toTypedArray()))
-            assertThat(eventList.map { it.timestamp }, contains(*expectedBatch.events.map { it.timestamp.toTimestamp() }.toTypedArray()))
+            assertThat(eventList.map { it.timestamp }, contains(*expectedBatch.events.map { it.timestamp?.toTimestamp() }.toTypedArray()))
 
             val expectedSwitchEvents = expectedBatch.events.filterIsInstance<SwitchStateEvent>()
             assertThat(eventList.map { it.switch.mrid }, contains(*expectedSwitchEvents.map { it.mRID }.toTypedArray()))

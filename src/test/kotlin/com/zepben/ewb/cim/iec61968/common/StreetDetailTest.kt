@@ -28,7 +28,7 @@ internal class StreetDetailTest {
 
     @Test
     internal fun accessorCoverage() {
-        val streetDetail = StreetDetail("buildingName", "floorIdentification", "name", "number", "suiteNumber", "type", "displayAddress")
+        val streetDetail = StreetDetail("buildingName", "floorIdentification", "name", "number", "suiteNumber", "type", "displayAddress", "buildingNumber")
 
         assertThat(streetDetail.buildingName, equalTo("buildingName"))
         assertThat(streetDetail.floorIdentification, equalTo("floorIdentification"))
@@ -37,11 +37,13 @@ internal class StreetDetailTest {
         assertThat(streetDetail.suiteNumber, equalTo("suiteNumber"))
         assertThat(streetDetail.type, equalTo("type"))
         assertThat(streetDetail.displayAddress, equalTo("displayAddress"))
+        assertThat(streetDetail.buildingNumber, equalTo("buildingNumber"))
     }
 
     @Test
     internal fun testAllFieldsEmpty() {
         assertThat("allFieldsEmpty should return true for empty StreetDetail", StreetDetail().allFieldsEmpty())
+        assertThat("allFieldsEmpty should return true for empty StreetDetail", StreetDetail("", "", "", "", "", "", "", "").allFieldsEmpty())
 
         assertThat("allFieldsEmpty() should return false for nonempty buildingName", !StreetDetail(buildingName = "value").allFieldsEmpty())
         assertThat("allFieldsEmpty() should return false for nonempty floorIdentification", !StreetDetail(floorIdentification = "value").allFieldsEmpty())
@@ -50,6 +52,7 @@ internal class StreetDetailTest {
         assertThat("allFieldsEmpty() should return false for nonempty suiteNumber", !StreetDetail(suiteNumber = "value").allFieldsEmpty())
         assertThat("allFieldsEmpty() should return false for nonempty type", !StreetDetail(type = "value").allFieldsEmpty())
         assertThat("allFieldsEmpty() should return false for nonempty displayAddress", !StreetDetail(displayAddress = "value").allFieldsEmpty())
+        assertThat("allFieldsEmpty() should return false for nonempty buildingNumber", !StreetDetail(buildingNumber = "value").allFieldsEmpty())
     }
 
     @Test
@@ -63,6 +66,7 @@ internal class StreetDetailTest {
         assertThat("allFieldsNull() should return false for nonempty suiteNumber", !StreetDetail(suiteNumber = "value").allFieldsNull())
         assertThat("allFieldsNull() should return false for nonempty type", !StreetDetail(type = "value").allFieldsNull())
         assertThat("allFieldsNull() should return false for nonempty displayAddress", !StreetDetail(displayAddress = "value").allFieldsNull())
+        assertThat("allFieldsNull() should return false for nonempty buildingNumber", !StreetDetail(buildingNumber = "value").allFieldsNull())
     }
 
 }

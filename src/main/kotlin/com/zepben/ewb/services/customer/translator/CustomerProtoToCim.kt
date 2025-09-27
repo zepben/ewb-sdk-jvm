@@ -12,9 +12,11 @@ import com.zepben.ewb.cim.iec61968.common.Agreement
 import com.zepben.ewb.cim.iec61968.common.Organisation
 import com.zepben.ewb.cim.iec61968.customers.*
 import com.zepben.ewb.cim.iec61970.base.core.NameType
+import com.zepben.ewb.cim.iec61970.base.domain.DateTimeInterval
 import com.zepben.ewb.services.common.Resolvers
 import com.zepben.ewb.services.common.translator.BaseProtoToCim
 import com.zepben.ewb.services.common.translator.toCim
+import com.zepben.ewb.services.common.translator.toInstant
 import com.zepben.ewb.services.customer.CustomerService
 import com.zepben.protobuf.cim.iec61968.common.Agreement as PBAgreement
 import com.zepben.protobuf.cim.iec61968.common.Organisation as PBOrganisation
@@ -23,13 +25,17 @@ import com.zepben.protobuf.cim.iec61968.customers.CustomerAgreement as PBCustome
 import com.zepben.protobuf.cim.iec61968.customers.PricingStructure as PBPricingStructure
 import com.zepben.protobuf.cim.iec61968.customers.Tariff as PBTariff
 import com.zepben.protobuf.cim.iec61970.base.core.NameType as PBNameType
+import com.zepben.protobuf.cim.iec61970.base.domain.DateTimeInterval as PBDateTimeInterval
 
 // ###################
 // # IEC61968 Common #
 // ###################
 
 private fun toCim(pb: PBAgreement, cim: Agreement, customerService: CustomerService): Agreement =
-    cim.also { toCim(pb.doc, it, customerService) }
+    cim.apply {
+        validityInterval = pb.validityIntervalSet.takeUnless { pb.hasValidityIntervalNull() }?.let { toCim(it) }
+        toCim(pb.doc, this, customerService)
+    }
 
 /**
  * An extension to add a converted copy of the protobuf [PBOrganisation] to the [CustomerService].
@@ -130,6 +136,16 @@ fun CustomerService.addFromPb(pb: PBTariff): Tariff? = tryAddOrNull(toCim(pb, th
  * An extension to add a converted copy of the protobuf [PBNameType] to the [CustomerService].
  */
 fun CustomerService.addFromPb(pb: PBNameType): NameType = toCim(pb, this)
+
+// ########################
+// # IEC61970 Base Domain #
+// ########################
+
+private fun toCim(pb: PBDateTimeInterval): DateTimeInterval =
+    DateTimeInterval(
+        start = pb.startSet.takeUnless { pb.hasStartNull() }?.toInstant(),
+        end = pb.endSet.takeUnless { pb.hasEndNull() }?.toInstant(),
+    )
 
 // #################################
 // # Class for Java friendly usage #

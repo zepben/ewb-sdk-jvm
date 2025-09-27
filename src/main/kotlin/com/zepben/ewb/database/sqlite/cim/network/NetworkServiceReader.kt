@@ -13,6 +13,9 @@ import com.zepben.ewb.database.sqlite.cim.CimReader
 import com.zepben.ewb.database.sqlite.cim.tables.associations.*
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.assetinfo.TableRecloseDelays
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.assetinfo.TableRelayInfo
+import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.common.TableContactDetailsElectronicAddresses
+import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.common.TableContactDetailsStreetAddresses
+import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.common.TableContactDetailsTelephoneNumbers
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.metering.TablePanDemandResponseFunctions
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61970.base.core.TableSites
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61970.base.feeder.TableLoops
@@ -33,6 +36,7 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61968.infiec61968.infassetin
 import com.zepben.ewb.database.sqlite.cim.tables.iec61968.infiec61968.infassets.TablePoles
 import com.zepben.ewb.database.sqlite.cim.tables.iec61968.metering.TableMeters
 import com.zepben.ewb.database.sqlite.cim.tables.iec61968.metering.TableUsagePoints
+import com.zepben.ewb.database.sqlite.cim.tables.iec61968.metering.TableUsagePointsContactDetails
 import com.zepben.ewb.database.sqlite.cim.tables.iec61968.operations.TableOperationalRestrictions
 import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.auxiliaryequipment.TableCurrentTransformers
 import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.auxiliaryequipment.TableFaultIndicators
@@ -92,6 +96,10 @@ internal class NetworkServiceReader(
             readEach<TableMeters>(service, reader::read) and
             readEach<TableEndDevicesEndDeviceFunctions>(service, reader::read) and
             readEach<TableUsagePoints>(service, reader::read) and
+            readEach<TableUsagePointsContactDetails>(service, reader::read) and
+            readEach<TableContactDetailsElectronicAddresses>(service, reader::read) and
+            readEach<TableContactDetailsStreetAddresses>(service, reader::read) and
+            readEach<TableContactDetailsTelephoneNumbers>(service, reader::read) and
             readEach<TableOperationalRestrictions>(service, reader::read) and
             readEach<TableBaseVoltages>(service, reader::read) and
             readEach<TableConnectivityNodes>(service, reader::read) and
@@ -110,6 +118,7 @@ internal class NetworkServiceReader(
             readEach<TableClamps>(service, reader::read) and
             readEach<TableCuts>(service, reader::read) and
             readEach<TableCurrentRelays>(service, reader::read) and
+            readEach<TableDirectionalCurrentRelays>(service, reader::read) and
             readEach<TableDistanceRelays>(service, reader::read) and
             readEach<TableVoltageRelays>(service, reader::read) and
             readEach<TableProtectionRelayFunctionThresholds>(service, reader::read) and

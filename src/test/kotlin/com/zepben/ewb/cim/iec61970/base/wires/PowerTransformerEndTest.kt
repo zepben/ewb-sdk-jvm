@@ -17,6 +17,7 @@ import com.zepben.ewb.services.network.ResistanceReactance
 import com.zepben.ewb.services.network.ResistanceReactanceTest.Companion.validateResistanceReactance
 import com.zepben.ewb.services.network.testdata.fillFields
 import com.zepben.ewb.utils.PrivateCollectionValidator
+import com.zepben.ewb.utils.PrivateCollectionValidator.DuplicateBehaviour
 import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
@@ -194,7 +195,8 @@ internal class PowerTransformerEndTest {
             PowerTransformerEnd::addRating,
             PowerTransformerEnd::removeRating,
             PowerTransformerEnd::clearRatings,
-            TransformerEndRatedS::coolingType
+            TransformerEndRatedS::coolingType,
+            DuplicateBehaviour.THROWS,
         )
     }
 

@@ -127,6 +127,15 @@ class BaseServiceJavaTest {
         assertThat(service.mapOf(AcLineSegment.class, it -> it.getName() == null).values(), containsInAnyOrder(acLineSegment2));
     }
 
+    @Test
+    void containsJavaInterop() {
+        assertThat(service.contains(breaker1.getMRID()), equalTo(true));
+        assertThat(service.contains(breaker1), equalTo(true));
+
+        assertThat(service.contains("unknown"), equalTo(false));
+        assertThat(service.contains(new Breaker()), equalTo(false));
+    }
+
     private <T extends IdentifiedObject> T create(BaseService baseService, Supplier<T> supplier) {
         T it = supplier.get();
         baseService.add(it);

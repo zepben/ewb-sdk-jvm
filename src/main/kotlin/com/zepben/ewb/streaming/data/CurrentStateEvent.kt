@@ -61,8 +61,7 @@ sealed class CurrentStateEvent(
     protected fun toPbBuilder(): PBCurrentStateEvent.Builder =
         PBCurrentStateEvent.newBuilder().also { pb ->
             pb.eventId = eventId
-            timestamp.toTimestamp()?.let { pb.timestamp = it } ?: pb.clearTimestamp()
-            pb.timestamp = timestamp.toTimestamp()
+            timestamp?.let { pb.timestamp = it.toTimestamp() } ?: pb.clearTimestamp()
         }
 
 }

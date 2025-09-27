@@ -9,6 +9,7 @@
 package com.zepben.ewb.database.sqlite.cim.network
 
 import com.zepben.ewb.cim.extensions.iec61968.assetinfo.RelayInfo
+import com.zepben.ewb.cim.extensions.iec61968.common.ContactDetails
 import com.zepben.ewb.cim.extensions.iec61968.metering.PanDemandResponseFunction
 import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
@@ -47,6 +48,10 @@ import com.zepben.ewb.database.sqlite.cim.CimWriter
 import com.zepben.ewb.database.sqlite.cim.tables.associations.*
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.assetinfo.TableRecloseDelays
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.assetinfo.TableRelayInfo
+import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.common.TableContactDetails
+import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.common.TableContactDetailsElectronicAddresses
+import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.common.TableContactDetailsStreetAddresses
+import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.common.TableContactDetailsTelephoneNumbers
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.metering.TablePanDemandResponseFunctions
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61970.base.core.TableSites
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61970.base.feeder.TableLoops
@@ -61,10 +66,7 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61968.common.*
 import com.zepben.ewb.database.sqlite.cim.tables.iec61968.infiec61968.infassetinfo.TableCurrentTransformerInfo
 import com.zepben.ewb.database.sqlite.cim.tables.iec61968.infiec61968.infassetinfo.TablePotentialTransformerInfo
 import com.zepben.ewb.database.sqlite.cim.tables.iec61968.infiec61968.infassets.TablePoles
-import com.zepben.ewb.database.sqlite.cim.tables.iec61968.metering.TableEndDeviceFunctions
-import com.zepben.ewb.database.sqlite.cim.tables.iec61968.metering.TableEndDevices
-import com.zepben.ewb.database.sqlite.cim.tables.iec61968.metering.TableMeters
-import com.zepben.ewb.database.sqlite.cim.tables.iec61968.metering.TableUsagePoints
+import com.zepben.ewb.database.sqlite.cim.tables.iec61968.metering.*
 import com.zepben.ewb.database.sqlite.cim.tables.iec61968.operations.TableOperationalRestrictions
 import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.auxiliaryequipment.*
 import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.core.*
@@ -126,6 +128,59 @@ class NetworkCimWriter(
         insert.setNullableBoolean(table.RECLOSE_FAST.queryIndex, relayInfo.recloseFast)
 
         return writeAssetInfo(table, insert, relayInfo, "relay info")
+    }
+
+    // ##############################
+    // # Extensions IEC61968 Common #
+    // ##############################
+
+    @Throws(SQLException::class)
+    private fun writeContactDetails(table: TableContactDetails, insert: PreparedStatement, contactDetails: ContactDetails, description: String): Boolean {
+        insert.setString(table.ID.queryIndex, contactDetails.id)
+        insert.setNullableString(table.CONTACT_TYPE.queryIndex, contactDetails.contactType)
+        insert.setNullableString(table.FIRST_NAME.queryIndex, contactDetails.firstName)
+        insert.setNullableString(table.LAST_NAME.queryIndex, contactDetails.lastName)
+        insert.setNullableString(table.PREFERRED_CONTACT_METHOD.queryIndex, contactDetails.preferredContactMethod.name)
+        insert.setNullableBoolean(table.IS_PRIMARY.queryIndex, contactDetails.isPrimary)
+        insert.setNullableString(table.BUSINESS_NAME.queryIndex, contactDetails.businessName)
+
+        var status = writeContactDetailsStreetAddress(contactDetails, contactDetails.contactAddress)
+        contactDetails.phoneNumbers.forEach { status = status and writeContactDetailsTelephoneNumber(contactDetails, it) }
+        contactDetails.electronicAddresses.forEach { status = status and writeContactDetailsElectronicAddress(contactDetails, it) }
+
+        return status and insert.tryExecuteSingleUpdate(description)
+    }
+
+    @Throws(SQLException::class)
+    private fun writeContactDetailsElectronicAddress(contactDetails: ContactDetails, electronicAddress: ElectronicAddress): Boolean {
+        val table = databaseTables.getTable<TableContactDetailsElectronicAddresses>()
+        val insert = databaseTables.getInsert<TableContactDetailsElectronicAddresses>()
+
+        insert.setString(table.CONTACT_DETAILS_ID.queryIndex, contactDetails.id)
+
+        return writeElectronicAddress(table, insert, electronicAddress, "electronic address for contact ${contactDetails.id}")
+    }
+
+    @Throws(SQLException::class)
+    private fun writeContactDetailsStreetAddress(contactDetails: ContactDetails, streetAddress: StreetAddress?): Boolean {
+        streetAddress ?: return true
+
+        val table = databaseTables.getTable<TableContactDetailsStreetAddresses>()
+        val insert = databaseTables.getInsert<TableContactDetailsStreetAddresses>()
+
+        insert.setString(table.CONTACT_DETAILS_ID.queryIndex, contactDetails.id)
+
+        return writeStreetAddress(table, insert, streetAddress, "street address for contact ${contactDetails.id}")
+    }
+
+    @Throws(SQLException::class)
+    private fun writeContactDetailsTelephoneNumber(contactDetails: ContactDetails, phoneNumber: TelephoneNumber): Boolean {
+        val table = databaseTables.getTable<TableContactDetailsTelephoneNumbers>()
+        val insert = databaseTables.getInsert<TableContactDetailsTelephoneNumbers>()
+
+        insert.setString(table.CONTACT_DETAILS_ID.queryIndex, contactDetails.id)
+
+        return writeTelephoneNumber(table, insert, phoneNumber, "phone number for contact ${contactDetails.id}")
     }
 
     // ################################
@@ -236,6 +291,30 @@ class NetworkCimWriter(
     // #######################################
     // # Extensions IEC61970 Base Protection #
     // #######################################
+
+    /**
+     * Write the [DirectionalCurrentRelay] fields to [TableDirectionalCurrentRelays].
+     *
+     * @param directionalCurrentRelay The [DirectionalCurrentRelay] instance to write to the database.
+     *
+     * @return true if the [DirectionalCurrentRelay] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
+    fun write(directionalCurrentRelay: DirectionalCurrentRelay): Boolean {
+        val table = databaseTables.getTable<TableDirectionalCurrentRelays>()
+        val insert = databaseTables.getInsert<TableDirectionalCurrentRelays>()
+
+        insert.setNullableDouble(table.DIRECTIONAL_CHARACTERISTIC_ANGLE.queryIndex, directionalCurrentRelay.directionalCharacteristicAngle)
+        insert.setString(table.POLARIZING_QUANTITY_TYPE.queryIndex, directionalCurrentRelay.polarizingQuantityType.name)
+        insert.setString(table.RELAY_ELEMENT_PHASE.queryIndex, directionalCurrentRelay.relayElementPhase.name)
+        insert.setNullableDouble(table.MINIMUM_PICKUP_CURRENT.queryIndex, directionalCurrentRelay.minimumPickupCurrent)
+        insert.setNullableDouble(table.CURRENT_LIMIT_1.queryIndex, directionalCurrentRelay.currentLimit1)
+        insert.setNullableBoolean(table.INVERSE_TIME_FLAG.queryIndex, directionalCurrentRelay.inverseTimeFlag)
+        insert.setNullableDouble(table.TIME_DELAY_1.queryIndex, directionalCurrentRelay.timeDelay1)
+
+        return writeProtectionRelayFunction(table, insert, directionalCurrentRelay, "directional current relay")
+    }
 
     /**
      * Write the [DistanceRelay] fields to [TableDistanceRelays].
@@ -712,6 +791,20 @@ class NetworkCimWriter(
     // # IEC61968 Common #
     // ###################
 
+    @Throws(SQLException::class)
+    private fun writeElectronicAddress(
+        table: TableElectronicAddresses,
+        insert: PreparedStatement,
+        electronicAddress: ElectronicAddress,
+        description: String
+    ): Boolean {
+        insert.setNullableString(table.EMAIL_1.queryIndex, electronicAddress.email1)
+        insert.setNullableBoolean(table.IS_PRIMARY.queryIndex, electronicAddress.isPrimary)
+        insert.setNullableString(table.DESCRIPTION.queryIndex, electronicAddress.description)
+
+        return insert.tryExecuteSingleUpdate(description)
+    }
+
     /**
      * Write the [Location] fields to [TableLocations].
      *
@@ -792,11 +885,33 @@ class NetworkCimWriter(
         insert.setNullableString(table.SUITE_NUMBER.queryIndex, streetDetail?.suiteNumber)
         insert.setNullableString(table.TYPE.queryIndex, streetDetail?.type)
         insert.setNullableString(table.DISPLAY_ADDRESS.queryIndex, streetDetail?.displayAddress)
+        insert.setNullableString(table.BUILDING_NUMBER.queryIndex, streetDetail?.buildingNumber)
+    }
+
+    @Throws(SQLException::class)
+    private fun writeTelephoneNumber(
+        table: TableTelephoneNumbers,
+        insert: PreparedStatement,
+        telephoneNumber: TelephoneNumber,
+        description: String
+    ): Boolean {
+        insert.setNullableString(table.AREA_CODE.queryIndex, telephoneNumber.areaCode)
+        insert.setNullableString(table.CITY_CODE.queryIndex, telephoneNumber.cityCode)
+        insert.setNullableString(table.COUNTRY_CODE.queryIndex, telephoneNumber.countryCode)
+        insert.setNullableString(table.DIAL_OUT.queryIndex, telephoneNumber.dialOut)
+        insert.setNullableString(table.EXTENSION.queryIndex, telephoneNumber.extension)
+        insert.setNullableString(table.INTERNATIONAL_PREFIX.queryIndex, telephoneNumber.internationalPrefix)
+        insert.setNullableString(table.LOCAL_NUMBER.queryIndex, telephoneNumber.localNumber)
+        insert.setNullableBoolean(table.IS_PRIMARY.queryIndex, telephoneNumber.isPrimary)
+        insert.setNullableString(table.DESCRIPTION.queryIndex, telephoneNumber.description)
+
+        return insert.tryExecuteSingleUpdate(description)
     }
 
     private fun insertTownDetail(table: TableTownDetails, insert: PreparedStatement, townDetail: TownDetail?) {
         insert.setNullableString(table.TOWN_NAME.queryIndex, townDetail?.name)
         insert.setNullableString(table.STATE_OR_PROVINCE.queryIndex, townDetail?.stateOrProvince)
+        insert.setNullableString(table.COUNTRY.queryIndex, townDetail?.country)
     }
 
     // #####################################
@@ -943,8 +1058,24 @@ class NetworkCimWriter(
 
         var status = true
         usagePoint.equipment.forEach { status = status and writeAssociation(it, usagePoint) }
+        usagePoint.contacts.forEach { status = status and writeUsagePointContactDetails(usagePoint, it) }
 
         return status and writeIdentifiedObject(table, insert, usagePoint, "usage point")
+    }
+
+    @Throws(SQLException::class)
+    private fun writeUsagePointContactDetails(usagePoint: UsagePoint, contactDetails: ContactDetails): Boolean {
+        val table = databaseTables.getTable<TableUsagePointsContactDetails>()
+        val insert = databaseTables.getInsert<TableUsagePointsContactDetails>()
+
+        insert.setNullableString(table.USAGE_POINT_MRID.queryIndex, usagePoint.mRID)
+
+        return writeContactDetails(
+            table,
+            insert,
+            contactDetails,
+            "contact details [${contactDetails.id}] for usage point ${usagePoint.mRID}"
+        )
     }
 
     // #######################

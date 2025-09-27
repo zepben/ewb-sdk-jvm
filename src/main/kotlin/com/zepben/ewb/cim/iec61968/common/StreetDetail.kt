@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Zeppelin Bend Pty Ltd
+ * Copyright 2025 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -7,6 +7,8 @@
  */
 
 package com.zepben.ewb.cim.iec61968.common
+
+import com.zepben.ewb.cim.extensions.ZBEX
 
 /**
  * Street details, in the context of address.
@@ -19,6 +21,7 @@ package com.zepben.ewb.cim.iec61968.common
  * @property suiteNumber Number of the apartment or suite.
  * @property type Type of street. Examples include: street, circle, boulevard, avenue, road, drive, etc.
  * @property displayAddress The address as it should be displayed to a user.
+ * @property buildingNumber [ZBEX] The number of the building.
  */
 data class StreetDetail(
     val buildingName: String? = null,
@@ -27,7 +30,8 @@ data class StreetDetail(
     val number: String? = null,
     val suiteNumber: String? = null,
     val type: String? = null,
-    val displayAddress: String? = null
+    val displayAddress: String? = null,
+    @ZBEX val buildingNumber: String? = null,
 ) {
 
     /**
@@ -36,13 +40,14 @@ data class StreetDetail(
      * @return true if all fields are empty, otherwise false
      */
     fun allFieldsEmpty(): Boolean = (
-        buildingName.isNullOrEmpty() &&
-            floorIdentification.isNullOrEmpty() &&
-            name.isNullOrEmpty() &&
-            number.isNullOrEmpty() &&
-            suiteNumber.isNullOrEmpty() &&
-            type.isNullOrEmpty() &&
-            displayAddress.isNullOrEmpty()
+        buildingName.isNullOrEmpty()
+            && floorIdentification.isNullOrEmpty()
+            && name.isNullOrEmpty()
+            && number.isNullOrEmpty()
+            && suiteNumber.isNullOrEmpty()
+            && type.isNullOrEmpty()
+            && displayAddress.isNullOrEmpty()
+            && buildingNumber.isNullOrEmpty()
         )
 
     /**
@@ -51,13 +56,14 @@ data class StreetDetail(
      * @return true if all fields are null, otherwise false
      */
     fun allFieldsNull(): Boolean = (
-        buildingName == null &&
-            floorIdentification == null &&
-            name == null &&
-            number == null &&
-            suiteNumber == null &&
-            type == null &&
-            displayAddress == null
+        buildingName == null
+            && floorIdentification == null
+            && name == null
+            && number == null
+            && suiteNumber == null
+            && type == null
+            && displayAddress == null
+            && buildingNumber == null
         )
 
 }

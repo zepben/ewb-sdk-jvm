@@ -9,6 +9,7 @@
 package com.zepben.ewb.services.network
 
 import com.zepben.ewb.cim.extensions.iec61968.assetinfo.RelayInfo
+import com.zepben.ewb.cim.extensions.iec61968.common.ContactDetails
 import com.zepben.ewb.cim.extensions.iec61968.metering.PanDemandResponseFunction
 import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
@@ -131,6 +132,21 @@ class NetworkServiceComparator @JvmOverloads constructor(
     // #######################################
     // # Extensions IEC61970 Base Protection #
     // #######################################
+
+    private fun compareDirectionalCurrentRelay(source: DirectionalCurrentRelay, target: DirectionalCurrentRelay): ObjectDifference<DirectionalCurrentRelay> =
+        ObjectDifference(source, target).apply {
+            compareProtectionRelayFunction()
+
+            compareValues(
+                DirectionalCurrentRelay::directionalCharacteristicAngle,
+                DirectionalCurrentRelay::polarizingQuantityType,
+                DirectionalCurrentRelay::relayElementPhase,
+                DirectionalCurrentRelay::minimumPickupCurrent,
+                DirectionalCurrentRelay::currentLimit1,
+                DirectionalCurrentRelay::inverseTimeFlag,
+                DirectionalCurrentRelay::timeDelay1,
+            )
+        }
 
     private fun compareDistanceRelay(source: DistanceRelay, target: DistanceRelay): ObjectDifference<DistanceRelay> =
         ObjectDifference(source, target).apply {
@@ -468,6 +484,8 @@ class NetworkServiceComparator @JvmOverloads constructor(
                 UsagePoint::approvedInverterCapacity,
                 UsagePoint::phaseCode
             )
+            compareUnorderedValueCollection(UsagePoint::contacts, ContactDetails::id)
+
             if (options.compareLvSimplification)
                 compareIdReferenceCollections(UsagePoint::equipment, UsagePoint::endDevices)
         }

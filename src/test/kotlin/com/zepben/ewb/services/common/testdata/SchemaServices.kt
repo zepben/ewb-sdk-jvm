@@ -8,12 +8,15 @@
 
 package com.zepben.ewb.services.common.testdata
 
+import com.zepben.ewb.cim.iec61968.common.StreetAddress
+import com.zepben.ewb.cim.iec61968.common.StreetDetail
+import com.zepben.ewb.cim.iec61968.common.TownDetail
+import com.zepben.ewb.cim.iec61968.infiec61968.infcommon.Ratio
+import com.zepben.ewb.cim.iec61968.metering.ControlledAppliance
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.core.NameType
-import com.zepben.ewb.cim.iec61970.base.wires.EnergyConsumer
-import com.zepben.ewb.cim.iec61970.base.wires.EnergyConsumerPhase
-import com.zepben.ewb.cim.iec61970.base.wires.EnergySource
-import com.zepben.ewb.cim.iec61970.base.wires.EnergySourcePhase
+import com.zepben.ewb.cim.iec61970.base.domain.DateTimeInterval
+import com.zepben.ewb.cim.iec61970.base.wires.*
 import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.common.meta.DataSource
 import com.zepben.ewb.services.common.meta.MetadataCollection
@@ -107,30 +110,86 @@ object SchemaServices {
      * We then converted them to nullable and wanted to ensure that nothing got broken by writing/reading these from the DB/protos.
      *
      * Will create an 'empty' type like a default constructor, but any nullable string property will be
-     * created with an empty string (""), and any nullable boolean will be created with false.
+     * created with an empty string (""), and any nullable boolean will be created with false etc.
      *
-     * We also specify numControls and numDiagramObjects explicitly, as these were previously not nullable but
-     * now are, and we set them to 0. We don't do this for all integers as many (TapChanger and PowerElectronicsConnection) settings
-     * have range restrictions on them where a default of 0 won't work.
+     * Any exception in setting the value to the empty value means there are constraints in place, and the old null
+     * replacements won't be an issue, so can safely be ignored.
      */
     fun fillEmptys(io: IdentifiedObject) {
         io::class.memberProperties
             .filter { it.visibility == KVisibility.PUBLIC }
             .filter { it.returnType.isMarkedNullable }
-            .filterNot { it.name.uppercase().endsWith("MRID") }     // Ignore identifiedObjectMRID, customerMRID, etc
+            .filterNot { it.name.uppercase().endsWith("MRID") } // Ignore identifiedObjectMRID, customerMRID, etc
             .filterIsInstance<KMutableProperty<*>>()
+            .filter { it.getter.call(io) == null }
             .forEach { prop ->
-                if (prop.returnType.withNullability(false).isSubtypeOf(String::class.createType())) {
-                    prop.setter.call(io, "")
+                val value = prop.findKnownNonEmpty(io) ?: when {
+                    prop.isNullableOf<String>() -> ""
+                    prop.isNullableOf<Boolean>() -> false
+                    prop.isNullableOf<Int>() -> 0
+                    prop.isNullableOf<Long>() -> 0L
+                    prop.isNullableOf<Float>() -> 0.0f
+                    prop.isNullableOf<Double>() -> 0.0
+                    // We don't need to worry about references to other objects, they are covered by `filled`.
+                    prop.isNullableOf<IdentifiedObject>() -> null
+                    prop.isNullableOf<ControlledAppliance>() -> ControlledAppliance(0)
+                    prop.isNullableOf<DateTimeInterval>() -> DateTimeInterval(Instant.ofEpochSecond(0), Instant.ofEpochSecond(1))
+                    prop.isNullableOf<Instant>() -> Instant.ofEpochSecond(0)
+                    prop.isNullableOf<Ratio>() -> Ratio(0.0, 0.0)
+                    prop.isNullableOf<StreetAddress>() -> StreetAddress(
+                        postalCode = "",
+                        townDetail = TownDetail(name = "", stateOrProvince = "", country = ""),
+                        poBox = "",
+                        streetDetail = StreetDetail(
+                            buildingName = "",
+                            floorIdentification = "",
+                            name = "",
+                            number = "",
+                            suiteNumber = "",
+                            type = "",
+                            displayAddress = "",
+                            buildingNumber = ""
+                        ),
+                    )
+
+                    else -> throw IllegalStateException("INTERNAL ERROR: You forgot to add an empty value mapper for ${prop.returnType} - used by ${io::class.simpleName}.${prop.name}")
                 }
 
-                if (prop.returnType.withNullability(false).isSubtypeOf(Boolean::class.createType())) {
-                    prop.setter.call(io, false)
-                }
-
-                if (prop.name == "numDiagramObjects" || prop.name == "numControls" || prop.name == "numEndDevices")
-                    prop.setter.call(io, 0)
+//                try {
+                prop.setter.call(io, value)
+//                } catch (_: Exception) {
+//                    // Any exception in setting the value to the empty value means there are constraints in place, and the old null
+//                    // replacements won't be an issue, so can safely be ignored.
+//                }
             }
     }
+
+    private inline fun <reified T> KMutableProperty<*>.isNullableOf(): Boolean =
+        returnType.withNullability(false).isSubtypeOf(T::class.createType())
+
+    private fun KMutableProperty<*>.findKnownNonEmpty(io: IdentifiedObject): Any? {
+        return tryPowerElectronicsConnectionNonEmpty(io)
+    }
+
+    private fun KMutableProperty<*>.tryPowerElectronicsConnectionNonEmpty(io: IdentifiedObject): Any? =
+        when (io) {
+            is PowerElectronicsConnection -> {
+                when (name) {
+                    "invWattRespV1", "invWattRespV3", "invWattRespV4" -> 244
+                    "invWattRespV2" -> 216 // 244 is invalid for invWattRespV2.
+                    "invVarRespV1", "invVarRespV2", "invVarRespV3", "invVarRespV4" -> 200
+                    else -> null
+                }
+            }
+
+            is TapChanger -> {
+                when (name) {
+                    "lowStep" -> -1
+                    else -> null
+                }
+            }
+
+            else -> null
+        }
 
 }

@@ -27,7 +27,11 @@ import com.zepben.ewb.services.common.ObjectDifference
 class CustomerServiceComparator : BaseServiceComparator() {
 
     private fun ObjectDifference<out Agreement>.compareAgreement(): ObjectDifference<out Agreement> =
-        apply { compareDocument() }
+        apply {
+            compareDocument()
+
+            compareValues(Agreement::validityInterval)
+        }
 
     private fun compareCustomer(source: Customer, target: Customer): ObjectDifference<Customer> =
         ObjectDifference(source, target).apply {

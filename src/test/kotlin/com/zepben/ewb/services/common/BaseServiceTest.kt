@@ -294,6 +294,15 @@ internal class BaseServiceTest {
         assertThat("Adding different object with same mRID should return false", !service.add(location))
     }
 
+    @Test
+    fun `contains as operator`() {
+        assertThat("should contain breaker1", breaker1.mRID in service)
+        assertThat("should contain breaker1", breaker1 in service)
+
+        assertThat("shouldn't contain unknown", "unknown" !in service)
+        assertThat("shouldn't contain unknown", Breaker() !in service)
+    }
+
     private inline fun <reified T : IdentifiedObject> validateForEach(expected: List<ConductingEquipment>) {
         val visited = mutableListOf<IdentifiedObject>()
         service.sequenceOf<T>().forEach { visited.add(it) }

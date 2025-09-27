@@ -48,11 +48,15 @@ import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.ewb.database.sqlite.cim.network.NetworkDatabaseTables
 import com.zepben.ewb.database.sqlite.cim.tables.associations.*
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.assetinfo.TableRecloseDelays
+import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.common.TableContactDetailsElectronicAddresses
+import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.common.TableContactDetailsStreetAddresses
+import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.common.TableContactDetailsTelephoneNumbers
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61970.base.protection.TableProtectionRelayFunctionThresholds
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61970.base.protection.TableProtectionRelayFunctionTimeLimits
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61970.base.wires.TablePowerTransformerEndRatings
 import com.zepben.ewb.database.sqlite.cim.tables.iec61968.common.TableLocationStreetAddresses
 import com.zepben.ewb.database.sqlite.cim.tables.iec61968.common.TablePositionPoints
+import com.zepben.ewb.database.sqlite.cim.tables.iec61968.metering.TableUsagePointsContactDetails
 import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.core.TableCurveData
 import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.wires.TablePhaseImpedanceData
 import com.zepben.ewb.services.common.testdata.fillFieldsCommon
@@ -110,6 +114,7 @@ internal class NetworkTranslatorTest : TranslatorTestBase<NetworkService>(
         // # Extensions IEC61970 Base Protection #
         // #######################################
 
+        ValidationInfo(::DirectionalCurrentRelay, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
         ValidationInfo(::DistanceRelay, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
         ValidationInfo(::ProtectionRelayScheme, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
         ValidationInfo(::ProtectionRelaySystem, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
@@ -319,6 +324,9 @@ internal class NetworkTranslatorTest : TranslatorTestBase<NetworkService>(
             TableUsagePointsEndDevices::class,
 
             // Excluded array data
+            TableContactDetailsElectronicAddresses::class,
+            TableContactDetailsStreetAddresses::class,
+            TableContactDetailsTelephoneNumbers::class,
             TableCurveData::class,
             TableLocationStreetAddresses::class,
             TablePhaseImpedanceData::class,
@@ -328,6 +336,7 @@ internal class NetworkTranslatorTest : TranslatorTestBase<NetworkService>(
             TableProtectionRelayFunctionTimeLimits::class,
             TableProtectionRelayFunctionsSensors::class,
             TableRecloseDelays::class,
+            TableUsagePointsContactDetails::class,
         )
 
     /**

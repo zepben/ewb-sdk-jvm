@@ -3,18 +3,44 @@
 ### Breaking Changes
 * Discrepancies in the v61 upgrade scripts and the schema creation objects have been fixed. This includes correcting the types of some columns, changing the
   nullability of some columns and adding missing indexes.
+* `Timestamp.toInstant()` and `Instant.toTimestamp()` have been removed from the public API. If you were using them, you will need to copy the implementation.
+* The following gRPC fields have been modified to support nulls (they were missed in v1.0.0):
+  * `Document.createdDateTime`
+  * `Equipment.commissionedDate`
+  * `MeasurementValue.timeStamp`
+  * `RelayInfo.curveSetting`
+  * `RelayInfo.recloseFast`
+* `NetworkCimReader` is now an `AutoClosable` to clean up local caches used when loading the database. Failure to close the reader simply means the unused
+  memory will be kept indefinitely, rather than being released back to the server, but you may get code analysis errors due to this change.
 
 ### New Features
-* None.
+* Added the following new CIM classes:
+  * `DateTimeInterval`, interval between two date and time points, where the interval includes the start time but excludes end time.
+  * `ElectronicAddress`, electronic address information.
+  * `TelephoneNumber`, telephone number.
+* Added the following new CIM extension classes:
+  * `ContactDetails`, the details required to contact a person or company. These can be accessed/used via a `UsagePoint`.
+  * `DirectionalCurrentRelay`, a directional current relay is a type of protective relay used in electrical power systems to detect the direction of current
+    flow and operate only when the current exceeds a certain threshold in a specified direction.
+* Added new CIM extension enums:
+  * `ContactMethodType`
+  * `PolarizingQuantityType`
 
 ### Enhancements
-* None.
+* `BaseService.contains` has been marked as an `operator`, allowing Kotlin to use `in` against a service. It has also been expanded to support objects in
+  addition to mRIDs.
+* `Agreement` now supports `validityInterval`, the date and time interval the agreement is valid (from going into effect to termination).
+* `StreetDetail` now supports extension `buildingNumber`, the number of the building.
+* `TownDetail` now supports `country`, the name of the country.
+* The `compareUnorderedValueCollection` methods in `BaseServiceComparator` and `PropertyOmpareres` have been relaxed to take any `Colleciton` rather than only
+  accepting a `List`.
 
 ### Fixes
 * Fixed a bug in the LV feeder assignment when processing sites in the current state of the network. This prevented LV feeders on switches (rather than the
   transformer) from being assigned to the current state energising feeder.
 * Indexes have been fixed in the database schema. Many were missing due to not calling `super`, so the method of adding indexes has been reworked to prevent
   this in the future.
+* `CurrentStateEvent.timestamp` now correctly clears the timestamp if you have a `null` timestamp.
 
 ### Notes
 * None.

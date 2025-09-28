@@ -59,12 +59,12 @@ internal abstract class CimReader<TService : BaseService> {
     @Throws(SQLException::class)
     protected fun readDocument(document: Document, table: TableDocuments, resultSet: ResultSet): Boolean {
         document.apply {
-            title = resultSet.getNullableString(table.TITLE.queryIndex)?.internEmpty()
+            title = resultSet.getNullableString(table.TITLE.queryIndex)
             createdDateTime = resultSet.getInstant(table.CREATED_DATE_TIME.queryIndex)
-            authorName = resultSet.getNullableString(table.AUTHOR_NAME.queryIndex)?.internEmpty()
-            type = resultSet.getNullableString(table.TYPE.queryIndex)?.internEmpty()
-            status = resultSet.getNullableString(table.STATUS.queryIndex)?.internEmpty()
-            comment = resultSet.getNullableString(table.COMMENT.queryIndex)?.internEmpty()
+            authorName = resultSet.getNullableString(table.AUTHOR_NAME.queryIndex)
+            type = resultSet.getNullableString(table.TYPE.queryIndex)
+            status = resultSet.getNullableString(table.STATUS.queryIndex)
+            comment = resultSet.getNullableString(table.COMMENT.queryIndex)
         }
 
         return readIdentifiedObject(document, table, resultSet)
@@ -128,8 +128,8 @@ internal abstract class CimReader<TService : BaseService> {
     @Throws(SQLException::class)
     protected fun readIdentifiedObject(identifiedObject: IdentifiedObject, table: TableIdentifiedObjects, resultSet: ResultSet): Boolean {
         identifiedObject.apply {
-            name = resultSet.getNullableString(table.NAME.queryIndex)?.internEmpty()
-            description = resultSet.getNullableString(table.DESCRIPTION.queryIndex)?.internEmpty()
+            name = resultSet.getNullableString(table.NAME.queryIndex)
+            description = resultSet.getNullableString(table.DESCRIPTION.queryIndex)
             numDiagramObjects = resultSet.getNullableInt(table.NUM_DIAGRAM_OBJECTS.queryIndex)
         }
 

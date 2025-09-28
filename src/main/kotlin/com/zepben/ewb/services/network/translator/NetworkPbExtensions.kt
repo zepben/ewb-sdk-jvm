@@ -101,6 +101,11 @@ fun EvChargingUnit.mRID(): String = peu.mRID()
 /**
  * Extract the mRID from the composed classes.
  */
+fun DirectionalCurrentRelay.mRID(): String = prf.mRID()
+
+/**
+ * Extract the mRID from the composed classes.
+ */
 fun DistanceRelay.mRID(): String = prf.mRID()
 
 /**

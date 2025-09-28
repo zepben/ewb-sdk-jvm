@@ -13,6 +13,7 @@ import com.zepben.ewb.cim.iec61968.customers.Customer
 import com.zepben.ewb.cim.iec61968.customers.CustomerAgreement
 import com.zepben.ewb.cim.iec61968.customers.PricingStructure
 import com.zepben.ewb.cim.iec61968.customers.Tariff
+import com.zepben.ewb.database.sql.extensions.setInstant
 import com.zepben.ewb.database.sql.extensions.setNullableInt
 import com.zepben.ewb.database.sql.extensions.setNullableString
 import com.zepben.ewb.database.sqlite.cim.CimWriter
@@ -43,6 +44,9 @@ class CustomerCimWriter(
     @Suppress("SameParameterValue")
     @Throws(SQLException::class)
     private fun writeAgreement(table: TableAgreements, insert: PreparedStatement, agreement: Agreement, description: String): Boolean {
+        insert.setInstant(table.VALIDITY_INTERVAL_START.queryIndex, agreement.validityInterval?.start)
+        insert.setInstant(table.VALIDITY_INTERVAL_END.queryIndex, agreement.validityInterval?.end)
+
         return writeDocument(table, insert, agreement, description)
     }
 

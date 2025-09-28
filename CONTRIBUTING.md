@@ -59,8 +59,9 @@ Make sure you double (or triple) check the ones listed in the "most important" l
    8. Migration written. - `com.zepben.ewb.database.sqlite.cim.upgrade`
       1. ChangeSet written. - `com.zepben.ewb.database.sqlite.cim.upgrade.changesets.ChangeSet*`
       2. ChangeSet added to UpgradeRunner. - `com.zepben.ewb.database.sqlite.cim.upgrade.UpgradeRunner`
-      3. ChangeSetValidator written for ChangeSet. - `com.zepben.ewb.database.sqlite.cim.upgrade.changesets.ChangeSet*Validator`
-      4. ChangeSetValidator added to changeSetValidators. - `com.zepben.ewb.database.sqlite.cim.upgrade.ChangeSetTest`
+      3. Tests. - `src/test`
+         * ChangeSetValidator written for ChangeSet. - `com.zepben.ewb.database.sqlite.cim.upgrade.changesets.ChangeSet*Validator`
+         * ChangeSetValidator added to changeSetValidators. - `com.zepben.ewb.database.sqlite.cim.upgrade.ChangeSetTest`
    9. Add schema tests:
       * `com.zepben.ewb.database.sqlite.cim.customer.CustomerDatabaseSchemaTest`
       * `com.zepben.ewb.database.sqlite.cim.diagram.DiagramDatabaseSchemaTest`

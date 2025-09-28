@@ -9,6 +9,7 @@
 package com.zepben.ewb.cim.iec61968.metering
 
 import com.zepben.ewb.cim.extensions.ZBEX
+import com.zepben.ewb.cim.extensions.iec61968.common.ContactDetails
 import com.zepben.ewb.cim.iec61968.common.Location
 import com.zepben.ewb.cim.iec61970.base.core.Equipment
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
@@ -32,6 +33,7 @@ import com.zepben.ewb.services.common.extensions.validateReference
  * @property approvedInverterCapacity [ZBEX] ]The approved inverter capacity at this UsagePoint in volt-amperes.
  * @property phaseCode Phase code. Number of wires and specific nominal phases can be deduced from enumeration literal values. For example, ABCN is three-phase,
  *                     four-wire, s12n (splitSecondary12N) is single-phase, three-wire, and s1n and s2n are single-phase, two-wire.
+ * @property contacts [ZBEX] All contact details for this UsagePoint.
  */
 class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mRID) {
 
@@ -46,6 +48,7 @@ class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject
 
     private var _equipment: MutableList<Equipment>? = null
     private var _endDevices: MutableList<EndDevice>? = null
+    private var _contacts: MutableList<ContactDetails>? = null
 
     /**
      *  All equipment connecting this usage point to the electrical grid. The returned collection is read only
@@ -156,6 +159,61 @@ class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject
      */
     fun clearEndDevices(): UsagePoint {
         _endDevices = null
+        return this
+    }
+
+    @ZBEX
+    val contacts: Collection<ContactDetails> get() = _contacts.asUnmodifiable()
+
+    /**
+     * Get the number of entries in the [ContactDetails] collection.
+     */
+    fun numContacts(): Int = _contacts?.size ?: 0
+
+    /**
+     * All end devices at this usage point.
+     *
+     * @param id the ID of the required [ContactDetails]
+     * @return The [ContactDetails] with the specified [id] if it exists, otherwise null
+     */
+    fun getContact(id: String): ContactDetails? = _contacts?.firstOrNull { it.id == id }
+
+
+    /**
+     * Add a [ContactDetails] to this [UsagePoint].
+     *
+     * @param contact The [ContactDetails] to add.
+     * @return This [UsagePoint] for fluent use.
+     */
+    fun addContact(contact: ContactDetails): UsagePoint {
+        if (validateReference(contact, ContactDetails::id, ::getContact) { "A ContactDetails with ID ${contact.id}" })
+            return this
+
+        _contacts = _contacts ?: mutableListOf()
+        _contacts!!.add(contact)
+
+        return this
+    }
+
+    /**
+     * Remove a [ContactDetails] from this [UsagePoint].
+     *
+     * @param contact The [ContactDetails] to remove.
+     * @return true if the [ContactDetails] were removed.
+     */
+    fun removeContact(contact: ContactDetails): Boolean {
+        val ret = _contacts?.remove(contact) == true
+        if (_contacts.isNullOrEmpty()) _contacts = null
+        return ret
+    }
+
+    /**
+     * Clear all [ContactDetails] from this [UsagePoint].
+     *
+     * @return This [UsagePoint] for fluent use.
+     */
+    fun clearContacts(): UsagePoint {
+        _contacts = null
         return this
     }
 

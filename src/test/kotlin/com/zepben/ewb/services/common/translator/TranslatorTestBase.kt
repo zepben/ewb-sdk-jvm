@@ -70,12 +70,17 @@ internal abstract class TranslatorTestBase<S : BaseService>(
     internal fun `converts all types correctly`() {
         if (validationInfo.size != (databaseTables.tables.keys - excludedTables).size) {
             val actual = validationInfo.map { it.cim::class.simpleName!! }.toSet()
-            val expected = (databaseTables.tables.keys - excludedTables).map { it.simpleName!!.removePrefix("Table").removeSuffix("s") }.toSet()
+            val expected = (databaseTables.tables.keys - excludedTables).map { it.simpleName!!.removePrefix("Table") }.toSet()
+
+            val potentialSuffixes = listOf("", "s", "es")
+            val actualWithSuffixes = actual.flatMap { potentialSuffixes.map { suffix -> "$it$suffix" } }.toSet()
+            val expectedWithoutSuffixes = expected.flatMap { potentialSuffixes.map { suffix -> it.removeSuffix(suffix) } }.toSet()
+
             fail(
                 "The number of items being validated did not match the number of items written to the database. Did you forget to validate an item, " +
                     "or to exclude the table if it was an association or array data?" +
-                    formatValidationError("Unexpected", actual - expected) +
-                    formatValidationError("Missing", expected - actual)
+                    formatValidationError("Unexpected", actual - expectedWithoutSuffixes) +
+                    formatValidationError("Missing", expected - actualWithSuffixes)
             )
         }
 

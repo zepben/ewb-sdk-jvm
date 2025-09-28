@@ -14,10 +14,7 @@ import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
 import com.zepben.ewb.cim.extensions.iec61970.base.generation.production.EvChargingUnit
-import com.zepben.ewb.cim.extensions.iec61970.base.protection.DistanceRelay
-import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelayScheme
-import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelaySystem
-import com.zepben.ewb.cim.extensions.iec61970.base.protection.VoltageRelay
+import com.zepben.ewb.cim.extensions.iec61970.base.protection.*
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.BatteryControl
 import com.zepben.ewb.cim.iec61968.assetinfo.*
 import com.zepben.ewb.cim.iec61968.assets.AssetOwner
@@ -187,6 +184,22 @@ class NetworkService(metadata: MetadataCollection = MetadataCollection()) : Base
     // #######################################
     // # Extensions IEC61970 Base Protection #
     // #######################################
+
+    /**
+     * Add the [DirectionalCurrentRelay] to this service.
+     *
+     * @param directionalCurrentRelay The [DirectionalCurrentRelay] to add.
+     * @return `true` if the item was added to the service, otherwise false.
+     */
+    fun add(directionalCurrentRelay: DirectionalCurrentRelay): Boolean = super.add(directionalCurrentRelay)
+
+    /**
+     * Remove the [DirectionalCurrentRelay] from this service.
+     *
+     * @param directionalCurrentRelay The [DirectionalCurrentRelay] to remove.
+     * @return `true` if the item was removed from the service, otherwise false.
+     */
+    fun remove(directionalCurrentRelay: DirectionalCurrentRelay): Boolean = super.remove(directionalCurrentRelay)
 
     /**
      * Add the [DistanceRelay] to this service.

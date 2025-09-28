@@ -8,7 +8,7 @@
 
 package com.zepben.ewb.services.measurement.translator
 
-import com.google.protobuf.Timestamp
+import com.google.protobuf.NullValue
 import com.zepben.ewb.cim.iec61970.base.meas.AccumulatorValue
 import com.zepben.ewb.cim.iec61970.base.meas.AnalogValue
 import com.zepben.ewb.cim.iec61970.base.meas.DiscreteValue
@@ -25,7 +25,7 @@ import com.zepben.protobuf.cim.iec61970.base.meas.MeasurementValue as PBMeasurem
 internal class MeasurementCimToProtoTestValidator {
 
     private fun validate(cim: MeasurementValue, pb: PBMeasurementValue) {
-        cim.timeStamp?.let { assertThat(pb.timeStamp, equalTo(it.toTimestamp())) } ?: assertThat(pb.timeStamp, equalTo(Timestamp.getDefaultInstance()))
+        cim.timeStamp?.let { assertThat(pb.timeStampSet, equalTo(it.toTimestamp())) } ?: assertThat(pb.timeStampNull, equalTo(NullValue.NULL_VALUE))
     }
 
     fun validate(cim: AnalogValue, pb: PBAnalogValue) {

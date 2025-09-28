@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.cim.iec61968.metering
 
+import com.zepben.ewb.cim.extensions.iec61968.common.ContactDetails
 import com.zepben.ewb.cim.iec61970.base.core.Equipment
 import com.zepben.ewb.cim.iec61970.base.core.PhaseCode
 import com.zepben.ewb.services.network.NetworkService
@@ -62,7 +63,7 @@ internal class UsagePointTest {
             UsagePoint::getEndDevice,
             UsagePoint::addEndDevice,
             UsagePoint::removeEndDevice,
-            UsagePoint::clearEndDevices
+            UsagePoint::clearEndDevices,
         )
     }
 
@@ -76,7 +77,23 @@ internal class UsagePointTest {
             UsagePoint::getEquipment,
             UsagePoint::addEquipment,
             UsagePoint::removeEquipment,
-            UsagePoint::clearEquipment
+            UsagePoint::clearEquipment,
+        )
+    }
+
+    @Test
+    internal fun contacts() {
+        PrivateCollectionValidator.validateUnordered(
+            ::UsagePoint,
+            { id -> ContactDetails(id = "$id") },
+            UsagePoint::contacts,
+            UsagePoint::numContacts,
+            UsagePoint::getContact,
+            UsagePoint::addContact,
+            UsagePoint::removeContact,
+            UsagePoint::clearContacts,
+            ContactDetails::id,
+            PrivateCollectionValidator.DuplicateBehaviour.IGNORED,
         )
     }
 

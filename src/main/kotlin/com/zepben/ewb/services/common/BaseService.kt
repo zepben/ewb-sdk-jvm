@@ -184,7 +184,16 @@ abstract class BaseService(
      *
      * @return true if there is an object associated with the specified [mRID].
      */
-    fun contains(mRID: String): Boolean = objectsByType.values.any { it.containsKey(mRID) }
+    operator fun contains(mRID: String): Boolean = objectsByType.values.any { it.containsKey(mRID) }
+
+    /**
+     * Check if [obj] is in the service.
+     *
+     * @param obj The [IdentifiedObject] to search for.
+     *
+     * @return true if [obj] was found in the service, otherwise false.
+     */
+    operator fun contains(obj: IdentifiedObject): Boolean = objectsByType.values.any { it[obj.mRID] == obj }
 
     /**
      * Get the number of objects associated with this service.

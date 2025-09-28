@@ -9,6 +9,8 @@
 package com.zepben.ewb.services.network.testdata
 
 import com.zepben.ewb.cim.extensions.iec61968.assetinfo.RelayInfo
+import com.zepben.ewb.cim.extensions.iec61968.common.ContactDetails
+import com.zepben.ewb.cim.extensions.iec61968.common.ContactMethodType
 import com.zepben.ewb.cim.extensions.iec61968.metering.PanDemandResponseFunction
 import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
@@ -60,6 +62,54 @@ fun RelayInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true
     curveSetting = "curveSetting"
     recloseFast = true
     addDelays(1.0, 2.0, 3.0)
+
+    return this
+}
+
+// ##############################
+// # Extensions IEC61968 Common #
+// ##############################
+
+fun ContactDetails.fillFields(): ContactDetails {
+    contactAddress = StreetAddress(
+        postalCode = "1",
+        townDetail = TownDetail(name = "2", stateOrProvince = "3"),
+        poBox = "4",
+        streetDetail = StreetDetail(
+            buildingName = "5",
+            floorIdentification = "6",
+            name = "7",
+            number = "8",
+            suiteNumber = "9",
+            type = "10",
+            displayAddress = "11"
+        )
+    )
+    contactType = "12"
+    firstName = "13"
+    lastName = "14"
+    preferredContactMethod = ContactMethodType.LETTER
+    isPrimary = true
+    businessName = "15"
+
+    @Suppress("unused")
+    for (i in 0..1) {
+        addPhoneNumber(
+            TelephoneNumber(
+                areaCode = "$i-1",
+                cityCode = "2",
+                countryCode = "3",
+                dialOut = "4",
+                extension = "5",
+                internationalPrefix = "6",
+                localNumber = "7",
+                isPrimary = true,
+                description = "8"
+            )
+        )
+
+        addElectronicAddress(ElectronicAddress(email1 = "$i-1", isPrimary = true, description = "2"))
+    }
 
     return this
 }
@@ -167,6 +217,20 @@ fun EvChargingUnit.fillFields(service: NetworkService, includeRuntime: Boolean =
 // ######################################
 // # Extension IEC61970 Base Protection #
 // ######################################
+
+fun DirectionalCurrentRelay.fillFields(service: NetworkService, includeRuntime: Boolean = true): DirectionalCurrentRelay {
+    (this as ProtectionRelayFunction).fillFields(service, includeRuntime)
+
+    directionalCharacteristicAngle = 1.1
+    polarizingQuantityType = PolarizingQuantityType.NEGATIVE_SEQUENCE_VOLTAGE
+    relayElementPhase = PhaseCode.ABCN
+    minimumPickupCurrent = 2.2
+    currentLimit1 = 3.3
+    inverseTimeFlag = true
+    timeDelay1 = 4.4
+
+    return this
+}
 
 fun DistanceRelay.fillFields(service: NetworkService, includeRuntime: Boolean = true): DistanceRelay {
     (this as ProtectionRelayFunction).fillFields(service, includeRuntime)
@@ -613,6 +677,8 @@ fun UsagePoint.fillFields(service: NetworkService, includeRuntime: Boolean = tru
             it.addUsagePoint(this)
             service.add(it)
         })
+
+        addContact(ContactDetails().fillFields())
     }
 
     return this

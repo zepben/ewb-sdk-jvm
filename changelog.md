@@ -25,6 +25,7 @@
 * Added new CIM extension enums:
   * `ContactMethodType`
   * `PolarizingQuantityType`
+* `EquipmentTreeBuilder` will now calculate `leaves` when specified to do so via the `calculateLeaves` constructor parameter.
 
 ### Enhancements
 * `BaseService.contains` has been marked as an `operator`, allowing Kotlin to use `in` against a service. It has also been expanded to support objects in
@@ -169,8 +170,6 @@
 
 ### Enhancements
 * Upgrade ewb-grpc to 1.0.0 to support customer level load results.
-* `EquipmentTreeBuilder` will now calculate `leaves` when specified to do so.
-
 
 ### Fixes
 * Fixed bug that would cause a null pointer exception when processing metrics job sources with a null metadata timestamp

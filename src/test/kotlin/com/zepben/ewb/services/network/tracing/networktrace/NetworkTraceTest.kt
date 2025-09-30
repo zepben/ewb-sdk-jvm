@@ -365,8 +365,8 @@ class NetworkTraceTest {
             .addStepAction(StepActionWithContext())
             .run(ns.get<ConductingEquipment>("c0")!!)
 
-        assert(dataCapture.size == 2)
-        assertContentEquals(dataCapture.getValue("ec3"), listOf("c0", "c0", "c1", "c1", "c2", "c2"))
-        assertContentEquals(dataCapture.getValue("ec5"),  listOf("c0", "c0", "c1", "c1-clamp1", "c4", "c4"))
+        assertThat(dataCapture.size, equalTo(2))
+        assertThat(dataCapture.getValue("ec3"), contains("c0", "c0", "c1", "c1", "c2", "c2"))
+        assertThat(dataCapture.getValue("ec5"), contains("c0", "c0", "c1", "c1-clamp1", "c4", "c4"))
     }
 }

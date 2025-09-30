@@ -27,9 +27,7 @@ import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
-import java.lang.IllegalArgumentException
 import java.util.*
-import kotlin.test.assertContains
 
 internal class EquipmentTreeBuilderTest {
     @JvmField
@@ -54,9 +52,23 @@ internal class EquipmentTreeBuilderTest {
             .addStepAction(treeBuilder)
             .run(n.get<ConductingEquipment>("j1")!!)
 
-        listOf(n.get<ConductingEquipment>("j5"), n.get<ConductingEquipment>("j13")).forEach {
-            assert(it in treeBuilder.leaves.map { leaf -> leaf.identifiedObject }.toSet())
-        }
+        assertThat(
+            treeBuilder.leaves.map { leaf -> leaf.identifiedObject.mRID },
+            contains(
+                "j6",
+                "j5",
+                "j6",
+                "acLineSegment16",
+                "acLineSegment12",
+                "j13",
+                "acLineSegment11",
+                "j13",
+                "acLineSegment15",
+                "acLineSegment12",
+                "acLineSegment11",
+                "j13"
+            )
+        )
 
     }
 

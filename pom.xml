@@ -10,7 +10,7 @@
 
     <groupId>com.zepben</groupId>
     <artifactId>ewb-sdk</artifactId>
-    <version>1.1.0b5</version>
+    <version>1.1.0</version>
     <packaging>jar</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>SDK for interaction with the evolve platform</description>
@@ -68,7 +68,7 @@
         <dependency>
             <groupId>com.zepben</groupId>
             <artifactId>protobuf</artifactId>
-            <version>1.1.0b1</version>
+            <version>1.1.0</version>
         </dependency>
         <dependency>
             <groupId>com.zepben</groupId>

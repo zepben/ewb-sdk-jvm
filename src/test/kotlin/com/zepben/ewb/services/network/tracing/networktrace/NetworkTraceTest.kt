@@ -9,13 +9,17 @@
 package com.zepben.ewb.services.network.tracing.networktrace
 
 import com.zepben.ewb.cim.iec61970.base.core.ConductingEquipment
+import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.core.Terminal
 import com.zepben.ewb.cim.iec61970.base.wires.AcLineSegment
 import com.zepben.ewb.cim.iec61970.base.wires.Clamp
 import com.zepben.ewb.cim.iec61970.base.wires.Cut
+import com.zepben.ewb.cim.iec61970.base.wires.EnergyConsumer
 import com.zepben.ewb.cim.iec61970.base.wires.Junction
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.getT
+import com.zepben.ewb.services.network.tracing.traversal.StepActionWithContextValue
+import com.zepben.ewb.services.network.tracing.traversal.StepContext
 import com.zepben.ewb.services.network.tracing.traversal.TraversalQueue
 import com.zepben.ewb.testing.TestNetworkBuilder
 import org.hamcrest.MatcherAssert.assertThat
@@ -23,6 +27,7 @@ import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertTimeoutPreemptively
 import java.time.Duration
+import kotlin.test.assertContentEquals
 
 class NetworkTraceTest {
 
@@ -314,4 +319,54 @@ class NetworkTraceTest {
         return NetworkTraceStep.Path(from, to, traversed)
     }
 
+    @Test
+    internal fun `test context is not shared between branches`() {
+        //
+        // 1--c0--21--c1-*-21--c2--21--ec3
+        //               1
+        //               1--c4--21--ec5
+        //
+        val ns = TestNetworkBuilder()
+            .fromAcls() // c0
+            .toAcls() // c1
+            .withClamp() // c1-clamp1
+            .toAcls() // c2
+            .toEnergyConsumer() // ec3
+            .branchFrom("c1-clamp1")
+            .toAcls() // c4
+            .toEnergyConsumer() // ec5
+            .network
+
+        val dataCapture = mutableMapOf<String, List<String>>()
+        class StepActionWithContext : StepActionWithContextValue<NetworkTraceStep<*>, List<String>> {
+            override val key: String get() = "testing"
+
+            override fun apply( item: NetworkTraceStep<*>, context: StepContext ) {
+                item.path.toEquipment.let {
+                    if (it is EnergyConsumer) dataCapture[it.mRID] = context.value
+                }
+            }
+
+            override fun computeInitialValue(item: NetworkTraceStep<*>): List<String> {
+                return listOf(item.path.fromEquipment.mRID)
+            }
+
+            override fun computeNextValueTyped(
+                nextItem: NetworkTraceStep<*>,
+                currentItem: NetworkTraceStep<*>,
+                currentValue: List<String>
+            ): List<String> {
+                return currentValue.toMutableList().also {
+                    it.add(nextItem.path.fromEquipment.mRID)
+                }
+            }
+        }
+        Tracing.networkTrace()
+            .addStepAction(StepActionWithContext())
+            .run(ns.get<ConductingEquipment>("c0")!!)
+
+        assertThat(dataCapture.size, equalTo(2))
+        assertThat(dataCapture.getValue("ec3"), contains("c0", "c0", "c1", "c1", "c2", "c2"))
+        assertThat(dataCapture.getValue("ec5"), contains("c0", "c0", "c1", "c1-clamp1", "c4", "c4"))
+    }
 }

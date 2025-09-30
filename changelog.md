@@ -25,6 +25,7 @@
 * Added new CIM extension enums:
   * `ContactMethodType`
   * `PolarizingQuantityType`
+* `EquipmentTreeBuilder` will now calculate `leaves` when specified to do so via the `calculateLeaves` constructor parameter.
 
 ### Enhancements
 * `BaseService.contains` has been marked as an `operator`, allowing Kotlin to use `in` against a service. It has also been expanded to support objects in

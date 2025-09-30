@@ -1,4 +1,20 @@
 # Zepben EWB SDK changelog
+## [1.2.0] - UNRELEASED
+### Breaking Changes
+* None.
+
+### New Features
+* None.
+
+### Enhancements
+* None.
+
+### Fixes
+* None.
+
+### Notes
+* None.
+
 ## [1.1.0] - 2025-09-30
 ### Breaking Changes
 * Discrepancies in the v61 upgrade scripts and the schema creation objects have been fixed. This includes correcting the types of some columns, changing the

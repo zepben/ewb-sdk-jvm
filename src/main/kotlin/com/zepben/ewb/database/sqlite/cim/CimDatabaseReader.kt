@@ -59,14 +59,14 @@ abstract class CimDatabaseReader<TTables : CimDatabaseTables, TService : BaseSer
     /**
      * Read the database.
      */
-    fun read(service: TService): Boolean =
+    fun read(service: TService, afterServiceReadFunction: Boolean? = true): Boolean =
         try {
             require(!hasBeenUsed) { "You can only use the database reader once." }
             hasBeenUsed = true
 
             beforeRead()
                 && readService(service)
-                && afterServiceRead(service)
+                && if (afterServiceReadFunction ?: true) afterServiceRead(service) else true
         } catch (e: Exception) {
             logger.error("Unable to read database: " + e.message)
             false

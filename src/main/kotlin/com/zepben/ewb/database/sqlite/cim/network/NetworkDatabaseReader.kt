@@ -118,7 +118,7 @@ class NetworkDatabaseReader internal constructor(
 
     private fun logInferredPhases(
         normalInferredPhases: Collection<PhaseInferrer.InferredPhase>,
-        currentInferredPhases: Collection<PhaseInferrer.InferredPhase>
+        currentInferredPhases: Collection<PhaseInferrer.InferredPhase>,
     ) {
         val inferredPhases = normalInferredPhases.associateBy { it.conductingEquipment }.toMutableMap()
         currentInferredPhases.forEach {

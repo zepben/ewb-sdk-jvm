@@ -10,6 +10,8 @@
   * `UUID`
   * `TIMESTAMP`
   * `BYTES`
+* Added support for variants to `EwbDataFilePaths`. You can now provide a variant name to `EwbDataFilePaths.resolve` to generate a variant filename, and call
+  `getAvailableVariantsFor` to get the list of available variants for a specified date.
 
 ### Enhancements
 * None.

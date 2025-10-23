@@ -21,8 +21,8 @@ import com.zepben.ewb.database.sqlite.common.SqliteTable
 @Suppress("PropertyName")
 class TableEndDevicesEndDeviceFunctions : SqliteTable() {
 
-    val END_DEVICE_MRID: Column = Column(++columnIndex, "end_device_mrid", "TEXT", NOT_NULL)
-    val END_DEVICE_FUNCTION_MRID: Column = Column(++columnIndex, "end_device_function_mrid", "TEXT", NOT_NULL)
+    val END_DEVICE_MRID: Column = Column(++columnIndex, "end_device_mrid", Column.Type.STRING, NOT_NULL)
+    val END_DEVICE_FUNCTION_MRID: Column = Column(++columnIndex, "end_device_function_mrid", Column.Type.STRING, NOT_NULL)
 
     override val name: String = "end_devices_end_device_functions"
 

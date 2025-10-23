@@ -15,10 +15,10 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61968.assets.TableAssetInfo
 @Suppress("PropertyName")
 class TableShuntCompensatorInfo : TableAssetInfo() {
 
-    val MAX_POWER_LOSS: Column = Column(++columnIndex, "max_power_loss", "INTEGER", NULL)
-    val RATED_CURRENT: Column = Column(++columnIndex, "rated_current", "INTEGER", NULL)
-    val RATED_REACTIVE_POWER: Column = Column(++columnIndex, "rated_reactive_power", "INTEGER", NULL)
-    val RATED_VOLTAGE: Column = Column(++columnIndex, "rated_voltage", "INTEGER", NULL)
+    val MAX_POWER_LOSS: Column = Column(++columnIndex, "max_power_loss", Column.Type.INTEGER, NULL)
+    val RATED_CURRENT: Column = Column(++columnIndex, "rated_current", Column.Type.INTEGER, NULL)
+    val RATED_REACTIVE_POWER: Column = Column(++columnIndex, "rated_reactive_power", Column.Type.INTEGER, NULL)
+    val RATED_VOLTAGE: Column = Column(++columnIndex, "rated_voltage", Column.Type.INTEGER, NULL)
 
     override val name: String = "shunt_compensator_info"
 

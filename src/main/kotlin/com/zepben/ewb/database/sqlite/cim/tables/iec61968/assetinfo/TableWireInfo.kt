@@ -16,7 +16,7 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61968.assets.TableAssetInfo
 @Suppress("PropertyName")
 abstract class TableWireInfo : TableAssetInfo() {
 
-    val RATED_CURRENT: Column = Column(++columnIndex, "rated_current", "NUMBER", NULL)
-    val MATERIAL: Column = Column(++columnIndex, "material", "TEXT", NOT_NULL)
+    val RATED_CURRENT: Column = Column(++columnIndex, "rated_current", Column.Type.DOUBLE, NULL)
+    val MATERIAL: Column = Column(++columnIndex, "material", Column.Type.STRING, NOT_NULL)
 
 }

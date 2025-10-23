@@ -15,13 +15,13 @@ import com.zepben.ewb.database.sql.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TableEnergyConsumers : TableEnergyConnections() {
 
-    val CUSTOMER_COUNT: Column = Column(++columnIndex, "customer_count", "INTEGER", NULL)
-    val GROUNDED: Column = Column(++columnIndex, "grounded", "BOOLEAN", NULL)
-    val P: Column = Column(++columnIndex, "p", "NUMBER", NULL)
-    val Q: Column = Column(++columnIndex, "q", "NUMBER", NULL)
-    val P_FIXED: Column = Column(++columnIndex, "p_fixed", "NUMBER", NULL)
-    val Q_FIXED: Column = Column(++columnIndex, "q_fixed", "NUMBER", NULL)
-    val PHASE_CONNECTION: Column = Column(++columnIndex, "phase_connection", "TEXT", NOT_NULL)
+    val CUSTOMER_COUNT: Column = Column(++columnIndex, "customer_count", Column.Type.INTEGER, NULL)
+    val GROUNDED: Column = Column(++columnIndex, "grounded", Column.Type.BOOLEAN, NULL)
+    val P: Column = Column(++columnIndex, "p", Column.Type.DOUBLE, NULL)
+    val Q: Column = Column(++columnIndex, "q", Column.Type.DOUBLE, NULL)
+    val P_FIXED: Column = Column(++columnIndex, "p_fixed", Column.Type.DOUBLE, NULL)
+    val Q_FIXED: Column = Column(++columnIndex, "q_fixed", Column.Type.DOUBLE, NULL)
+    val PHASE_CONNECTION: Column = Column(++columnIndex, "phase_connection", Column.Type.STRING, NOT_NULL)
 
     override val name: String = "energy_consumers"
 

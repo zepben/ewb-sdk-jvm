@@ -21,8 +21,8 @@ import com.zepben.ewb.database.sqlite.common.SqliteTable
 @Suppress("PropertyName")
 class TableAssetOrganisationRolesAssets : SqliteTable() {
 
-    val ASSET_ORGANISATION_ROLE_MRID: Column = Column(++columnIndex, "asset_organisation_role_mrid", "TEXT", NOT_NULL)
-    val ASSET_MRID: Column = Column(++columnIndex, "asset_mrid", "TEXT", NOT_NULL)
+    val ASSET_ORGANISATION_ROLE_MRID: Column = Column(++columnIndex, "asset_organisation_role_mrid", Column.Type.STRING, NOT_NULL)
+    val ASSET_MRID: Column = Column(++columnIndex, "asset_mrid", Column.Type.STRING, NOT_NULL)
 
     override val name: String = "asset_organisation_roles_assets"
 

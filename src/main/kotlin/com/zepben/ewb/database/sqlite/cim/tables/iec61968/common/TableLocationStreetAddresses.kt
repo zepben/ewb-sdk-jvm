@@ -14,8 +14,8 @@ import com.zepben.ewb.database.sql.Column.Nullable.NOT_NULL
 @Suppress("PropertyName")
 class TableLocationStreetAddresses : TableStreetAddresses() {
 
-    val LOCATION_MRID: Column = Column(++columnIndex, "location_mrid", "TEXT", NOT_NULL)
-    val ADDRESS_FIELD: Column = Column(++columnIndex, "address_field", "TEXT", NOT_NULL)
+    val LOCATION_MRID: Column = Column(++columnIndex, "location_mrid", Column.Type.STRING, NOT_NULL)
+    val ADDRESS_FIELD: Column = Column(++columnIndex, "address_field", Column.Type.STRING, NOT_NULL)
 
     override val name: String = "location_street_addresses"
 

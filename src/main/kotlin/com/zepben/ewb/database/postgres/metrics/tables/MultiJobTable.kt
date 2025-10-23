@@ -18,6 +18,6 @@ import com.zepben.ewb.database.sql.Column.Nullable.NOT_NULL
 @Suppress("PropertyName")
 abstract class MultiJobTable : PostgresTable() {
 
-    val JOB_ID: Column = Column(++columnIndex, "job_id", "UUID", NOT_NULL)
+    val JOB_ID: Column = Column(++columnIndex, "job_id", Column.Type.UUID, NOT_NULL)
 
 }

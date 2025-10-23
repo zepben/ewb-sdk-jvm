@@ -15,8 +15,8 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.core.TableIdentif
 @Suppress("PropertyName")
 class TableDiagrams : TableIdentifiedObjects() {
 
-    val DIAGRAM_STYLE: Column = Column(++columnIndex, "diagram_style", "TEXT", NOT_NULL)
-    val ORIENTATION_KIND: Column = Column(++columnIndex, "orientation_kind", "TEXT", NOT_NULL)
+    val DIAGRAM_STYLE: Column = Column(++columnIndex, "diagram_style", Column.Type.STRING, NOT_NULL)
+    val ORIENTATION_KIND: Column = Column(++columnIndex, "orientation_kind", Column.Type.STRING, NOT_NULL)
 
     override val name: String = "diagrams"
 

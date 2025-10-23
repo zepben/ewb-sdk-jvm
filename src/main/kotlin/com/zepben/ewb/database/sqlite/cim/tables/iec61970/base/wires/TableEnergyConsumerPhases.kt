@@ -16,12 +16,12 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.core.TablePowerSy
 @Suppress("PropertyName")
 class TableEnergyConsumerPhases : TablePowerSystemResources() {
 
-    val ENERGY_CONSUMER_MRID: Column = Column(++columnIndex, "energy_consumer_mrid", "TEXT", NOT_NULL)
-    val PHASE: Column = Column(++columnIndex, "phase", "TEXT", NOT_NULL)
-    val P: Column = Column(++columnIndex, "p", "NUMBER", NULL)
-    val Q: Column = Column(++columnIndex, "q", "NUMBER", NULL)
-    val P_FIXED: Column = Column(++columnIndex, "p_fixed", "NUMBER", NULL)
-    val Q_FIXED: Column = Column(++columnIndex, "q_fixed", "NUMBER", NULL)
+    val ENERGY_CONSUMER_MRID: Column = Column(++columnIndex, "energy_consumer_mrid", Column.Type.STRING, NOT_NULL)
+    val PHASE: Column = Column(++columnIndex, "phase", Column.Type.STRING, NOT_NULL)
+    val P: Column = Column(++columnIndex, "p", Column.Type.DOUBLE, NULL)
+    val Q: Column = Column(++columnIndex, "q", Column.Type.DOUBLE, NULL)
+    val P_FIXED: Column = Column(++columnIndex, "p_fixed", Column.Type.DOUBLE, NULL)
+    val Q_FIXED: Column = Column(++columnIndex, "q_fixed", Column.Type.DOUBLE, NULL)
 
     override val name: String = "energy_consumer_phases"
 

@@ -15,8 +15,8 @@ import com.zepben.ewb.database.sql.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TablePotentialTransformers : TableSensors() {
 
-    val POTENTIAL_TRANSFORMER_INFO_MRID: Column = Column(++columnIndex, "potential_transformer_info_mrid", "TEXT", NULL)
-    val TYPE: Column = Column(++columnIndex, "type", "TEXT", NOT_NULL)
+    val POTENTIAL_TRANSFORMER_INFO_MRID: Column = Column(++columnIndex, "potential_transformer_info_mrid", Column.Type.STRING, NULL)
+    val TYPE: Column = Column(++columnIndex, "type", Column.Type.STRING, NOT_NULL)
 
     override val name: String = "potential_transformers"
 

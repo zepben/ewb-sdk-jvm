@@ -21,8 +21,8 @@ import com.zepben.ewb.database.sqlite.common.SqliteTable
 @Suppress("PropertyName")
 class TablePricingStructuresTariffs : SqliteTable() {
 
-    val PRICING_STRUCTURE_MRID: Column = Column(++columnIndex, "pricing_structure_mrid", "TEXT", NOT_NULL)
-    val TARIFF_MRID: Column = Column(++columnIndex, "tariff_mrid", "TEXT", NOT_NULL)
+    val PRICING_STRUCTURE_MRID: Column = Column(++columnIndex, "pricing_structure_mrid", Column.Type.STRING, NOT_NULL)
+    val TARIFF_MRID: Column = Column(++columnIndex, "tariff_mrid", Column.Type.STRING, NOT_NULL)
 
     override val name: String = "pricing_structures_tariffs"
 

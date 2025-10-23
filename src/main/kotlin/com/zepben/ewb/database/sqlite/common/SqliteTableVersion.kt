@@ -19,7 +19,7 @@ import com.zepben.ewb.database.sql.TableVersion
  */
 class SqliteTableVersion(override val supportedVersion: Int) : TableVersion, SqliteTable() {
 
-    override val VERSION: Column = Column(++columnIndex, "version", "TEXT", NOT_NULL)
+    override val VERSION: Column = Column(++columnIndex, "version", Column.Type.STRING, NOT_NULL)
 
     override val name: String = "version"
 

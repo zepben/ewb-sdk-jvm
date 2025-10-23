@@ -15,7 +15,7 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.core.TableIdentif
 @Suppress("PropertyName")
 class TableProtectionRelaySchemes : TableIdentifiedObjects() {
 
-    val SYSTEM_MRID: Column = Column(++columnIndex, "system_mrid", "TEXT", NULL)
+    val SYSTEM_MRID: Column = Column(++columnIndex, "system_mrid", Column.Type.STRING, NULL)
 
     override val name: String = "protection_relay_schemes"
 

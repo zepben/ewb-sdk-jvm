@@ -25,11 +25,11 @@ import com.zepben.ewb.database.sqlite.common.SqliteTable
 @Suppress("PropertyName")
 class TableCurveData : SqliteTable() {
 
-    val CURVE_MRID: Column = Column(++columnIndex, "curve_mrid", "TEXT", NOT_NULL)
-    val X_VALUE: Column = Column(++columnIndex, "x_value", "NUMBER", NOT_NULL)
-    val Y1_VALUE: Column = Column(++columnIndex, "y1_value", "NUMBER", NOT_NULL)
-    val Y2_VALUE: Column = Column(++columnIndex, "y2_value", "NUMBER", NULL)
-    val Y3_VALUE: Column = Column(++columnIndex, "y3_value", "NUMBER", NULL)
+    val CURVE_MRID: Column = Column(++columnIndex, "curve_mrid", Column.Type.STRING, NOT_NULL)
+    val X_VALUE: Column = Column(++columnIndex, "x_value", Column.Type.DOUBLE, NOT_NULL)
+    val Y1_VALUE: Column = Column(++columnIndex, "y1_value", Column.Type.DOUBLE, NOT_NULL)
+    val Y2_VALUE: Column = Column(++columnIndex, "y2_value", Column.Type.DOUBLE, NULL)
+    val Y3_VALUE: Column = Column(++columnIndex, "y3_value", Column.Type.DOUBLE, NULL)
 
     override val name: String = "curve_data"
 

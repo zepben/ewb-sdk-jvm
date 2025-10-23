@@ -15,7 +15,7 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.core.TableEquipme
 @Suppress("PropertyName")
 class TableProtectionRelaySystems : TableEquipment() {
 
-    val PROTECTION_KIND: Column = Column(++columnIndex, "protection_kind", "TEXT", NOT_NULL)
+    val PROTECTION_KIND: Column = Column(++columnIndex, "protection_kind", Column.Type.STRING, NOT_NULL)
 
     override val name: String = "protection_relay_systems"
 

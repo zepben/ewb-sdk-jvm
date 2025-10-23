@@ -16,12 +16,12 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.core.TablePowerSy
 @Suppress("PropertyName")
 abstract class TableProtectionRelayFunctions : TablePowerSystemResources() {
 
-    val MODEL: Column = Column(++columnIndex, "model", "TEXT", NULL)
-    val RECLOSING: Column = Column(++columnIndex, "reclosing", "BOOLEAN", NULL)
-    val RELAY_DELAY_TIME: Column = Column(++columnIndex, "relay_delay_time", "NUMBER", NULL)
-    val PROTECTION_KIND: Column = Column(++columnIndex, "protection_kind", "TEXT", NOT_NULL)
-    val DIRECTABLE: Column = Column(++columnIndex, "directable", "BOOLEAN", NULL)
-    val POWER_DIRECTION: Column = Column(++columnIndex, "power_direction", "TEXT", NOT_NULL)
-    val RELAY_INFO_MRID: Column = Column(++columnIndex, "relay_info_mrid", "TEXT", NULL)
+    val MODEL: Column = Column(++columnIndex, "model", Column.Type.STRING, NULL)
+    val RECLOSING: Column = Column(++columnIndex, "reclosing", Column.Type.BOOLEAN, NULL)
+    val RELAY_DELAY_TIME: Column = Column(++columnIndex, "relay_delay_time", Column.Type.DOUBLE, NULL)
+    val PROTECTION_KIND: Column = Column(++columnIndex, "protection_kind", Column.Type.STRING, NOT_NULL)
+    val DIRECTABLE: Column = Column(++columnIndex, "directable", Column.Type.BOOLEAN, NULL)
+    val POWER_DIRECTION: Column = Column(++columnIndex, "power_direction", Column.Type.STRING, NOT_NULL)
+    val RELAY_INFO_MRID: Column = Column(++columnIndex, "relay_info_mrid", Column.Type.STRING, NULL)
 
 }

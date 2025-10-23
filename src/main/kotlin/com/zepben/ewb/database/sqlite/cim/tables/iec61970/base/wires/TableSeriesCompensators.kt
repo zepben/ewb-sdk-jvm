@@ -15,12 +15,12 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.core.TableConduct
 @Suppress("PropertyName")
 class TableSeriesCompensators : TableConductingEquipment() {
 
-    val R: Column = Column(++columnIndex, "r", "NUMBER", NULL)
-    val R0: Column = Column(++columnIndex, "r0", "NUMBER", NULL)
-    val X: Column = Column(++columnIndex, "x", "NUMBER", NULL)
-    val X0: Column = Column(++columnIndex, "x0", "NUMBER", NULL)
-    val VARISTOR_RATED_CURRENT: Column = Column(++columnIndex, "varistor_rated_current", "INTEGER", NULL)
-    val VARISTOR_VOLTAGE_THRESHOLD: Column = Column(++columnIndex, "varistor_voltage_threshold", "INTEGER", NULL)
+    val R: Column = Column(++columnIndex, "r", Column.Type.DOUBLE, NULL)
+    val R0: Column = Column(++columnIndex, "r0", Column.Type.DOUBLE, NULL)
+    val X: Column = Column(++columnIndex, "x", Column.Type.DOUBLE, NULL)
+    val X0: Column = Column(++columnIndex, "x0", Column.Type.DOUBLE, NULL)
+    val VARISTOR_RATED_CURRENT: Column = Column(++columnIndex, "varistor_rated_current", Column.Type.INTEGER, NULL)
+    val VARISTOR_VOLTAGE_THRESHOLD: Column = Column(++columnIndex, "varistor_voltage_threshold", Column.Type.INTEGER, NULL)
 
     override val name: String = "series_compensators"
 

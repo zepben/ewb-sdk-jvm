@@ -16,10 +16,10 @@ import com.zepben.ewb.database.sqlite.common.SqliteTable
 @Suppress("PropertyName")
 abstract class TableIdentifiedObjects : SqliteTable() {
 
-    val MRID: Column = Column(++columnIndex, "mrid", "TEXT", NOT_NULL)
-    val NAME: Column = Column(++columnIndex, "name", "TEXT", NULL)
-    val DESCRIPTION: Column = Column(++columnIndex, "description", "TEXT", NULL)
-    val NUM_DIAGRAM_OBJECTS: Column = Column(++columnIndex, "num_diagram_objects", "INTEGER", NULL)
+    val MRID: Column = Column(++columnIndex, "mrid", Column.Type.STRING, NOT_NULL)
+    val NAME: Column = Column(++columnIndex, "name", Column.Type.STRING, NULL)
+    val DESCRIPTION: Column = Column(++columnIndex, "description", Column.Type.STRING, NULL)
+    val NUM_DIAGRAM_OBJECTS: Column = Column(++columnIndex, "num_diagram_objects", Column.Type.INTEGER, NULL)
 
     init {
         addUniqueIndexes(

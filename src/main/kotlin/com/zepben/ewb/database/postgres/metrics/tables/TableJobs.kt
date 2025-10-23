@@ -14,10 +14,10 @@ import com.zepben.ewb.database.sql.Column.Nullable.NOT_NULL
 @Suppress("PropertyName")
 class TableJobs : MultiJobTable() {
 
-    val INGEST_TIME: Column = Column(++columnIndex, "ingest_time", "TIMESTAMP", NOT_NULL)
-    val SOURCE: Column = Column(++columnIndex, "source", "TEXT", NOT_NULL)
-    val APPLICATION: Column = Column(++columnIndex, "application", "TEXT", NOT_NULL)
-    val APPLICATION_VERSION: Column = Column(++columnIndex, "application_version", "TEXT", NOT_NULL)
+    val INGEST_TIME: Column = Column(++columnIndex, "ingest_time", Column.Type.TIMESTAMP, NOT_NULL)
+    val SOURCE: Column = Column(++columnIndex, "source", Column.Type.STRING, NOT_NULL)
+    val APPLICATION: Column = Column(++columnIndex, "application", Column.Type.STRING, NOT_NULL)
+    val APPLICATION_VERSION: Column = Column(++columnIndex, "application_version", Column.Type.STRING, NOT_NULL)
 
     override val name: String = "jobs"
 

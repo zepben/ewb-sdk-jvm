@@ -15,7 +15,7 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.wires.TableLines
 @Suppress("PropertyName")
 class TableCircuits : TableLines() {
 
-    val LOOP_MRID: Column = Column(++columnIndex, "loop_mrid", "TEXT", NULL)
+    val LOOP_MRID: Column = Column(++columnIndex, "loop_mrid", Column.Type.STRING, NULL)
 
     override val name: String = "circuits"
 

@@ -14,8 +14,8 @@ import com.zepben.ewb.database.sql.Column.Nullable.NULL
 @Suppress("PropertyName")
 abstract class TableEquipment : TablePowerSystemResources() {
 
-    val NORMALLY_IN_SERVICE: Column = Column(++columnIndex, "normally_in_service", "BOOLEAN")
-    val IN_SERVICE: Column = Column(++columnIndex, "in_service", "BOOLEAN")
-    val COMMISSIONED_DATE: Column = Column(++columnIndex, "commissioned_date", "TEXT", NULL)
+    val NORMALLY_IN_SERVICE: Column = Column(++columnIndex, "normally_in_service", Column.Type.BOOLEAN, NULL)
+    val IN_SERVICE: Column = Column(++columnIndex, "in_service", Column.Type.BOOLEAN, NULL)
+    val COMMISSIONED_DATE: Column = Column(++columnIndex, "commissioned_date", Column.Type.STRING, NULL)
 
 }

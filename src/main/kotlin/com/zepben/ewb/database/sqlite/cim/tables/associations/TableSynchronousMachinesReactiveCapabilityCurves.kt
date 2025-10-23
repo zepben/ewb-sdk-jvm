@@ -21,8 +21,8 @@ import com.zepben.ewb.database.sqlite.common.SqliteTable
 @Suppress("PropertyName")
 class TableSynchronousMachinesReactiveCapabilityCurves : SqliteTable() {
 
-    val SYNCHRONOUS_MACHINE_MRID: Column = Column(++columnIndex, "synchronous_machine_mrid", "TEXT", NOT_NULL)
-    val REACTIVE_CAPABILITY_CURVE_MRID: Column = Column(++columnIndex, "reactive_capability_curve_mrid", "TEXT", NOT_NULL)
+    val SYNCHRONOUS_MACHINE_MRID: Column = Column(++columnIndex, "synchronous_machine_mrid", Column.Type.STRING, NOT_NULL)
+    val REACTIVE_CAPABILITY_CURVE_MRID: Column = Column(++columnIndex, "reactive_capability_curve_mrid", Column.Type.STRING, NOT_NULL)
 
     override val name: String = "synchronous_machines_reactive_capability_curves"
 

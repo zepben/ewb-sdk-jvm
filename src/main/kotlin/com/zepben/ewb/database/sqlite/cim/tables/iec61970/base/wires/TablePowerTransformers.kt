@@ -16,11 +16,11 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.core.TableConduct
 @Suppress("PropertyName")
 class TablePowerTransformers : TableConductingEquipment() {
 
-    val VECTOR_GROUP: Column = Column(++columnIndex, "vector_group", "TEXT", NOT_NULL)
-    val TRANSFORMER_UTILISATION: Column = Column(++columnIndex, "transformer_utilisation", "NUMBER", NULL)
-    val CONSTRUCTION_KIND: Column = Column(++columnIndex, "construction_kind", "TEXT", NOT_NULL)
-    val FUNCTION: Column = Column(++columnIndex, "function", "TEXT", NOT_NULL)
-    val POWER_TRANSFORMER_INFO_MRID: Column = Column(++columnIndex, "power_transformer_info_mrid", "TEXT", NULL)
+    val VECTOR_GROUP: Column = Column(++columnIndex, "vector_group", Column.Type.STRING, NOT_NULL)
+    val TRANSFORMER_UTILISATION: Column = Column(++columnIndex, "transformer_utilisation", Column.Type.DOUBLE, NULL)
+    val CONSTRUCTION_KIND: Column = Column(++columnIndex, "construction_kind", Column.Type.STRING, NOT_NULL)
+    val FUNCTION: Column = Column(++columnIndex, "function", Column.Type.STRING, NOT_NULL)
+    val POWER_TRANSFORMER_INFO_MRID: Column = Column(++columnIndex, "power_transformer_info_mrid", Column.Type.STRING, NULL)
 
     override val name: String = "power_transformers"
 

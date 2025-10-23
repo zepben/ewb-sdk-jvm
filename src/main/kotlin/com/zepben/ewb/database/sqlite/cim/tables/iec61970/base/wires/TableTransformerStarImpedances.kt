@@ -15,11 +15,11 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.core.TableIdentif
 @Suppress("PropertyName")
 class TableTransformerStarImpedances : TableIdentifiedObjects() {
 
-    val R: Column = Column(++columnIndex, "R", "NUMBER", NULL)
-    val R0: Column = Column(++columnIndex, "R0", "NUMBER", NULL)
-    val X: Column = Column(++columnIndex, "X", "NUMBER", NULL)
-    val X0: Column = Column(++columnIndex, "X0", "NUMBER", NULL)
-    val TRANSFORMER_END_INFO_MRID: Column = Column(++columnIndex, "transformer_end_info_mrid", "TEXT", NULL)
+    val R: Column = Column(++columnIndex, "R", Column.Type.DOUBLE, NULL)
+    val R0: Column = Column(++columnIndex, "R0", Column.Type.DOUBLE, NULL)
+    val X: Column = Column(++columnIndex, "X", Column.Type.DOUBLE, NULL)
+    val X0: Column = Column(++columnIndex, "X0", Column.Type.DOUBLE, NULL)
+    val TRANSFORMER_END_INFO_MRID: Column = Column(++columnIndex, "transformer_end_info_mrid", Column.Type.STRING, NULL)
 
     override val name: String = "transformer_star_impedances"
 

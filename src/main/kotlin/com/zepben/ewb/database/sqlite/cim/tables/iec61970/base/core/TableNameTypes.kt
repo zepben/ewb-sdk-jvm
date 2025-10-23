@@ -16,8 +16,8 @@ import com.zepben.ewb.database.sqlite.common.SqliteTable
 @Suppress("PropertyName")
 class TableNameTypes : SqliteTable() {
 
-    val NAME: Column = Column(++columnIndex, "name", "TEXT", NOT_NULL)
-    val DESCRIPTION: Column = Column(++columnIndex, "description", "TEXT", NULL)
+    val NAME: Column = Column(++columnIndex, "name", Column.Type.STRING, NOT_NULL)
+    val DESCRIPTION: Column = Column(++columnIndex, "description", Column.Type.STRING, NULL)
 
     override val name: String = "name_types"
 

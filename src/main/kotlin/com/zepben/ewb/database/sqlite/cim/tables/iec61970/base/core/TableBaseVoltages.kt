@@ -14,7 +14,7 @@ import com.zepben.ewb.database.sql.Column.Nullable.NOT_NULL
 @Suppress("PropertyName")
 class TableBaseVoltages : TableIdentifiedObjects() {
 
-    val NOMINAL_VOLTAGE: Column = Column(++columnIndex, "nominal_voltage", "INTEGER", NOT_NULL)
+    val NOMINAL_VOLTAGE: Column = Column(++columnIndex, "nominal_voltage", Column.Type.INTEGER, NOT_NULL)
 
     override val name: String = "base_voltages"
 

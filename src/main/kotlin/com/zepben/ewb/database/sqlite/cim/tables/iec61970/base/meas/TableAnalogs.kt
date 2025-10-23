@@ -14,7 +14,7 @@ import com.zepben.ewb.database.sql.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TableAnalogs : TableMeasurements() {
 
-    val POSITIVE_FLOW_IN: Column = Column(++columnIndex, "positive_flow_in", "BOOLEAN", NULL)
+    val POSITIVE_FLOW_IN: Column = Column(++columnIndex, "positive_flow_in", Column.Type.BOOLEAN, NULL)
 
     override val name: String = "analogs"
 

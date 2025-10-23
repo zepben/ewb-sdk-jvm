@@ -15,9 +15,9 @@ import com.zepben.ewb.database.sqlite.common.SqliteTable
 @Suppress("PropertyName")
 class TablePowerTransformerEndRatings : SqliteTable() {
 
-    val POWER_TRANSFORMER_END_MRID: Column = Column(++columnIndex, "power_transformer_end_mrid", "TEXT", NOT_NULL)
-    val COOLING_TYPE: Column = Column(++columnIndex, "cooling_type", "TEXT", NOT_NULL)
-    val RATED_S: Column = Column(++columnIndex, "rated_s", "INTEGER", NOT_NULL)
+    val POWER_TRANSFORMER_END_MRID: Column = Column(++columnIndex, "power_transformer_end_mrid", Column.Type.STRING, NOT_NULL)
+    val COOLING_TYPE: Column = Column(++columnIndex, "cooling_type", Column.Type.STRING, NOT_NULL)
+    val RATED_S: Column = Column(++columnIndex, "rated_s", Column.Type.INTEGER, NOT_NULL)
 
     override val name: String = "power_transformer_end_ratings"
 

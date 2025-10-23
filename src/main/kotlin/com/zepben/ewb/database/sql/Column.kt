@@ -16,66 +16,76 @@ package com.zepben.ewb.database.sql
  * @property type The data type of column. Supported data types depend on the implementation of SQL of being targeted (e.g. Postgres).
  * @property nullable How the nullability of the column is specified when creating the table.
  */
-class Column @Deprecated("Use the `Type` variant of the constructor instead.") internal constructor(
+class Column internal constructor(
     val queryIndex: Int,
     val name: String,
-    val type: String,
-    val nullable: Nullable = Nullable.NONE
+    val type: Type,
+    val nullable: Nullable
 ) {
-
-    @Suppress("DEPRECATION")
-    internal constructor(
-        queryIndex: Int,
-        name: String,
-        type: Type,
-        nullable: Nullable = Nullable.NONE
-    ) : this(queryIndex, name, type.sqlite, nullable)
 
     /**
      * Ways of specifying whether a column is nullable.
+     *
+     * @property sqlite The nullability definition for the column when creating it in Sqlite.
+     * @property postgres The nullability definition for the column when creating it in Postgres.
      */
-    enum class Nullable {
-        /**
-         * Nullability is left unspecified, which should default to nullable in every ANSI-compliant implementation of SQL.
-         */
-        NONE,
+    enum class Nullable(val sqlite: String, val postgres: String) {
 
         /**
          * Column is specified with the NOT NULL constraint.
          */
-        NOT_NULL,
+        NOT_NULL(sqlite = "NOT NULL", postgres = "NOT NULL"),
 
         /**
          * Column is explicitly nullable via the NULL constraint.
          */
-        NULL
+        NULL(sqlite = "NULL", postgres = "NULL")
+
     }
 
     /**
      * Ways of specifying the columns data type.
      *
      * @property sqlite The type definition for the column when creating it in Sqlite.
+     * @property postgres The type definition for the column when creating it in Postgres.
      */
-    enum class Type(val sqlite: String) {
+    enum class Type(val sqlite: String, val postgres: String) {
+
         /**
          * The column stores a string.
          */
-        STRING(sqlite = "TEXT"),
+        STRING(sqlite = "TEXT", postgres = "TEXT"),
 
         /**
          * The column stores an integer.
          */
-        INTEGER(sqlite = "INTEGER"),
+        INTEGER(sqlite = "INTEGER", postgres = "INTEGER"),
 
         /**
          * The column stores a double.
          */
-        DOUBLE(sqlite = "NUMBER"),
+        DOUBLE(sqlite = "NUMBER", postgres = "DOUBLE PRECISION"),
 
         /**
          * The column stores a boolean.
          */
-        BOOLEAN(sqlite = "BOOLEAN"),
+        BOOLEAN(sqlite = "BOOLEAN", postgres = "BOOLEAN"),
+
+        /**
+         * The column stores a UUID.
+         */
+        UUID(sqlite = "TEXT", postgres = "UUID"),
+
+        /**
+         * The column stores a TIMESTAMP.
+         */
+        TIMESTAMP(sqlite = "TEXT", postgres = "TIMESTAMP"),
+
+        /**
+         * The column stores a BYTEA.
+         */
+        BYTES(sqlite = "BLOB", postgres = "BYTEA"),
+
     }
 
     init {

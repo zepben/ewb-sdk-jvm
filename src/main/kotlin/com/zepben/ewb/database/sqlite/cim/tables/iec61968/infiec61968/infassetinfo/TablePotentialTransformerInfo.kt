@@ -15,13 +15,13 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61968.assets.TableAssetInfo
 @Suppress("PropertyName")
 class TablePotentialTransformerInfo : TableAssetInfo() {
 
-    val ACCURACY_CLASS: Column = Column(++columnIndex, "accuracy_class", "TEXT", NULL)
-    val NOMINAL_RATIO_DENOMINATOR: Column = Column(++columnIndex, "nominal_ratio_denominator", "NUMBER", NULL)
-    val NOMINAL_RATIO_NUMERATOR: Column = Column(++columnIndex, "nominal_ratio_numerator", "NUMBER", NULL)
-    val PRIMARY_RATIO: Column = Column(++columnIndex, "primary_ratio", "NUMBER", NULL)
-    val PT_CLASS: Column = Column(++columnIndex, "pt_class", "TEXT", NULL)
-    val RATED_VOLTAGE: Column = Column(++columnIndex, "rated_voltage", "INTEGER", NULL)
-    val SECONDARY_RATIO: Column = Column(++columnIndex, "secondary_ratio", "NUMBER", NULL)
+    val ACCURACY_CLASS: Column = Column(++columnIndex, "accuracy_class", Column.Type.STRING, NULL)
+    val NOMINAL_RATIO_DENOMINATOR: Column = Column(++columnIndex, "nominal_ratio_denominator", Column.Type.DOUBLE, NULL)
+    val NOMINAL_RATIO_NUMERATOR: Column = Column(++columnIndex, "nominal_ratio_numerator", Column.Type.DOUBLE, NULL)
+    val PRIMARY_RATIO: Column = Column(++columnIndex, "primary_ratio", Column.Type.DOUBLE, NULL)
+    val PT_CLASS: Column = Column(++columnIndex, "pt_class", Column.Type.STRING, NULL)
+    val RATED_VOLTAGE: Column = Column(++columnIndex, "rated_voltage", Column.Type.INTEGER, NULL)
+    val SECONDARY_RATIO: Column = Column(++columnIndex, "secondary_ratio", Column.Type.DOUBLE, NULL)
 
     override val name: String = "potential_transformer_info"
 

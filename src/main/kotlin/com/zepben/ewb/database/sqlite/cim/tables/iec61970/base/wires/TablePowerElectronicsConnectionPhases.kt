@@ -16,10 +16,10 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.core.TablePowerSy
 @Suppress("PropertyName")
 class TablePowerElectronicsConnectionPhases : TablePowerSystemResources() {
 
-    val POWER_ELECTRONICS_CONNECTION_MRID: Column = Column(++columnIndex, "power_electronics_connection_mrid", "TEXT", NULL)
-    val P: Column = Column(++columnIndex, "p", "NUMBER", NULL)
-    val PHASE: Column = Column(++columnIndex, "phase", "TEXT", NOT_NULL)
-    val Q: Column = Column(++columnIndex, "q", "NUMBER", NULL)
+    val POWER_ELECTRONICS_CONNECTION_MRID: Column = Column(++columnIndex, "power_electronics_connection_mrid", Column.Type.STRING, NULL)
+    val P: Column = Column(++columnIndex, "p", Column.Type.DOUBLE, NULL)
+    val PHASE: Column = Column(++columnIndex, "phase", Column.Type.STRING, NOT_NULL)
+    val Q: Column = Column(++columnIndex, "q", Column.Type.DOUBLE, NULL)
 
     override val name: String = "power_electronics_connection_phases"
 

@@ -15,9 +15,9 @@ import com.zepben.ewb.database.sql.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TableJobSources : MultiJobTable() {
 
-    val DATA_SOURCE: Column = Column(++columnIndex, "data_source", "TEXT", NOT_NULL)
-    val SOURCE_TIME: Column = Column(++columnIndex, "source_time", "TIMESTAMP", NULL)
-    val FILE_SHA: Column = Column(++columnIndex, "file_sha", "BYTEA", NULL)
+    val DATA_SOURCE: Column = Column(++columnIndex, "data_source", Column.Type.STRING, NOT_NULL)
+    val SOURCE_TIME: Column = Column(++columnIndex, "source_time", Column.Type.TIMESTAMP, NULL)
+    val FILE_SHA: Column = Column(++columnIndex, "file_sha", Column.Type.BYTES, NULL)
 
     override val name: String = "job_sources"
 

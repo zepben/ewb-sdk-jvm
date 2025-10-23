@@ -21,8 +21,8 @@ import com.zepben.ewb.database.sqlite.common.SqliteTable
 @Suppress("PropertyName")
 class TableEquipmentOperationalRestrictions : SqliteTable() {
 
-    val EQUIPMENT_MRID: Column = Column(++columnIndex, "equipment_mrid", "TEXT", NOT_NULL)
-    val OPERATIONAL_RESTRICTION_MRID: Column = Column(++columnIndex, "operational_restriction_mrid", "TEXT", NOT_NULL)
+    val EQUIPMENT_MRID: Column = Column(++columnIndex, "equipment_mrid", Column.Type.STRING, NOT_NULL)
+    val OPERATIONAL_RESTRICTION_MRID: Column = Column(++columnIndex, "operational_restriction_mrid", Column.Type.STRING, NOT_NULL)
 
     override val name: String = "equipment_operational_restrictions"
 

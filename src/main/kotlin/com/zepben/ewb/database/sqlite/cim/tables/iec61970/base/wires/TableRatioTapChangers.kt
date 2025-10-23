@@ -14,8 +14,8 @@ import com.zepben.ewb.database.sql.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TableRatioTapChangers : TableTapChangers() {
 
-    val TRANSFORMER_END_MRID: Column = Column(++columnIndex, "transformer_end_mrid", "TEXT", NULL)
-    val STEP_VOLTAGE_INCREMENT: Column = Column(++columnIndex, "step_voltage_increment", "NUMBER", NULL)
+    val TRANSFORMER_END_MRID: Column = Column(++columnIndex, "transformer_end_mrid", Column.Type.STRING, NULL)
+    val STEP_VOLTAGE_INCREMENT: Column = Column(++columnIndex, "step_voltage_increment", Column.Type.DOUBLE, NULL)
 
     override val name: String = "ratio_tap_changers"
 

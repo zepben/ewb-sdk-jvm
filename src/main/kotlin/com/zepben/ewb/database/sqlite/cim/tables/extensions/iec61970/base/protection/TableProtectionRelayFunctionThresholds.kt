@@ -16,11 +16,11 @@ import com.zepben.ewb.database.sqlite.common.SqliteTable
 @Suppress("PropertyName")
 class TableProtectionRelayFunctionThresholds : SqliteTable() {
 
-    val PROTECTION_RELAY_FUNCTION_MRID: Column = Column(++columnIndex, "protection_relay_function_mrid", "TEXT", NOT_NULL)
-    val SEQUENCE_NUMBER: Column = Column(++columnIndex, "sequence_number", "INTEGER", NOT_NULL)
-    val UNIT_SYMBOL: Column = Column(++columnIndex, "unit_symbol", "TEXT", NOT_NULL)
-    val VALUE: Column = Column(++columnIndex, "value", "NUMBER", NOT_NULL)
-    val NAME: Column = Column(++columnIndex, "name", "TEXT", NULL)
+    val PROTECTION_RELAY_FUNCTION_MRID: Column = Column(++columnIndex, "protection_relay_function_mrid", Column.Type.STRING, NOT_NULL)
+    val SEQUENCE_NUMBER: Column = Column(++columnIndex, "sequence_number", Column.Type.INTEGER, NOT_NULL)
+    val UNIT_SYMBOL: Column = Column(++columnIndex, "unit_symbol", Column.Type.STRING, NOT_NULL)
+    val VALUE: Column = Column(++columnIndex, "value", Column.Type.DOUBLE, NOT_NULL)
+    val NAME: Column = Column(++columnIndex, "name", Column.Type.STRING, NULL)
 
     override val name: String = "protection_relay_function_thresholds"
 

@@ -14,7 +14,7 @@ import com.zepben.ewb.database.sql.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TableBreakers : TableProtectedSwitches() {
 
-    val IN_TRANSIT_TIME: Column = Column(++columnIndex, "in_transit_time", "NUMBER", NULL)
+    val IN_TRANSIT_TIME: Column = Column(++columnIndex, "in_transit_time", Column.Type.DOUBLE, NULL)
 
     override val name: String = "breakers"
 

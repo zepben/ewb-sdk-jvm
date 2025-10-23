@@ -20,6 +20,6 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.core.TableConduct
 @Suppress("PropertyName")
 abstract class TableEarthFaultCompensators : TableConductingEquipment() {
 
-    val R: Column = Column(++columnIndex, "r", "NUMBER", NULL)
+    val R: Column = Column(++columnIndex, "r", Column.Type.DOUBLE, NULL)
 
 }

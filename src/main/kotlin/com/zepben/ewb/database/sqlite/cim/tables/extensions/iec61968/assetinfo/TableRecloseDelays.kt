@@ -15,9 +15,9 @@ import com.zepben.ewb.database.sqlite.common.SqliteTable
 @Suppress("PropertyName")
 class TableRecloseDelays : SqliteTable() {
 
-    val RELAY_INFO_MRID: Column = Column(++columnIndex, "relay_info_mrid", "TEXT", NOT_NULL)
-    val RECLOSE_DELAY: Column = Column(++columnIndex, "reclose_delay", "NUMBER", NOT_NULL)
-    val SEQUENCE_NUMBER: Column = Column(++columnIndex, "sequence_number", "INTEGER", NOT_NULL)
+    val RELAY_INFO_MRID: Column = Column(++columnIndex, "relay_info_mrid", Column.Type.STRING, NOT_NULL)
+    val RECLOSE_DELAY: Column = Column(++columnIndex, "reclose_delay", Column.Type.DOUBLE, NOT_NULL)
+    val SEQUENCE_NUMBER: Column = Column(++columnIndex, "sequence_number", Column.Type.INTEGER, NOT_NULL)
 
     override val name: String = "reclose_delays"
 

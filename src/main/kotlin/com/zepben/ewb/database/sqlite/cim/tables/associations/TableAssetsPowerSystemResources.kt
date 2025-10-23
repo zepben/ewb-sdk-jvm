@@ -21,8 +21,8 @@ import com.zepben.ewb.database.sqlite.common.SqliteTable
 @Suppress("PropertyName")
 class TableAssetsPowerSystemResources : SqliteTable() {
 
-    val ASSET_MRID: Column = Column(++columnIndex, "asset_mrid", "TEXT", NOT_NULL)
-    val POWER_SYSTEM_RESOURCE_MRID: Column = Column(++columnIndex, "power_system_resource_mrid", "TEXT", NOT_NULL)
+    val ASSET_MRID: Column = Column(++columnIndex, "asset_mrid", Column.Type.STRING, NOT_NULL)
+    val POWER_SYSTEM_RESOURCE_MRID: Column = Column(++columnIndex, "power_system_resource_mrid", Column.Type.STRING, NOT_NULL)
 
     override val name: String = "assets_power_system_resources"
 

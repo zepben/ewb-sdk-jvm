@@ -15,9 +15,9 @@ import com.zepben.ewb.database.sqlite.common.SqliteTable
 @Suppress("PropertyName")
 class TableNames : SqliteTable() {
 
-    val NAME: Column = Column(++columnIndex, "name", "TEXT", NOT_NULL)
-    val IDENTIFIED_OBJECT_MRID: Column = Column(++columnIndex, "identified_object_mrid", "TEXT", NOT_NULL)
-    val NAME_TYPE_NAME: Column = Column(++columnIndex, "name_type_name", "TEXT", NOT_NULL)
+    val NAME: Column = Column(++columnIndex, "name", Column.Type.STRING, NOT_NULL)
+    val IDENTIFIED_OBJECT_MRID: Column = Column(++columnIndex, "identified_object_mrid", Column.Type.STRING, NOT_NULL)
+    val NAME_TYPE_NAME: Column = Column(++columnIndex, "name_type_name", Column.Type.STRING, NOT_NULL)
 
     override val name: String = "names"
 

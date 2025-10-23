@@ -1,10 +1,15 @@
 # Zepben EWB SDK changelog
 ## [1.2.0] - UNRELEASED
 ### Breaking Changes
-* None.
+* Removed `Column.Nullable.NONE` in favour of setting the column nullability explicitly. Nullability left unspecified should default to nullable in every
+  ANSI-compliant implementation of SQL, so you likely can replace any use with `Column.Nullable.NULL`.
 
 ### New Features
-* None.
+* Added postgres support for `Column.Type`.
+* Added the following new `Column.Type` values:
+  * `UUID`
+  * `TIMESTAMP`
+  * `BYTES`
 
 ### Enhancements
 * None.

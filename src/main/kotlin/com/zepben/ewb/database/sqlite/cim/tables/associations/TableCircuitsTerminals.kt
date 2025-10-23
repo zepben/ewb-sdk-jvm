@@ -21,8 +21,8 @@ import com.zepben.ewb.database.sqlite.common.SqliteTable
 @Suppress("PropertyName")
 class TableCircuitsTerminals : SqliteTable() {
 
-    val CIRCUIT_MRID: Column = Column(++columnIndex, "circuit_mrid", "TEXT", NOT_NULL)
-    val TERMINAL_MRID: Column = Column(++columnIndex, "terminal_mrid", "TEXT", NOT_NULL)
+    val CIRCUIT_MRID: Column = Column(++columnIndex, "circuit_mrid", Column.Type.STRING, NOT_NULL)
+    val TERMINAL_MRID: Column = Column(++columnIndex, "terminal_mrid", Column.Type.STRING, NOT_NULL)
 
     override val name: String = "circuits_terminals"
 

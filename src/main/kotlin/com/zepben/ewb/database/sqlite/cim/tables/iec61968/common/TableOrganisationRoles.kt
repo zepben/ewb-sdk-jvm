@@ -15,6 +15,6 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.core.TableIdentif
 @Suppress("PropertyName")
 abstract class TableOrganisationRoles : TableIdentifiedObjects() {
 
-    val ORGANISATION_MRID: Column = Column(++columnIndex, "organisation_mrid", "TEXT", NULL)
+    val ORGANISATION_MRID: Column = Column(++columnIndex, "organisation_mrid", Column.Type.STRING, NULL)
 
 }

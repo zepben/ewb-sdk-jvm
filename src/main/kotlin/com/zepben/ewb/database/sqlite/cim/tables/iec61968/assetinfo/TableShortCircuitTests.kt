@@ -14,16 +14,16 @@ import com.zepben.ewb.database.sql.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TableShortCircuitTests : TableTransformerTest() {
 
-    val CURRENT: Column = Column(++columnIndex, "current", "NUMBER", NULL)
-    val ENERGISED_END_STEP: Column = Column(++columnIndex, "energised_end_step", "INTEGER", NULL)
-    val GROUNDED_END_STEP: Column = Column(++columnIndex, "grounded_end_step", "INTEGER", NULL)
-    val LEAKAGE_IMPEDANCE: Column = Column(++columnIndex, "leakage_impedance", "NUMBER", NULL)
-    val LEAKAGE_IMPEDANCE_ZERO: Column = Column(++columnIndex, "leakage_impedance_zero", "NUMBER", NULL)
-    val LOSS: Column = Column(++columnIndex, "loss", "INTEGER", NULL)
-    val LOSS_ZERO: Column = Column(++columnIndex, "loss_zero", "INTEGER", NULL)
-    val POWER: Column = Column(++columnIndex, "power", "INTEGER", NULL)
-    val VOLTAGE: Column = Column(++columnIndex, "voltage", "NUMBER", NULL)
-    val VOLTAGE_OHMIC_PART: Column = Column(++columnIndex, "voltage_ohmic_part", "NUMBER", NULL)
+    val CURRENT: Column = Column(++columnIndex, "current", Column.Type.DOUBLE, NULL)
+    val ENERGISED_END_STEP: Column = Column(++columnIndex, "energised_end_step", Column.Type.INTEGER, NULL)
+    val GROUNDED_END_STEP: Column = Column(++columnIndex, "grounded_end_step", Column.Type.INTEGER, NULL)
+    val LEAKAGE_IMPEDANCE: Column = Column(++columnIndex, "leakage_impedance", Column.Type.DOUBLE, NULL)
+    val LEAKAGE_IMPEDANCE_ZERO: Column = Column(++columnIndex, "leakage_impedance_zero", Column.Type.DOUBLE, NULL)
+    val LOSS: Column = Column(++columnIndex, "loss", Column.Type.INTEGER, NULL)
+    val LOSS_ZERO: Column = Column(++columnIndex, "loss_zero", Column.Type.INTEGER, NULL)
+    val POWER: Column = Column(++columnIndex, "power", Column.Type.INTEGER, NULL)
+    val VOLTAGE: Column = Column(++columnIndex, "voltage", Column.Type.DOUBLE, NULL)
+    val VOLTAGE_OHMIC_PART: Column = Column(++columnIndex, "voltage_ohmic_part", Column.Type.DOUBLE, NULL)
 
     override val name: String = "short_circuit_tests"
 

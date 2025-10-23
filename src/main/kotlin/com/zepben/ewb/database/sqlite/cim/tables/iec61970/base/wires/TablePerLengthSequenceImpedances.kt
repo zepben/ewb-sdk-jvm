@@ -14,14 +14,14 @@ import com.zepben.ewb.database.sql.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TablePerLengthSequenceImpedances : TablePerLengthImpedances() {
 
-    val R: Column = Column(++columnIndex, "r", "NUMBER", NULL)
-    val X: Column = Column(++columnIndex, "x", "NUMBER", NULL)
-    val R0: Column = Column(++columnIndex, "r0", "NUMBER", NULL)
-    val X0: Column = Column(++columnIndex, "x0", "NUMBER", NULL)
-    val BCH: Column = Column(++columnIndex, "bch", "NUMBER", NULL)
-    val GCH: Column = Column(++columnIndex, "gch", "NUMBER", NULL)
-    val B0CH: Column = Column(++columnIndex, "b0ch", "NUMBER", NULL)
-    val G0CH: Column = Column(++columnIndex, "g0ch", "NUMBER", NULL)
+    val R: Column = Column(++columnIndex, "r", Column.Type.DOUBLE, NULL)
+    val X: Column = Column(++columnIndex, "x", Column.Type.DOUBLE, NULL)
+    val R0: Column = Column(++columnIndex, "r0", Column.Type.DOUBLE, NULL)
+    val X0: Column = Column(++columnIndex, "x0", Column.Type.DOUBLE, NULL)
+    val BCH: Column = Column(++columnIndex, "bch", Column.Type.DOUBLE, NULL)
+    val GCH: Column = Column(++columnIndex, "gch", Column.Type.DOUBLE, NULL)
+    val B0CH: Column = Column(++columnIndex, "b0ch", Column.Type.DOUBLE, NULL)
+    val G0CH: Column = Column(++columnIndex, "g0ch", Column.Type.DOUBLE, NULL)
 
     override val name: String = "per_length_sequence_impedances"
 

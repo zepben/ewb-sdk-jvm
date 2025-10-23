@@ -16,10 +16,10 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.wires.TableRegula
 @Suppress("PropertyName")
 class TableBatteryControls : TableRegulatingControls() {
 
-    val CHARGING_RATE: Column = Column(++columnIndex, "charging_rate", "NUMBER", NULL)
-    val DISCHARGING_RATE: Column = Column(++columnIndex, "discharging_rate", "NUMBER", NULL)
-    val RESERVE_PERCENT: Column = Column(++columnIndex, "reserve_percent", "NUMBER", NULL)
-    val CONTROL_MODE: Column = Column(++columnIndex, "control_mode", "TEXT", NOT_NULL)
+    val CHARGING_RATE: Column = Column(++columnIndex, "charging_rate", Column.Type.DOUBLE, NULL)
+    val DISCHARGING_RATE: Column = Column(++columnIndex, "discharging_rate", Column.Type.DOUBLE, NULL)
+    val RESERVE_PERCENT: Column = Column(++columnIndex, "reserve_percent", Column.Type.DOUBLE, NULL)
+    val CONTROL_MODE: Column = Column(++columnIndex, "control_mode", Column.Type.STRING, NOT_NULL)
 
     override val name: String = "battery_controls"
 

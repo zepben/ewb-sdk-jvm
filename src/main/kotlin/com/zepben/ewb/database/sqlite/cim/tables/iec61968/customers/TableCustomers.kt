@@ -23,9 +23,9 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61968.common.TableOrganisati
 @Suppress("PropertyName")
 class TableCustomers : TableOrganisationRoles() {
 
-    val KIND: Column = Column(++columnIndex, "kind", "TEXT", NOT_NULL)
-    val NUM_END_DEVICES: Column = Column(++columnIndex, "num_end_devices", "INTEGER", NULL)
-    val SPECIAL_NEED: Column = Column(++columnIndex, "special_need", "TEXT", NULL)
+    val KIND: Column = Column(++columnIndex, "kind", Column.Type.STRING, NOT_NULL)
+    val NUM_END_DEVICES: Column = Column(++columnIndex, "num_end_devices", Column.Type.INTEGER, NULL)
+    val SPECIAL_NEED: Column = Column(++columnIndex, "special_need", Column.Type.STRING, NULL)
 
     override val name: String = "customers"
 

@@ -19,7 +19,7 @@ import com.zepben.ewb.database.sql.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TableGroundingImpedances : TableEarthFaultCompensators() {
 
-    val X: Column = Column(++columnIndex, "x", "NUMBER", NULL)
+    val X: Column = Column(++columnIndex, "x", Column.Type.DOUBLE, NULL)
 
     override val name: String = "grounding_impedances"
 

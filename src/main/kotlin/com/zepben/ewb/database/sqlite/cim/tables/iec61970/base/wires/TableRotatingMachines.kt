@@ -23,10 +23,10 @@ import com.zepben.ewb.database.sql.Column.Nullable.NULL
 @Suppress("PropertyName")
 abstract class TableRotatingMachines : com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.wires.TableRegulatingCondEq() {
 
-    val RATED_POWER_FACTOR: Column = Column(++columnIndex, "rated_power_factor", "NUMBER", NULL)
-    val RATED_S: Column = Column(++columnIndex, "rated_s", "NUMBER", NULL)
-    val RATED_U: Column = Column(++columnIndex, "rated_u", "INTEGER", NULL)
-    val P: Column = Column(++columnIndex, "p", "NUMBER", NULL)
-    val Q: Column = Column(++columnIndex, "q", "NUMBER", NULL)
+    val RATED_POWER_FACTOR: Column = Column(++columnIndex, "rated_power_factor", Column.Type.DOUBLE, NULL)
+    val RATED_S: Column = Column(++columnIndex, "rated_s", Column.Type.DOUBLE, NULL)
+    val RATED_U: Column = Column(++columnIndex, "rated_u", Column.Type.INTEGER, NULL)
+    val P: Column = Column(++columnIndex, "p", Column.Type.DOUBLE, NULL)
+    val Q: Column = Column(++columnIndex, "q", Column.Type.DOUBLE, NULL)
 
 }

@@ -16,10 +16,10 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.core.TableIdentif
 @Suppress("PropertyName")
 class TableDiagramObjects : TableIdentifiedObjects() {
 
-    val IDENTIFIED_OBJECT_MRID: Column = Column(++columnIndex, "identified_object_mrid", "TEXT", NULL)
-    val DIAGRAM_MRID: Column = Column(++columnIndex, "diagram_mrid", "TEXT", NULL)
-    val STYLE: Column = Column(++columnIndex, "style", "TEXT", NULL)
-    val ROTATION: Column = Column(++columnIndex, "rotation", "NUMBER", NOT_NULL)
+    val IDENTIFIED_OBJECT_MRID: Column = Column(++columnIndex, "identified_object_mrid", Column.Type.STRING, NULL)
+    val DIAGRAM_MRID: Column = Column(++columnIndex, "diagram_mrid", Column.Type.STRING, NULL)
+    val STYLE: Column = Column(++columnIndex, "style", Column.Type.STRING, NULL)
+    val ROTATION: Column = Column(++columnIndex, "rotation", Column.Type.DOUBLE, NOT_NULL)
 
     override val name: String = "diagram_objects"
 

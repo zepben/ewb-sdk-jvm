@@ -15,8 +15,8 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.core.TablePowerSy
 @Suppress("PropertyName")
 class TableEnergySourcePhases : TablePowerSystemResources() {
 
-    val ENERGY_SOURCE_MRID: Column = Column(++columnIndex, "energy_source_mrid", "TEXT", NOT_NULL)
-    val PHASE: Column = Column(++columnIndex, "phase", "TEXT", NOT_NULL)
+    val ENERGY_SOURCE_MRID: Column = Column(++columnIndex, "energy_source_mrid", Column.Type.STRING, NOT_NULL)
+    val PHASE: Column = Column(++columnIndex, "phase", Column.Type.STRING, NOT_NULL)
 
     override val name: String = "energy_source_phases"
 

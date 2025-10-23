@@ -15,6 +15,6 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61968.assets.TableAssetFunct
 @Suppress("PropertyName")
 abstract class TableEndDeviceFunctions : TableAssetFunctions() {
 
-    val ENABLED: Column = Column(++columnIndex, "enabled", "BOOLEAN", NULL)
+    val ENABLED: Column = Column(++columnIndex, "enabled", Column.Type.BOOLEAN, NULL)
 
 }

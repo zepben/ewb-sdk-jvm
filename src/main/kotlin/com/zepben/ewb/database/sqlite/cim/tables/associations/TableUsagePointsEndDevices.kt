@@ -21,8 +21,8 @@ import com.zepben.ewb.database.sqlite.common.SqliteTable
 @Suppress("PropertyName")
 class TableUsagePointsEndDevices : SqliteTable() {
 
-    val USAGE_POINT_MRID: Column = Column(++columnIndex, "usage_point_mrid", "TEXT", NOT_NULL)
-    val END_DEVICE_MRID: Column = Column(++columnIndex, "end_device_mrid", "TEXT", NOT_NULL)
+    val USAGE_POINT_MRID: Column = Column(++columnIndex, "usage_point_mrid", Column.Type.STRING, NOT_NULL)
+    val END_DEVICE_MRID: Column = Column(++columnIndex, "end_device_mrid", Column.Type.STRING, NOT_NULL)
 
     override val name: String = "usage_points_end_devices"
 

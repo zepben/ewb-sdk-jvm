@@ -9,14 +9,13 @@
 package com.zepben.ewb.database.sqlite.cim.tables.iec61968.infiec61968.infassets
 
 import com.zepben.ewb.database.sql.Column
-import com.zepben.ewb.database.sql.Column.Nullable.NOT_NULL
 import com.zepben.ewb.database.sql.Column.Nullable.NULL
 import com.zepben.ewb.database.sqlite.cim.tables.iec61968.assets.TableStructures
 
 @Suppress("PropertyName")
 class TablePoles : TableStructures() {
 
-    val CLASSIFICATION: Column = Column(++columnIndex, "classification", "TEXT", NULL)
+    val CLASSIFICATION: Column = Column(++columnIndex, "classification", Column.Type.STRING, NULL)
 
     override val name: String = "poles"
 

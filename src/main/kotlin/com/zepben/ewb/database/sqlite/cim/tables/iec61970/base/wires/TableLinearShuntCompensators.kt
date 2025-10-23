@@ -14,10 +14,10 @@ import com.zepben.ewb.database.sql.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TableLinearShuntCompensators : TableShuntCompensators() {
 
-    val B0_PER_SECTION: Column = Column(++columnIndex, "b0_per_section", "NUMBER", NULL)
-    val B_PER_SECTION: Column = Column(++columnIndex, "b_per_section", "NUMBER", NULL)
-    val G0_PER_SECTION: Column = Column(++columnIndex, "g0_per_section", "NUMBER", NULL)
-    val G_PER_SECTION: Column = Column(++columnIndex, "g_per_section", "NUMBER", NULL)
+    val B0_PER_SECTION: Column = Column(++columnIndex, "b0_per_section", Column.Type.DOUBLE, NULL)
+    val B_PER_SECTION: Column = Column(++columnIndex, "b_per_section", Column.Type.DOUBLE, NULL)
+    val G0_PER_SECTION: Column = Column(++columnIndex, "g0_per_section", Column.Type.DOUBLE, NULL)
+    val G_PER_SECTION: Column = Column(++columnIndex, "g_per_section", Column.Type.DOUBLE, NULL)
 
     override val name: String = "linear_shunt_compensators"
 

@@ -15,9 +15,9 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.core.TableEquipme
 @Suppress("PropertyName")
 abstract class TablePowerElectronicsUnits : TableEquipment() {
 
-    val POWER_ELECTRONICS_CONNECTION_MRID: Column = Column(++columnIndex, "power_electronics_connection_mrid", "TEXT", NULL)
-    val MAX_P: Column = Column(++columnIndex, "max_p", "INTEGER", NULL)
-    val MIN_P: Column = Column(++columnIndex, "min_p", "INTEGER", NULL)
+    val POWER_ELECTRONICS_CONNECTION_MRID: Column = Column(++columnIndex, "power_electronics_connection_mrid", Column.Type.STRING, NULL)
+    val MAX_P: Column = Column(++columnIndex, "max_p", Column.Type.INTEGER, NULL)
+    val MIN_P: Column = Column(++columnIndex, "min_p", Column.Type.INTEGER, NULL)
 
     init {
         addNonUniqueIndexes(

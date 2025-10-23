@@ -21,8 +21,8 @@ import com.zepben.ewb.database.sqlite.common.SqliteTable
 @Suppress("PropertyName")
 class TableBatteryUnitsBatteryControls : SqliteTable() {
 
-    val BATTERY_UNIT_MRID: Column = Column(++columnIndex, "battery_unit_mrid", "TEXT", NOT_NULL)
-    val BATTERY_CONTROL_MRID: Column = Column(++columnIndex, "battery_control_mrid", "TEXT", NOT_NULL)
+    val BATTERY_UNIT_MRID: Column = Column(++columnIndex, "battery_unit_mrid", Column.Type.STRING, NOT_NULL)
+    val BATTERY_CONTROL_MRID: Column = Column(++columnIndex, "battery_control_mrid", Column.Type.STRING, NOT_NULL)
 
     override val name: String = "battery_units_battery_controls"
 

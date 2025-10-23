@@ -54,7 +54,7 @@ abstract class SqlTable internal constructor() {
      * The index of the previously added column. Should be used to increment column indexes to avoid massive rework when adding columns to base classes.
      *
      * e.g.
-     * val MY_COL: Column = Column(++columnIndex, "my_col", "TEXT", NOT_NULL)
+     * val MY_COL: Column = Column(++columnIndex, "my_col", Column.Type.STRING, NOT_NULL)
      */
     protected var columnIndex: Int = 0
 

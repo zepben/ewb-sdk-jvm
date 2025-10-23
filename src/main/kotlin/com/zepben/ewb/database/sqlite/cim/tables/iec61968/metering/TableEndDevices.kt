@@ -15,7 +15,7 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61968.assets.TableAssetConta
 @Suppress("PropertyName")
 abstract class TableEndDevices : TableAssetContainers() {
 
-    val CUSTOMER_MRID: Column = Column(++columnIndex, "customer_mrid", "TEXT", NULL)
-    val SERVICE_LOCATION_MRID: Column = Column(++columnIndex, "service_location_mrid", "TEXT", NULL)
+    val CUSTOMER_MRID: Column = Column(++columnIndex, "customer_mrid", Column.Type.STRING, NULL)
+    val SERVICE_LOCATION_MRID: Column = Column(++columnIndex, "service_location_mrid", Column.Type.STRING, NULL)
 
 }

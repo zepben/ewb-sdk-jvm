@@ -15,7 +15,7 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.core.TableEquipme
 @Suppress("PropertyName")
 class TableLvFeeders : TableEquipmentContainers() {
 
-    val NORMAL_HEAD_TERMINAL_MRID: Column = Column(++columnIndex, "normal_head_terminal_mrid", "TEXT", NULL)
+    val NORMAL_HEAD_TERMINAL_MRID: Column = Column(++columnIndex, "normal_head_terminal_mrid", Column.Type.STRING, NULL)
 
     override val name: String = "lv_feeders"
 }

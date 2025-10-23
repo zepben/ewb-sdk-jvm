@@ -15,9 +15,9 @@ import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61970.base.protec
 @Suppress("PropertyName")
 class TableCurrentRelays : TableProtectionRelayFunctions() {
 
-    val CURRENT_LIMIT_1: Column = Column(++columnIndex, "current_limit_1", "NUMBER", NULL)
-    val INVERSE_TIME_FLAG: Column = Column(++columnIndex, "inverse_time_flag", "BOOLEAN", NULL)
-    val TIME_DELAY_1: Column = Column(++columnIndex, "time_delay_1", "NUMBER", NULL)
+    val CURRENT_LIMIT_1: Column = Column(++columnIndex, "current_limit_1", Column.Type.DOUBLE, NULL)
+    val INVERSE_TIME_FLAG: Column = Column(++columnIndex, "inverse_time_flag", Column.Type.BOOLEAN, NULL)
+    val TIME_DELAY_1: Column = Column(++columnIndex, "time_delay_1", Column.Type.DOUBLE, NULL)
 
     override val name: String = "current_relays"
 

@@ -15,10 +15,10 @@ import com.zepben.ewb.database.sqlite.common.SqliteTable
 @Suppress("PropertyName")
 class TableDiagramObjectPoints : SqliteTable() {
 
-    val DIAGRAM_OBJECT_MRID: Column = Column(++columnIndex, "diagram_object_mrid", "TEXT", NOT_NULL)
-    val SEQUENCE_NUMBER: Column = Column(++columnIndex, "sequence_number", "INTEGER", NOT_NULL)
-    val X_POSITION: Column = Column(++columnIndex, "x_position", "NUMBER", NOT_NULL)
-    val Y_POSITION: Column = Column(++columnIndex, "y_position", "NUMBER", NOT_NULL)
+    val DIAGRAM_OBJECT_MRID: Column = Column(++columnIndex, "diagram_object_mrid", Column.Type.STRING, NOT_NULL)
+    val SEQUENCE_NUMBER: Column = Column(++columnIndex, "sequence_number", Column.Type.INTEGER, NOT_NULL)
+    val X_POSITION: Column = Column(++columnIndex, "x_position", Column.Type.DOUBLE, NOT_NULL)
+    val Y_POSITION: Column = Column(++columnIndex, "y_position", Column.Type.DOUBLE, NOT_NULL)
 
     override val name: String = "diagram_object_points"
 

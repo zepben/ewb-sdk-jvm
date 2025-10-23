@@ -15,7 +15,7 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61968.assets.TableAssetInfo
 @Suppress("PropertyName")
 class TableTransformerTankInfo : TableAssetInfo() {
 
-    val POWER_TRANSFORMER_INFO_MRID: Column = Column(++columnIndex, "power_transformer_info_mrid", "TEXT", NULL)
+    val POWER_TRANSFORMER_INFO_MRID: Column = Column(++columnIndex, "power_transformer_info_mrid", Column.Type.STRING, NULL)
 
     override val name: String = "transformer_tank_info"
 

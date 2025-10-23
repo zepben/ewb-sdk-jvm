@@ -14,7 +14,7 @@ import com.zepben.ewb.database.sql.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TableRemoteControls : TableRemotePoints() {
 
-    val CONTROL_MRID: Column = Column(++columnIndex, "control_mrid", "TEXT", NULL)
+    val CONTROL_MRID: Column = Column(++columnIndex, "control_mrid", Column.Type.STRING, NULL)
 
     override val name: String = "remote_controls"
 

@@ -15,10 +15,10 @@ import com.zepben.ewb.database.sql.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TableTerminals : TableAcDcTerminals() {
 
-    val CONDUCTING_EQUIPMENT_MRID: Column = Column(++columnIndex, "conducting_equipment_mrid", "TEXT", NULL)
-    val SEQUENCE_NUMBER: Column = Column(++columnIndex, "sequence_number", "INTEGER", NOT_NULL)
-    val CONNECTIVITY_NODE_MRID: Column = Column(++columnIndex, "connectivity_node_mrid", "TEXT", NULL)
-    val PHASES: Column = Column(++columnIndex, "phases", "TEXT", NOT_NULL)
+    val CONDUCTING_EQUIPMENT_MRID: Column = Column(++columnIndex, "conducting_equipment_mrid", Column.Type.STRING, NULL)
+    val SEQUENCE_NUMBER: Column = Column(++columnIndex, "sequence_number", Column.Type.INTEGER, NOT_NULL)
+    val CONNECTIVITY_NODE_MRID: Column = Column(++columnIndex, "connectivity_node_mrid", Column.Type.STRING, NULL)
+    val PHASES: Column = Column(++columnIndex, "phases", Column.Type.STRING, NOT_NULL)
 
     override val name: String = "terminals"
 

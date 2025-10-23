@@ -15,9 +15,9 @@ import com.zepben.ewb.database.sql.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TableStreetlights : TableAssets() {
 
-    val POLE_MRID: Column = Column(++columnIndex, "pole_mrid", "TEXT", NULL)
-    val LAMP_KIND: Column = Column(++columnIndex, "lamp_kind", "TEXT", NOT_NULL)
-    val LIGHT_RATING: Column = Column(++columnIndex, "light_rating", "INTEGER", NULL)
+    val POLE_MRID: Column = Column(++columnIndex, "pole_mrid", Column.Type.STRING, NULL)
+    val LAMP_KIND: Column = Column(++columnIndex, "lamp_kind", Column.Type.STRING, NOT_NULL)
+    val LIGHT_RATING: Column = Column(++columnIndex, "light_rating", Column.Type.INTEGER, NULL)
 
     override val name: String = "streetlights"
 

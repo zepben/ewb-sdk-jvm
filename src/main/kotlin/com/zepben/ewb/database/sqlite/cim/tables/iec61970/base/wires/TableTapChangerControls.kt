@@ -14,15 +14,15 @@ import com.zepben.ewb.database.sql.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TableTapChangerControls : TableRegulatingControls() {
 
-    val LIMIT_VOLTAGE: Column = Column(++columnIndex, "limit_voltage", "INTEGER", NULL)
-    val LINE_DROP_COMPENSATION: Column = Column(++columnIndex, "line_drop_compensation", "BOOLEAN", NULL)
-    val LINE_DROP_R: Column = Column(++columnIndex, "line_drop_r", "NUMBER", NULL)
-    val LINE_DROP_X: Column = Column(++columnIndex, "line_drop_x", "NUMBER", NULL)
-    val REVERSE_LINE_DROP_R: Column = Column(++columnIndex, "reverse_line_drop_r", "NUMBER", NULL)
-    val REVERSE_LINE_DROP_X: Column = Column(++columnIndex, "reverse_line_drop_x", "NUMBER", NULL)
-    val FORWARD_LDC_BLOCKING: Column = Column(++columnIndex, "forward_ldc_blocking", "BOOLEAN", NULL)
-    val TIME_DELAY: Column = Column(++columnIndex, "time_delay", "NUMBER", NULL)
-    val CO_GENERATION_ENABLED: Column = Column(++columnIndex, "co_generation_enabled", "BOOLEAN", NULL)
+    val LIMIT_VOLTAGE: Column = Column(++columnIndex, "limit_voltage", Column.Type.INTEGER, NULL)
+    val LINE_DROP_COMPENSATION: Column = Column(++columnIndex, "line_drop_compensation", Column.Type.BOOLEAN, NULL)
+    val LINE_DROP_R: Column = Column(++columnIndex, "line_drop_r", Column.Type.DOUBLE, NULL)
+    val LINE_DROP_X: Column = Column(++columnIndex, "line_drop_x", Column.Type.DOUBLE, NULL)
+    val REVERSE_LINE_DROP_R: Column = Column(++columnIndex, "reverse_line_drop_r", Column.Type.DOUBLE, NULL)
+    val REVERSE_LINE_DROP_X: Column = Column(++columnIndex, "reverse_line_drop_x", Column.Type.DOUBLE, NULL)
+    val FORWARD_LDC_BLOCKING: Column = Column(++columnIndex, "forward_ldc_blocking", Column.Type.BOOLEAN, NULL)
+    val TIME_DELAY: Column = Column(++columnIndex, "time_delay", Column.Type.DOUBLE, NULL)
+    val CO_GENERATION_ENABLED: Column = Column(++columnIndex, "co_generation_enabled", Column.Type.BOOLEAN, NULL)
 
     override val name: String = "tap_changer_controls"
 

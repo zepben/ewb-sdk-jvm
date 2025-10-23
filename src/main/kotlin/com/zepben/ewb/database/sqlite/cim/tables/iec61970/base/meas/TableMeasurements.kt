@@ -16,11 +16,11 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.core.TableIdentif
 @Suppress("PropertyName")
 abstract class TableMeasurements : TableIdentifiedObjects() {
 
-    val POWER_SYSTEM_RESOURCE_MRID: Column = Column(++columnIndex, "power_system_resource_mrid", "TEXT", NULL)
-    val REMOTE_SOURCE_MRID: Column = Column(++columnIndex, "remote_source_mrid", "TEXT", NULL)
-    val TERMINAL_MRID: Column = Column(++columnIndex, "terminal_mrid", "TEXT", NULL)
-    val PHASES: Column = Column(++columnIndex, "phases", "TEXT", NOT_NULL)
-    val UNIT_SYMBOL: Column = Column(++columnIndex, "unit_symbol", "TEXT", NOT_NULL)
+    val POWER_SYSTEM_RESOURCE_MRID: Column = Column(++columnIndex, "power_system_resource_mrid", Column.Type.STRING, NULL)
+    val REMOTE_SOURCE_MRID: Column = Column(++columnIndex, "remote_source_mrid", Column.Type.STRING, NULL)
+    val TERMINAL_MRID: Column = Column(++columnIndex, "terminal_mrid", Column.Type.STRING, NULL)
+    val PHASES: Column = Column(++columnIndex, "phases", Column.Type.STRING, NOT_NULL)
+    val UNIT_SYMBOL: Column = Column(++columnIndex, "unit_symbol", Column.Type.STRING, NOT_NULL)
 
     init {
         addNonUniqueIndexes(

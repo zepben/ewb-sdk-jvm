@@ -9,13 +9,12 @@
 package com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.wires
 
 import com.zepben.ewb.database.sql.Column
-import com.zepben.ewb.database.sql.Column.Nullable.NOT_NULL
 import com.zepben.ewb.database.sql.Column.Nullable.NULL
 
 @Suppress("PropertyName")
 abstract class TableRegulatingCondEq : TableEnergyConnections() {
 
-    val CONTROL_ENABLED: Column = Column(++columnIndex, "control_enabled", "BOOLEAN", NULL)
-    val REGULATING_CONTROL_MRID: Column = Column(++columnIndex, "regulating_control_mrid", "TEXT", NULL)
+    val CONTROL_ENABLED: Column = Column(++columnIndex, "control_enabled", Column.Type.BOOLEAN, NULL)
+    val REGULATING_CONTROL_MRID: Column = Column(++columnIndex, "regulating_control_mrid", Column.Type.STRING, NULL)
 
 }

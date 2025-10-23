@@ -14,7 +14,7 @@ import com.zepben.ewb.database.sql.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TableRemoteSources : TableRemotePoints() {
 
-    val MEASUREMENT_MRID: Column = Column(++columnIndex, "measurement_mrid", "TEXT", NULL)
+    val MEASUREMENT_MRID: Column = Column(++columnIndex, "measurement_mrid", Column.Type.STRING, NULL)
 
     override val name: String = "remote_sources"
 

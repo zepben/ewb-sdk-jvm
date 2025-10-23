@@ -15,11 +15,11 @@ import com.zepben.ewb.database.sql.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TableNetworkContainerMetrics : MultiJobTable() {
 
-    val HIERARCHY_ID: Column = Column(++columnIndex, "hierarchy_id", "TEXT", NOT_NULL)
-    val HIERARCHY_NAME: Column = Column(++columnIndex, "hierarchy_name", "TEXT", NULL)
-    val CONTAINER_TYPE: Column = Column(++columnIndex, "container_type", "TEXT", NOT_NULL)
-    val METRIC_NAME: Column = Column(++columnIndex, "metric_name", "TEXT", NOT_NULL)
-    val METRIC_VALUE: Column = Column(++columnIndex, "metric_value", "DOUBLE PRECISION", NOT_NULL)
+    val HIERARCHY_ID: Column = Column(++columnIndex, "hierarchy_id", Column.Type.STRING, NOT_NULL)
+    val HIERARCHY_NAME: Column = Column(++columnIndex, "hierarchy_name", Column.Type.STRING, NULL)
+    val CONTAINER_TYPE: Column = Column(++columnIndex, "container_type", Column.Type.STRING, NOT_NULL)
+    val METRIC_NAME: Column = Column(++columnIndex, "metric_name", Column.Type.STRING, NOT_NULL)
+    val METRIC_VALUE: Column = Column(++columnIndex, "metric_value", Column.Type.DOUBLE, NOT_NULL)
 
     override val name: String = "network_container_metrics"
 

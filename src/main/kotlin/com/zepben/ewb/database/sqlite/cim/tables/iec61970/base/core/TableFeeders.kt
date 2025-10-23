@@ -14,9 +14,9 @@ import com.zepben.ewb.database.sql.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TableFeeders : TableEquipmentContainers() {
 
-    val NORMAL_HEAD_TERMINAL_MRID: Column = Column(++columnIndex, "normal_head_terminal_mrid", "TEXT", NULL)
+    val NORMAL_HEAD_TERMINAL_MRID: Column = Column(++columnIndex, "normal_head_terminal_mrid", Column.Type.STRING, NULL)
     val NORMAL_ENERGIZING_SUBSTATION_MRID: Column =
-        Column(++columnIndex, "normal_energizing_substation_mrid", "TEXT", NULL)
+        Column(++columnIndex, "normal_energizing_substation_mrid", Column.Type.STRING, NULL)
 
     override val name: String = "feeders"
 

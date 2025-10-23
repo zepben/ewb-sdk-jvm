@@ -15,7 +15,7 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61968.common.TableAgreements
 @Suppress("PropertyName")
 class TableCustomerAgreements : TableAgreements() {
 
-    val CUSTOMER_MRID: Column = Column(++columnIndex, "customer_mrid", "TEXT", NULL)
+    val CUSTOMER_MRID: Column = Column(++columnIndex, "customer_mrid", Column.Type.STRING, NULL)
 
     override val name: String = "customer_agreements"
 

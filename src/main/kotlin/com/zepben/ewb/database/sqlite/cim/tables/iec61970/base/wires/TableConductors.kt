@@ -23,9 +23,9 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.core.TableConduct
 @Suppress("PropertyName")
 abstract class TableConductors : TableConductingEquipment() {
 
-    val LENGTH: Column = Column(++columnIndex, "length", "NUMBER", NULL)
-    val DESIGN_TEMPERATURE: Column = Column(++columnIndex, "design_temperature", "INTEGER", NULL)
-    val DESIGN_RATING: Column = Column(++columnIndex, "design_rating", "NUMBER", NULL)
-    val WIRE_INFO_MRID: Column = Column(++columnIndex, "wire_info_mrid", "TEXT", NULL)
+    val LENGTH: Column = Column(++columnIndex, "length", Column.Type.DOUBLE, NULL)
+    val DESIGN_TEMPERATURE: Column = Column(++columnIndex, "design_temperature", Column.Type.INTEGER, NULL)
+    val DESIGN_RATING: Column = Column(++columnIndex, "design_rating", Column.Type.DOUBLE, NULL)
+    val WIRE_INFO_MRID: Column = Column(++columnIndex, "wire_info_mrid", Column.Type.STRING, NULL)
 
 }

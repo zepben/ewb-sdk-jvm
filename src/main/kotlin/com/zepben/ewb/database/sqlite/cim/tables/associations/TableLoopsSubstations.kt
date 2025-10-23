@@ -22,9 +22,9 @@ import com.zepben.ewb.database.sqlite.common.SqliteTable
 @Suppress("PropertyName")
 class TableLoopsSubstations : SqliteTable() {
 
-    val LOOP_MRID: Column = Column(++columnIndex, "loop_mrid", "TEXT", NOT_NULL)
-    val SUBSTATION_MRID: Column = Column(++columnIndex, "substation_mrid", "TEXT", NOT_NULL)
-    val RELATIONSHIP: Column = Column(++columnIndex, "relationship", "TEXT", NOT_NULL)
+    val LOOP_MRID: Column = Column(++columnIndex, "loop_mrid", Column.Type.STRING, NOT_NULL)
+    val SUBSTATION_MRID: Column = Column(++columnIndex, "substation_mrid", Column.Type.STRING, NOT_NULL)
+    val RELATIONSHIP: Column = Column(++columnIndex, "relationship", Column.Type.STRING, NOT_NULL)
 
     override val name: String = "loops_substations"
 

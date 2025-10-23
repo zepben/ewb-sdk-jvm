@@ -9,18 +9,17 @@
 package com.zepben.ewb.database.sqlite.cim.tables.iec61968.common
 
 import com.zepben.ewb.database.sql.Column
-import com.zepben.ewb.database.sql.Column.Nullable.NOT_NULL
 import com.zepben.ewb.database.sql.Column.Nullable.NULL
 import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.core.TableIdentifiedObjects
 
 @Suppress("PropertyName")
 abstract class TableDocuments : TableIdentifiedObjects() {
 
-    val TITLE: Column = Column(++columnIndex, "title", "TEXT", NULL)
-    val CREATED_DATE_TIME: Column = Column(++columnIndex, "created_date_time", "TEXT", NULL)
-    val AUTHOR_NAME: Column = Column(++columnIndex, "author_name", "TEXT", NULL)
-    val TYPE: Column = Column(++columnIndex, "type", "TEXT", NULL)
-    val STATUS: Column = Column(++columnIndex, "status", "TEXT", NULL)
-    val COMMENT: Column = Column(++columnIndex, "comment", "TEXT", NULL)
+    val TITLE: Column = Column(++columnIndex, "title", Column.Type.STRING, NULL)
+    val CREATED_DATE_TIME: Column = Column(++columnIndex, "created_date_time", Column.Type.STRING, NULL)
+    val AUTHOR_NAME: Column = Column(++columnIndex, "author_name", Column.Type.STRING, NULL)
+    val TYPE: Column = Column(++columnIndex, "type", Column.Type.STRING, NULL)
+    val STATUS: Column = Column(++columnIndex, "status", Column.Type.STRING, NULL)
+    val COMMENT: Column = Column(++columnIndex, "comment", Column.Type.STRING, NULL)
 
 }

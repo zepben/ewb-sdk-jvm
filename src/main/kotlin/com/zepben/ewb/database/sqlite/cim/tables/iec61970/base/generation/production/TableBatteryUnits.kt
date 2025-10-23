@@ -15,9 +15,9 @@ import com.zepben.ewb.database.sql.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TableBatteryUnits : TablePowerElectronicsUnits() {
 
-    val BATTERY_STATE: Column = Column(++columnIndex, "battery_state", "TEXT", NOT_NULL)
-    val RATED_E: Column = Column(++columnIndex, "rated_e", "INTEGER", NULL)
-    val STORED_E: Column = Column(++columnIndex, "stored_e", "INTEGER", NULL)
+    val BATTERY_STATE: Column = Column(++columnIndex, "battery_state", Column.Type.STRING, NOT_NULL)
+    val RATED_E: Column = Column(++columnIndex, "rated_e", Column.Type.INTEGER, NULL)
+    val STORED_E: Column = Column(++columnIndex, "stored_e", Column.Type.INTEGER, NULL)
 
     override val name: String = "battery_units"
 

@@ -15,7 +15,7 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61968.assets.TableAssetInfo
 @Suppress("PropertyName")
 class TableSwitchInfo : TableAssetInfo() {
 
-    val RATED_INTERRUPTING_TIME: Column = Column(++columnIndex, "rated_interrupting_time", "NUMBER", NULL)
+    val RATED_INTERRUPTING_TIME: Column = Column(++columnIndex, "rated_interrupting_time", Column.Type.DOUBLE, NULL)
 
     override val name: String = "switch_info"
 

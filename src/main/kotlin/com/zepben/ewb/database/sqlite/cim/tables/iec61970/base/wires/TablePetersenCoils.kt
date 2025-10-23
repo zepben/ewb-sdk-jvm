@@ -20,7 +20,7 @@ import com.zepben.ewb.database.sql.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TablePetersenCoils : TableEarthFaultCompensators() {
 
-    val X_GROUND_NOMINAL: Column = Column(++columnIndex, "x_ground_nominal", "NUMBER", NULL)
+    val X_GROUND_NOMINAL: Column = Column(++columnIndex, "x_ground_nominal", Column.Type.DOUBLE, NULL)
 
     override val name: String = "petersen_coils"
 

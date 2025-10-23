@@ -19,7 +19,7 @@ import com.zepben.ewb.database.sql.TableVersion
  */
 class PostgresTableVersion(override val supportedVersion: Int) : TableVersion, PostgresTable() {
 
-    override val VERSION: Column = Column(++columnIndex, "version", "TEXT", NOT_NULL)
+    override val VERSION: Column = Column(++columnIndex, "version", Column.Type.STRING, NOT_NULL)
 
     override val name: String = "version"
 

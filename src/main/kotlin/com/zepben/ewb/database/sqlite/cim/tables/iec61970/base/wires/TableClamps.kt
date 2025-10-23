@@ -22,8 +22,8 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.core.TableConduct
 @Suppress("PropertyName")
 class TableClamps : TableConductingEquipment() {
 
-    val LENGTH_FROM_TERMINAL_1: Column = Column(++columnIndex, "length_from_terminal_1", "NUMBER", NULL)
-    val AC_LINE_SEGMENT_MRID: Column = Column(++columnIndex, "ac_line_segment_mrid", "TEXT", NULL)
+    val LENGTH_FROM_TERMINAL_1: Column = Column(++columnIndex, "length_from_terminal_1", Column.Type.DOUBLE, NULL)
+    val AC_LINE_SEGMENT_MRID: Column = Column(++columnIndex, "ac_line_segment_mrid", Column.Type.STRING, NULL)
 
     override val name: String = "clamps"
 

@@ -15,7 +15,7 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61968.assets.TableAssetInfo
 @Suppress("PropertyName")
 abstract class TableTransformerTest : TableAssetInfo() {
 
-    val BASE_POWER: Column = Column(++columnIndex, "base_power", "INTEGER", NULL)
-    val TEMPERATURE: Column = Column(++columnIndex, "temperature", "NUMBER", NULL)
+    val BASE_POWER: Column = Column(++columnIndex, "base_power", Column.Type.INTEGER, NULL)
+    val TEMPERATURE: Column = Column(++columnIndex, "temperature", Column.Type.DOUBLE, NULL)
 
 }

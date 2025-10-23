@@ -15,6 +15,6 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.core.TableIdentif
 @Suppress("PropertyName")
 abstract class TableAssets : TableIdentifiedObjects() {
 
-    val LOCATION_MRID: Column = Column(++columnIndex, "location_mrid", "TEXT", NULL)
+    val LOCATION_MRID: Column = Column(++columnIndex, "location_mrid", Column.Type.STRING, NULL)
 
 }

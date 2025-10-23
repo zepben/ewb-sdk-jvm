@@ -14,11 +14,11 @@ import com.zepben.ewb.database.sql.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TableNoLoadTests : TableTransformerTest() {
 
-    val ENERGISED_END_VOLTAGE: Column = Column(++columnIndex, "energised_end_voltage", "INTEGER", NULL)
-    val EXCITING_CURRENT: Column = Column(++columnIndex, "exciting_current", "NUMBER", NULL)
-    val EXCITING_CURRENT_ZERO: Column = Column(++columnIndex, "exciting_current_zero", "NUMBER", NULL)
-    val LOSS: Column = Column(++columnIndex, "loss", "INTEGER", NULL)
-    val LOSS_ZERO: Column = Column(++columnIndex, "loss_zero", "INTEGER", NULL)
+    val ENERGISED_END_VOLTAGE: Column = Column(++columnIndex, "energised_end_voltage", Column.Type.INTEGER, NULL)
+    val EXCITING_CURRENT: Column = Column(++columnIndex, "exciting_current", Column.Type.DOUBLE, NULL)
+    val EXCITING_CURRENT_ZERO: Column = Column(++columnIndex, "exciting_current_zero", Column.Type.DOUBLE, NULL)
+    val LOSS: Column = Column(++columnIndex, "loss", Column.Type.INTEGER, NULL)
+    val LOSS_ZERO: Column = Column(++columnIndex, "loss_zero", Column.Type.INTEGER, NULL)
 
     override val name: String = "no_load_tests"
 

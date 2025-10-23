@@ -14,7 +14,7 @@ import com.zepben.ewb.database.sql.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TableFuses : TableSwitches() {
 
-    val FUNCTION_MRID: Column = Column(++columnIndex, "function_mrid", "TEXT", NULL)
+    val FUNCTION_MRID: Column = Column(++columnIndex, "function_mrid", Column.Type.STRING, NULL)
 
     override val name: String = "fuses"
 

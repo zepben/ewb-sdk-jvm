@@ -14,7 +14,7 @@ import com.zepben.ewb.database.sql.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TableSubGeographicalRegions : TableIdentifiedObjects() {
 
-    val GEOGRAPHICAL_REGION_MRID: Column = Column(++columnIndex, "geographical_region_mrid", "TEXT", NULL)
+    val GEOGRAPHICAL_REGION_MRID: Column = Column(++columnIndex, "geographical_region_mrid", Column.Type.STRING, NULL)
 
     override val name: String = "sub_geographical_regions"
 

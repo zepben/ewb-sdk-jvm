@@ -15,9 +15,9 @@ import com.zepben.ewb.database.sqlite.common.SqliteTable
 @Suppress("PropertyName")
 class TableMetadataDataSources : SqliteTable() {
 
-    val SOURCE: Column = Column(++columnIndex, "source", "TEXT", NOT_NULL)
-    val VERSION: Column = Column(++columnIndex, "version", "TEXT", NOT_NULL)
-    val TIMESTAMP: Column = Column(++columnIndex, "timestamp", "TEXT", NOT_NULL)
+    val SOURCE: Column = Column(++columnIndex, "source", Column.Type.STRING, NOT_NULL)
+    val VERSION: Column = Column(++columnIndex, "version", Column.Type.STRING, NOT_NULL)
+    val TIMESTAMP: Column = Column(++columnIndex, "timestamp", Column.Type.STRING, NOT_NULL)
 
     override val name: String = "metadata_data_sources"
 

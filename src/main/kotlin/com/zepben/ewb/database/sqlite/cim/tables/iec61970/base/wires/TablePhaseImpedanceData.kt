@@ -16,13 +16,13 @@ import com.zepben.ewb.database.sqlite.common.SqliteTable
 @Suppress("PropertyName")
 class TablePhaseImpedanceData : SqliteTable() {
 
-    val PER_LENGTH_PHASE_IMPEDANCE_MRID: Column = Column(++columnIndex, "per_length_phase_impedance_mrid", "TEXT", NOT_NULL)
-    val FROM_PHASE: Column = Column(++columnIndex, "from_phase", "TEXT", NOT_NULL)
-    val TO_PHASE: Column = Column(++columnIndex, "to_phase", "TEXT", NOT_NULL)
-    val B: Column = Column(++columnIndex, "b", "NUMBER", NULL)
-    val G: Column = Column(++columnIndex, "g", "NUMBER", NULL)
-    val R: Column = Column(++columnIndex, "r", "NUMBER", NULL)
-    val X: Column = Column(++columnIndex, "x", "NUMBER", NULL)
+    val PER_LENGTH_PHASE_IMPEDANCE_MRID: Column = Column(++columnIndex, "per_length_phase_impedance_mrid", Column.Type.STRING, NOT_NULL)
+    val FROM_PHASE: Column = Column(++columnIndex, "from_phase", Column.Type.STRING, NOT_NULL)
+    val TO_PHASE: Column = Column(++columnIndex, "to_phase", Column.Type.STRING, NOT_NULL)
+    val B: Column = Column(++columnIndex, "b", Column.Type.DOUBLE, NULL)
+    val G: Column = Column(++columnIndex, "g", Column.Type.DOUBLE, NULL)
+    val R: Column = Column(++columnIndex, "r", Column.Type.DOUBLE, NULL)
+    val X: Column = Column(++columnIndex, "x", Column.Type.DOUBLE, NULL)
 
     override val name: String = "phase_impedance_data"
 

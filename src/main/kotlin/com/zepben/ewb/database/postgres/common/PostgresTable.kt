@@ -27,7 +27,6 @@ abstract class PostgresTable internal constructor() : SqlTable() {
                 "ON $name (${indexCols.joinToString { it.name }})"
         }
 
-    private fun Column.sqlString(): String = (name + " " + type + " " + nullable.sqlString()).trim { it <= ' ' }
-    private fun Column.Nullable.sqlString(): String = if (this == Column.Nullable.NULL) "NULL" else if (this == Column.Nullable.NOT_NULL) "NOT NULL" else ""
+    private fun Column.sqlString(): String = "$name ${type.postgres} ${nullable.postgres}"
 
 }

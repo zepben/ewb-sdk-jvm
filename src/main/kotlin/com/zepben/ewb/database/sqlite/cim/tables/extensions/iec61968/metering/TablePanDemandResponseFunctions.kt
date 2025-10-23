@@ -16,8 +16,8 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61968.metering.TableEndDevic
 @Suppress("PropertyName")
 class TablePanDemandResponseFunctions : TableEndDeviceFunctions() {
 
-    val KIND: Column = Column(++columnIndex, "kind", "TEXT", NOT_NULL)
-    val APPLIANCE: Column = Column(++columnIndex, "appliance", "INTEGER", NULL)
+    val KIND: Column = Column(++columnIndex, "kind", Column.Type.STRING, NOT_NULL)
+    val APPLIANCE: Column = Column(++columnIndex, "appliance", Column.Type.INTEGER, NULL)
 
     override val name: String = "pan_demand_response_functions"
 

@@ -31,7 +31,7 @@ class LocalEwbDataFilePaths @JvmOverloads constructor(
     private val createDirectories: (Path) -> Path = { Files.createDirectories(it) },
     isDirectory: (Path) -> Boolean = { Files.isDirectory(it) },
     private val exists: (Path) -> Boolean = { Files.exists(it) },
-    private val listFiles: (Path) -> Iterator<Path> = { Files.walk(it, 2, FileVisitOption.FOLLOW_LINKS).iterator() }
+    private val listFiles: (Path) -> Iterator<Path> = { Files.walk(it, MAX_DEPTH, FileVisitOption.FOLLOW_LINKS).iterator() }
 ) : EwbDataFilePaths {
 
     init {
@@ -57,4 +57,16 @@ class LocalEwbDataFilePaths @JvmOverloads constructor(
 
     override fun resolveDatabase(path: Path): Path =
         baseDir.resolve(path)
+
+    private companion object {
+
+        // The maximum depth to follow links. A depth of 4 is used to allow finding:
+        // 1. The top level date directory.
+        // 2. The base service databases and the variants sub folder.
+        // 3. The variant folders.
+        // 4. The variant service databases.
+        const val MAX_DEPTH = 4
+
+    }
+
 }

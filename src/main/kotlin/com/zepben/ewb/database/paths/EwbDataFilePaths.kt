@@ -34,6 +34,20 @@ interface EwbDataFilePaths {
 
     /**
      * Resolves the [Path] to the database file for the specified [DatabaseType] that has
+     * [DatabaseType.perDate] set to true and the specified [LocalDate], within the [variant].
+     *
+     * @param type The [DatabaseType] to use for the database [Path].
+     * @param date The [LocalDate] to use for the database [Path].
+     * @param variant The name of the variant containing the database.
+     * @return The [Path] to the [DatabaseType] database file for the [variant].
+     */
+    fun resolve(type: DatabaseType, date: LocalDate, variant: String): Path {
+        require(type.perDate) { "type must have its perDate set to true to use this method." }
+        return resolveDatabase(date.toDatedVariantPath(type, variant))
+    }
+
+    /**
+     * Resolves the [Path] to the database file for the specified [DatabaseType] that has
      * [DatabaseType.perDate] set to false.
      *
      * @param type The [DatabaseType] to use for the database [Path].
@@ -109,6 +123,23 @@ interface EwbDataFilePaths {
     }
 
     /**
+     * Find available variants for the specified [date] in data path.
+     *
+     * @param date The target date. Defaults to today.
+     *
+     * @return list of variant names that exist in the data path for the specified [date].
+     */
+    fun getAvailableVariantsFor(date: LocalDate = LocalDate.now()): List<String> {
+        return enumerateDescendants()
+            .asSequence()
+            .filter { it.parent?.fileName.toString().lowercase() == VARIANTS_PATH }
+            .filter { it.parent?.parent?.fileName.toString() == date.toString() }
+            .map { it.fileName.toString() }
+            .sorted()
+            .toList()
+    }
+
+    /**
      * Lists the child items of source location.
      *
      * @return collection of child items.
@@ -138,6 +169,18 @@ interface EwbDataFilePaths {
     private fun LocalDate.toDatedPath(type: DatabaseType): Path =
         toString().let { dateStr -> Paths.get(dateStr).resolve("$dateStr-${type.databaseName}") }
 
+    private fun LocalDate.toDatedVariantPath(type: DatabaseType, variant: String): Path =
+        toString().let { dateStr -> Paths.get(dateStr).resolve(VARIANTS_PATH).resolve(variant).resolve("$dateStr-${type.databaseName}") }
+
     private val DatabaseType.databaseName: String get() = "$fileDescriptor.sqlite"
+
+    companion object {
+
+        /**
+         * The folder containing the variants. Will be placed under the dated folder alongside the network model database.
+         */
+        const val VARIANTS_PATH: String = "variants"
+
+    }
 
 }

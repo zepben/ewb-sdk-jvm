@@ -11,7 +11,7 @@ package com.zepben.ewb.database.paths
 import com.zepben.testutils.exception.ExpectException.Companion.expect
 import io.mockk.*
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -70,12 +70,24 @@ class LocalEwbDataFilePathsTest {
 
     @Test
     internal fun `formats paths`() {
-        DatabaseType.entries.filter { it.perDate }.forEach {
-            assertThat(ewbPaths.resolve(it, today), equalTo(baseDir.datedPath(today, it.fileDescriptor)))
+        DatabaseType.entries.forEach { type ->
+            if (type.perDate)
+                assertThat(ewbPaths.resolve(type, today), equalTo(baseDir.datedPath(today, type.fileDescriptor)))
+            else {
+                expect { ewbPaths.resolve(type, today) }
+                    .toThrow<IllegalArgumentException>()
+                    .withMessage("type must have its perDate set to true to use this method.")
+            }
         }
 
-        DatabaseType.entries.filter { !it.perDate }.forEach {
-            assertThat(ewbPaths.resolve(it), equalTo(baseDir.resolve(it.fileDescriptor + ".sqlite")))
+        DatabaseType.entries.forEach { type ->
+            if (!type.perDate)
+                assertThat(ewbPaths.resolve(type), equalTo(baseDir.resolve(type.fileDescriptor + ".sqlite")))
+            else {
+                expect { ewbPaths.resolve(type) }
+                    .toThrow<IllegalArgumentException>()
+                    .withMessage("type must have its perDate set to false to use this method.")
+            }
         }
     }
 
@@ -179,26 +191,6 @@ class LocalEwbDataFilePathsTest {
         }
     }
 
-    private fun `validate getAvailableDatesFor for date type`(dbType: DatabaseType) {
-        clearMocks(isDirectory, exists, listFiles, answers = false)
-
-        val usableDirectories = listOf("2001-02-03", "2001-02-04", "2011-03-09")
-        val emptyDirectories = listOf("2111-11-11", "2222-12-14")
-        val nonDateDirectories = listOf("other_data", "2002-02-04-backup", "backup-2011-03-09")
-        val nonDirectoryFiles = listOf("config.json", "other", "run.sh", "1234-11-22")
-
-        val otherPaths = (emptyDirectories + nonDateDirectories + nonDirectoryFiles)
-
-        every { listFiles(baseDir) } answers {
-            (usableDirectories.map { Paths.get(baseDir.toString(), it, "${dbType.fileDescriptor}.sqlite") } +
-                otherPaths.map { Paths.get(baseDir.toString(), it) }).iterator()
-        }
-
-        assertThat(ewbPaths.getAvailableDatesFor(dbType), equalTo(usableDirectories.map { LocalDate.parse(it) }))
-
-        verify { listFiles(baseDir) }
-    }
-
     @Test
     internal fun `getAvailableDatesFor() sorts the returned dates`() {
         val directories = listOf(
@@ -221,19 +213,6 @@ class LocalEwbDataFilePathsTest {
             )
         )
     }
-
-    private fun validateClosest(expectedDate: LocalDate?, searchForwards: Boolean = false) {
-        DatabaseType.entries.filter { it.perDate }.forEach {
-            validateClosest(it, expectedDate, searchForwards)
-        }
-    }
-
-    private fun validateClosest(type: DatabaseType, expectedDate: LocalDate?, searchForwards: Boolean = false) {
-        assertThat(ewbPaths.findClosest(type, 10, today, searchForwards), equalTo(expectedDate))
-    }
-
-    private fun Path.datedPath(date: LocalDate, name: String): Path =
-        resolve(date.toString()).resolve("$date-$name.sqlite")
 
     @Test
     internal fun enumerateDescendants() {
@@ -259,4 +238,107 @@ class LocalEwbDataFilePathsTest {
 
         assertThat(ewbPaths.resolveDatabase(Paths.get(path)), equalTo(baseDir.resolve(path)))
     }
+
+    @Test
+    internal fun `resolves variant databases`() {
+        fun DatabaseType.toVariantPath(variant: String) =
+            baseDir.resolve(today.toString()).resolve(EwbDataFilePaths.VARIANTS_PATH).resolve(variant).resolve("$today-$fileDescriptor.sqlite")
+
+        DatabaseType.entries.forEach { type ->
+            if (type.perDate) {
+                assertThat(ewbPaths.resolve(type, today, "my-variant1"), equalTo(type.toVariantPath("my-variant1")))
+                assertThat(ewbPaths.resolve(type, today, "my-variant2"), equalTo(type.toVariantPath("my-variant2")))
+            } else {
+                expect { ewbPaths.resolve(type, today, "my-variant") }
+                    .toThrow<IllegalArgumentException>()
+                    .withMessage("type must have its perDate set to true to use this method.")
+            }
+        }
+    }
+
+    @Test
+    internal fun `can request variants for a day`() {
+        val yesterday = today.minusDays(1)
+
+        descendants += listOf(
+            Path.of(yesterday.toString(), EwbDataFilePaths.VARIANTS_PATH, "my-variant-1"),
+            Path.of(yesterday.toString(), EwbDataFilePaths.VARIANTS_PATH, "my-variant-2"),
+
+            Path.of(today.toString(), EwbDataFilePaths.VARIANTS_PATH, "my-variant-2"),
+            Path.of(today.toString(), EwbDataFilePaths.VARIANTS_PATH, "my-variant-3"),
+        )
+
+        assertThat(ewbPaths.getAvailableVariantsFor(yesterday), contains("my-variant-1", "my-variant-2"))
+
+        // No date will default to today.
+        assertThat(ewbPaths.getAvailableVariantsFor(), contains("my-variant-2", "my-variant-3"))
+
+        // Should return an empty list if there are no variants for the specified date.
+        assertThat(ewbPaths.getAvailableVariantsFor(today.minusDays(2)), empty())
+    }
+
+    @Test
+    internal fun `variant databases don't count for the exists check for find nearest`() {
+        val t1 = today.minusDays(1)
+        val t2 = today.minusDays(2)
+
+        DatabaseType.entries.filter { it.perDate }.forEach {
+            descendants.add(Path.of(t1.toString(), EwbDataFilePaths.VARIANTS_PATH, "my-variant", "${t1}-${it.fileDescriptor}.sqlite"))
+        }
+
+        DatabaseType.entries.filter { it.perDate }.forEach {
+            assertThat(ewbPaths.findClosest(it, maxDaysToSearch = 3), nullValue())
+        }
+
+        DatabaseType.entries.filter { it.perDate }.forEach {
+            descendants.add(Path.of(t2.toString(), "${t2}-${it.fileDescriptor}.sqlite"))
+        }
+
+        DatabaseType.entries.filter { it.perDate }.forEach {
+            assertThat(ewbPaths.findClosest(it, maxDaysToSearch = 3), equalTo(t2))
+        }
+    }
+
+    @Test
+    internal fun `only folders under variants are included`() {
+        val yesterday = today.minusDays(1)
+
+        descendants.add(Path.of(yesterday.toString(), "not-variant", "my-variant-1"))
+
+        assertThat(ewbPaths.getAvailableVariantsFor(yesterday), empty())
+    }
+
+    private fun validateClosest(expectedDate: LocalDate?, searchForwards: Boolean = false) {
+        DatabaseType.entries.filter { it.perDate }.forEach {
+            validateClosest(it, expectedDate, searchForwards)
+        }
+    }
+
+    private fun validateClosest(type: DatabaseType, expectedDate: LocalDate?, searchForwards: Boolean = false) {
+        assertThat(ewbPaths.findClosest(type, 10, today, searchForwards), equalTo(expectedDate))
+    }
+
+    private fun `validate getAvailableDatesFor for date type`(dbType: DatabaseType) {
+        clearMocks(isDirectory, exists, listFiles, answers = false)
+
+        val usableDirectories = listOf("2001-02-03", "2001-02-04", "2011-03-09")
+        val emptyDirectories = listOf("2111-11-11", "2222-12-14")
+        val nonDateDirectories = listOf("other_data", "2002-02-04-backup", "backup-2011-03-09")
+        val nonDirectoryFiles = listOf("config.json", "other", "run.sh", "1234-11-22")
+
+        val otherPaths = (emptyDirectories + nonDateDirectories + nonDirectoryFiles)
+
+        every { listFiles(baseDir) } answers {
+            (usableDirectories.map { Paths.get(baseDir.toString(), it, "${dbType.fileDescriptor}.sqlite") } +
+                otherPaths.map { Paths.get(baseDir.toString(), it) }).iterator()
+        }
+
+        assertThat(ewbPaths.getAvailableDatesFor(dbType), equalTo(usableDirectories.map { LocalDate.parse(it) }))
+
+        verify { listFiles(baseDir) }
+    }
+
+    private fun Path.datedPath(date: LocalDate, name: String): Path =
+        resolve(date.toString()).resolve("$date-$name.sqlite")
+
 }

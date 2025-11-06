@@ -38,10 +38,10 @@ import com.zepben.ewb.cim.iec61970.base.scada.RemoteSource
 import com.zepben.ewb.cim.iec61970.base.wires.*
 import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.ewb.services.common.Resolvers
-import com.zepben.ewb.services.common.translator.BaseProtoToCim
-import com.zepben.ewb.services.common.translator.toCim
-import com.zepben.ewb.services.common.translator.toInstant
+import com.zepben.ewb.services.common.translator.*
 import com.zepben.ewb.services.network.NetworkService
+import com.zepben.protobuf.nc.NetworkIdentifiedObject
+import com.zepben.protobuf.nc.NetworkIdentifiedObject.IdentifiedObjectCase.*
 import com.zepben.protobuf.cim.extensions.iec61968.assetinfo.RelayInfo as PBRelayInfo
 import com.zepben.protobuf.cim.extensions.iec61968.common.ContactDetails as PBContactDetails
 import com.zepben.protobuf.cim.extensions.iec61968.metering.PanDemandResponseFunction as PBPanDemandResponseFunction
@@ -182,6 +182,108 @@ import com.zepben.protobuf.cim.iec61970.base.wires.TapChangerControl as PBTapCha
 import com.zepben.protobuf.cim.iec61970.base.wires.TransformerEnd as PBTransformerEnd
 import com.zepben.protobuf.cim.iec61970.base.wires.TransformerStarImpedance as PBTransformerStarImpedance
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Circuit as PBCircuit
+
+/**
+ * An extension to add a converted copy of the protobuf [NetworkIdentifiedObject] to the [NetworkService].
+ *
+ * @receiver The [NetworkService] to add the converted [pb] into.
+ * @param pb The [NetworkIdentifiedObject] to add to the [NetworkService].
+ * @return The result of trying to add the item to the service.
+ */
+fun NetworkService.addFromPb(pb: NetworkIdentifiedObject): AddFromPbResult =
+    when (pb.identifiedObjectCase) {
+        BATTERYUNIT -> getOrAddFromPb(pb.batteryUnit.mRID()) { addFromPb(pb.batteryUnit) }
+        PHOTOVOLTAICUNIT -> getOrAddFromPb(pb.photoVoltaicUnit.mRID()) { addFromPb(pb.photoVoltaicUnit) }
+        POWERELECTRONICSWINDUNIT -> getOrAddFromPb(pb.powerElectronicsWindUnit.mRID()) { addFromPb(pb.powerElectronicsWindUnit) }
+        CABLEINFO -> getOrAddFromPb(pb.cableInfo.mRID()) { addFromPb(pb.cableInfo) }
+        OVERHEADWIREINFO -> getOrAddFromPb(pb.overheadWireInfo.mRID()) { addFromPb(pb.overheadWireInfo) }
+        POWERTRANSFORMERINFO -> getOrAddFromPb(pb.powerTransformerInfo.mRID()) { addFromPb(pb.powerTransformerInfo) }
+        ASSETOWNER -> getOrAddFromPb(pb.assetOwner.mRID()) { addFromPb(pb.assetOwner) }
+        ORGANISATION -> getOrAddFromPb(pb.organisation.mRID()) { addFromPb(pb.organisation) }
+        LOCATION -> getOrAddFromPb(pb.location.mRID()) { addFromPb(pb.location) }
+        METER -> getOrAddFromPb(pb.meter.mRID()) { addFromPb(pb.meter) }
+        USAGEPOINT -> getOrAddFromPb(pb.usagePoint.mRID()) { addFromPb(pb.usagePoint) }
+        OPERATIONALRESTRICTION -> getOrAddFromPb(pb.operationalRestriction.mRID()) { addFromPb(pb.operationalRestriction) }
+        FAULTINDICATOR -> getOrAddFromPb(pb.faultIndicator.mRID()) { addFromPb(pb.faultIndicator) }
+        BASEVOLTAGE -> getOrAddFromPb(pb.baseVoltage.mRID()) { addFromPb(pb.baseVoltage) }
+        CONNECTIVITYNODE -> getOrAddFromPb(pb.connectivityNode.mRID()) { addFromPb(pb.connectivityNode) }
+        FEEDER -> getOrAddFromPb(pb.feeder.mRID()) { addFromPb(pb.feeder) }
+        GEOGRAPHICALREGION -> getOrAddFromPb(pb.geographicalRegion.mRID()) { addFromPb(pb.geographicalRegion) }
+        SITE -> getOrAddFromPb(pb.site.mRID()) { addFromPb(pb.site) }
+        SUBGEOGRAPHICALREGION -> getOrAddFromPb(pb.subGeographicalRegion.mRID()) { addFromPb(pb.subGeographicalRegion) }
+        SUBSTATION -> getOrAddFromPb(pb.substation.mRID()) { addFromPb(pb.substation) }
+        TERMINAL -> getOrAddFromPb(pb.terminal.mRID()) { addFromPb(pb.terminal) }
+        ACLINESEGMENT -> getOrAddFromPb(pb.acLineSegment.mRID()) { addFromPb(pb.acLineSegment) }
+        BREAKER -> getOrAddFromPb(pb.breaker.mRID()) { addFromPb(pb.breaker) }
+        LOADBREAKSWITCH -> getOrAddFromPb(pb.loadBreakSwitch.mRID()) { addFromPb(pb.loadBreakSwitch) }
+        DISCONNECTOR -> getOrAddFromPb(pb.disconnector.mRID()) { addFromPb(pb.disconnector) }
+        ENERGYCONSUMER -> getOrAddFromPb(pb.energyConsumer.mRID()) { addFromPb(pb.energyConsumer) }
+        ENERGYCONSUMERPHASE -> getOrAddFromPb(pb.energyConsumerPhase.mRID()) { addFromPb(pb.energyConsumerPhase) }
+        ENERGYSOURCE -> getOrAddFromPb(pb.energySource.mRID()) { addFromPb(pb.energySource) }
+        ENERGYSOURCEPHASE -> getOrAddFromPb(pb.energySourcePhase.mRID()) { addFromPb(pb.energySourcePhase) }
+        FUSE -> getOrAddFromPb(pb.fuse.mRID()) { addFromPb(pb.fuse) }
+        JUMPER -> getOrAddFromPb(pb.jumper.mRID()) { addFromPb(pb.jumper) }
+        JUNCTION -> getOrAddFromPb(pb.junction.mRID()) { addFromPb(pb.junction) }
+        LINEARSHUNTCOMPENSATOR -> getOrAddFromPb(pb.linearShuntCompensator.mRID()) { addFromPb(pb.linearShuntCompensator) }
+        PERLENGTHSEQUENCEIMPEDANCE -> getOrAddFromPb(pb.perLengthSequenceImpedance.mRID()) { addFromPb(pb.perLengthSequenceImpedance) }
+        POWERELECTRONICSCONNECTION -> getOrAddFromPb(pb.powerElectronicsConnection.mRID()) { addFromPb(pb.powerElectronicsConnection) }
+        POWERELECTRONICSCONNECTIONPHASE -> getOrAddFromPb(pb.powerElectronicsConnectionPhase.mRID()) { addFromPb(pb.powerElectronicsConnectionPhase) }
+        POWERTRANSFORMER -> getOrAddFromPb(pb.powerTransformer.mRID()) { addFromPb(pb.powerTransformer) }
+        POWERTRANSFORMEREND -> getOrAddFromPb(pb.powerTransformerEnd.mRID()) { addFromPb(pb.powerTransformerEnd) }
+        RATIOTAPCHANGER -> getOrAddFromPb(pb.ratioTapChanger.mRID()) { addFromPb(pb.ratioTapChanger) }
+        RECLOSER -> getOrAddFromPb(pb.recloser.mRID()) { addFromPb(pb.recloser) }
+        BUSBARSECTION -> getOrAddFromPb(pb.busbarSection.mRID()) { addFromPb(pb.busbarSection) }
+        CIRCUIT -> getOrAddFromPb(pb.circuit.mRID()) { addFromPb(pb.circuit) }
+        LOOP -> getOrAddFromPb(pb.loop.mRID()) { addFromPb(pb.loop) }
+        POLE -> getOrAddFromPb(pb.pole.mRID()) { addFromPb(pb.pole) }
+        STREETLIGHT -> getOrAddFromPb(pb.streetlight.mRID()) { addFromPb(pb.streetlight) }
+        ACCUMULATOR -> getOrAddFromPb(pb.accumulator.measurement.mRID()) { addFromPb(pb.accumulator) }
+        ANALOG -> getOrAddFromPb(pb.analog.measurement.mRID()) { addFromPb(pb.analog) }
+        DISCRETE -> getOrAddFromPb(pb.discrete.measurement.mRID()) { addFromPb(pb.discrete) }
+        CONTROL -> getOrAddFromPb(pb.control.mRID()) { addFromPb(pb.control) }
+        REMOTECONTROL -> getOrAddFromPb(pb.remoteControl.mRID()) { addFromPb(pb.remoteControl) }
+        REMOTESOURCE -> getOrAddFromPb(pb.remoteSource.mRID()) { addFromPb(pb.remoteSource) }
+        TRANSFORMERSTARIMPEDANCE -> getOrAddFromPb(pb.transformerStarImpedance.mRID()) { addFromPb(pb.transformerStarImpedance) }
+        TRANSFORMERENDINFO -> getOrAddFromPb(pb.transformerEndInfo.mRID()) { addFromPb(pb.transformerEndInfo) }
+        TRANSFORMERTANKINFO -> getOrAddFromPb(pb.transformerTankInfo.mRID()) { addFromPb(pb.transformerTankInfo) }
+        NOLOADTEST -> getOrAddFromPb(pb.noLoadTest.mRID()) { addFromPb(pb.noLoadTest) }
+        OPENCIRCUITTEST -> getOrAddFromPb(pb.openCircuitTest.mRID()) { addFromPb(pb.openCircuitTest) }
+        SHORTCIRCUITTEST -> getOrAddFromPb(pb.shortCircuitTest.mRID()) { addFromPb(pb.shortCircuitTest) }
+        EQUIVALENTBRANCH -> getOrAddFromPb(pb.equivalentBranch.mRID()) { addFromPb(pb.equivalentBranch) }
+        SHUNTCOMPENSATORINFO -> getOrAddFromPb(pb.shuntCompensatorInfo.mRID()) { addFromPb(pb.shuntCompensatorInfo) }
+        LVFEEDER -> getOrAddFromPb(pb.lvFeeder.mRID()) { addFromPb(pb.lvFeeder) }
+        CURRENTTRANSFORMER -> getOrAddFromPb(pb.currentTransformer.mRID()) { addFromPb(pb.currentTransformer) }
+        POTENTIALTRANSFORMER -> getOrAddFromPb(pb.potentialTransformer.mRID()) { addFromPb(pb.potentialTransformer) }
+        CURRENTTRANSFORMERINFO -> getOrAddFromPb(pb.currentTransformerInfo.mRID()) { addFromPb(pb.currentTransformerInfo) }
+        POTENTIALTRANSFORMERINFO -> getOrAddFromPb(pb.potentialTransformerInfo.mRID()) { addFromPb(pb.potentialTransformerInfo) }
+        SWITCHINFO -> getOrAddFromPb(pb.switchInfo.mRID()) { addFromPb(pb.switchInfo) }
+        RELAYINFO -> getOrAddFromPb(pb.relayInfo.mRID()) { addFromPb(pb.relayInfo) }
+        CURRENTRELAY -> getOrAddFromPb(pb.currentRelay.mRID()) { addFromPb(pb.currentRelay) }
+        EVCHARGINGUNIT -> getOrAddFromPb(pb.evChargingUnit.mRID()) { addFromPb(pb.evChargingUnit) }
+        TAPCHANGERCONTROL -> getOrAddFromPb(pb.tapChangerControl.mRID()) { addFromPb(pb.tapChangerControl) }
+        SERIESCOMPENSATOR -> getOrAddFromPb(pb.seriesCompensator.mRID()) { addFromPb(pb.seriesCompensator) }
+        GROUND -> getOrAddFromPb(pb.ground.mRID()) { addFromPb(pb.ground) }
+        GROUNDDISCONNECTOR -> getOrAddFromPb(pb.groundDisconnector.mRID()) { addFromPb(pb.groundDisconnector) }
+        PROTECTIONRELAYSCHEME -> getOrAddFromPb(pb.protectionRelayScheme.mRID()) { addFromPb(pb.protectionRelayScheme) }
+        PROTECTIONRELAYSYSTEM -> getOrAddFromPb(pb.protectionRelaySystem.mRID()) { addFromPb(pb.protectionRelaySystem) }
+        VOLTAGERELAY -> getOrAddFromPb(pb.voltageRelay.mRID()) { addFromPb(pb.voltageRelay) }
+        DISTANCERELAY -> getOrAddFromPb(pb.distanceRelay.mRID()) { addFromPb(pb.distanceRelay) }
+        REACTIVECAPABILITYCURVE -> getOrAddFromPb(pb.reactiveCapabilityCurve.mRID()) { addFromPb(pb.reactiveCapabilityCurve) }
+        SYNCHRONOUSMACHINE -> getOrAddFromPb(pb.synchronousMachine.mRID()) { addFromPb(pb.synchronousMachine) }
+        GROUNDINGIMPEDANCE -> getOrAddFromPb(pb.groundingImpedance.mRID()) { addFromPb(pb.groundingImpedance) }
+        PETERSENCOIL -> getOrAddFromPb(pb.petersenCoil.mRID()) { addFromPb(pb.petersenCoil) }
+        PANDEMANDRESPONSEFUNCTION -> getOrAddFromPb(pb.panDemandResponseFunction.mRID()) { addFromPb(pb.panDemandResponseFunction) }
+        BATTERYCONTROL -> getOrAddFromPb(pb.batteryControl.mRID()) { addFromPb(pb.batteryControl) }
+        STATICVARCOMPENSATOR -> getOrAddFromPb(pb.staticVarCompensator.mRID()) { addFromPb(pb.staticVarCompensator) }
+        PERLENGTHPHASEIMPEDANCE -> getOrAddFromPb(pb.perLengthPhaseImpedance.mRID()) { addFromPb(pb.perLengthPhaseImpedance) }
+        CUT -> getOrAddFromPb(pb.cut.mRID()) { addFromPb(pb.cut) }
+        CLAMP -> getOrAddFromPb(pb.clamp.mRID()) { addFromPb(pb.clamp) }
+        DIRECTIONALCURRENTRELAY -> getOrAddFromPb(pb.directionalCurrentRelay.mRID()) { addFromPb(pb.directionalCurrentRelay) }
+        OTHER, IDENTIFIEDOBJECT_NOT_SET, null -> throw UnsupportedOperationException(
+            "Identified object type ${pb.identifiedObjectCase} is not supported by the network service"
+        )
+
+    }
 
 // ##################################
 // # Extensions IEC61968 Asset Info #
@@ -2986,6 +3088,15 @@ fun NetworkService.addFromPb(pb: PBCircuit): Circuit? = tryAddOrNull(toCim(pb, t
  * @property networkService The [NetworkService] all converted objects should be added to.
  */
 class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
+
+    /**
+     * Add a converted copy of the protobuf [NetworkIdentifiedObject] to the [NetworkService].
+     *
+     * @param pb The [NetworkIdentifiedObject] to convert.
+     * @return The converted [AddFromPbResult] containing information on how the add was handled.
+     */
+    fun addFromPb(pb: NetworkIdentifiedObject): AddFromPbResult =
+        networkService.addFromPb(pb)
 
     // ##################################
     // # Extensions IEC61968 Asset Info #

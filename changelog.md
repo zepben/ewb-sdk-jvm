@@ -14,7 +14,7 @@
   `getAvailableVariantsFor` to get the list of available variants for a specified date.
 
 ### Enhancements
-* None.
+* Added `addFromPb` methods to accept the top level protobuf messages for `CustomerIdentifiedObject`, `DiagramIdentifiedObject` and `NetworkIdentifiedObject`.
 
 ### Fixes
 * None.

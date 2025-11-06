@@ -11,14 +11,12 @@ package com.zepben.ewb.streaming.get
 import com.zepben.ewb.cim.iec61968.customers.Customer
 import com.zepben.ewb.cim.iec61970.base.core.EquipmentContainer
 import com.zepben.ewb.services.common.BaseService
-import com.zepben.ewb.services.common.translator.mRID
 import com.zepben.ewb.services.customer.CustomerService
 import com.zepben.ewb.services.customer.translator.CustomerProtoToCim
-import com.zepben.ewb.services.customer.translator.mRID
+import com.zepben.ewb.services.customer.translator.addFromPb
 import com.zepben.ewb.streaming.grpc.GrpcChannel
 import com.zepben.ewb.streaming.grpc.GrpcResult
 import com.zepben.protobuf.cc.*
-import com.zepben.protobuf.cc.CustomerIdentifiedObject.IdentifiedObjectCase.*
 import com.zepben.protobuf.metadata.GetMetadataRequest
 import com.zepben.protobuf.metadata.GetMetadataResponse
 import io.grpc.CallCredentials
@@ -144,16 +142,10 @@ class CustomerConsumerClient @JvmOverloads constructor(
         return extractResults.asSequence()
     }
 
-    private fun extractIdentifiedObject(io: CustomerIdentifiedObject): ExtractResult {
-        return when (io.identifiedObjectCase) {
-            ORGANISATION -> extractResult(io.organisation.mRID()) { addFromPb(io.organisation) }
-            CUSTOMER -> extractResult(io.customer.mRID()) { addFromPb(io.customer) }
-            CUSTOMERAGREEMENT -> extractResult(io.customerAgreement.mRID()) { addFromPb(io.customerAgreement) }
-            PRICINGSTRUCTURE -> extractResult(io.pricingStructure.mRID()) { addFromPb(io.pricingStructure) }
-            TARIFF -> extractResult(io.tariff.mRID()) { addFromPb(io.tariff) }
-            OTHER, IDENTIFIEDOBJECT_NOT_SET, null -> throw UnsupportedOperationException("Identified object type ${io.identifiedObjectCase} is not supported by the customer service")
+    private fun extractIdentifiedObject(io: CustomerIdentifiedObject): ExtractResult =
+        protoToCim.customerService.addFromPb(io).let {
+            ExtractResult(it.identifiedObject, it.mRID)
         }
-    }
 
     override fun runGetMetadata(getMetadataRequest: GetMetadataRequest, streamObserver: AwaitableStreamObserver<GetMetadataResponse>) {
         stub.getMetadata(getMetadataRequest, streamObserver)

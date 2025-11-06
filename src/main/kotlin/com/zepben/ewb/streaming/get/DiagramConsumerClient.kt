@@ -11,11 +11,10 @@ package com.zepben.ewb.streaming.get
 import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.diagram.DiagramService
 import com.zepben.ewb.services.diagram.translator.DiagramProtoToCim
-import com.zepben.ewb.services.diagram.translator.mRID
+import com.zepben.ewb.services.diagram.translator.addFromPb
 import com.zepben.ewb.streaming.grpc.GrpcChannel
 import com.zepben.ewb.streaming.grpc.GrpcResult
 import com.zepben.protobuf.dc.*
-import com.zepben.protobuf.dc.DiagramIdentifiedObject.IdentifiedObjectCase.*
 import com.zepben.protobuf.metadata.GetMetadataRequest
 import com.zepben.protobuf.metadata.GetMetadataResponse
 import io.grpc.CallCredentials
@@ -119,13 +118,10 @@ class DiagramConsumerClient(
         return extractResults.asSequence()
     }
 
-    private fun extractIdentifiedObject(io: DiagramIdentifiedObject): ExtractResult {
-        return when (io.identifiedObjectCase) {
-            DIAGRAM -> extractResult(io.diagram.mRID()) { addFromPb(io.diagram) }
-            DIAGRAMOBJECT -> extractResult(io.diagramObject.mRID()) { addFromPb(io.diagramObject) }
-            OTHER, IDENTIFIEDOBJECT_NOT_SET, null -> throw UnsupportedOperationException("Identified object type ${io.identifiedObjectCase} is not supported by the diagram service")
+    private fun extractIdentifiedObject(io: DiagramIdentifiedObject): ExtractResult =
+        protoToCim.diagramService.addFromPb(io).let {
+            ExtractResult(it.identifiedObject, it.mRID)
         }
-    }
 
     private fun processDiagramObjects(
         mRIDs: Sequence<String>,

@@ -16,6 +16,11 @@ import com.zepben.protobuf.cim.iec61970.base.meas.AnalogValue as PBAnalogValue
 import com.zepben.protobuf.cim.iec61970.base.meas.DiscreteValue as PBDiscreteValue
 import com.zepben.protobuf.cim.iec61970.base.meas.MeasurementValue as PBMeasurementValue
 
+//
+// NOTE: Top level addFromPb doesn't exist for the measurement service at this stage. This can be implemented if
+// we ever add proper support for these objects.
+//
+
 // ######################
 // # IEC61970 Base Meas #
 // ######################
@@ -101,6 +106,11 @@ fun MeasurementService.addFromPb(pb: PBDiscreteValue): DiscreteValue = toCim(pb)
 //
 @Suppress("Unused")
 class MeasurementProtoToCim(private val measurementService: MeasurementService) {
+
+    //
+    // NOTE: Top level addFromPb doesn't exist for the measurement service at this stage. This can be implemented if
+    // we ever add proper support for these objects.
+    //
 
     // ######################
     // # IEC61970 Base Meas #

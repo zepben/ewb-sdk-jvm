@@ -14,10 +14,10 @@ import com.zepben.ewb.cim.iec61968.customers.*
 import com.zepben.ewb.cim.iec61970.base.core.NameType
 import com.zepben.ewb.cim.iec61970.base.domain.DateTimeInterval
 import com.zepben.ewb.services.common.Resolvers
-import com.zepben.ewb.services.common.translator.BaseProtoToCim
-import com.zepben.ewb.services.common.translator.toCim
-import com.zepben.ewb.services.common.translator.toInstant
+import com.zepben.ewb.services.common.translator.*
 import com.zepben.ewb.services.customer.CustomerService
+import com.zepben.protobuf.cc.CustomerIdentifiedObject
+import com.zepben.protobuf.cc.CustomerIdentifiedObject.IdentifiedObjectCase.*
 import com.zepben.protobuf.cim.iec61968.common.Agreement as PBAgreement
 import com.zepben.protobuf.cim.iec61968.common.Organisation as PBOrganisation
 import com.zepben.protobuf.cim.iec61968.customers.Customer as PBCustomer
@@ -26,6 +26,23 @@ import com.zepben.protobuf.cim.iec61968.customers.PricingStructure as PBPricingS
 import com.zepben.protobuf.cim.iec61968.customers.Tariff as PBTariff
 import com.zepben.protobuf.cim.iec61970.base.core.NameType as PBNameType
 import com.zepben.protobuf.cim.iec61970.base.domain.DateTimeInterval as PBDateTimeInterval
+
+/**
+ * An extension to add a converted copy of the protobuf [CustomerIdentifiedObject] to the [CustomerService].
+ *
+ * @receiver The [CustomerService] to add the converted [pb] into.
+ * @param pb The [CustomerIdentifiedObject] to add to the [CustomerService].
+ * @return The result of trying to add the item to the service.
+ */
+fun CustomerService.addFromPb(pb: CustomerIdentifiedObject): AddFromPbResult =
+    when (pb.identifiedObjectCase) {
+        ORGANISATION -> getOrAddFromPb(pb.organisation.mRID()) { addFromPb(pb.organisation) }
+        CUSTOMER -> getOrAddFromPb(pb.customer.mRID()) { addFromPb(pb.customer) }
+        CUSTOMERAGREEMENT -> getOrAddFromPb(pb.customerAgreement.mRID()) { addFromPb(pb.customerAgreement) }
+        PRICINGSTRUCTURE -> getOrAddFromPb(pb.pricingStructure.mRID()) { addFromPb(pb.pricingStructure) }
+        TARIFF -> getOrAddFromPb(pb.tariff.mRID()) { addFromPb(pb.tariff) }
+        OTHER, IDENTIFIEDOBJECT_NOT_SET, null -> throw UnsupportedOperationException("Identified object type ${pb.identifiedObjectCase} is not supported by the customer service")
+    }
 
 // ###################
 // # IEC61968 Common #
@@ -156,7 +173,16 @@ private fun toCim(pb: PBDateTimeInterval): DateTimeInterval =
  *
  * @property customerService The [CustomerService] all converted objects should be added to.
  */
-class CustomerProtoToCim(private val customerService: CustomerService) : BaseProtoToCim() {
+class CustomerProtoToCim(val customerService: CustomerService) : BaseProtoToCim() {
+
+    /**
+     * Add a converted copy of the protobuf [CustomerIdentifiedObject] to the [CustomerService].
+     *
+     * @param pb The [CustomerIdentifiedObject] to convert.
+     * @return The converted [AddFromPbResult] containing information on how the add was handled.
+     */
+    fun addFromPb(pb: CustomerIdentifiedObject): AddFromPbResult =
+        customerService.addFromPb(pb)
 
     // ###################
     // # IEC61968 Common #

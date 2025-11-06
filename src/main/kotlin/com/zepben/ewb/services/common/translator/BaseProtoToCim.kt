@@ -21,8 +21,13 @@ import com.zepben.protobuf.cim.iec61968.common.OrganisationRole as PBOrganisatio
 import com.zepben.protobuf.cim.iec61970.base.core.IdentifiedObject as PBIdentifiedObject
 import com.zepben.protobuf.cim.iec61970.base.core.NameType as PBNameType
 
+internal inline fun <reified CIM : IdentifiedObject> BaseService.getOrAddFromPb(mRID: String, addFromPb: () -> CIM?): AddFromPbResult =
+    get<CIM>(mRID)?.let {
+        AddFromPbResult(mRID, it, reusedExisting = true)
+    } ?: AddFromPbResult(mRID, addFromPb(), reusedExisting = false)
+
 //
-// NOTE: Do not add base level extensions here, add them to the overriding services directly otherwise you will have import issues.
+// NOTE: Do not add base level `addFromPb` extensions here, add them to the overriding services directly otherwise you will have import issues.
 //
 
 // ###################

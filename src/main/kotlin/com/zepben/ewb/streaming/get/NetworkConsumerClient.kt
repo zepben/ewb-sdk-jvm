@@ -18,6 +18,7 @@ import com.zepben.ewb.services.common.translator.mRID
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.NetworkState
 import com.zepben.ewb.services.network.translator.NetworkProtoToCim
+import com.zepben.ewb.services.network.translator.addFromPb
 import com.zepben.ewb.services.network.translator.mRID
 import com.zepben.ewb.streaming.get.hierarchy.NetworkHierarchy
 import com.zepben.ewb.streaming.grpc.GrpcChannel
@@ -25,7 +26,6 @@ import com.zepben.ewb.streaming.grpc.GrpcResult
 import com.zepben.protobuf.metadata.GetMetadataRequest
 import com.zepben.protobuf.metadata.GetMetadataResponse
 import com.zepben.protobuf.nc.*
-import com.zepben.protobuf.nc.NetworkIdentifiedObject.IdentifiedObjectCase.*
 import io.grpc.CallCredentials
 import io.grpc.Channel
 import java.io.IOException
@@ -543,98 +543,8 @@ class NetworkConsumerClient(
     }
 
     private fun extractIdentifiedObject(io: NetworkIdentifiedObject): ExtractResult =
-        when (io.identifiedObjectCase) {
-            BATTERYUNIT -> extractResult(io.batteryUnit.mRID()) { addFromPb(io.batteryUnit) }
-            PHOTOVOLTAICUNIT -> extractResult(io.photoVoltaicUnit.mRID()) { addFromPb(io.photoVoltaicUnit) }
-            POWERELECTRONICSWINDUNIT -> extractResult(io.powerElectronicsWindUnit.mRID()) { addFromPb(io.powerElectronicsWindUnit) }
-            CABLEINFO -> extractResult(io.cableInfo.mRID()) { addFromPb(io.cableInfo) }
-            OVERHEADWIREINFO -> extractResult(io.overheadWireInfo.mRID()) { addFromPb(io.overheadWireInfo) }
-            POWERTRANSFORMERINFO -> extractResult(io.powerTransformerInfo.mRID()) { addFromPb(io.powerTransformerInfo) }
-            ASSETOWNER -> extractResult(io.assetOwner.mRID()) { addFromPb(io.assetOwner) }
-            ORGANISATION -> extractResult(io.organisation.mRID()) { addFromPb(io.organisation) }
-            LOCATION -> extractResult(io.location.mRID()) { addFromPb(io.location) }
-            METER -> extractResult(io.meter.mRID()) { addFromPb(io.meter) }
-            USAGEPOINT -> extractResult(io.usagePoint.mRID()) { addFromPb(io.usagePoint) }
-            OPERATIONALRESTRICTION -> extractResult(io.operationalRestriction.mRID()) { addFromPb(io.operationalRestriction) }
-            FAULTINDICATOR -> extractResult(io.faultIndicator.mRID()) { addFromPb(io.faultIndicator) }
-            BASEVOLTAGE -> extractResult(io.baseVoltage.mRID()) { addFromPb(io.baseVoltage) }
-            CONNECTIVITYNODE -> extractResult(io.connectivityNode.mRID()) { addFromPb(io.connectivityNode) }
-            FEEDER -> extractResult(io.feeder.mRID()) { addFromPb(io.feeder) }
-            GEOGRAPHICALREGION -> extractResult(io.geographicalRegion.mRID()) { addFromPb(io.geographicalRegion) }
-            SITE -> extractResult(io.site.mRID()) { addFromPb(io.site) }
-            SUBGEOGRAPHICALREGION -> extractResult(io.subGeographicalRegion.mRID()) { addFromPb(io.subGeographicalRegion) }
-            SUBSTATION -> extractResult(io.substation.mRID()) { addFromPb(io.substation) }
-            TERMINAL -> extractResult(io.terminal.mRID()) { addFromPb(io.terminal) }
-            ACLINESEGMENT -> extractResult(io.acLineSegment.mRID()) { addFromPb(io.acLineSegment) }
-            BREAKER -> extractResult(io.breaker.mRID()) { addFromPb(io.breaker) }
-            LOADBREAKSWITCH -> extractResult(io.loadBreakSwitch.mRID()) { addFromPb(io.loadBreakSwitch) }
-            DISCONNECTOR -> extractResult(io.disconnector.mRID()) { addFromPb(io.disconnector) }
-            ENERGYCONSUMER -> extractResult(io.energyConsumer.mRID()) { addFromPb(io.energyConsumer) }
-            ENERGYCONSUMERPHASE -> extractResult(io.energyConsumerPhase.mRID()) { addFromPb(io.energyConsumerPhase) }
-            ENERGYSOURCE -> extractResult(io.energySource.mRID()) { addFromPb(io.energySource) }
-            ENERGYSOURCEPHASE -> extractResult(io.energySourcePhase.mRID()) { addFromPb(io.energySourcePhase) }
-            FUSE -> extractResult(io.fuse.mRID()) { addFromPb(io.fuse) }
-            JUMPER -> extractResult(io.jumper.mRID()) { addFromPb(io.jumper) }
-            JUNCTION -> extractResult(io.junction.mRID()) { addFromPb(io.junction) }
-            LINEARSHUNTCOMPENSATOR -> extractResult(io.linearShuntCompensator.mRID()) { addFromPb(io.linearShuntCompensator) }
-            PERLENGTHSEQUENCEIMPEDANCE -> extractResult(io.perLengthSequenceImpedance.mRID()) { addFromPb(io.perLengthSequenceImpedance) }
-            POWERELECTRONICSCONNECTION -> extractResult(io.powerElectronicsConnection.mRID()) { addFromPb(io.powerElectronicsConnection) }
-            POWERELECTRONICSCONNECTIONPHASE -> extractResult(io.powerElectronicsConnectionPhase.mRID()) { addFromPb(io.powerElectronicsConnectionPhase) }
-            POWERTRANSFORMER -> extractResult(io.powerTransformer.mRID()) { addFromPb(io.powerTransformer) }
-            POWERTRANSFORMEREND -> extractResult(io.powerTransformerEnd.mRID()) { addFromPb(io.powerTransformerEnd) }
-            RATIOTAPCHANGER -> extractResult(io.ratioTapChanger.mRID()) { addFromPb(io.ratioTapChanger) }
-            RECLOSER -> extractResult(io.recloser.mRID()) { addFromPb(io.recloser) }
-            BUSBARSECTION -> extractResult(io.busbarSection.mRID()) { addFromPb(io.busbarSection) }
-            CIRCUIT -> extractResult(io.circuit.mRID()) { addFromPb(io.circuit) }
-            LOOP -> extractResult(io.loop.mRID()) { addFromPb(io.loop) }
-            POLE -> extractResult(io.pole.mRID()) { addFromPb(io.pole) }
-            STREETLIGHT -> extractResult(io.streetlight.mRID()) { addFromPb(io.streetlight) }
-            ACCUMULATOR -> extractResult(io.accumulator.measurement.mRID()) { addFromPb(io.accumulator) }
-            ANALOG -> extractResult(io.analog.measurement.mRID()) { addFromPb(io.analog) }
-            DISCRETE -> extractResult(io.discrete.measurement.mRID()) { addFromPb(io.discrete) }
-            CONTROL -> extractResult(io.control.mRID()) { addFromPb(io.control) }
-            REMOTECONTROL -> extractResult(io.remoteControl.mRID()) { addFromPb(io.remoteControl) }
-            REMOTESOURCE -> extractResult(io.remoteSource.mRID()) { addFromPb(io.remoteSource) }
-            TRANSFORMERSTARIMPEDANCE -> extractResult(io.transformerStarImpedance.mRID()) { addFromPb(io.transformerStarImpedance) }
-            TRANSFORMERENDINFO -> extractResult(io.transformerEndInfo.mRID()) { addFromPb(io.transformerEndInfo) }
-            TRANSFORMERTANKINFO -> extractResult(io.transformerTankInfo.mRID()) { addFromPb(io.transformerTankInfo) }
-            NOLOADTEST -> extractResult(io.noLoadTest.mRID()) { addFromPb(io.noLoadTest) }
-            OPENCIRCUITTEST -> extractResult(io.openCircuitTest.mRID()) { addFromPb(io.openCircuitTest) }
-            SHORTCIRCUITTEST -> extractResult(io.shortCircuitTest.mRID()) { addFromPb(io.shortCircuitTest) }
-            EQUIVALENTBRANCH -> extractResult(io.equivalentBranch.mRID()) { addFromPb(io.equivalentBranch) }
-            SHUNTCOMPENSATORINFO -> extractResult(io.shuntCompensatorInfo.mRID()) { addFromPb(io.shuntCompensatorInfo) }
-            LVFEEDER -> extractResult(io.lvFeeder.mRID()) { addFromPb(io.lvFeeder) }
-            CURRENTTRANSFORMER -> extractResult(io.currentTransformer.mRID()) { addFromPb(io.currentTransformer) }
-            POTENTIALTRANSFORMER -> extractResult(io.potentialTransformer.mRID()) { addFromPb(io.potentialTransformer) }
-            CURRENTTRANSFORMERINFO -> extractResult(io.currentTransformerInfo.mRID()) { addFromPb(io.currentTransformerInfo) }
-            POTENTIALTRANSFORMERINFO -> extractResult(io.potentialTransformerInfo.mRID()) { addFromPb(io.potentialTransformerInfo) }
-            SWITCHINFO -> extractResult(io.switchInfo.mRID()) { addFromPb(io.switchInfo) }
-            RELAYINFO -> extractResult(io.relayInfo.mRID()) { addFromPb(io.relayInfo) }
-            CURRENTRELAY -> extractResult(io.currentRelay.mRID()) { addFromPb(io.currentRelay) }
-            EVCHARGINGUNIT -> extractResult(io.evChargingUnit.mRID()) { addFromPb(io.evChargingUnit) }
-            TAPCHANGERCONTROL -> extractResult(io.tapChangerControl.mRID()) { addFromPb(io.tapChangerControl) }
-            SERIESCOMPENSATOR -> extractResult(io.seriesCompensator.mRID()) { addFromPb(io.seriesCompensator) }
-            GROUND -> extractResult(io.ground.mRID()) { addFromPb(io.ground) }
-            GROUNDDISCONNECTOR -> extractResult(io.groundDisconnector.mRID()) { addFromPb(io.groundDisconnector) }
-            PROTECTIONRELAYSCHEME -> extractResult(io.protectionRelayScheme.mRID()) { addFromPb(io.protectionRelayScheme) }
-            PROTECTIONRELAYSYSTEM -> extractResult(io.protectionRelaySystem.mRID()) { addFromPb(io.protectionRelaySystem) }
-            VOLTAGERELAY -> extractResult(io.voltageRelay.mRID()) { addFromPb(io.voltageRelay) }
-            DISTANCERELAY -> extractResult(io.distanceRelay.mRID()) { addFromPb(io.distanceRelay) }
-            REACTIVECAPABILITYCURVE -> extractResult(io.reactiveCapabilityCurve.mRID()) { addFromPb(io.reactiveCapabilityCurve) }
-            SYNCHRONOUSMACHINE -> extractResult(io.synchronousMachine.mRID()) { addFromPb(io.synchronousMachine) }
-            GROUNDINGIMPEDANCE -> extractResult(io.groundingImpedance.mRID()) { addFromPb(io.groundingImpedance) }
-            PETERSENCOIL -> extractResult(io.petersenCoil.mRID()) { addFromPb(io.petersenCoil) }
-            PANDEMANDRESPONSEFUNCTION -> extractResult(io.panDemandResponseFunction.mRID()) { addFromPb(io.panDemandResponseFunction) }
-            BATTERYCONTROL -> extractResult(io.batteryControl.mRID()) { addFromPb(io.batteryControl) }
-            STATICVARCOMPENSATOR -> extractResult(io.staticVarCompensator.mRID()) { addFromPb(io.staticVarCompensator) }
-            PERLENGTHPHASEIMPEDANCE -> extractResult(io.perLengthPhaseImpedance.mRID()) { addFromPb(io.perLengthPhaseImpedance) }
-            CUT -> extractResult(io.cut.mRID()) { addFromPb(io.cut) }
-            CLAMP -> extractResult(io.clamp.mRID()) { addFromPb(io.clamp) }
-            DIRECTIONALCURRENTRELAY -> extractResult(io.directionalCurrentRelay.mRID()) { addFromPb(io.directionalCurrentRelay) }
-            OTHER, IDENTIFIEDOBJECT_NOT_SET, null -> throw UnsupportedOperationException(
-                "Identified object type ${io.identifiedObjectCase} is not supported by the network service"
-            )
-
+        protoToCim.networkService.addFromPb(io).let {
+            ExtractResult(it.identifiedObject, it.mRID)
         }
 
     private fun <T, U : IdentifiedObject> toMap(objects: Iterable<T>, mapper: (T) -> U?): Map<String, U> =

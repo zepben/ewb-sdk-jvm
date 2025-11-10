@@ -58,15 +58,21 @@ abstract class CimDatabaseReader<TTables : CimDatabaseTables, TService : BaseSer
 
     /**
      * Read the database.
+     *
+     * @param service The [TService] to store the entries that are read.
+     * @param performAfterReadProcessing An optional "opt-out" control for performing the "after read processing".
+     *
+     * @return `true` if the database was successfully read, otherwise `false`.
      */
-    fun read(service: TService, preformAfterReadProcessing: Boolean = true): Boolean =
+    @JvmOverloads
+    fun read(service: TService, performAfterReadProcessing: Boolean = true): Boolean =
         try {
             require(!hasBeenUsed) { "You can only use the database reader once." }
             hasBeenUsed = true
 
             beforeRead()
                 && readService(service)
-                && if (afterServiceReadFunction ?: true) afterServiceRead(service) else true
+                && if (performAfterReadProcessing) afterServiceRead(service) else true
         } catch (e: Exception) {
             logger.error("Unable to read database: " + e.message)
             false

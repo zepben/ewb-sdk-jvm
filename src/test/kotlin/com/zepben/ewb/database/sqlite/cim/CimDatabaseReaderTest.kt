@@ -68,6 +68,14 @@ internal class CimDatabaseReaderTest {
     }
 
     @Test
+    internal fun `can opt-out of after read processing`() {
+        assertThat("Should have read", reader.read(service, performAfterReadProcessing = false))
+
+        verifyReadersCalled()
+        assertThat("afterServiceRead should have been called", !afterServiceReadCalled)
+    }
+
+    @Test
     internal fun `can only run once`() {
         assertThat("Should have read the first time", reader.read(service))
         assertThat("Shouldn't have read a second time", !reader.read(service))

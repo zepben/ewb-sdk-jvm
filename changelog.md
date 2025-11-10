@@ -15,6 +15,7 @@
 
 ### Enhancements
 * Added `addFromPb` methods to accept the top level protobuf messages for `CustomerIdentifiedObject`, `DiagramIdentifiedObject` and `NetworkIdentifiedObject`.
+* You can now opt out of the post read processing in the database readers using the optional `preformAfterReadProcessing` parameter.
 
 ### Fixes
 * None.

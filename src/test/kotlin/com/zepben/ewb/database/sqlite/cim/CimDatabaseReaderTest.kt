@@ -72,7 +72,7 @@ internal class CimDatabaseReaderTest {
         assertThat("Should have read", reader.read(service, performAfterReadProcessing = false))
 
         verifyReadersCalled()
-        assertThat("afterServiceRead should have been called", !afterServiceReadCalled)
+        assertThat("afterServiceRead shouldn't have been called", !afterServiceReadCalled)
     }
 
     @Test

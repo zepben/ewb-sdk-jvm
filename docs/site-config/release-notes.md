@@ -1,43 +1,42 @@
 #### Release History
 
-| Version                | Released            |
-|------------------------|---------------------|
-|[1.1.0](#110)| `30 September 2025` |
-|[1.0.1](#101)| `19 September 2025` |
-|[1.0.0](#100)| `27 August 2025` |
-|[0.29.0](#v0290)| `05 June 2025` |
-|[0.28.0](#v0280)| `28 April 2025` |
-|[0.27.0](#v0270)| `24 April 2025` |
-|[0.26.1](#v0261)| `03 April 2025` |
-|[0.26.0](#v0260)| `02 April 2025` |
-|[0.25.0](#v0250)| `04 March 2025` |
-|[0.24.1](#v0241)| `23 January 2025` |
-|[0.24.0](#v0240)| `21 January 2025` |
-|[0.23.0](#v0230)| `18 October 2024` |
-|[0.22.0](#v0220)| `30 May 2024` |
-|[0.21.0](#v0210)| `15 May 2024` |
-|[0.20.0](#v0200)| `14 May 2024` |
-|[0.19.0](#v0190)| `08 April 2024` |
-|[0.18.0](#v0180)| `08 April 2024` |
-| [0.17.1](#v0171)       | `11 January 2024`   |
-| [0.17.0](#v0170)       | `22 November 2023`  |
-| [0.16.0](#v0160)       | `13 September 2023` |
-| [0.15.0](#v0150)       | `01 May 2023`       |
-| [0.14.0](#v0140)       | `07 February 2023`  |
-| [0.13.0](#v0130)       | `21 October 2022`   |
-| [0.12.1](#v0121)       | `22 August 2022`    |
-| [0.12.0](#v0120)       | `12 August 2022`    |
-| [0.11.0](#v0110)       | `09 May 2022`       |
-| [0.10.0](#v0100)       | `27 April 2022`     |
-| [0.9.0](#v090)         | `05 April 2022`     |
-| [0.8.0](#v080)         | `03 March 2022`     |
-| [0.7.0](#v070)         | `22 September 2021` |
-| [0.6.0](#v060)         | `06 April 2021`     |
-| [0.5.0](#v050)         | `01 February 2021`  |
-| [0.4.0](#v040)         | `12 January 2021`   |
-| [0.3.0](#v030)         | `10 November 2020`  |
-| [0.2.0](#v020)         | `08 October 2020`   |
-| [0.1.0](#v010)         | `07 September 2020` |
+| Version                  | Released              |
+| ------------------------ | --------------------- |
+| [1.1.0](#110)            | `30 September 2025`   |
+| [1.0.1](#101)            | `19 September 2025`   |
+| [1.0.0](#100)            | `27 August 2025`      |
+| [0.29.0](#0290)          | `05 June 2025`        |
+| [0.28.0](#0280)          | `28 April 2025`       |
+| [0.27.0](#0270)          | `24 April 2025`       |
+| [0.26.1](#0261)          | `03 April 2025`       |
+| [0.26.0](#0260)          | `02 April 2025`       |
+| [0.25.0](#0250)          | `04 March 2025`       |
+| [0.24.1](#0241)          | `23 January 2025`     |
+| [0.24.0](#0240)          | `21 January 2025`     |
+| [0.23.0](#0230)          | `18 October 2024`     |
+| [0.22.0](#0220)          | `30 May 2024`         |
+| [0.21.0](#0210)          | `15 May 2024`         |
+| [0.20.0](#0200)          | `14 May 2024`         |
+| [0.19.0](#0190)          | `08 April 2024`       |
+| [0.18.0](#0180)          | `08 April 2024`       |
+| [0.17.1](#0171)          | `11 January 2024`     |
+| [0.17.0](#0170)          | `22 November 2023`    |
+| [0.16.0](#0160)          | `13 September 2023`   |
+| [0.15.0](#0150)          | `01 May 2023`         |
+| [0.14.0](#0140)          | `07 February 2023`    |
+| [0.13.0](#0130)          | `21 October 2022`     |
+| [0.12.0](#0120)          | `12 August 2022`      |
+| [0.11.0](#0110)          | `09 May 2022`         |
+| [0.10.0](#0100)          | `27 April 2022`       |
+| [0.9.0](#090)            | `05 April 2022`       |
+| [0.8.0](#080)            | `03 March 2022`       |
+| [0.7.0](#070)            | `22 September 2021`   |
+| [0.6.0](#060)            | `06 April 2021`       |
+| [0.5.0](#050)            | `01 February 2021`    |
+| [0.4.0](#040)            | `12 January 2021`     |
+| [0.3.0](#030)            | `10 November 2020`    |
+| [0.2.0](#020)            | `08 October 2020`     |
+| [0.1.0](#010)            | `07 September 2020`   |
 
 ---
 
@@ -118,7 +117,7 @@ NOTE: This library is not yet stable, and breaking changes should be expected un
 ## [1.0.0]
 
 ### Breaking Changes
-* Renamed the package to `com.zepben.ewb`. You will need to update all your imports `com.zepben.evolve.*` -> `com.zepben.ewb.*`. This also updates the maven
+* Renamed the package to `com.zepben.ewb`. You will need to update all your imports `com.zepben.evolve.*` -\> `com.zepben.ewb.*`. This also updates the maven
   artifact:
   ```xml
   <dependency>
@@ -127,27 +126,27 @@ NOTE: This library is not yet stable, and breaking changes should be expected un
   </dependency>
   ```
 * Relocated the following classes into the Zepben extensions area, marking them as [ZBEX]:
-  * `DistanceRelay`: `cim.iec61970.base.protection` -> `cim.extensions.iec61970.base.protection`.
-  * `EvChargingUnit`: `cim.iec61970.infiec61970.wires.generation.production` -> `cim.extensions.iec61970.base.generation.production`.
-  * `Loop`: `cim.iec61970.infiec61970.feeder` -> `cim.extensions.iec61970.base.feeder`.
-  * `LvFeeder`: `cim.iec61970.infiec61970.feeder` -> `cim.extensions.iec61970.base.feeder`.
-  * `PowerDirectionKind`: `cim.iec61970.infiec61970.protection` -> `cim.extensions.iec61970.base.protection`.
-  * `ProtectionKind`: `cim.iec61970.infiec61970.protection` -> `cim.extensions.iec61970.base.protection`.
-  * `ProtectionRelayFunction`: `cim.iec61970.base.protection` -> `cim.extensions.iec61970.base.protection`.
-  * `ProtectionRelayScheme`: `cim.iec61970.base.protection` -> `cim.extensions.iec61970.base.protection`.
-  * `ProtectionRelaySystem`: `cim.iec61970.base.protection` -> `cim.extensions.iec61970.base.protection`.
-  * `RelayInfo`: `cim.iec61968.infiec61968.infassetinfo` -> `cim.extensions.iec61968.assetinfo`.
-  * `RelaySetting`: `cim.iec61970.base.protection` -> `cim.extensions.iec61970.base.protection`.
-  * `Site`: `cim.iec61970.base.core` -> `cim.extensions.iec61970.base.core`.
-  * `TransformerCoolingType`: `cim.iec61970.base.wires` -> `cim.extensions.iec61970.base.wires`.
-  * `TransformerEndRatedS`: `cim.iec61970.base.wires` -> `cim.extensions.iec61970.base.wires`.
-  * `VectorGroup`: `cim.iec61970.base.wires` -> `cim.extensions.iec61970.base.wires`.
-  * `VoltageRelay`: `cim.iec61970.base.protection` -> `cim.extensions.iec61970.base.protection`.
-  * `WindingConnection`: `cim.iec61970.base.wires.winding` -> `cim.iec61970.base.wires`.
+  * `DistanceRelay`: `cim.iec61970.base.protection` -\> `cim.extensions.iec61970.base.protection`.
+  * `EvChargingUnit`: `cim.iec61970.infiec61970.wires.generation.production` -\> `cim.extensions.iec61970.base.generation.production`.
+  * `Loop`: `cim.iec61970.infiec61970.feeder` -\> `cim.extensions.iec61970.base.feeder`.
+  * `LvFeeder`: `cim.iec61970.infiec61970.feeder` -\> `cim.extensions.iec61970.base.feeder`.
+  * `PowerDirectionKind`: `cim.iec61970.infiec61970.protection` -\> `cim.extensions.iec61970.base.protection`.
+  * `ProtectionKind`: `cim.iec61970.infiec61970.protection` -\> `cim.extensions.iec61970.base.protection`.
+  * `ProtectionRelayFunction`: `cim.iec61970.base.protection` -\> `cim.extensions.iec61970.base.protection`.
+  * `ProtectionRelayScheme`: `cim.iec61970.base.protection` -\> `cim.extensions.iec61970.base.protection`.
+  * `ProtectionRelaySystem`: `cim.iec61970.base.protection` -\> `cim.extensions.iec61970.base.protection`.
+  * `RelayInfo`: `cim.iec61968.infiec61968.infassetinfo` -\> `cim.extensions.iec61968.assetinfo`.
+  * `RelaySetting`: `cim.iec61970.base.protection` -\> `cim.extensions.iec61970.base.protection`.
+  * `Site`: `cim.iec61970.base.core` -\> `cim.extensions.iec61970.base.core`.
+  * `TransformerCoolingType`: `cim.iec61970.base.wires` -\> `cim.extensions.iec61970.base.wires`.
+  * `TransformerEndRatedS`: `cim.iec61970.base.wires` -\> `cim.extensions.iec61970.base.wires`.
+  * `VectorGroup`: `cim.iec61970.base.wires` -\> `cim.extensions.iec61970.base.wires`.
+  * `VoltageRelay`: `cim.iec61970.base.protection` -\> `cim.extensions.iec61970.base.protection`.
+  * `WindingConnection`: `cim.iec61970.base.wires.winding` -\> `cim.iec61970.base.wires`.
 * Relocated the following classes that were in the wrong packages:
-  * `Pole`: `cim.iec61968.assets` -> `cim.iec61968.infiec61968.infassets`.
-  * `StreetlightLampKind`: `cim.iec61968.assets` -> `cim.iec61968.infiec61968.infassets`.
-  * All classes in the incorrectly located `cim.iec61970.base.wires.generation.production` -> `cim.iec61970.base.generation.production`.
+  * `Pole`: `cim.iec61968.assets` -\> `cim.iec61968.infiec61968.infassets`.
+  * `StreetlightLampKind`: `cim.iec61968.assets` -\> `cim.iec61968.infiec61968.infassets`.
+  * All classes in the incorrectly located `cim.iec61970.base.wires.generation.production` -\> `cim.iec61970.base.generation.production`.
 * The protobuf implementation has the following changes, which will only have an impact if you are using protobuf directly:
   * Updated the values of the following enums to conform to Protobuf standard naming:
     * `BatteryControlMode`
@@ -186,29 +185,29 @@ NOTE: This library is not yet stable, and breaking changes should be expected un
     * `Diagram`
     * `TransformerEnd`
 * Renamed the following enum values:
-  * `PowerDirectionKind.UNKNOWN_DIRECTION` -> `PowerDirectionKind.UNKNOWN`
-  * `RegulatingControlModeKind.UNKNOWN_CONTROL_MODE` -> `RegulatingControlModeKind.UNKNOWN`
-  * `TransformerCoolingType.UNKNOWN_COOLING_TYPE` -> `TransformerCoolingType.UNKNOWN`
-  * `WindingConnection.UNKNOWN_WINDING` -> `WindingConnection.UNKNOWN`
+  * `PowerDirectionKind.UNKNOWN_DIRECTION` -\> `PowerDirectionKind.UNKNOWN`
+  * `RegulatingControlModeKind.UNKNOWN_CONTROL_MODE` -\> `RegulatingControlModeKind.UNKNOWN`
+  * `TransformerCoolingType.UNKNOWN_COOLING_TYPE` -\> `TransformerCoolingType.UNKNOWN`
+  * `WindingConnection.UNKNOWN_WINDING` -\> `WindingConnection.UNKNOWN`
 * Added `TransformerFunctionKind.UNKNOWN` to allow distinction between an unknown function, and a function that is not covered by the enum (i.e. `other`). This
   addition has changed the order of the enum values, with `other` now being the last entry, instead of the first.
 * `NetworkConsumerClient` no longer uses the protobuf `IncludedEnergizedContainers`, `IncludedEnergizingContainers` and `NetworkState` enums directly, it now
   uses SDK versions of these enums. To use these enums you will need to update your imports, and use the simplified versions of the enum values:
   * `IncludedEnergizedContainers` from package `com.zepben.ewb.streaming.get`.
-    * `EXCLUDE_ENERGIZED_CONTAINERS` -> `NONE`.
-    * `INCLUDE_ENERGIZED_FEEDERS` -> `FEEDERS`.
-    * `INCLUDE_ENERGIZED_LV_FEEDERS` -> `LV_FEEDERS`.
+    * `EXCLUDE_ENERGIZED_CONTAINERS` -\> `NONE`.
+    * `INCLUDE_ENERGIZED_FEEDERS` -\> `FEEDERS`.
+    * `INCLUDE_ENERGIZED_LV_FEEDERS` -\> `LV_FEEDERS`.
   * `IncludedEnergizingContainers` from package `com.zepben.ewb.streaming.get`.
-    * `EXCLUDE_ENERGIZING_CONTAINERS` -> `NONE`.
-    * `INCLUDE_ENERGIZING_FEEDERS` -> `FEEDERS`.
-    * `INCLUDE_ENERGIZING_SUBSTATIONS` -> `SUBSTATIONS`.
+    * `EXCLUDE_ENERGIZING_CONTAINERS` -\> `NONE`.
+    * `INCLUDE_ENERGIZING_FEEDERS` -\> `FEEDERS`.
+    * `INCLUDE_ENERGIZING_SUBSTATIONS` -\> `SUBSTATIONS`.
   * `NetworkState` from package `com.zepben.ewb.services.network`.
-    * `ALL_NETWORK_STATE` -> `ALL`.
-    * `NORMAL_NETWORK_STATE` -> `NORMAL`.
-    * `CURRENT_NETWORK_STATE` -> `CURRENT`.
+    * `ALL_NETWORK_STATE` -\> `ALL`.
+    * `NORMAL_NETWORK_STATE` -\> `NORMAL`.
+    * `CURRENT_NETWORK_STATE` -\> `CURRENT`.
 * The `evolve-conn` dependency has been incorporated into the SDK with the following package changes:
-  * `com.zepben.auth` -> `com.zepben.ewb.auth`
-  * `com.zepben.evolve.conn` -> `com.zepben.ewb.conn`
+  * `com.zepben.auth` -\> `com.zepben.ewb.auth`
+  * `com.zepben.evolve.conn` -\> `com.zepben.ewb.conn`
 * The following CIM fields have been made nullable. Note if previously accessing these fields you will now have to handle them potentially being null.
   * Analog.positiveFlowIn
   * Document.*
@@ -823,7 +822,7 @@ NOTE: This library is not yet stable, and breaking changes should be expected un
 
 * Added missing collection methods for `RelayInfo.recloseDelays` (`RelayInfo` was previously named `CurrentRelayInfo`):
     * `RelayInfo.getDelay(sequenceNumber: Int): Double?`
-    * `RelayInfo.forEachDelay(action: (sequenceNumber: Int, delay: Double) -> Unit)`
+    * `RelayInfo.forEachDelay(action: (sequenceNumber: Int, delay: Double) -\> Unit)`
     * `RelayInfo.removeDelay(delay: Double?): Boolean`
         * The original method with this name has been renamed to `RelayInfo.removeDelayAt(index: Int): Double?`.
 * Cleaned up code using IntelliJ code inspection. Some typos in documentation have also been fixed.
@@ -894,13 +893,13 @@ NOTE: This library is not yet stable, and breaking changes should be expected un
 
 * Deprecated old style accessors in favour of Kotlin accessors for `SinglePhaseKind`. To use the new function make the folloiwng modification to your code:
     * Kotlin:
-        * `spk.value()` -> `spk.value`
-        * `spk.maskIndex()` -> `spk.maskIndex`
-        * `spk.bitMask()` -> `spk.bitMask`
+        * `spk.value()` -\> `spk.value`
+        * `spk.maskIndex()` -\> `spk.maskIndex`
+        * `spk.bitMask()` -\> `spk.bitMask`
     * Java:
-        * `spk.value()` -> `spk.getValue()`
-        * `spk.maskIndex()` -> `spk.getMaskIndex()`
-        * `spk.bitMask()` -> `spk.getBitMask()`
+        * `spk.value()` -\> `spk.getValue()`
+        * `spk.maskIndex()` -\> `spk.getMaskIndex()`
+        * `spk.bitMask()` -\> `spk.getBitMask()`
 * `SetDirection.run(NetworkService)` will no longer set directions for feeders with a head terminal on an open switch. It is expected these feeders are either
   placeholder feeders with no meaningful equipment, or are energised from another feeder which will set the directions from the other end.
 
@@ -1060,7 +1059,7 @@ NOTE: This library is not yet stable, and breaking changes should be expected un
 
 ---
 
-### v0.13.0
+## [0.13.0]
 
 ##### Breaking Changes
 
@@ -1104,7 +1103,7 @@ NOTE: This library is not yet stable, and breaking changes should be expected un
 
 ---
 
-### v0.12.0
+## [0.12.0]
 
 ##### Breaking Changes
 
@@ -1139,42 +1138,7 @@ NOTE: This library is not yet stable, and breaking changes should be expected un
 
 ---
 
-### v0.12.0
-
-##### Breaking Changes
-
-* Changed `TestNetworkBuilder` to have a public constructor and removed `startWith*` functions. Change `TestNetworkBuilder.startWith*` to
-  `TestNetworkBuilder().from*` _(kotlin)_, or `new TestNetworkBuilder().from*` _(java)_.
-* Changed `TestNetworkBuilder.fromOther` and `TestNetworkBuilder.toOther` to take a creator, rather than an instance.
-* Modified `ConnectedEquipmentTrace` in the following ways:
-    * Moved from package `com.zepben.evolve.services.network.tracing` to `com.zepben.evolve.services.network.tracing.connectivity`.
-    * Changed to process a `ConnectedEquipmentStep`, rather than `ConductingEquipment` directly. `ConnectedEquipmentStep` stores both the
-      `ConductingEquipment`, plus the number of steps taken from the starting object.
-    * Changed the return types from `BassicTraversal<ConductingEquipment>` to `ConnectedEquipmentTraversal` which has a helper method for starting the trace
-      directly from `ConductingEquipment`
-    * Updated to use `ConnectedEquipmentStepTracker` which allows revisiting `ConductingEquipment` if a shorter path is found.
-
-##### New Features
-
-* Added `LimitedConnectedEquipmentTrace`, which can be used to trace from `ConductingEquipment` limiting by the number of steps, and optionally, feeder
-  direction.
-
-##### Enhancements
-
-* `TestNetworkBuilder.build()` will now assign equipment to feeders if feeders were added to the network.
-
-##### Fixes
-
-* `TreeNode().sortWeight` no longer throws an error when evaluated on nodes for equipment without terminals.
-* `PhaseStepTracker` now reports strict subsets of visited phases as visited.
-
-##### Notes
-
-* None.
-
----
-
-### v0.11.0
+## [0.11.0]
 
 ##### Breaking Changes
 
@@ -1199,7 +1163,7 @@ NOTE: This library is not yet stable, and breaking changes should be expected un
 
 ---
 
-### v0.10.0
+## [0.10.0]
 
 ##### Breaking Changes
 
@@ -1223,7 +1187,7 @@ NOTE: This library is not yet stable, and breaking changes should be expected un
 
 ---
 
-### v0.9.0
+## [0.9.0]
 
 ##### Breaking Changes
 
@@ -1251,7 +1215,7 @@ NOTE: This library is not yet stable, and breaking changes should be expected un
 
 ---
 
-### v0.8.0
+## [0.8.0]
 
 ##### Breaking Changes
 
@@ -1302,7 +1266,7 @@ NOTE: This library is not yet stable, and breaking changes should be expected un
 
 ---
 
-### v0.7.0
+## [0.7.0]
 
 ##### Breaking Changes
 
@@ -1361,7 +1325,7 @@ NOTE: This library is not yet stable, and breaking changes should be expected un
 
 ---
 
-### v0.6.0
+## [0.6.0]
 
 ##### Breaking Changes
 
@@ -1397,8 +1361,8 @@ NOTE: This library is not yet stable, and breaking changes should be expected un
 * New class `SwitchStateClient` that allows you to set the current state of switches via a gRPC service.
 
 * BaseService has two new functions which allow retrieving the UnresolvedReferences for an mRID by either `toMrid` or `from.mRID`:
-    - getUnresolvedReferencesTo(mRID: String): Sequence<UnresolvedReference<*,*>>
-    - getUnresolvedReferencesFrom(mRID: String): Sequence<UnresolvedReference<*,*>>
+    - getUnresolvedReferencesTo(mRID: String): Sequence\<UnresolvedReference\<*,*\>\>
+    - getUnresolvedReferencesFrom(mRID: String): Sequence\<UnresolvedReference\<*,*\>\>
 
 * Added the following classes:
     * `LoadBreakSwitch`
@@ -1430,7 +1394,7 @@ NOTE: This library is not yet stable, and breaking changes should be expected un
 
 ---
 
-### v0.5.0
+## [0.5.0]
 
 ##### Breaking Changes
 
@@ -1460,7 +1424,7 @@ None.
 
 ---
 
-### v0.4.0
+## [0.4.0]
 
 ##### Breaking Changes
 
@@ -1505,7 +1469,7 @@ None.
 
 ---
 
-### v0.3.0
+## [0.3.0]
 
 ##### Breaking Changes
 
@@ -1532,7 +1496,7 @@ None.
 
 ---
 
-### v0.2.0
+## [0.2.0]
 
 ##### Breaking Changes
 
@@ -1558,6 +1522,6 @@ None.
 
 ---
 
-### v0.1.0
+## [0.1.0]
 
 Initial release containing the Zepben CIM profile, database [de]serialisation, protobuf [de]serialisation, network model tracing, and gRPC producer clients.

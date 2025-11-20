@@ -1,24 +1,24 @@
 {
-  "version-0.7.0/someSidebar": [
+  "someSidebar": [
     {
       "type": "doc",
-      "id": "version-0.7.0/sdk-data-model"
+      "id": "sdk-data-model"
     },
     {
       "type": "doc",
-      "id": "version-0.7.0/sdk-services"
+      "id": "sdk-services"
     },
     {
       "type": "doc",
-      "id": "version-0.7.0/sdk-tracing"
+      "id": "sdk-tracing"
     },
     {
       "type": "doc",
-      "id": "version-0.7.0/sdk-persistence"
+      "id": "sdk-persistence"
     },
     {
       "type": "doc",
-      "id": "version-0.7.0/sdk-consumer"
+      "id": "sdk-consumer"
     }
   ]
 }

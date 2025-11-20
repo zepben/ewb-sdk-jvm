@@ -1,0 +1,28 @@
+{
+  "someSidebar": [
+    {
+      "type": "doc",
+      "id": "sdk-data-model"
+    },
+    {
+      "type": "doc",
+      "id": "sdk-services"
+    },
+    {
+      "type": "doc",
+      "id": "sdk-phases"
+    },
+    {
+      "type": "doc",
+      "id": "sdk-tracing"
+    },
+    {
+      "type": "doc",
+      "id": "sdk-persistence"
+    },
+    {
+      "type": "doc",
+      "id": "sdk-consumer"
+    }
+  ]
+}

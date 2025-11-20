@@ -11,8 +11,4 @@ on:
 jobs:
   snapshot:
     uses: zepben/.github/.github/workflows/maven-lib-snapshot.yml@main
-    with:
-      private: false
-      product-key: "jvm-sdk"
-      product-repo: "zepben/evolve-sdk-jvm"
     secrets: inherit

@@ -1,23 +1,24 @@
 ---
 id: sdk-data-model
 title: Data Model
+slug: /
 ---
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-The EWB SDK provides the building blocks you need to interface with the rest of the platform. It can also be used to
+The Evolve SDK provides the building blocks you need to interface with the rest of the platform. It can also be used to
 build your own solutions from scratch that will be compatible with other things built with the SDK.
 
 ## CIM Model
 
-The EWB platform is composed around a domain model based on the 'Common Information Model' (CIM). The CIM is a very
-large standard that covers a huge amount of use cases. To make things more digestible, Zepben publishes its own CIM
-profile. CIM profiles are subsets of the whole CIM standard that dictates which parts of the model are in use. EWB
+The Evolve platform is composed around a domain model based on the 'Common Information Model' (CIM). The CIM is a very
+large standard that covers a huge amount of use cases. To make things more digestible, Evolve publishes its own CIM
+profile. CIM profiles are subsets of the whole CIM standard that dictates which parts of the model are in use. Evolve
 publishes its model at [Evolve Docs](https://zepben.github.io/evolve/docs/cim/evolve/).
 
-If the EWB profile doesn't contain a part of CIM that you require for your use case, you can request or propose a change to the model
-by starting a discussion at the [GitHub discussions](https://github.com/zepben/evolve/discussions) or by contacting Zepben directly at \<https://www.zepben.com/contact>.
+If the Evolve profile doesn't contain a part of CIM that you require for your use case, you can request or propose a change to the model
+by starting a discussion at the [Evolve GitHub discussions](https://github.com/zepben/evolve/discussions) or by contacting Zepben directly at \<https://https://www.zepben.com/contact>.
 
 ## Getting Started With The Model
 
@@ -247,8 +248,8 @@ switch.setOpen(false)
 Phases in CIM are set on a [Terminal](https://zepben.github.io/evolve/docs/cim/evolve/IEC61970/Base/Core/Terminal). The `phases`
 property on the terminal should be considered as the terminal's 'nominal' phases. The vast majority of the time, this will
 be the actual active phases at that terminal. However, due to the dynamic nature of the network, it's possible that when
-tracing connectivity that the active phase at the terminal is different. The phase can be tracked using the `normalPhases`
-and `currentPhases` properties on the terminal.
+tracing connecitvity that the active phase at the terminal is different. The phase can be tracked using the `tracedPhases`
+property on the terminal. 
 
 :::tip
 There are a number of helpful functions for tracing phases based on connectivity. See [tracing](./sdk-tracing) for more details.
@@ -287,15 +288,12 @@ In electricity distribution networks, a model is typically made up of groups of 
 sections of the network. For example things like: feeder, zone (substation), transmission line etc. The terminology 
 differs within the industry, however CIM provides types of 
 [EquipmentContainer](https://zepben.github.io/evolve/docs/cim/evolve/IEC61970/Base/Core/EquipmentContainer) to allow you to
-group equipment into the above types of categories. You can refer to the EWB CIM profile for all supported equipment
+group equipment into the above types of categories. You can refer to the Evolve CIM profile for all supported equipment 
 container types in the model, however the most common ones are:
 
 - [Line](https://zepben.github.io/evolve/docs/cim/evolve/IEC61970/Base/Wires/Line/)
 - [Substation](https://zepben.github.io/evolve/docs/cim/evolve/IEC61970/Base/Core/Substation/)
 - [Feeder](https://zepben.github.io/evolve/docs/cim/evolve/IEC61970/Base/Core/Feeder/)
-
-We also extend CIM to provide an extension of the hierarchy to an `LvFeeder`, representing LV equipment underneath
-a distribution transformer.
 
 ### Network Hierarchy
 
@@ -304,7 +302,7 @@ When creating a `Substation` you will see that it can belong to a
 `SubGeogrpahicalRegion` can belong to a 
 [GeographicalRegion](https://zepben.github.io/evolve/docs/cim/evolve/IEC61970/Base/Core/GeographicalRegion). 
 
-When using various parts of the EWB platform, it will refer to the concept of a network hierarchy. This is the
+When using various parts of the Evolve platform, it will refer to the concept of a network hierarchy. This is the 
 mechanism used to chunk up the network and provides an overview of what makes up the model. The network hierarchy looks
 as follows:
 
@@ -312,9 +310,8 @@ as follows:
   * SubGeographicalRegion
     * Substation
       * Feeder
-        * LvFeeder
 
-When working with the EWB Platform, it is important to make sure equipment and equipment containers are correctly
+When working with the Evolve Platform, it is important to make sure equipment and equipment containers are correctly
 populated as there are assumptions built around the network being structured in this pattern.
 
 ### Feeders
@@ -385,153 +382,6 @@ val feederCb = Breaker().apply {
     addContainer(feeder)
     feeder.addEquipment(this)
 }
-```
-
-</TabItem>
-</Tabs>
-
-### Names and IDs
-
-As everything in our model is ultimately an IdentifiedObject, it can have one or many "names" associated with it.
-The `IdentifiedObject.name` property is typically treated as a user-friendly name for a particular object. It is not a required field, and will
-default to an empty string if left unset. If set, it should be considered a presentation field for displaying in UI's or for providing context
-for an object. It should be avoided for storing any sort of information or metadata about an object beyond a human readable name.
-
-Sometimes a need will arise to store extra IDs or metadata about a specific object alongside it's existing `mRID` and `name`. For example these could be IDs
-for separate systems (e.g GIS, DMS), or NMI's associated with the object.
-To store this information we recommend storing additional "names" via the `IdentifiedObject.names` field utilising `NameType`s. Extra names are not
-considered presentation fields, and thus can have more structured string data within them.
-
-To add extra names to an IdentifiedObject, utilise the `addName` function:
-
-<Tabs
-    groupId="code-example"
-    defaultValue="java"
-    values={[
-        { label: "Java", value: "java", },
-        { label: "Kotlin", value: "kotlin", },
-    ]
-}>
-<TabItem value="java">
-
-```java
-NameType gisNameType = NameType("GIS_ID");
-subTx.addName(substation);
-
-// Same as above but via the NameType
-gisNameType.getOrAddName("123456789", subTx)
-```
-
-</TabItem>
-<TabItem  value="kotlin">
-
-```kotlin
-val gisNameType = NameType("GIS_ID")
-subTx.addName(gisNameType, "123456789")
-
-// Same as above but via the NameType
-gisNameType.getOrAddName("123456789", subTx)
-```
-
-</TabItem>
-</Tabs>
-
-This will add a name to `subTx` that can be retrieved off the transformer or the `NameType` itself:
-
-<Tabs
-    groupId="code-example"
-    defaultValue="java"
-    values={[
-        { label: "Java", value: "java", },
-        { label: "Kotlin", value: "kotlin", },
-    ]
-}>
-<TabItem value="java">
-
-```java
-ArrayList<Name> names = gisNameType.getNames(subTx);
-names = subTx.getNames("GIS_ID");     // Same result as above.
-names = subTx.getNames(gisNameType);  // Same result as above.
-
-for (Name name : names) {
-    System.out.println(subTx.mRID + ": " + name.type.name + " - " + name.name);  // <UUID>: GIS_ID - 123456789
-}
-
-// Get an individual Name.
-Name name = subTx.getName("GIS_ID", "123456789");
-Name name = subTx.getName(gisNameType, "123456789");
-
-```
-
-</TabItem>
-<TabItem  value="kotlin">
-
-```kotlin
-var names = gisNameType.getNames(subTx)
-names = subTx.getNames("GIS_ID")     // Same result as above.
-names = subTx.getNames(gisNameType)  // Same result as above.
-
-names.forEach { name ->
-    println("${subTx.mRID}: ${name.type.name} - ${name.name}")  // <UUID>: GIS_ID - 123456789
-}
-
-// Get an individual Name.
-var name: Name = subTx.getName("GIS_ID", "123456789")
-name: Name = subTx.getName(gisNameType, "123456789")
-```
-
-</TabItem>
-</Tabs>
-
-Names can also be removed or cleared from an `IdentifiedObject` or a `NameType`:
-
-<Tabs
-    groupId="code-example"
-    defaultValue="java"
-    values={[
-        { label: "Java", value: "java", },
-        { label: "Kotlin", value: "kotlin", },
-    ]
-}>
-<TabItem value="java">
-
-```java
-Name name = subTx.getName(gisNameType, "123456789");
-subTx.removeName(name);
-
-// Or clear all names
-subTx.clearNames();
-
-// Remove names from a NameType
-gisNameType.removeName(name);
-
-// Remove all names from the NameType with the matching name
-// This will also remove it from the corresponding IdentifiedObject
-gisNameType.removeNames("1123456789");
-
-// Clear all names from a NameType
-gisNameType.clearNames();
-```
-
-</TabItem>
-<TabItem  value="kotlin">
-
-```kotlin
-val name: Name = subTx.getName(gisNameType, "123456789")
-subTx.removeName(name)
-
-// Or clear all names
-subTx.clearNames()
-
-// Remove names from a NameType
-gisNameType.removeName(name)
-
-// Remove all names from the NameType with the matching name
-// This will also remove it from the corresponding IdentifiedObject
-gisNameType.removeNames("1123456789")
-
-// Clear all names from a NameType
-gisNameType.clearNames()
 ```
 
 </TabItem>

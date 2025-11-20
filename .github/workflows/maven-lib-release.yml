@@ -5,7 +5,4 @@ on: workflow_dispatch
 jobs:
   release:
     uses: zepben/.github/.github/workflows/maven-lib-release-with-docs.yml@main
-    with:
-      private: false
-      product-key: "jvm-sdk"
     secrets: inherit

@@ -43,7 +43,8 @@ internal abstract class BaseServiceComparatorTest {
             { NameType("type1") },
             { NameType("type2") },
             { "name1" },
-            { "name2" }
+            { "name2" },
+            ::ValueCollectionDifference,
         )
     }
 
@@ -115,14 +116,17 @@ internal abstract class BaseServiceComparatorTest {
             diffNameName,
             expectModification = ObjectDifference(subject, diffNameName).apply {
                 differences["names"] =
-                    CollectionDifference(missingFromTarget = subject.names.toMutableList(), missingFromSource = diffNameName.names.toMutableList())
+                    ObjectCollectionDifference(missingFromTarget = subject.names.toMutableList(), missingFromSource = diffNameName.names.toMutableList())
             })
         comparatorValidator.validateNameTypes(
             subject,
             diffNameIdentifiedObject,
             expectModification = ObjectDifference(subject, diffNameIdentifiedObject).apply {
                 differences["names"] =
-                    CollectionDifference(missingFromTarget = subject.names.toMutableList(), missingFromSource = diffNameIdentifiedObject.names.toMutableList())
+                    ObjectCollectionDifference(
+                        missingFromTarget = subject.names.toMutableList(),
+                        missingFromSource = diffNameIdentifiedObject.names.toMutableList()
+                    )
             })
 
 

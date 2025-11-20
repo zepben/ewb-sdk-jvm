@@ -44,9 +44,7 @@ import com.zepben.ewb.cim.iec61970.base.scada.RemotePoint
 import com.zepben.ewb.cim.iec61970.base.scada.RemoteSource
 import com.zepben.ewb.cim.iec61970.base.wires.*
 import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
-import com.zepben.ewb.services.common.BaseServiceComparatorTest
-import com.zepben.ewb.services.common.ObjectDifference
-import com.zepben.ewb.services.common.ValueDifference
+import com.zepben.ewb.services.common.*
 import com.zepben.ewb.services.network.tracing.feeder.FeederDirection
 import com.zepben.ewb.utils.ServiceComparatorValidator
 import org.junit.jupiter.api.Test
@@ -75,7 +73,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             RelayInfo::addDelay,
             { RelayInfo(it) },
             { 1.0 },
-            { 2.0 }
+            { 2.0 },
+            ::ValueCollectionDifference,
         )
     }
 
@@ -113,14 +112,29 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
     internal fun compareLoop() {
         compareIdentifiedObject { Loop(it) }
 
-        comparatorValidator.validateCollection(Loop::circuits, Loop::addCircuit, { Loop(it) }, { Circuit("c1") }, { Circuit("c2") })
-        comparatorValidator.validateCollection(Loop::substations, Loop::addSubstation, { Loop(it) }, { Substation("s1") }, { Substation("s2") })
+        comparatorValidator.validateCollection(
+            Loop::circuits,
+            Loop::addCircuit,
+            { Loop(it) },
+            { Circuit("c1") },
+            { Circuit("c2") },
+            ::ObjectCollectionDifference,
+        )
+        comparatorValidator.validateCollection(
+            Loop::substations,
+            Loop::addSubstation,
+            { Loop(it) },
+            { Substation("s1") },
+            { Substation("s2") },
+            ::ObjectCollectionDifference,
+        )
         comparatorValidator.validateCollection(
             Loop::energizingSubstations,
             Loop::addEnergizingSubstation,
             { Loop(it) },
             { Substation("s1") },
-            { Substation("s2") }
+            { Substation("s2") },
+            ::ObjectCollectionDifference,
         )
     }
 
@@ -134,19 +148,25 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             LvFeeder::addCurrentEquipment,
             { LvFeeder(it) },
             { Junction("j1") },
-            { Junction("j2") })
+            { Junction("j2") },
+            ::ObjectCollectionDifference,
+        )
         comparatorValidator.validateCollection(
             LvFeeder::normalEnergizingFeeders,
             LvFeeder::addNormalEnergizingFeeder,
             { LvFeeder(it) },
             { Feeder("lvf1") },
-            { Feeder("lvf2") })
+            { Feeder("lvf2") },
+            ::ObjectCollectionDifference,
+        )
         comparatorValidator.validateCollection(
             LvFeeder::currentEnergizingFeeders,
             LvFeeder::addCurrentEnergizingFeeder,
             { LvFeeder(it) },
             { Feeder("lvf1") },
-            { Feeder("lvf2") })
+            { Feeder("lvf2") },
+            ::ObjectCollectionDifference,
+        )
 
     }
 
@@ -220,35 +240,40 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             ProtectionRelayFunction::addTimeLimit,
             createProtectionRelayFunction,
             { 1.1 },
-            { 2.2 }
+            { 2.2 },
+            ::ValueCollectionDifference,
         )
         comparatorValidator.validateIndexedCollection(
             ProtectionRelayFunction::thresholds,
             ProtectionRelayFunction::addThreshold,
             createProtectionRelayFunction,
             { RelaySetting(UnitSymbol.V, 1.1) },
-            { RelaySetting(UnitSymbol.V, 2.2) }
+            { RelaySetting(UnitSymbol.V, 2.2) },
+            ::ValueCollectionDifference,
         )
         comparatorValidator.validateCollection(
             ProtectionRelayFunction::protectedSwitches,
             ProtectionRelayFunction::addProtectedSwitch,
             createProtectionRelayFunction,
             { Breaker("b1") },
-            { Breaker("b2") }
+            { Breaker("b2") },
+            ::ObjectCollectionDifference,
         )
         comparatorValidator.validateCollection(
             ProtectionRelayFunction::sensors,
             ProtectionRelayFunction::addSensor,
             createProtectionRelayFunction,
             { CurrentTransformer("ct1") },
-            { CurrentTransformer("ct2") }
+            { CurrentTransformer("ct2") },
+            ::ObjectCollectionDifference,
         )
         comparatorValidator.validateCollection(
             ProtectionRelayFunction::schemes,
             ProtectionRelayFunction::addScheme,
             createProtectionRelayFunction,
             { ProtectionRelayScheme("prs1") },
-            { ProtectionRelayScheme("prs2") }
+            { ProtectionRelayScheme("prs2") },
+            ::ObjectCollectionDifference,
         )
     }
 
@@ -267,7 +292,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             ProtectionRelayScheme::addFunction,
             { ProtectionRelayScheme(it) },
             { CurrentRelay("cr1") },
-            { CurrentRelay("cr2") }
+            { CurrentRelay("cr2") },
+            ::ObjectCollectionDifference,
         )
     }
 
@@ -284,7 +310,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             ProtectionRelaySystem::addScheme,
             { ProtectionRelaySystem(it) },
             { ProtectionRelayScheme("prs1") },
-            { ProtectionRelayScheme("prs2") }
+            { ProtectionRelayScheme("prs2") },
+            ::ObjectCollectionDifference,
         )
     }
 
@@ -357,7 +384,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             PowerTransformerInfo::addTransformerTankInfo,
             { PowerTransformerInfo(it) },
             { TransformerTankInfo("tti1") },
-            { TransformerTankInfo("tti2") }
+            { TransformerTankInfo("tti2") },
+            ::ObjectCollectionDifference,
         )
     }
 
@@ -408,7 +436,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             TransformerTankInfo::addTransformerEndInfo,
             { TransformerTankInfo(it) },
             { TransformerEndInfo("tei1") },
-            { TransformerEndInfo("tei2") }
+            { TransformerEndInfo("tei2") },
+            ::ObjectCollectionDifference,
         )
     }
 
@@ -433,8 +462,22 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
     private fun compareAsset(createAsset: (String) -> Asset) {
         compareIdentifiedObject(createAsset)
 
-        comparatorValidator.validateCollection(Asset::organisationRoles, Asset::addOrganisationRole, createAsset, { AssetOwner("a1") }, { AssetOwner("a2") })
-        comparatorValidator.validateCollection(Asset::powerSystemResources, Asset::addPowerSystemResource, createAsset, { Junction("j1") }, { Junction("j2") })
+        comparatorValidator.validateCollection(
+            Asset::organisationRoles,
+            Asset::addOrganisationRole,
+            createAsset,
+            { AssetOwner("a1") },
+            { AssetOwner("a2") },
+            ::ObjectCollectionDifference,
+        )
+        comparatorValidator.validateCollection(
+            Asset::powerSystemResources,
+            Asset::addPowerSystemResource,
+            createAsset,
+            { Junction("j1") },
+            { Junction("j2") },
+            ::ObjectCollectionDifference,
+        )
         comparatorValidator.validateProperty(Asset::location, createAsset, { Location("l1") }, { Location("l2") })
     }
 
@@ -496,7 +539,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             Location::addPoint,
             { Location(it) },
             { PositionPoint(1.0, 2.0) },
-            { PositionPoint(3.0, 4.0) }
+            { PositionPoint(3.0, 4.0) },
+            ::ValueCollectionDifference,
         )
     }
 
@@ -542,7 +586,14 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
     internal fun comparePole() {
         compareStructure { Pole(mRID = it) }
         comparatorValidator.validateProperty(Pole::classification, { Pole(it) }, { "c1" }, { "c2" })
-        comparatorValidator.validateCollection(Pole::streetlights, Pole::addStreetlight, { Pole(it) }, { Streetlight("sl1") }, { Streetlight("sl2") })
+        comparatorValidator.validateCollection(
+            Pole::streetlights,
+            Pole::addStreetlight,
+            { Pole(it) },
+            { Streetlight("sl1") },
+            { Streetlight("sl2") },
+            ::ObjectCollectionDifference,
+        )
     }
 
     // #####################
@@ -560,6 +611,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             createEndDevice,
             { UsagePoint("up1") },
             { UsagePoint("up2") },
+            ::ObjectCollectionDifference,
             NetworkServiceComparatorOptions.all().copy(compareLvSimplification = false),
             optionsStopCompare = true
         )
@@ -592,6 +644,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             { UsagePoint(it) },
             { Meter("m1") },
             { Meter("m2") },
+            ::ObjectCollectionDifference,
             NetworkServiceComparatorOptions.all().copy(compareLvSimplification = false),
             optionsStopCompare = true
         )
@@ -602,6 +655,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             { UsagePoint(it) },
             { Junction("j1") },
             { Junction("j2") },
+            ::ObjectCollectionDifference,
             NetworkServiceComparatorOptions.all().copy(compareLvSimplification = false),
             optionsStopCompare = true
         )
@@ -620,7 +674,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             OperationalRestriction::addEquipment,
             { OperationalRestriction(it) },
             { Junction("j1") },
-            { Junction("j2") }
+            { Junction("j2") },
+            ::ObjectCollectionDifference,
         )
     }
 
@@ -681,7 +736,12 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         compareAuxiliaryEquipment(createSensor)
 
         comparatorValidator.validateCollection(
-            Sensor::relayFunctions, Sensor::addRelayFunction, createSensor, { CurrentRelay("cr1") }, { CurrentRelay("cr2") }
+            Sensor::relayFunctions,
+            Sensor::addRelayFunction,
+            createSensor,
+            { CurrentRelay("cr1") },
+            { CurrentRelay("cr2") },
+            ::ObjectCollectionDifference,
         )
     }
 
@@ -709,6 +769,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             createConductingEquipment,
             { Terminal(mRID = "1").apply { conductingEquipment = it } },
             { Terminal(mRID = "2").apply { conductingEquipment = it } },
+            ::ObjectCollectionDifference,
             NetworkServiceComparatorOptions.all().copy(compareTerminals = false), optionsStopCompare = true
         )
     }
@@ -722,7 +783,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             ConnectivityNode::addTerminal,
             { ConnectivityNode(it) },
             { Terminal("1") },
-            { Terminal("2") }
+            { Terminal("2") },
+            ::ObjectCollectionDifference,
         )
     }
 
@@ -738,7 +800,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             Curve::addData,
             createCurve,
             { CurveData(1f, 2f) },
-            { CurveData(3f, 4f) }
+            { CurveData(3f, 4f) },
+            ::ValueCollectionDifference,
         )
     }
 
@@ -748,16 +811,31 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         comparatorValidator.validateProperty(Equipment::inService, createEquipment, { true }, { false })
         comparatorValidator.validateProperty(Equipment::normallyInService, createEquipment, { true }, { false })
         comparatorValidator.validateProperty(Equipment::commissionedDate, createEquipment, { Instant.MIN }, { Instant.MAX })
-        comparatorValidator.validateCollection(Equipment::containers, Equipment::addContainer, createEquipment, { Site("s1") }, { Site("s2") })
+        comparatorValidator.validateCollection(
+            Equipment::containers,
+            Equipment::addContainer,
+            createEquipment,
+            { Site("s1") },
+            { Site("s2") },
+            ::ObjectCollectionDifference,
+        )
 
-        comparatorValidator.validateCollection(Equipment::usagePoints, Equipment::addUsagePoint, createEquipment, { UsagePoint("u1") }, { UsagePoint("u2") })
+        comparatorValidator.validateCollection(
+            Equipment::usagePoints,
+            Equipment::addUsagePoint,
+            createEquipment,
+            { UsagePoint("u1") },
+            { UsagePoint("u2") },
+            ::ObjectCollectionDifference,
+        )
 
         comparatorValidator.validateCollection(
             Equipment::operationalRestrictions,
             Equipment::addOperationalRestriction,
             createEquipment,
             { OperationalRestriction("o1") },
-            { OperationalRestriction("o2") }
+            { OperationalRestriction("o2") },
+            ::ObjectCollectionDifference,
         )
 
         comparatorValidator.validateCollection(
@@ -765,7 +843,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             Equipment::addCurrentContainer,
             createEquipment,
             { Feeder("f1") },
-            { Feeder("f2") }
+            { Feeder("f2") },
+            ::ObjectCollectionDifference,
         )
     }
 
@@ -777,7 +856,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             EquipmentContainer::addEquipment,
             createEquipmentContainer,
             { Junction("j1") },
-            { Junction("j2") }
+            { Junction("j2") },
+            ::ObjectCollectionDifference,
         )
     }
 
@@ -787,19 +867,30 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
 
         comparatorValidator.validateProperty(Feeder::normalHeadTerminal, { Feeder(it) }, { Terminal("t1") }, { Terminal("t2") })
         comparatorValidator.validateProperty(Feeder::normalEnergizingSubstation, { Feeder(it) }, { Substation("s1") }, { Substation("s2") })
-        comparatorValidator.validateCollection(Feeder::currentEquipment, Feeder::addCurrentEquipment, { Feeder(it) }, { Junction("j1") }, { Junction("j2") })
+        comparatorValidator.validateCollection(
+            Feeder::currentEquipment,
+            Feeder::addCurrentEquipment,
+            { Feeder(it) },
+            { Junction("j1") },
+            { Junction("j2") },
+            ::ObjectCollectionDifference,
+        )
         comparatorValidator.validateCollection(
             Feeder::normalEnergizedLvFeeders,
             Feeder::addNormalEnergizedLvFeeder,
             { Feeder(it) },
             { LvFeeder("lvf1") },
-            { LvFeeder("lvf2") })
+            { LvFeeder("lvf2") },
+            ::ObjectCollectionDifference,
+        )
         comparatorValidator.validateCollection(
             Feeder::currentEnergizedLvFeeders,
             Feeder::addCurrentEnergizedLvFeeder,
             { Feeder(it) },
             { LvFeeder("lvf1") },
-            { LvFeeder("lvf2") })
+            { LvFeeder("lvf2") },
+            ::ObjectCollectionDifference,
+        )
 
     }
 
@@ -812,7 +903,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             GeographicalRegion::addSubGeographicalRegion,
             { GeographicalRegion(it) },
             { SubGeographicalRegion("sg1") },
-            { SubGeographicalRegion("sg2") }
+            { SubGeographicalRegion("sg2") },
+            ::ObjectCollectionDifference,
         )
     }
 
@@ -821,7 +913,14 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
 
         comparatorValidator.validateProperty(PowerSystemResource::location, createPowerSystemResource, { Location("l1") }, { Location("l2") })
         comparatorValidator.validateProperty(PowerSystemResource::numControls, createPowerSystemResource, { 1 }, { 2 })
-        comparatorValidator.validateCollection(PowerSystemResource::assets, PowerSystemResource::addAsset, { Junction(it) }, { Pole("p1") }, { Pole("p2") })
+        comparatorValidator.validateCollection(
+            PowerSystemResource::assets,
+            PowerSystemResource::addAsset,
+            { Junction(it) },
+            { Pole("p1") },
+            { Pole("p2") },
+            ::ObjectCollectionDifference,
+        )
 
     }
 
@@ -841,7 +940,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             SubGeographicalRegion::addSubstation,
             { SubGeographicalRegion(it) },
             { Substation("s1") },
-            { Substation("s2") }
+            { Substation("s2") },
+            ::ObjectCollectionDifference,
         )
     }
 
@@ -856,7 +956,14 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             { SubGeographicalRegion("sg2") }
         )
 
-        comparatorValidator.validateCollection(Substation::feeders, Substation::addFeeder, { Substation(it) }, { Feeder("f1") }, { Feeder("f2") })
+        comparatorValidator.validateCollection(
+            Substation::feeders,
+            Substation::addFeeder,
+            { Substation(it) },
+            { Feeder("f1") },
+            { Feeder("f2") },
+            ::ObjectCollectionDifference,
+        )
     }
 
     @Test
@@ -1062,8 +1169,22 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             { PerLengthSequenceImpedance("p1") },
             { PerLengthSequenceImpedance("p2") }
         )
-        comparatorValidator.validateCollection(AcLineSegment::cuts, AcLineSegment::addCut, { AcLineSegment(it) }, { Cut("c1") }, { Cut("c2") })
-        comparatorValidator.validateCollection(AcLineSegment::clamps, AcLineSegment::addClamp, { AcLineSegment(it) }, { Clamp("c1") }, { Clamp("c2") })
+        comparatorValidator.validateCollection(
+            AcLineSegment::cuts,
+            AcLineSegment::addCut,
+            { AcLineSegment(it) },
+            { Cut("c1") },
+            { Cut("c2") },
+            ::ObjectCollectionDifference,
+        )
+        comparatorValidator.validateCollection(
+            AcLineSegment::clamps,
+            AcLineSegment::addClamp,
+            { AcLineSegment(it) },
+            { Clamp("c1") },
+            { Clamp("c2") },
+            ::ObjectCollectionDifference,
+        )
     }
 
     @Test
@@ -1143,7 +1264,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             EnergyConsumer::addPhase,
             { EnergyConsumer(it) },
             { EnergyConsumerPhase("ecp1") },
-            { EnergyConsumerPhase("ecp2") }
+            { EnergyConsumerPhase("ecp2") },
+            ::ObjectCollectionDifference,
         )
     }
 
@@ -1200,7 +1322,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             EnergySource::addPhase,
             { EnergySource(it) },
             { EnergySourcePhase("ecp1") },
-            { EnergySourcePhase("ecp2") }
+            { EnergySourcePhase("ecp2") },
+            ::ObjectCollectionDifference,
         )
     }
 
@@ -1279,6 +1402,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             { PhaseImpedanceData(SinglePhaseKind.A, SinglePhaseKind.B, 1.0, 2.0, 3.0, 4.0) },
             { PhaseImpedanceData(SinglePhaseKind.A, SinglePhaseKind.C, 1.0, 2.0, 3.0, 4.0) },
             { PhaseImpedanceData(SinglePhaseKind.A, SinglePhaseKind.B, 2.0, 3.0, 4.0, 5.0) },
+            ::ValueCollectionDifference,
         )
     }
 
@@ -1312,14 +1436,16 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             PowerElectronicsConnection::addPhase,
             { PowerElectronicsConnection(it) },
             { PowerElectronicsConnectionPhase("pecp1") },
-            { PowerElectronicsConnectionPhase("pecp2") }
+            { PowerElectronicsConnectionPhase("pecp2") },
+            ::ObjectCollectionDifference,
         )
         comparatorValidator.validateCollection(
             PowerElectronicsConnection::units,
             PowerElectronicsConnection::addUnit,
             { PowerElectronicsConnection(it) },
             { object : PowerElectronicsUnit("peu1") {} },
-            { object : PowerElectronicsUnit("peu2") {} }
+            { object : PowerElectronicsUnit("peu2") {} },
+            ::ObjectCollectionDifference,
         )
 
         comparatorValidator.validateProperty(PowerElectronicsConnection::maxIFault, { PowerElectronicsConnection(it) }, { 1 }, { 2 })
@@ -1404,6 +1530,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             { PowerTransformer(it) },
             { PowerTransformerEnd(mRID = "pte1").apply { powerTransformer = it } },
             { PowerTransformerEnd(mRID = "pte2").apply { powerTransformer = it } },
+            ::ObjectCollectionDifference,
         )
     }
 
@@ -1441,6 +1568,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             { PowerTransformerEnd(it) },
             { TransformerEndRatedS(TransformerCoolingType.UNKNOWN, 1) },
             { TransformerEndRatedS(TransformerCoolingType.UNKNOWN, 2) },
+            ::ValueCollectionDifference,
             expectedDifferences = setOf("ratedS")
         )
 
@@ -1455,7 +1583,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             ProtectedSwitch::addRelayFunction,
             createProtectedSwitch,
             { object : ProtectionRelayFunction("prf1") {} },
-            { object : ProtectionRelayFunction("prf2") {} }
+            { object : ProtectionRelayFunction("prf2") {} },
+            ::ObjectCollectionDifference,
         )
     }
 
@@ -1521,7 +1650,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             RegulatingControl::addRegulatingCondEq,
             createRegulatingControl,
             { object : RegulatingCondEq("rce1") {} },
-            { object : RegulatingCondEq("rce2") {} }
+            { object : RegulatingCondEq("rce2") {} },
+            ::ObjectCollectionDifference,
         )
     }
 
@@ -1648,7 +1778,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             SynchronousMachine::addCurve,
             { SynchronousMachine(it) },
             { ReactiveCapabilityCurve("rcc1") },
-            { ReactiveCapabilityCurve("rcc2") }
+            { ReactiveCapabilityCurve("rcc2") },
+            ::ObjectCollectionDifference,
         )
     }
 
@@ -1728,9 +1859,23 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
 
         comparatorValidator.validateProperty(Circuit::loop, { Circuit(it) }, { Loop("l1") }, { Loop("l2") })
 
-        comparatorValidator.validateCollection(Circuit::endTerminals, Circuit::addEndTerminal, { Circuit(it) }, { Terminal("t1") }, { Terminal("t2") })
+        comparatorValidator.validateCollection(
+            Circuit::endTerminals,
+            Circuit::addEndTerminal,
+            { Circuit(it) },
+            { Terminal("t1") },
+            { Terminal("t2") },
+            ::ObjectCollectionDifference,
+        )
 
-        comparatorValidator.validateCollection(Circuit::endSubstations, Circuit::addEndSubstation, { Circuit(it) }, { Substation("s1") }, { Substation("s2") })
+        comparatorValidator.validateCollection(
+            Circuit::endSubstations,
+            Circuit::addEndSubstation,
+            { Circuit(it) },
+            { Substation("s1") },
+            { Substation("s2") },
+            ::ObjectCollectionDifference,
+        )
     }
 
 }

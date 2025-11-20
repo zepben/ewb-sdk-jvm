@@ -144,7 +144,7 @@ abstract class BaseServiceComparator {
                     this.type.name == other.type.name &&
                     this.identifiedObject.mRID == other.identifiedObject.mRID
 
-            val differences = CollectionDifference()
+            val differences = ObjectCollectionDifference()
 
             source.names.forEach { sName ->
                 if (!target.names.any { tName -> sName.compareMatch(tName) })

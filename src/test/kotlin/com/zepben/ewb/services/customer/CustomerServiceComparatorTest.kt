@@ -11,6 +11,7 @@ package com.zepben.ewb.services.customer
 import com.zepben.ewb.cim.iec61968.common.Agreement
 import com.zepben.ewb.cim.iec61968.customers.*
 import com.zepben.ewb.services.common.BaseServiceComparatorTest
+import com.zepben.ewb.services.common.ObjectCollectionDifference
 import com.zepben.ewb.utils.ServiceComparatorValidator
 import org.junit.jupiter.api.Test
 
@@ -32,7 +33,9 @@ internal class CustomerServiceComparatorTest : BaseServiceComparatorTest() {
             Customer::addAgreement,
             { Customer(it) },
             { CustomerAgreement("1").apply { customer = it } },
-            { CustomerAgreement("2").apply { customer = it } })
+            { CustomerAgreement("2").apply { customer = it } },
+            ::ObjectCollectionDifference,
+        )
         comparatorValidator.validateProperty(Customer::numEndDevices, { Customer(it) }, { 1 }, { 2 })
         comparatorValidator.validateProperty(Customer::specialNeed, { Customer(it) }, { "1" }, { "2" })
     }
@@ -47,7 +50,9 @@ internal class CustomerServiceComparatorTest : BaseServiceComparatorTest() {
             CustomerAgreement::addPricingStructure,
             { CustomerAgreement(it) },
             { PricingStructure("1") },
-            { PricingStructure("2") })
+            { PricingStructure("2") },
+            ::ObjectCollectionDifference
+        )
     }
 
     @Test
@@ -59,7 +64,9 @@ internal class CustomerServiceComparatorTest : BaseServiceComparatorTest() {
             PricingStructure::addTariff,
             { PricingStructure(it) },
             { Tariff("1") },
-            { Tariff("2") })
+            { Tariff("2") },
+            ::ObjectCollectionDifference,
+        )
     }
 
     @Test

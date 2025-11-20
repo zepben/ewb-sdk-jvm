@@ -17,6 +17,12 @@ import org.hamcrest.Matchers.*
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty1
 
+typealias CreateCollectionDifference = (
+    missingFromTarget: MutableList<in Any>,
+    missingFromSource: MutableList<in Any>,
+    modifications: MutableList<Difference>
+) -> CollectionDifference
+
 class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
     val newService: () -> T,
     val newComparator: (NetworkServiceComparatorOptions) -> C
@@ -133,9 +139,10 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
         createIdObj: (String) -> T,
         createItem: (T) -> R,
         createOtherItem: (T) -> R,
+        createCollectionDifference: CreateCollectionDifference,
         options: NetworkServiceComparatorOptions = NetworkServiceComparatorOptions.all(),
         optionsStopCompare: Boolean = false,
-        expectedDifferences: Set<String> = emptySet()
+        expectedDifferences: Set<String> = emptySet(),
     ) {
         val sourceEmpty = createIdObj("mRID")
         val targetEmpty = createIdObj("mRID")
@@ -147,21 +154,22 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
 
         ObjectDifference(inSource, targetEmpty).apply {
             val item = property.get(source).first()
-            differences[property.name] = CollectionDifference(missingFromTarget = mutableListOf(item))
+            differences[property.name] = createCollectionDifference(mutableListOf(item), mutableListOf(), mutableListOf())
         }.validateExpected(options, optionsStopCompare, expectedDifferences)
 
         ObjectDifference(sourceEmpty, inTarget).apply {
             val item = property.get(target).first()
-            differences[property.name] = CollectionDifference(missingFromSource = mutableListOf(item))
+            differences[property.name] = createCollectionDifference(mutableListOf(), mutableListOf(item), mutableListOf())
         }.validateExpected(options, optionsStopCompare, expectedDifferences)
 
         val inTargetDifference = createIdObj("mRID").apply { addToCollection(this, createOtherItem(this)) }
         ObjectDifference(inSource, inTargetDifference).apply {
             val inSourceItem = property.get(source).first()
             val inTargetItem = property.get(target).first()
-            differences[property.name] = CollectionDifference(
-                missingFromSource = mutableListOf(inTargetItem),
-                missingFromTarget = mutableListOf(inSourceItem)
+            differences[property.name] = createCollectionDifference(
+                mutableListOf(inSourceItem),
+                mutableListOf(inTargetItem),
+                mutableListOf(),
             )
         }.validateExpected(options, optionsStopCompare, expectedDifferences)
     }
@@ -182,9 +190,10 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
         createOtherItem1: (T) -> U,
         createItem2: (T) -> V,
         createOtherItem2: (T) -> V,
+        createCollectionDifference: CreateCollectionDifference,
         options: NetworkServiceComparatorOptions = NetworkServiceComparatorOptions.all(),
         optionsStopCompare: Boolean = false,
-        expectedDifferences: Set<String> = emptySet()
+        expectedDifferences: Set<String> = emptySet(),
     ) {
         val sourceEmpty = createIdObj("mRID")
         val targetEmpty = createIdObj("mRID")
@@ -196,21 +205,22 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
 
         ObjectDifference(inSource, targetEmpty).apply {
             val item = property.get(source).first()
-            differences[property.name] = CollectionDifference(missingFromTarget = mutableListOf(item))
+            differences[property.name] = createCollectionDifference(mutableListOf(item), mutableListOf(), mutableListOf())
         }.validateExpected(options, optionsStopCompare, expectedDifferences)
 
         ObjectDifference(sourceEmpty, inTarget).apply {
             val item = property.get(target).first()
-            differences[property.name] = CollectionDifference(missingFromSource = mutableListOf(item))
+            differences[property.name] = createCollectionDifference(mutableListOf(), mutableListOf(item), mutableListOf())
         }.validateExpected(options, optionsStopCompare, expectedDifferences)
 
         val inTargetDifference1 = createIdObj("mRID").apply { addToCollection(this, createOtherItem1(this), createItem2(this)) }
         ObjectDifference(inSource, inTargetDifference1).apply {
             val inSourceItem = property.get(source).first()
             val inTargetItem = property.get(target).first()
-            differences[property.name] = CollectionDifference(
-                missingFromSource = mutableListOf(inTargetItem),
-                missingFromTarget = mutableListOf(inSourceItem)
+            differences[property.name] = createCollectionDifference(
+                mutableListOf(inSourceItem),
+                mutableListOf(inTargetItem),
+                mutableListOf()
             )
         }.validateExpected(options, optionsStopCompare, expectedDifferences)
 
@@ -218,9 +228,10 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
         ObjectDifference(inSource, inTargetDifference2).apply {
             val inSourceItem = property.get(source).first()
             val inTargetItem = property.get(target).first()
-            differences[property.name] = CollectionDifference(
-                missingFromSource = mutableListOf(inTargetItem),
-                missingFromTarget = mutableListOf(inSourceItem)
+            differences[property.name] = createCollectionDifference(
+                mutableListOf(inSourceItem),
+                mutableListOf(inTargetItem),
+                mutableListOf(),
             )
         }.validateExpected(options, optionsStopCompare, expectedDifferences)
     }
@@ -231,9 +242,10 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
         createIdObj: (String) -> T,
         createItem: (T) -> R,
         createOtherItem: (T) -> R,
+        createCollectionDifference: CreateCollectionDifference,
         options: NetworkServiceComparatorOptions = NetworkServiceComparatorOptions.all(),
         optionsStopCompare: Boolean = false,
-        expectedDifferences: Set<String> = emptySet()
+        expectedDifferences: Set<String> = emptySet(),
     ) {
         val sourceEmpty = createIdObj("mRID")
         val targetEmpty = createIdObj("mRID")
@@ -253,12 +265,12 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
 
         ObjectDifference(inSource, targetEmpty).apply {
             val valOrRefDiff = getValueOrReferenceDifference(getItem(source), null)
-            differences[property.name] = CollectionDifference().apply { missingFromTarget.add(IndexedDifference(0, valOrRefDiff)) }
+            differences[property.name] = createCollectionDifference(mutableListOf(IndexedDifference(0, valOrRefDiff)), mutableListOf(), mutableListOf())
         }.validateExpected(options, optionsStopCompare, expectedDifferences)
 
         ObjectDifference(sourceEmpty, inTarget).apply {
             val valOrRefDiff = getValueOrReferenceDifference(null, getItem(target))
-            differences[property.name] = CollectionDifference().apply { missingFromSource.add(IndexedDifference(0, valOrRefDiff)) }
+            differences[property.name] = createCollectionDifference(mutableListOf(), mutableListOf(IndexedDifference(0, valOrRefDiff)), mutableListOf())
         }.validateExpected(options, optionsStopCompare, expectedDifferences)
 
         val targetDifferent = createIdObj("mRID").apply {
@@ -267,7 +279,7 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
         }
         ObjectDifference(inSource, targetDifferent).apply {
             val valOrRefDiff = getValueOrReferenceDifference(getItem(source), getItem(target))
-            differences[property.name] = CollectionDifference().apply { modifications.add(IndexedDifference(0, valOrRefDiff)) }
+            differences[property.name] = createCollectionDifference(mutableListOf(), mutableListOf(), mutableListOf(IndexedDifference(0, valOrRefDiff)))
         }.validateExpected(options, optionsStopCompare, expectedDifferences)
     }
 
@@ -290,9 +302,10 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
         createItem1: (T) -> R,
         createItem2: (T) -> R,
         createDiffItem1: (T) -> R,
+        createCollectionDifference: CreateCollectionDifference,
         options: NetworkServiceComparatorOptions = NetworkServiceComparatorOptions.all(),
         optionsStopCompare: Boolean = false,
-        expectedDifferences: Set<String> = emptySet()
+        expectedDifferences: Set<String> = emptySet(),
     ) {
         val sourceEmpty = createIdObj("mRID")
         val targetEmpty = createIdObj("mRID")
@@ -327,17 +340,25 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
         val getItem2 = { obj: T -> property.get(obj).lastOrNull() }
 
         ObjectDifference(inSource, targetEmpty).apply {
-            differences[property.name] = CollectionDifference().apply {
-                missingFromTarget.add(getValueOrReferenceDifference(getItem1(source), null))
-                missingFromTarget.add(getValueOrReferenceDifference(getItem2(source), null))
-            }
+            differences[property.name] = createCollectionDifference(
+                mutableListOf(
+                    getValueOrReferenceDifference(getItem1(source), null),
+                    getValueOrReferenceDifference(getItem2(source), null),
+                ),
+                mutableListOf(),
+                mutableListOf(),
+            )
         }.validateExpected(options, optionsStopCompare, expectedDifferences)
 
         ObjectDifference(sourceEmpty, inTargetSameOrder).apply {
-            differences[property.name] = CollectionDifference().apply {
-                missingFromSource.add(getValueOrReferenceDifference(null, getItem1(target)))
-                missingFromSource.add(getValueOrReferenceDifference(null, getItem2(target)))
-            }
+            differences[property.name] = createCollectionDifference(
+                mutableListOf(),
+                mutableListOf(
+                    getValueOrReferenceDifference(null, getItem1(target)),
+                    getValueOrReferenceDifference(null, getItem2(target)),
+                ),
+                mutableListOf(),
+            )
         }.validateExpected(options, optionsStopCompare, expectedDifferences)
 
         val targetDifferent = createIdObj("mRID").apply {
@@ -348,9 +369,11 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
             addToCollection(this, item2)
         }
         ObjectDifference(inSource, targetDifferent).apply {
-            differences[property.name] = CollectionDifference().apply {
-                modifications.add(getValueOrReferenceDifference(getItem1(source), getItem1(target)))
-            }
+            differences[property.name] = createCollectionDifference(
+                mutableListOf(),
+                mutableListOf(),
+                mutableListOf(getValueOrReferenceDifference(getItem1(source), getItem1(target))),
+            )
         }.validateExpected(options, optionsStopCompare, expectedDifferences)
     }
 

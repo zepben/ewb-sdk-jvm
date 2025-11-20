@@ -3,6 +3,8 @@
 ### Breaking Changes
 * Removed `Column.Nullable.NONE` in favour of setting the column nullability explicitly. Nullability left unspecified should default to nullable in every
   ANSI-compliant implementation of SQL, so you likely can replace any use with `Column.Nullable.NULL`.
+* `CollectionDifference` is now abstract, with two descendants (`ValueCollectionDifference` and `ObjectCollectionDifference`) to allow detection of differences
+  in the object itself, and in having different references to other objects.
 
 ### New Features
 * Added postgres support for `Column.Type`.

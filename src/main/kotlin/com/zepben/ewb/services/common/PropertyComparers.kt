@@ -89,10 +89,10 @@ fun <T, R : IdentifiedObject> KProperty1<in T, R?>.compareIdReference(source: T?
  * @receiver The property to compare.
  * @param source The first object to compare.
  * @param target The second object to compare.
- * @return The [CollectionDifference] if there were any differences, otherwise `null`.
+ * @return The [ObjectCollectionDifference] if there were any differences, otherwise `null`.
  */
-fun <T, R : IdentifiedObject> KProperty1<in T, Collection<R>>.compareIdReferenceCollection(source: T, target: T): CollectionDifference? {
-    val differences = CollectionDifference()
+fun <T, R : IdentifiedObject> KProperty1<in T, Collection<R>>.compareIdReferenceCollection(source: T, target: T): ObjectCollectionDifference? {
+    val differences = ObjectCollectionDifference()
     val sourceCollection = this.get(source)
     val targetCollection = this.get(target)
 
@@ -119,12 +119,12 @@ fun <T, R : IdentifiedObject> KProperty1<in T, Collection<R>>.compareIdReference
  * @receiver The property to compare.
  * @param source The first object to compare.
  * @param target The second object to compare.
- * @return The [CollectionDifference] if there were any differences, otherwise `null`.
+ * @return The [ValueCollectionDifference] if there were any differences, otherwise `null`.
  */
-fun <T : IdentifiedObject> KProperty1<in T, Collection<Name>>.compareNames(source: T, target: T): CollectionDifference? {
+fun <T : IdentifiedObject> KProperty1<in T, Collection<Name>>.compareNames(source: T, target: T): ValueCollectionDifference? {
     data class NameTypeName(val nameType: String, val name: String)
 
-    val differences = CollectionDifference()
+    val differences = ValueCollectionDifference()
     val sourceCollection = this.get(source)
     val targetCollection = this.get(target)
 
@@ -151,13 +151,13 @@ fun <T : IdentifiedObject> KProperty1<in T, Collection<Name>>.compareNames(sourc
  * @receiver The property to compare.
  * @param source The first object to compare.
  * @param target The second object to compare.
- * @return The [CollectionDifference] if there were any differences, otherwise `null`.
+ * @return The [ObjectCollectionDifference] if there were any differences, otherwise `null`.
  */
 fun <T, R : IdentifiedObject> KProperty1<in T, List<R>>.compareIndexedIdReferenceCollection(
     source: T,
     target: T
-): CollectionDifference? {
-    val differences = CollectionDifference()
+): ObjectCollectionDifference? {
+    val differences = ObjectCollectionDifference()
     val sourceList = this.get(source)
     val targetList = this.get(target)
 
@@ -182,13 +182,13 @@ fun <T, R : IdentifiedObject> KProperty1<in T, List<R>>.compareIndexedIdReferenc
  * @receiver The property to compare.
  * @param source The first object to compare.
  * @param target The second object to compare.
- * @return The [CollectionDifference] if there were any differences, otherwise `null`.
+ * @return The [ValueCollectionDifference] if there were any differences, otherwise `null`.
  */
 fun <T, R> KProperty1<in T, List<R>>.compareIndexedValueCollection(
     source: T,
     target: T
-): CollectionDifference? {
-    val differences = CollectionDifference()
+): ValueCollectionDifference? {
+    val differences = ValueCollectionDifference()
     val sourceList = this.get(source)
     val targetList = this.get(target)
 
@@ -214,14 +214,14 @@ fun <T, R> KProperty1<in T, List<R>>.compareIndexedValueCollection(
  * @param source The first object to compare.
  * @param target The second object to compare.
  * @param keySelector A function to return a "key" from the item, that can be used to compare values.
- * @return The [CollectionDifference] if there were any differences, otherwise `null`.
+ * @return The [ValueCollectionDifference] if there were any differences, otherwise `null`.
  */
 fun <T, R, K : Comparable<K>> KProperty1<in T, Collection<R>>.compareUnorderedValueCollection(
     source: T,
     target: T,
     keySelector: (R) -> K
-): CollectionDifference? {
-    val differences = CollectionDifference()
+): ValueCollectionDifference? {
+    val differences = ValueCollectionDifference()
     val sourceList = this.get(source).sortedBy { keySelector(it) }
     val targetList = this.get(target).sortedBy { keySelector(it) }
 
@@ -258,7 +258,14 @@ fun <T, R, K : Comparable<K>> KProperty1<in T, Collection<R>>.compareUnorderedVa
     return differences.nullIfEmpty()
 }
 
-internal fun CollectionDifference.nullIfEmpty() =
+internal fun ObjectCollectionDifference.nullIfEmpty() =
+    if (missingFromSource.isEmpty() && missingFromTarget.isEmpty() && modifications.isEmpty()) {
+        null
+    } else {
+        this
+    }
+
+internal fun ValueCollectionDifference.nullIfEmpty() =
     if (missingFromSource.isEmpty() && missingFromTarget.isEmpty() && modifications.isEmpty()) {
         null
     } else {

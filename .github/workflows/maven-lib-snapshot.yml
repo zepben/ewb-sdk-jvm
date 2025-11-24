@@ -11,4 +11,6 @@ on:
 jobs:
   snapshot:
     uses: zepben/.github/.github/workflows/maven-lib-snapshot.yml@main
+    with:
+      product-key: "jvm-sdk"
     secrets: inherit

@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.services
 
+import com.zepben.ewb.annotations.ZepbenExperimental
 import com.zepben.ewb.services.customer.CustomerService
 import com.zepben.ewb.services.diagram.DiagramService
 import com.zepben.ewb.services.network.NetworkService
@@ -18,26 +19,42 @@ import com.zepben.ewb.services.network.NetworkService
  * @property networkService A [NetworkService].
  * @property diagramService A [DiagramService].
  * @property customerService A [CustomerService].
+ * @property customerDiagramService A [DiagramService].
  */
-open class Services(
-    val networkService: NetworkService = NetworkService(),
-    val diagramService: DiagramService = DiagramService(),
-    val customerService: CustomerService = CustomerService()
+// TODO: Create task to implement customerDiagramService in the database reading, at which point ZepbenExperimental can be removed.
+open class Services @ZepbenExperimental constructor(
+    open val networkService: NetworkService = NetworkService(),
+    open val diagramService: DiagramService = DiagramService(),
+    open val customerService: CustomerService = CustomerService(),
+    @property:ZepbenExperimental open val customerDiagramService: DiagramService,    // NOTE: Do not use unless you know better. Talk to Anthony/Kurt.
 ) {
+
+    @OptIn(ZepbenExperimental::class)
+    constructor(
+        networkService: NetworkService = NetworkService(),
+        diagramService: DiagramService = DiagramService(),
+        customerService: CustomerService = CustomerService(),
+    ): this(networkService, diagramService, customerService, DiagramService())
 
     /**
      * Accessor of the [networkService] to allow for destructuring.
      */
-    operator fun component1(): NetworkService = networkService
+    open operator fun component1(): NetworkService = networkService
 
     /**
      * Accessor of the [diagramService] to allow for destructuring.
      */
-    operator fun component2(): DiagramService = diagramService
+    open operator fun component2(): DiagramService = diagramService
 
     /**
      * Accessor of the [customerService] to allow for destructuring.
      */
-    operator fun component3(): CustomerService = customerService
+    open operator fun component3(): CustomerService = customerService
+
+    /**
+     * Accessor of the [customerDiagramService] to allow for destructuring.
+     */
+    @OptIn(ZepbenExperimental::class)
+    open operator fun component4(): DiagramService = customerDiagramService
 
 }

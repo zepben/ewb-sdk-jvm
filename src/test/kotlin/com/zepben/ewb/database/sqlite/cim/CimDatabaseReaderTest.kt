@@ -164,6 +164,39 @@ internal class CimDatabaseReaderTest {
         assertThat(systemErr.log, containsString("Unable to read database: Test Error"))
     }
 
+    @Test
+    internal fun `can delay after read processing`() {
+        var afterServiceReadCallback: (() -> Boolean)? = null
+        var delayAfterReadProcessingCalled = false
+
+        assertThat(
+            "Should have read",
+            reader.read(service) { afterServiceRead ->
+                delayAfterReadProcessingCalled = true
+                afterServiceReadCallback = afterServiceRead
+            }
+        )
+
+        verifyReadersCalled()
+        assertThat("afterServiceRead shouldn't have been called", !afterServiceReadCalled)
+        assertThat("delayAfterReadProcessing should have been called", delayAfterReadProcessingCalled)
+
+        afterServiceReadCallback!!()
+
+        assertThat("afterServiceRead should have been called by the provided callback", afterServiceReadCalled)
+    }
+
+    @Test
+    internal fun `delay after read processing only called on successful load`() {
+        var delayAfterReadProcessingCalled = false
+
+        every { tableVersion.getVersion(any()) } returns null
+
+        assertThat("Should not have read", !reader.read(service) { delayAfterReadProcessingCalled = true })
+
+        assertThat("delayAfterReadProcessing shouldn't have been called", !delayAfterReadProcessingCalled)
+    }
+
     private fun verifyReadersCalled() {
         verifySequence {
             tableVersion.supportedVersion

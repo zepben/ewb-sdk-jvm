@@ -58,15 +58,31 @@ abstract class CimDatabaseReader<TTables : CimDatabaseTables, TService : BaseSer
 
     /**
      * Read the database.
+     *
+     * @param service The [TService] to store the entries that are read.
+     * @param delayAfterReadProcessing An optional callback which itself is passed a callback to perform the after read processing. If this callback is
+     * provided, it becomes the callers responsibility when (if at all) to run the provided `afterServiceRead`. You can use this to "opt-out" by never calling
+     * the `afterServiceRead`, or you can delay this processing until after you have performed.
+     *
+     * NOTE: This callback will only be called if the post read processing can be called. i.e. if the read was successful.
+     *
+     * @return `true` if the database was successfully read, otherwise `false`.
      */
-    fun read(service: TService): Boolean =
+    @JvmOverloads
+    fun read(service: TService, delayAfterReadProcessing: ((afterServiceRead: () -> Boolean) -> Unit)? = null): Boolean =
         try {
             require(!hasBeenUsed) { "You can only use the database reader once." }
             hasBeenUsed = true
 
-            beforeRead()
+            var status = beforeRead()
                 && readService(service)
-                && afterServiceRead(service)
+
+            if (status && (delayAfterReadProcessing != null))
+                delayAfterReadProcessing { afterServiceRead(service) }
+            else
+                status = status && afterServiceRead(service)
+
+            status
         } catch (e: Exception) {
             logger.error("Unable to read database: " + e.message)
             false

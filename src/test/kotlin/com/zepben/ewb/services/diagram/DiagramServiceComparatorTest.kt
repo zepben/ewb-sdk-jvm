@@ -10,6 +10,8 @@ package com.zepben.ewb.services.diagram
 
 import com.zepben.ewb.cim.iec61970.base.diagramlayout.*
 import com.zepben.ewb.services.common.BaseServiceComparatorTest
+import com.zepben.ewb.services.common.ObjectCollectionDifference
+import com.zepben.ewb.services.common.ValueCollectionDifference
 import com.zepben.ewb.utils.ServiceComparatorValidator
 import org.junit.jupiter.api.Test
 
@@ -31,7 +33,9 @@ internal class DiagramServiceComparatorTest : BaseServiceComparatorTest() {
             Diagram::addDiagramObject,
             { Diagram(it) },
             { DiagramObject("1").apply { diagram = it } },
-            { DiagramObject("2").apply { diagram = it } })
+            { DiagramObject("2").apply { diagram = it } },
+            ::ObjectCollectionDifference,
+        )
     }
 
     @Test
@@ -47,7 +51,8 @@ internal class DiagramServiceComparatorTest : BaseServiceComparatorTest() {
             DiagramObject::addPoint,
             { DiagramObject(it) },
             { DiagramObjectPoint(1.0, 2.0) },
-            { DiagramObjectPoint(3.0, 4.0) }
+            { DiagramObjectPoint(3.0, 4.0) },
+            ::ValueCollectionDifference,
         )
     }
 }

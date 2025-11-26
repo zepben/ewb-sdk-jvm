@@ -15,7 +15,6 @@ import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.core.NameType
 import com.zepben.ewb.services.common.BaseService
-import org.hamcrest.MatcherAssert.assertThat
 import java.time.Instant
 import java.util.*
 

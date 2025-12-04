@@ -20,7 +20,7 @@ import com.zepben.ewb.services.common.extensions.validateReference
  * @property breakingCapacity The maximum fault current in amps a breaking device can break safely under prescribed conditions of use.
  * @property relayFunctions The [ProtectionRelayFunction]s operating this [ProtectedSwitch].
  */
-abstract class ProtectedSwitch(mRID: String = "") : Switch(mRID) {
+abstract class ProtectedSwitch(mRID: String) : Switch(mRID) {
 
     var breakingCapacity: Int? = null
     private var _relayFunctions: MutableList<ProtectionRelayFunction>? = null

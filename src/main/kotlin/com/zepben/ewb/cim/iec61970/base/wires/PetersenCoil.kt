@@ -14,7 +14,7 @@ package com.zepben.ewb.cim.iec61970.base.wires
  * @property xGroundNominal The nominal reactance. This is the operating point (normally over compensation) that is defined based on the resonance point in the
  * healthy network condition. The impedance is calculated based on nominal voltage divided by position current.
  */
-class PetersenCoil @JvmOverloads constructor(mRID: String = "") : EarthFaultCompensator(mRID) {
+class PetersenCoil(mRID: String) : EarthFaultCompensator(mRID) {
 
     var xGroundNominal: Double? = null
 

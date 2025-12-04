@@ -11,4 +11,4 @@ package com.zepben.ewb.cim.iec61970.base.generation.production
 /**
  * A photovoltaic device or an aggregation of such devices.
  */
-class PhotoVoltaicUnit @JvmOverloads constructor(mRID: String = "") : PowerElectronicsUnit(mRID)
+class PhotoVoltaicUnit(mRID: String) : PowerElectronicsUnit(mRID)

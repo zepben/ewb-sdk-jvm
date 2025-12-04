@@ -22,7 +22,7 @@ import java.time.Instant
  * @property status Status of subject matter (e.g., Agreement, Work) this document represents.
  * @property comment Free text comment.
  */
-abstract class Document(mRID: String = "") : IdentifiedObject(mRID) {
+abstract class Document(mRID: String) : IdentifiedObject(mRID) {
 
     var title: String? = null
     var createdDateTime: Instant? = null

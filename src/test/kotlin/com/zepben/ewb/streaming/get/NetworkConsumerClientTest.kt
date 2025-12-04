@@ -18,6 +18,7 @@ import com.zepben.ewb.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.ewb.services.common.Resolvers
 import com.zepben.ewb.services.common.extensions.typeNameAndMRID
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.NetworkServiceComparator
 import com.zepben.ewb.services.network.NetworkState
@@ -89,7 +90,7 @@ internal class NetworkConsumerClientTest {
         //       send, and one of those references was resolved by processing the response of an earlier part of the batch before the later part was sent. This
         //       is a race condition between the processing of the references and the sending of requests.
         //
-        val feeder = Feeder().also { service.add(it) }
+        val feeder = Feeder(generateId()).also { service.add(it) }
 
         // We create a set of references that will require a batch send, and one that will be resolved by the first half of the batch.
         (0..1000).onEach { service.resolveOrDeferReference(Resolvers.equipment(feeder), "b$it") }
@@ -598,9 +599,9 @@ internal class NetworkConsumerClientTest {
     internal fun `direct object variant coverage`() {
         val expectedResult = mock<GrpcResult<MultiObjectResult>>()
 
-        val feeder = Feeder()
-        val operationalRestriction = OperationalRestriction()
-        val connectivityNode = ConnectivityNode()
+        val feeder = Feeder(generateId())
+        val operationalRestriction = OperationalRestriction(generateId())
+        val connectivityNode = ConnectivityNode(generateId())
 
         doReturn(expectedResult).`when`(consumerClient).getEquipmentForContainer(eq(feeder.mRID), any(), any(), any())
         doReturn(expectedResult).`when`(consumerClient).getEquipmentContainer(eq(feeder.mRID), any(), any(), any(), any())

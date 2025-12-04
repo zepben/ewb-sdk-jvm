@@ -19,7 +19,7 @@ import com.zepben.ewb.services.common.extensions.validateReference
  * @property diagramStyle A Diagram may have a DiagramStyle.
  * @property orientationKind Coordinate system orientation of the diagram.
  */
-class Diagram @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mRID) {
+class Diagram(mRID: String) : IdentifiedObject(mRID) {
 
     var diagramStyle: DiagramStyle = DiagramStyle.SCHEMATIC
     var orientationKind: OrientationKind = OrientationKind.POSITIVE

@@ -14,7 +14,7 @@ import com.zepben.ewb.cim.iec61968.infiec61968.infassets.StreetlightLampKind
 /**
  * A Streetlight asset
  */
-class Streetlight @JvmOverloads constructor(mRID: String = "") : Asset(mRID) {
+class Streetlight(mRID: String) : Asset(mRID) {
 
     /**
      * The [Pole] this [Streetlight] is attached to.

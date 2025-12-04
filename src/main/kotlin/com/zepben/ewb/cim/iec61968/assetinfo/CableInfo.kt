@@ -11,4 +11,4 @@ package com.zepben.ewb.cim.iec61968.assetinfo
 /**
  * Cable data.
  */
-class CableInfo @JvmOverloads constructor(mRID: String = "") : WireInfo(mRID)
+class CableInfo(mRID: String) : WireInfo(mRID)

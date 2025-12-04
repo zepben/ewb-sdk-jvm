@@ -13,7 +13,7 @@ import com.zepben.ewb.services.common.extensions.*
 /**
  * A geographical region of a power system network model.
  */
-class GeographicalRegion @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mRID) {
+class GeographicalRegion(mRID: String) : IdentifiedObject(mRID) {
 
     private var _subGeographicalRegions: MutableList<SubGeographicalRegion>? = null
 
@@ -66,8 +66,12 @@ class GeographicalRegion @JvmOverloads constructor(mRID: String = "") : Identifi
         return ret
     }
 
+    /**
+     * @return A reference to this [GeographicalRegion] to allow fluent use.
+     */
     fun clearSubGeographicalRegions(): GeographicalRegion {
         _subGeographicalRegions = null
         return this
     }
+
 }

@@ -9,11 +9,13 @@
 package com.zepben.ewb.cim.iec61968.infiec61968.infassetinfo
 
 import com.zepben.ewb.cim.iec61968.infiec61968.infcommon.Ratio
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.testdata.fillFields
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -25,13 +27,12 @@ internal class PotentialTransformerInfoTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(PotentialTransformerInfo().mRID, not(equalTo("")))
         assertThat(PotentialTransformerInfo("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val potentialTransformerInfo = PotentialTransformerInfo()
+        val potentialTransformerInfo = PotentialTransformerInfo(generateId())
 
         assertThat(potentialTransformerInfo.accuracyClass, nullValue())
         assertThat(potentialTransformerInfo.nominalRatio, nullValue())

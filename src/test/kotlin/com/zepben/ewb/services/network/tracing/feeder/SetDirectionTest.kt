@@ -17,6 +17,7 @@ import com.zepben.ewb.cim.iec61970.base.core.Substation
 import com.zepben.ewb.cim.iec61970.base.core.Terminal
 import com.zepben.ewb.cim.iec61970.base.wires.BusbarSection
 import com.zepben.ewb.cim.iec61970.base.wires.Cut
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.getT
 import com.zepben.ewb.services.network.testdata.CutsAndClampsNetwork
@@ -140,7 +141,7 @@ internal class SetDirectionTest {
         val n = TestNetworkBuilder()
             .fromBreaker() // b0
             .toAcls() // c1
-            .toPowerTransformer { addContainer(Substation()) } // tx2
+            .toPowerTransformer { addContainer(Substation(generateId())) } // tx2
             .toAcls() // c3
             .addFeeder("b0", 2)
             .build()

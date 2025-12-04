@@ -22,8 +22,6 @@ internal class IdentifiedObjectTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(object : IdentifiedObject() {}.mRID, not(equalTo("")))
-        assertThat(object : IdentifiedObject() {}.mRID, not(equalTo(object : IdentifiedObject() {}.mRID)))
         assertThat(object : IdentifiedObject("id") {}.mRID, equalTo("id"))
     }
 

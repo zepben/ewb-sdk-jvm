@@ -8,9 +8,11 @@
 
 package com.zepben.ewb.cim.iec61968.common
 
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -22,14 +24,13 @@ internal class OrganisationRoleTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(object : OrganisationRole() {}.mRID, not(equalTo("")))
         assertThat(object : OrganisationRole("id") {}.mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val organisationRole = object : OrganisationRole() {}
-        val organisation = Organisation()
+        val organisationRole = object : OrganisationRole(generateId()) {}
+        val organisation = Organisation(generateId())
 
         assertThat(organisationRole.organisation, nullValue())
 

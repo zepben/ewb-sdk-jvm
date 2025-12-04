@@ -9,6 +9,7 @@
 package com.zepben.ewb.services.network.tracing.networktrace.operators
 
 import com.zepben.ewb.cim.iec61970.base.core.Terminal
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.tracing.feeder.FeederDirection
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
@@ -24,7 +25,7 @@ class FeederDirectionStateOperatorsTest {
     @Test
     fun getDirection() {
         fun test(operations: FeederDirectionStateOperations, directionProp: KMutableProperty1<Terminal, FeederDirection>) {
-            val terminal = Terminal()
+            val terminal = Terminal(generateId())
             directionProp.set(terminal, FeederDirection.UPSTREAM)
             assertThat(operations.getDirection(terminal), equalTo(FeederDirection.UPSTREAM))
         }
@@ -36,7 +37,7 @@ class FeederDirectionStateOperatorsTest {
     @Test
     fun setDirection() {
         fun test(operations: FeederDirectionStateOperations, directionProp: KMutableProperty1<Terminal, FeederDirection>) {
-            val terminal = Terminal()
+            val terminal = Terminal(generateId())
             directionProp.set(terminal, FeederDirection.NONE)
             assertThat(operations.setDirection(terminal, FeederDirection.UPSTREAM), equalTo(true))
             assertThat(directionProp.get(terminal), equalTo(FeederDirection.UPSTREAM))
@@ -56,7 +57,7 @@ class FeederDirectionStateOperatorsTest {
     @Test
     fun addDirection() {
         fun test(operations: FeederDirectionStateOperations, directionProp: KMutableProperty1<Terminal, FeederDirection>) {
-            val terminal = Terminal()
+            val terminal = Terminal(generateId())
             directionProp.set(terminal, FeederDirection.NONE)
             assertThat(operations.addDirection(terminal, FeederDirection.UPSTREAM), equalTo(true))
             assertThat(directionProp.get(terminal), equalTo(FeederDirection.UPSTREAM))
@@ -76,7 +77,7 @@ class FeederDirectionStateOperatorsTest {
     @Test
     fun removeDirection() {
         fun test(operations: FeederDirectionStateOperations, directionProp: KMutableProperty1<Terminal, FeederDirection>) {
-            val terminal = Terminal()
+            val terminal = Terminal(generateId())
             directionProp.set(terminal, FeederDirection.BOTH)
             assertThat(operations.removeDirection(terminal, FeederDirection.UPSTREAM), equalTo(true))
             assertThat(directionProp.get(terminal), equalTo(FeederDirection.DOWNSTREAM))

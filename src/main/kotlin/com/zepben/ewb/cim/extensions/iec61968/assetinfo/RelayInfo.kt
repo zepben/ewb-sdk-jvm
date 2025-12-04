@@ -23,7 +23,7 @@ import java.util.function.BiConsumer
  * @property recloseDelays [ZBEX] The reclose delays for this curve and relay type. The index of the list is the reclose step, and the value is the overall delay time.
  */
 @ZBEX
-class RelayInfo @JvmOverloads constructor(mRID: String = "") : AssetInfo(mRID) {
+class RelayInfo(mRID: String) : AssetInfo(mRID) {
 
     @ZBEX
     var curveSetting: String? = null

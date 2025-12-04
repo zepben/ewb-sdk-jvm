@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.cim.iec61970.base.core
 
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -23,7 +24,7 @@ internal class NameTest {
     @Test
     internal fun constructorCoverage() {
         val type = NameType("type")
-        val idObj = object : IdentifiedObject() {}
+        val idObj = object : IdentifiedObject(generateId()) {}
         val name = Name("name", type, idObj)
         assertThat(name.name, equalTo("name"))
         assertThat(name.type, equalTo(type))

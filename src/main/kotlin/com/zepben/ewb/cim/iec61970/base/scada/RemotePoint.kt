@@ -14,4 +14,4 @@ import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
  * For an RTU remote points correspond to telemetered values or control outputs. Other units (e.g. control centers) usually
  * also contain calculated values.
  */
-abstract class RemotePoint(mRID: String = "") : IdentifiedObject(mRID)
+abstract class RemotePoint(mRID: String) : IdentifiedObject(mRID)

@@ -11,6 +11,7 @@ package com.zepben.ewb.cim.iec61970.base.wires
 import com.zepben.ewb.cim.iec61968.assetinfo.SwitchInfo
 import com.zepben.ewb.cim.iec61970.base.core.PhaseCode
 import com.zepben.ewb.cim.iec61970.base.core.Terminal
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.testdata.fillFields
 import com.zepben.testutils.exception.ExpectException.Companion.expect
@@ -30,13 +31,12 @@ internal class SwitchTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(object : Switch() {}.mRID, not(equalTo("")))
         assertThat(object : Switch("id") {}.mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val switch = object : Switch() {}
+        val switch = object : Switch(generateId()) {}
 
         assertThat(switch.assetInfo, nullValue())
         assertThat(switch.ratedCurrent, nullValue())
@@ -49,14 +49,14 @@ internal class SwitchTest {
 
     @Test
     internal fun `defaults to closed`() {
-        val switch = object : Switch() {}
+        val switch = object : Switch(generateId()) {}
         testOpen(switch, aOpen = false, bOpen = false, cOpen = false, nOpen = false)
         testNormallyOpen(switch, aOpen = false, bOpen = false, cOpen = false, nOpen = false)
     }
 
     @Test
     internal fun `sets all open with null phase`() {
-        val switch = object : Switch() {}
+        val switch = object : Switch(generateId()) {}
         switch.setOpen(false, null)
         testOpen(switch, aOpen = false, bOpen = false, cOpen = false, nOpen = false)
 
@@ -72,7 +72,7 @@ internal class SwitchTest {
 
     @Test
     internal fun `set open state`() {
-        val switch = object : Switch() {}
+        val switch = object : Switch(generateId()) {}
 
         // Test closing current
         switch.setOpen(true, null).setOpen(false, SPK.A)
@@ -117,7 +117,7 @@ internal class SwitchTest {
 
     @Test
     internal fun `any open phase returns open for null phase`() {
-        val switch = object : Switch() {}
+        val switch = object : Switch(generateId()) {}
         switch.setOpen(false, null)
         assertThat(switch.isOpen(null), equalTo(false))
 
@@ -133,9 +133,9 @@ internal class SwitchTest {
 
     @Test
     internal fun `ignores terminal phases`() {
-        val switch = object : Switch() {}.also {
-            it.addTerminal(Terminal().apply { phases = PhaseCode.A })
-            it.addTerminal(Terminal().apply { phases = PhaseCode.B })
+        val switch = object : Switch(generateId()) {}.also {
+            it.addTerminal(Terminal(generateId()).apply { phases = PhaseCode.A })
+            it.addTerminal(Terminal(generateId()).apply { phases = PhaseCode.B })
         }
 
         switch.setOpen(true)
@@ -149,7 +149,7 @@ internal class SwitchTest {
 
     @Test
     internal fun `throws on invalid phase`() {
-        val switch = object : Switch() {}
+        val switch = object : Switch(generateId()) {}
         expect { switch.setOpen(true, SPK.INVALID) }.toThrow<IllegalArgumentException>()
         expect { switch.setOpen(true, SPK.NONE) }.toThrow<IllegalArgumentException>()
         expect { switch.isOpen(SPK.INVALID) }.toThrow<IllegalArgumentException>()

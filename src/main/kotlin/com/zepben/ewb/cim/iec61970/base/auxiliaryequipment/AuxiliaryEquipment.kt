@@ -18,7 +18,7 @@ import com.zepben.ewb.cim.iec61970.base.core.Terminal
  *
  * @property terminal The [Terminal] at the equipment where the [AuxiliaryEquipment] is attached.
  */
-abstract class AuxiliaryEquipment(mRID: String = "") : Equipment(mRID) {
+abstract class AuxiliaryEquipment(mRID: String) : Equipment(mRID) {
 
     var terminal: Terminal? = null
 }

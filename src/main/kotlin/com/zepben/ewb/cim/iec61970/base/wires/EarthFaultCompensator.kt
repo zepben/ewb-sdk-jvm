@@ -17,7 +17,7 @@ import com.zepben.ewb.cim.iec61970.base.core.ConductingEquipment
  *
  * @property r Nominal resistance of device in ohms.
  */
-abstract class EarthFaultCompensator @JvmOverloads constructor(mRID: String = "") : ConductingEquipment(mRID) {
+abstract class EarthFaultCompensator(mRID: String) : ConductingEquipment(mRID) {
 
     var r: Double? = null
 

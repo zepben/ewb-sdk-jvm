@@ -20,6 +20,7 @@ import com.zepben.ewb.cim.iec61970.base.wires.Breaker
 import com.zepben.ewb.cim.iec61970.base.wires.Junction
 import com.zepben.ewb.services.common.exceptions.UnsupportedIdentifiedObjectException
 import com.zepben.ewb.services.common.meta.MetadataCollection
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.translator.addFromPb
 import com.zepben.ewb.services.network.translator.toPb
@@ -53,10 +54,10 @@ internal class BaseServiceTest {
     }
 
     private val service = TestBaseService()
-    private val breaker1 = Breaker().also { service.add(it) }
-    private val breaker2 = Breaker().also { service.add(it) }
-    private val acLineSegment1 = AcLineSegment().also { service.add(it) }
-    private val acLineSegment2 = AcLineSegment().also { service.add(it) }
+    private val breaker1 = Breaker(generateId()).also { service.add(it) }
+    private val breaker2 = Breaker(generateId()).also { service.add(it) }
+    private val acLineSegment1 = AcLineSegment(generateId()).also { service.add(it) }
+    private val acLineSegment2 = AcLineSegment(generateId()).also { service.add(it) }
 
     @BeforeEach
     internal fun beforeEach() {
@@ -72,11 +73,11 @@ internal class BaseServiceTest {
 
     @Test
     internal fun tryFunctions() {
-        val junction = Junction()
+        val junction = Junction(generateId())
         assertThat("Initial tryAdd should return true", service.tryAdd(junction))
         assertThat("tryRemove should return true for previously-added object", service.tryRemove(junction))
-        expect { service.tryAdd(CableInfo()) }.toThrow<UnsupportedIdentifiedObjectException>()
-        expect { service.tryRemove(CableInfo()) }.toThrow<UnsupportedIdentifiedObjectException>()
+        expect { service.tryAdd(CableInfo(generateId())) }.toThrow<UnsupportedIdentifiedObjectException>()
+        expect { service.tryRemove(CableInfo(generateId())) }.toThrow<UnsupportedIdentifiedObjectException>()
     }
 
     @Test
@@ -300,7 +301,7 @@ internal class BaseServiceTest {
         assertThat("should contain breaker1", breaker1 in service)
 
         assertThat("shouldn't contain unknown", "unknown" !in service)
-        assertThat("shouldn't contain unknown", Breaker() !in service)
+        assertThat("shouldn't contain unknown", Breaker(generateId()) !in service)
     }
 
     private inline fun <reified T : IdentifiedObject> validateForEach(expected: List<ConductingEquipment>) {

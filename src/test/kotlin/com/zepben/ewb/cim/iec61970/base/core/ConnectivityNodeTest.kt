@@ -12,7 +12,6 @@ import com.zepben.ewb.utils.PrivateCollectionValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -24,7 +23,6 @@ internal class ConnectivityNodeTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(ConnectivityNode().mRID, not(equalTo("")))
         assertThat(ConnectivityNode("id").mRID, equalTo("id"))
     }
 

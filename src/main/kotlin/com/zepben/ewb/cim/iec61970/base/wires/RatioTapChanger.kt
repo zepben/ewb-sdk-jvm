@@ -14,7 +14,7 @@ package com.zepben.ewb.cim.iec61970.base.wires
  * @property transformerEnd Transformer end to which this ratio tap changer belongs.
  * @property stepVoltageIncrement Tap step increment, in per cent of neutral voltage, per step position.
  */
-class RatioTapChanger @JvmOverloads constructor(mRID: String = "") : TapChanger(mRID) {
+class RatioTapChanger(mRID: String) : TapChanger(mRID) {
 
     var transformerEnd: TransformerEnd? = null
     var stepVoltageIncrement: Double? = null

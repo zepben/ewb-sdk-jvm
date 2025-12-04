@@ -8,10 +8,10 @@
 
 package com.zepben.ewb.cim.iec61970.base.core
 
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -23,13 +23,12 @@ internal class BaseVoltageTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(BaseVoltage().mRID, not(equalTo("")))
         assertThat(BaseVoltage("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val baseVoltage = BaseVoltage().apply { nominalVoltage = 900 }
+        val baseVoltage = BaseVoltage(generateId()).apply { nominalVoltage = 900 }
         assertThat(baseVoltage.nominalVoltage, equalTo(900))
     }
 

@@ -13,4 +13,4 @@ import com.zepben.ewb.cim.iec61970.base.core.EquipmentContainer
 /**
  * Contains equipment beyond a substation belonging to a power transmission line.
  */
-abstract class Line(mRID: String = "") : EquipmentContainer(mRID)
+abstract class Line(mRID: String) : EquipmentContainer(mRID)

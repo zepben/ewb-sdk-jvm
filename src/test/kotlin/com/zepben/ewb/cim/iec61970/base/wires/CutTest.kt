@@ -10,6 +10,7 @@ package com.zepben.ewb.cim.iec61970.base.wires
 
 import com.zepben.ewb.cim.iec61970.base.core.Terminal
 import com.zepben.ewb.services.common.extensions.typeNameAndMRID
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
@@ -25,14 +26,13 @@ internal class CutTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(Cut().mRID, not(equalTo("")))
         assertThat(Cut("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val cut = Cut()
-        val acls = AcLineSegment()
+        val cut = Cut(generateId())
+        val acls = AcLineSegment(generateId())
 
         assertThat(cut.lengthFromTerminal1, nullValue())
         assertThat(cut.acLineSegment, nullValue())
@@ -46,11 +46,11 @@ internal class CutTest {
 
     @Test
     internal fun `can only have two terminals`() {
-        val cut = Cut()
-        val terminal = Terminal()
+        val cut = Cut(generateId())
+        val terminal = Terminal(generateId())
 
-        cut.addTerminal(Terminal())
-        cut.addTerminal(Terminal())
+        cut.addTerminal(Terminal(generateId()))
+        cut.addTerminal(Terminal(generateId()))
         expect { cut.addTerminal(terminal) }
             .toThrow<IllegalStateException>()
             .withMessage(

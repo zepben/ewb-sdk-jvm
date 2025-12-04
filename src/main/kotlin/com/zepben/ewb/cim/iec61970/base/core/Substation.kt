@@ -18,7 +18,7 @@ import com.zepben.ewb.services.common.extensions.*
  *
  * @property subGeographicalRegion The SubGeographicalRegion containing the substation.
  */
-class Substation @JvmOverloads constructor(mRID: String = "") : EquipmentContainer(mRID) {
+class Substation(mRID: String) : EquipmentContainer(mRID) {
 
     var subGeographicalRegion: SubGeographicalRegion? = null
     private var _normalEnergizedFeeders: MutableList<Feeder>? = null

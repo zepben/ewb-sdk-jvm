@@ -8,11 +8,13 @@
 
 package com.zepben.ewb.cim.iec61968.assetinfo
 
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.ResistanceReactance
 import com.zepben.ewb.services.network.ResistanceReactanceTest
 import com.zepben.ewb.utils.PrivateCollectionValidator
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.spy
@@ -21,7 +23,6 @@ internal class PowerTransformerInfoTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(PowerTransformerInfo().mRID, not(equalTo("")))
         assertThat(PowerTransformerInfo("id").mRID, equalTo("id"))
     }
 
@@ -41,9 +42,9 @@ internal class PowerTransformerInfoTest {
 
     @Test
     internal fun populatesResistanceReactanceFromEndsWithMatchingNumber() {
-        val tank1 = spy(TransformerTankInfo())
-        val tank2 = spy(TransformerTankInfo())
-        val txInfo = PowerTransformerInfo().apply {
+        val tank1 = spy(TransformerTankInfo(generateId()))
+        val tank2 = spy(TransformerTankInfo(generateId()))
+        val txInfo = PowerTransformerInfo(generateId()).apply {
             addTransformerTankInfo(tank1)
             addTransformerTankInfo(tank2)
         }

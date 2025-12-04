@@ -8,8 +8,6 @@
 
 package com.zepben.ewb.cim.iec61970.base.core
 
-import java.util.*
-
 /**
  * This is a root class to provide common identification for all classes needing identification and naming attributes.
  *
@@ -21,12 +19,13 @@ import java.util.*
  * @property description a free human-readable text describing or naming the object. It may be non-unique and may not correlate to a naming hierarchy.
  * @property numDiagramObjects Number of DiagramObject's known to associate with this [IdentifiedObject]
  */
-abstract class IdentifiedObject(mRID: String = "") {
+abstract class IdentifiedObject(
+    val mRID: String
+) {
 
     // Changed to use mutableSet to prevent duplicated entries from addName function
     private var _names: MutableSet<Name>? = null
 
-    val mRID: String = mRID.ifEmpty { UUID.randomUUID().toString() }
     var name: String? = null
     var description: String? = null
     var numDiagramObjects: Int? = null
@@ -46,6 +45,10 @@ abstract class IdentifiedObject(mRID: String = "") {
      */
     val hasDiagramObjects: Boolean
         get() = (numDiagramObjects ?: 0) > 0
+
+    init {
+        require(mRID.isNotBlank()) { "You must provide an mRID for this object." }
+    }
 
     override fun toString(): String {
         return javaClass.simpleName + "{" +

@@ -22,7 +22,7 @@ import com.zepben.ewb.services.common.extensions.validateReference
  * to many customers for more than a short time.
  */
 @ZBEX
-class Loop @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mRID) {
+class Loop(mRID: String) : IdentifiedObject(mRID) {
 
     private var _circuits: MutableList<Circuit>? = null
     private var _substations: MutableList<Substation>? = null

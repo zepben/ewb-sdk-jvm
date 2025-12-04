@@ -15,7 +15,7 @@ import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
  *
  * @property organisation [Organisation] having this role.
  */
-abstract class OrganisationRole(mRID: String = "") : IdentifiedObject(mRID) {
+abstract class OrganisationRole(mRID: String) : IdentifiedObject(mRID) {
 
     var organisation: Organisation? = null
 }

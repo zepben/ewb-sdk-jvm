@@ -11,6 +11,7 @@ package com.zepben.ewb.services.network.testdata
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
 import com.zepben.ewb.cim.iec61970.base.core.PhaseCode
 import com.zepben.ewb.cim.iec61970.base.core.Substation
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 
 object FeederStartPointBetweenConductorsNetwork {
@@ -30,7 +31,7 @@ object FeederStartPointBetweenConductorsNetwork {
         if (makeFeederLv) {
             LvFeeder("f").apply { normalHeadTerminal = fsp.getTerminal(2) }.also { networkService.add(it) }
         } else {
-            val substation = Substation().also { networkService.add(it) }
+            val substation = Substation(generateId()).also { networkService.add(it) }
             createFeeder(networkService, "f", "f", substation, fsp, fsp.getTerminal(2))
         }
     }

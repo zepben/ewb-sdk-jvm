@@ -17,6 +17,7 @@ import com.zepben.ewb.cim.iec61970.base.core.Substation
 import com.zepben.ewb.cim.iec61970.base.wires.Junction
 import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.ewb.database.sqlite.cim.tables.associations.TableEquipmentEquipmentContainers
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.every
 import io.mockk.mockk
@@ -65,8 +66,8 @@ class NetworkCimWriterTest {
             .filter { EquipmentContainer::class.java.isAssignableFrom(it) }
             .toSet()
 
-        val shouldExport = listOf(Site(), Substation(), Circuit())
-        val shouldIgnore = listOf(Feeder(), LvFeeder())
+        val shouldExport = listOf(Site(generateId()), Substation(generateId()), Circuit(generateId()))
+        val shouldIgnore = listOf(Feeder(generateId()), LvFeeder(generateId()))
 
         assertThat(
             "Should be checking all EquipmentContainer subclasses",
@@ -74,7 +75,7 @@ class NetworkCimWriterTest {
             equalTo(allEquipmentContainerClasses)
         )
 
-        val junction = Junction().apply {
+        val junction = Junction(generateId()).apply {
             shouldExport.forEach { addContainer(it) }
             shouldIgnore.forEach { addContainer(it) }
         }

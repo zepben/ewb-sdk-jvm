@@ -31,7 +31,7 @@ import com.zepben.ewb.cim.iec61968.assetinfo.ShuntCompensatorInfo
  *                    For [NonlinearShuntCompensator]-s shall only be set to one of the NonlinearShuntCompensatorPoint.sectionNumber.
  *                    There is no interpolation between NonlinearShuntCompensatorPoint-s.
  */
-abstract class ShuntCompensator(mRID: String = "") : RegulatingCondEq(mRID) {
+abstract class ShuntCompensator(mRID: String) : RegulatingCondEq(mRID) {
 
     override var assetInfo: ShuntCompensatorInfo? = null
 

@@ -10,6 +10,7 @@ package com.zepben.ewb.cim.iec61968.assetinfo
 
 import com.zepben.ewb.cim.iec61970.base.wires.TransformerStarImpedance
 import com.zepben.ewb.cim.iec61970.base.wires.WindingConnection
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.ResistanceReactance
 import com.zepben.ewb.services.network.ResistanceReactanceTest.Companion.validateResistanceReactance
@@ -30,13 +31,12 @@ internal class TransformerEndInfoTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(TransformerEndInfo().mRID, not(equalTo("")))
         assertThat(TransformerEndInfo("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val transformerEndInfo = TransformerEndInfo()
+        val transformerEndInfo = TransformerEndInfo(generateId())
 
         assertThat(transformerEndInfo.connectionKind, equalTo(WindingConnection.UNKNOWN))
         assertThat(transformerEndInfo.emergencyS, nullValue())
@@ -77,8 +77,8 @@ internal class TransformerEndInfoTest {
 
     @Test
     internal fun populatesResistanceReactanceOffEndStarImpedanceIfAvailable() {
-        val info = spy(TransformerEndInfo().apply {
-            transformerStarImpedance = TransformerStarImpedance().apply {
+        val info = spy(TransformerEndInfo(generateId()).apply {
+            transformerStarImpedance = TransformerStarImpedance(generateId()).apply {
                 r = 1.1
                 x = 1.2
                 r0 = 1.3
@@ -92,7 +92,7 @@ internal class TransformerEndInfoTest {
 
     @Test
     internal fun populatesResistanceReactanceOffEndInfoTestsIfAvailable() {
-        val info = spy(TransformerEndInfo())
+        val info = spy(TransformerEndInfo(generateId()))
         doReturn(ResistanceReactance(2.1, 2.2, 2.3, 2.4)).`when`(info).calculateResistanceReactanceFromTests()
 
         validateResistanceReactance(info.resistanceReactance()!!, 2.1, 2.2, 2.3, 2.4)
@@ -101,7 +101,7 @@ internal class TransformerEndInfoTest {
 
     @Test
     internal fun mergesResistanceReactanceIfRequired() {
-        val info = spy(TransformerEndInfo().apply {
+        val info = spy(TransformerEndInfo(generateId()).apply {
             transformerStarImpedance =
                 mock(defaultAnswer = DefaultAnswer.of(ResistanceReactance::class.java, ResistanceReactance(1.1, null, null, null)))
         })
@@ -113,20 +113,20 @@ internal class TransformerEndInfoTest {
 
     @Test
     internal fun calculatesResistanceReactanceOffEndInfoTestsIfAvailable() {
-        val info = TransformerEndInfo()
+        val info = TransformerEndInfo(generateId())
 
         assertThat(info.calculateResistanceReactanceFromTests(), nullValue())
     }
 
     @Test
     internal fun testCalculatesResistanceReactanceOfEndInfoTestsIfAvailable() {
-        val lossTest = ShortCircuitTest().apply { loss = 2020180; voltage = 11.85 }
-        val lossNoVoltageTest = ShortCircuitTest().apply { loss = 2020180 }
-        val lossTestWithCurrent = ShortCircuitTest().apply { loss = 2020180; voltage = 11.85; current = 4075.0 }
-        val ohmicTest = ShortCircuitTest().apply { voltageOhmicPart = 0.124; voltage = 11.85 }
-        val ohmicNoVoltageTest = ShortCircuitTest().apply { voltageOhmicPart = 0.124 }
-        val ohmicTestWithCurrent = ShortCircuitTest().apply { voltageOhmicPart = 0.124; voltage = 11.85; current = 4075.0 }
-        val voltageOnlyTest = ShortCircuitTest().apply { voltage = 11.85 }
+        val lossTest = ShortCircuitTest(generateId()).apply { loss = 2020180; voltage = 11.85 }
+        val lossNoVoltageTest = ShortCircuitTest(generateId()).apply { loss = 2020180 }
+        val lossTestWithCurrent = ShortCircuitTest(generateId()).apply { loss = 2020180; voltage = 11.85; current = 4075.0 }
+        val ohmicTest = ShortCircuitTest(generateId()).apply { voltageOhmicPart = 0.124; voltage = 11.85 }
+        val ohmicNoVoltageTest = ShortCircuitTest(generateId()).apply { voltageOhmicPart = 0.124 }
+        val ohmicTestWithCurrent = ShortCircuitTest(generateId()).apply { voltageOhmicPart = 0.124; voltage = 11.85; current = 4075.0 }
+        val voltageOnlyTest = ShortCircuitTest(generateId()).apply { voltage = 11.85 }
 
         // check via loss
         validateResistanceReactanceFromTest(400000, 1630000000, lossTest, lossTest, ResistanceReactance(0.12, 11.63, 0.12, 11.63))
@@ -157,7 +157,7 @@ internal class TransformerEndInfoTest {
         groundedTest: ShortCircuitTest?,
         expectedRr: ResistanceReactance?
     ) {
-        val info = TransformerEndInfo().apply {
+        val info = TransformerEndInfo(generateId()).apply {
             this.ratedU = ratedU
             this.ratedS = ratedS
             groundedEndShortCircuitTests = groundedTest

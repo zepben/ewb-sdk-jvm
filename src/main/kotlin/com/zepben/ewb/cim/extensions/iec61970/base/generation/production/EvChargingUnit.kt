@@ -16,4 +16,4 @@ import com.zepben.ewb.cim.iec61970.base.generation.production.PowerElectronicsUn
  * An electric vehicle charging station.
  */
 @ZBEX
-class EvChargingUnit @JvmOverloads constructor(mRID: String = "") : PowerElectronicsUnit(mRID)
+class EvChargingUnit(mRID: String) : PowerElectronicsUnit(mRID)

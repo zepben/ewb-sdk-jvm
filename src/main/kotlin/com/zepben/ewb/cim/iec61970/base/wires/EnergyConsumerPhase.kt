@@ -27,7 +27,7 @@ import com.zepben.ewb.cim.iec61970.base.core.PowerSystemResource
  *             Starting value for a steady state solution.
  * @property qFixed Reactive power of the load that is a fixed quantity. Load sign convention is used, i.e. positive sign means flow out from a node.
  */
-class EnergyConsumerPhase @JvmOverloads constructor(mRID: String = "") : PowerSystemResource(mRID) {
+class EnergyConsumerPhase(mRID: String) : PowerSystemResource(mRID) {
 
     var energyConsumer: EnergyConsumer? = null
         set(value) {

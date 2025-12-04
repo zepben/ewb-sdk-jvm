@@ -18,7 +18,7 @@ import com.zepben.ewb.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerIn
  * @property assetInfo Datasheet information for this current transformer.
  * @property coreBurden Power burden of the CT core in watts.
  */
-class CurrentTransformer @JvmOverloads constructor(mRID: String = "") : Sensor(mRID) {
+class CurrentTransformer(mRID: String) : Sensor(mRID) {
 
     override var assetInfo: CurrentTransformerInfo? = null
 

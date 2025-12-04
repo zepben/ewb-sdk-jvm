@@ -28,7 +28,7 @@ import com.zepben.ewb.cim.iec61970.base.core.PhaseCode
  * @property timeDelay1 [ZBEX] Inverse time delay number 1 for current limit number 1 in seconds.
  */
 @ZBEX
-class DirectionalCurrentRelay @JvmOverloads constructor(mRID: String = "") : ProtectionRelayFunction(mRID) {
+class DirectionalCurrentRelay(mRID: String) : ProtectionRelayFunction(mRID) {
 
     @ZBEX
     var directionalCharacteristicAngle: Double? = null

@@ -14,6 +14,7 @@ import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import kotlin.reflect.full.primaryConstructor
 
 internal class CustomerServiceTest {
 
@@ -25,9 +26,9 @@ internal class CustomerServiceTest {
 
     @Test
     internal fun `can add and remove supported types`() {
-        service.supportedClasses
+        service.supportedKClasses
             .asSequence()
-            .map { it.getDeclaredConstructor().newInstance() }
+            .map { it.primaryConstructor!!.call("id-${it.simpleName}") }
             .forEach {
                 assertThat("Initial tryAdd should return true", service.tryAdd(it))
                 assertThat(service[it.mRID], equalTo(it))

@@ -16,11 +16,14 @@ import com.zepben.ewb.cim.iec61970.base.core.NameType
 import com.zepben.ewb.services.common.BaseService
 import org.hamcrest.MatcherAssert.assertThat
 import java.time.Instant
+import java.util.*
 
 //
 // NOTE: The following extensions are named differently on purpose. If they are called `fillFields` you can not import them
 //       correctly, and you get skipping of sublevels in the service specific use.
 //
+
+fun generateId(): String = UUID.randomUUID().toString()
 
 // ###################
 // # IEC61968 Common #
@@ -47,7 +50,7 @@ fun Organisation.fillFieldsCommon(service: BaseService, includeRuntime: Boolean 
 fun OrganisationRole.fillFieldsCommon(service: BaseService, includeRuntime: Boolean = true): OrganisationRole {
     (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
 
-    organisation = Organisation().also {
+    organisation = Organisation(generateId()).also {
         assertThat("Initial tryAdd should return true", service.tryAdd(it))
     }
 

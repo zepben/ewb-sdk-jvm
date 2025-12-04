@@ -8,9 +8,11 @@
 
 package com.zepben.ewb.cim.iec61970.base.wires
 
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -22,13 +24,12 @@ internal class LinearShuntCompensatorTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(LinearShuntCompensator().mRID, not(equalTo("")))
         assertThat(LinearShuntCompensator("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val linearShuntCompensator = LinearShuntCompensator()
+        val linearShuntCompensator = LinearShuntCompensator(generateId())
 
         assertThat(linearShuntCompensator.b0PerSection, nullValue())
         assertThat(linearShuntCompensator.bPerSection, nullValue())

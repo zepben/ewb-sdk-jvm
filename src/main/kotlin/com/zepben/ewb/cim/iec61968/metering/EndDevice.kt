@@ -31,7 +31,7 @@ import com.zepben.ewb.services.common.extensions.validateReference
  * @property usagePoints The collection of [UsagePoint] belonging to this [EndDevice]. The returned collection is read only.
  * @property functions The collection of [EndDeviceFunctionKind] present on this [EndDevice]. The returned collection is read only.
  */
-abstract class EndDevice(mRID: String = "") : AssetContainer(mRID) {
+abstract class EndDevice(mRID: String) : AssetContainer(mRID) {
 
     var customerMRID: String? = null
     var serviceLocation: Location? = null

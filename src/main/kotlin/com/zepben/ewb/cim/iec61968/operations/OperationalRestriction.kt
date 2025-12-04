@@ -24,7 +24,7 @@ import com.zepben.ewb.services.common.extensions.validateReference
  * They then apply operational restrictions in the operational systems to warn operators of potential problems.
  * After appropriate inspection and maintenance, the operational restrictions may be removed.
  */
-class OperationalRestriction @JvmOverloads constructor(mRID: String = "") : Document(mRID) {
+class OperationalRestriction(mRID: String) : Document(mRID) {
 
     private var _equipment: MutableList<Equipment>? = null
 
@@ -66,6 +66,7 @@ class OperationalRestriction @JvmOverloads constructor(mRID: String = "") : Docu
      * Remove equipment already associated with this restriction.
      *
      * @param equipment The equipment tor remove.
+     * @return true if [equipment] is removed from the collection.
      */
     fun removeEquipment(equipment: Equipment): Boolean {
         val ret = _equipment?.remove(equipment) == true
@@ -73,8 +74,14 @@ class OperationalRestriction @JvmOverloads constructor(mRID: String = "") : Docu
         return ret
     }
 
+    /**
+     * Clear the collection of equipment to which this restriction applies.
+     *
+     * @return A reference to this [OperationalRestriction] to allow fluent use.
+     */
     fun clearEquipment(): OperationalRestriction {
         _equipment = null
         return this
     }
+
 }

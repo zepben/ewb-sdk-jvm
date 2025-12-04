@@ -21,7 +21,7 @@ import com.zepben.ewb.services.common.extensions.validateReference
  *
  * @property loop The [Loop] containing this [Circuit].
  */
-class Circuit @JvmOverloads constructor(mRID: String = "") : Line(mRID) {
+class Circuit(mRID: String) : Line(mRID) {
 
     var loop: Loop? = null
 

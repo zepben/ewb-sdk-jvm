@@ -32,7 +32,7 @@ import com.zepben.ewb.cim.extensions.ZBEX
  * @property operationPhaseAngle3 [ZBEX] The phase angle (in degrees) between voltage and current during normal operating conditions for zone 3 relay.
  */
 @ZBEX
-class DistanceRelay @JvmOverloads constructor(mRID: String = "") : ProtectionRelayFunction(mRID) {
+class DistanceRelay(mRID: String) : ProtectionRelayFunction(mRID) {
 
     @ZBEX
     var backwardBlind: Double? = null

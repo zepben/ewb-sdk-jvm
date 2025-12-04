@@ -11,7 +11,6 @@ package com.zepben.ewb.cim.extensions.iec61970.base.generation.production
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -23,7 +22,6 @@ internal class EvChargingUnitTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(EvChargingUnit().mRID, not(equalTo("")))
         assertThat(EvChargingUnit("id").mRID, equalTo("id"))
     }
 

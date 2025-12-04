@@ -17,4 +17,4 @@ import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
  * - as attributes of an asset model (product by a manufacturer)
  * - as attributes of a type asset (generic type of asset as used in designs/extension planning).
  */
-abstract class AssetInfo(mRID: String = "") : IdentifiedObject(mRID)
+abstract class AssetInfo(mRID: String) : IdentifiedObject(mRID)

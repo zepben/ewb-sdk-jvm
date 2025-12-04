@@ -8,10 +8,12 @@
 
 package com.zepben.ewb.cim.iec61968.customers
 
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.utils.PrivateCollectionValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -23,7 +25,7 @@ internal class CustomerTest {
 
     @Test
     internal fun hasEndDevicesReflectsNumEndDevices() {
-        val customer = Customer()
+        val customer = Customer(generateId())
         assertThat("Customer has no end devices by default", !customer.hasEndDevices())
 
         customer.numEndDevices = 1
@@ -35,13 +37,12 @@ internal class CustomerTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(Customer().mRID, not(equalTo("")))
         assertThat(Customer("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val customer = Customer()
+        val customer = Customer(generateId())
 
         assertThat(customer.kind, equalTo(CustomerKind.UNKNOWN))
         assertThat(customer.numEndDevices, nullValue())

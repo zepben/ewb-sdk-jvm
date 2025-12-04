@@ -11,6 +11,7 @@ package com.zepben.ewb.services.network.equivalents
 import com.zepben.ewb.cim.iec61970.base.core.EquipmentContainer
 import com.zepben.ewb.cim.iec61970.base.core.Feeder
 import com.zepben.ewb.cim.iec61970.base.core.Substation
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -26,8 +27,8 @@ internal class EdgeDetectionDetailsTest {
 
     @Test
     internal fun `factory methods fill in object as expected`() {
-        val feeder = Feeder()
-        val substation = Substation()
+        val feeder = Feeder(generateId())
+        val substation = Substation(generateId())
 
         validate(setOf(Feeder::class, Substation::class), setOf(feeder, substation)) { EdgeDetectionDetails.between(feeder, substation) }
         validate(setOf(Feeder::class, Substation::class), setOf(feeder)) { EdgeDetectionDetails.between(feeder, Substation::class) }

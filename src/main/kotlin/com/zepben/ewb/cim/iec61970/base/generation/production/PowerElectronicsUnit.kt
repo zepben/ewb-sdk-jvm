@@ -18,7 +18,7 @@ import com.zepben.ewb.cim.iec61970.base.wires.PowerElectronicsConnection
  * @property maxP Maximum active power limit. This is the maximum (nameplate) limit for the unit.
  * @property minP Minimum active power limit. This is the minimum (nameplate) limit for the unit.
  */
-abstract class PowerElectronicsUnit(mRID: String = "") : Equipment(mRID) {
+abstract class PowerElectronicsUnit(mRID: String) : Equipment(mRID) {
 
     var powerElectronicsConnection: PowerElectronicsConnection? = null
         set(value) {

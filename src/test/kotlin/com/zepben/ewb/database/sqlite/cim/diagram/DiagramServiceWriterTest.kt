@@ -9,6 +9,7 @@
 package com.zepben.ewb.database.sqlite.cim.diagram
 
 import com.zepben.ewb.cim.iec61970.base.diagramlayout.Diagram
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.diagram.DiagramService
 import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.every
@@ -33,7 +34,7 @@ internal class DiagramServiceWriterTest {
 
     @Test
     internal fun `passes objects through to the cim writer`() {
-        val diagram = Diagram().also { diagramService.add(it) }
+        val diagram = Diagram(generateId()).also { diagramService.add(it) }
 
         // NOTE: the write method will fail due to the relaxed mock returning false for all write operations,
         //       but a `write` should still be attempted on every object

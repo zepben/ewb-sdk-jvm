@@ -11,10 +11,12 @@ package com.zepben.ewb.cim.iec61970.base.wires
 import com.zepben.ewb.cim.iec61968.assetinfo.CableInfo
 import com.zepben.ewb.cim.iec61968.assetinfo.OverheadWireInfo
 import com.zepben.ewb.cim.iec61968.assetinfo.WireInfo
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -26,14 +28,13 @@ internal class ConductorTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(object : Conductor() {}.mRID, not(equalTo("")))
         assertThat(object : Conductor("id") {}.mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val conductor = object : Conductor() {}
-        val wireInfo = object : WireInfo() {}
+        val conductor = object : Conductor(generateId()) {}
+        val wireInfo = object : WireInfo(generateId()) {}
 
         assertThat(conductor.assetInfo, nullValue())
         assertThat(conductor.length, nullValue())
@@ -53,7 +54,7 @@ internal class ConductorTest {
 
     @Test
     internal fun validatesLength() {
-        val conductor = object : Conductor() {}
+        val conductor = object : Conductor(generateId()) {}
         conductor.length = 1.0
         conductor.length = 0.0
         conductor.length = Double.NaN
@@ -64,9 +65,9 @@ internal class ConductorTest {
 
     @Test
     internal fun undergroundVsOverhead() {
-        val ug = CableInfo()
-        val oh = OverheadWireInfo()
-        val conductor = object : Conductor() {}
+        val ug = CableInfo(generateId())
+        val oh = OverheadWireInfo(generateId())
+        val conductor = object : Conductor(generateId()) {}
 
         assertThat(conductor.isUnderground, equalTo(false))
 

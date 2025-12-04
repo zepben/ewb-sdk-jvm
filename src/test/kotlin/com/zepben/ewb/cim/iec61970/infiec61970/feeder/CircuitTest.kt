@@ -11,10 +11,12 @@ package com.zepben.ewb.cim.iec61970.infiec61970.feeder
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.iec61970.base.core.Substation
 import com.zepben.ewb.cim.iec61970.base.core.Terminal
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.utils.PrivateCollectionValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -26,14 +28,13 @@ internal class CircuitTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(Circuit().mRID, not(equalTo("")))
         assertThat(Circuit("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val circuit = Circuit()
-        val loop = Loop()
+        val circuit = Circuit(generateId())
+        val loop = Loop(generateId())
 
         assertThat(circuit.loop, nullValue())
 

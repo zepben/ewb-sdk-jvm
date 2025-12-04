@@ -8,9 +8,11 @@
 
 package com.zepben.ewb.cim.iec61970.base.wires
 
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -22,13 +24,12 @@ internal class PerLengthSequenceImpedanceTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(PerLengthSequenceImpedance().mRID, not(equalTo("")))
         assertThat(PerLengthSequenceImpedance("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val perLengthSequenceImpedance = PerLengthSequenceImpedance()
+        val perLengthSequenceImpedance = PerLengthSequenceImpedance(generateId())
 
         assertThat(perLengthSequenceImpedance.r, nullValue())
         assertThat(perLengthSequenceImpedance.x, nullValue())

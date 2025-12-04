@@ -1683,7 +1683,7 @@ class NetworkService(metadata: MetadataCollection = MetadataCollection()) : Base
         _connectivityNodes.remove(connectivityNode.mRID)
     }
 
-    private fun createConnectivityNode(mRID: String = ""): ConnectivityNode {
+    private fun createConnectivityNode(mRID: String): ConnectivityNode {
         return ConnectivityNode(mRID)
     }
 

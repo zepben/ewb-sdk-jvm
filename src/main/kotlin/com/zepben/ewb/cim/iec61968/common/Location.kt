@@ -19,7 +19,7 @@ import java.util.function.BiConsumer
  *
  * @property mainAddress Main address of the location.
  */
-class Location @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mRID) {
+class Location(mRID: String) : IdentifiedObject(mRID) {
 
     var mainAddress: StreetAddress? = null
     private var _positionPoints: MutableList<PositionPoint>? = null

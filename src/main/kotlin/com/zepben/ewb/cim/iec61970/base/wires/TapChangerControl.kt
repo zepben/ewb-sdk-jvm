@@ -24,7 +24,7 @@ package com.zepben.ewb.cim.iec61970.base.wires
  * @property coGenerationEnabled True implies cogeneration mode is enabled and that the control will regulate to the new source bushing (downline bushing),
  * keeping locations downline from experiencing overvoltage situations.
  */
-class TapChangerControl @JvmOverloads constructor(mRID: String = "") : RegulatingControl(mRID) {
+class TapChangerControl(mRID: String) : RegulatingControl(mRID) {
 
     var limitVoltage: Int? = null
 

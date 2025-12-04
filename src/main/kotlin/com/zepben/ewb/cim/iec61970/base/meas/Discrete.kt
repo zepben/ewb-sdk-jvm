@@ -11,4 +11,4 @@ package com.zepben.ewb.cim.iec61970.base.meas
 /**
  * Discrete represents a discrete Measurement, i.e. a Measurement representing discrete values, e.g. a Breaker position.
  */
-class Discrete @JvmOverloads constructor(mRID: String = "") : Measurement(mRID)
+class Discrete(mRID: String) : Measurement(mRID)

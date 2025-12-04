@@ -13,6 +13,7 @@ import com.zepben.ewb.cim.iec61970.base.wires.AcLineSegment
 import com.zepben.ewb.cim.iec61970.base.wires.Clamp
 import com.zepben.ewb.cim.iec61970.base.wires.Cut
 import com.zepben.ewb.cim.iec61970.base.wires.Junction
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.testdata.CutsAndClampsNetwork
 import com.zepben.ewb.services.network.tracing.feeder.FeederDirection
 import com.zepben.ewb.services.network.tracing.feeder.FeederDirection.*
@@ -182,8 +183,8 @@ class DirectionConditionTest {
         val (direction, toDirection, tracedInternally) = this
         val nextPath = mockk<NetworkTraceStep.Path>()
         every { nextPath.tracedInternally } returns tracedInternally
-        every { nextPath.toTerminal } returns Terminal()
-        every { nextPath.toEquipment } returns Junction()
+        every { nextPath.toTerminal } returns Terminal(generateId())
+        every { nextPath.toEquipment } returns Junction(generateId())
         every { nextPath.didTraverseAcLineSegment } returns false
         val nextItem = NetworkTraceStep(nextPath, 0, 0, Unit)
 
@@ -196,8 +197,8 @@ class DirectionConditionTest {
     private infix fun Pair<FeederDirection, FeederDirection>.startTerminalShouldQueue(expected: Boolean) {
         val (direction, toDirection) = this
         val nextPath = mockk<NetworkTraceStep.Path>()
-        every { nextPath.toTerminal } returns Terminal()
-        every { nextPath.toEquipment } returns Junction()
+        every { nextPath.toTerminal } returns Terminal(generateId())
+        every { nextPath.toEquipment } returns Junction(generateId())
         every { nextPath.didTraverseAcLineSegment } returns false
         val nextItem = NetworkTraceStep(nextPath, 0, 0, Unit)
 

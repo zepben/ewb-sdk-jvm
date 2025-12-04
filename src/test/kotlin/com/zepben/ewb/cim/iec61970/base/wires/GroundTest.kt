@@ -10,14 +10,12 @@ package com.zepben.ewb.cim.iec61970.base.wires
 
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.Test
 
 internal class GroundTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(Ground().mRID, not(equalTo("")))
         assertThat(Ground("id").mRID, equalTo("id"))
     }
 

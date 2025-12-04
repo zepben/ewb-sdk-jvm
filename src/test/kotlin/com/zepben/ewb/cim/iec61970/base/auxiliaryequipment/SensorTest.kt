@@ -13,7 +13,6 @@ import com.zepben.ewb.utils.PrivateCollectionValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -25,14 +24,13 @@ internal class SensorTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(object : Sensor() {}.mRID, not(equalTo("")))
         assertThat(object : Sensor("id") {}.mRID, equalTo("id"))
     }
 
     @Test
     internal fun relayFunctions() {
         PrivateCollectionValidator.validateUnordered(
-            { object : Sensor() {} },
+            { id -> object : Sensor(id) {} },
             { id -> object : ProtectionRelayFunction(id) {} },
             Sensor::relayFunctions,
             Sensor::numRelayFunctions,

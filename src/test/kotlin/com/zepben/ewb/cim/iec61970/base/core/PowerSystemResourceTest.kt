@@ -10,10 +10,12 @@ package com.zepben.ewb.cim.iec61970.base.core
 
 import com.zepben.ewb.cim.iec61968.assets.Asset
 import com.zepben.ewb.cim.iec61968.common.Location
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.utils.PrivateCollectionValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -25,14 +27,13 @@ internal class PowerSystemResourceTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(object : PowerSystemResource() {}.mRID, not(equalTo("")))
         assertThat(object : PowerSystemResource("id") {}.mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val powerSystemResource = object : PowerSystemResource() {}
-        val location = Location()
+        val powerSystemResource = object : PowerSystemResource(generateId()) {}
+        val location = Location(generateId())
 
         assertThat(powerSystemResource.assetInfo, nullValue())
         assertThat(powerSystemResource.location, nullValue())
@@ -52,7 +53,7 @@ internal class PowerSystemResourceTest {
     @Test
     internal fun assets() {
         PrivateCollectionValidator.validateUnordered(
-            { object : PowerSystemResource() {} },
+            { id -> object : PowerSystemResource(id) {} },
             { id -> object : Asset(id) {} },
             PowerSystemResource::assets,
             PowerSystemResource::numAssets,

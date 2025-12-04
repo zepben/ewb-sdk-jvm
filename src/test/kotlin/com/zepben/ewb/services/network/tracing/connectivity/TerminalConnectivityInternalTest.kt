@@ -11,6 +11,7 @@ package com.zepben.ewb.services.network.tracing.connectivity
 import com.zepben.ewb.cim.iec61970.base.core.PhaseCode
 import com.zepben.ewb.cim.iec61970.base.core.Terminal
 import com.zepben.ewb.cim.iec61970.base.wires.PowerTransformer
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.containsInAnyOrder
@@ -294,9 +295,9 @@ internal class TerminalConnectivityInternalTest {
     }
 
     private fun validateTxPaths(primary: PhaseCode, secondary: PhaseCode, traced: PhaseCode = secondary) {
-        val tx = PowerTransformer()
-        val primaryTerminal = Terminal().apply { phases = primary }.also { tx.addTerminal(it) }
-        val secondaryTerminal = Terminal().apply { phases = secondary }.also { tx.addTerminal(it) }
+        val tx = PowerTransformer(generateId())
+        val primaryTerminal = Terminal(generateId()).apply { phases = primary }.also { tx.addTerminal(it) }
+        val secondaryTerminal = Terminal(generateId()).apply { phases = secondary }.also { tx.addTerminal(it) }
 
         if (traced != PhaseCode.NONE) {
             assertThat(

@@ -11,11 +11,13 @@ package com.zepben.ewb.cim.iec61970.base.core
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.ewb.services.common.extensions.typeNameAndMRID
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.utils.PrivateCollectionValidator
 import com.zepben.testutils.exception.ExpectException
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -27,14 +29,13 @@ internal class SubstationTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(Substation().mRID, not(equalTo("")))
         assertThat(Substation("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val substation = Substation()
-        val subGeographicalRegion = SubGeographicalRegion()
+        val substation = Substation(generateId())
+        val subGeographicalRegion = SubGeographicalRegion(generateId())
 
         assertThat(substation.subGeographicalRegion, nullValue())
 
@@ -45,8 +46,8 @@ internal class SubstationTest {
 
     @Test
     internal fun assignsSubstationToFeederIfMissing() {
-        val substation = Substation()
-        val feeder = Feeder()
+        val substation = Substation(generateId())
+        val feeder = Feeder(generateId())
 
         substation.addFeeder(feeder)
         assertThat(feeder.normalEnergizingSubstation, equalTo(substation))
@@ -54,9 +55,9 @@ internal class SubstationTest {
 
     @Test
     internal fun rejectsFeederWithWrongSubstation() {
-        val substation1 = Substation()
-        val substation2 = Substation()
-        val feeder = Feeder().apply { normalEnergizingSubstation = substation2 }
+        val substation1 = Substation(generateId())
+        val substation2 = Substation(generateId())
+        val feeder = Feeder(generateId()).apply { normalEnergizingSubstation = substation2 }
 
         ExpectException.expect { substation1.addFeeder(feeder) }
             .toThrow<IllegalArgumentException>()

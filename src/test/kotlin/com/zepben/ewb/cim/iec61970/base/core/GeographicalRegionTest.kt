@@ -9,12 +9,12 @@
 package com.zepben.ewb.cim.iec61970.base.core
 
 import com.zepben.ewb.services.common.extensions.typeNameAndMRID
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.utils.PrivateCollectionValidator
 import com.zepben.testutils.exception.ExpectException
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -26,14 +26,13 @@ internal class GeographicalRegionTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(GeographicalRegion().mRID, not(equalTo("")))
         assertThat(GeographicalRegion("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun assignsGeographicalRegionToSubGeographicalRegionIfMissing() {
-        val geographicalRegion = GeographicalRegion()
-        val subGeographicalRegion = SubGeographicalRegion()
+        val geographicalRegion = GeographicalRegion(generateId())
+        val subGeographicalRegion = SubGeographicalRegion(generateId())
 
         geographicalRegion.addSubGeographicalRegion(subGeographicalRegion)
         assertThat(subGeographicalRegion.geographicalRegion, equalTo(geographicalRegion))
@@ -41,9 +40,9 @@ internal class GeographicalRegionTest {
 
     @Test
     internal fun rejectsSubGeographicalRegionWithWrongGeographicalRegion() {
-        val geographicalRegion1 = GeographicalRegion()
-        val geographicalRegion2 = GeographicalRegion()
-        val subGeographicalRegion = SubGeographicalRegion().apply { geographicalRegion = geographicalRegion2 }
+        val geographicalRegion1 = GeographicalRegion(generateId())
+        val geographicalRegion2 = GeographicalRegion(generateId())
+        val subGeographicalRegion = SubGeographicalRegion(generateId()).apply { geographicalRegion = geographicalRegion2 }
 
         ExpectException.expect { geographicalRegion1.addSubGeographicalRegion(subGeographicalRegion) }
             .toThrow<IllegalArgumentException>()

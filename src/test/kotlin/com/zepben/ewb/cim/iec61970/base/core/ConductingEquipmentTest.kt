@@ -9,6 +9,7 @@
 package com.zepben.ewb.cim.iec61970.base.core
 
 import com.zepben.ewb.services.common.extensions.typeNameAndMRID
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.utils.PrivateCollectionValidator
 import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
@@ -26,14 +27,13 @@ internal class ConductingEquipmentTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(object : ConductingEquipment() {}.mRID, not(equalTo("")))
         assertThat(object : ConductingEquipment("id") {}.mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val conductingEquipment = object : ConductingEquipment() {}
-        val baseVoltage = BaseVoltage().apply { nominalVoltage = 100 }
+        val conductingEquipment = object : ConductingEquipment(generateId()) {}
+        val baseVoltage = BaseVoltage(generateId()).apply { nominalVoltage = 100 }
 
         assertThat(conductingEquipment.baseVoltage, nullValue())
         assertThat(conductingEquipment.baseVoltageValue, equalTo(0))
@@ -46,8 +46,8 @@ internal class ConductingEquipmentTest {
 
     @Test
     internal fun assignsEquipmentToTerminalIfMissing() {
-        val conductingEquipment = object : ConductingEquipment() {}
-        val terminal = Terminal()
+        val conductingEquipment = object : ConductingEquipment(generateId()) {}
+        val terminal = Terminal(generateId())
 
         conductingEquipment.addTerminal(terminal)
         assertThat(terminal.conductingEquipment, equalTo(conductingEquipment))
@@ -55,9 +55,9 @@ internal class ConductingEquipmentTest {
 
     @Test
     internal fun rejectsTerminalWithWrongEquipment() {
-        val ce1 = object : ConductingEquipment() {}
-        val ce2 = object : ConductingEquipment() {}
-        val terminal = Terminal().apply { conductingEquipment = ce2 }
+        val ce1 = object : ConductingEquipment(generateId()) {}
+        val ce2 = object : ConductingEquipment(generateId()) {}
+        val terminal = Terminal(generateId()).apply { conductingEquipment = ce2 }
 
         expect { ce1.addTerminal(terminal) }
             .toThrow<IllegalArgumentException>()
@@ -67,7 +67,7 @@ internal class ConductingEquipmentTest {
     @Test
     internal fun terminals() {
         PrivateCollectionValidator.validateOrdered(
-            { object : ConductingEquipment() {} },
+            { id -> object : ConductingEquipment(id) {} },
             { id, sn -> Terminal(id).apply { sequenceNumber = sn } },
             ConductingEquipment::terminals,
             ConductingEquipment::numTerminals,
@@ -82,10 +82,10 @@ internal class ConductingEquipmentTest {
 
     @Test
     internal fun `test addTerminal sequence numbers`() {
-        val ce = object : ConductingEquipment() {}
-        val t1 = Terminal()
-        val t2 = Terminal()
-        val t3 = Terminal().apply { sequenceNumber = 4 }
+        val ce = object : ConductingEquipment(generateId()) {}
+        val t1 = Terminal(generateId())
+        val t2 = Terminal(generateId())
+        val t3 = Terminal(generateId()).apply { sequenceNumber = 4 }
 
         // Test order
         ce.addTerminal(t1)
@@ -100,7 +100,7 @@ internal class ConductingEquipmentTest {
         assertThat(ce.getTerminal(4), equalTo(t3))
 
         // Test add terminal with same sequence number fails
-        val duplicateTerminal = Terminal().apply { sequenceNumber = 1 }
+        val duplicateTerminal = Terminal(generateId()).apply { sequenceNumber = 1 }
         expect {
             ce.addTerminal(duplicateTerminal)
         }.toThrow<IllegalArgumentException>()
@@ -109,15 +109,15 @@ internal class ConductingEquipmentTest {
 
     @Test
     internal fun `terminal helpers`() {
-        val ce = object : ConductingEquipment() {}
+        val ce = object : ConductingEquipment(generateId()) {}
 
         expect { ce.t1 }.toThrow<NullPointerException>()
         expect { ce.t2 }.toThrow<NullPointerException>()
         expect { ce.t3 }.toThrow<NullPointerException>()
 
-        val t1 = Terminal().also { ce.addTerminal(it) }
-        val t2 = Terminal().also { ce.addTerminal(it) }
-        val t3 = Terminal().also { ce.addTerminal(it) }
+        val t1 = Terminal(generateId()).also { ce.addTerminal(it) }
+        val t2 = Terminal(generateId()).also { ce.addTerminal(it) }
+        val t3 = Terminal(generateId()).also { ce.addTerminal(it) }
 
         assertThat(ce.t1, equalTo(t1))
         assertThat(ce.t2, equalTo(t2))
@@ -126,27 +126,27 @@ internal class ConductingEquipmentTest {
 
     @Test
     fun `default maxTerminals is max int`() {
-        val ce = object : ConductingEquipment() {}
+        val ce = object : ConductingEquipment(generateId()) {}
         assertThat(ce.maxTerminals, equalTo(Int.MAX_VALUE))
     }
 
     @Test
     fun `maxTerminals throws when exceeded`() {
-        val ce = object : ConductingEquipment() {
+        val ce = object : ConductingEquipment(generateId()) {
             override val maxTerminals: Int get() = 1
         }
 
-        ce.addTerminal(Terminal())
-        assertThrows<IllegalStateException> { ce.addTerminal(Terminal()) }
+        ce.addTerminal(Terminal(generateId()))
+        assertThrows<IllegalStateException> { ce.addTerminal(Terminal(generateId())) }
     }
 
     @Test
     fun `can re-add existing terminal without maxTerminals causing a throw`() {
-        val ce = object : ConductingEquipment() {
+        val ce = object : ConductingEquipment(generateId()) {
             override val maxTerminals: Int get() = 1
         }
 
-        val t = Terminal()
+        val t = Terminal(generateId())
         ce.addTerminal(t)
         ce.addTerminal(t)
     }

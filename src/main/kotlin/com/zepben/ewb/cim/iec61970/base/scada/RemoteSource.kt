@@ -15,7 +15,7 @@ import com.zepben.ewb.cim.iec61970.base.meas.Measurement
  *
  * @property measurement The [Measurement] for the [RemoteSource] point.
  */
-class RemoteSource @JvmOverloads constructor(mRID: String = "") : RemotePoint(mRID) {
+class RemoteSource(mRID: String) : RemotePoint(mRID) {
 
     var measurement: Measurement? = null
 }

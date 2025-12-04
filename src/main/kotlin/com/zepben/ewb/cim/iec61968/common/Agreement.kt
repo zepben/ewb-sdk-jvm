@@ -16,7 +16,7 @@ import com.zepben.ewb.cim.iec61970.base.domain.DateTimeInterval
  *
  * @property validityInterval Date and time interval this agreement is valid (from going into effect to termination).
  */
-abstract class Agreement(mRID: String = "") : Document(mRID) {
+abstract class Agreement(mRID: String) : Document(mRID) {
 
     var validityInterval: DateTimeInterval? = null
 

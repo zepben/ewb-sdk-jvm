@@ -23,7 +23,7 @@ import java.util.function.BiConsumer
  * @property style A diagram object has a style associated that provides a reference for the style used in the originating system.
  * @property rotation Sets the angle of rotation of the diagram object.  Zero degrees is pointing to the top of the diagram.  Rotation is clockwise.
  */
-class DiagramObject @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mRID) {
+class DiagramObject(mRID: String) : IdentifiedObject(mRID) {
 
     var diagram: Diagram? = null
         set(value) {

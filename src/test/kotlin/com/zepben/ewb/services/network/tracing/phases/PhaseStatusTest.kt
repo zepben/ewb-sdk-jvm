@@ -11,6 +11,7 @@ package com.zepben.ewb.services.network.tracing.phases
 import com.zepben.ewb.cim.iec61970.base.core.PhaseCode
 import com.zepben.ewb.cim.iec61970.base.core.Terminal
 import com.zepben.ewb.cim.iec61970.base.wires.SinglePhaseKind
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.testutils.exception.ExpectException
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
@@ -28,7 +29,7 @@ internal class PhaseStatusTest {
 
     @Test
     internal fun setAndGetNominalMatchesTraced() {
-        val terminal = Terminal().apply { phases = PhaseCode.ABCN }
+        val terminal = Terminal(generateId()).apply { phases = PhaseCode.ABCN }
         val phaseStatus = PhaseStatus(terminal)
 
         /* -- Setting -- */
@@ -52,7 +53,7 @@ internal class PhaseStatusTest {
 
     @Test
     internal fun setAndGetNominalDoesNotMatchTraced() {
-        val terminal = Terminal().apply { phases = PhaseCode.ABCN }
+        val terminal = Terminal(generateId()).apply { phases = PhaseCode.ABCN }
         val phaseStatus = PhaseStatus(terminal)
 
         /* -- Setting -- */
@@ -76,7 +77,7 @@ internal class PhaseStatusTest {
 
     @Test
     internal fun phaseCodeThree() {
-        val terminal = Terminal().apply { phases = PhaseCode.ABCN }
+        val terminal = Terminal(generateId()).apply { phases = PhaseCode.ABCN }
         val phaseStatus = PhaseStatus(terminal)
 
         assertThat(phaseStatus.asPhaseCode(), equalTo(PhaseCode.NONE))
@@ -92,7 +93,7 @@ internal class PhaseStatusTest {
 
     @Test
     internal fun phaseCodeSingle() {
-        val terminal = Terminal().apply { phases = PhaseCode.BC }
+        val terminal = Terminal(generateId()).apply { phases = PhaseCode.BC }
         val phaseStatus = PhaseStatus(terminal)
 
         assertThat(phaseStatus.asPhaseCode(), equalTo(PhaseCode.NONE))
@@ -106,7 +107,7 @@ internal class PhaseStatusTest {
 
     @Test
     internal fun phaseCodeNone() {
-        val terminal = Terminal().apply { phases = PhaseCode.ABCN }
+        val terminal = Terminal(generateId()).apply { phases = PhaseCode.ABCN }
         val phaseStatus = PhaseStatus(terminal)
 
         assertThat(phaseStatus.asPhaseCode(), equalTo(PhaseCode.NONE))
@@ -126,7 +127,7 @@ internal class PhaseStatusTest {
 
     @Test
     internal fun asPhaseCodeHandlesChangingTerminalPhases() {
-        val terminal = Terminal().apply { phases = PhaseCode.ABN }
+        val terminal = Terminal(generateId()).apply { phases = PhaseCode.ABN }
         val phaseStatus = PhaseStatus(terminal)
 
         phaseStatus[SPK.A] = SPK.A
@@ -155,7 +156,7 @@ internal class PhaseStatusTest {
 
     @Test
     internal fun asPhaseCodeDoesNotDropPhases() {
-        val terminal = Terminal().apply { phases = PhaseCode.ABCN }
+        val terminal = Terminal(generateId()).apply { phases = PhaseCode.ABCN }
         val phaseStatus = PhaseStatus(terminal)
 
         phaseStatus[SPK.B] = SPK.A
@@ -166,7 +167,7 @@ internal class PhaseStatusTest {
 
     @Test
     internal fun testInvalidNominalPhase() {
-        val terminal = Terminal().apply { phases = PhaseCode.ABCN }
+        val terminal = Terminal(generateId()).apply { phases = PhaseCode.ABCN }
         val phaseStatus = PhaseStatus(terminal)
 
         ExpectException.expect { phaseStatus[SPK.INVALID] }
@@ -176,7 +177,7 @@ internal class PhaseStatusTest {
 
     @Test
     internal fun testCrossingPhasesException() {
-        val terminal = Terminal().apply { phases = PhaseCode.ABCN }
+        val terminal = Terminal(generateId()).apply { phases = PhaseCode.ABCN }
         val phaseStatus = PhaseStatus(terminal)
 
         ExpectException.expect {

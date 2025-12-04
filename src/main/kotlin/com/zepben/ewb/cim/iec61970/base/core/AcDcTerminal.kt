@@ -12,4 +12,4 @@ package com.zepben.ewb.cim.iec61970.base.core
  * An electrical connection point (AC or DC) to a piece of conducting equipment. Terminals are connected at physical
  * connection points called connectivity nodes.
  */
-abstract class AcDcTerminal(mRID: String = "") : IdentifiedObject(mRID)
+abstract class AcDcTerminal(mRID: String) : IdentifiedObject(mRID)

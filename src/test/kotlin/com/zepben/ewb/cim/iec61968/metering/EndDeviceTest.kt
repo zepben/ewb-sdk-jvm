@@ -9,10 +9,12 @@
 package com.zepben.ewb.cim.iec61968.metering
 
 import com.zepben.ewb.cim.iec61968.common.Location
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.utils.PrivateCollectionValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -24,14 +26,13 @@ internal class EndDeviceTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(object : EndDevice() {}.mRID, not(equalTo("")))
         assertThat(object : EndDevice("id") {}.mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val endDevice = object : EndDevice() {}
-        val location = Location()
+        val endDevice = object : EndDevice(generateId()) {}
+        val location = Location(generateId())
 
         assertThat(endDevice.customerMRID, nullValue())
         assertThat(endDevice.serviceLocation, nullValue())
@@ -48,7 +49,7 @@ internal class EndDeviceTest {
     @Test
     internal fun usagePoints() {
         PrivateCollectionValidator.validateUnordered(
-            { object : EndDevice() {} },
+            { id -> object : EndDevice(id) {} },
             ::UsagePoint,
             EndDevice::usagePoints,
             EndDevice::numUsagePoints,
@@ -62,7 +63,7 @@ internal class EndDeviceTest {
     @Test
     internal fun endDeviceFunctions() {
         PrivateCollectionValidator.validateUnordered(
-            { object : EndDevice() {} },
+            { id -> object : EndDevice(id) {} },
             { id -> object : EndDeviceFunction(id) {} },
             EndDevice::functions,
             EndDevice::numFunctions,

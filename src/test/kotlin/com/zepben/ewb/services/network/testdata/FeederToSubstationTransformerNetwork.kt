@@ -9,6 +9,7 @@
 package com.zepben.ewb.services.network.testdata
 
 import com.zepben.ewb.cim.iec61970.base.core.Substation
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 
 object FeederToSubstationTransformerNetwork {
@@ -18,7 +19,7 @@ object FeederToSubstationTransformerNetwork {
     // fsp ---- tz ----
     //
     fun create(): NetworkService = NetworkService().also { networkService ->
-        val substation = Substation().also { networkService.add(it) }
+        val substation = Substation(generateId()).also { networkService.add(it) }
 
         val fsp = createJunctionForConnecting(networkService, "fsp", 1)
         val c1 = createAcLineSegmentForConnecting(networkService, "c1")

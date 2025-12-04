@@ -20,7 +20,7 @@ package com.zepben.ewb.cim.iec61970.base.wires
  * @property b0ch Zero sequence shunt (charging) susceptance, per unit of length.
  * @property g0ch Zero sequence shunt (charging) conductance, per unit of length.
  */
-class PerLengthSequenceImpedance @JvmOverloads constructor(mRID: String = "") : PerLengthImpedance(mRID) {
+class PerLengthSequenceImpedance(mRID: String) : PerLengthImpedance(mRID) {
 
     var r: Double? = null
     var x: Double? = null

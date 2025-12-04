@@ -53,7 +53,7 @@ import com.zepben.ewb.services.network.mergeIfIncomplete
  * @property x Positive sequence series reactance (star-model) of the transformer end in ohms. Do not read this directly, use [resistanceReactance().x] instead.
  * @property x0 Zero sequence series reactance of the transformer end in ohms. Do not read this directly, use [resistanceReactance().x0] instead.
  */
-class PowerTransformerEnd @JvmOverloads constructor(mRID: String = "") : TransformerEnd(mRID) {
+class PowerTransformerEnd(mRID: String) : TransformerEnd(mRID) {
 
     var powerTransformer: PowerTransformer? = null
         set(value) {
@@ -103,8 +103,17 @@ class PowerTransformerEnd @JvmOverloads constructor(mRID: String = "") : Transfo
     @ZBEX
     val sRatings: List<TransformerEndRatedS> get() = _sRatings.asUnmodifiable()
 
+    /**
+     * Find the first rating with the provided cooling type.
+     *
+     * @param coolingType The [TransformerCoolingType] to search for.
+     * @return The [TransformerEndRatedS] for the given [coolingType], or `null` if there were no ratings for that type.
+     */
     fun getRating(coolingType: TransformerCoolingType): TransformerEndRatedS? = _sRatings?.find { it.coolingType == coolingType }
 
+    /**
+     * The number of ratings.
+     */
     fun numRatings(): Int = _sRatings?.size ?: 0
 
     /**
@@ -129,6 +138,12 @@ class PowerTransformerEnd @JvmOverloads constructor(mRID: String = "") : Transfo
         return this
     }
 
+    /**
+     * Add a [TransformerEndRatedS] to this [PowerTransformerEnd].
+     *
+     * @param rating The [TransformerEndRatedS] to add.
+     * @return This [PowerTransformerEnd] for fluent use.
+     */
     fun addRating(rating: TransformerEndRatedS): PowerTransformerEnd = addRating(rating.ratedS, rating.coolingType)
 
     /**

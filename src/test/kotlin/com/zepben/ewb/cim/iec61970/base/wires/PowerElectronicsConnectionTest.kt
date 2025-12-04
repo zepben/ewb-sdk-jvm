@@ -10,13 +10,15 @@ package com.zepben.ewb.cim.iec61970.base.wires
 
 import com.zepben.ewb.cim.iec61970.base.generation.production.PowerElectronicsUnit
 import com.zepben.ewb.services.common.extensions.typeNameAndMRID
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.testdata.fillFields
 import com.zepben.ewb.utils.PrivateCollectionValidator
 import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -28,13 +30,12 @@ internal class PowerElectronicsConnectionTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(PowerElectronicsConnection().mRID, not(equalTo("")))
         assertThat(PowerElectronicsConnection("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val powerElectronicsConnection = PowerElectronicsConnection()
+        val powerElectronicsConnection = PowerElectronicsConnection(generateId())
 
         assertThat(powerElectronicsConnection.maxIFault, nullValue())
         assertThat(powerElectronicsConnection.maxQ, nullValue())
@@ -106,7 +107,7 @@ internal class PowerElectronicsConnectionTest {
 
     @Test
     internal fun `test bounds on properties`() {
-        val powerElectronicsConnection = PowerElectronicsConnection()
+        val powerElectronicsConnection = PowerElectronicsConnection(generateId())
 
         expect { powerElectronicsConnection.invWattRespV1 = 199 }
             .toThrow<IllegalStateException>()
@@ -212,8 +213,8 @@ internal class PowerElectronicsConnectionTest {
 
     @Test
     internal fun assignsPowerElectronicsConnectionToPowerElectronicsConnectionPhaseIfMissing() {
-        val powerElectronicsConnection = PowerElectronicsConnection()
-        val phase = PowerElectronicsConnectionPhase()
+        val powerElectronicsConnection = PowerElectronicsConnection(generateId())
+        val phase = PowerElectronicsConnectionPhase(generateId())
 
         powerElectronicsConnection.addPhase(phase)
         assertThat(phase.powerElectronicsConnection, equalTo(powerElectronicsConnection))
@@ -221,9 +222,9 @@ internal class PowerElectronicsConnectionTest {
 
     @Test
     internal fun rejectsPowerElectronicsConnectionPhaseWithWrongPowerElectronicsConnection() {
-        val powerElectronicsConnection1 = PowerElectronicsConnection()
-        val powerElectronicsConnection2 = PowerElectronicsConnection()
-        val phase = PowerElectronicsConnectionPhase().apply { powerElectronicsConnection = powerElectronicsConnection2 }
+        val powerElectronicsConnection1 = PowerElectronicsConnection(generateId())
+        val powerElectronicsConnection2 = PowerElectronicsConnection(generateId())
+        val phase = PowerElectronicsConnectionPhase(generateId()).apply { powerElectronicsConnection = powerElectronicsConnection2 }
 
         expect { powerElectronicsConnection1.addPhase(phase) }
             .toThrow<IllegalArgumentException>()

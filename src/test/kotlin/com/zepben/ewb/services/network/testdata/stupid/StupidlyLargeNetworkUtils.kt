@@ -29,6 +29,7 @@ import com.zepben.ewb.cim.iec61970.base.meas.Discrete
 import com.zepben.ewb.cim.iec61970.base.meas.Measurement
 import com.zepben.ewb.cim.iec61970.base.scada.RemoteSource
 import com.zepben.ewb.cim.iec61970.base.wires.*
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.diagram.DiagramService
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.testdata.createTerminal
@@ -81,7 +82,7 @@ class StupidlyLargeNetworkUtils {
                     this.name = name
                 }.also {
                     phases.singlePhases.forEach { phase ->
-                        val energySourcePhase = EnergySourcePhase().apply { this.phase = phase; energySource = it; it.addPhase(this) }
+                        val energySourcePhase = EnergySourcePhase(generateId()).apply { this.phase = phase; energySource = it; it.addPhase(this) }
                         assertThat("Initial add should return true", network.add(energySourcePhase))
                         it.addPhase(energySourcePhase)
                     }
@@ -155,7 +156,7 @@ class StupidlyLargeNetworkUtils {
                 assertThat("Initial add should return true", network.add(it))
             }
 
-        fun createOverheadWireInfo(network: NetworkService, mRID: String = ""): OverheadWireInfo =
+        fun createOverheadWireInfo(network: NetworkService, mRID: String): OverheadWireInfo =
             OverheadWireInfo(mRID)
                 .also {
                     assertThat("Initial add should return true", network.add(it))
@@ -248,17 +249,17 @@ class StupidlyLargeNetworkUtils {
         }
 
         fun locationOf(postcode: Int, state: String, locality: String): Location =
-            Location().apply {
+            Location(generateId()).apply {
                 mainAddress = StreetAddress(postcode.toString(), TownDetail(locality, state))
             }
 
-        fun locationOf(vararg coords: Double): Location = Location().apply {
+        fun locationOf(vararg coords: Double): Location = Location(generateId()).apply {
             for (i in coords.indices step 2)
                 addPoint(PositionPoint(coords[i], coords[i + 1]))
         }
 
         fun baseVoltageOf(voltage: Int): BaseVoltage = baseVoltagesByNominalVoltage.computeIfAbsent(voltage) {
-            BaseVoltage().apply { nominalVoltage = it }
+            BaseVoltage(generateId()).apply { nominalVoltage = it }
         }
 
         fun createDiagram(diagramService: DiagramService, mRID: String): Diagram {
@@ -276,7 +277,7 @@ class StupidlyLargeNetworkUtils {
             x2: Double? = null,
             y2: Double? = null
         ): DiagramObject {
-            return DiagramObject().apply {
+            return DiagramObject(generateId()).apply {
                 diagram.addDiagramObject(this)
 
                 identifiedObjectMRID = identifiedObject.mRID
@@ -288,7 +289,7 @@ class StupidlyLargeNetworkUtils {
         }
 
         fun createRemoteSource(network: NetworkService, meas: Measurement): RemoteSource {
-            return RemoteSource()
+            return RemoteSource(generateId())
                 .apply {
                     meas.remoteSource = this
                     measurement = meas
@@ -302,7 +303,7 @@ class StupidlyLargeNetworkUtils {
             psr: PowerSystemResource? = null,
             isRemote: Boolean = false
         ): Analog {
-            val meas = Analog()
+            val meas = Analog(generateId())
                 .apply {
                     powerSystemResourceMRID = psr?.mRID
                     terminalMRID = termMRID
@@ -326,7 +327,7 @@ class StupidlyLargeNetworkUtils {
             psr: PowerSystemResource? = null,
             isRemote: Boolean = false
         ): Accumulator {
-            val meas = Accumulator()
+            val meas = Accumulator(generateId())
                 .apply {
                     powerSystemResourceMRID = psr?.mRID
                     terminalMRID = termMRID
@@ -348,7 +349,7 @@ class StupidlyLargeNetworkUtils {
             psr: PowerSystemResource? = null,
             isRemote: Boolean = false
         ): Discrete {
-            val meas = Discrete()
+            val meas = Discrete(generateId())
                 .apply {
                     powerSystemResourceMRID = psr?.mRID
                     terminalMRID = termMRID

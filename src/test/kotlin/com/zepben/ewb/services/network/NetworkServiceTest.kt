@@ -17,6 +17,7 @@ import com.zepben.ewb.cim.iec61970.base.meas.Discrete
 import com.zepben.ewb.cim.iec61970.base.meas.Measurement
 import com.zepben.ewb.cim.iec61970.base.wires.AcLineSegment
 import com.zepben.ewb.cim.iec61970.base.wires.SinglePhaseKind
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService.Companion.connectedEquipment
 import com.zepben.ewb.services.network.NetworkService.Companion.connectedTerminals
 import com.zepben.ewb.services.network.testdata.PhaseSwapLoopNetwork
@@ -32,6 +33,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import java.util.stream.Collectors
 import java.util.stream.IntStream
+import kotlin.reflect.full.primaryConstructor
 
 internal class NetworkServiceTest {
 
@@ -43,9 +45,9 @@ internal class NetworkServiceTest {
 
     @Test
     internal fun `can add and remove supported types`() {
-        service.supportedClasses
+        service.supportedKClasses
             .asSequence()
-            .map { it.getDeclaredConstructor().newInstance() }
+            .map { it.primaryConstructor!!.call("id-${it.simpleName}") }
             .forEach {
                 assertThat("Initial tryAdd should return true", service.tryAdd(it))
                 assertThat(service[it.mRID], equalTo(it))
@@ -58,10 +60,10 @@ internal class NetworkServiceTest {
     internal fun `indexes measurements on terminal`() {
         assertThat(service.getMeasurements<Measurement>("t1"), empty())
 
-        val discrete = Discrete().apply { terminalMRID = "t1" }
-        val accumulator = Accumulator().apply { terminalMRID = "t2" }
-        val analog1 = Analog().apply { terminalMRID = "t1" }
-        val analog2 = Analog().apply { terminalMRID = "t1" }
+        val discrete = Discrete(generateId()).apply { terminalMRID = "t1" }
+        val accumulator = Accumulator(generateId()).apply { terminalMRID = "t2" }
+        val analog1 = Analog(generateId()).apply { terminalMRID = "t1" }
+        val analog2 = Analog(generateId()).apply { terminalMRID = "t1" }
 
         service.add(discrete)
         service.add(accumulator)
@@ -80,10 +82,10 @@ internal class NetworkServiceTest {
     internal fun `indexes measurements on power system resource`() {
         assertThat(service.getMeasurements<Measurement>("psr1"), empty())
 
-        val discrete = Discrete().apply { powerSystemResourceMRID = "psr1" }
-        val accumulator = Accumulator().apply { powerSystemResourceMRID = "psr2" }
-        val analog1 = Analog().apply { powerSystemResourceMRID = "psr1" }
-        val analog2 = Analog().apply { powerSystemResourceMRID = "psr1" }
+        val discrete = Discrete(generateId()).apply { powerSystemResourceMRID = "psr1" }
+        val accumulator = Accumulator(generateId()).apply { powerSystemResourceMRID = "psr2" }
+        val analog1 = Analog(generateId()).apply { powerSystemResourceMRID = "psr1" }
+        val analog2 = Analog(generateId()).apply { powerSystemResourceMRID = "psr1" }
 
         service.add(discrete)
         service.add(accumulator)

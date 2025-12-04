@@ -16,4 +16,4 @@ import com.zepben.ewb.cim.iec61970.base.core.EquipmentContainer
  * A collection of equipment for organizational purposes, used for grouping distribution resources located at a site.
  */
 @ZBEX
-class Site @JvmOverloads constructor(mRID: String = "") : EquipmentContainer(mRID)
+class Site(mRID: String) : EquipmentContainer(mRID)

@@ -28,7 +28,7 @@ import java.time.Instant
  * @property currentLvFeeders [LvFeeder]'s that represent the current LV feeders of the equipment.
  * @property substations [Substation]'s that represent the substation of the equipment.
  */
-abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
+abstract class Equipment(mRID: String) : PowerSystemResource(mRID) {
 
     var inService: Boolean = true
     var normallyInService: Boolean = true

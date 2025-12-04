@@ -11,4 +11,4 @@ package com.zepben.ewb.cim.iec61970.base.wires
 /**
  * A point where one or more conducting equipments are connected with zero resistance.
  */
-class Junction @JvmOverloads constructor(mRID: String = "") : Connector(mRID)
+class Junction(mRID: String) : Connector(mRID)

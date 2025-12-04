@@ -26,7 +26,7 @@ import com.zepben.ewb.services.common.extensions.validateReference
  * @property location Location of this power system resource.
  * @property numControls Number of Control's known to associate with this [PowerSystemResource]
  */
-abstract class PowerSystemResource(mRID: String = "") : IdentifiedObject(mRID) {
+abstract class PowerSystemResource(mRID: String) : IdentifiedObject(mRID) {
 
     private var _assets: MutableList<Asset>? = null
     open val assetInfo: AssetInfo? get() = null

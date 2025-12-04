@@ -9,6 +9,7 @@
 package com.zepben.ewb.database.sqlite.cim.customer
 
 import com.zepben.ewb.cim.iec61968.customers.Customer
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.customer.CustomerService
 import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.every
@@ -33,7 +34,7 @@ internal class CustomerServiceWriterTest {
 
     @Test
     internal fun `passes objects through to the cim writer`() {
-        val customer = Customer().also { customerService.add(it) }
+        val customer = Customer(generateId()).also { customerService.add(it) }
 
         // NOTE: the write method will fail due to the relaxed mock returning false for all write operations,
         //       but a `write` should still be attempted on every object

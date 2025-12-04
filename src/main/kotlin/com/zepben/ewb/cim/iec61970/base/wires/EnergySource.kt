@@ -16,6 +16,10 @@ import com.zepben.ewb.services.common.extensions.validateReference
 /**
  * A generic equivalent for an energy supplier on a transmission or distribution voltage level.
  *
+ * @property activePower High voltage source active injection. Load sign convention is used, i.e. positive sign means flow out from a node.
+ * Starting value for steady state solutions.
+ * @property reactivePower High voltage source reactive injection. Load sign convention is used, i.e. positive sign means flow out from a node.
+ * Starting value for steady state solutions.
  * @property voltageAngle Phase angle of a-phase open circuit used when voltage characteristics need to be imposed at the node associated with
  *                        the terminal of the energy source, such as when voltages and angles from the transmission level are used as input to
  *                        the distribution network. The attribute shall be a positive value or zero.
@@ -48,7 +52,7 @@ import com.zepben.ewb.services.common.extensions.validateReference
  * @property x0Max Maximum zero sequence Thevenin reactance.
 
  */
-class EnergySource @JvmOverloads constructor(mRID: String = "") : EnergyConnection(mRID) {
+class EnergySource(mRID: String) : EnergyConnection(mRID) {
 
     private var _energySourcePhases: MutableList<EnergySourcePhase>? = null
     var activePower: Double? = null
@@ -95,6 +99,12 @@ class EnergySource @JvmOverloads constructor(mRID: String = "") : EnergyConnecti
      */
     fun getPhase(mRID: String): EnergySourcePhase? = _energySourcePhases?.getByMRID(mRID)
 
+    /**
+     * Add an [EnergySourcePhase] to this [EnergySource].
+     *
+     * @param [phase] The [EnergySourcePhase] to add.
+     * @return This [EnergySource] for fluent use.
+     */
     fun addPhase(phase: EnergySourcePhase): EnergySource {
         if (validateReference(phase, ::getPhase, "An EnergySourcePhase"))
             return this
@@ -112,14 +122,26 @@ class EnergySource @JvmOverloads constructor(mRID: String = "") : EnergyConnecti
         return this
     }
 
+    /**
+     * Remove an [EnergySourcePhase] from this [EnergySource].
+     *
+     * @param [phase] The [EnergySourcePhase] to remove.
+     * @return true if [[phase]] is removed from the collection.
+     */
     fun removePhase(phase: EnergySourcePhase): Boolean {
         val ret = _energySourcePhases?.remove(phase) == true
         if (_energySourcePhases.isNullOrEmpty()) _energySourcePhases = null
         return ret
     }
 
+    /**
+     * Clear all [EnergySourcePhase]'s from this [EnergySource].
+     *
+     * @return This [EnergySource] for fluent use.
+     */
     fun clearPhases(): EnergySource {
         _energySourcePhases = null
         return this
     }
+
 }

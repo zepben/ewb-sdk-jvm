@@ -9,11 +9,13 @@
 package com.zepben.ewb.cim.extensions.iec61970.base.protection
 
 import com.zepben.ewb.cim.iec61970.base.core.PhaseCode
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.testdata.fillFields
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -25,13 +27,12 @@ class DirectionalCurrentRelayTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(DirectionalCurrentRelay().mRID, not(equalTo("")))
         assertThat(DirectionalCurrentRelay("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val relay = DirectionalCurrentRelay()
+        val relay = DirectionalCurrentRelay(generateId())
 
         assertThat(relay.directionalCharacteristicAngle, nullValue())
         assertThat(relay.polarizingQuantityType, equalTo(PolarizingQuantityType.UNKNOWN))

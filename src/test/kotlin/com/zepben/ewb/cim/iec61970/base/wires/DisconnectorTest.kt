@@ -11,7 +11,6 @@ package com.zepben.ewb.cim.iec61970.base.wires
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -23,7 +22,6 @@ internal class DisconnectorTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(Disconnector().mRID, not(equalTo("")))
         assertThat(Disconnector("id").mRID, equalTo("id"))
     }
 

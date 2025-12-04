@@ -9,11 +9,13 @@
 package com.zepben.ewb.cim.iec61970.base.wires
 
 import com.zepben.ewb.services.common.extensions.typeNameAndMRID
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.utils.PrivateCollectionValidator
 import com.zepben.testutils.exception.ExpectException
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -25,13 +27,12 @@ internal class EnergyConsumerTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(EnergyConsumer().mRID, not(equalTo("")))
         assertThat(EnergyConsumer("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val energyConsumer = EnergyConsumer()
+        val energyConsumer = EnergyConsumer(generateId())
 
         assertThat(energyConsumer.customerCount, nullValue())
         assertThat(energyConsumer.grounded, nullValue())
@@ -60,8 +61,8 @@ internal class EnergyConsumerTest {
 
     @Test
     internal fun assignsEnergyConsumerToEnergyConsumerPhaseIfMissing() {
-        val energyConsumer = EnergyConsumer()
-        val phase = EnergyConsumerPhase()
+        val energyConsumer = EnergyConsumer(generateId())
+        val phase = EnergyConsumerPhase(generateId())
 
         energyConsumer.addPhase(phase)
         assertThat(phase.energyConsumer, equalTo(energyConsumer))
@@ -69,9 +70,9 @@ internal class EnergyConsumerTest {
 
     @Test
     internal fun rejectsEnergyConsumerPhaseWithWrongEnergyConsumer() {
-        val energyConsumer1 = EnergyConsumer()
-        val energyConsumer2 = EnergyConsumer()
-        val phase = EnergyConsumerPhase().apply { energyConsumer = energyConsumer2 }
+        val energyConsumer1 = EnergyConsumer(generateId())
+        val energyConsumer2 = EnergyConsumer(generateId())
+        val phase = EnergyConsumerPhase(generateId()).apply { energyConsumer = energyConsumer2 }
 
         ExpectException.expect { energyConsumer1.addPhase(phase) }
             .toThrow<IllegalArgumentException>()

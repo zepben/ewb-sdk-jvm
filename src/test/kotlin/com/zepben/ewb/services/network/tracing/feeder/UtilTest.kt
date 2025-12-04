@@ -11,6 +11,7 @@ package com.zepben.ewb.services.network.tracing.feeder
 import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
 import com.zepben.ewb.cim.iec61970.base.core.Equipment
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.getT
 import com.zepben.ewb.services.network.lvFeederStartPoints
 import com.zepben.ewb.services.network.tracing.networktrace.operators.NetworkStateOperators
@@ -26,7 +27,7 @@ class UtilTest {
         //
         // tx0 21 b1(lvf5) 21--c2--2
         //     21 b3(lvf6) 21--c4--2
-        val site = Site()
+        val site = Site(generateId())
         val network = TestNetworkBuilder()
             .fromPowerTransformer { addToSite(site) } // tx0
             .toBreaker(isNormallyOpen = true, isOpen = true) { addToSite(site) }// b1

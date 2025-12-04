@@ -10,6 +10,7 @@ package com.zepben.ewb.cim.iec61970.base.wires
 
 import com.zepben.ewb.cim.iec61970.base.core.Terminal
 import com.zepben.ewb.services.common.extensions.typeNameAndMRID
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
@@ -25,14 +26,13 @@ internal class ClampTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(Clamp().mRID, not(equalTo("")))
         assertThat(Clamp("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val clamp = Clamp()
-        val acls = AcLineSegment()
+        val clamp = Clamp(generateId())
+        val acls = AcLineSegment(generateId())
 
         assertThat(clamp.lengthFromTerminal1, nullValue())
         assertThat(clamp.acLineSegment, nullValue())
@@ -46,10 +46,10 @@ internal class ClampTest {
 
     @Test
     internal fun `can only have a single terminal`() {
-        val clamp = Clamp()
-        val terminal = Terminal()
+        val clamp = Clamp(generateId())
+        val terminal = Terminal(generateId())
 
-        clamp.addTerminal(Terminal())
+        clamp.addTerminal(Terminal(generateId()))
         expect { clamp.addTerminal(terminal) }
             .toThrow<IllegalStateException>()
             .withMessage(

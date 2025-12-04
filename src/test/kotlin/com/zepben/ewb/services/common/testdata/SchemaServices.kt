@@ -90,14 +90,14 @@ object SchemaServices {
     private fun fillRequired(service: NetworkService, io: IdentifiedObject) {
         when (io) {
             is EnergyConsumerPhase -> {
-                io.energyConsumer = EnergyConsumer().also {
+                io.energyConsumer = EnergyConsumer(generateId()).also {
                     it.addPhase(io)
                     service.add(it)
                 }
             }
 
             is EnergySourcePhase -> {
-                io.energySource = EnergySource().also {
+                io.energySource = EnergySource(generateId()).also {
                     it.addPhase(io)
                     service.add(it)
                 }

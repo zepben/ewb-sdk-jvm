@@ -25,7 +25,7 @@ import com.zepben.ewb.services.common.extensions.validateReference
  * @property schemes [ZBEX] The schemes implemented by this ProtectionRelaySystem.
  */
 @ZBEX
-class ProtectionRelaySystem @JvmOverloads constructor(mRID: String = "") : Equipment(mRID) {
+class ProtectionRelaySystem(mRID: String) : Equipment(mRID) {
 
     @ZBEX
     var protectionKind: ProtectionKind = ProtectionKind.UNKNOWN

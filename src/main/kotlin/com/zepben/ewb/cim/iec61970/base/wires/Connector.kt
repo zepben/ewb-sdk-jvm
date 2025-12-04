@@ -14,4 +14,4 @@ import com.zepben.ewb.cim.iec61970.base.core.ConductingEquipment
  * A conductor, or group of conductors, with negligible impedance, that serve to connect other conducting equipment
  * within a single substation and are modelled with a single logical terminal.
  */
-abstract class Connector(mRID: String = "") : ConductingEquipment(mRID)
+abstract class Connector(mRID: String) : ConductingEquipment(mRID)

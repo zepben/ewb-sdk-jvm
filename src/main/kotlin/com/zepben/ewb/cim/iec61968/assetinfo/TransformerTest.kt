@@ -16,7 +16,7 @@ import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
  * @property basePower Base power at which the tests are conducted, usually equal to the ratedS of one of the involved transformer ends in VA.
  * @property temperature Temperature at which the test is conducted in degrees Celsius.
  */
-abstract class TransformerTest(mRID: String = "") : IdentifiedObject(mRID) {
+abstract class TransformerTest(mRID: String) : IdentifiedObject(mRID) {
 
     var basePower: Int? = null
     var temperature: Double? = null

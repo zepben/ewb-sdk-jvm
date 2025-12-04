@@ -20,6 +20,7 @@ import com.zepben.ewb.cim.iec61970.base.generation.production.PhotoVoltaicUnit
 import com.zepben.ewb.cim.iec61970.base.protection.CurrentRelay
 import com.zepben.ewb.cim.iec61970.base.wires.Breaker
 import com.zepben.ewb.cim.iec61970.base.wires.ProtectedSwitch
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.getT
 import com.zepben.ewb.services.network.lvFeederStartPoints
 import com.zepben.ewb.services.network.testdata.DownstreamFeederStartPointNetwork
@@ -41,8 +42,8 @@ internal class AssignToLvFeedersTest {
     @RegisterExtension
     val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
-    val hvBaseVoltage = BaseVoltage().apply { nominalVoltage = 11000 }
-    val lvBaseVoltage = BaseVoltage().apply { nominalVoltage = 400 }
+    val hvBaseVoltage = BaseVoltage(generateId()).apply { nominalVoltage = 11000 }
+    val lvBaseVoltage = BaseVoltage(generateId()).apply { nominalVoltage = 400 }
 
     private val assignToLvFeeders = AssignToLvFeeders(debugLogger = null)
 
@@ -342,15 +343,15 @@ internal class AssignToLvFeedersTest {
 
             val b7 = network.get<Breaker>("b7")!!
 
-            val feeder = Feeder()
+            val feeder = Feeder(generateId())
             val lvFeeder8 = network.get<LvFeeder>("lvf8")!!.also { operators.associateEnergizingFeeder(feeder, it) }
             val lvFeeder9 = network.get<LvFeeder>("lvf9")!!.also { operators.associateEnergizingFeeder(feeder, it) }
             val lvFeeder10 = network.get<LvFeeder>("lvf10")!!.also { operators.associateEnergizingFeeder(feeder, it) }
 
             // We create an LV feeder to assign from b7 with its associated energizing feeder, which we will test is assigned to all LV feeders
             // in the dist substation site, not just the one on b5.
-            val backFeed = Feeder()
-            val lvFeeder = LvFeeder().also { operators.associateEnergizingFeeder(backFeed, it) }
+            val backFeed = Feeder(generateId())
+            val lvFeeder = LvFeeder(generateId()).also { operators.associateEnergizingFeeder(backFeed, it) }
 
             assignToLvFeeders.run(
                 b7.terminals.first(),
@@ -385,8 +386,8 @@ internal class AssignToLvFeedersTest {
             .addLvFeeder("b0") // lvf1
             .network
 
-        val normalFeeder = Feeder()
-        val currentFeeder = Feeder()
+        val normalFeeder = Feeder(generateId())
+        val currentFeeder = Feeder(generateId())
         val breaker: Breaker = network["b0"]!!
         val lvFeeder: LvFeeder = network["lvf1"]!!
 

@@ -20,6 +20,7 @@ import com.zepben.ewb.database.sqlite.common.SqliteTableVersion
 import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.common.BaseServiceComparator
 import com.zepben.ewb.services.common.testdata.SchemaServices
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -143,13 +144,13 @@ internal abstract class TranslatorTestBase<S : BaseService>(
      * @property translate The callback that performs the translation from CIM to protobuf and back.
      */
     protected inner class ValidationInfo<T : IdentifiedObject>(
-        cimFactory: () -> T,
+        cimFactory: (String) -> T,
         val filler: T.(S) -> Unit,
         val translate: S.(T) -> T?
     ) {
 
-        val cim = cimFactory()
-        private val cimEmptys = cimFactory()
+        val cim = cimFactory(generateId())
+        private val cimEmptys = cimFactory(generateId())
 
         override fun toString(): String = "ValidationInfo<${cim::class.simpleName}>"
 

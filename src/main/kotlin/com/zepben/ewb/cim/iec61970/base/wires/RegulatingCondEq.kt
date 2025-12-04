@@ -13,7 +13,7 @@ package com.zepben.ewb.cim.iec61970.base.wires
  * @property controlEnabled Specifies the regulation status of the equipment.  True is regulating, false is not regulating.
  * @property regulatingControl The [RegulatingControl] associated with this [RegulatingCondEq]
  */
-abstract class RegulatingCondEq(mRID: String = "") : EnergyConnection(mRID) {
+abstract class RegulatingCondEq(mRID: String) : EnergyConnection(mRID) {
 
     var controlEnabled: Boolean? = null
     var regulatingControl: RegulatingControl? = null

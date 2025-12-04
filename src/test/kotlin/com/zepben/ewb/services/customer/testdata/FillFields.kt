@@ -14,6 +14,7 @@ import com.zepben.ewb.cim.iec61968.common.OrganisationRole
 import com.zepben.ewb.cim.iec61968.customers.*
 import com.zepben.ewb.cim.iec61970.base.domain.DateTimeInterval
 import com.zepben.ewb.services.common.testdata.fillFieldsCommon
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.customer.CustomerService
 import java.time.Instant
 
@@ -41,7 +42,7 @@ fun Customer.fillFields(service: CustomerService, includeRuntime: Boolean = true
     specialNeed = "my need"
 
     for (i in 0..1) {
-        addAgreement(CustomerAgreement().also {
+        addAgreement(CustomerAgreement(generateId()).also {
             it.customer = this
             service.add(it)
         })
@@ -53,13 +54,13 @@ fun Customer.fillFields(service: CustomerService, includeRuntime: Boolean = true
 fun CustomerAgreement.fillFields(service: CustomerService, includeRuntime: Boolean = true): CustomerAgreement {
     (this as Agreement).fillFields(service, includeRuntime)
 
-    customer = Customer().also {
+    customer = Customer(generateId()).also {
         it.addAgreement(this)
         service.add(it)
     }
 
     for (i in 0..1)
-        addPricingStructure(PricingStructure().also { service.add(it) })
+        addPricingStructure(PricingStructure(generateId()).also { service.add(it) })
 
     validityInterval = DateTimeInterval(Instant.ofEpochSecond(1), Instant.ofEpochSecond(2))
 
@@ -70,7 +71,7 @@ fun PricingStructure.fillFields(service: CustomerService, includeRuntime: Boolea
     (this as Document).fillFieldsCommon(service, includeRuntime)
 
     for (i in 0..1)
-        addTariff(Tariff().also { service.add(it) })
+        addTariff(Tariff(generateId()).also { service.add(it) })
 
     return this
 }

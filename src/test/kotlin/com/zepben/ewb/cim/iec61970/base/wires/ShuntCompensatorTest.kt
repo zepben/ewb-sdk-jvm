@@ -9,6 +9,7 @@
 package com.zepben.ewb.cim.iec61970.base.wires
 
 import com.zepben.ewb.cim.iec61968.assetinfo.ShuntCompensatorInfo
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.testdata.fillFields
 import com.zepben.testutils.junit.SystemLogExtension
@@ -25,13 +26,12 @@ internal class ShuntCompensatorTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(object : ShuntCompensator() {}.mRID, not(equalTo("")))
         assertThat(object : ShuntCompensator("id") {}.mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val shuntCompensator = object : ShuntCompensator() {}
+        val shuntCompensator = object : ShuntCompensator(generateId()) {}
 
         assertThat(shuntCompensator.assetInfo, nullValue())
         assertThat(shuntCompensator.grounded, nullValue())

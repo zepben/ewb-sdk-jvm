@@ -15,6 +15,7 @@ import com.zepben.ewb.cim.iec61970.base.core.Substation
 import com.zepben.ewb.cim.iec61970.base.core.Terminal
 import com.zepben.ewb.cim.iec61970.base.wires.Junction
 import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 
 object LoopNetwork {
@@ -33,10 +34,10 @@ object LoopNetwork {
     //     CBR
     //
     fun create(): NetworkService = NetworkService().apply {
-        val v330 = BaseVoltage().apply { nominalVoltage = 330000 }.also { add(it) }
-        val v132 = BaseVoltage().apply { nominalVoltage = 132000 }.also { add(it) }
-        val v66 = BaseVoltage().apply { nominalVoltage = 66000 }.also { add(it) }
-        val v11 = BaseVoltage().apply { nominalVoltage = 11000 }.also { add(it) }
+        val v330 = BaseVoltage(generateId()).apply { nominalVoltage = 330000 }.also { add(it) }
+        val v132 = BaseVoltage(generateId()).apply { nominalVoltage = 132000 }.also { add(it) }
+        val v66 = BaseVoltage(generateId()).apply { nominalVoltage = 66000 }.also { add(it) }
+        val v11 = BaseVoltage(generateId()).apply { nominalVoltage = 11000 }.also { add(it) }
 
         val tg = createSubstation("TG", v330, v132)
         val zts = createSubstation("ZTS", v132, v66)

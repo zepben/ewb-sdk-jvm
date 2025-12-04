@@ -35,7 +35,7 @@ import java.util.function.BiConsumer
  * @property schemes [ZBEX]  The schemes this function operates under.
  */
 @ZBEX
-abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(mRID) {
+abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID) {
 
     override var assetInfo: RelayInfo? = null
 

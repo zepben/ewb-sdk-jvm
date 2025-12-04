@@ -10,8 +10,10 @@ package com.zepben.ewb.cim.iec61968.metering
 
 /**
  * Physical asset that performs the metering role of the usage point. Used for measuring consumption and detection of events.
+ *
+ * @property companyMeterId Helper function for getting the company specific meter ID, which is stored as the name of the meter.
  */
-class Meter @JvmOverloads constructor(mRID: String = "") : EndDevice(mRID) {
+class Meter(mRID: String) : EndDevice(mRID) {
 
     var companyMeterId: String?
         get() = name

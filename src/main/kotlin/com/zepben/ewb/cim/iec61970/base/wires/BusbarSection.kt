@@ -14,6 +14,6 @@ package com.zepben.ewb.cim.iec61970.base.wires
  * Voltage measurements are typically obtained from voltage transformers that are connected to busbar sections. A bus bar section may have many
  * physical terminals but for analysis is modelled with exactly one logical terminal.
  */
-class BusbarSection @JvmOverloads constructor(mRID: String = "") : Connector(mRID) {
+class BusbarSection(mRID: String) : Connector(mRID) {
     override val maxTerminals: Int get() = 1
 }

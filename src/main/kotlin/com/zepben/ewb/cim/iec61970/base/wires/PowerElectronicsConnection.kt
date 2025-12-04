@@ -57,7 +57,7 @@ import com.zepben.ewb.services.common.extensions.validateReference
  * @property invReactivePowerMode [ZBEX] If true, enables Static Reactive Power mode on the inverter. Note: It must be false if invVoltVarRespMode or InvVoltWattRespMode is true.
  * @property invFixReactivePower  [ZBEX] Static Reactive Power, specified in a percentage output of the system. Permitted range is between -1.0 and 1.0 (inclusive), with a negative sign referring to “sink”.
  */
-class PowerElectronicsConnection @JvmOverloads constructor(mRID: String = "") : RegulatingCondEq(mRID) {
+class PowerElectronicsConnection(mRID: String) : RegulatingCondEq(mRID) {
 
     private var _powerElectronicsUnits: MutableList<PowerElectronicsUnit>? = null
     private var _powerElectronicsConnectionPhases: MutableList<PowerElectronicsConnectionPhase>? = null
@@ -229,6 +229,12 @@ class PowerElectronicsConnection @JvmOverloads constructor(mRID: String = "") : 
      */
     fun getUnit(mRID: String): PowerElectronicsUnit? = _powerElectronicsUnits?.getByMRID(mRID)
 
+    /**
+     * Add a [PowerElectronicsUnit] to this [PowerElectronicsConnection].
+     *
+     * @param unit The [PowerElectronicsUnit] to add.
+     * @return This [PowerElectronicsConnection] for fluent use.
+     */
     fun addUnit(unit: PowerElectronicsUnit): PowerElectronicsConnection {
         if (validateReference(unit, ::getUnit, "An PowerElectronicsUnit"))
             return this
@@ -239,12 +245,23 @@ class PowerElectronicsConnection @JvmOverloads constructor(mRID: String = "") : 
         return this
     }
 
+    /**
+     * Remove a [PowerElectronicsUnit] from this [PowerElectronicsConnection].
+     *
+     * @param unit The [PowerElectronicsUnit] to remove.
+     * @return true if [unit] is removed from the collection.
+     */
     fun removeUnit(unit: PowerElectronicsUnit): Boolean {
         val ret = _powerElectronicsUnits?.remove(unit) == true
         if (_powerElectronicsUnits.isNullOrEmpty()) _powerElectronicsUnits = null
         return ret
     }
 
+    /**
+     * Clear all [PowerElectronicsUnit]'s from this [PowerElectronicsConnection].
+     *
+     * @return This [PowerElectronicsConnection] for fluent use.
+     */
     fun clearUnits(): PowerElectronicsConnection {
         _powerElectronicsUnits = null
         return this
@@ -263,6 +280,12 @@ class PowerElectronicsConnection @JvmOverloads constructor(mRID: String = "") : 
      */
     fun getPhase(mRID: String): PowerElectronicsConnectionPhase? = _powerElectronicsConnectionPhases?.getByMRID(mRID)
 
+    /**
+     * Add a [PowerElectronicsConnectionPhase] to this [PowerElectronicsConnection].
+     *
+     * @param phase The [PowerElectronicsConnectionPhase] to add.
+     * @return This [PowerElectronicsConnection] for fluent use.
+     */
     fun addPhase(phase: PowerElectronicsConnectionPhase): PowerElectronicsConnection {
         if (validateReference(phase, ::getPhase, "An PowerElectronicsConnectionPhase"))
             return this
@@ -280,12 +303,23 @@ class PowerElectronicsConnection @JvmOverloads constructor(mRID: String = "") : 
         return this
     }
 
+    /**
+     * Remove a [PowerElectronicsConnectionPhase] from this [PowerElectronicsConnection].
+     *
+     * @param phase The [PowerElectronicsConnectionPhase] to remove.
+     * @return true if [phase] is removed from the collection.
+     */
     fun removePhase(phase: PowerElectronicsConnectionPhase): Boolean {
         val ret = _powerElectronicsConnectionPhases?.remove(phase) == true
         if (_powerElectronicsConnectionPhases.isNullOrEmpty()) _powerElectronicsConnectionPhases = null
         return ret
     }
 
+    /**
+     * Clear all [PowerElectronicsConnectionPhase]'s from this [PowerElectronicsConnection].
+     *
+     * @return This [PowerElectronicsConnection] for fluent use.
+     */
     fun clearPhases(): PowerElectronicsConnection {
         _powerElectronicsConnectionPhases = null
         return this

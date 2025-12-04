@@ -8,23 +8,24 @@
 
 package com.zepben.ewb.cim.iec61968.assetinfo
 
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.testdata.fillFields
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 
 internal class SwitchInfoTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(SwitchInfo().mRID, not(equalTo("")))
         assertThat(SwitchInfo("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val switchInfo = SwitchInfo()
+        val switchInfo = SwitchInfo(generateId())
 
         assertThat(switchInfo.ratedInterruptingTime, nullValue())
 

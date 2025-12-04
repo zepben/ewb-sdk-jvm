@@ -53,7 +53,7 @@ import com.zepben.ewb.cim.iec61970.base.scada.RemoteSource
  *                      When the measurementType is set to "Specialization", the type of Measurement is defined in
  *                      more detail by the specialized class which inherits from Measurement.
  */
-abstract class Measurement(mRID: String = "") : IdentifiedObject(mRID) {
+abstract class Measurement(mRID: String) : IdentifiedObject(mRID) {
 
     var powerSystemResourceMRID: String? = null
     var remoteSource: RemoteSource? = null

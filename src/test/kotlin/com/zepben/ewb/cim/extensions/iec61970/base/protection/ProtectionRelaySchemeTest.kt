@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.cim.extensions.iec61970.base.protection
 
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.testdata.fillFields
 import com.zepben.ewb.utils.PrivateCollectionValidator
@@ -19,13 +20,12 @@ internal class ProtectionRelaySchemeTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(ProtectionRelayScheme().mRID, not(equalTo("")))
         assertThat(ProtectionRelayScheme("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val protectionRelayScheme = ProtectionRelayScheme()
+        val protectionRelayScheme = ProtectionRelayScheme(generateId())
 
         assertThat(protectionRelayScheme.system, nullValue())
 

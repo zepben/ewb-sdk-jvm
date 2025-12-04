@@ -35,7 +35,7 @@ import com.zepben.ewb.services.common.extensions.validateReference
  *                     four-wire, s12n (splitSecondary12N) is single-phase, three-wire, and s1n and s2n are single-phase, two-wire.
  * @property contacts [ZBEX] All contact details for this UsagePoint.
  */
-class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mRID) {
+class UsagePoint(mRID: String) : IdentifiedObject(mRID) {
 
     var usagePointLocation: Location? = null
     var isVirtual: Boolean? = null

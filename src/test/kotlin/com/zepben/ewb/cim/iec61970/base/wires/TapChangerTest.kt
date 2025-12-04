@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.cim.iec61970.base.wires
 
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.testdata.fillFields
 import com.zepben.testutils.exception.ExpectException.Companion.expect
@@ -25,13 +26,12 @@ internal class TapChangerTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(object : TapChanger() {}.mRID, not(equalTo("")))
         assertThat(object : TapChanger("id") {}.mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val tapChanger = object : TapChanger() {}
+        val tapChanger = object : TapChanger(generateId()) {}
 
         assertThat(tapChanger.controlEnabled, nullValue())
         assertThat(tapChanger.highStep, nullValue())
@@ -56,7 +56,7 @@ internal class TapChangerTest {
 
     @Test
     internal fun validateSteps() {
-        val tapChanger = object : TapChanger() {}.apply {
+        val tapChanger = object : TapChanger(generateId()) {}.apply {
             highStep = 3
             lowStep = -3
             neutralStep = 1

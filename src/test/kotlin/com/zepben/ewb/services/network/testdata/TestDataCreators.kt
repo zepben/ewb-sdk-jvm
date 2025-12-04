@@ -16,6 +16,7 @@ import com.zepben.ewb.cim.iec61968.metering.UsagePoint
 import com.zepben.ewb.cim.iec61968.operations.OperationalRestriction
 import com.zepben.ewb.cim.iec61970.base.core.*
 import com.zepben.ewb.cim.iec61970.base.wires.*
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.customer.CustomerService
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.tracing.networktrace.Tracing
@@ -25,7 +26,7 @@ import org.hamcrest.MatcherAssert.assertThat
 fun createSourceForConnecting(network: NetworkService, id: String, numTerminals: Int, phaseCode: PhaseCode = PhaseCode.A): EnergySource =
     EnergySource(id).apply {
         phaseCode.singlePhases.forEach { phase ->
-            EnergySourcePhase().also {
+            EnergySourcePhase(generateId()).also {
                 it.phase = phase
                 addPhase(it)
                 network.add(it)
@@ -141,7 +142,7 @@ fun createTerminals(network: NetworkService, condEq: ConductingEquipment, numTer
 }
 
 fun createTerminal(network: NetworkService, conductingEquipment: ConductingEquipment?, phases: PhaseCode = PhaseCode.A, sequenceNumber: Int): Terminal =
-    conductingEquipment?.getTerminal(sequenceNumber) ?: Terminal(conductingEquipment?.mRID?.let { "$it-t$sequenceNumber" } ?: "").apply {
+    conductingEquipment?.getTerminal(sequenceNumber) ?: Terminal(conductingEquipment?.mRID?.let { "$it-t$sequenceNumber" } ?: generateId()).apply {
         this.conductingEquipment = conductingEquipment
         this.phases = phases
         this.sequenceNumber = sequenceNumber
@@ -184,19 +185,8 @@ fun createFeeder(
         networkService.add(this)
     }
 
-fun createFeeder(networkService: NetworkService, mRID: String, name: String, substation: Substation, vararg equipmentMRIDs: String?): Feeder =
-    createFeeder(networkService, mRID, name, substation, networkService.get(ConductingEquipment::class, equipmentMRIDs[0]))
-        .apply {
-            for (equipmentMRID in equipmentMRIDs) {
-                val conductingEquipment = networkService.get(ConductingEquipment::class, equipmentMRID)!!
-                conductingEquipment.addContainer(this)
-
-                this.addEquipment(conductingEquipment)
-            }
-        }
-
 fun createEnd(networkService: NetworkService, tx: PowerTransformer, ratedU: Int? = null, endNumber: Int = 0): PowerTransformerEnd =
-    PowerTransformerEnd().also {
+    PowerTransformerEnd(generateId()).also {
         it.ratedU = ratedU
         it.endNumber = endNumber
 

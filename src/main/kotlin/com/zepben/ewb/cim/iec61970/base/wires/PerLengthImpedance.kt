@@ -11,4 +11,4 @@ package com.zepben.ewb.cim.iec61970.base.wires
 /**
  * Common type for per-length impedance electrical catalogues.
  */
-abstract class PerLengthImpedance(mRID: String = "") : PerLengthLineParameter(mRID)
+abstract class PerLengthImpedance(mRID: String) : PerLengthLineParameter(mRID)

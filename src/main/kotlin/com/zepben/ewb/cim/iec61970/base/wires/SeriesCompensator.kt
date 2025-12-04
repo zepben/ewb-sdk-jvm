@@ -18,12 +18,13 @@ import com.zepben.ewb.cim.iec61970.base.core.ConductingEquipment
  * @property x Positive sequence reactance in ohms.
  * @property x0 Zero sequence reactance in ohms.
  * @property varistorRatedCurrent The maximum current in amps the varistor is designed to handle at specified duration. It is used for short circuit
- *                                calculations. The attribute shall be a positive value. If null and varistorVoltageThreshold is null, a varistor is not
- *                                present.
+ * calculations. The attribute shall be a positive value. If null and varistorVoltageThreshold is null, a varistor is not present.
  * @property varistorVoltageThreshold The dc voltage in volts at which the varistor starts conducting. It is used for short circuit calculations. If null and
- *                                    varistorRatedCurrent is null, a varistor is not present.
+ * varistorRatedCurrent is null, a varistor is not present.
+ * @property varistorPresent Describe if a metal oxide varistor (mov) for over voltage protection is configured in parallel with the series compensator. It is
+ * used for short circuit calculations.
  */
-class SeriesCompensator @JvmOverloads constructor(mRID: String = "") : ConductingEquipment(mRID) {
+class SeriesCompensator(mRID: String) : ConductingEquipment(mRID) {
 
     var r: Double? = null
     var r0: Double? = null

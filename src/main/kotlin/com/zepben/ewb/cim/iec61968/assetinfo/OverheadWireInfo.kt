@@ -11,4 +11,4 @@ package com.zepben.ewb.cim.iec61968.assetinfo
 /**
  * Overhead wire data.
  */
-class OverheadWireInfo @JvmOverloads constructor(mRID: String = "") : WireInfo(mRID)
+class OverheadWireInfo(mRID: String) : WireInfo(mRID)

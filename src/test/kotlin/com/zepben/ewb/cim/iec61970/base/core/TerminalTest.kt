@@ -9,6 +9,7 @@
 package com.zepben.ewb.cim.iec61970.base.core
 
 import com.zepben.ewb.cim.iec61970.base.wires.Junction
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.testdata.fillFields
 import com.zepben.ewb.services.network.tracing.feeder.FeederDirection
@@ -26,13 +27,12 @@ internal class TerminalTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(Terminal().mRID, not(equalTo("")))
         assertThat(Terminal(mRID = "id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val terminal = Terminal()
+        val terminal = Terminal(generateId())
 
         assertThat(terminal.conductingEquipment, nullValue())
         assertThat(terminal.phases, equalTo(PhaseCode.ABC))
@@ -57,8 +57,8 @@ internal class TerminalTest {
 
     @Test
     internal fun connectivity() {
-        val terminal = Terminal()
-        val connectivityNode = ConnectivityNode()
+        val terminal = Terminal(generateId())
+        val connectivityNode = ConnectivityNode(generateId())
 
         assertThat(terminal.connectivityNode, nullValue())
         assertThat(terminal.connectivityNodeId, nullValue())
@@ -79,9 +79,9 @@ internal class TerminalTest {
 
     @Test
     internal fun connectedTerminals() {
-        val terminal1 = Terminal()
-        val terminal2 = Terminal()
-        val terminal3 = Terminal()
+        val terminal1 = Terminal(generateId())
+        val terminal2 = Terminal(generateId())
+        val terminal3 = Terminal(generateId())
         val networkService = NetworkService()
 
         assertThat(terminal1.connectedTerminals().toList(), empty())
@@ -98,10 +98,10 @@ internal class TerminalTest {
 
     @Test
     internal fun otherTerminals() {
-        val terminal1 = Terminal()
-        val terminal2 = Terminal()
-        val terminal3 = Terminal()
-        val ce = Junction()
+        val terminal1 = Terminal(generateId())
+        val terminal2 = Terminal(generateId())
+        val terminal3 = Terminal(generateId())
+        val ce = Junction(generateId())
 
         assertThat(terminal1.otherTerminals().toList(), empty())
 
@@ -117,7 +117,7 @@ internal class TerminalTest {
 
     @Test
     internal fun normalAndCurrentPhasesAreDifferentStatuses() {
-        val terminal = Terminal()
+        val terminal = Terminal(generateId())
         assertThat(terminal.normalPhases, not(sameInstance(terminal.currentPhases)))
     }
 

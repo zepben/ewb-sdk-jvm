@@ -9,11 +9,13 @@
 package com.zepben.ewb.cim.iec61970.base.wires
 
 import com.zepben.ewb.services.common.extensions.typeNameAndMRID
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.utils.PrivateCollectionValidator
 import com.zepben.testutils.exception.ExpectException
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -25,13 +27,12 @@ internal class EnergySourceTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(EnergySource().mRID, not(equalTo("")))
         assertThat(EnergySource("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val energySource = EnergySource()
+        val energySource = EnergySource(generateId())
 
         assertThat(energySource.activePower, nullValue())
         assertThat(energySource.reactivePower, nullValue())
@@ -114,8 +115,8 @@ internal class EnergySourceTest {
 
     @Test
     internal fun assignsEnergySourceToEnergySourcePhaseIfMissing() {
-        val energySource = EnergySource()
-        val phase = EnergySourcePhase()
+        val energySource = EnergySource(generateId())
+        val phase = EnergySourcePhase(generateId())
 
         energySource.addPhase(phase)
         assertThat(phase.energySource, equalTo(energySource))
@@ -123,9 +124,9 @@ internal class EnergySourceTest {
 
     @Test
     internal fun rejectsEnergySourcePhaseWithWrongEnergySource() {
-        val energySource1 = EnergySource()
-        val energySource2 = EnergySource()
-        val phase = EnergySourcePhase().apply { energySource = energySource2 }
+        val energySource1 = EnergySource(generateId())
+        val energySource2 = EnergySource(generateId())
+        val phase = EnergySourcePhase(generateId()).apply { energySource = energySource2 }
 
         ExpectException.expect { energySource1.addPhase(phase) }
             .toThrow<IllegalArgumentException>()

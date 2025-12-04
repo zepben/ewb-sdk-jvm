@@ -11,6 +11,7 @@ package com.zepben.ewb.services.network.tracing
 import com.zepben.ewb.cim.iec61970.base.core.BaseVoltage
 import com.zepben.ewb.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.ewb.cim.iec61970.base.core.PhaseCode
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.ewb.testing.TestNetworkBuilder
@@ -61,10 +62,10 @@ internal class FindSwerEquipmentTest {
             .toAcls(PhaseCode.A) // c4
             .toAcls(PhaseCode.A) // c5
             .toPowerTransformer(listOf(PhaseCode.A, PhaseCode.AN, PhaseCode.AN)) // tx6
-            .toAcls(PhaseCode.AN) { baseVoltage = BaseVoltage().apply { nominalVoltage = 415 } } // c7
-            .toBreaker(PhaseCode.AN) { baseVoltage = BaseVoltage().apply { nominalVoltage = 415 } } // b8
+            .toAcls(PhaseCode.AN) { baseVoltage = BaseVoltage(generateId()).apply { nominalVoltage = 415 } } // c7
+            .toBreaker(PhaseCode.AN) { baseVoltage = BaseVoltage(generateId()).apply { nominalVoltage = 415 } } // b8
             .branchFrom("tx6", 2)
-            .toAcls(PhaseCode.AN) { baseVoltage = BaseVoltage().apply { nominalVoltage = 11000 } } // c9
+            .toAcls(PhaseCode.AN) { baseVoltage = BaseVoltage(generateId()).apply { nominalVoltage = 11000 } } // c9
             .addFeeder("b0") // fdr10
             .build()
 
@@ -116,9 +117,9 @@ internal class FindSwerEquipmentTest {
     internal fun `LV includes open switches and stops at them`() {
         val ns = TestNetworkBuilder()
             .fromPowerTransformer(listOf(PhaseCode.A, PhaseCode.AN)) // tx0
-            .toAcls(PhaseCode.AN) { baseVoltage = BaseVoltage().apply { nominalVoltage = 415 } } // c1
-            .toBreaker(PhaseCode.AN, isNormallyOpen = true) { baseVoltage = BaseVoltage().apply { nominalVoltage = 415 } } // b2
-            .toAcls(PhaseCode.AN) { baseVoltage = BaseVoltage().apply { nominalVoltage = 415 } } // c3
+            .toAcls(PhaseCode.AN) { baseVoltage = BaseVoltage(generateId()).apply { nominalVoltage = 415 } } // c1
+            .toBreaker(PhaseCode.AN, isNormallyOpen = true) { baseVoltage = BaseVoltage(generateId()).apply { nominalVoltage = 415 } } // b2
+            .toAcls(PhaseCode.AN) { baseVoltage = BaseVoltage(generateId()).apply { nominalVoltage = 415 } } // c3
             .addFeeder("tx0") // fdr4
             .build()
 
@@ -130,13 +131,13 @@ internal class FindSwerEquipmentTest {
     internal fun `runs off multiple terminals`() {
         val ns = TestNetworkBuilder()
             .fromPowerTransformer(listOf(PhaseCode.A, PhaseCode.A, PhaseCode.AN, PhaseCode.AN)) // tx0
-            .toAcls(PhaseCode.AN) { baseVoltage = BaseVoltage().apply { nominalVoltage = 415 } } // c1
+            .toAcls(PhaseCode.AN) { baseVoltage = BaseVoltage(generateId()).apply { nominalVoltage = 415 } } // c1
             .branchFrom("tx0", 1)
             .toAcls(PhaseCode.A) // c2
             .branchFrom("tx0", 2)
             .toAcls(PhaseCode.A) // c3
             .branchFrom("tx0", 3)
-            .toAcls(PhaseCode.AN) { baseVoltage = BaseVoltage().apply { nominalVoltage = 415 } } // c4
+            .toAcls(PhaseCode.AN) { baseVoltage = BaseVoltage(generateId()).apply { nominalVoltage = 415 } } // c4
             .addFeeder("tx0") // fdr5
             .build()
 
@@ -150,7 +151,7 @@ internal class FindSwerEquipmentTest {
             .toAcls() // c1
             .toAcls(PhaseCode.A) // c2
             .toPowerTransformer(listOf(PhaseCode.A, PhaseCode.AN)) // tx3
-            .toAcls(PhaseCode.AN) { baseVoltage = BaseVoltage().apply { nominalVoltage = 415 } } // c4
+            .toAcls(PhaseCode.AN) { baseVoltage = BaseVoltage(generateId()).apply { nominalVoltage = 415 } } // c4
             .toPowerTransformer(listOf(PhaseCode.AN, PhaseCode.A)) // tx5
             .toAcls(PhaseCode.A) // c6
             .connect("c6", "c1", 2, 1)

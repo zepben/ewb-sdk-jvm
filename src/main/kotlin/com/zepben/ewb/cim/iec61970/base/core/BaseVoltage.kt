@@ -12,7 +12,7 @@ package com.zepben.ewb.cim.iec61970.base.core
  * Defines a system base voltage which is referenced.
  * @property nominalVoltage The power system resource's base voltage.
  */
-class BaseVoltage @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mRID) {
+class BaseVoltage(mRID: String) : IdentifiedObject(mRID) {
 
     var nominalVoltage: Int = 0
 }

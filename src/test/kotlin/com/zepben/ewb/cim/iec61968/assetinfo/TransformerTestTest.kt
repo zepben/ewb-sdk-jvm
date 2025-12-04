@@ -8,11 +8,13 @@
 
 package com.zepben.ewb.cim.iec61968.assetinfo
 
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.testdata.fillFields
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -24,13 +26,12 @@ internal class TransformerTestTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(object : TransformerTest() {}.mRID, not(equalTo("")))
         assertThat(object : TransformerTest("id") {}.mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val transformerTest = object : TransformerTest() {}
+        val transformerTest = object : TransformerTest(generateId()) {}
 
         assertThat(transformerTest.basePower, nullValue())
         assertThat(transformerTest.temperature, nullValue())

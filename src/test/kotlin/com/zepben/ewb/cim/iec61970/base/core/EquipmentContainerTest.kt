@@ -9,6 +9,7 @@
 package com.zepben.ewb.cim.iec61970.base.core
 
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.utils.PrivateCollectionValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
@@ -24,14 +25,13 @@ internal class EquipmentContainerTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(object : EquipmentContainer() {}.mRID, not(equalTo("")))
         assertThat(object : EquipmentContainer("id") {}.mRID, equalTo("id"))
     }
 
     @Test
     internal fun equipment() {
         PrivateCollectionValidator.validateUnordered(
-            { object : EquipmentContainer() {} },
+            { id -> object : EquipmentContainer(id) {} },
             { id -> object : Equipment(id) {} },
             EquipmentContainer::equipment,
             EquipmentContainer::numEquipment,
@@ -45,7 +45,7 @@ internal class EquipmentContainerTest {
     @Test
     internal fun currentEquipment() {
         PrivateCollectionValidator.validateUnordered(
-            { object : EquipmentContainer() {} },
+            { id -> object : EquipmentContainer(id) {} },
             { id -> object : Equipment(id) {} },
             EquipmentContainer::currentEquipment,
             EquipmentContainer::numCurrentEquipment,
@@ -58,7 +58,7 @@ internal class EquipmentContainerTest {
 
     @Test
     internal fun currentEquipmentMirrorsNormalEquipment() {
-        val ec = object : EquipmentContainer() {}
+        val ec = object : EquipmentContainer(generateId()) {}
         val eq1 = object : Equipment("eq1") {}
         val eq2 = object : Equipment("eq2") {}
 
@@ -71,16 +71,16 @@ internal class EquipmentContainerTest {
 
     @Test
     internal fun normalFeeders() {
-        val fdr1 = Feeder()
-        val fdr2 = Feeder()
-        val fdr3 = Feeder()
-        val substation = Substation()
-        val lvFdr = LvFeeder()
+        val fdr1 = Feeder(generateId())
+        val fdr2 = Feeder(generateId())
+        val fdr3 = Feeder(generateId())
+        val substation = Substation(generateId())
+        val lvFdr = LvFeeder(generateId())
 
-        val eq1 = object : Equipment() {}.addContainer(fdr1).addContainer(fdr2).addContainer(substation)
-        val eq2 = object : Equipment() {}.addContainer(fdr2).addContainer(fdr3).addContainer(lvFdr)
+        val eq1 = object : Equipment(generateId()) {}.addContainer(fdr1).addContainer(fdr2).addContainer(substation)
+        val eq2 = object : Equipment(generateId()) {}.addContainer(fdr2).addContainer(fdr3).addContainer(lvFdr)
 
-        val equipmentContainer = object : EquipmentContainer() {}.addEquipment(eq1).addEquipment(eq2)
+        val equipmentContainer = object : EquipmentContainer(generateId()) {}.addEquipment(eq1).addEquipment(eq2)
 
         assertThat(equipmentContainer.normalFeeders(), containsInAnyOrder(fdr1, fdr2, fdr3))
         assertThat(equipmentContainer.currentFeeders(), empty())
@@ -88,16 +88,16 @@ internal class EquipmentContainerTest {
 
     @Test
     internal fun currentFeeders() {
-        val fdr1 = Feeder()
-        val fdr2 = Feeder()
-        val fdr3 = Feeder()
-        val substation = Substation()
-        val lvFdr = LvFeeder()
+        val fdr1 = Feeder(generateId())
+        val fdr2 = Feeder(generateId())
+        val fdr3 = Feeder(generateId())
+        val substation = Substation(generateId())
+        val lvFdr = LvFeeder(generateId())
 
-        val eq1 = object : Equipment() {}.addCurrentContainer(fdr1).addCurrentContainer(fdr2).addCurrentContainer(substation)
-        val eq2 = object : Equipment() {}.addCurrentContainer(fdr2).addCurrentContainer(fdr3).addCurrentContainer(lvFdr)
+        val eq1 = object : Equipment(generateId()) {}.addCurrentContainer(fdr1).addCurrentContainer(fdr2).addCurrentContainer(substation)
+        val eq2 = object : Equipment(generateId()) {}.addCurrentContainer(fdr2).addCurrentContainer(fdr3).addCurrentContainer(lvFdr)
 
-        val equipmentContainer = object : EquipmentContainer() {}.addEquipment(eq1).addEquipment(eq2)
+        val equipmentContainer = object : EquipmentContainer(generateId()) {}.addEquipment(eq1).addEquipment(eq2)
 
         assertThat(equipmentContainer.normalFeeders(), empty())
         assertThat(equipmentContainer.currentFeeders(), containsInAnyOrder(fdr1, fdr2, fdr3))

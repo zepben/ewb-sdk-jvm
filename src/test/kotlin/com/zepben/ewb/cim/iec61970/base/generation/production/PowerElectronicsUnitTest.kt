@@ -9,10 +9,12 @@
 package com.zepben.ewb.cim.iec61970.base.generation.production
 
 import com.zepben.ewb.cim.iec61970.base.wires.PowerElectronicsConnection
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.testutils.exception.ExpectException
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -24,14 +26,13 @@ internal class PowerElectronicsUnitTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(object : PowerElectronicsUnit() {}.mRID, not(equalTo("")))
         assertThat(object : PowerElectronicsUnit("id") {}.mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val powerElectronicsUnit = object : PowerElectronicsUnit() {}
-        val powerElectronicsConnection = PowerElectronicsConnection()
+        val powerElectronicsUnit = object : PowerElectronicsUnit(generateId()) {}
+        val powerElectronicsConnection = PowerElectronicsConnection(generateId())
 
         assertThat(powerElectronicsUnit.powerElectronicsConnection, nullValue())
         assertThat(powerElectronicsUnit.maxP, nullValue())
@@ -50,9 +51,9 @@ internal class PowerElectronicsUnitTest {
 
     @Test
     internal fun throwsOnReassignment() {
-        val powerElectronicsUnit = object : PowerElectronicsUnit() {}
-        val powerElectronicsConnection1 = PowerElectronicsConnection()
-        val powerElectronicsConnection2 = PowerElectronicsConnection()
+        val powerElectronicsUnit = object : PowerElectronicsUnit(generateId()) {}
+        val powerElectronicsConnection1 = PowerElectronicsConnection(generateId())
+        val powerElectronicsConnection2 = PowerElectronicsConnection(generateId())
 
         powerElectronicsUnit.apply { this.powerElectronicsConnection = powerElectronicsConnection1 }
         ExpectException.expect { powerElectronicsUnit.powerElectronicsConnection = powerElectronicsConnection2 }

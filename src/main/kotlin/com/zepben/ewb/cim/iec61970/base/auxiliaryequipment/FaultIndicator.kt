@@ -14,4 +14,4 @@ package com.zepben.ewb.cim.iec61970.base.auxiliaryequipment
  * assisting with the dispatch of crews to "most likely" part of the network (i.e. assists with determining circuit section
  * where the fault most likely happened).
  */
-class FaultIndicator @JvmOverloads constructor(mRID: String = "") : AuxiliaryEquipment(mRID)
+class FaultIndicator(mRID: String) : AuxiliaryEquipment(mRID)

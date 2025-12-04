@@ -13,4 +13,4 @@ import com.zepben.ewb.cim.iec61970.base.core.ConductingEquipment
 /**
  * A connection of energy generation or consumption on the power system model.
  */
-abstract class EnergyConnection(mRID: String = "") : ConductingEquipment(mRID)
+abstract class EnergyConnection(mRID: String) : ConductingEquipment(mRID)

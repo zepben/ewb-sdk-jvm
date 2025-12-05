@@ -2,6 +2,7 @@
 
 | Version                  | Released              |
 | ------------------------ | --------------------- |
+|[1.2.0](#120)| `05 December 2025` |
 | [1.1.0](#110)            | `30 September 2025`   |
 | [1.0.1](#101)            | `19 September 2025`   |
 | [1.0.0](#100)            | `27 August 2025`      |
@@ -41,6 +42,35 @@
 ---
 
 NOTE: This library is not yet stable, and breaking changes should be expected until a 1.0.0 release.
+
+---
+
+## [1.2.0]
+
+### Breaking Changes
+* Removed `Column.Nullable.NONE` in favour of setting the column nullability explicitly. Nullability left unspecified should default to nullable in every
+  ANSI-compliant implementation of SQL, so you likely can replace any use with `Column.Nullable.NULL`.
+* `CollectionDifference` is now abstract, with two descendants (`ValueCollectionDifference` and `ObjectCollectionDifference`) to allow detection of differences
+  in the object itself, and in having different references to other objects.
+
+### New Features
+* Added postgres support for `Column.Type`.
+* Added the following new `Column.Type` values:
+  * `UUID`
+  * `TIMESTAMP`
+  * `BYTES`
+* Added support for variants to `EwbDataFilePaths`. You can now provide a variant name to `EwbDataFilePaths.resolve` to generate a variant filename, and call
+  `getAvailableVariantsFor` to get the list of available variants for a specified date.
+
+### Enhancements
+* Added `addFromPb` methods to accept the top level protobuf messages for `CustomerIdentifiedObject`, `DiagramIdentifiedObject` and `NetworkIdentifiedObject`.
+* You can now register to delay post read processing in the database readers using the optional `delayAfterReadProcessing` parameter.
+
+### Fixes
+* None.
+
+### Notes
+* None.
 
 ---
 

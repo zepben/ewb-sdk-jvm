@@ -4,5 +4,5 @@ on: workflow_dispatch
 
 jobs:
   release:
-    uses: zepben/.github/.github/workflows/maven-lib-release-with-docs.yml@main
+    uses: zepben/.github/.github/workflows/maven-lib-release.yml@main
     secrets: inherit

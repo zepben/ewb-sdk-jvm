@@ -1,5 +1,5 @@
 # Zepben EWB SDK changelog
-## [1.2.0] - UNRELEASED
+## [1.2.0] - 2025-12-05
 ### Breaking Changes
 * Removed `Column.Nullable.NONE` in favour of setting the column nullability explicitly. Nullability left unspecified should default to nullable in every
   ANSI-compliant implementation of SQL, so you likely can replace any use with `Column.Nullable.NULL`.

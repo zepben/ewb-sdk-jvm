@@ -8,23 +8,24 @@
 
 package com.zepben.ewb.cim.iec61970.base.wires
 
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.testdata.fillFields
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 
 internal class SeriesCompensatorTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(SeriesCompensator().mRID, not(equalTo("")))
         assertThat(SeriesCompensator("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val seriesCompensator = SeriesCompensator()
+        val seriesCompensator = SeriesCompensator(generateId())
 
         assertThat(seriesCompensator.r, nullValue())
         assertThat(seriesCompensator.r0, nullValue())
@@ -45,9 +46,9 @@ internal class SeriesCompensatorTest {
 
     @Test
     internal fun varistorPresent() {
-        val seriesCompensator1 = SeriesCompensator()
-        val seriesCompensator2 = SeriesCompensator().apply { varistorRatedCurrent = 1 }
-        val seriesCompensator3 = SeriesCompensator().apply { varistorVoltageThreshold = 1 }
+        val seriesCompensator1 = SeriesCompensator(generateId())
+        val seriesCompensator2 = SeriesCompensator(generateId()).apply { varistorRatedCurrent = 1 }
+        val seriesCompensator3 = SeriesCompensator(generateId()).apply { varistorVoltageThreshold = 1 }
 
         assertThat(seriesCompensator1.varistorPresent, equalTo(false))
         assertThat(seriesCompensator2.varistorPresent, equalTo(true))

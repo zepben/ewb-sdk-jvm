@@ -13,6 +13,6 @@ package com.zepben.ewb.cim.iec61970.base.meas
  *
  * @property positiveFlowIn If true then this measurement is an active power, reactive power or current with the convention that a positive value measured at the Terminal means power is flowing into the related PowerSystemResource.
  */
-class Analog @JvmOverloads constructor(mRID: String = "") : Measurement(mRID) {
+class Analog(mRID: String) : Measurement(mRID) {
     var positiveFlowIn: Boolean? = null
 }

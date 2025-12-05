@@ -24,8 +24,9 @@ import java.lang.ref.WeakReference
  *                          The first terminal is the "starting point" for a two terminal branch.
  * @property normalFeederDirection Stores the direction of the feeder head relative to this [Terminal] in the normal state of the network.
  * @property currentFeederDirection Stores the direction of the feeder head relative to this [Terminal] in the current state of the network.
+ * @property connectivityNode The [ConnectivityNode] this [Terminal] is connected to, or `null` if this [Terminal] is disconnected.
  */
-class Terminal @JvmOverloads constructor(mRID: String = "") : AcDcTerminal(mRID) {
+class Terminal(mRID: String) : AcDcTerminal(mRID) {
 
     var conductingEquipment: ConductingEquipment? = null
         set(value) {

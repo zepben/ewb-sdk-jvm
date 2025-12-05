@@ -11,7 +11,6 @@ package com.zepben.ewb.cim.iec61970.base.meas
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -23,7 +22,6 @@ internal class IoPointTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(object : IoPoint() {}.mRID, not(equalTo("")))
         assertThat(object : IoPoint("id") {}.mRID, equalTo("id"))
     }
 

@@ -10,10 +10,12 @@ package com.zepben.ewb.cim.iec61970.base.generation.production
 
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.BatteryControl
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.BatteryControlMode
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.utils.PrivateCollectionValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -25,14 +27,13 @@ internal class BatteryUnitTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(BatteryUnit().mRID, not(equalTo("")))
         assertThat(BatteryUnit("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val batteryUnit = BatteryUnit()
-        val batteryControl = BatteryControl()
+        val batteryUnit = BatteryUnit(generateId())
+        val batteryControl = BatteryControl(generateId())
 
         assertThat(batteryUnit.batteryState, equalTo(BatteryStateKind.UNKNOWN))
         assertThat(batteryUnit.ratedE, nullValue())
@@ -66,8 +67,8 @@ internal class BatteryUnitTest {
 
     @Test
     internal fun getBatteryControlWithMode() {
-        val batteryUnit = BatteryUnit()
-        val batteryControl = BatteryControl()
+        val batteryUnit = BatteryUnit(generateId())
+        val batteryControl = BatteryControl(generateId())
 
         batteryUnit.addControl(batteryControl)
 

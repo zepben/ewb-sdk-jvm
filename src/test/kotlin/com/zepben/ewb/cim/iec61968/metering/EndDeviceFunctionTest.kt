@@ -8,9 +8,11 @@
 
 package com.zepben.ewb.cim.iec61968.metering
 
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -22,13 +24,12 @@ internal class EndDeviceFunctionTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(object : EndDeviceFunction() {}.mRID, not(equalTo("")))
         assertThat(object : EndDeviceFunction("id") {}.mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val endDeviceFunction = object : EndDeviceFunction() {}
+        val endDeviceFunction = object : EndDeviceFunction(generateId()) {}
 
         assertThat(endDeviceFunction.enabled, nullValue())
 

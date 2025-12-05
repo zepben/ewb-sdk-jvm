@@ -21,9 +21,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 
+import static com.zepben.ewb.services.common.testdata.FillFieldsCommonKt.generateId;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -133,11 +134,11 @@ class BaseServiceJavaTest {
         assertThat(service.contains(breaker1), equalTo(true));
 
         assertThat(service.contains("unknown"), equalTo(false));
-        assertThat(service.contains(new Breaker()), equalTo(false));
+        assertThat(service.contains(new Breaker(generateId())), equalTo(false));
     }
 
-    private <T extends IdentifiedObject> T create(BaseService baseService, Supplier<T> supplier) {
-        T it = supplier.get();
+    private <T extends IdentifiedObject> T create(BaseService baseService, Function<String, T> creator) {
+        T it = creator.apply(generateId());
         baseService.add(it);
         return it;
     }

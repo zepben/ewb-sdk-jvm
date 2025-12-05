@@ -13,12 +13,14 @@ import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 
 /**
  * Impedance and admittance parameters per unit length for n-wire unbalanced lines, in matrix form.
+ *
+ * @property data All data that belong to this conductor phase impedance.
  */
-class PerLengthPhaseImpedance @JvmOverloads constructor(mRID: String = "") : PerLengthImpedance(mRID) {
+class PerLengthPhaseImpedance(mRID: String) : PerLengthImpedance(mRID) {
 
-    private var _data: MutableList<com.zepben.ewb.cim.iec61970.base.wires.PhaseImpedanceData>? = null
+    private var _data: MutableList<PhaseImpedanceData>? = null
 
-    val data: List<com.zepben.ewb.cim.iec61970.base.wires.PhaseImpedanceData> get() = _data.asUnmodifiable()
+    val data: List<PhaseImpedanceData> get() = _data.asUnmodifiable()
 
     /**
      * Get the number of entries in the [PhaseImpedanceData] collection.
@@ -28,7 +30,7 @@ class PerLengthPhaseImpedance @JvmOverloads constructor(mRID: String = "") : Per
     /**
      * Get only the diagonal elements of the matrix, i.e toPhase == fromPhase.
      */
-    fun diagonal(): List<com.zepben.ewb.cim.iec61970.base.wires.PhaseImpedanceData>? = _data?.filter { it.toPhase == it.fromPhase }
+    fun diagonal(): List<PhaseImpedanceData>? = _data?.filter { it.toPhase == it.fromPhase }
 
     /**
      * Get the matrix entry for the corresponding to and from phases.
@@ -37,7 +39,7 @@ class PerLengthPhaseImpedance @JvmOverloads constructor(mRID: String = "") : Per
      * @param toPhase The "to" phase to lookup.
      * @return The matching [PhaseImpedanceData] or null if none was found.
      */
-    fun getData(fromPhase: SinglePhaseKind, toPhase: SinglePhaseKind): com.zepben.ewb.cim.iec61970.base.wires.PhaseImpedanceData? =
+    fun getData(fromPhase: SinglePhaseKind, toPhase: SinglePhaseKind): PhaseImpedanceData? =
         _data?.find { it.fromPhase == fromPhase && it.toPhase == toPhase }
 
     /**
@@ -45,7 +47,7 @@ class PerLengthPhaseImpedance @JvmOverloads constructor(mRID: String = "") : Per
      * @param phaseImpedanceData The [PhaseImpedanceData] to add
      * @return This [PerLengthPhaseImpedance] for fluent use.
      */
-    fun addData(phaseImpedanceData: com.zepben.ewb.cim.iec61970.base.wires.PhaseImpedanceData): PerLengthPhaseImpedance {
+    fun addData(phaseImpedanceData: PhaseImpedanceData): PerLengthPhaseImpedance {
         require(
             _data.isNullOrEmpty()
                 || _data?.none { pid -> pid.fromPhase == phaseImpedanceData.fromPhase && pid.toPhase == phaseImpedanceData.toPhase } == true) {
@@ -65,7 +67,7 @@ class PerLengthPhaseImpedance @JvmOverloads constructor(mRID: String = "") : Per
      * @param phaseImpedanceData The [PhaseImpedanceData] to remove.
      * @return true if the [phaseImpedanceData] was removed.
      */
-    fun removeData(phaseImpedanceData: com.zepben.ewb.cim.iec61970.base.wires.PhaseImpedanceData): Boolean {
+    fun removeData(phaseImpedanceData: PhaseImpedanceData): Boolean {
         val ret = _data?.remove(phaseImpedanceData) == true
         if (_data.isNullOrEmpty()) _data = null
         return ret

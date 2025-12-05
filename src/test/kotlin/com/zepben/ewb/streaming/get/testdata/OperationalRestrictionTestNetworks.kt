@@ -12,6 +12,7 @@ import com.zepben.ewb.cim.iec61968.common.Location
 import com.zepben.ewb.cim.iec61968.common.PositionPoint
 import com.zepben.ewb.cim.iec61970.base.core.PhaseCode
 import com.zepben.ewb.cim.iec61970.base.core.PowerSystemResource
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.testdata.*
 
@@ -54,7 +55,7 @@ object OperationalRestrictionTestNetworks {
     }
 
     private fun addLocation(networkService: NetworkService, psr: PowerSystemResource, coords: List<Double>) {
-        Location().apply {
+        Location(generateId()).apply {
             for (i in coords.indices step 2)
                 addPoint(PositionPoint(coords[i], coords[i + 1]))
         }.also {

@@ -15,7 +15,7 @@ import com.zepben.ewb.services.common.extensions.validateReference
 /**
  * Connectivity nodes are points where terminals of AC conducting equipment are connected together with zero impedance.
  */
-class ConnectivityNode @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mRID) {
+class ConnectivityNode(mRID: String) : IdentifiedObject(mRID) {
 
     private val _terminals: MutableList<Terminal> = mutableListOf()
 

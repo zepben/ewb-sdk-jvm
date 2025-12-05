@@ -18,7 +18,7 @@ import com.zepben.ewb.services.network.ResistanceReactance
 /**
  * Set of power transformer data, from an equipment library.
  */
-class PowerTransformerInfo @JvmOverloads constructor(mRID: String = "") : AssetInfo(mRID) {
+class PowerTransformerInfo(mRID: String) : AssetInfo(mRID) {
 
     private var _transformerTankInfos: MutableList<TransformerTankInfo>? = null
 

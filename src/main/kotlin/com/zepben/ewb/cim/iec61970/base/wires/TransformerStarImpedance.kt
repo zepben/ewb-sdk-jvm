@@ -25,7 +25,7 @@ import com.zepben.ewb.services.network.mergeIfIncomplete
  * @property x0 Zero sequence series reactance of the transformer end in ohms.
  * @property transformerEndInfo Transformer end datasheet used to calculate this transformer star impedance.
  */
-class TransformerStarImpedance @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mRID) {
+class TransformerStarImpedance(mRID: String) : IdentifiedObject(mRID) {
 
     var r: Double? = null
     var r0: Double? = null

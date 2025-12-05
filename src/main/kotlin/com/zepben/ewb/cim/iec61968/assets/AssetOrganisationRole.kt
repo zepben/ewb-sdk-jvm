@@ -13,4 +13,4 @@ import com.zepben.ewb.cim.iec61968.common.OrganisationRole
 /**
  * Role an organisation plays with respect to asset.
  */
-abstract class AssetOrganisationRole(mRID: String = "") : OrganisationRole(mRID)
+abstract class AssetOrganisationRole(mRID: String) : OrganisationRole(mRID)

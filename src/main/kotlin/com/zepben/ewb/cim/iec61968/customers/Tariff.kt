@@ -16,4 +16,4 @@ import com.zepben.ewb.cim.iec61968.common.Document
  * unique number within the state or province. For rate schedules it is frequently allocated
  * by the affiliated Public utilities commission (PUC).
  */
-class Tariff @JvmOverloads constructor(mRID: String = "") : Document(mRID)
+class Tariff(mRID: String) : Document(mRID)

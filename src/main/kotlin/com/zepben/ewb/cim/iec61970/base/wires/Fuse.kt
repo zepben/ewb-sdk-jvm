@@ -16,7 +16,7 @@ import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelayFun
  *
  * @property function The function implemented by this Fuse
  */
-class Fuse @JvmOverloads constructor(mRID: String = "") : Switch(mRID) {
+class Fuse(mRID: String) : Switch(mRID) {
 
     var function: ProtectionRelayFunction? = null
 

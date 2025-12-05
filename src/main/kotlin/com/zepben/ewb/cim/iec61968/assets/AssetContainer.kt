@@ -11,4 +11,4 @@ package com.zepben.ewb.cim.iec61968.assets
 /**
  * Asset that is aggregation of other assets such as conductors, transformers, switchgear, land, fences, buildings, equipment, vehicles, etc.
  */
-abstract class AssetContainer(mRID: String = "") : Asset(mRID)
+abstract class AssetContainer(mRID: String) : Asset(mRID)

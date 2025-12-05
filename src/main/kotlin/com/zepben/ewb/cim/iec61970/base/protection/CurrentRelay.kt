@@ -17,7 +17,7 @@ import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelayFun
  * @property inverseTimeFlag Set true if the current relay has inverse time characteristic.
  * @property timeDelay1 Inverse time delay number 1 for current limit number 1 in seconds.
  */
-class CurrentRelay @JvmOverloads constructor(mRID: String = "") : ProtectionRelayFunction(mRID) {
+class CurrentRelay(mRID: String) : ProtectionRelayFunction(mRID) {
 
     var currentLimit1: Double? = null
     var inverseTimeFlag: Boolean? = null

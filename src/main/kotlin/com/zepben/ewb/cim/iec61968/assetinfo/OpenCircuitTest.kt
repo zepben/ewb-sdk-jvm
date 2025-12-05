@@ -18,7 +18,7 @@ package com.zepben.ewb.cim.iec61968.assetinfo
  * @property openEndVoltage Voltage measured at the open-circuited end, with the energised end set to rated voltage and all other ends open in volts.
  * @property phaseShift Phase shift measured at the open end with the energised end set to rated voltage and all other ends open in angle degrees.
  */
-class OpenCircuitTest @JvmOverloads constructor(mRID: String = "") : TransformerTest(mRID) {
+class OpenCircuitTest(mRID: String) : TransformerTest(mRID) {
 
     var energisedEndStep: Int? = null
     var energisedEndVoltage: Int? = null

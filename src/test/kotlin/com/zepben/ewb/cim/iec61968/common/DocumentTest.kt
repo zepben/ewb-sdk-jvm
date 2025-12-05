@@ -8,9 +8,11 @@
 
 package com.zepben.ewb.cim.iec61968.common
 
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import java.time.Instant
@@ -23,13 +25,12 @@ internal class DocumentTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(object : Document() {}.mRID, not(equalTo("")))
         assertThat(object : Document("id") {}.mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val document = object : Document() {}
+        val document = object : Document(generateId()) {}
 
         assertThat(document.title, nullValue())
         assertThat(document.createdDateTime, nullValue())

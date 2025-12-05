@@ -40,7 +40,7 @@ import kotlin.math.sqrt
  * @property energisedEndOpenCircuitTests All open-circuit test measurements in which this transformer end was excited.
 
  */
-class TransformerEndInfo @JvmOverloads constructor(mRID: String = "") : AssetInfo(mRID) {
+class TransformerEndInfo(mRID: String) : AssetInfo(mRID) {
 
     var connectionKind: WindingConnection = WindingConnection.UNKNOWN
     var emergencyS: Int? = null

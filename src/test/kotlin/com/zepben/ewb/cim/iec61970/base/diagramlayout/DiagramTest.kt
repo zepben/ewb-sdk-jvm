@@ -9,12 +9,12 @@
 package com.zepben.ewb.cim.iec61970.base.diagramlayout
 
 import com.zepben.ewb.services.common.extensions.typeNameAndMRID
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.utils.PrivateCollectionValidator
 import com.zepben.testutils.exception.ExpectException
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -26,13 +26,12 @@ internal class DiagramTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(Diagram().mRID, not(equalTo("")))
         assertThat(Diagram("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val diagram = Diagram()
+        val diagram = Diagram(generateId())
 
         assertThat(diagram.diagramStyle, equalTo(DiagramStyle.SCHEMATIC))
         assertThat(diagram.orientationKind, equalTo(OrientationKind.POSITIVE))
@@ -46,8 +45,8 @@ internal class DiagramTest {
 
     @Test
     internal fun assignsDiagramToObjectsIfMissing() {
-        val diagram = Diagram()
-        val diagramObject = DiagramObject()
+        val diagram = Diagram(generateId())
+        val diagramObject = DiagramObject(generateId())
 
         diagram.addDiagramObject(diagramObject)
         assertThat(diagramObject.diagram, equalTo(diagram))
@@ -55,9 +54,9 @@ internal class DiagramTest {
 
     @Test
     internal fun rejectsObjectWithWrongDiagram() {
-        val d1 = Diagram()
-        val d2 = Diagram()
-        val obj = DiagramObject().apply { diagram = d2 }
+        val d1 = Diagram(generateId())
+        val d2 = Diagram(generateId())
+        val obj = DiagramObject(generateId()).apply { diagram = d2 }
 
         ExpectException.expect { d1.addDiagramObject(obj) }
             .toThrow<IllegalArgumentException>()

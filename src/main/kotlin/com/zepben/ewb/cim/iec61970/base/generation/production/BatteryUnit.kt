@@ -24,7 +24,7 @@ import com.zepben.ewb.services.common.extensions.validateReference
  * @property storedE Amount of energy currently stored in watt-hours (Wh). The attribute shall be a positive value or zero and lower than [BatteryUnit.ratedE].
  * @property controls [ZBEX] The collection of [BatteryControl] controlling this [BatteryUnit]. The returned collection is read only.
  */
-class BatteryUnit @JvmOverloads constructor(mRID: String = "") : PowerElectronicsUnit(mRID) {
+class BatteryUnit(mRID: String) : PowerElectronicsUnit(mRID) {
 
     var batteryState: BatteryStateKind = BatteryStateKind.UNKNOWN
     var ratedE: Long? = null

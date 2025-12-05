@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.cim.extensions.iec61968.assetinfo
 
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.testdata.fillFields
 import com.zepben.ewb.utils.PrivateCollectionValidator
@@ -19,13 +20,12 @@ internal class RelayInfoTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(RelayInfo().mRID, not(equalTo("")))
         assertThat(RelayInfo("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val relayInfo = RelayInfo()
+        val relayInfo = RelayInfo(generateId())
 
         assertThat(relayInfo.curveSetting, nullValue())
         assertThat(relayInfo.recloseFast, nullValue())

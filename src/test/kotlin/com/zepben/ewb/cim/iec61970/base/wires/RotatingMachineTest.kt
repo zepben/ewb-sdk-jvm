@@ -8,12 +8,12 @@
 
 package com.zepben.ewb.cim.iec61970.base.wires
 
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.testdata.fillFields
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -25,13 +25,12 @@ internal class RotatingMachineTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(object : RotatingMachine() {}.mRID, not(equalTo("")))
         assertThat(object : RotatingMachine("id") {}.mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val rotatingMachine = object : RotatingMachine() {}
+        val rotatingMachine = object : RotatingMachine(generateId()) {}
 
         assertThat(rotatingMachine.ratedPowerFactor, equalTo(null))
         assertThat(rotatingMachine.ratedS, equalTo(null))

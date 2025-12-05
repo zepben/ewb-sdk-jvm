@@ -20,7 +20,7 @@ import com.zepben.ewb.services.common.extensions.validateReference
  * @property numEndDevices The number of end devices associated with this customer.
  * @property specialNeed A special service need such as life support, hospitals, etc.
  */
-class Customer @JvmOverloads constructor(mRID: String = "") : OrganisationRole(mRID) {
+class Customer(mRID: String) : OrganisationRole(mRID) {
 
     var kind: CustomerKind = CustomerKind.UNKNOWN
     var numEndDevices: Int? = null

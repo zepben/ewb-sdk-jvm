@@ -15,7 +15,7 @@ package com.zepben.ewb.cim.iec61970.base.wires
  *
  * @property inTransitTime The transition time from open to close in seconds.
  */
-class Breaker @JvmOverloads constructor(mRID: String = "") : ProtectedSwitch(mRID) {
+class Breaker(mRID: String) : ProtectedSwitch(mRID) {
 
     var inTransitTime: Double? = null
 

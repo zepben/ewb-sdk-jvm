@@ -15,7 +15,7 @@ import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 /**
  * The Curve class is a multipurpose functional relationship between an independent variable (X-axis) and dependent (Y-axis) variables.
  */
-abstract class Curve @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mRID) {
+abstract class Curve(mRID: String) : IdentifiedObject(mRID) {
 
     private var _data: MutableList<CurveData>? = null
 

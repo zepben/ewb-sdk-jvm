@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.cim.iec61970.base.wires
 
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.utils.PrivateCollectionValidator
 import com.zepben.ewb.utils.PrivateCollectionValidator.DuplicateBehaviour
 import com.zepben.testutils.junit.SystemLogExtension
@@ -24,7 +25,6 @@ internal class PerLengthPhaseImpedanceTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(PerLengthPhaseImpedance().mRID, not(equalTo("")))
         assertThat(PerLengthPhaseImpedance("id").mRID, equalTo("id"))
     }
 
@@ -59,7 +59,7 @@ internal class PerLengthPhaseImpedanceTest {
         val pid2 = PhaseImpedanceData(SinglePhaseKind.B, SinglePhaseKind.B)
         val pid3 = PhaseImpedanceData(SinglePhaseKind.C, SinglePhaseKind.C)
 
-        PerLengthPhaseImpedance().apply {
+        PerLengthPhaseImpedance(generateId()).apply {
             addData(pi1)
             addData(pi2)
             addData(pi3)

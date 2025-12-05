@@ -23,7 +23,7 @@ import com.zepben.ewb.services.common.extensions.validateReference
  * @property normalHeadTerminal [ZBEX] The normal head terminal of this LV feeder, typically the LV terminal of a distribution substation.
  */
 @ZBEX
-class LvFeeder @JvmOverloads constructor(mRID: String = "") : EquipmentContainer(mRID) {
+class LvFeeder(mRID: String) : EquipmentContainer(mRID) {
 
     @ZBEX
     var normalHeadTerminal: Terminal? = null

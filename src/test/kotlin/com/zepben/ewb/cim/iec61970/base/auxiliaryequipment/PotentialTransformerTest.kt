@@ -9,6 +9,7 @@
 package com.zepben.ewb.cim.iec61970.base.auxiliaryequipment
 
 import com.zepben.ewb.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.testdata.fillFields
 import com.zepben.testutils.junit.SystemLogExtension
@@ -25,13 +26,12 @@ internal class PotentialTransformerTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(CurrentTransformer().mRID, not(equalTo("")))
         assertThat(CurrentTransformer("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val potentialTransformer = PotentialTransformer()
+        val potentialTransformer = PotentialTransformer(generateId())
 
         assertThat(potentialTransformer.assetInfo, nullValue())
         assertThat(potentialTransformer.type, equalTo(PotentialTransformerKind.UNKNOWN))

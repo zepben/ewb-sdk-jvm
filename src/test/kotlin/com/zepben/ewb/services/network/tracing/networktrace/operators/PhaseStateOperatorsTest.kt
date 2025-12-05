@@ -9,6 +9,7 @@
 package com.zepben.ewb.services.network.tracing.networktrace.operators
 
 import com.zepben.ewb.cim.iec61970.base.core.Terminal
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.tracing.phases.PhaseStatus
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.sameInstance
@@ -24,7 +25,7 @@ class PhaseStateOperatorsTest {
     @Test
     fun phaseStatus() {
         fun test(operators: PhaseStateOperators, phasesProp: KProperty1<Terminal, PhaseStatus>) {
-            val terminal = Terminal()
+            val terminal = Terminal(generateId())
             val result = operators.phaseStatus(terminal)
             assertThat(result, sameInstance(phasesProp.get(terminal)))
         }

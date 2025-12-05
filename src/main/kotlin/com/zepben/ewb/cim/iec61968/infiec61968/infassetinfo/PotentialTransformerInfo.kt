@@ -21,7 +21,7 @@ import com.zepben.ewb.cim.iec61968.infiec61968.infcommon.Ratio
  * @property ratedVoltage Rated voltage on the primary side in Volts.
  * @property secondaryRatio Ratio for the secondary winding tap changer (denominator).
  */
-class PotentialTransformerInfo @JvmOverloads constructor(mRID: String = "") : AssetInfo(mRID) {
+class PotentialTransformerInfo(mRID: String) : AssetInfo(mRID) {
 
     var accuracyClass: String? = null
     var nominalRatio: Ratio? = null

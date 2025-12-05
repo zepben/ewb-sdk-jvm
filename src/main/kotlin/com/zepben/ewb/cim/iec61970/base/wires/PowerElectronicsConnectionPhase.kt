@@ -21,7 +21,7 @@ import com.zepben.ewb.cim.iec61970.base.core.PowerSystemResource
  *                 logical non-neutral phase.
  * @property q Reactive power injection. Load sign convention is used, i.e. positive sign means flow into the equipment from the network.
  */
-class PowerElectronicsConnectionPhase @JvmOverloads constructor(mRID: String = "") : PowerSystemResource(mRID) {
+class PowerElectronicsConnectionPhase(mRID: String) : PowerSystemResource(mRID) {
 
     var powerElectronicsConnection: PowerElectronicsConnection? = null
         set(value) {

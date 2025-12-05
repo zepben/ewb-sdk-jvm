@@ -11,4 +11,4 @@ package com.zepben.ewb.cim.iec61970.base.wires
 /**
  * A mechanical switching device capable of making, carrying, and breaking currents under normal operating conditions.
  */
-class LoadBreakSwitch @JvmOverloads constructor(mRID: String = "") : ProtectedSwitch(mRID)
+class LoadBreakSwitch(mRID: String) : ProtectedSwitch(mRID)

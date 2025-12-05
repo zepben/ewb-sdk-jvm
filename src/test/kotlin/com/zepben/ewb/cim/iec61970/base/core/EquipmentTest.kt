@@ -12,6 +12,7 @@ import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
 import com.zepben.ewb.cim.iec61968.metering.UsagePoint
 import com.zepben.ewb.cim.iec61968.operations.OperationalRestriction
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.testdata.fillFields
 import com.zepben.ewb.utils.PrivateCollectionValidator
@@ -30,13 +31,12 @@ internal class EquipmentTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(object : Equipment() {}.mRID, not(equalTo("")))
         assertThat(object : Equipment("id") {}.mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val equipment = object : Equipment() {}
+        val equipment = object : Equipment(generateId()) {}
 
         assertThat(equipment.inService, equalTo(true))
         assertThat(equipment.normallyInService, equalTo(true))
@@ -52,7 +52,7 @@ internal class EquipmentTest {
     @Test
     internal fun equipmentContainers() {
         PrivateCollectionValidator.validateUnordered(
-            { object : Equipment() {} },
+            { id -> object : Equipment(id) {} },
             { id -> object : EquipmentContainer(id) {} },
             Equipment::containers,
             Equipment::numContainers,
@@ -66,7 +66,7 @@ internal class EquipmentTest {
     @Test
     internal fun usagePoints() {
         PrivateCollectionValidator.validateUnordered(
-            { object : Equipment() {} },
+            { id -> object : Equipment(id) {} },
             ::UsagePoint,
             Equipment::usagePoints,
             Equipment::numUsagePoints,
@@ -80,7 +80,7 @@ internal class EquipmentTest {
     @Test
     internal fun operationalRestrictions() {
         PrivateCollectionValidator.validateUnordered(
-            { object : Equipment() {} },
+            { id -> object : Equipment(id) {} },
             ::OperationalRestriction,
             Equipment::operationalRestrictions,
             Equipment::numOperationalRestrictions,
@@ -94,7 +94,7 @@ internal class EquipmentTest {
     @Test
     internal fun currentContainers() {
         PrivateCollectionValidator.validateUnordered(
-            { object : Equipment() {} },
+            { id -> object : Equipment(id) {} },
             { id -> object : EquipmentContainer(id) {} },
             Equipment::currentContainers,
             Equipment::numCurrentContainers,
@@ -107,19 +107,19 @@ internal class EquipmentTest {
 
     @Test
     internal fun equipmentContainerFilters() {
-        val equipment = object : Equipment() {}
-        val site1 = Site()
-        val site2 = Site()
-        val feeder1 = Feeder()
-        val feeder2 = Feeder()
-        val feeder3 = Feeder()
-        val feeder4 = Feeder()
-        val lvFeeder1 = LvFeeder()
-        val lvFeeder2 = LvFeeder()
-        val lvFeeder3 = LvFeeder()
-        val lvFeeder4 = LvFeeder()
-        val substation1 = Substation()
-        val substation2 = Substation()
+        val equipment = object : Equipment(generateId()) {}
+        val site1 = Site(generateId())
+        val site2 = Site(generateId())
+        val feeder1 = Feeder(generateId())
+        val feeder2 = Feeder(generateId())
+        val feeder3 = Feeder(generateId())
+        val feeder4 = Feeder(generateId())
+        val lvFeeder1 = LvFeeder(generateId())
+        val lvFeeder2 = LvFeeder(generateId())
+        val lvFeeder3 = LvFeeder(generateId())
+        val lvFeeder4 = LvFeeder(generateId())
+        val substation1 = Substation(generateId())
+        val substation2 = Substation(generateId())
 
         equipment.addContainer(site1)
         equipment.addContainer(site2)

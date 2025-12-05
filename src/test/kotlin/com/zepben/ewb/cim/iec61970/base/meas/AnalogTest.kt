@@ -8,11 +8,13 @@
 
 package com.zepben.ewb.cim.iec61970.base.meas
 
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.testdata.fillFields
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -23,13 +25,12 @@ internal class AnalogTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(Analog().mRID, not(equalTo("")))
         assertThat(Analog("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val analog = Analog()
+        val analog = Analog(generateId())
         assertThat(analog.positiveFlowIn, nullValue())
 
         analog.fillFields(NetworkService())

@@ -8,10 +8,12 @@
 
 package com.zepben.ewb.cim.iec61968.common
 
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.utils.PrivateCollectionValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -23,13 +25,12 @@ internal class LocationTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(Location().mRID, not(equalTo("")))
         assertThat(Location("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val location = Location()
+        val location = Location(generateId())
         val mainAddress = StreetAddress()
 
         assertThat(location.mainAddress, nullValue())

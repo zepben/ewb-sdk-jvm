@@ -58,7 +58,7 @@ import com.zepben.ewb.services.common.extensions.*
  * corresponding [TransformerEnd]s cannot be associated directly with a [TransformerStarImpedance], as the existence of [assetInfo] indicates that impedance
  * values are calculated from the data sheet information.
  */
-class PowerTransformer @JvmOverloads constructor(mRID: String = "") : ConductingEquipment(mRID) {
+class PowerTransformer(mRID: String) : ConductingEquipment(mRID) {
 
     val primaryVoltage: Int?
         get() = if (ends.isEmpty()) baseVoltage?.nominalVoltage else ends[0].baseVoltage?.nominalVoltage ?: ends[0].ratedU
@@ -170,12 +170,23 @@ class PowerTransformer @JvmOverloads constructor(mRID: String = "") : Conducting
         return this
     }
 
+    /**
+     * Remove a [PowerTransformerEnd] from this [PowerTransformer].
+     *
+     * @param end The [PowerTransformerEnd] to remove.
+     * @return true if [end] is removed from the collection.
+     */
     fun removeEnd(end: PowerTransformerEnd): Boolean {
         val ret = _powerTransformerEnds.safeRemove(end)
         if (_powerTransformerEnds.isNullOrEmpty()) _powerTransformerEnds = null
         return ret
     }
 
+    /**
+     * Clear all [PowerTransformerEnd]'s from this [PowerTransformer].
+     *
+     * @return This [PowerTransformer] for fluent use.
+     */
     fun clearEnds(): PowerTransformer {
         _powerTransformerEnds = null
         return this

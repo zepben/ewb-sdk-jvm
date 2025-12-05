@@ -26,7 +26,7 @@ import com.zepben.ewb.services.common.extensions.*
  * @property cuts Cuts applied to the line segment.
  * @property clamps The clamps connected to the line segment.
  */
-class AcLineSegment @JvmOverloads constructor(mRID: String = "") : Conductor(mRID) {
+class AcLineSegment(mRID: String) : Conductor(mRID) {
 
     override val maxTerminals: Int get() = 2
 

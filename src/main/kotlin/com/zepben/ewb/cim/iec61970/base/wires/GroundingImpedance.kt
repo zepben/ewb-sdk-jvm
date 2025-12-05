@@ -13,7 +13,7 @@ package com.zepben.ewb.cim.iec61970.base.wires
  *
  * @property x Reactance of device in ohms.
  */
-class GroundingImpedance @JvmOverloads constructor(mRID: String = "") : EarthFaultCompensator(mRID) {
+class GroundingImpedance(mRID: String) : EarthFaultCompensator(mRID) {
 
     var x: Double? = null
 

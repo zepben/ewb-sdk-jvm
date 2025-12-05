@@ -19,7 +19,7 @@ import com.zepben.ewb.services.common.extensions.validateReference
  * customer classification, site characteristics, classification (i.e. fee price structure, deposit price
  * structure, electric service price structure, etc.) and accounting requirements.
  */
-class PricingStructure @JvmOverloads constructor(mRID: String = "") : Document(mRID) {
+class PricingStructure(mRID: String) : Document(mRID) {
 
     private var _tariffs: MutableList<Tariff>? = null
 
@@ -41,6 +41,12 @@ class PricingStructure @JvmOverloads constructor(mRID: String = "") : Document(m
      */
     fun getTariff(mRID: String): Tariff? = _tariffs?.getByMRID(mRID)
 
+    /**
+     * Add a [Tariff] to this [PricingStructure].
+     *
+     * @param tariff The [Tariff] to add.
+     * @return This [PricingStructure] for fluent use.
+     */
     fun addTariff(tariff: Tariff): PricingStructure {
         if (validateReference(tariff, ::getTariff, "A Tariff"))
             return this
@@ -51,12 +57,23 @@ class PricingStructure @JvmOverloads constructor(mRID: String = "") : Document(m
         return this
     }
 
+    /**
+     * Remove a [Tariff] from this [PricingStructure].
+     *
+     * @param tariff The [Tariff] to remove.
+     * @return true if [tariff] is removed from the collection.
+     */
     fun removeTariff(tariff: Tariff): Boolean {
         val ret = _tariffs?.remove(tariff) == true
         if (_tariffs.isNullOrEmpty()) _tariffs = null
         return ret
     }
 
+    /**
+     * Clear all [Tariff]'s from this [PricingStructure].
+     *
+     * @return This [PricingStructure] for fluent use.
+     */
     fun clearTariffs(): PricingStructure {
         _tariffs = null
         return this

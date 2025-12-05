@@ -11,7 +11,6 @@ package com.zepben.ewb.cim.iec61968.assetinfo
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -23,7 +22,6 @@ internal class CableInfoTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(CableInfo().mRID, not(equalTo("")))
         assertThat(CableInfo("id").mRID, equalTo("id"))
     }
 

@@ -10,11 +10,13 @@ package com.zepben.ewb.cim.iec61970.base.core
 
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
 import com.zepben.ewb.cim.iec61970.base.wires.PowerTransformer
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.utils.PrivateCollectionValidator
 import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -24,18 +26,17 @@ internal class FeederTest {
     @RegisterExtension
     val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
-    private val feeder = Feeder()
+    private val feeder = Feeder(generateId())
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(Feeder().mRID, not(equalTo("")))
         assertThat(Feeder("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val terminal = Terminal()
-        val substation = Substation()
+        val terminal = Terminal(generateId())
+        val substation = Substation(generateId())
 
         assertThat(feeder.normalHeadTerminal, nullValue())
         assertThat(feeder.normalEnergizingSubstation, nullValue())
@@ -93,8 +94,8 @@ internal class FeederTest {
 
     @Test
     internal fun `can set feeder head terminal on feeder without equipment`() {
-        val terminal = Terminal()
-        val terminal2 = Terminal()
+        val terminal = Terminal(generateId())
+        val terminal2 = Terminal(generateId())
 
         feeder.normalHeadTerminal = terminal
         assertThat(feeder.normalHeadTerminal, equalTo(terminal))
@@ -105,9 +106,9 @@ internal class FeederTest {
 
     @Test
     internal fun `can set feeder head terminal on feeder with equipment but no head terminal`() {
-        val terminal = Terminal()
+        val terminal = Terminal(generateId())
 
-        feeder.addEquipment(PowerTransformer())
+        feeder.addEquipment(PowerTransformer(generateId()))
         feeder.normalHeadTerminal = terminal
 
         assertThat(feeder.normalHeadTerminal, equalTo(terminal))
@@ -115,9 +116,9 @@ internal class FeederTest {
 
     @Test
     internal fun `can set feeder head terminal on feeder with current equipment but no head terminal`() {
-        val terminal = Terminal()
+        val terminal = Terminal(generateId())
 
-        feeder.addCurrentEquipment(PowerTransformer())
+        feeder.addCurrentEquipment(PowerTransformer(generateId()))
         feeder.normalHeadTerminal = terminal
 
         assertThat(feeder.normalHeadTerminal, equalTo(terminal))
@@ -126,22 +127,22 @@ internal class FeederTest {
     @Test
     internal fun `cannot set feeder head terminal on feeder with equipment and head terminal assigned`() {
         feeder.apply {
-            normalHeadTerminal = Terminal()
-            addEquipment(PowerTransformer())
+            normalHeadTerminal = Terminal(generateId())
+            addEquipment(PowerTransformer(generateId()))
         }
 
-        expect { feeder.normalHeadTerminal = Terminal() }.toThrowAny()
+        expect { feeder.normalHeadTerminal = Terminal(generateId()) }.toThrowAny()
             .withMessage("Feeder ${feeder.mRID} has equipment assigned to it. Cannot update normalHeadTerminal on a feeder with equipment assigned.")
     }
 
     @Test
     internal fun `cannot set feeder head terminal on feeder with current equipment and head terminal assigned`() {
         feeder.apply {
-            normalHeadTerminal = Terminal()
-            addCurrentEquipment(PowerTransformer())
+            normalHeadTerminal = Terminal(generateId())
+            addCurrentEquipment(PowerTransformer(generateId()))
         }
 
-        expect { feeder.normalHeadTerminal = Terminal() }.toThrowAny()
+        expect { feeder.normalHeadTerminal = Terminal(generateId()) }.toThrowAny()
             .withMessage("Feeder ${feeder.mRID} has equipment assigned to it. Cannot update normalHeadTerminal on a feeder with equipment assigned.")
     }
 

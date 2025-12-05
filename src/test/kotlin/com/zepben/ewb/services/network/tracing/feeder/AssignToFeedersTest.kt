@@ -19,6 +19,7 @@ import com.zepben.ewb.cim.iec61970.base.generation.production.PhotoVoltaicUnit
 import com.zepben.ewb.cim.iec61970.base.protection.CurrentRelay
 import com.zepben.ewb.cim.iec61970.base.wires.Junction
 import com.zepben.ewb.cim.iec61970.base.wires.ProtectedSwitch
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.getT
 import com.zepben.ewb.services.network.testdata.*
 import com.zepben.ewb.services.network.tracing.networktrace.operators.NetworkStateOperators
@@ -35,8 +36,8 @@ internal class AssignToFeedersTest {
     @RegisterExtension
     val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
-    val hvBaseVoltage = BaseVoltage().apply { nominalVoltage = 11000 }
-    val lvBaseVoltage = BaseVoltage().apply { nominalVoltage = 400 }
+    val hvBaseVoltage = BaseVoltage(generateId()).apply { nominalVoltage = 11000 }
+    val lvBaseVoltage = BaseVoltage(generateId()).apply { nominalVoltage = 400 }
 
     private val assignToFeeders = AssignToFeeders(debugLogger = null)
 

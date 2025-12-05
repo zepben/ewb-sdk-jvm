@@ -9,6 +9,7 @@
 package com.zepben.ewb.cim.iec61970.base.wires
 
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelayFunction
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.testdata.fillFields
 import com.zepben.testutils.junit.SystemLogExtension
@@ -25,13 +26,12 @@ internal class FuseTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(Fuse().mRID, not(equalTo("")))
         assertThat(Fuse("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val fuse = Fuse()
+        val fuse = Fuse(generateId())
 
         assertThat(fuse.function, nullValue())
 

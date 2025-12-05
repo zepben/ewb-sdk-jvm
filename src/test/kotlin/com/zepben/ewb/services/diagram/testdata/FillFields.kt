@@ -11,6 +11,7 @@ package com.zepben.ewb.services.diagram.testdata
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.diagramlayout.*
 import com.zepben.ewb.services.common.testdata.fillFieldsCommon
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.diagram.DiagramService
 
 // ################################
@@ -24,7 +25,7 @@ fun Diagram.fillFields(service: DiagramService, includeRuntime: Boolean = true):
     orientationKind = OrientationKind.NEGATIVE
 
     for (i in 0..1)
-        addDiagramObject(DiagramObject().also { service.add(it) })
+        addDiagramObject(DiagramObject(generateId()).also { service.add(it) })
 
     return this
 }
@@ -32,7 +33,7 @@ fun Diagram.fillFields(service: DiagramService, includeRuntime: Boolean = true):
 fun DiagramObject.fillFields(service: DiagramService, includeRuntime: Boolean = true): DiagramObject {
     (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
 
-    diagram = Diagram().also { service.add(it) }
+    diagram = Diagram(generateId()).also { service.add(it) }
     diagram?.addDiagramObject(this)
 
     identifiedObjectMRID = "io_mrid"

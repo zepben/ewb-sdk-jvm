@@ -13,7 +13,6 @@ import com.zepben.ewb.utils.PrivateCollectionValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -25,7 +24,6 @@ internal class OperationalRestrictionTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(OperationalRestriction().mRID, not(equalTo("")))
         assertThat(OperationalRestriction("id").mRID, equalTo("id"))
     }
 

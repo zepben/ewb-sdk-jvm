@@ -21,7 +21,7 @@ import com.zepben.ewb.services.common.extensions.validateReference
  *
  * @property relayFunctions [ZBEX] ]The relay functions influenced by this [Sensor].
  */
-abstract class Sensor(mRID: String = "") : AuxiliaryEquipment(mRID) {
+abstract class Sensor(mRID: String) : AuxiliaryEquipment(mRID) {
 
     private var _relayFunctions: MutableList<ProtectionRelayFunction>? = null
 

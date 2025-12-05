@@ -12,11 +12,13 @@ import com.zepben.ewb.cim.iec61970.base.core.Equipment
 import com.zepben.ewb.cim.iec61970.base.core.Feeder
 import com.zepben.ewb.cim.iec61970.base.core.Terminal
 import com.zepben.ewb.cim.iec61970.base.wires.PowerTransformer
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.utils.PrivateCollectionValidator
 import com.zepben.testutils.exception.ExpectException
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -26,17 +28,16 @@ internal class LvFeederTest {
     @RegisterExtension
     val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
-    private val lvFeeder = LvFeeder()
+    private val lvFeeder = LvFeeder(generateId())
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(LvFeeder().mRID, not(equalTo("")))
         assertThat(LvFeeder("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val terminal = Terminal()
+        val terminal = Terminal(generateId())
 
         assertThat(lvFeeder.normalHeadTerminal, nullValue())
 
@@ -91,8 +92,8 @@ internal class LvFeederTest {
 
     @Test
     internal fun `can set feeder head terminal on feeder without equipment`() {
-        val terminal = Terminal()
-        val terminal2 = Terminal()
+        val terminal = Terminal(generateId())
+        val terminal2 = Terminal(generateId())
 
         lvFeeder.normalHeadTerminal = terminal
         assertThat(lvFeeder.normalHeadTerminal, equalTo(terminal))
@@ -103,9 +104,9 @@ internal class LvFeederTest {
 
     @Test
     internal fun `can set feeder head terminal on feeder with equipment but no head terminal`() {
-        val terminal = Terminal()
+        val terminal = Terminal(generateId())
 
-        lvFeeder.addEquipment(PowerTransformer())
+        lvFeeder.addEquipment(PowerTransformer(generateId()))
         lvFeeder.normalHeadTerminal = terminal
 
         assertThat(lvFeeder.normalHeadTerminal, equalTo(terminal))
@@ -113,9 +114,9 @@ internal class LvFeederTest {
 
     @Test
     internal fun `can set feeder head terminal on feeder with current equipment but no head terminal`() {
-        val terminal = Terminal()
+        val terminal = Terminal(generateId())
 
-        lvFeeder.addCurrentEquipment(PowerTransformer())
+        lvFeeder.addCurrentEquipment(PowerTransformer(generateId()))
         lvFeeder.normalHeadTerminal = terminal
 
         assertThat(lvFeeder.normalHeadTerminal, equalTo(terminal))
@@ -124,22 +125,22 @@ internal class LvFeederTest {
     @Test
     internal fun `cannot set feeder head terminal on feeder with equipment and head terminal assigned`() {
         lvFeeder.apply {
-            normalHeadTerminal = Terminal()
-            addEquipment(PowerTransformer())
+            normalHeadTerminal = Terminal(generateId())
+            addEquipment(PowerTransformer(generateId()))
         }
 
-        ExpectException.expect { lvFeeder.normalHeadTerminal = Terminal() }.toThrowAny()
+        ExpectException.expect { lvFeeder.normalHeadTerminal = Terminal(generateId()) }.toThrowAny()
             .withMessage("LvFeeder ${lvFeeder.mRID} has equipment assigned to it. Cannot update normalHeadTerminal on a feeder with equipment assigned.")
     }
 
     @Test
     internal fun `cannot set feeder head terminal on feeder with current equipment and head terminal assigned`() {
         lvFeeder.apply {
-            normalHeadTerminal = Terminal()
-            addCurrentEquipment(PowerTransformer())
+            normalHeadTerminal = Terminal(generateId())
+            addCurrentEquipment(PowerTransformer(generateId()))
         }
 
-        ExpectException.expect { lvFeeder.normalHeadTerminal = Terminal() }.toThrowAny()
+        ExpectException.expect { lvFeeder.normalHeadTerminal = Terminal(generateId()) }.toThrowAny()
             .withMessage("LvFeeder ${lvFeeder.mRID} has equipment assigned to it. Cannot update normalHeadTerminal on a feeder with equipment assigned.")
     }
 

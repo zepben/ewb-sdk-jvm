@@ -11,4 +11,4 @@ package com.zepben.ewb.cim.iec61970.base.core
 /**
  * A base class for all objects that may contain connectivity nodes or topological nodes.
  */
-abstract class ConnectivityNodeContainer(mRID: String = "") : PowerSystemResource(mRID)
+abstract class ConnectivityNodeContainer(mRID: String) : PowerSystemResource(mRID)

@@ -11,7 +11,6 @@ package com.zepben.ewb.cim.iec61968.assets
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -23,7 +22,6 @@ internal class AssetOrganisationRoleTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(object : AssetOrganisationRole() {}.mRID, not(equalTo("")))
         assertThat(object : AssetOrganisationRole("id") {}.mRID, equalTo("id"))
     }
 

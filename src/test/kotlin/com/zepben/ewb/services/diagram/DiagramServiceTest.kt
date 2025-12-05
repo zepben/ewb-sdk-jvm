@@ -10,9 +10,11 @@ package com.zepben.ewb.services.diagram
 
 import com.zepben.ewb.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.ewb.cim.iec61970.base.diagramlayout.DiagramObject
+import com.zepben.ewb.services.common.testdata.generateId
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
+import kotlin.reflect.full.primaryConstructor
 
 internal class DiagramServiceTest {
 
@@ -21,9 +23,9 @@ internal class DiagramServiceTest {
 
     @Test
     internal fun `can add and remove supported types`() {
-        service.supportedClasses
+        service.supportedKClasses
             .asSequence()
-            .map { it.getDeclaredConstructor().newInstance() }
+            .map { it.primaryConstructor!!.call("id-${it.simpleName}") }
             .forEach {
                 assertThat("Initial tryAdd should return true", service.tryAdd(it))
                 assertThat(service[it.mRID], equalTo(it))
@@ -34,11 +36,11 @@ internal class DiagramServiceTest {
 
     @Test
     internal fun testIndexDiagramObject() {
-        val diagram1 = Diagram()
-        val diagram2 = Diagram()
-        val diagramObject1 = DiagramObject().apply { diagram = diagram1; identifiedObjectMRID = "io1" }
-        val diagramObject2 = DiagramObject().apply { diagram = diagram1; identifiedObjectMRID = "io2" }
-        val diagramObject3 = DiagramObject().apply { diagram = diagram2; identifiedObjectMRID = "io1" }
+        val diagram1 = Diagram(generateId())
+        val diagram2 = Diagram(generateId())
+        val diagramObject1 = DiagramObject(generateId()).apply { diagram = diagram1; identifiedObjectMRID = "io1" }
+        val diagramObject2 = DiagramObject(generateId()).apply { diagram = diagram1; identifiedObjectMRID = "io2" }
+        val diagramObject3 = DiagramObject(generateId()).apply { diagram = diagram2; identifiedObjectMRID = "io1" }
 
         service.add(diagramObject1)
         service.add(diagramObject2)

@@ -24,6 +24,7 @@ import com.zepben.ewb.cim.iec61970.base.core.SubGeographicalRegion
 import com.zepben.ewb.cim.iec61970.base.core.Substation
 import com.zepben.ewb.cim.iec61970.base.wires.*
 import com.zepben.ewb.services.Services
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.customer.CustomerService
 import com.zepben.ewb.services.diagram.DiagramService
 import com.zepben.ewb.services.network.NetworkService
@@ -289,10 +290,10 @@ object StupidlyLargeNetwork {
         val primarySource = createEnergySource(networkService, "primary_source", "primary source").apply { isExternalGrid = true }
         networkService.connect(createTerminal(networkService, primarySource, PhaseCode.A, 1), createTerminal(networkService, switch4, PhaseCode.A, 1))
 
-        val geographicalRegion = GeographicalRegion()
+        val geographicalRegion = GeographicalRegion(generateId())
         val subGeographicalRegion =
-            SubGeographicalRegion().also { it.geographicalRegion = geographicalRegion; geographicalRegion.addSubGeographicalRegion(it) }
-        val substation = Substation().also { it.subGeographicalRegion = subGeographicalRegion; subGeographicalRegion.addSubstation(it) }
+            SubGeographicalRegion(generateId()).also { it.geographicalRegion = geographicalRegion; geographicalRegion.addSubGeographicalRegion(it) }
+        val substation = Substation(generateId()).also { it.subGeographicalRegion = subGeographicalRegion; subGeographicalRegion.addSubstation(it) }
 
         networkService.add(geographicalRegion)
         networkService.add(subGeographicalRegion)
@@ -316,7 +317,7 @@ object StupidlyLargeNetwork {
         val usagePoint = UsagePoint(energyConsumer1.mRID + "-up").apply { name = energyConsumer1.name + " usage point" }
         val acme = createAssetOwner(networkService, customerService, "acme")
         val hvLocation = locationOf(1234, "STATE", "locality")
-        val hvMeter = Meter().apply {
+        val hvMeter = Meter(generateId()).apply {
             name = "acme_1111"
             addOrganisationRole(acme)
             serviceLocation = hvLocation
@@ -641,25 +642,25 @@ object StupidlyLargeNetwork {
         val acme2 = createAssetOwner(network, customerService, "acme2")
         val acme3 = createAssetOwner(network, customerService, "acme3")
 
-        val tariff = Tariff().apply { name = "r" }
-        val pricingStructure = PricingStructure().apply { addTariff(tariff) }
-        val customer = Customer().apply { kind = CustomerKind.residential }
-        CustomerAgreement().apply { this.customer = customer }.addPricingStructure(pricingStructure)
+        val tariff = Tariff(generateId()).apply { name = "r" }
+        val pricingStructure = PricingStructure(generateId()).apply { addTariff(tariff) }
+        val customer = Customer(generateId()).apply { kind = CustomerKind.residential }
+        CustomerAgreement(generateId()).apply { this.customer = customer }.addPricingStructure(pricingStructure)
 
-        val location = Location()
-        val locationN1A1 = Location().apply {
+        val location = Location(generateId())
+        val locationN1A1 = Location(generateId()).apply {
             name = "n1"
             mainAddress = StreetAddress("a1")
         }
-        val locationN1A2 = Location().apply {
+        val locationN1A2 = Location(generateId()).apply {
             name = "n1"
             mainAddress = StreetAddress("a2")
         }
-        val locationN2 = Location().apply {
+        val locationN2 = Location(generateId()).apply {
             name = "n2"
             mainAddress = StreetAddress("")
         }
-        val locationN3 = Location().apply {
+        val locationN3 = Location(generateId()).apply {
             name = "n3"
             mainAddress = StreetAddress("")
         }

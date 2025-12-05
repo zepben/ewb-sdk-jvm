@@ -20,7 +20,7 @@ package com.zepben.ewb.cim.iec61970.base.wires
  * with sequenceNumber equal to 1.
  * @property acLineSegment The line segment to which the cut is applied.
  */
-class Cut @JvmOverloads constructor(mRID: String = "") : Switch(mRID) {
+class Cut(mRID: String) : Switch(mRID) {
 
     override val maxTerminals: Int get() = 2
 

@@ -16,7 +16,7 @@ import com.zepben.ewb.cim.iec61968.assets.AssetInfo
  * @property ratedCurrent Current carrying capacity of the wire under stated thermal conditions.
  * @property material Conductor material
  */
-abstract class WireInfo(mRID: String = "") : AssetInfo(mRID) {
+abstract class WireInfo(mRID: String) : AssetInfo(mRID) {
 
     var ratedCurrent: Int? = null
     var material: WireMaterialKind = WireMaterialKind.UNKNOWN

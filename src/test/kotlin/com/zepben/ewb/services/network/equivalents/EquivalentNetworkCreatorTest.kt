@@ -13,6 +13,7 @@ import com.zepben.ewb.cim.iec61968.common.Location
 import com.zepben.ewb.cim.iec61970.base.core.*
 import com.zepben.ewb.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.ewb.cim.iec61970.base.wires.*
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.equivalents.EdgeDetectionDetails.Companion.between
 import com.zepben.ewb.services.network.equivalents.EquivalentNetworkCreator.addToEdgeBetween
@@ -26,7 +27,7 @@ import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import kotlin.reflect.KClass
-import kotlin.reflect.full.createInstance
+import kotlin.reflect.full.primaryConstructor
 
 internal class EquivalentNetworkCreatorTest {
 
@@ -38,9 +39,9 @@ internal class EquivalentNetworkCreatorTest {
 
     @Test
     internal fun `check that calling convenience functions calls underlying function`() {
-        val lvFeeder = LvFeeder()
-        val hvFeeder = Feeder()
-        val substation = Substation()
+        val lvFeeder = LvFeeder(generateId())
+        val hvFeeder = Feeder(generateId())
+        val substation = Substation(generateId())
         val classes = setOf(Substation::class, Feeder::class, LvFeeder::class)
         val containers = setOf<EquipmentContainer>(mockk(), mockk(), mockk())
 
@@ -65,9 +66,9 @@ internal class EquivalentNetworkCreatorTest {
 
     @Test
     internal fun `check that calling convenience functions allows customisation`() {
-        val lvFeeder = LvFeeder()
-        val hvFeeder = Feeder()
-        val substation = Substation()
+        val lvFeeder = LvFeeder(generateId())
+        val hvFeeder = Feeder(generateId())
+        val substation = Substation(generateId())
         val classes = setOf(Substation::class, Feeder::class, LvFeeder::class)
         val containers = setOf<EquipmentContainer>(mockk(), mockk(), mockk())
 
@@ -95,8 +96,8 @@ internal class EquivalentNetworkCreatorTest {
         val network = NetworkService()
         val (edgeEquipment, lvFeeder, hvFeeder, _) = network.createEdgeBetween<LvFeeder, Feeder>()
         edgeEquipment.apply {
-            location = Location()
-            baseVoltage = BaseVoltage().apply { nominalVoltage = 1 }
+            location = Location(generateId())
+            baseVoltage = BaseVoltage(generateId()).apply { nominalVoltage = 1 }
             terminals.forEach { it.phases = PhaseCode.AB }
         }
 
@@ -144,14 +145,14 @@ internal class EquivalentNetworkCreatorTest {
         val network = NetworkService()
         val (edgeEquipment, lvFeeder, hvFeeder, edgeNode) = network.createEdgeBetween<LvFeeder, Feeder>()
         edgeEquipment.apply {
-            location = Location()
-            baseVoltage = BaseVoltage().apply { nominalVoltage = 1 }
+            location = Location(generateId())
+            baseVoltage = BaseVoltage(generateId()).apply { nominalVoltage = 1 }
         }
 
         val branchMrid = spyk<BranchMridSupplier>({ "branchMrid" })
         val equipmentMrid = spyk<EquipmentMridSupplier>({ "equipmentMrid" })
-        val initBranch = spyk<BranchInitialisation>({ location = Location() })
-        val initEquipment = spyk<EquipmentInitialisation<EnergySource>>({ baseVoltage = BaseVoltage() })
+        val initBranch = spyk<BranchInitialisation>({ location = Location(generateId()) })
+        val initEquipment = spyk<EquipmentInitialisation<EnergySource>>({ baseVoltage = BaseVoltage(generateId()) })
 
         val results = network.addToEdgeBetween(lvFeeder, hvFeeder, branchMrid, equipmentMrid, null, initBranch, initEquipment)
 
@@ -186,11 +187,11 @@ internal class EquivalentNetworkCreatorTest {
         val network = NetworkService()
         val (edgeEquipment, lvFeeder, hvFeeder, _) = network.createEdgeBetween<LvFeeder, Feeder>()
         edgeEquipment.apply {
-            location = Location()
-            baseVoltage = BaseVoltage().apply { nominalVoltage = 1 }
+            location = Location(generateId())
+            baseVoltage = BaseVoltage(generateId()).apply { nominalVoltage = 1 }
         }
 
-        val initBranch = spyk<BranchInitialisation>({ addTerminal(Terminal().apply { phases = PhaseCode.AN }) })
+        val initBranch = spyk<BranchInitialisation>({ addTerminal(Terminal(generateId()).apply { phases = PhaseCode.AN }) })
 
         val results = network.addToEdgeBetween<EnergySource>(lvFeeder, hvFeeder, initBranch = initBranch)
 
@@ -210,11 +211,11 @@ internal class EquivalentNetworkCreatorTest {
         val network = NetworkService()
         val (edgeEquipment, lvFeeder, hvFeeder, _) = network.createEdgeBetween<LvFeeder, Feeder>()
         edgeEquipment.apply {
-            location = Location()
-            baseVoltage = BaseVoltage().apply { nominalVoltage = 1 }
+            location = Location(generateId())
+            baseVoltage = BaseVoltage(generateId()).apply { nominalVoltage = 1 }
         }
 
-        val initEquipment = spyk<EquipmentInitialisation<EnergySource>>({ addTerminal(Terminal().apply { phases = PhaseCode.BN }) })
+        val initEquipment = spyk<EquipmentInitialisation<EnergySource>>({ addTerminal(Terminal(generateId()).apply { phases = PhaseCode.BN }) })
 
         val results = network.addToEdgeBetween(lvFeeder, hvFeeder, initEquipment = initEquipment)
 
@@ -234,8 +235,8 @@ internal class EquivalentNetworkCreatorTest {
         val network = NetworkService()
         val (edgeEquipment, lvFeeder, hvFeeder, _) = network.createEdgeBetween<LvFeeder, Feeder>()
         edgeEquipment.apply {
-            location = Location()
-            baseVoltage = BaseVoltage().apply { nominalVoltage = 1 }
+            location = Location(generateId())
+            baseVoltage = BaseVoltage(generateId()).apply { nominalVoltage = 1 }
         }
 
         val results = addToEdgeBetween(network, between(lvFeeder, hvFeeder)) {
@@ -351,12 +352,12 @@ internal class EquivalentNetworkCreatorTest {
         network: NetworkService = NetworkService(),
         edgeIsOnFirstContainer: Boolean = false
     ): NetworkEdge<T, U> {
-        val a = aClass.createInstance().also { network.tryAdd(it) }
-        val b = bClass.createInstance().also { network.tryAdd(it) }
+        val a = aClass.primaryConstructor!!.call("a").also { network.tryAdd(it) }
+        val b = bClass.primaryConstructor!!.call("b").also { network.tryAdd(it) }
 
-        val edgeEquipment = Junction().apply {
-            location = Location()
-            baseVoltage = BaseVoltage().apply { nominalVoltage = 1 }
+        val edgeEquipment = Junction(generateId()).apply {
+            location = Location(generateId())
+            baseVoltage = BaseVoltage(generateId()).apply { nominalVoltage = 1 }
 
             addContainer(a)
             addContainer(b)
@@ -370,7 +371,7 @@ internal class EquivalentNetworkCreatorTest {
         }
 
         val sharedContainer = if (edgeIsOnFirstContainer) b else a
-        val equipment = AcLineSegment().apply {
+        val equipment = AcLineSegment(generateId()).apply {
             addContainer(sharedContainer)
         }.also {
             createTerminal(network, it, PhaseCode.ABC, sequenceNumber = 1)

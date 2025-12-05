@@ -11,9 +11,11 @@ package com.zepben.ewb.cim.iec61970.base.meas
 import com.zepben.ewb.cim.iec61970.base.core.PhaseCode
 import com.zepben.ewb.cim.iec61970.base.domain.UnitSymbol
 import com.zepben.ewb.cim.iec61970.base.scada.RemoteSource
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -24,14 +26,13 @@ internal class MeasurementTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(object : Measurement() {}.mRID, not(equalTo("")))
         assertThat(object : Measurement("id") {}.mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val measurement = object : Measurement() {}
-        val remoteSource = RemoteSource()
+        val measurement = object : Measurement(generateId()) {}
+        val remoteSource = RemoteSource(generateId())
 
         assertThat(measurement.powerSystemResourceMRID, nullValue())
         assertThat(measurement.remoteSource, nullValue())

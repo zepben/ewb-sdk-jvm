@@ -9,6 +9,7 @@
 package com.zepben.ewb.cim.iec61970.base.wires
 
 import com.zepben.ewb.cim.iec61968.assetinfo.TransformerEndInfo
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.ResistanceReactance
 import com.zepben.ewb.services.network.ResistanceReactanceTest.Companion.validateResistanceReactance
@@ -31,13 +32,12 @@ internal class TransformerStarImpedanceTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(TransformerStarImpedance().mRID, not(equalTo("")))
         assertThat(TransformerStarImpedance("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val transformerStarImpedance = TransformerStarImpedance()
+        val transformerStarImpedance = TransformerStarImpedance(generateId())
 
         assertThat(transformerStarImpedance.r, nullValue())
         assertThat(transformerStarImpedance.r0, nullValue())
@@ -56,7 +56,7 @@ internal class TransformerStarImpedanceTest {
 
     @Test
     internal fun populatesResistanceReactanceDirectlyIfAvailable() {
-        val rr = TransformerStarImpedance().apply {
+        val rr = TransformerStarImpedance(generateId()).apply {
             r = 1.1
             x = 1.2
             r0 = 1.3
@@ -71,7 +71,7 @@ internal class TransformerStarImpedanceTest {
         val info = mock<TransformerEndInfo>()
         doReturn(ResistanceReactance(2.1, 2.2, 2.3, 2.4)).`when`(info).calculateResistanceReactanceFromTests()
 
-        val rr = TransformerStarImpedance().apply { transformerEndInfo = info }
+        val rr = TransformerStarImpedance(generateId()).apply { transformerEndInfo = info }
             .resistanceReactance()
 
         validateResistanceReactance(rr, 2.1, 2.2, 2.3, 2.4)
@@ -83,7 +83,7 @@ internal class TransformerStarImpedanceTest {
         val info = mock<TransformerEndInfo>()
 
         // Isolated star impedance
-        val starImpedance = TransformerStarImpedance()
+        val starImpedance = TransformerStarImpedance(generateId())
         validateResistanceReactance(starImpedance.resistanceReactance(), null, null, null, null)
 
         // End info with no resistance/reactance
@@ -96,7 +96,7 @@ internal class TransformerStarImpedanceTest {
         val info = mock<TransformerEndInfo>()
         doReturn(ResistanceReactance(x = 2.2)).`when`(info).calculateResistanceReactanceFromTests()
 
-        val rr = TransformerStarImpedance().apply {
+        val rr = TransformerStarImpedance(generateId()).apply {
             r = 1.1
             transformerEndInfo = info
         }.resistanceReactance()

@@ -15,7 +15,7 @@ import com.zepben.ewb.cim.iec61970.base.meas.Control
 
  * @property control The [Control] for the [RemoteControl] point.
  */
-class RemoteControl @JvmOverloads constructor(mRID: String = "") : RemotePoint(mRID) {
+class RemoteControl(mRID: String) : RemotePoint(mRID) {
 
     var control: Control? = null
 }

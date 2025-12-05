@@ -23,7 +23,7 @@ import com.zepben.ewb.cim.iec61970.base.core.ConductingEquipment
  * @property designRating [ZBEX] The current rating in Amperes at the specified design temperature that can be used without the conductor breaching physical network
  *   design limits.
  */
-abstract class Conductor(mRID: String = "") : ConductingEquipment(mRID) {
+abstract class Conductor(mRID: String) : ConductingEquipment(mRID) {
     var length: Double? = null
         set(value) {
             require((value == null) || (value >= 0) || value.isNaN()) { "Conductor length cannot be negative." }

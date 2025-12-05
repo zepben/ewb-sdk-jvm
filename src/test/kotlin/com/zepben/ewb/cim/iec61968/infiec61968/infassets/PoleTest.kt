@@ -12,7 +12,8 @@ import com.zepben.ewb.cim.iec61968.assets.Streetlight
 import com.zepben.ewb.utils.PrivateCollectionValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -24,7 +25,6 @@ internal class PoleTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(Pole().mRID, not(equalTo("")))
         assertThat(Pole("id").mRID, equalTo("id"))
     }
 

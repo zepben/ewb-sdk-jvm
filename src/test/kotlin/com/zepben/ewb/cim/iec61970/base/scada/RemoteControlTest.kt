@@ -9,9 +9,11 @@
 package com.zepben.ewb.cim.iec61970.base.scada
 
 import com.zepben.ewb.cim.iec61970.base.meas.Control
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -23,14 +25,13 @@ internal class RemoteControlTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(RemoteControl().mRID, not(equalTo("")))
         assertThat(RemoteControl("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val remoteControl = RemoteControl()
-        val control = Control()
+        val remoteControl = RemoteControl(generateId())
+        val control = Control(generateId())
 
         assertThat(remoteControl.control, nullValue())
 

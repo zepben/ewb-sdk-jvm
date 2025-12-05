@@ -11,6 +11,7 @@ package com.zepben.ewb.cim.extensions.iec61968.metering
 import com.zepben.ewb.cim.iec61968.metering.ControlledAppliance
 import com.zepben.ewb.cim.iec61968.metering.ControlledAppliance.Appliance.*
 import com.zepben.ewb.cim.iec61968.metering.EndDeviceFunctionKind
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.testdata.fillFields
 import com.zepben.testutils.exception.ExpectException.Companion.expect
@@ -28,13 +29,12 @@ internal class PanDemandResponseFunctionTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(PanDemandResponseFunction().mRID, not(equalTo("")))
         assertThat(PanDemandResponseFunction("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val panDemandResponseFunction = PanDemandResponseFunction()
+        val panDemandResponseFunction = PanDemandResponseFunction(generateId())
 
         assertThat(panDemandResponseFunction.kind, equalTo(EndDeviceFunctionKind.UNKNOWN))
         assertThat(panDemandResponseFunction.applianceBitmask, nullValue())
@@ -49,7 +49,7 @@ internal class PanDemandResponseFunctionTest {
 
     @Test
     internal fun `can add and remove appliances`() {
-        val panDemandResponseFunction = PanDemandResponseFunction()
+        val panDemandResponseFunction = PanDemandResponseFunction(generateId())
 
         // Add an appliance with no previous bitmask.
         assertThat("Should have added", panDemandResponseFunction.addAppliance(WATER_HEATER))
@@ -78,7 +78,7 @@ internal class PanDemandResponseFunctionTest {
 
     @Test
     internal fun `can add and remove multiple appliances`() {
-        val panDemandResponseFunction = PanDemandResponseFunction()
+        val panDemandResponseFunction = PanDemandResponseFunction(generateId())
 
         // Must include appliances to add.
         expect { panDemandResponseFunction.addAppliances() }.toThrow<IllegalArgumentException>()
@@ -122,7 +122,7 @@ internal class PanDemandResponseFunctionTest {
     @Test
     internal fun `removing an appliance initialises the bitmask`() {
         // Removing an appliance with no previous bitmask marks the controlled appliance as used.
-        val panDemandResponseFunction = PanDemandResponseFunction()
+        val panDemandResponseFunction = PanDemandResponseFunction(generateId())
 
         assertThat(panDemandResponseFunction.applianceBitmask, nullValue())
         assertThat(panDemandResponseFunction.appliance, nullValue())
@@ -136,7 +136,7 @@ internal class PanDemandResponseFunctionTest {
     @Test
     internal fun `removing appliances initialises the bitmask`() {
         // Removing appliances with no previous bitmask marks the controlled appliance as used.
-        val panDemandResponseFunction = PanDemandResponseFunction()
+        val panDemandResponseFunction = PanDemandResponseFunction(generateId())
 
         assertThat(panDemandResponseFunction.applianceBitmask, nullValue())
         assertThat(panDemandResponseFunction.appliance, nullValue())

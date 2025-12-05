@@ -15,6 +15,7 @@ import com.zepben.ewb.cim.iec61970.base.core.PhaseCode
 import com.zepben.ewb.cim.iec61970.base.core.Terminal
 import com.zepben.ewb.cim.iec61970.base.wires.Breaker
 import com.zepben.ewb.cim.iec61970.base.wires.PowerTransformer
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 
 object DroppedPhasesNetwork {
@@ -50,7 +51,7 @@ object DroppedPhasesNetwork {
 
     private fun addTerminals(networkService: NetworkService, conductingEquipment: ConductingEquipment, phaseCode: PhaseCode) {
         for (i in 1..2) {
-            Terminal().apply {
+            Terminal(generateId()).apply {
                 this.conductingEquipment = conductingEquipment
                 phases = phaseCode
             }.also {

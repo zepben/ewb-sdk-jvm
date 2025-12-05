@@ -16,6 +16,7 @@ import com.zepben.ewb.cim.iec61970.base.core.BaseVoltage
 import com.zepben.ewb.cim.iec61970.base.core.ConnectivityNode
 import com.zepben.ewb.cim.iec61970.base.core.Terminal
 import com.zepben.ewb.services.common.extensions.typeNameAndMRID
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.utils.PrivateCollectionValidator
 import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
@@ -32,14 +33,13 @@ internal class PowerTransformerTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(PowerTransformer().mRID, not(equalTo("")))
         assertThat(PowerTransformer("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val powerTransformer = PowerTransformer()
-        val powerTransformerInfo = PowerTransformerInfo()
+        val powerTransformer = PowerTransformer(generateId())
+        val powerTransformerInfo = PowerTransformerInfo(generateId())
 
         assertThat(powerTransformer.vectorGroup, equalTo(VectorGroup.UNKNOWN))
         assertThat(powerTransformer.transformerUtilisation, nullValue())
@@ -63,8 +63,8 @@ internal class PowerTransformerTest {
 
     @Test
     internal fun assignsTransformerToEndIfMissing() {
-        val transformer = PowerTransformer()
-        val end = PowerTransformerEnd()
+        val transformer = PowerTransformer(generateId())
+        val end = PowerTransformerEnd(generateId())
 
         transformer.addEnd(end)
         assertThat(end.powerTransformer, equalTo(transformer))
@@ -72,9 +72,9 @@ internal class PowerTransformerTest {
 
     @Test
     internal fun rejectsEndWithWrongTransformer() {
-        val tx1 = PowerTransformer()
-        val tx2 = PowerTransformer()
-        val end = PowerTransformerEnd().apply { powerTransformer = tx2 }
+        val tx1 = PowerTransformer(generateId())
+        val tx2 = PowerTransformer(generateId())
+        val end = PowerTransformerEnd(generateId()).apply { powerTransformer = tx2 }
 
         expect { tx1.addEnd(end) }
             .toThrow<IllegalArgumentException>()
@@ -99,12 +99,12 @@ internal class PowerTransformerTest {
 
     @Test
     internal fun getEndByTerminal() {
-        val t1 = Terminal()
-        val t2 = Terminal()
-        val t3 = Terminal()
-        val e1 = PowerTransformerEnd().apply { terminal = t3 }
-        val e2 = PowerTransformerEnd().apply { terminal = t1 }
-        val pt = PowerTransformer().apply {
+        val t1 = Terminal(generateId())
+        val t2 = Terminal(generateId())
+        val t3 = Terminal(generateId())
+        val e1 = PowerTransformerEnd(generateId()).apply { terminal = t3 }
+        val e2 = PowerTransformerEnd(generateId()).apply { terminal = t1 }
+        val pt = PowerTransformer(generateId()).apply {
             addTerminal(t1)
             addTerminal(t2)
             addTerminal(t3)
@@ -119,18 +119,18 @@ internal class PowerTransformerTest {
 
     @Test
     internal fun getEndByConnectivityNode() {
-        val t1 = Terminal().apply {
-            connectivityNode = ConnectivityNode()
+        val t1 = Terminal(generateId()).apply {
+            connectivityNode = ConnectivityNode(generateId())
         }
-        val t2 = Terminal().apply {
-            connectivityNode = ConnectivityNode()
+        val t2 = Terminal(generateId()).apply {
+            connectivityNode = ConnectivityNode(generateId())
         }
-        val t3 = Terminal().apply {
-            connectivityNode = ConnectivityNode()
+        val t3 = Terminal(generateId()).apply {
+            connectivityNode = ConnectivityNode(generateId())
         }
-        val e1 = PowerTransformerEnd().apply { terminal = t3 }
-        val e2 = PowerTransformerEnd().apply { terminal = t1 }
-        val pt = PowerTransformer().apply {
+        val e1 = PowerTransformerEnd(generateId()).apply { terminal = t3 }
+        val e2 = PowerTransformerEnd(generateId()).apply { terminal = t1 }
+        val pt = PowerTransformer(generateId()).apply {
             addTerminal(t1)
             addTerminal(t2)
             addTerminal(t3)
@@ -145,11 +145,11 @@ internal class PowerTransformerTest {
 
     @Test
     internal fun getBaseVoltageByEndNumber() {
-        val bv1 = BaseVoltage()
-        val bv2 = BaseVoltage()
-        val e1 = PowerTransformerEnd().apply { baseVoltage = bv1 }
-        val e2 = PowerTransformerEnd().apply { baseVoltage = bv2 }
-        val pt = PowerTransformer().apply {
+        val bv1 = BaseVoltage(generateId())
+        val bv2 = BaseVoltage(generateId())
+        val e1 = PowerTransformerEnd(generateId()).apply { baseVoltage = bv1 }
+        val e2 = PowerTransformerEnd(generateId()).apply { baseVoltage = bv2 }
+        val pt = PowerTransformer(generateId()).apply {
             addEnd(e1)
             addEnd(e2)
         }
@@ -161,14 +161,14 @@ internal class PowerTransformerTest {
 
     @Test
     internal fun getBaseVoltageByTerminal() {
-        val bv1 = BaseVoltage()
-        val bv2 = BaseVoltage()
-        val t1 = Terminal()
-        val t2 = Terminal()
-        val t3 = Terminal()
-        val e1 = PowerTransformerEnd().apply { terminal = t1; baseVoltage = bv1 }
-        val e2 = PowerTransformerEnd().apply { terminal = t2; baseVoltage = bv2 }
-        val pt = PowerTransformer().apply {
+        val bv1 = BaseVoltage(generateId())
+        val bv2 = BaseVoltage(generateId())
+        val t1 = Terminal(generateId())
+        val t2 = Terminal(generateId())
+        val t3 = Terminal(generateId())
+        val e1 = PowerTransformerEnd(generateId()).apply { terminal = t1; baseVoltage = bv1 }
+        val e2 = PowerTransformerEnd(generateId()).apply { terminal = t2; baseVoltage = bv2 }
+        val pt = PowerTransformer(generateId()).apply {
             addTerminal(t1)
             addTerminal(t2)
             addTerminal(t3)
@@ -183,24 +183,24 @@ internal class PowerTransformerTest {
 
     @Test
     internal fun getBaseVoltageByConnectivityNode() {
-        val bv1 = BaseVoltage().apply {
+        val bv1 = BaseVoltage(generateId()).apply {
             nominalVoltage = 1
         }
-        val bv2 = BaseVoltage().apply {
+        val bv2 = BaseVoltage(generateId()).apply {
             nominalVoltage = 2
         }
-        val t1 = Terminal().apply {
-            connectivityNode = ConnectivityNode()
+        val t1 = Terminal(generateId()).apply {
+            connectivityNode = ConnectivityNode(generateId())
         }
-        val t2 = Terminal().apply {
-            connectivityNode = ConnectivityNode()
+        val t2 = Terminal(generateId()).apply {
+            connectivityNode = ConnectivityNode(generateId())
         }
-        val t3 = Terminal().apply {
-            connectivityNode = ConnectivityNode()
+        val t3 = Terminal(generateId()).apply {
+            connectivityNode = ConnectivityNode(generateId())
         }
-        val e1 = PowerTransformerEnd().apply { terminal = t1; baseVoltage = bv1 }
-        val e2 = PowerTransformerEnd().apply { terminal = t2; baseVoltage = bv2 }
-        val pt = PowerTransformer().apply {
+        val e1 = PowerTransformerEnd(generateId()).apply { terminal = t1; baseVoltage = bv1 }
+        val e2 = PowerTransformerEnd(generateId()).apply { terminal = t2; baseVoltage = bv2 }
+        val pt = PowerTransformer(generateId()).apply {
             addTerminal(t1)
             addTerminal(t2)
             addTerminal(t3)
@@ -215,10 +215,10 @@ internal class PowerTransformerTest {
 
     @Test
     internal fun `test addEnd end numbers`() {
-        val pt = PowerTransformer()
-        val e1 = PowerTransformerEnd()
-        val e2 = PowerTransformerEnd()
-        val e3 = PowerTransformerEnd().apply { endNumber = 4 }
+        val pt = PowerTransformer(generateId())
+        val e1 = PowerTransformerEnd(generateId())
+        val e2 = PowerTransformerEnd(generateId())
+        val e3 = PowerTransformerEnd(generateId()).apply { endNumber = 4 }
 
         // Test order
         pt.addEnd(e1)
@@ -233,7 +233,7 @@ internal class PowerTransformerTest {
         assertThat(pt.getEnd(4), equalTo(e3))
 
         // Test try to add terminal with same sequence number fails
-        val duplicatePowerTransformerEnd = PowerTransformerEnd().apply { endNumber = 1 }
+        val duplicatePowerTransformerEnd = PowerTransformerEnd(generateId()).apply { endNumber = 1 }
         expect {
             pt.addEnd(duplicatePowerTransformerEnd)
         }.toThrow<IllegalArgumentException>()
@@ -242,19 +242,19 @@ internal class PowerTransformerTest {
 
     @Test
     internal fun `test primaryVoltage`() {
-        val pt = PowerTransformer()
-        val e1 = PowerTransformerEnd().apply {
+        val pt = PowerTransformer(generateId())
+        val e1 = PowerTransformerEnd(generateId()).apply {
             powerTransformer = pt
         }
-        val e2 = PowerTransformerEnd().apply {
+        val e2 = PowerTransformerEnd(generateId()).apply {
             powerTransformer = pt
-            baseVoltage = BaseVoltage().apply { nominalVoltage = 20 }
+            baseVoltage = BaseVoltage(generateId()).apply { nominalVoltage = 20 }
             ratedU = 25
         }
 
         assertThat(pt.primaryVoltage, nullValue())
 
-        pt.baseVoltage = BaseVoltage().apply { nominalVoltage = 5 }
+        pt.baseVoltage = BaseVoltage(generateId()).apply { nominalVoltage = 5 }
         assertThat(pt.primaryVoltage, equalTo(5))
 
         pt.addEnd(e1).addEnd(e2)
@@ -263,21 +263,21 @@ internal class PowerTransformerTest {
         e1.ratedU = 15
         assertThat(pt.primaryVoltage, equalTo(15))
 
-        e1.baseVoltage = BaseVoltage().apply { nominalVoltage = 10 }
+        e1.baseVoltage = BaseVoltage(generateId()).apply { nominalVoltage = 10 }
         assertThat(pt.primaryVoltage, equalTo(10))
     }
 
     @Test
     internal fun `only checks for TransformerStarImpedance with non-null AssetInfo`() {
-        val tx = PowerTransformer()
-        val end = PowerTransformerEnd().apply {
+        val tx = PowerTransformer(generateId())
+        val end = PowerTransformerEnd(generateId()).apply {
             powerTransformer = tx
-            starImpedance = TransformerStarImpedance()
+            starImpedance = TransformerStarImpedance(generateId())
         }.also { tx.addEnd(it) }
         assertThat(tx.assetInfo, nullValue())
         tx.assetInfo = null
 
-        val pti = PowerTransformerInfo()
+        val pti = PowerTransformerInfo(generateId())
         expect { tx.assetInfo = pti }
             .toThrow<IllegalArgumentException>()
             .withMessage("Unable to use ${pti.typeNameAndMRID()} for ${tx.typeNameAndMRID()} because the following associated ends have a direct link to a star impedance: [${end.typeNameAndMRID()}].")

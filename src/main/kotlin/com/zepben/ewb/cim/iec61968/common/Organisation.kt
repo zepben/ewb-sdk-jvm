@@ -13,4 +13,4 @@ import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 /**
  * Organisation that might have roles as utility, contractor, supplier, manufacturer, customer, etc.
  */
-class Organisation @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mRID)
+class Organisation(mRID: String) : IdentifiedObject(mRID)

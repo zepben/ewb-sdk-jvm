@@ -13,4 +13,4 @@ import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 /**
  * Common type for per-length electrical catalogues describing line parameters.
  */
-abstract class PerLengthLineParameter(mRID: String = "") : IdentifiedObject(mRID)
+abstract class PerLengthLineParameter(mRID: String) : IdentifiedObject(mRID)

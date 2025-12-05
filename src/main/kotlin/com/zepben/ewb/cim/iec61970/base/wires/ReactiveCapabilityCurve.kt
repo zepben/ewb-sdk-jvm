@@ -16,4 +16,4 @@ import com.zepben.ewb.cim.iec61970.base.core.Curve
  * is a corresponding high and low reactive power limit value. Typically, there will be a separate curve for each coolant condition, such as hydrogen pressure.
  * The Y1 axis values represent reactive minimum and the Y2 axis values represent reactive maximum.
  */
-class ReactiveCapabilityCurve @JvmOverloads constructor(mRID: String = "") : Curve(mRID)
+class ReactiveCapabilityCurve(mRID: String) : Curve(mRID)

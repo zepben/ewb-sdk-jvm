@@ -17,7 +17,7 @@ import com.zepben.ewb.cim.iec61970.base.scada.RemoteControl
  * @property powerSystemResourceMRID Regulating device governed by this control output.
  * @property remoteControl The remote point controlling the physical actuator.
  */
-class Control @JvmOverloads constructor(mRID: String = "") : IoPoint(mRID) {
+class Control(mRID: String) : IoPoint(mRID) {
 
     var powerSystemResourceMRID: String? = null
     var remoteControl: RemoteControl? = null

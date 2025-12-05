@@ -23,7 +23,7 @@ package com.zepben.ewb.cim.iec61968.assetinfo
  * @property voltage Short circuit voltage as a percentage.
  * @property voltageOhmicPart Short Circuit Voltage – Ohmic Part as a percentage.
  */
-class ShortCircuitTest @JvmOverloads constructor(mRID: String = "") : TransformerTest(mRID) {
+class ShortCircuitTest(mRID: String) : TransformerTest(mRID) {
 
     var current: Double? = null
     var energisedEndStep: Int? = null

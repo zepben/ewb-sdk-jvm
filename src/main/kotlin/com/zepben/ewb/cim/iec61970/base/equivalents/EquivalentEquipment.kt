@@ -13,4 +13,4 @@ import com.zepben.ewb.cim.iec61970.base.core.ConductingEquipment
 /**
  * The class represents equivalent objects that are the result of a network reduction. The class is the base for equivalent objects of different types.
  */
-abstract class EquivalentEquipment(mRID: String = "") : ConductingEquipment(mRID)
+abstract class EquivalentEquipment(mRID: String) : ConductingEquipment(mRID)

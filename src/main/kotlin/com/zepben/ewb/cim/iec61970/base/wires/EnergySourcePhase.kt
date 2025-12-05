@@ -18,7 +18,7 @@ import com.zepben.ewb.cim.iec61970.base.core.PowerSystemResource
  *                 to the central ground or neutral point.  If the energy source is delta connected, the phase indicates an energy source connected
  *                 from the indicated phase to the next logical non-neutral phase.
  */
-class EnergySourcePhase @JvmOverloads constructor(mRID: String = "") : PowerSystemResource(mRID) {
+class EnergySourcePhase(mRID: String) : PowerSystemResource(mRID) {
 
     var energySource: EnergySource? = null
         set(value) {

@@ -9,6 +9,7 @@
 package com.zepben.ewb.cim.iec61970.base.core
 
 import com.zepben.ewb.cim.iec61970.base.wires.Junction
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -39,9 +40,9 @@ internal class NameTypeTest {
     internal fun getOrAddNames() {
         val nt = NameType("nt")
 
-        val j1 = Junction()
-        val j2 = Junction()
-        val j3 = Junction()
+        val j1 = Junction(generateId())
+        val j2 = Junction(generateId())
+        val j3 = Junction(generateId())
 
         val n1a = nt.getOrAddName("n1", j1)
         val n1b = nt.getOrAddName("n1", j2)
@@ -70,8 +71,8 @@ internal class NameTypeTest {
     internal fun names() {
         val nt = NameType("nt")
 
-        val j1 = Junction()
-        val j2 = Junction()
+        val j1 = Junction(generateId())
+        val j2 = Junction(generateId())
 
         val n1a = nt.getOrAddName("n1", j1)
         val n1b = nt.getOrAddName("n1", j2)
@@ -84,8 +85,8 @@ internal class NameTypeTest {
     internal fun getNames() {
         val nt = NameType("nt")
 
-        val j1 = Junction()
-        val j2 = Junction()
+        val j1 = Junction(generateId())
+        val j2 = Junction(generateId())
 
         val n1a = nt.getOrAddName("n1", j1)
         val n1b = nt.getOrAddName("n1", j2)
@@ -100,8 +101,8 @@ internal class NameTypeTest {
     internal fun `removesNames remove names from nameType and associated identifiedObject`() {
         val nt = NameType("nt")
 
-        val j1 = Junction()
-        val j2 = Junction()
+        val j1 = Junction(generateId())
+        val j2 = Junction(generateId())
 
         val n1a = nt.getOrAddName("n1", j1)
         val n1b = nt.getOrAddName("n1", j2)
@@ -127,8 +128,8 @@ internal class NameTypeTest {
     internal fun `getNames retrieves all the names associated with a given identifiedObject`() {
         val nt = NameType("nt")
 
-        val j1 = Junction()
-        val j2 = Junction()
+        val j1 = Junction(generateId())
+        val j2 = Junction(generateId())
 
         val n1a = nt.getOrAddName("n1", j1)
         val n1b = nt.getOrAddName("n1", j2)
@@ -144,13 +145,13 @@ internal class NameTypeTest {
     internal fun `removeName remove name from nameType and associated identifiedObject`() {
         val nt = NameType("nt")
 
-        val j1 = Junction()
-        val j2 = Junction()
+        val j1 = Junction(generateId())
+        val j2 = Junction(generateId())
 
         val n1a = nt.getOrAddName("n1", j1)
         val n1b = nt.getOrAddName("n1", j2)
         val n2 = nt.getOrAddName("n2", j2)
-        val n3 = Name("n3", NameType("other"), Junction())
+        val n3 = Name("n3", NameType("other"), Junction(generateId()))
 
         assertThat(j1.numNames(), equalTo(1))
         assertThat(j2.numNames(), equalTo(2))
@@ -179,8 +180,8 @@ internal class NameTypeTest {
     internal fun `clearNames remove all names from nameType and associated identifiedObject`() {
         val nt = NameType("nt")
 
-        val j1 = Junction()
-        val j2 = Junction()
+        val j1 = Junction(generateId())
+        val j2 = Junction(generateId())
 
         val n1 = nt.getOrAddName("n1", j1)
         val n2 = nt.getOrAddName("n2", j1)

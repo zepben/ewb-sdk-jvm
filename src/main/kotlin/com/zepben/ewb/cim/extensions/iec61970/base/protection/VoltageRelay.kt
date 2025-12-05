@@ -18,4 +18,4 @@ import com.zepben.ewb.cim.extensions.ZBEX
  * overvoltage detection and undervoltage relay for undervoltage detection.
  */
 @ZBEX
-class VoltageRelay @JvmOverloads constructor(mRID: String = "") : ProtectionRelayFunction(mRID)
+class VoltageRelay(mRID: String) : ProtectionRelayFunction(mRID)

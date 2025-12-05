@@ -13,4 +13,4 @@ import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 /**
  * Function performed by an asset.
  */
-abstract class AssetFunction(mRID: String = "") : IdentifiedObject(mRID)
+abstract class AssetFunction(mRID: String) : IdentifiedObject(mRID)

@@ -45,7 +45,7 @@ package com.zepben.ewb.cim.iec61970.base.equivalents
  * @property zeroX21 Zero sequence series reactance from terminal sequence 2 to terminal sequence 1. Used for short circuit data exchange according to
  *                   IEC 60909. Usage : EquivalentBranch is a result of network reduction prior to the data exchange.
  */
-class EquivalentBranch @JvmOverloads constructor(mRID: String = "") : EquivalentEquipment(mRID) {
+class EquivalentBranch(mRID: String) : EquivalentEquipment(mRID) {
 
     var negativeR12: Double? = null
     var negativeR21: Double? = null

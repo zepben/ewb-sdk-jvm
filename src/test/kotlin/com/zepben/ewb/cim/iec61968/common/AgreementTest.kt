@@ -9,11 +9,13 @@
 package com.zepben.ewb.cim.iec61968.common
 
 import com.zepben.ewb.cim.iec61970.base.domain.DateTimeInterval
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.customer.CustomerService
 import com.zepben.ewb.services.customer.testdata.fillFields
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import java.time.Instant
@@ -26,13 +28,12 @@ internal class AgreementTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(object : Agreement() {}.mRID, not(equalTo("")))
         assertThat(object : Agreement("id") {}.mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val agreement = object : Agreement() {}
+        val agreement = object : Agreement(generateId()) {}
 
         assertThat(agreement.validityInterval, nullValue())
 

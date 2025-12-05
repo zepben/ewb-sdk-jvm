@@ -18,6 +18,7 @@ import com.zepben.ewb.database.sqlite.cim.CimDatabaseSchemaTest
 import com.zepben.ewb.services.common.Resolvers
 import com.zepben.ewb.services.common.testdata.SchemaServices
 import com.zepben.ewb.services.common.testdata.fillFieldsCommon
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.customer.CustomerService
 import com.zepben.ewb.services.customer.CustomerServiceComparator
 import com.zepben.ewb.services.customer.testdata.fillFields
@@ -42,7 +43,7 @@ class CustomerDatabaseSchemaTest : CimDatabaseSchemaTest<CustomerService, Custom
 
     override fun createComparator(): CustomerServiceComparator = CustomerServiceComparator()
 
-    override fun createIdentifiedObject(): IdentifiedObject = Customer()
+    override fun createIdentifiedObject(): IdentifiedObject = Customer(generateId())
 
     @Test
     @Disabled

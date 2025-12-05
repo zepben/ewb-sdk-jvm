@@ -12,4 +12,4 @@ package com.zepben.ewb.cim.iec61970.base.wires
  * A short section of conductor with negligible impedance which can be manually removed and replaced if the circuit is de-energized.
  * Note that zero-impedance branches can potentially be modeled by other equipment types.
  */
-class Jumper @JvmOverloads constructor(mRID: String = "") : Switch(mRID)
+class Jumper(mRID: String) : Switch(mRID)

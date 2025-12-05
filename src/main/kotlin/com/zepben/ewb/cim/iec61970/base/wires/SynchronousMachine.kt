@@ -45,7 +45,7 @@ import com.zepben.ewb.services.common.extensions.validateReference
  * @property type Modes that this synchronous machine can operate in.
  * @property operatingMode Current mode of operation.
  */
-class SynchronousMachine @JvmOverloads constructor(mRID: String = "") : RotatingMachine(mRID) {
+class SynchronousMachine(mRID: String) : RotatingMachine(mRID) {
 
     private var _reactiveCapabilityCurves: MutableList<ReactiveCapabilityCurve>? = null
 

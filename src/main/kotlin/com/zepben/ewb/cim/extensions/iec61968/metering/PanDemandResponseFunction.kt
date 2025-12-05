@@ -21,7 +21,7 @@ import com.zepben.ewb.cim.iec61968.metering.EndDeviceFunctionKind
  * @property appliance [ZBEX] The appliances being controlled.
  */
 @ZBEX
-class PanDemandResponseFunction @JvmOverloads constructor(mRID: String = "") : EndDeviceFunction(mRID) {
+class PanDemandResponseFunction(mRID: String) : EndDeviceFunction(mRID) {
 
     @ZBEX
     var kind: EndDeviceFunctionKind = EndDeviceFunctionKind.UNKNOWN

@@ -12,6 +12,7 @@ import com.zepben.ewb.cim.iec61970.base.core.ConnectivityNode
 import com.zepben.ewb.cim.iec61970.base.core.PhaseCode
 import com.zepben.ewb.cim.iec61970.base.core.Terminal
 import com.zepben.ewb.cim.iec61970.base.wires.AcLineSegment
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
@@ -244,7 +245,7 @@ internal class TerminalConnectivityConnectedTest {
     private fun createConnectedTerminals(vararg phaseCodes: PhaseCode): List<Terminal> {
         val cn = networkService.getNextConnectivityNode()
         return phaseCodes.map { phaseCode ->
-            Terminal().apply { phases = phaseCode }.also { networkService.connect(it, cn.mRID) }
+            Terminal(generateId()).apply { phases = phaseCode }.also { networkService.connect(it, cn.mRID) }
         }
     }
 
@@ -280,9 +281,9 @@ internal class TerminalConnectivityConnectedTest {
                 connected[toTerminal]!!.nominalPhasePaths,
                 containsInAnyOrder(
                     *phases
-                    .mapIndexed { index, phase -> NominalPhasePath(t.phases.singlePhases[index], phase) }
-                    .filter { it.to != SPK.NONE }
-                    .toTypedArray())
+                        .mapIndexed { index, phase -> NominalPhasePath(t.phases.singlePhases[index], phase) }
+                        .filter { it.to != SPK.NONE }
+                        .toTypedArray())
             )
         }
     }

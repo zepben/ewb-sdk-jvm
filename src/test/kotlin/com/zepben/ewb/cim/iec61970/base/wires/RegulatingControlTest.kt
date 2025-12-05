@@ -9,6 +9,7 @@
 package com.zepben.ewb.cim.iec61970.base.wires
 
 import com.zepben.ewb.cim.iec61970.base.core.PhaseCode
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.testdata.fillFields
 import com.zepben.ewb.utils.PrivateCollectionValidator
@@ -26,13 +27,12 @@ internal class RegulatingControlTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(object : RegulatingControl() {}.mRID, not(equalTo("")))
         assertThat(object : RegulatingControl("id") {}.mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val regulatingControl = object : RegulatingControl() {}
+        val regulatingControl = object : RegulatingControl(generateId()) {}
 
         assertThat(regulatingControl.discrete, nullValue())
         assertThat(regulatingControl.enabled, nullValue())
@@ -67,7 +67,7 @@ internal class RegulatingControlTest {
     @Test
     internal fun regulatingCondEqs() {
         PrivateCollectionValidator.validateUnordered(
-            { object : RegulatingControl() {} },
+            { id -> object : RegulatingControl(id) {} },
             { id -> object : RegulatingCondEq(id) {} },
             RegulatingControl::regulatingCondEqs,
             RegulatingControl::numRegulatingCondEqs,

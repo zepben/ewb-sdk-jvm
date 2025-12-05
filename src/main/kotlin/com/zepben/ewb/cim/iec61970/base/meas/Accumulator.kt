@@ -11,4 +11,4 @@ package com.zepben.ewb.cim.iec61970.base.meas
 /**
  * Accumulator represents an accumulated (counted) Measurement, e.g. an energy value.
  */
-class Accumulator @JvmOverloads constructor(mRID: String = "") : Measurement(mRID)
+class Accumulator(mRID: String) : Measurement(mRID)

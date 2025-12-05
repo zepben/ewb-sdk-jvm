@@ -18,7 +18,7 @@ import com.zepben.ewb.cim.iec61970.base.core.ConductingEquipment
  * with sequence number equal to 1.
  * @property acLineSegment The line segment to which the clamp is connected.
  */
-class Clamp @JvmOverloads constructor(mRID: String = "") : ConductingEquipment(mRID) {
+class Clamp(mRID: String) : ConductingEquipment(mRID) {
 
     var lengthFromTerminal1: Double? = null
     var acLineSegment: AcLineSegment? = null

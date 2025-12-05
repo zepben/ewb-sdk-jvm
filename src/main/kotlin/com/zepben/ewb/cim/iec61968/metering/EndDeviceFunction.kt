@@ -15,7 +15,7 @@ import com.zepben.ewb.cim.iec61968.assets.AssetFunction
  *
  *  @property enabled True if the function is enabled.
  */
-abstract class EndDeviceFunction(mRID: String = "") : AssetFunction(mRID) {
+abstract class EndDeviceFunction(mRID: String) : AssetFunction(mRID) {
 
     var enabled: Boolean? = null
 

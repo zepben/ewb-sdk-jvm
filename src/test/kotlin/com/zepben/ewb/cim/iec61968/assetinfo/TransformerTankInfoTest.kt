@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.cim.iec61968.assetinfo
 
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.ResistanceReactance
 import com.zepben.ewb.services.network.ResistanceReactanceTest.Companion.validateResistanceReactance
@@ -29,13 +30,12 @@ internal class TransformerTankInfoTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(TransformerTankInfo().mRID, not(equalTo("")))
         assertThat(TransformerTankInfo("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val transformerTankInfo = TransformerTankInfo()
+        val transformerTankInfo = TransformerTankInfo(generateId())
 
         assertThat(transformerTankInfo.powerTransformerInfo, nullValue())
 
@@ -60,9 +60,9 @@ internal class TransformerTankInfoTest {
 
     @Test
     internal fun populatesResistanceReactanceFromEndsWithMatchingNumber() {
-        val end1 = spy(TransformerEndInfo().apply { endNumber = 1 })
-        val end2 = spy(TransformerEndInfo().apply { endNumber = 2 })
-        val tankInfo = TransformerTankInfo().apply {
+        val end1 = spy(TransformerEndInfo(generateId()).apply { endNumber = 1 })
+        val end2 = spy(TransformerEndInfo(generateId()).apply { endNumber = 2 })
+        val tankInfo = TransformerTankInfo(generateId()).apply {
             addTransformerEndInfo(end1)
             addTransformerEndInfo(end2)
         }

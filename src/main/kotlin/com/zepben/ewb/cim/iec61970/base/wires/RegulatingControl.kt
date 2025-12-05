@@ -64,7 +64,7 @@ import com.zepben.ewb.services.common.extensions.validateReference
  * regulators, shunt compensators, or battery units.
  * @property regulatingCondEqs The [RegulatingCondEq] that are controlled by this regulating control scheme.
  */
-abstract class RegulatingControl(mRID: String = "") : PowerSystemResource(mRID) {
+abstract class RegulatingControl(mRID: String) : PowerSystemResource(mRID) {
 
     var discrete: Boolean? = null
     var mode: RegulatingControlModeKind = RegulatingControlModeKind.UNKNOWN

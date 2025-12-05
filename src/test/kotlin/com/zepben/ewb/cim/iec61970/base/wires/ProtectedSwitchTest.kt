@@ -9,12 +9,14 @@
 package com.zepben.ewb.cim.iec61970.base.wires
 
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelayFunction
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.testdata.fillFields
 import com.zepben.ewb.utils.PrivateCollectionValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -26,13 +28,12 @@ internal class ProtectedSwitchTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(object : ProtectedSwitch() {}.mRID, not(equalTo("")))
         assertThat(object : ProtectedSwitch("id") {}.mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val protectedSwitch = object : ProtectedSwitch() {}
+        val protectedSwitch = object : ProtectedSwitch(generateId()) {}
 
         assertThat(protectedSwitch.breakingCapacity, nullValue())
 
@@ -44,7 +45,7 @@ internal class ProtectedSwitchTest {
     @Test
     internal fun relayFunctions() {
         PrivateCollectionValidator.validateUnordered(
-            { object : ProtectedSwitch() {} },
+            { id -> object : ProtectedSwitch(id) {} },
             { id -> object : ProtectionRelayFunction(id) {} },
             ProtectedSwitch::relayFunctions,
             ProtectedSwitch::numRelayFunctions,

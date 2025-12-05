@@ -9,13 +9,9 @@
 package com.zepben.ewb.services.network.tracing.networktrace
 
 import com.zepben.ewb.cim.iec61970.base.core.ConductingEquipment
-import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.core.Terminal
-import com.zepben.ewb.cim.iec61970.base.wires.AcLineSegment
-import com.zepben.ewb.cim.iec61970.base.wires.Clamp
-import com.zepben.ewb.cim.iec61970.base.wires.Cut
-import com.zepben.ewb.cim.iec61970.base.wires.EnergyConsumer
-import com.zepben.ewb.cim.iec61970.base.wires.Junction
+import com.zepben.ewb.cim.iec61970.base.wires.*
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.getT
 import com.zepben.ewb.services.network.tracing.traversal.StepActionWithContextValue
@@ -27,15 +23,14 @@ import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertTimeoutPreemptively
 import java.time.Duration
-import kotlin.test.assertContentEquals
 
 class NetworkTraceTest {
 
     @Test
     internal fun `adds start clamp terminal as traversed segment path`() {
         val trace = Tracing.networkTrace()
-        val segment = AcLineSegment()
-        val clamp = Clamp().apply { addTerminal(Terminal()) }
+        val segment = AcLineSegment(generateId())
+        val clamp = Clamp(generateId()).apply { addTerminal(Terminal(generateId())) }
         segment.addClamp(clamp)
 
         trace.addStartItem(clamp.t1)
@@ -45,9 +40,9 @@ class NetworkTraceTest {
     @Test
     internal fun `adds start whole clamp as not traversed segment path`() {
         val trace = Tracing.networkTrace()
-        val segment = AcLineSegment()
-        val clamp = Clamp().apply {
-            addTerminal(Terminal())
+        val segment = AcLineSegment(generateId())
+        val clamp = Clamp(generateId()).apply {
+            addTerminal(Terminal(generateId()))
             segment.addClamp(this)
         }
 
@@ -58,26 +53,26 @@ class NetworkTraceTest {
     @Test
     internal fun `adds start AcLineSegment terminals, cut terminals and clamp terminals as traversed segment`() {
         val trace = Tracing.networkTrace()
-        val segment = AcLineSegment().apply {
-            addTerminal(Terminal())
-            addTerminal(Terminal())
+        val segment = AcLineSegment(generateId()).apply {
+            addTerminal(Terminal(generateId()))
+            addTerminal(Terminal(generateId()))
         }
-        val clamp1 = Clamp().apply {
-            addTerminal(Terminal())
+        val clamp1 = Clamp(generateId()).apply {
+            addTerminal(Terminal(generateId()))
             segment.addClamp(this)
         }
-        val clamp2 = Clamp().apply {
-            addTerminal(Terminal())
+        val clamp2 = Clamp(generateId()).apply {
+            addTerminal(Terminal(generateId()))
             segment.addClamp(this)
         }
-        val cut1 = Cut().apply {
-            addTerminal(Terminal())
-            addTerminal(Terminal())
+        val cut1 = Cut(generateId()).apply {
+            addTerminal(Terminal(generateId()))
+            addTerminal(Terminal(generateId()))
             segment.addCut(this)
         }
-        val cut2 = Cut().apply {
-            addTerminal(Terminal())
-            addTerminal(Terminal())
+        val cut2 = Cut(generateId()).apply {
+            addTerminal(Terminal(generateId()))
+            addTerminal(Terminal(generateId()))
             segment.addCut(this)
         }
 
@@ -338,10 +333,11 @@ class NetworkTraceTest {
             .network
 
         val dataCapture = mutableMapOf<String, List<String>>()
+
         class StepActionWithContext : StepActionWithContextValue<NetworkTraceStep<*>, List<String>> {
             override val key: String get() = "testing"
 
-            override fun apply( item: NetworkTraceStep<*>, context: StepContext ) {
+            override fun apply(item: NetworkTraceStep<*>, context: StepContext) {
                 item.path.toEquipment.let {
                     if (it is EnergyConsumer) dataCapture[it.mRID] = context.value
                 }

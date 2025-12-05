@@ -8,10 +8,12 @@
 
 package com.zepben.ewb.cim.iec61968.customers
 
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.utils.PrivateCollectionValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -23,14 +25,13 @@ internal class CustomerAgreementTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(CustomerAgreement().mRID, not(equalTo("")))
         assertThat(CustomerAgreement("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val customerAgreement = CustomerAgreement()
-        val customer = Customer()
+        val customerAgreement = CustomerAgreement(generateId())
+        val customer = Customer(generateId())
 
         assertThat(customerAgreement.customer, nullValue())
 

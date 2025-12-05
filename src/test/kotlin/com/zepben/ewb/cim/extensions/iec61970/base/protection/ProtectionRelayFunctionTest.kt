@@ -12,6 +12,7 @@ import com.zepben.ewb.cim.extensions.iec61968.assetinfo.RelayInfo
 import com.zepben.ewb.cim.iec61970.base.auxiliaryequipment.Sensor
 import com.zepben.ewb.cim.iec61970.base.domain.UnitSymbol
 import com.zepben.ewb.cim.iec61970.base.wires.ProtectedSwitch
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.testdata.fillFields
 import com.zepben.ewb.utils.PrivateCollectionValidator
@@ -23,13 +24,12 @@ internal class ProtectionRelayFunctionTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(object : ProtectionRelayFunction() {}.mRID, not(equalTo("")))
         assertThat(object : ProtectionRelayFunction("id") {}.mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val protectionRelayFunction = object : ProtectionRelayFunction() {}
+        val protectionRelayFunction = object : ProtectionRelayFunction(generateId()) {}
 
         assertThat(protectionRelayFunction.assetInfo, nullValue())
         assertThat(protectionRelayFunction.model, nullValue())
@@ -53,7 +53,7 @@ internal class ProtectionRelayFunctionTest {
     @Test
     internal fun timeLimits() {
         PrivateCollectionValidator.validateOrdered(
-            { object : ProtectionRelayFunction() {} },
+            { id -> object : ProtectionRelayFunction(id) {} },
             { it.toDouble() },
             ProtectionRelayFunction::timeLimits,
             ProtectionRelayFunction::numTimeLimits,
@@ -66,7 +66,7 @@ internal class ProtectionRelayFunctionTest {
             ProtectionRelayFunction::clearTimeLimits
         )
 
-        val protectionRelayFunction = object : ProtectionRelayFunction() {}
+        val protectionRelayFunction = object : ProtectionRelayFunction(generateId()) {}
 
         protectionRelayFunction.addTimeLimits(1.0, 2.0, 3.0)
         assertThat(protectionRelayFunction.timeLimits, contains(1.0, 2.0, 3.0))
@@ -75,7 +75,7 @@ internal class ProtectionRelayFunctionTest {
     @Test
     internal fun thresholds() {
         PrivateCollectionValidator.validateOrdered(
-            { object : ProtectionRelayFunction() {} },
+            { id -> object : ProtectionRelayFunction(id) {} },
             { RelaySetting(UnitSymbol.W, it.toDouble()) },
             ProtectionRelayFunction::thresholds,
             ProtectionRelayFunction::numThresholds,
@@ -92,7 +92,7 @@ internal class ProtectionRelayFunctionTest {
     @Test
     internal fun protectedSwitches() {
         PrivateCollectionValidator.validateUnordered(
-            { object : ProtectionRelayFunction() {} },
+            { id -> object : ProtectionRelayFunction(id) {} },
             { id -> object : ProtectedSwitch(id) {} },
             ProtectionRelayFunction::protectedSwitches,
             ProtectionRelayFunction::numProtectedSwitches,
@@ -106,7 +106,7 @@ internal class ProtectionRelayFunctionTest {
     @Test
     internal fun sensors() {
         PrivateCollectionValidator.validateUnordered(
-            { object : ProtectionRelayFunction() {} },
+            { id -> object : ProtectionRelayFunction(id) {} },
             { id -> object : Sensor(id) {} },
             ProtectionRelayFunction::sensors,
             ProtectionRelayFunction::numSensors,
@@ -120,7 +120,7 @@ internal class ProtectionRelayFunctionTest {
     @Test
     internal fun schemes() {
         PrivateCollectionValidator.validateUnordered(
-            { object : ProtectionRelayFunction() {} },
+            { id -> object : ProtectionRelayFunction(id) {} },
             ::ProtectionRelayScheme,
             ProtectionRelayFunction::schemes,
             ProtectionRelayFunction::numSchemes,

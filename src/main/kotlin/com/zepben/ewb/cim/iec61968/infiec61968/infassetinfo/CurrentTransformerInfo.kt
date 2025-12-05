@@ -27,7 +27,7 @@ import com.zepben.ewb.cim.iec61968.infiec61968.infcommon.Ratio
  * @property secondaryRatio Ratio for the secondary winding tap changer (denominator).
  * @property usage Intended usage of the CT; i.e. metering, protection.
  */
-class CurrentTransformerInfo @JvmOverloads constructor(mRID: String = "") : AssetInfo(mRID) {
+class CurrentTransformerInfo(mRID: String) : AssetInfo(mRID) {
 
     var accuracyClass: String? = null
     var accuracyLimit: Double? = null

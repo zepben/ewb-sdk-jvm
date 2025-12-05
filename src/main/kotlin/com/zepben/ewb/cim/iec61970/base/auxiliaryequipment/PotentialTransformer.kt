@@ -18,7 +18,7 @@ import com.zepben.ewb.cim.iec61968.infiec61968.infassetinfo.PotentialTransformer
  * @property assetInfo Datasheet information for this potential transformer.
  * @property type Potential transformer construction type.
  */
-class PotentialTransformer @JvmOverloads constructor(mRID: String = "") : Sensor(mRID) {
+class PotentialTransformer(mRID: String) : Sensor(mRID) {
 
     override var assetInfo: PotentialTransformerInfo? = null
 

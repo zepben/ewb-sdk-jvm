@@ -25,7 +25,7 @@ import com.zepben.ewb.cim.iec61970.base.core.ConductingEquipment
  * @property open The attribute tells if the switch is considered open when used as input to topology processing.
  * @property assetInfo Datasheet information for this Switch.
  */
-abstract class Switch(mRID: String = "") : ConductingEquipment(mRID) {
+abstract class Switch(mRID: String) : ConductingEquipment(mRID) {
 
     override var assetInfo: SwitchInfo? = null
 

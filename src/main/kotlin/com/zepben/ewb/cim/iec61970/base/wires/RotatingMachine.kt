@@ -21,7 +21,7 @@ package com.zepben.ewb.cim.iec61970.base.wires
  * @property q Reactive power injection. Load sign convention is used, i.e. positive sign means flow out from a node.
  *             Starting value for a steady state solution.
  */
-abstract class RotatingMachine @JvmOverloads constructor(mRID: String = "") : RegulatingCondEq(mRID) {
+abstract class RotatingMachine(mRID: String) : RegulatingCondEq(mRID) {
 
     var ratedPowerFactor: Double? = null
     var ratedS: Double? = null

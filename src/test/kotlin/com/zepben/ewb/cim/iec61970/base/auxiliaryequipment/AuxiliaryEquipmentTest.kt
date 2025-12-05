@@ -9,9 +9,11 @@
 package com.zepben.ewb.cim.iec61970.base.auxiliaryequipment
 
 import com.zepben.ewb.cim.iec61970.base.core.Terminal
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -23,14 +25,13 @@ internal class AuxiliaryEquipmentTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(object : AuxiliaryEquipment() {}.mRID, not(equalTo("")))
         assertThat(object : AuxiliaryEquipment("id") {}.mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val auxiliaryEquipment = object : AuxiliaryEquipment() {}
-        val terminal = Terminal()
+        val auxiliaryEquipment = object : AuxiliaryEquipment(generateId()) {}
+        val terminal = Terminal(generateId())
 
         assertThat(auxiliaryEquipment.terminal, nullValue())
 

@@ -10,9 +10,11 @@ package com.zepben.ewb.cim.iec61968.assets
 
 import com.zepben.ewb.cim.iec61968.infiec61968.infassets.Pole
 import com.zepben.ewb.cim.iec61968.infiec61968.infassets.StreetlightLampKind
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -24,13 +26,12 @@ internal class StreetlightTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(Streetlight().mRID, not(equalTo("")))
         assertThat(Streetlight("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val streetlight = Streetlight()
+        val streetlight = Streetlight(generateId())
         val pole = Pole("p")
 
         assertThat(streetlight.pole, nullValue())

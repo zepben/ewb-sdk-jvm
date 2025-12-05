@@ -20,7 +20,7 @@ import com.zepben.ewb.services.common.extensions.validateReference
  * @property normalHeadTerminal The normal head terminal or terminals of the feeder.
  * @property normalEnergizingSubstation The substation that nominally energizes the feeder.  Also used for naming purposes.
  */
-class Feeder @JvmOverloads constructor(mRID: String = "") : EquipmentContainer(mRID) {
+class Feeder(mRID: String) : EquipmentContainer(mRID) {
 
     var normalHeadTerminal: Terminal? = null
         set(value) {

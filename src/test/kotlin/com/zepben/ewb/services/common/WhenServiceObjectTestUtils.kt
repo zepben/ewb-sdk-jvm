@@ -9,13 +9,14 @@
 package com.zepben.ewb.services.common
 
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.ewb.services.common.testdata.generateId
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.slf4j.LoggerFactory
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter
-import kotlin.reflect.full.createInstance
+import kotlin.reflect.full.primaryConstructor
 
 private val logger = LoggerFactory.getLogger("verifyWhenServiceFunctionSupportsAllServiceTypes")
 
@@ -23,7 +24,7 @@ internal fun verifyWhenServiceFunctionSupportsAllServiceTypes(
     supportedKClasses: Set<KClass<*>>,
     whenFunction: KFunction<*>,
     subjectField: String = "identifiedObject",
-    createUnknownClass: () -> Any = { object : IdentifiedObject() {} }
+    createUnknownClass: (String) -> Any = { object : IdentifiedObject(it) {} }
 ) {
     // Find all the parameters that have arguments and get their first parameter.
     // These should all be IdentifiedObject leaf classes in the "when*ServiceObject" functions.
@@ -46,11 +47,22 @@ internal fun verifyWhenServiceFunctionSupportsAllServiceTypes(
         mapOf(paramsByName.ensureParam("isOther") to neverInvokedChecker<IdentifiedObject>())
 
     supportedKClasses.forEach { check ->
-        whenFunction.validateObjectCallback(check.createInstance(), check.expectedCallback, neverInvokedParams, paramsByName, subjectField)
+        whenFunction.validateObjectCallback(
+            check.primaryConstructor!!.run {
+                if (parameters.size == 1)
+                    call("id-${check.simpleName}")
+                else
+                    call()
+            },
+            check.expectedCallback,
+            neverInvokedParams,
+            paramsByName,
+            subjectField
+        )
     }
 
     // Make sure unknown objects call the error handler.
-    whenFunction.validateObjectCallback(createUnknownClass(), "isOther", neverInvokedParams, paramsByName, subjectField)
+    whenFunction.validateObjectCallback(createUnknownClass(generateId()), "isOther", neverInvokedParams, paramsByName, subjectField)
 }
 
 private fun <T : Any> KFunction<*>.validateObjectCallback(

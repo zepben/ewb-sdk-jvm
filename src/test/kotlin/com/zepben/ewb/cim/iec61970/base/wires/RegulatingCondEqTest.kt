@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.cim.iec61970.base.wires
 
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.testdata.fillFields
 import com.zepben.testutils.exception.ExpectException.Companion.expect
@@ -26,13 +27,12 @@ internal class RegulatingCondEqTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(object : RegulatingCondEq() {}.mRID, not(equalTo("")))
         assertThat(object : RegulatingCondEq("id") {}.mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val regulatingCondEq = object : RegulatingCondEq() {}
+        val regulatingCondEq = object : RegulatingCondEq(generateId()) {}
 
         assertThat(regulatingCondEq.controlEnabled, nullValue())
         assertThat(regulatingCondEq.regulatingControl, nullValue())
@@ -45,7 +45,7 @@ internal class RegulatingCondEqTest {
 
     @Test
     internal fun cannotChangeRegulatingControl() {
-        val regulatingCondEq = object : RegulatingCondEq() {}
+        val regulatingCondEq = object : RegulatingCondEq(generateId()) {}
         val regControl = mockk<RegulatingControl>()
         regulatingCondEq.regulatingControl = regControl
 

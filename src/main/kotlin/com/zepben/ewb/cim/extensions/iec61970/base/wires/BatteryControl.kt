@@ -22,7 +22,7 @@ import com.zepben.ewb.cim.iec61970.base.wires.RegulatingControl
  * @property controlMode [ZBEX] Mode of operation for the dispatch (charging/discharging) function of BatteryControl.
  */
 @ZBEX
-class BatteryControl @JvmOverloads constructor(mRID: String = "") : RegulatingControl(mRID) {
+class BatteryControl(mRID: String) : RegulatingControl(mRID) {
 
     @ZBEX
     var chargingRate: Double? = null

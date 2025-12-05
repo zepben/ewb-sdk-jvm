@@ -22,7 +22,7 @@ import com.zepben.ewb.services.common.extensions.validateReference
  * model (refer to IEC61970-301 and model package IEC61970::Wires). Asset description places emphasis on the physical characteristics
  * of the equipment fulfilling that role.
  */
-abstract class Asset(mRID: String = "") : IdentifiedObject(mRID) {
+abstract class Asset(mRID: String) : IdentifiedObject(mRID) {
 
     private var _organisationRoles: MutableList<AssetOrganisationRole>? = null
     private var _powerSystemResources: MutableList<PowerSystemResource>? = null
@@ -80,6 +80,9 @@ abstract class Asset(mRID: String = "") : IdentifiedObject(mRID) {
         return ret
     }
 
+    /**
+     * @return A reference to this [Asset] to allow fluent use.
+     */
     fun clearOrganisationRoles(): Asset {
         _organisationRoles = null
         return this

@@ -11,4 +11,4 @@ package com.zepben.ewb.cim.iec61970.base.wires
 /**
  * Pole-mounted fault interrupter with built-in phase and ground relays, current transformer (CT), and supplemental controls.
  */
-class Recloser @JvmOverloads constructor(mRID: String = "") : ProtectedSwitch(mRID)
+class Recloser(mRID: String) : ProtectedSwitch(mRID)

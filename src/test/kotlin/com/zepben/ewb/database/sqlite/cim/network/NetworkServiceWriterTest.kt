@@ -9,6 +9,7 @@
 package com.zepben.ewb.database.sqlite.cim.network
 
 import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.every
@@ -33,7 +34,7 @@ internal class NetworkServiceWriterTest {
 
     @Test
     internal fun `passes objects through to the cim writer`() {
-        val circuit = Circuit().also { networkService.add(it) }
+        val circuit = Circuit(generateId()).also { networkService.add(it) }
 
         // NOTE: the write method will fail due to the relaxed mock returning false for all write operations,
         //       but a `write` should still be attempted on every object

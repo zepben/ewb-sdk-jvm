@@ -8,10 +8,12 @@
 
 package com.zepben.ewb.cim.iec61970.base.diagramlayout
 
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.utils.PrivateCollectionValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -23,14 +25,13 @@ internal class DiagramObjectTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(DiagramObject().mRID, not(equalTo("")))
         assertThat(DiagramObject("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val diagramObject = DiagramObject().apply { this.diagram = diagram }
-        val diagram = Diagram()
+        val diagramObject = DiagramObject(generateId()).apply { this.diagram = diagram }
+        val diagram = Diagram(generateId())
 
         assertThat(diagramObject.diagram, nullValue())
         assertThat(diagramObject.identifiedObjectMRID, nullValue())

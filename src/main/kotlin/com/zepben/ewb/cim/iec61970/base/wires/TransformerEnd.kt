@@ -35,7 +35,7 @@ import com.zepben.ewb.services.network.ResistanceReactance
  * When [starImpedance] is set here it indicates that impedance values are measured on the [TransformerEnd] itself rather than from the [PowerTransformer] data
  * sheet, and thus the corresponding [PowerTransformer] for this end cannot have an associated [PowerTransformerInfo].
  */
-abstract class TransformerEnd(mRID: String = "") : IdentifiedObject(mRID) {
+abstract class TransformerEnd(mRID: String) : IdentifiedObject(mRID) {
 
     var grounded: Boolean? = null
     var rGround: Double? = null

@@ -24,7 +24,7 @@ internal class PrivateCollectionValidator {
          * Validate the internal collection for an associated [IdentifiedObject] that has no order significance.
          */
         internal fun <T : IdentifiedObject, U : IdentifiedObject> validateUnordered(
-            createIt: () -> T,
+            createIt: (String) -> T,
             createOther: (String) -> U,
             getAll: (T) -> Collection<U>,
             num: (T) -> Int,
@@ -33,7 +33,7 @@ internal class PrivateCollectionValidator {
             remove: (T, U) -> Boolean,
             clear: (T) -> T
         ) {
-            val it = createIt()
+            val it = createIt("it")
             val other1 = createOther("1")
             val other2 = createOther("2")
             val other3 = createOther("3")
@@ -69,7 +69,7 @@ internal class PrivateCollectionValidator {
          * Validate the internal collection for an associated object that is not an [IdentifiedObject] that has no order significance.
          */
         internal fun <T, U : Any, K : Any> validateUnordered(
-            createIt: () -> T,
+            createIt: (String) -> T,
             createOther: (Int) -> U,
             getAll: (T) -> Collection<U>,
             num: (T) -> Int,
@@ -80,7 +80,7 @@ internal class PrivateCollectionValidator {
             getKey: (U) -> K,
             duplicateBehaviour: DuplicateBehaviour,
         ) {
-            val it = createIt()
+            val it = createIt("it")
             val other1 = createOther(1)
             val other2 = createOther(2)
             val other3 = createOther(3)
@@ -125,7 +125,7 @@ internal class PrivateCollectionValidator {
          * NOTE: Baked in index is expected to be 1-based, not 0-based.
          */
         internal fun <T : IdentifiedObject, U : IdentifiedObject> validateOrdered(
-            createIt: () -> T,
+            createIt: (String) -> T,
             createOther: (String, Int) -> U,
             getAll: (T) -> Collection<U>,
             num: (T) -> Int,
@@ -136,7 +136,7 @@ internal class PrivateCollectionValidator {
             clear: (T) -> T,
             indexOf: (U) -> Int
         ) {
-            val it = createIt()
+            val it = createIt("it")
             val other1 = createOther("1", 1)
             val other2 = createOther("2", 2)
             val otherAuto = createOther("3", 0)
@@ -193,7 +193,7 @@ internal class PrivateCollectionValidator {
          * NOTE: Positional index is expected to be 0-based, not 1-based.
          */
         internal fun <T : IdentifiedObject, U : Any> validateOrdered(
-            createIt: () -> T,
+            createIt: (String) -> T,
             createOther: (Int) -> U,
             getAll: (T) -> Collection<U>,
             num: (T) -> Int,
@@ -205,7 +205,7 @@ internal class PrivateCollectionValidator {
             removeAtIndex: ((T, Int) -> U?),
             clear: (T) -> T
         ) {
-            val it = createIt()
+            val it = createIt("it")
             val other1 = createOther(1)
             val other2 = createOther(2)
             val other3 = createOther(3)

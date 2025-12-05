@@ -14,4 +14,4 @@ import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
  * This class describes a measurement or control value.
  * The purpose is to enable having attributes and associations common for measurement and control.
  */
-abstract class IoPoint(mRID: String = "") : IdentifiedObject(mRID)
+abstract class IoPoint(mRID: String) : IdentifiedObject(mRID)

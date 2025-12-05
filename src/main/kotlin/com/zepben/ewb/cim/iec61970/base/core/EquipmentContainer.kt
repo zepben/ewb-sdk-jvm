@@ -15,7 +15,7 @@ import com.zepben.ewb.services.common.extensions.validateReference
  * A modeling construct to provide a root class for containing equipment.
  * Unless overridden, all functions operating on currentEquipment simply operate on the equipment collection. i.e. currentEquipment = equipment
  */
-abstract class EquipmentContainer(mRID: String = "") : ConnectivityNodeContainer(mRID) {
+abstract class EquipmentContainer(mRID: String) : ConnectivityNodeContainer(mRID) {
 
     private var _equipmentById: MutableMap<String?, Equipment>? = null
 

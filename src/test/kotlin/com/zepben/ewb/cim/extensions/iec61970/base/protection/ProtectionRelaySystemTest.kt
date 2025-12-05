@@ -8,25 +8,24 @@
 
 package com.zepben.ewb.cim.extensions.iec61970.base.protection
 
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.testdata.fillFields
 import com.zepben.ewb.utils.PrivateCollectionValidator
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.Test
 
 internal class ProtectionRelaySystemTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(ProtectionRelaySystem().mRID, not(equalTo("")))
         assertThat(ProtectionRelaySystem("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val protectionRelaySystem = ProtectionRelaySystem()
+        val protectionRelaySystem = ProtectionRelaySystem(generateId())
 
         assertThat(protectionRelaySystem.protectionKind, equalTo(ProtectionKind.UNKNOWN))
 

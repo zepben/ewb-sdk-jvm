@@ -8,10 +8,10 @@
 
 package com.zepben.ewb.cim.iec61970.base.wires
 
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -23,13 +23,12 @@ internal class BusbarSectionTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(BusbarSection().mRID, not(equalTo("")))
         assertThat(BusbarSection("id").mRID, equalTo("id"))
     }
 
     @Test
     fun `can only have a single terminal`() {
-        assertThat(BusbarSection().maxTerminals, equalTo(1))
+        assertThat(BusbarSection(generateId()).maxTerminals, equalTo(1))
     }
 
 }

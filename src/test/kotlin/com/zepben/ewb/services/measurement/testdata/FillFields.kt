@@ -8,7 +8,11 @@
 
 package com.zepben.ewb.services.measurement.testdata
 
-import com.zepben.ewb.cim.iec61970.base.meas.*
+import com.zepben.ewb.cim.iec61970.base.meas.AccumulatorValue
+import com.zepben.ewb.cim.iec61970.base.meas.AnalogValue
+import com.zepben.ewb.cim.iec61970.base.meas.DiscreteValue
+import com.zepben.ewb.cim.iec61970.base.meas.MeasurementValue
+import com.zepben.ewb.services.common.testdata.generateId
 import java.time.Instant
 
 // ######################
@@ -17,21 +21,21 @@ import java.time.Instant
 
 fun AccumulatorValue.fillFields(): AccumulatorValue {
     value = 23u
-    accumulatorMRID = Analog().mRID
+    accumulatorMRID = generateId()
     (this as MeasurementValue).fillFields()
     return this
 }
 
 fun AnalogValue.fillFields(): AnalogValue {
     value = 2.3
-    analogMRID = Analog().mRID
+    analogMRID = generateId()
     (this as MeasurementValue).fillFields()
     return this
 }
 
 fun DiscreteValue.fillFields(): DiscreteValue {
     value = 23
-    discreteMRID = Analog().mRID
+    discreteMRID = generateId()
     (this as MeasurementValue).fillFields()
     return this
 }

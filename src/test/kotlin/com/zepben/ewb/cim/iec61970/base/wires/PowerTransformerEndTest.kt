@@ -12,6 +12,7 @@ import com.zepben.ewb.cim.extensions.iec61970.base.wires.TransformerCoolingType
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.TransformerEndRatedS
 import com.zepben.ewb.cim.iec61968.assetinfo.PowerTransformerInfo
 import com.zepben.ewb.services.common.extensions.typeNameAndMRID
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.ResistanceReactance
 import com.zepben.ewb.services.network.ResistanceReactanceTest.Companion.validateResistanceReactance
@@ -39,13 +40,12 @@ internal class PowerTransformerEndTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(PowerTransformerEnd().mRID, not(equalTo("")))
         assertThat(PowerTransformerEnd("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val powerTransformerEnd = PowerTransformerEnd()
+        val powerTransformerEnd = PowerTransformerEnd(generateId())
 
         assertThat(powerTransformerEnd.powerTransformer, nullValue())
         assertThat(powerTransformerEnd.b, nullValue())
@@ -80,7 +80,7 @@ internal class PowerTransformerEndTest {
         assertThat(powerTransformerEnd.sRatings, contains(TransformerEndRatedS(TransformerCoolingType.UNKNOWN, 8)))
 
         // Cover default cooling type for addRating
-        val pte = PowerTransformerEnd()
+        val pte = PowerTransformerEnd(generateId())
         assertThat(pte.ratedS, nullValue())
         pte.addRating(11000)
         assertThat(pte.ratedS, equalTo(11000))
@@ -89,24 +89,24 @@ internal class PowerTransformerEndTest {
 
     @Test
     internal fun `cant assign star impedance when powerTransformer has an AssetInfo`() {
-        val tx = PowerTransformer().apply { assetInfo = PowerTransformerInfo() }
-        val end = PowerTransformerEnd().apply { powerTransformer = tx }.also { tx.addEnd(it) }
+        val tx = PowerTransformer(generateId()).apply { assetInfo = PowerTransformerInfo(generateId()) }
+        val end = PowerTransformerEnd(generateId()).apply { powerTransformer = tx }.also { tx.addEnd(it) }
 
-        expect { end.starImpedance = TransformerStarImpedance() }
+        expect { end.starImpedance = TransformerStarImpedance(generateId()) }
             .toThrow<IllegalArgumentException>()
             .withMessage("Unable to use a star impedance for ${end.typeNameAndMRID()} directly because ${tx.typeNameAndMRID()} references ${tx.assetInfo?.typeNameAndMRID()}.")
     }
 
     @Test
     internal fun `only checks for AssetInfo assigned with non-null star impedance`() {
-        val tx = PowerTransformer().apply { assetInfo = PowerTransformerInfo() }
-        val end = PowerTransformerEnd().apply { powerTransformer = tx }.also { tx.addEnd(it) }
+        val tx = PowerTransformer(generateId()).apply { assetInfo = PowerTransformerInfo(generateId()) }
+        val end = PowerTransformerEnd(generateId()).apply { powerTransformer = tx }.also { tx.addEnd(it) }
         end.starImpedance = null
     }
 
     @Test
     internal fun populatesResistanceReactanceDirectlyIfAvailable() {
-        val end = PowerTransformerEnd().apply {
+        val end = PowerTransformerEnd(generateId()).apply {
             r = 1.1
             x = 1.2
             r0 = 1.3
@@ -118,7 +118,7 @@ internal class PowerTransformerEndTest {
 
     @Test
     internal fun populatesResistanceReactanceOffStarImpedanceIfAvailable() {
-        val end = PowerTransformerEnd().apply {
+        val end = PowerTransformerEnd(generateId()).apply {
             powerTransformer = tx
             starImpedance = si
         }
@@ -133,7 +133,7 @@ internal class PowerTransformerEndTest {
 
     @Test
     internal fun populatesResistanceReactanceOffAssetInfoIfAvailable() {
-        val end = PowerTransformerEnd().apply {
+        val end = PowerTransformerEnd(generateId()).apply {
             endNumber = 123
             powerTransformer = tx
         }
@@ -150,7 +150,7 @@ internal class PowerTransformerEndTest {
     @Test
     internal fun leavesResistanceReactanceUnpopulatedIfNoSourceAvailable() {
         // Isolated end
-        val end = PowerTransformerEnd()
+        val end = PowerTransformerEnd(generateId())
         validateResistanceReactance(end.resistanceReactance(), null, null, null, null)
 
         // With invalid star impedance
@@ -168,7 +168,7 @@ internal class PowerTransformerEndTest {
 
     @Test
     internal fun mergesIncompleteWithPrecedence() {
-        val end = PowerTransformerEnd().apply {
+        val end = PowerTransformerEnd(generateId()).apply {
             r = 1.1
             endNumber = 1
             starImpedance = si
@@ -203,7 +203,7 @@ internal class PowerTransformerEndTest {
     @Test
     internal fun `remove rating by cooling type`() {
         val coolingTypes = TransformerCoolingType.entries
-        val pte = PowerTransformerEnd()
+        val pte = PowerTransformerEnd(generateId())
         (1..11).forEach {
             pte.addRating(it * 10, coolingTypes[it - 1])
             assertThat(pte.numRatings(), equalTo(it))
@@ -219,7 +219,7 @@ internal class PowerTransformerEndTest {
 
     @Test
     internal fun `add rating with same cooling type throws exception`() {
-        val pte = PowerTransformerEnd()
+        val pte = PowerTransformerEnd(generateId())
         pte.addRating(3, TransformerCoolingType.KFWF)
         pte.addRating(3, TransformerCoolingType.KNAF)
 
@@ -231,7 +231,7 @@ internal class PowerTransformerEndTest {
 
     @Test
     internal fun `ratedS setter coverage`() {
-        val pte = PowerTransformerEnd()
+        val pte = PowerTransformerEnd(generateId())
         @Suppress("DEPRECATION")
         pte.ratedS = 10
         assertThat(pte.ratedS, equalTo(10))

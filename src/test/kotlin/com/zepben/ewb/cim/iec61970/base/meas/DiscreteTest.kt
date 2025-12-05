@@ -11,7 +11,6 @@ package com.zepben.ewb.cim.iec61970.base.meas
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -22,7 +21,6 @@ internal class DiscreteTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(Discrete().mRID, not(equalTo("")))
         assertThat(Discrete("id").mRID, equalTo("id"))
     }
 

@@ -19,7 +19,7 @@ import com.zepben.ewb.services.common.extensions.validateReference
  * @property baseVoltage Base voltage of this conducting equipment.  Use only when there is no voltage level container used and only one base
  *                       voltage applies.  For example, not used for transformers.
  */
-abstract class ConductingEquipment(mRID: String = "") : Equipment(mRID) {
+abstract class ConductingEquipment(mRID: String) : Equipment(mRID) {
 
     var baseVoltage: BaseVoltage? = null
     private val _terminals: MutableList<Terminal> = mutableListOf()
@@ -94,8 +94,19 @@ abstract class ConductingEquipment(mRID: String = "") : Equipment(mRID) {
      */
     open val maxTerminals: Int get() = Int.MAX_VALUE
 
+    /**
+     * Remove a [Terminal] from this [ConductingEquipment].
+     *
+     * @param terminal The [Terminal] to remove.
+     * @return true if [terminal] is removed from the collection.
+     */
     fun removeTerminal(terminal: Terminal): Boolean = _terminals.remove(terminal)
 
+    /**
+     * Clear all [Terminal]'s from this [ConductingEquipment].
+     *
+     * @return This [ConductingEquipment] for fluent use.
+     */
     fun clearTerminals(): ConductingEquipment {
         _terminals.clear()
         return this

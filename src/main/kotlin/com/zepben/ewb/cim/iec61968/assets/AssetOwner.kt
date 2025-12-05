@@ -11,4 +11,4 @@ package com.zepben.ewb.cim.iec61968.assets
 /**
  * Owner of the asset.
  */
-class AssetOwner @JvmOverloads constructor(mRID: String = "") : AssetOrganisationRole(mRID)
+class AssetOwner(mRID: String) : AssetOrganisationRole(mRID)

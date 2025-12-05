@@ -8,9 +8,11 @@
 
 package com.zepben.ewb.cim.iec61970.base.wires
 
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -22,14 +24,13 @@ internal class EnergySourcePhaseTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(EnergySourcePhase().mRID, not(equalTo("")))
         assertThat(EnergySourcePhase("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val energySourcePhase = EnergySourcePhase()
-        val energySource = EnergySource()
+        val energySourcePhase = EnergySourcePhase(generateId())
+        val energySource = EnergySource(generateId())
 
         assertThat(energySourcePhase.energySource, nullValue())
         assertThat(energySourcePhase.phase, equalTo(SinglePhaseKind.X))

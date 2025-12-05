@@ -29,7 +29,7 @@ import com.zepben.ewb.cim.iec61970.base.core.PowerSystemResource
  *                a solutions where a narrow voltage band force the tap step to oscillate or accommodate for a continuous solution as input.
  *                The attribute shall be equal or greater than lowStep and equal or less than highStep.
  */
-abstract class TapChanger(mRID: String = "") : PowerSystemResource(mRID) {
+abstract class TapChanger(mRID: String) : PowerSystemResource(mRID) {
 
     var controlEnabled: Boolean? = null
 

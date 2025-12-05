@@ -14,7 +14,7 @@ import com.zepben.ewb.services.common.extensions.*
  * A subset of a geographical region of a power system network model.
  * @property geographicalRegion The geographical region to which this sub-geographical region is within.
  */
-class SubGeographicalRegion @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mRID) {
+class SubGeographicalRegion(mRID: String) : IdentifiedObject(mRID) {
 
     var geographicalRegion: GeographicalRegion? = null
     private var _substations: MutableList<Substation>? = null

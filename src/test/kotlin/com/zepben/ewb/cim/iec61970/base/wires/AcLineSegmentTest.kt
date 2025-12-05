@@ -8,9 +8,12 @@
 
 package com.zepben.ewb.cim.iec61970.base.wires
 
+import com.zepben.ewb.services.common.testdata.generateId
+import com.zepben.ewb.utils.PrivateCollectionValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -22,15 +25,14 @@ internal class AcLineSegmentTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(AcLineSegment().mRID, not(equalTo("")))
         assertThat(AcLineSegment("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val acLineSegment = AcLineSegment()
-        val perLengthSequenceImpedance = PerLengthSequenceImpedance()
-        val perLengthPhaseImpedance = PerLengthPhaseImpedance()
+        val acLineSegment = AcLineSegment(generateId())
+        val perLengthSequenceImpedance = PerLengthSequenceImpedance(generateId())
+        val perLengthPhaseImpedance = PerLengthPhaseImpedance(generateId())
 
         assertThat(acLineSegment.perLengthSequenceImpedance, nullValue())
         assertThat(acLineSegment.perLengthPhaseImpedance, nullValue())
@@ -53,6 +55,34 @@ internal class AcLineSegmentTest {
         assertThat(acLineSegment.perLengthSequenceImpedance, nullValue())
         assertThat(acLineSegment.perLengthPhaseImpedance, nullValue())
         assertThat(acLineSegment.perLengthImpedance, nullValue())
+    }
+
+    @Test
+    internal fun cuts() {
+        PrivateCollectionValidator.validateUnordered(
+            { id -> AcLineSegment(id) },
+            { id -> Cut(id) },
+            AcLineSegment::cuts,
+            AcLineSegment::numCuts,
+            AcLineSegment::getCut,
+            AcLineSegment::addCut,
+            AcLineSegment::removeCut,
+            AcLineSegment::clearCuts,
+        )
+    }
+
+    @Test
+    internal fun clamps() {
+        PrivateCollectionValidator.validateUnordered(
+            { id -> AcLineSegment(id) },
+            { id -> Clamp(id) },
+            AcLineSegment::clamps,
+            AcLineSegment::numClamps,
+            AcLineSegment::getClamp,
+            AcLineSegment::addClamp,
+            AcLineSegment::removeClamp,
+            AcLineSegment::clearClamps,
+        )
     }
 
 }

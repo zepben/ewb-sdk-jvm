@@ -20,7 +20,7 @@ import com.zepben.ewb.services.common.extensions.validateReference
  *
  * @property customer Customer for this agreement.
  */
-class CustomerAgreement @JvmOverloads constructor(mRID: String = "") : Agreement(mRID) {
+class CustomerAgreement(mRID: String) : Agreement(mRID) {
 
     var customer: Customer? = null
         set(value) {
@@ -48,6 +48,12 @@ class CustomerAgreement @JvmOverloads constructor(mRID: String = "") : Agreement
      */
     fun getPricingStructure(mRID: String): PricingStructure? = _pricingStructures?.getByMRID(mRID)
 
+    /**
+     * Add a [PricingStructure] to this [CustomerAgreement].
+     *
+     * @param pricingStructure The [PricingStructure] to add.
+     * @return This [CustomerAgreement] for fluent use.
+     */
     fun addPricingStructure(pricingStructure: PricingStructure): CustomerAgreement {
         if (validateReference(pricingStructure, ::getPricingStructure, "A PricingStructure"))
             return this
@@ -58,14 +64,26 @@ class CustomerAgreement @JvmOverloads constructor(mRID: String = "") : Agreement
         return this
     }
 
+    /**
+     * Remove a [PricingStructure] from this [CustomerAgreement].
+     *
+     * @param pricingStructure The [PricingStructure] to remove.
+     * @return true if [pricingStructure] is removed from the collection.
+     */
     fun removePricingStructure(pricingStructure: PricingStructure): Boolean {
         val ret = _pricingStructures?.remove(pricingStructure) == true
         if (_pricingStructures.isNullOrEmpty()) _pricingStructures = null
         return ret
     }
 
+    /**
+     * Clear all [PricingStructure]'s from this [CustomerAgreement].
+     *
+     * @return This [CustomerAgreement] for fluent use.
+     */
     fun clearPricingStructures(): CustomerAgreement {
         _pricingStructures = null
         return this
     }
+
 }

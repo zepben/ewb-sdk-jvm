@@ -9,11 +9,13 @@
 package com.zepben.ewb.cim.iec61970.base.core
 
 import com.zepben.ewb.services.common.extensions.typeNameAndMRID
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.utils.PrivateCollectionValidator
 import com.zepben.testutils.exception.ExpectException
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -25,14 +27,13 @@ internal class SubGeographicalRegionTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(SubGeographicalRegion().mRID, not(equalTo("")))
         assertThat(SubGeographicalRegion("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val subGeographicalRegion = SubGeographicalRegion()
-        val geographicalRegion = GeographicalRegion()
+        val subGeographicalRegion = SubGeographicalRegion(generateId())
+        val geographicalRegion = GeographicalRegion(generateId())
 
         assertThat(subGeographicalRegion.geographicalRegion, nullValue())
 
@@ -43,8 +44,8 @@ internal class SubGeographicalRegionTest {
 
     @Test
     internal fun assignsSubGeographicalRegionToSubstationIfMissing() {
-        val subGeographicalRegion = SubGeographicalRegion()
-        val substation = Substation()
+        val subGeographicalRegion = SubGeographicalRegion(generateId())
+        val substation = Substation(generateId())
 
         subGeographicalRegion.addSubstation(substation)
         assertThat(substation.subGeographicalRegion, equalTo(subGeographicalRegion))
@@ -52,9 +53,9 @@ internal class SubGeographicalRegionTest {
 
     @Test
     internal fun rejectsSubstationWithWrongSubGeographicalRegion() {
-        val subGeographicalRegion1 = SubGeographicalRegion()
-        val subGeographicalRegion2 = SubGeographicalRegion()
-        val substation = Substation().apply { subGeographicalRegion = subGeographicalRegion2 }
+        val subGeographicalRegion1 = SubGeographicalRegion(generateId())
+        val subGeographicalRegion2 = SubGeographicalRegion(generateId())
+        val substation = Substation(generateId()).apply { subGeographicalRegion = subGeographicalRegion2 }
 
         ExpectException.expect { subGeographicalRegion1.addSubstation(substation) }
             .toThrow<IllegalArgumentException>()

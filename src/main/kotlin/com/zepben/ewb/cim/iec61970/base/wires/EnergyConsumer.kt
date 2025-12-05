@@ -26,7 +26,7 @@ import com.zepben.ewb.services.common.extensions.validateReference
  *             For voltage dependent loads the value is at rated voltage. Starting value for a steady state solution.
  * @property qFixed power of the load that is a fixed quantity. Load sign convention is used, i.e. positive sign means flow out from a node.
  */
-class EnergyConsumer @JvmOverloads constructor(mRID: String = "") : EnergyConnection(mRID) {
+class EnergyConsumer(mRID: String) : EnergyConnection(mRID) {
 
     private var _energyConsumerPhases: MutableList<EnergyConsumerPhase>? = null
     var customerCount: Int? = null
@@ -55,6 +55,12 @@ class EnergyConsumer @JvmOverloads constructor(mRID: String = "") : EnergyConnec
      */
     fun getPhase(mRID: String): EnergyConsumerPhase? = _energyConsumerPhases?.getByMRID(mRID)
 
+    /**
+     * Add an [EnergyConsumerPhase] to this [EnergyConsumer].
+     *
+     * @param phase The [EnergyConsumerPhase] to add.
+     * @return This [EnergyConsumer] for fluent use.
+     */
     fun addPhase(phase: EnergyConsumerPhase): EnergyConsumer {
         if (validateReference(phase, ::getPhase, "An EnergyConsumerPhase"))
             return this
@@ -72,14 +78,26 @@ class EnergyConsumer @JvmOverloads constructor(mRID: String = "") : EnergyConnec
         return this
     }
 
+    /**
+     * Remove an [EnergyConsumerPhase] from this [EnergyConsumer].
+     *
+     * @param phase The [EnergyConsumerPhase] to remove.
+     * @return true if [phase] is removed from the collection.
+     */
     fun removePhase(phase: EnergyConsumerPhase): Boolean {
         val ret = _energyConsumerPhases?.remove(phase) == true
         if (_energyConsumerPhases.isNullOrEmpty()) _energyConsumerPhases = null
         return ret
     }
 
+    /**
+     * Clear all [EnergyConsumerPhase]'s from this [EnergyConsumer].
+     *
+     * @return This [EnergyConsumer] for fluent use.
+     */
     fun clearPhases(): EnergyConsumer {
         _energyConsumerPhases = null
         return this
     }
+
 }

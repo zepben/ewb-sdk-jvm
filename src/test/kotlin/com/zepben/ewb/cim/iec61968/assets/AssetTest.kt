@@ -10,10 +10,12 @@ package com.zepben.ewb.cim.iec61968.assets
 
 import com.zepben.ewb.cim.iec61968.common.Location
 import com.zepben.ewb.cim.iec61970.base.core.PowerSystemResource
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.utils.PrivateCollectionValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -25,14 +27,13 @@ internal class AssetTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(object : Asset() {}.mRID, not(equalTo("")))
         assertThat(object : Asset("id") {}.mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val asset = object : Asset() {}
-        val location = Location()
+        val asset = object : Asset(generateId()) {}
+        val location = Location(generateId())
 
         assertThat(asset.location, nullValue())
 
@@ -44,7 +45,7 @@ internal class AssetTest {
     @Test
     internal fun organisationRoles() {
         PrivateCollectionValidator.validateUnordered(
-            { object : Asset() {} },
+            { id -> object : Asset(id) {} },
             { id -> object : AssetOrganisationRole(id) {} },
             Asset::organisationRoles,
             Asset::numOrganisationRoles,
@@ -58,7 +59,7 @@ internal class AssetTest {
     @Test
     internal fun powerSystemResources() {
         PrivateCollectionValidator.validateUnordered(
-            { object : Asset() {} },
+            { id -> object : Asset(id) {} },
             { id -> object : PowerSystemResource(id) {} },
             Asset::powerSystemResources,
             Asset::numPowerSystemResources,

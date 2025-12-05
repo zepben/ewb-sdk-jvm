@@ -11,6 +11,7 @@ package com.zepben.ewb.cim.iec61968.metering
 import com.zepben.ewb.cim.extensions.iec61968.common.ContactDetails
 import com.zepben.ewb.cim.iec61970.base.core.Equipment
 import com.zepben.ewb.cim.iec61970.base.core.PhaseCode
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.testdata.fillFields
 import com.zepben.ewb.utils.PrivateCollectionValidator
@@ -28,13 +29,12 @@ internal class UsagePointTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(UsagePoint().mRID, not(equalTo("")))
         assertThat(UsagePoint("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val usagePoint = UsagePoint()
+        val usagePoint = UsagePoint(generateId())
 
         assertThat(usagePoint.usagePointLocation, nullValue())
         assertThat(usagePoint.isVirtual, nullValue())

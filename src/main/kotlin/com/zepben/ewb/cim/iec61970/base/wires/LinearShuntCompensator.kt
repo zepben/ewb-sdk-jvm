@@ -15,7 +15,7 @@ package com.zepben.ewb.cim.iec61970.base.wires
  * @property g0PerSection Zero sequence shunt (charging) conductance per section
  * @property gPerSection Positive sequence shunt (charging) conductance per section
  */
-class LinearShuntCompensator @JvmOverloads constructor(mRID: String = "") : ShuntCompensator(mRID) {
+class LinearShuntCompensator(mRID: String) : ShuntCompensator(mRID) {
 
     var b0PerSection: Double? = null
     var bPerSection: Double? = null

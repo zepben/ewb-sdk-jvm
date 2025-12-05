@@ -8,23 +8,24 @@
 
 package com.zepben.ewb.cim.iec61970.base.protection
 
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.testdata.fillFields
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 
 internal class CurrentRelayTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(CurrentRelay().mRID, not(equalTo("")))
         assertThat(CurrentRelay("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val currentRelay = CurrentRelay()
+        val currentRelay = CurrentRelay(generateId())
 
         assertThat(currentRelay.currentLimit1, nullValue())
         assertThat(currentRelay.inverseTimeFlag, nullValue())

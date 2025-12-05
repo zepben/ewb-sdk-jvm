@@ -10,6 +10,7 @@ package com.zepben.ewb.cim.iec61970.base.wires
 
 import com.zepben.ewb.cim.iec61970.base.core.Terminal
 import com.zepben.ewb.services.common.extensions.typeNameAndMRID
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.testdata.fillFields
 import com.zepben.testutils.exception.ExpectException.Companion.expect
@@ -27,13 +28,12 @@ internal class TransformerEndTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(object : TransformerEnd() {}.mRID, not(equalTo("")))
         assertThat(object : TransformerEnd("id") {}.mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val transformerEnd = object : TransformerEnd() {}
+        val transformerEnd = object : TransformerEnd(generateId()) {}
 
         assertThat(transformerEnd.grounded, nullValue())
         assertThat(transformerEnd.rGround, nullValue())
@@ -56,7 +56,7 @@ internal class TransformerEndTest {
 
     @Test
     internal fun throwsOnUnknownEndType() {
-        val end = object : TransformerEnd() {}
+        val end = object : TransformerEnd(generateId()) {}
         expect { end.resistanceReactance() }
             .toThrow<NotImplementedError>()
             .withMessage("Unknown transformer end leaf type: ${end.typeNameAndMRID()}. Add support which should at least include `starImpedance?.resistanceReactance() ?: ResistanceReactance()`.")
@@ -64,7 +64,7 @@ internal class TransformerEndTest {
 
     @Test
     internal fun throwsOnAssignmentToNonTransformerTerminal() {
-        val end = object : TransformerEnd() {}
+        val end = object : TransformerEnd(generateId()) {}
         val junction = Junction("j0")
         val terminal = Terminal("j0-t1").also { junction.addTerminal(it) }
         expect { end.terminal = terminal }
@@ -77,8 +77,8 @@ internal class TransformerEndTest {
 
     @Test
     internal fun doesNotThrowOnAssignmentToDisconnectedTerminal() {
-        val end = object : TransformerEnd() {}
-        val terminal = Terminal()
+        val end = object : TransformerEnd(generateId()) {}
+        val terminal = Terminal(generateId())
         end.terminal = terminal
         assertThat(end.terminal, equalTo(terminal))
     }

@@ -47,6 +47,7 @@ import com.zepben.ewb.database.sqlite.cim.CimDatabaseSchemaTest
 import com.zepben.ewb.services.common.Resolvers
 import com.zepben.ewb.services.common.testdata.SchemaServices
 import com.zepben.ewb.services.common.testdata.fillFieldsCommon
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.NetworkServiceComparator
 import com.zepben.ewb.services.network.testdata.*
@@ -74,7 +75,7 @@ class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkD
 
     override fun createComparator(): NetworkServiceComparator = NetworkServiceComparator()
 
-    override fun createIdentifiedObject(): IdentifiedObject = Junction()
+    override fun createIdentifiedObject(): IdentifiedObject = Junction(generateId())
 
     @Test
     @Disabled

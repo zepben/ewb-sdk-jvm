@@ -30,11 +30,13 @@ internal class MetricsSchemaTest {
 
     private val uuid = UUID.randomUUID()
 
+    // NOTE: this pattern must be used instead of `getConnection.use` to ensure the same in-memory DB is used for each of these tests.
     private val connection = getConnection()
 
     private fun getConnection() = DriverManager.getConnection("jdbc:h2:mem:metrics;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH")
 
     @BeforeEach
+    // NOTE: this pattern must be used instead of `getConnection.use` to ensure the same in-memory DB is used for each of these tests.
     internal fun createSchema() {
         // The MetricsDatabaseWriter assumes that the schema has been created already, so we create it here
         connection.createStatement().use { statement ->
@@ -52,6 +54,7 @@ internal class MetricsSchemaTest {
     }
 
     @AfterEach
+    // NOTE: this pattern must be used instead of `getConnection.use` to ensure the same in-memory DB is used for each of these tests.
     internal fun closeConnection() = connection.close()
 
     @Test

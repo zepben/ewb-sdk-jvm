@@ -21,7 +21,7 @@ import com.zepben.ewb.services.common.meta.MetadataCollection
  * @param databaseTables The tables that are available in the database.
  */
 internal class MetadataEntryWriter(
-    val databaseTables: CimDatabaseTables
+    val databaseTables: BaseDatabaseTables
 ) : BaseEntryWriter() {
 
     /**

@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.services.common.testdata
 
+import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectComponent
 import com.zepben.ewb.cim.iec61968.common.StreetAddress
 import com.zepben.ewb.cim.iec61968.common.StreetDetail
 import com.zepben.ewb.cim.iec61968.common.TownDetail
@@ -17,13 +18,17 @@ import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.core.NameType
 import com.zepben.ewb.cim.iec61970.base.domain.DateTimeInterval
 import com.zepben.ewb.cim.iec61970.base.wires.*
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.DataSet
 import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.common.meta.DataSource
 import com.zepben.ewb.services.common.meta.MetadataCollection
 import com.zepben.ewb.services.customer.CustomerService
 import com.zepben.ewb.services.diagram.DiagramService
 import com.zepben.ewb.services.network.NetworkService
+import com.zepben.ewb.services.variant.VariantService
 import java.time.Instant
+import javax.annotation.Nullable
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KVisibility
 import kotlin.reflect.full.*
@@ -87,7 +92,21 @@ object SchemaServices {
             networkService.tryAdd(factory("emptyNotNull").also { fillRequired(networkService, it); fillEmptys(it) })
         }
 
-    private fun fillRequired(service: NetworkService, io: IdentifiedObject) {
+    fun <T : IdentifiedObject> variantServicesOf(factory: (mRID: String) -> T, filler: (T, VariantService, Boolean) -> T): VariantService =
+        VariantService().also { variantService ->
+            variantService.tryAdd(factory("empty").also { fillRequired(variantService, it) })
+            variantService.tryAdd(filler(factory("filled"), variantService, false))
+            variantService.tryAdd(factory("emptyNotNull").also { fillRequired(variantService, it); fillEmptys(it)})
+        }
+
+    fun variantServicesOfChangeSets(factory: (mRID: String) -> ChangeSet, filler: (ChangeSet, VariantService, Boolean) -> ChangeSet): VariantService =
+        VariantService().also { variantService ->
+            variantService.add(factory("empty").also { fillRequired(variantService, it) })
+            variantService.add(filler(factory("filled"), variantService, false))
+            variantService.add(factory("emptyNotNull").also { fillRequired(variantService, it); fillEmptys(it) })
+        }
+
+    private fun fillRequired(service: NetworkService, io: Any) {
         when (io) {
             is EnergyConsumerPhase -> {
                 io.energyConsumer = EnergyConsumer(generateId()).also {
@@ -115,7 +134,7 @@ object SchemaServices {
      * Any exception in setting the value to the empty value means there are constraints in place, and the old null
      * replacements won't be an issue, so can safely be ignored.
      */
-    fun fillEmptys(io: IdentifiedObject) {
+    fun fillEmptys(io: Any) {
         io::class.memberProperties
             .filter { it.visibility == KVisibility.PUBLIC }
             .filter { it.returnType.isMarkedNullable }
@@ -151,7 +170,7 @@ object SchemaServices {
                             buildingNumber = ""
                         ),
                     )
-
+                    // FIXME: IDK how, also not much thought has gone in, but this just bit me with an accidental public var (NetworkModelProject._children), maybe we should check for that? ie: isPublic && name.startswith("_") ?
                     else -> throw IllegalStateException("INTERNAL ERROR: You forgot to add an empty value mapper for ${prop.returnType} - used by ${io::class.simpleName}.${prop.name}")
                 }
 
@@ -167,11 +186,11 @@ object SchemaServices {
     private inline fun <reified T> KMutableProperty<*>.isNullableOf(): Boolean =
         returnType.withNullability(false).isSubtypeOf(T::class.createType())
 
-    private fun KMutableProperty<*>.findKnownNonEmpty(io: IdentifiedObject): Any? {
+    private fun KMutableProperty<*>.findKnownNonEmpty(io: Any): Any? {
         return tryPowerElectronicsConnectionNonEmpty(io)
     }
 
-    private fun KMutableProperty<*>.tryPowerElectronicsConnectionNonEmpty(io: IdentifiedObject): Any? =
+    private fun KMutableProperty<*>.tryPowerElectronicsConnectionNonEmpty(io: Any): Any? =
         when (io) {
             is PowerElectronicsConnection -> {
                 when (name) {

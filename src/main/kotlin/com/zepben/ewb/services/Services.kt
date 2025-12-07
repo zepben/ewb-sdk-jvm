@@ -11,6 +11,7 @@ package com.zepben.ewb.services
 import com.zepben.ewb.services.customer.CustomerService
 import com.zepben.ewb.services.diagram.DiagramService
 import com.zepben.ewb.services.network.NetworkService
+import com.zepben.ewb.services.variant.VariantService
 
 /**
  * A convenience class for storing the data supported by the SDK.
@@ -18,11 +19,13 @@ import com.zepben.ewb.services.network.NetworkService
  * @property networkService A [NetworkService].
  * @property diagramService A [DiagramService].
  * @property customerService A [CustomerService].
+ * @property variantService A [VariantService].
  */
 open class Services(
     val networkService: NetworkService = NetworkService(),
     val diagramService: DiagramService = DiagramService(),
-    val customerService: CustomerService = CustomerService()
+    val customerService: CustomerService = CustomerService(),
+    val variantService: VariantService = VariantService(),
 ) {
 
     /**
@@ -39,5 +42,10 @@ open class Services(
      * Accessor of the [customerService] to allow for destructuring.
      */
     operator fun component3(): CustomerService = customerService
+
+    /**
+     * Accessor of the [variantService] to allow for destructuring.
+     */
+    operator fun component4(): VariantService = variantService
 
 }

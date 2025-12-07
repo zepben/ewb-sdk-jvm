@@ -32,20 +32,31 @@ import java.sql.DriverManager
 /**
  * Base class for CIM service database schema tests
  */
-abstract class CimDatabaseSchemaTest<TService : BaseService, TWriter : CimDatabaseWriter<*, TService>, TReader : CimDatabaseReader<*, TService>, TComparator : BaseServiceComparator> {
+abstract class CimDatabaseSchemaTest<
+    TService : BaseService,
+    TWriter : CimDatabaseWriter<*, TService>,
+    TReader : CimDatabaseReader<*, TService>,
+    TComparator : BaseServiceComparator,
+    TMaxsCoolObject: Any,
+    >(
+    private val tableVersion: TableVersion = tableCimVersion,
+    private val schemaTestFile: String = "src/test/data/schemaTest.sqlite",
+    private val databaseInitialiser: DatabaseInitialiser<CimDatabaseTables> = SqliteDatabaseInitialiser(schemaTestFile),
+    private val describeObject: TMaxsCoolObject.() -> String,
+    private val addToService: TService.(TMaxsCoolObject) -> Boolean,
+) {
 
     @JvmField
     @RegisterExtension
     val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     protected val logger: Logger = LoggerFactory.getLogger(javaClass)
-    private val schemaTestFile = "src/test/data/schemaTest.sqlite"
 
     abstract fun createService(): TService
     abstract fun createWriter(filename: String): TWriter
     abstract fun createReader(connection: Connection, databaseDescription: String): TReader
     abstract fun createComparator(): TComparator
-    abstract fun createIdentifiedObject(): IdentifiedObject
+    abstract fun createIdentifiedObject(): TMaxsCoolObject
 
     @BeforeEach
     internal fun beforeEach() {
@@ -72,15 +83,15 @@ abstract class CimDatabaseSchemaTest<TService : BaseService, TWriter : CimDataba
         val writeService = createService()
         val readService = createService()
 
-        val identifiedObject = createIdentifiedObject()
-        assertThat("Should have added", writeService.tryAdd(identifiedObject))
-        assertThat("Should have added", readService.tryAdd(identifiedObject))
+        val obj = createIdentifiedObject()
+        assertThat("Should have added", writeService.addToService(obj))
+        assertThat("Should have added", readService.addToService(obj))
 
         validateWriteRead(writeService, readService = readService)
 
         assertThat(
             systemErr.log,
-            containsString("Failed to read ${identifiedObject.typeNameAndMRID()}. Unable to add to service '${readService.name}': duplicate MRID")
+            containsString("Failed to read ${obj.describeObject()}. Unable to add to service '${readService.name}': duplicate MRID")
         )
     }
 
@@ -98,12 +109,17 @@ abstract class CimDatabaseSchemaTest<TService : BaseService, TWriter : CimDataba
     ) {
         assertThat("Database should have been written", createWriter(schemaTestFile).write(writeService))
 
-        assertThat(systemErr.log, containsString("Creating database schema v${tableCimVersion.supportedVersion}"))
-        assertThat("Database should now exist", Files.exists(Paths.get(schemaTestFile)))
+        if (databaseInitialiser is SqliteDatabaseInitialiser) {
+            assertThat(systemErr.log, containsString("Creating database schema v${tableVersion.supportedVersion}"))
+            assertThat("Database should now exist", Files.exists(Paths.get(schemaTestFile)))
+        } else if (databaseInitialiser is NoOpDatabaseInitialiser) {
+            assertThat(systemErr.log, containsString("Committing..."))
+            assertThat(systemErr.log, containsString("Done."))
+        }
 
         systemErr.clearCapturedLog()
-        val status = DriverManager.getConnection("jdbc:sqlite:$schemaTestFile").use { connection ->
-            createReader(connection, schemaTestFile).read(readService)
+        val status = databaseInitialiser.connect().use {
+            createReader(it, schemaTestFile).read(readService)
         }
 
         if (validateRead != null) {

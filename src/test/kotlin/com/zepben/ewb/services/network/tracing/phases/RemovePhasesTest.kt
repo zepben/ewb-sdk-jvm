@@ -117,8 +117,8 @@ internal class RemovePhasesTest {
             .toSource() // s4
             .build()
 
-        RemovePhases(debugLogger = null).run(n["s0-t1"]!!, NetworkStateOperators.NORMAL)
-        RemovePhases(debugLogger = null).run(n["s0-t1"]!!, NetworkStateOperators.CURRENT)
+        RemovePhases(debugLogger = null).run(terminal = n["s0-t1"]!!, NetworkStateOperators.NORMAL)  // FIXME: and below... why terminal = ns[...] ??
+        RemovePhases(debugLogger = null).run(terminal = n["s0-t1"]!!, NetworkStateOperators.CURRENT)
 
         validatePhases(n, "s0", PhaseCode.NONE)
         validatePhases(n, "c1", PhaseCode.NONE, PhaseCode.NONE)
@@ -154,8 +154,8 @@ internal class RemovePhasesTest {
             .connect("j4", "c6", 2, 2)
             .build()
 
-        RemovePhases(debugLogger = null).run(n["s0-t1"]!!, NetworkStateOperators.NORMAL)
-        RemovePhases(debugLogger = null).run(n["s0-t1"]!!, NetworkStateOperators.CURRENT)
+        RemovePhases(debugLogger = null).run(terminal = n["s0-t1"]!!, NetworkStateOperators.NORMAL)
+        RemovePhases(debugLogger = null).run(terminal = n["s0-t1"]!!, NetworkStateOperators.CURRENT)
 
         validatePhases(n, "s0", PhaseCode.NONE)
         validatePhases(n, "c1", PhaseCode.NONE, PhaseCode.NONE)

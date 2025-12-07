@@ -19,7 +19,7 @@ import com.zepben.ewb.services.common.meta.MetadataCollection
  * @param writer The [MetadataEntryWriter] used to populate the database.
  */
 internal class MetadataCollectionWriter(
-    databaseTables: CimDatabaseTables,
+    databaseTables: BaseDatabaseTables,
     private val writer: MetadataEntryWriter = MetadataEntryWriter(databaseTables)
 ) : BaseCollectionWriter<MetadataCollection>() {
 

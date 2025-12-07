@@ -457,7 +457,8 @@ abstract class BaseService(
      *
      * @return true if the object is disassociated from this service.
      */
-    protected fun remove(identifiedObject: IdentifiedObject): Boolean = objectsByType[identifiedObject::class]?.remove(identifiedObject.mRID) != null
+    protected fun remove(identifiedObject: IdentifiedObject): Boolean =
+        objectsByType[identifiedObject::class]?.removeIf(identifiedObject.mRID, identifiedObject) ?: false
 
     /**
      * Create a sequence of all instances of the specified type.
@@ -626,12 +627,18 @@ abstract class BaseService(
                     "return type for '${it.second}' needs to be Boolean"
                 }
 
-                require((it.second.parameters[0].type.classifier as KClass<*>).isFinal) {
+                require((it.second.parameters[1].type.classifier as KClass<*>).isFinal) { // FIXME: WHY DID THIS CHANGE???? open NetworkService class??
                     "${it.second} does not accept a leaf class. " +
                         "Only leafs should be used to reduce chances of edge case issues and potential undefined behaviour"
                 }
             }
             .toMap()
     }
+
+    protected fun <T: Any> MutableMap<String, T>.removeIf(id: String, obj: T): Boolean =
+        when {
+            get(id) === obj -> remove(id) != null
+            else -> false
+        }
 
 }

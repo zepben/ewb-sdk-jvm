@@ -14,6 +14,7 @@ import com.zepben.ewb.cim.iec61968.common.OrganisationRole
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.core.Name
 import com.zepben.ewb.cim.iec61970.base.core.NameType
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.DataSet
 import java.security.AccessController
 import java.security.PrivilegedActionException
 import java.security.PrivilegedExceptionAction

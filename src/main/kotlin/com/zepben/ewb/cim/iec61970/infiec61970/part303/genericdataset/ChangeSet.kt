@@ -15,7 +15,7 @@ import com.zepben.ewb.services.common.extensions.asUnmodifiable
  * Describes a set of changes that can be applied in different situations. A given registered
  * target object MRID may only be referenced once by the contained change set members.
  */
-class ChangeSet @JvmOverloads constructor(mRID: String = ""): DataSet(mRID) {
+class ChangeSet (mRID: String) : DataSet(mRID) {
 
     private var _changeSetMembers: MutableList<ChangeSetMember> = mutableListOf()
 

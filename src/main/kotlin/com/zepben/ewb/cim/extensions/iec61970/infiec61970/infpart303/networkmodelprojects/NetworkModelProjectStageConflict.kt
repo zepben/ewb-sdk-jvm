@@ -9,20 +9,16 @@
 package com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects
 
 import com.zepben.ewb.cim.extensions.ZBEX
+import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStage
-import java.time.Instant
 
 /**
  * [ZBEX] A conflict between the network model project state and the base network.
+ * # TODO: I think this class is bye bye now, or it should be. it adds absolutely no value.
  */
-class NetworkModelProjectStageConflict @JvmOverloads constructor(mRID: String = "") {
+class NetworkModelProjectStageConflict(mRID: String) : IdentifiedObject(mRID) {
 
     private var _stage: NetworkModelProjectStage? = null
-    /**
-     * [ZBEX] The date expected for this stage to be commissioned.
-     */
-    var plannedCommissionedDate: Instant? = null
-
     /**
      * [ZBEX] The stage the conflicts belong too.
      */

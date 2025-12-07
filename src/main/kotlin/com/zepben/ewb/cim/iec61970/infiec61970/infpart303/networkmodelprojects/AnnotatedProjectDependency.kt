@@ -9,7 +9,6 @@
 package com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects
 
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
-import java.util.UUID
 
 /**
  * Represents the relationship between two network model project stages.
@@ -18,13 +17,12 @@ import java.util.UUID
  * @param dependencyDependentOnStage NetworkModelProjectStages required by this stage.
  * @param dependencyDependingStage NetworkModelProjectStages that cannot be applied aslongside this stage.  TODO: FUCKING WHAT?!
  */
-class AnnotatedProjectDependency @JvmOverloads constructor (
-    mRID: String = UUID.randomUUID().toString(),
-
+class AnnotatedProjectDependency(
+    mRID: String,
     var dependencyType: DependencyKind,
     var dependencyDependentOnStage: NetworkModelProjectStage,
     var dependencyDependingStage: NetworkModelProjectStage
 
-): IdentifiedObject(mRID) {
+) : IdentifiedObject(mRID) {
 
 }

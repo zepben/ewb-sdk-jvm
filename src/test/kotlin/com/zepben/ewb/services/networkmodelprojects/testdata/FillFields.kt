@@ -1,0 +1,166 @@
+/*
+ * Copyright 2025 Zeppelin Bend Pty Ltd
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+package com.zepben.ewb.services.networkmodelprojects.testdata
+
+import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProject
+import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectComponent
+import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStageConflict
+import com.zepben.ewb.cim.iec61970.base.core.Feeder
+import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.ewb.cim.iec61970.base.wires.AcLineSegment
+import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.AnnotatedProjectDependency
+import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.DependencyKind
+import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStage
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSetMember
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.DataSet
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectCreation
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectDeletion
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectModification
+import com.zepben.ewb.services.common.testdata.fillFieldsCommon
+import com.zepben.ewb.services.networkmodelproject.NetworkModelProjectService
+import java.time.Instant
+import java.util.UUID
+
+// #######################################################
+// # Extensions IEC61970 InfPart303 NetworkModelProjects #
+// #######################################################
+
+fun NetworkModelProject.fillFields(service: NetworkModelProjectService, includeRuntime: Boolean = true): NetworkModelProject {
+    (this as NetworkModelProjectComponent).fillFields(service, includeRuntime)
+    externalStatus = "Probably Fine"
+    forecastCommissionDate = Instant.now().plusSeconds(600)
+    externalDriver = "Capacity"
+
+    @Suppress("unused")
+    if (includeRuntime) {
+        for (i in 0..1) {
+            addChild(NetworkModelProjectStage("${mRID}-child-1").also {
+                service.add(it)
+            })
+        }
+    }
+
+    return this
+}
+
+fun NetworkModelProjectComponent.fillFields(service: NetworkModelProjectService, includeRuntime: Boolean = true): NetworkModelProjectComponent {
+    (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
+
+    return this
+}
+
+// TODO: DELETE? check note in class file.
+fun NetworkModelProjectStageConflict.fillFields(service: NetworkModelProjectService, includeRuntime: Boolean = true): NetworkModelProjectStageConflict {
+    (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
+
+    return this
+}
+
+// ############################################
+// # IEC61970 InfPart303 NetworkModelProjects #
+// ############################################
+
+fun AnnotatedProjectDependency.fillFields(service: NetworkModelProjectService, includeRuntime: Boolean = true): AnnotatedProjectDependency {
+    (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
+    dependencyType = DependencyKind.mutuallyExclusive
+    dependencyDependentOnStage = NetworkModelProjectStage("${mRID}-dependent-on-stage").also { service.add(it) }
+    dependencyDependingStage = NetworkModelProjectStage("${mRID}-depending-on-stage").also { service.add(it) }
+
+    return this
+}
+
+fun NetworkModelProjectStage.fillFields(service: NetworkModelProjectService, includeRuntime: Boolean = true): NetworkModelProjectStage {
+    (this as NetworkModelProjectComponent).fillFields(service, includeRuntime)
+    plannedCommissionedDate = Instant.now().plusSeconds(3200)
+    confidenceLevel = 10
+    baseModelVersion = "2025-10-12"
+    lastConflictCheckedAt = Instant.now().minusSeconds(20000)
+    userComments = "Dodgy network, probably dont use this in production..."
+
+    if (includeRuntime) {
+        setChangeSet(ChangeSet("${mRID}-changeset-1"))
+        addDependingStage(
+            NetworkModelProjectStage("${mRID}-depending-stage").also { service.add(it) },
+            DependencyKind.required)
+        addDependentOnStage(
+            NetworkModelProjectStage("${mRID}-dependent-on-stage").also { service.add(it) },
+            DependencyKind.mutuallyExclusive)
+
+        addEquipmentContainer(
+            Feeder("${mRID}-equipment-container") // TODO: .also { service.add(it) }
+        )
+    }
+
+    return this
+}
+
+// ###################################
+// # IEC61970 Part303 GenericDataSet #
+// ###################################
+
+fun ChangeSet.fillFields(service: NetworkModelProjectService, includeRuntime: Boolean = true): ChangeSet {
+    (this as DataSet).fillFieldsCommon(service, includeRuntime)
+
+    if (includeRuntime) {
+        for (i in 0..3) {
+            addChangeSetMember(ObjectCreation(
+                changeSet = this,
+                targetObject = AcLineSegment()
+            ))
+            addChangeSetMember(ObjectDeletion(
+                changeSet = this,
+                targetObject = AcLineSegment()
+            ))
+            addChangeSetMember(ObjectModification.createObjectModification(
+                changeSet = this,
+                modifiedObject = AcLineSegment("${mRID}-modified-${i}"),
+                originalObject = AcLineSegment("${mRID}-original-${i}")
+            ))
+        }
+    }
+
+    return this
+}
+
+fun DataSet.fillFieldsCommon(service: NetworkModelProjectService, @Suppress("UNUSED_PARAMETER") includeRuntime: Boolean = true): DataSet {
+    name = "1"
+    description = "the description"
+
+    return this
+}
+
+fun ChangeSetMember.generateMRID(suffix: String): String = "${UUID.randomUUID()}-${suffix}"
+
+fun ObjectCreation.fillFields(service: NetworkModelProjectService, includeRuntime: Boolean = true): ObjectCreation {
+    return ObjectCreation(
+        changeSet = ChangeSet(generateMRID("change-set")),
+        targetObject = AcLineSegment()
+    )
+}
+
+fun ObjectDeletion.fillFields(service: NetworkModelProjectService, includeRuntime: Boolean = true): ObjectDeletion {
+    return ObjectDeletion(
+        changeSet = ChangeSet(generateMRID("change-set")),
+        targetObject = AcLineSegment()
+    )
+}
+
+fun ObjectModification.fillFields(service: NetworkModelProjectService, includeRuntime: Boolean = true): ObjectModification {
+    val baseUUID = UUID.randomUUID().toString()
+
+    return ObjectModification.createObjectModification(
+        changeSet = ChangeSet("${baseUUID}-change-set"),
+        modifiedObject = AcLineSegment("${baseUUID}-modified"),
+        originalObject = AcLineSegment("${baseUUID}-original")
+    )
+}
+
+// This is tested in ObjectModification.fillFields above, and i dont think we want the SDK using this object directly..?
+// ObjectReverseModification.fillFields

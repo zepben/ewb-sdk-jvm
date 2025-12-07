@@ -8,7 +8,6 @@
 
 package com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset
 
-import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import java.util.UUID
 
 /**
@@ -24,9 +23,8 @@ import java.util.UUID
  * @property name is any free human-readable and possibly non-unique text naming the object.
  * @property description a free human-readable text describing or naming the object. It may be non-unique and may not correlate to a naming hierarchy.
  */
-abstract class DataSet(mRID: String = "") {
+abstract class DataSet(val mRID: String) {
 
-    val mRID: String = mRID.ifEmpty { UUID.randomUUID().toString() }
     var name: String? = null
     var description: String? = null
 

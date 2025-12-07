@@ -8,11 +8,13 @@
 
 package com.zepben.ewb.database.sql.cim.diagram
 
+import com.zepben.ewb.database.sql.cim.CimDatabaseSchemaTest
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.ewb.cim.iec61970.base.diagramlayout.DiagramObject
 import com.zepben.ewb.database.sql.cim.CimDatabaseSchemaTest
 import com.zepben.ewb.services.common.Resolvers
+import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 import com.zepben.ewb.services.common.testdata.SchemaServices
 import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.diagram.DiagramService
@@ -27,7 +29,16 @@ import java.nio.file.Paths
 import java.sql.Connection
 import java.sql.DriverManager
 
-class DiagramDatabaseSchemaTest : CimDatabaseSchemaTest<DiagramService, DiagramDatabaseWriter, DiagramDatabaseReader, DiagramServiceComparator>() {
+class DiagramDatabaseSchemaTest : CimDatabaseSchemaTest<
+    DiagramService,
+    DiagramDatabaseWriter,
+    DiagramDatabaseReader,
+    DiagramServiceComparator,
+    IdentifiedObject
+>(
+    describeObject = IdentifiedObject::typeNameAndMRID,
+    addToService = BaseService::tryAdd
+){
 
     override fun createService(): DiagramService = DiagramService()
 

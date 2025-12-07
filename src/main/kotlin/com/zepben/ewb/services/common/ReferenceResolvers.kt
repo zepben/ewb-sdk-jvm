@@ -16,6 +16,8 @@ import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelayFun
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelayScheme
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelaySystem
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.BatteryControl
+import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProject
+import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectComponent
 import com.zepben.ewb.cim.iec61968.assetinfo.*
 import com.zepben.ewb.cim.iec61968.assets.Asset
 import com.zepben.ewb.cim.iec61968.assets.AssetOrganisationRole
@@ -49,6 +51,11 @@ import com.zepben.ewb.cim.iec61970.base.scada.RemoteControl
 import com.zepben.ewb.cim.iec61970.base.scada.RemoteSource
 import com.zepben.ewb.cim.iec61970.base.wires.*
 import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
+import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.AnnotatedProjectDependency
+import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStage
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSetMember
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.DataSet
 import kotlin.reflect.KClass
 
 
@@ -554,9 +561,43 @@ internal object PowerSystemResourceToAssetResolver : ReferenceResolver<PowerSyst
     PowerSystemResource::class, Asset::class, PowerSystemResource::addAsset
 )
 
+internal object NetworkModelProjectToNetworkModelProjectComponentResolver : ReferenceResolver<NetworkModelProject, NetworkModelProjectComponent> by KReferenceResolver(
+    NetworkModelProject::class, NetworkModelProjectComponent::class, NetworkModelProject::addChild
+)
+
+internal object NetworkModelProjectComponentToNetworkModelProjectResolver : ReferenceResolver<NetworkModelProjectComponent, NetworkModelProject> by KReferenceResolver(
+    NetworkModelProjectComponent::class, NetworkModelProject::class, NetworkModelProjectComponent::setParent
+)
+
+internal object NetworkModelProjectStageToChangeSet : ReferenceResolver<NetworkModelProjectStage, ChangeSet> by KReferenceResolverIO2DS(
+    NetworkModelProjectStage::class, ChangeSet::class, NetworkModelProjectStage::setChangeSet
+)
+
+internal object AnnotatedProjectDependencyToDependentNetworkModelProjectStageResolver : ReferenceResolver<AnnotatedProjectDependency, NetworkModelProjectStage> by KReferenceResolver(
+    AnnotatedProjectDependency::class, NetworkModelProjectStage::class, AnnotatedProjectDependency::addDependencyDependingStage
+)
+
+internal object AnnotatedProjectDependencyToDependingNetworkModelProjectStageResolver : ReferenceResolver<AnnotatedProjectDependency, NetworkModelProjectStage> by KReferenceResolver(
+    AnnotatedProjectDependency::class, NetworkModelProjectStage::class, AnnotatedProjectDependency::addDependencyDependingStage
+)
+
 //-------------------------------------------//
 
 class KReferenceResolver<T : IdentifiedObject, R : IdentifiedObject>(
+    private val fromKClass: KClass<T>,
+    private val toKClass: KClass<R>,
+    private val resolveFun: (T, R) -> Unit
+) : ReferenceResolver<T, R> {
+
+    override val fromClass: Class<T> get() = fromKClass.java
+    override val toClass: Class<R> get() = toKClass.java
+
+    override fun resolve(from: T, to: R) {
+        resolveFun(from, to)
+    }
+}
+
+class KReferenceResolverIO2DS<T : IdentifiedObject, R : DataSet>(
     private val fromKClass: KClass<T>,
     private val toKClass: KClass<R>,
     private val resolveFun: (T, R) -> Unit

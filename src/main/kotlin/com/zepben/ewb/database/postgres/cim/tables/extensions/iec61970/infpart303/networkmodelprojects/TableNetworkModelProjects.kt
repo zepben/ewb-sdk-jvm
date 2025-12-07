@@ -11,6 +11,13 @@ package com.zepben.ewb.database.postgres.cim.tables.extensions.iec61970.infpart3
 import com.zepben.ewb.database.sql.Column
 import com.zepben.ewb.database.sql.Column.Nullable
 
+/**
+ * A class representing the NetworkModelProject columns required for the database table.
+ *
+ * @property EXTERNAL_STATUS A column storing the status of the project in the external system.
+ * @property FORECAST_COMMISSION_DATE A column storing when the project is expected to be commissioned.
+ * @property EXTERNAL_DRIVER A column storing the driver of the project.
+ */
 @Suppress("PropertyName")
 class TableNetworkModelProjects : TableNetworkModelProjectComponents() {
 

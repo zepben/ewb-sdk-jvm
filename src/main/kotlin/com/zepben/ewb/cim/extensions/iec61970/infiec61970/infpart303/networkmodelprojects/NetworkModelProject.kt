@@ -28,7 +28,7 @@ class NetworkModelProject(mRID: String) : NetworkModelProjectComponent(mRID) {
     var externalStatus: String? = null
 
     /**
-     * [ZBEX] When the project is expected to be comissioned.
+     * [ZBEX] When the project is expected to be commissioned.
      */
     @ZBEX
     var forecastCommissionDate: Instant? = null

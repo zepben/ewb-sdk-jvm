@@ -16,7 +16,6 @@ import com.zepben.ewb.database.sql.Column.Type.STRING
 class TableChangeSets : TableDataSets() {
 
     val NETWORK_MODEL_PROJECT_STAGE_MRID: Column = Column(++columnIndex, "network_model_project_stage_mrid", STRING, NULL)
-    // TODO: TableChangeSetChangeSetMembers
 
     override val name: String = "change_sets"
 

@@ -8,8 +8,6 @@
 
 package com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset
 
-import java.util.UUID
-
 /**
  * A generic container of a version of instance data. The mRID can be used in an audit trail, not
  * in reusable script intended to work with new versions of data. A dataset could be serialized

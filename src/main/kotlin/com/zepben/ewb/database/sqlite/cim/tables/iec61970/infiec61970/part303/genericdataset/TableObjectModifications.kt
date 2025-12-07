@@ -10,6 +10,11 @@ package com.zepben.ewb.database.sqlite.cim.tables.iec61970.infiec61970.part303.g
 
 import com.zepben.ewb.database.sql.Column
 
+/**
+ * A class representing the ObjectModification columns required for the database table.
+ *
+ * @property OBJECT_REVERSE_MODIFICATION_MRID A column storing the mRID of the ObjectReverseModification specifying precondition properties for a preconditioned update.
+ */
 @Suppress("PropertyName")
 class TableObjectModifications : TableChangeSetMembers() {
 

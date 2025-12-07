@@ -8,9 +8,9 @@
 
 package com.zepben.ewb.database.sqlite.cim.tables.iec61970.infiec61970.part303.genericdataset
 
-import com.zepben.ewb.database.postgres.common.PostgresTable
 import com.zepben.ewb.database.sql.Column
 import com.zepben.ewb.database.sql.Column.Nullable
+import com.zepben.ewb.database.sqlite.common.SqliteTable
 
 /**
  * A class representing the association between ChangeSet and ChangeSetMember.
@@ -19,7 +19,7 @@ import com.zepben.ewb.database.sql.Column.Nullable
  * @property CHANGE_SET_MEMBER_MRID A column storing the mRID of ChangeSetMember.
  */
 @Suppress("PropertyName")
-class TableChangeSetChangeSetMembers : PostgresTable() {
+class TableChangeSetChangeSetMembers : SqliteTable() {
 
     val CHANGE_SET_MRID: Column = Column(++columnIndex, "change_set_mrid", Column.Type.STRING, Nullable.NOT_NULL)
     val CHANGE_SET_MEMBER_MRID: Column = Column(++columnIndex, "change_set_member_mrid", Column.Type.STRING, Nullable.NOT_NULL)

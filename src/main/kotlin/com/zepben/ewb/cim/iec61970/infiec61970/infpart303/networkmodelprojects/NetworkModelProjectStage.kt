@@ -17,15 +17,19 @@ import com.zepben.ewb.services.common.extensions.getByMRID
 import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 import java.time.Instant
 import com.zepben.ewb.cim.extensions.ZBEX
+import java.util.UUID
 
 /**
  * A specific phase in a network model project.
  */
-class NetworkModelProjectStage @JvmOverloads constructor(mRID: String = ""): NetworkModelProjectComponent(mRID){
+class NetworkModelProjectStage(mRID: String) : NetworkModelProjectComponent(mRID) {
 
     private var _dependentOnStage: MutableList<AnnotatedProjectDependency>? = null
     private var _dependingStage: MutableList<AnnotatedProjectDependency>? = null
     private var _changeSet: ChangeSet? = null
+    // FIXME: This is a cross service reference. Do we need to treat it differently?
+    //  can this cause the whole network to be left in memory?
+    //  i guess thats what we want, but still... @charlta.... HALP!
     private var _equipmentContainers: MutableList<EquipmentContainer>? = null
 
     /**
@@ -105,6 +109,7 @@ class NetworkModelProjectStage @JvmOverloads constructor(mRID: String = ""): Net
             _dependentOnStage = mutableListOf()
 
         val apd = AnnotatedProjectDependency(
+            mRID = UUID.randomUUID().toString(),
             dependencyType = type,
             dependencyDependentOnStage = this,
             dependencyDependingStage = stage
@@ -138,6 +143,7 @@ class NetworkModelProjectStage @JvmOverloads constructor(mRID: String = ""): Net
             _dependingStage = mutableListOf()
 
         val apd = AnnotatedProjectDependency(
+            mRID = UUID.randomUUID().toString(),
             dependencyType = type,
             dependencyDependentOnStage = stage,
             dependencyDependingStage = this
@@ -154,6 +160,7 @@ class NetworkModelProjectStage @JvmOverloads constructor(mRID: String = ""): Net
     /**
      * [ZBEX] The conflicts of this stage against the base model.
      */
+    // TODO: DELETEME?
     var conflicts: NetworkModelProjectStageConflict? = null
 
     /**

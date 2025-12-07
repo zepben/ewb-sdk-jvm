@@ -16,8 +16,8 @@ import java.time.Instant
  * [ZBEX] Abstract class for both a network model project and network model change.
  */
 @ZBEX
-abstract class NetworkModelProjectComponent @JvmOverloads constructor(
-    mRID: String = "",
+abstract class NetworkModelProjectComponent (
+    mRID: String,
     created: Instant = Instant.now(),
     updated: Instant? = null,
     closed: Instant? = null,

@@ -13,6 +13,12 @@ import com.zepben.ewb.database.sql.Column.Nullable.NOT_NULL
 import com.zepben.ewb.database.sql.Column.Type.STRING
 import com.zepben.ewb.database.sqlite.common.SqliteTable
 
+/**
+ * A class representing the ChangeSetMember columns required for the database table.
+ *
+ * @property CHANGE_SET_MRID A column storing the mRID of the ChangeSet this member belongs to.
+ * @property TARGET_OBJECT_MRID A column storing the registered CIM object affected by this changeset.
+ */
 @Suppress("PropertyName")
 abstract class TableChangeSetMembers : SqliteTable() {
 

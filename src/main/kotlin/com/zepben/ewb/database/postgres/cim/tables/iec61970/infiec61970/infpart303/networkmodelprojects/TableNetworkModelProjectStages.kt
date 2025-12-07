@@ -12,7 +12,17 @@ import com.zepben.ewb.database.postgres.cim.tables.iec61970.base.core.TableIdent
 import com.zepben.ewb.database.sql.Column
 import com.zepben.ewb.database.sql.Column.Nullable
 
-
+/**
+ * A class representing the NetworkModelProjectStage columns required for the database table.
+ *
+ * @property PLANNED_COMMISSION_DATE A column storing the date expected for this stage to be commissioned.
+ * @property COMMISSIONED_DATE A column storing the date this stage was commissioned.
+ * @property CONFIDENCE_LEVEL A column storing the percentage confidence that this project will be committed to.
+ * @property BASE_MODEL_VERSION A column storing the version of the base model this stage was imported against.
+ * @property LAST_CONFLICT_CHECKED_AT A column storing the time the last conflict check occured.
+ * @property USER_COMMENTS A column storing user comments.
+ * @property CHANGE_SET_MRID A column storing the mRID of the ChangeSet for this NetworkModelProjectStage.
+ */
 @Suppress("PropertyName")
 class TableNetworkModelProjectStages : TableIdentifiedObjects() {
 
@@ -23,10 +33,7 @@ class TableNetworkModelProjectStages : TableIdentifiedObjects() {
     val LAST_CONFLICT_CHECKED_AT: Column = Column(++columnIndex, "last_conflict_checked_at", Column.Type.TIMESTAMP, Nullable.NULL)
     val USER_COMMENTS: Column = Column(++columnIndex, "user_comments", Column.Type.STRING, Nullable.NULL)
     val CHANGE_SET_MRID: Column = Column(++columnIndex, "change_set_mrid", Column.Type.STRING, Nullable.NULL)
-    val DEPENDENT_ON_STAGE_MRID: Column = Column(++columnIndex, "dependent_on_stage_mrid", Column.Type.STRING, Nullable.NULL)
-    val DEPENDING_STAGE_MRID: Column = Column(++columnIndex, "depending_stage_mrid", Column.Type.STRING, Nullable.NULL)
     // TODO: conflicts... delete?
-    // TODO: EquipmentContainers
 
     override val name: String = "network_model_project_stages"
 

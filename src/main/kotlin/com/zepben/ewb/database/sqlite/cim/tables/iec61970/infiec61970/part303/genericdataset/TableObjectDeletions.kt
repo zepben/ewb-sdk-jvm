@@ -8,6 +8,9 @@
 
 package com.zepben.ewb.database.sqlite.cim.tables.iec61970.infiec61970.part303.genericdataset
 
+/**
+ * A class representing the ObjectDeletion columns required for the database table.
+ */
 @Suppress("PropertyName")
 class TableObjectDeletions : TableChangeSetMembers() {
 

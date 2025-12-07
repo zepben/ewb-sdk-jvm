@@ -12,7 +12,13 @@ import com.zepben.ewb.database.postgres.cim.tables.iec61970.base.core.TableIdent
 import com.zepben.ewb.database.sql.Column
 import com.zepben.ewb.database.sql.Column.Nullable
 
-
+/**
+ * A class representing the AnnotatedProjectDependency columns required for the database table.
+ *
+ * @property DEPENDENCY_TYPE A column storing the dependency relationship between the two classes.
+ * @property DEPENDENCY_DEPENDENT_ON_STAGE_MRID A column storing the mRID of the NetworkModelProjectStage representing the "to" stage.
+ * @property DEPENDENCY_DEPENDING_STAGE_MRID A column storing the mRID of the NetworkModelProjectStage representing the "from" stage.
+ */
 @Suppress("PropertyName")
 class TableAnnotatedProjectDependencies : TableIdentifiedObjects() {
 

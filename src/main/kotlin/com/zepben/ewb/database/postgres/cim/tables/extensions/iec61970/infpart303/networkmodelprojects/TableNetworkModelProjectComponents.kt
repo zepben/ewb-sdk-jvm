@@ -12,6 +12,14 @@ import com.zepben.ewb.database.postgres.cim.tables.iec61970.base.core.TableIdent
 import com.zepben.ewb.database.sql.Column
 import com.zepben.ewb.database.sql.Column.Nullable
 
+/**
+ * A class representing the NetworkModelProjectComponent columns required for the database table.
+ *
+ * @property CREATED A column storing when the component was created.
+ * @property UPDATED A column storing when the component was last updated.
+ * @property CLOSED A column storing when the component was deleted.
+ * @property PARENT_MRID A column storing the mRID of the contained NetworkModelProjectComponent.
+ */
 @Suppress("PropertyName")
 abstract class TableNetworkModelProjectComponents : TableIdentifiedObjects() {
     val CREATED: Column = Column(++columnIndex, "created", Column.Type.TIMESTAMP, Nullable.NOT_NULL)

@@ -14,8 +14,8 @@ import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
  * Represents the relationship between two network model project stages.
  *
  * @param dependencyType Describes the dependency relationship between the two classes.
- * @param dependencyDependentOnStage NetworkModelProjectStages required by this stage.
- * @param dependencyDependingStage NetworkModelProjectStages that cannot be applied aslongside this stage.  TODO: FUCKING WHAT?!
+ * @param dependencyDependentOnStage NetworkModelProjectStage representing the "to" stage. // TODO: GRPC
+ * @param dependencyDependingStage NetworkModelProjectStage representing the "from" stage.
  */
 class AnnotatedProjectDependency(
     mRID: String,

@@ -56,17 +56,9 @@ abstract class Asset(mRID: String = "") : IdentifiedObject(mRID) {
     @Deprecated("BOILERPLATE: Use organisationRoles.getByMRID(mRID) instead")
     fun getOrganisationRole(mRID: String): AssetOrganisationRole? = organisationRoles.getByMRID(mRID)
 
-    /**
-     * @param organisationRole the [AssetOrganisationRole] to associate with this [Asset].
-     * @return A reference to this [Asset] to allow fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use organisationRoles.add(organisationRole) instead")
     fun addOrganisationRole(organisationRole: AssetOrganisationRole): Asset {
-        if (validateReference(organisationRole, ::getOrganisationRole, "An AssetOrganisationRole"))
-            return this
-
-        _organisationRoles = _organisationRoles ?: mutableListOf()
-        _organisationRoles!!.add(organisationRole)
-
+        organisationRoles.add(organisationRole)
         return this
     }
 
@@ -84,19 +76,9 @@ abstract class Asset(mRID: String = "") : IdentifiedObject(mRID) {
     @Deprecated("BOILERPLATE: Use powerSystemResources.getByMRID(mRID) instead")
     fun getPowerSystemResource(mRID: String): PowerSystemResource? = powerSystemResources.getByMRID(mRID)
 
-    /**
-     * Add a [PowerSystemResource] to this [Asset]
-     *
-     * @param powerSystemResource the [PowerSystemResource] to associate with this [Asset].
-     * @return A reference to this [Asset] to allow fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use powerSystemResources.add(powerSystemResource) instead")
     fun addPowerSystemResource(powerSystemResource: PowerSystemResource): Asset {
-        if (validateReference(powerSystemResource, ::getPowerSystemResource, "A PowerSystemResource"))
-            return this
-
-        _powerSystemResources = _powerSystemResources ?: mutableListOf()
-        _powerSystemResources!!.add(powerSystemResource)
-
+        powerSystemResources.add(powerSystemResource)
         return this
     }
 

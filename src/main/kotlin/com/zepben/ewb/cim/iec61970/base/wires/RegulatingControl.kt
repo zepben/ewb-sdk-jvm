@@ -99,18 +99,9 @@ abstract class RegulatingControl(mRID: String = "") : PowerSystemResource(mRID) 
     @Deprecated("BOILERPLATE: Use regulatingCondEqs.getByMRID(mRID) instead")
     fun getRegulatingCondEq(mRID: String): RegulatingCondEq? = regulatingCondEqs.getByMRID(mRID)
 
-    /**
-     * @param regulatingCondEq the regulating conducting equipment controlled by this [RegulatingControl].
-     * @return true if the regulating conducting equipment is associated.
-     * @return A reference to this [RegulatingControl] to allow fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use regulatingCondEqs.add(regulatingCondEq) instead")
     fun addRegulatingCondEq(regulatingCondEq: RegulatingCondEq): RegulatingControl {
-        if (validateReference(regulatingCondEq, ::getRegulatingCondEq, "A RegulatingCondEq"))
-            return this
-
-        _regulatingCondEqs = _regulatingCondEqs ?: mutableListOf()
-        _regulatingCondEqs!!.add(regulatingCondEq)
-
+        regulatingCondEqs.add(regulatingCondEq)
         return this
     }
 

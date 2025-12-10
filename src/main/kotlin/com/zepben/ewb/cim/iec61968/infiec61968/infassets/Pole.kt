@@ -41,17 +41,9 @@ class Pole @JvmOverloads constructor(mRID: String = "") : Structure(mRID) {
     @Deprecated("BOILERPLATE: Use streetlights.getByMRID(mRID) instead")
     fun getStreetlight(mRID: String): Streetlight? = streetlights.getByMRID(mRID)
 
-    /**
-     * @param streetlight the [Streetlight] to associate with this [Pole].
-     * @return A reference to this [Pole] to allow fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use streetlights.add(streetlight) instead")
     fun addStreetlight(streetlight: Streetlight): Pole {
-        if (validateReference(streetlight, ::getStreetlight, "A Streetlight"))
-            return this
-
-        _streetlights = _streetlights ?: mutableListOf()
-        _streetlights!!.add(streetlight)
-
+        streetlights.add(streetlight)
         return this
     }
 

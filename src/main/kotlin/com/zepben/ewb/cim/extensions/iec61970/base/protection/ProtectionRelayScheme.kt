@@ -45,19 +45,9 @@ class ProtectionRelayScheme @JvmOverloads constructor(mRID: String = "") : Ident
     @Deprecated("BOILERPLATE: Use functions.getByMRID(mRID) instead")
     fun getFunction(mRID: String): ProtectionRelayFunction? = functions.getByMRID(mRID)
 
-    /**
-     * Associate a [ProtectionRelayFunction] with this [ProtectionRelayScheme].
-     *
-     * @param function The [ProtectionRelayFunction] to associate with this [ProtectionRelayScheme].
-     * @return A reference to this [ProtectionRelayScheme] for fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use functions.add(function) instead")
     fun addFunction(function: ProtectionRelayFunction): ProtectionRelayScheme {
-        if (validateReference(function, ::getFunction, "A ProtectionRelayFunction"))
-            return this
-
-        _functions = _functions ?: mutableListOf()
-        _functions!!.add(function)
-
+        functions.add(function)
         return this
     }
 

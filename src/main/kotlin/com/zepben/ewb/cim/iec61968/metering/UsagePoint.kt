@@ -66,19 +66,9 @@ class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject
     @Deprecated("BOILERPLATE: Use equipment.getByMRID(mRID) instead")
     fun getEquipment(mRID: String): Equipment? = equipment.getByMRID(mRID)
 
-    /**
-     * Add an [Equipment] to this [UsagePoint].
-     *
-     * @param equipment The [Equipment] to add.
-     * @return This [UsagePoint] for fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use equipment.add(equipment) instead")
     fun addEquipment(equipment: Equipment): UsagePoint {
-        if (validateReference(equipment, ::getEquipment, "An Equipment"))
-            return this
-
-        _equipment = _equipment ?: mutableListOf()
-        _equipment!!.add(equipment)
-
+        this.equipment.add(equipment)
         return this
     }
 
@@ -105,19 +95,9 @@ class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject
     @Deprecated("BOILERPLATE: Use endDevices.getByMRID(mRID) instead")
     fun getEndDevice(mRID: String): EndDevice? = endDevices.getByMRID(mRID)
 
-    /**
-     * Add an [EndDevice] to this [UsagePoint].
-     *
-     * @param endDevice The [EndDevice] to add.
-     * @return This [UsagePoint] for fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use endDevices.add(endDevice) instead")
     fun addEndDevice(endDevice: EndDevice): UsagePoint {
-        if (validateReference(endDevice, ::getEndDevice, "An EndDevice"))
-            return this
-
-        _endDevices = _endDevices ?: mutableListOf()
-        _endDevices!!.add(endDevice)
-
+        endDevices.add(endDevice)
         return this
     }
 
@@ -148,19 +128,9 @@ class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject
     fun getContact(id: String): ContactDetails? = _contacts?.firstOrNull { it.id == id }
 
 
-    /**
-     * Add a [ContactDetails] to this [UsagePoint].
-     *
-     * @param contact The [ContactDetails] to add.
-     * @return This [UsagePoint] for fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use contacts.add(contact) instead")
     fun addContact(contact: ContactDetails): UsagePoint {
-        if (validateReference(contact, ContactDetails::id, ::getContact) { "A ContactDetails with ID ${contact.id}" })
-            return this
-
-        _contacts = _contacts ?: mutableListOf()
-        _contacts!!.add(contact)
-
+        contacts.add(contact)
         return this
     }
 

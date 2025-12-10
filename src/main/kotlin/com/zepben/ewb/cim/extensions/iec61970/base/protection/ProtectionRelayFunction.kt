@@ -241,19 +241,9 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
     @Deprecated("BOILERPLATE: Use protectedSwitches.getByMRID(mRID) instead")
     fun getProtectedSwitch(mRID: String): ProtectedSwitch? = protectedSwitches.getByMRID(mRID)
 
-    /**
-     * Associate this [ProtectionRelayFunction] with a [ProtectedSwitch] that it operates.
-     *
-     * @param protectedSwitch The [ProtectedSwitch] to associate with this [ProtectionRelayFunction].
-     * @return A reference to this [ProtectionRelayFunction] for fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use protectedSwitches.add(protectedSwitch) instead")
     fun addProtectedSwitch(protectedSwitch: ProtectedSwitch): ProtectionRelayFunction {
-        if (validateReference(protectedSwitch, ::getProtectedSwitch, "A ProtectedSwitch"))
-            return this
-
-        _protectedSwitches = _protectedSwitches ?: mutableListOf()
-        _protectedSwitches!!.add(protectedSwitch)
-
+        protectedSwitches.add(protectedSwitch)
         return this
     }
 
@@ -278,19 +268,9 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
     @Deprecated("BOILERPLATE: Use sensors.getByMRID(mRID) instead")
     fun getSensor(mRID: String): Sensor? = sensors.getByMRID(mRID)
 
-    /**
-     * Associate this [ProtectionRelayFunction] with a [Sensor].
-     *
-     * @param sensor The [Sensor] to associate with this [ProtectionRelayFunction].
-     * @return A reference to this [ProtectionRelayFunction] for fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use sensors.add(sensor) instead")
     fun addSensor(sensor: Sensor): ProtectionRelayFunction {
-        if (validateReference(sensor, ::getSensor, "A Sensor"))
-            return this
-
-        _sensors = _sensors ?: mutableListOf()
-        _sensors!!.add(sensor)
-
+        sensors.add(sensor)
         return this
     }
 
@@ -315,19 +295,9 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
     @Deprecated("BOILERPLATE: Use schemes.getByMRID(mRID) instead")
     fun getScheme(mRID: String): ProtectionRelayScheme? = schemes.getByMRID(mRID)
 
-    /**
-     * Associate this [ProtectionRelayFunction] to a [ProtectionRelayScheme] it operates under.
-     *
-     * @param scheme The [ProtectionRelayScheme] to associate with this [ProtectionRelayFunction].
-     * @return A reference to this [ProtectionRelayFunction] for fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use schemes.add(scheme) instead")
     fun addScheme(scheme: ProtectionRelayScheme): ProtectionRelayFunction {
-        if (validateReference(scheme, ::getScheme, "A ProtectionRelayScheme"))
-            return this
-
-        _schemes = _schemes ?: mutableListOf()
-        _schemes!!.add(scheme)
-
+        schemes.add(scheme)
         return this
     }
 

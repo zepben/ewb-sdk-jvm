@@ -61,17 +61,9 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
     @Deprecated("BOILERPLATE: Use equipmentContainers.getByMRID(mRID) instead")
     fun getContainer(mRID: String): EquipmentContainer? = containers.getByMRID(mRID)
 
-    /**
-     * @param equipmentContainer the equipment container to associate with this equipment.
-     * @return A reference to this [Equipment] to allow fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use equipmentContainers.add(equipmentContainer) instead")
     fun addContainer(equipmentContainer: EquipmentContainer): Equipment {
-        if (validateReference(equipmentContainer, ::getContainer, "An EquipmentContainer"))
-            return this
-
-        _equipmentContainers = _equipmentContainers ?: mutableListOf()
-        _equipmentContainers!!.add(equipmentContainer)
-
+        containers.add(equipmentContainer)
         return this
     }
 
@@ -98,17 +90,9 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
     @Deprecated("BOILERPLATE: Use currentContainers.getByMRID(mRID) instead")
     fun getCurrentContainer(mRID: String): EquipmentContainer? = currentContainers.getByMRID(mRID)
 
-    /**
-     * @param equipmentContainer the equipment container to associate with this equipment.
-     * @return A reference to this [Equipment] to allow fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use currentContainers.add(equipmentContainer) instead")
     fun addCurrentContainer(equipmentContainer: EquipmentContainer): Equipment {
-        if (validateReference(equipmentContainer, ::getCurrentContainer, "A current EquipmentContainer"))
-            return this
-
-        _currentContainers = _currentContainers ?: mutableListOf()
-        _currentContainers!!.add(equipmentContainer)
-
+        currentContainers.add(equipmentContainer)
         return this
     }
 
@@ -135,18 +119,9 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
     @Deprecated("BOILERPLATE: Use usagePoints.getByMRID(mRID) instead")
     fun getUsagePoint(mRID: String): UsagePoint? = usagePoints.getByMRID(mRID)
 
-    /**
-     * @param usagePoint the usage point that connects to the electrical grid through this equipment.
-     * @return true if the usage point is associated.
-     * @return A reference to this [Equipment] to allow fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use usagePoints.add(usagePoint) instead")
     fun addUsagePoint(usagePoint: UsagePoint): Equipment {
-        if (validateReference(usagePoint, ::getUsagePoint, "A UsagePoint"))
-            return this
-
-        _usagePoints = _usagePoints ?: mutableListOf()
-        _usagePoints!!.add(usagePoint)
-
+        usagePoints.add(usagePoint)
         return this
     }
 

@@ -44,17 +44,9 @@ class Circuit @JvmOverloads constructor(mRID: String = "") : Line(mRID) {
     @Deprecated("BOILERPLATE: Use endTerminals.getByMRID(mRID) instead")
     fun getEndTerminal(mRID: String): Terminal? = endTerminals.getByMRID(mRID)
 
-    /**
-     * @param endTerminal the [Terminal] to associate with this [Circuit].
-     * @return A reference to this [Circuit] to allow fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use endTerminals.add(endTerminal) instead")
     fun addEndTerminal(endTerminal: Terminal): Circuit {
-        if (validateReference(endTerminal, ::getEndTerminal, "A Terminal"))
-            return this
-
-        _endTerminals = _endTerminals ?: mutableListOf()
-        _endTerminals!!.add(endTerminal)
-
+        endTerminals.add(endTerminal)
         return this
     }
 
@@ -82,17 +74,9 @@ class Circuit @JvmOverloads constructor(mRID: String = "") : Line(mRID) {
     @Deprecated("BOILERPLATE: Use endSubstations.getByMRID(mRID) instead")
     fun getEndSubstation(mRID: String): Substation? = endSubstations.getByMRID(mRID)
 
-    /**
-     * @param substation the [Substation] to associate with this [Circuit].
-     * @return A reference to this [Circuit] to allow fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use endSubstations.add(substation) instead")
     fun addEndSubstation(substation: Substation): Circuit {
-        if (validateReference(substation, ::getEndSubstation, "A Substation"))
-            return this
-
-        _endSubstations = _endSubstations ?: mutableListOf()
-        _endSubstations!!.add(substation)
-
+        endSubstations.add(substation)
         return this
     }
 

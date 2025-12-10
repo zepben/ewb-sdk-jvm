@@ -44,19 +44,9 @@ class OperationalRestriction @JvmOverloads constructor(mRID: String = "") : Docu
     @Deprecated("BOILERPLATE: Use equipment.getByMRID(mRID) instead")
     fun getEquipment(mRID: String): Equipment? = equipment.getByMRID(mRID)
 
-    /**
-     * Add equipment to which this restriction applies.
-     *
-     * @param equipment the equipment to add.
-     * @return A reference to this [OperationalRestriction] to allow fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use equipment.add(equipment) instead")
     fun addEquipment(equipment: Equipment): OperationalRestriction {
-        if (validateReference(equipment, ::getEquipment, "An Equipment"))
-            return this
-
-        _equipment = _equipment ?: mutableListOf()
-        _equipment!!.add(equipment)
-
+        this.equipment.add(equipment)
         return this
     }
 

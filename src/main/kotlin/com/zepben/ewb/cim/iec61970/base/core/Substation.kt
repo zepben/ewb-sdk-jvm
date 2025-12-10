@@ -86,17 +86,9 @@ class Substation @JvmOverloads constructor(mRID: String = "") : EquipmentContain
     @Deprecated("BOILERPLATE: Use loops.getByMRID(mRID) instead")
     fun getLoop(mRID: String): Loop? = loops.getByMRID(mRID)
 
-    /**
-     * @param loop the [Loop] to associate with this [Substation].
-     * @return A reference to this [Substation] to allow fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use loops.add(loop) instead")
     fun addLoop(loop: Loop): Substation {
-        if (validateReference(loop, ::getLoop, "A Loop"))
-            return this
-
-        _loops = _loops ?: mutableListOf()
-        _loops!!.add(loop)
-
+        loops.add(loop)
         return this
     }
 
@@ -124,17 +116,9 @@ class Substation @JvmOverloads constructor(mRID: String = "") : EquipmentContain
     @Deprecated("BOILERPLATE: Use energizedLoops.getByMRID(mRID) instead")
     fun getEnergizedLoop(mRID: String): Loop? = energizedLoops.getByMRID(mRID)
 
-    /**
-     * @param loop the [Loop] to associate with this [Substation].
-     * @return A reference to this [Substation] to allow fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use energizedLoops.add(loop) instead")
     fun addEnergizedLoop(loop: Loop): Substation {
-        if (validateReference(loop, ::getEnergizedLoop, "A Loop"))
-            return this
-
-        _energizedLoops = _energizedLoops ?: mutableListOf()
-        _energizedLoops!!.add(loop)
-
+        energizedLoops.add(loop)
         return this
     }
 
@@ -162,17 +146,9 @@ class Substation @JvmOverloads constructor(mRID: String = "") : EquipmentContain
     @Deprecated("BOILERPLATE: Use circuits.getByMRID(mRID) instead")
     fun getCircuit(mRID: String): Circuit? = circuits.getByMRID(mRID)
 
-    /**
-     * @param circuit the [Circuit] to associate with this [Substation].
-     * @return A reference to this [Substation] to allow fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use circuits.add(circuit) instead")
     fun addCircuit(circuit: Circuit): Substation {
-        if (validateReference(circuit, ::getCircuit, "A Circuit"))
-            return this
-
-        _circuits = _circuits ?: mutableListOf()
-        _circuits!!.add(circuit)
-
+        circuits.add(circuit)
         return this
     }
 

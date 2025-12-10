@@ -48,19 +48,9 @@ class Customer @JvmOverloads constructor(mRID: String = "") : OrganisationRole(m
     @Deprecated("BOILERPLATE: Use agreements.getByMRID(mRID) instead")
     fun getAgreement(mRID: String): CustomerAgreement? = agreements.getByMRID(mRID)
 
-    /**
-     *  Add a [CustomerAgreement] to this [Customer].
-     *
-     * @param customerAgreement The [CustomerAgreement] to add.
-     * @return this [Customer].
-     */
+    @Deprecated("BOILERPLATE: Use customerAgreements.add(customerAgreement) instead")
     fun addAgreement(customerAgreement: CustomerAgreement): Customer {
-        if (validateReference(customerAgreement, ::getAgreement, "A CustomerAgreement"))
-            return this
-
-        _customerAgreements = _customerAgreements ?: mutableListOf()
-        _customerAgreements!!.add(customerAgreement)
-
+        agreements.add(customerAgreement)
         return this
     }
 

@@ -53,19 +53,9 @@ abstract class PowerSystemResource(mRID: String = "") : IdentifiedObject(mRID) {
     @Deprecated("BOILERPLATE: Use assets.getByMRID(mRID) instead")
     fun getAsset(mRID: String): Asset? = assets.getByMRID(mRID)
 
-    /**
-     * Add an [Asset] to this PowerSystemResource
-     *
-     * @param asset the [Asset] to associate with this [PowerSystemResource].
-     * @return A reference to this [PowerSystemResource] to allow fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use assets.add(asset) instead")
     fun addAsset(asset: Asset): PowerSystemResource {
-        if (validateReference(asset, ::getAsset, "An Asset"))
-            return this
-
-        _assets = _assets ?: mutableListOf()
-        _assets!!.add(asset)
-
+        assets.add(asset)
         return this
     }
 

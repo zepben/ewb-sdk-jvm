@@ -37,19 +37,9 @@ abstract class ProtectedSwitch(mRID: String = "") : Switch(mRID) {
     @Deprecated("BOILERPLATE: Use relayFunctions.getByMRID(mRID) instead")
     fun getRelayFunction(mRID: String): ProtectionRelayFunction? = relayFunctions.getByMRID(mRID)
 
-    /**
-     * Associate this [ProtectedSwitch] with a [ProtectionRelayFunction] operating it.
-     *
-     * @param relayFunction The [ProtectionRelayFunction] to associate with this [ProtectedSwitch].
-     * @return A reference to this [ProtectedSwitch] for fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use relayFunctions.add(relayFunction) instead")
     fun addRelayFunction(relayFunction: ProtectionRelayFunction): ProtectedSwitch {
-        if (validateReference(relayFunction, ::getRelayFunction, "A ProtectionRelayFunction"))
-            return this
-
-        _relayFunctions = _relayFunctions ?: mutableListOf()
-        _relayFunctions!!.add(relayFunction)
-
+        relayFunctions.add(relayFunction)
         return this
     }
 

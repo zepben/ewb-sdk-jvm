@@ -51,17 +51,9 @@ abstract class EndDevice(mRID: String = "") : AssetContainer(mRID) {
     @Deprecated("BOILERPLATE: Use usagePoints.getByMRID(mRID) instead")
     fun getUsagePoint(mRID: String): UsagePoint? = usagePoints.getByMRID(mRID)
 
-    /**
-     * @param usagePoint the usage point to associate with this end device.
-     * @return true if the usage point is associated.
-     */
+    @Deprecated("BOILERPLATE: Use usagePoints.add(usagePoint) instead")
     fun addUsagePoint(usagePoint: UsagePoint): EndDevice {
-        if (validateReference(usagePoint, ::getUsagePoint, "A UsagePoint"))
-            return this
-
-        _usagePoints = _usagePoints ?: mutableListOf()
-        _usagePoints!!.add(usagePoint)
-
+        usagePoints.add(usagePoint)
         return this
     }
 

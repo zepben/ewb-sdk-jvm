@@ -45,17 +45,9 @@ class Loop @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mRID)
     @Deprecated("BOILERPLATE: Use circuits.getByMRID(mRID) instead")
     fun getCircuit(mRID: String): Circuit? = circuits.getByMRID(mRID)
 
-    /**
-     * @param circuit the [Circuit] to associate with this [Loop].
-     * @return A reference to this [Loop] to allow fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use circuits.add(circuit) instead")
     fun addCircuit(circuit: Circuit): Loop {
-        if (validateReference(circuit, ::getCircuit, "A Circuit"))
-            return this
-
-        _circuits = _circuits ?: mutableListOf()
-        _circuits!!.add(circuit)
-
+        circuits.add(circuit)
         return this
     }
 
@@ -84,17 +76,9 @@ class Loop @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mRID)
     @Deprecated("BOILERPLATE: Use substations.getByMRID(mRID) instead")
     fun getSubstation(mRID: String): Substation? = substations.getByMRID(mRID)
 
-    /**
-     * @param substation the [Substation] that is powered by this [Loop].
-     * @return A reference to this [Loop] to allow fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use substations.add(substation) instead")
     fun addSubstation(substation: Substation): Loop {
-        if (validateReference(substation, ::getSubstation, "A Substation"))
-            return this
-
-        _substations = _substations ?: mutableListOf()
-        _substations!!.add(substation)
-
+        substations.add(substation)
         return this
     }
 
@@ -123,17 +107,9 @@ class Loop @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mRID)
     @Deprecated("BOILERPLATE: Use energizingSubstations.getByMRID(mRID) instead")
     fun getEnergizingSubstation(mRID: String): Substation? = energizingSubstations.getByMRID(mRID)
 
-    /**
-     * @param substation the [Substation] that energizing this [Loop].
-     * @return A reference to this [Loop] to allow fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use energizingSubstations.add(substation) instead")
     fun addEnergizingSubstation(substation: Substation): Loop {
-        if (validateReference(substation, ::getEnergizingSubstation, "A Substation"))
-            return this
-
-        _energizingSubstations = _energizingSubstations ?: mutableListOf()
-        _energizingSubstations!!.add(substation)
-
+        energizingSubstations.add(substation)
         return this
     }
 

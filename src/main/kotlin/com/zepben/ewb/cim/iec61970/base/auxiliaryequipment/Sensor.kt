@@ -38,19 +38,9 @@ abstract class Sensor(mRID: String = "") : AuxiliaryEquipment(mRID) {
     @Deprecated("BOILERPLATE: Use relayFunctions.getByMRID(mRID) instead")
     fun getRelayFunction(mRID: String): ProtectionRelayFunction? = relayFunctions.getByMRID(mRID)
 
-    /**
-     * Associate this [Sensor] with a [ProtectionRelayFunction] it influences.
-     *
-     * @param protectionRelayFunction The [ProtectionRelayFunction] to associate with this [Sensor].
-     * @return A reference to this [Sensor] for fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use relayFunctions.add(protectionRelayFunction) instead")
     fun addRelayFunction(protectionRelayFunction: ProtectionRelayFunction): Sensor {
-        if (validateReference(protectionRelayFunction, ::getRelayFunction, "A ProtectionRelayFunction"))
-            return this
-
-        _relayFunctions = _relayFunctions ?: mutableListOf()
-        _relayFunctions!!.add(protectionRelayFunction)
-
+        relayFunctions.add(protectionRelayFunction)
         return this
     }
 

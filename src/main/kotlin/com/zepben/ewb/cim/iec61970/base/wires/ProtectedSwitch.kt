@@ -31,20 +31,11 @@ abstract class ProtectedSwitch(mRID: String = "") : Switch(mRID) {
             getter = { _relayFunctions },
             setter = { _relayFunctions = it })
 
-    /**
-     * Get the number of [ProtectionRelayFunction]s operating this [ProtectedSwitch].
-     *
-     * @return The number of [ProtectionRelayFunction]s operating this [ProtectedSwitch].
-     */
-    fun numRelayFunctions(): Int = _relayFunctions?.size ?: 0
+    @Deprecated("BOILERPLATE: Use relayFunctions.size instead")
+    fun numRelayFunctions(): Int = relayFunctions.size
 
-    /**
-     * Get a [ProtectionRelayFunction] operating this [ProtectedSwitch] by its mRID.
-     *
-     * @param mRID The mRID of the desired [ProtectionRelayFunction]
-     * @return The [ProtectionRelayFunction] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getRelayFunction(mRID: String): ProtectionRelayFunction? = _relayFunctions?.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use relayFunctions.getByMRID(mRID) instead")
+    fun getRelayFunction(mRID: String): ProtectionRelayFunction? = relayFunctions.getByMRID(mRID)
 
     /**
      * Associate this [ProtectedSwitch] with a [ProtectionRelayFunction] operating it.

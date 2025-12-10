@@ -226,13 +226,8 @@ class PowerElectronicsConnection @JvmOverloads constructor(mRID: String = "") : 
     @Deprecated("BOILERPLATE: Use units.size instead")
     fun numUnits(): Int = units.size
 
-    /**
-     * The individual unit information of the power electronics connection.
-     *
-     * @param mRID the mRID of the required [PowerElectronicsUnit]
-     * @return The [PowerElectronicsUnit] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getUnit(mRID: String): PowerElectronicsUnit? = _powerElectronicsUnits?.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use units.getByMRID(mRID) instead")
+    fun getUnit(mRID: String): PowerElectronicsUnit? = units.getByMRID(mRID)
 
     fun addUnit(unit: PowerElectronicsUnit): PowerElectronicsConnection {
         if (validateReference(unit, ::getUnit, "An PowerElectronicsUnit"))
@@ -258,13 +253,8 @@ class PowerElectronicsConnection @JvmOverloads constructor(mRID: String = "") : 
     @Deprecated("BOILERPLATE: Use phases.size instead")
     fun numPhases(): Int = phases.size
 
-    /**
-     * The individual phase information of the power electronics connection.
-     *
-     * @param mRID the mRID of the required [PowerElectronicsConnectionPhase]
-     * @return The [PowerElectronicsConnectionPhase] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getPhase(mRID: String): PowerElectronicsConnectionPhase? = _powerElectronicsConnectionPhases?.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use phases.getByMRID(mRID) instead")
+    fun getPhase(mRID: String): PowerElectronicsConnectionPhase? = phases.getByMRID(mRID)
 
     fun addPhase(phase: PowerElectronicsConnectionPhase): PowerElectronicsConnection {
         if (validateReference(phase, ::getPhase, "An PowerElectronicsConnectionPhase"))

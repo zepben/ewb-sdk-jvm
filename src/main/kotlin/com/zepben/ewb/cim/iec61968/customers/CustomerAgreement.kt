@@ -42,13 +42,8 @@ class CustomerAgreement @JvmOverloads constructor(mRID: String = "") : Agreement
     @Deprecated("BOILERPLATE: Use pricingStructures.size instead")
     fun numPricingStructures(): Int = pricingStructures.size
 
-    /**
-     * All pricing structures applicable to this customer agreement.
-     *
-     * @param mRID the mRID of the required [PricingStructure]
-     * @return The [PricingStructure] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getPricingStructure(mRID: String): PricingStructure? = _pricingStructures?.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use agreements.getByMRID(mRID) instead")
+    fun getPricingStructure(mRID: String): PricingStructure? = pricingStructures.getByMRID(mRID)
 
     fun addPricingStructure(pricingStructure: PricingStructure): CustomerAgreement {
         if (validateReference(pricingStructure, ::getPricingStructure, "A PricingStructure"))

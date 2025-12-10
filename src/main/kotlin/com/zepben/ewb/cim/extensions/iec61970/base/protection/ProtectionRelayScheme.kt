@@ -39,20 +39,11 @@ class ProtectionRelayScheme @JvmOverloads constructor(mRID: String = "") : Ident
             getter = { _functions },
             setter = { _functions = it })
 
-    /**
-     * Get the number of [ProtectionRelayFunction]s operated as a part of this [ProtectionRelayScheme].
-     *
-     * @return The number of [ProtectionRelayFunction]s operated as a part of this [ProtectionRelayScheme].
-     */
-    fun numFunctions(): Int = _functions?.size ?: 0
+    @Deprecated("BOILERPLATE: Use functions.size instead")
+    fun numFunctions(): Int = functions.size
 
-    /**
-     * Get a [ProtectionRelayFunction] operated as a part of this [ProtectionRelayScheme] by its mRID.
-     *
-     * @param mRID The mRID of the desired [ProtectionRelayFunction]
-     * @return The [ProtectionRelayFunction] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getFunction(mRID: String): ProtectionRelayFunction? = _functions?.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use functions.getByMRID(mRID) instead")
+    fun getFunction(mRID: String): ProtectionRelayFunction? = functions.getByMRID(mRID)
 
     /**
      * Associate a [ProtectionRelayFunction] with this [ProtectionRelayScheme].

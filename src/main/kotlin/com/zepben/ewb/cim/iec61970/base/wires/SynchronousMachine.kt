@@ -89,13 +89,8 @@ class SynchronousMachine @JvmOverloads constructor(mRID: String = "") : Rotating
     @Deprecated("BOILERPLATE: Use curves.size instead")
     fun numCurves(): Int = curves.size
 
-    /**
-     * The individual [ReactiveCapabilityCurve] for this [SynchronousMachine]
-     *
-     * @param mRID the mRID of the required [ReactiveCapabilityCurve]
-     * @return The [ReactiveCapabilityCurve] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getCurve(mRID: String): ReactiveCapabilityCurve? = _reactiveCapabilityCurves?.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use curves.getByMRID(mRID) instead")
+    fun getCurve(mRID: String): ReactiveCapabilityCurve? = curves.getByMRID(mRID)
 
     /**
      * Add a [ReactiveCapabilityCurve] for this [SynchronousMachine]
@@ -111,17 +106,8 @@ class SynchronousMachine @JvmOverloads constructor(mRID: String = "") : Rotating
         return this
     }
 
-    /**
-     * Remove a [ReactiveCapabilityCurve] for this [SynchronousMachine]
-     *
-     * @param curve the [ReactiveCapabilityCurve] to be removed from this [SynchronousMachine]
-     * @return true if [ReactiveCapabilityCurve] has been removed from this [SynchronousMachine]
-     */
-    fun removeCurve(curve: ReactiveCapabilityCurve?): Boolean {
-        val ret = _reactiveCapabilityCurves?.remove(curve) == true
-        if (_reactiveCapabilityCurves.isNullOrEmpty()) _reactiveCapabilityCurves = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use curves.remove(curve) instead")
+    fun removeCurve(curve: ReactiveCapabilityCurve?): Boolean = curves.remove(curve)
 
     /**
      * Clear all [ReactiveCapabilityCurve] for this [SynchronousMachine].

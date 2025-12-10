@@ -89,13 +89,8 @@ class EnergySource @JvmOverloads constructor(mRID: String = "") : EnergyConnecti
     @Deprecated("BOILERPLATE: Use phases.size instead")
     fun numPhases(): Int = phases.size
 
-    /**
-     * The individual phase information of the energy source.
-     *
-     * @param mRID the mRID of the required [EnergySourcePhase]
-     * @return The [EnergySourcePhase] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getPhase(mRID: String): EnergySourcePhase? = _energySourcePhases?.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use phases.getByMRID(mRID) instead")
+    fun getPhase(mRID: String): EnergySourcePhase? = phases.getByMRID(mRID)
 
     fun addPhase(phase: EnergySourcePhase): EnergySource {
         if (validateReference(phase, ::getPhase, "An EnergySourcePhase"))

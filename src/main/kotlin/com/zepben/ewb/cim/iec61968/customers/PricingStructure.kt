@@ -35,13 +35,8 @@ class PricingStructure @JvmOverloads constructor(mRID: String = "") : Document(m
     @Deprecated("BOILERPLATE: Use tariffs.size instead")
     fun numTariffs(): Int = tariffs.size
 
-    /**
-     * All tariffs used by this pricing structure.
-     *
-     * @param mRID the mRID of the required [Tariff]
-     * @return The [Tariff] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getTariff(mRID: String): Tariff? = _tariffs?.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use tariffs.getByMRID(mRID) instead")
+    fun getTariff(mRID: String): Tariff? = tariffs.getByMRID(mRID)
 
     fun addTariff(tariff: Tariff): PricingStructure {
         if (validateReference(tariff, ::getTariff, "A Tariff"))

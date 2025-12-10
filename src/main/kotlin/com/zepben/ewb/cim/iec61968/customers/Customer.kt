@@ -45,13 +45,8 @@ class Customer @JvmOverloads constructor(mRID: String = "") : OrganisationRole(m
     @Deprecated("BOILERPLATE: Use agreements.size instead")
     fun numAgreements(): Int = agreements.size
 
-    /**
-     * All agreements of this customer.
-     *
-     * @param mRID the mRID of the required [CustomerAgreement]
-     * @return The [CustomerAgreement] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getAgreement(mRID: String): CustomerAgreement? = _customerAgreements?.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use agreements.getByMRID(mRID) instead")
+    fun getAgreement(mRID: String): CustomerAgreement? = agreements.getByMRID(mRID)
 
     /**
      *  Add a [CustomerAgreement] to this [Customer].

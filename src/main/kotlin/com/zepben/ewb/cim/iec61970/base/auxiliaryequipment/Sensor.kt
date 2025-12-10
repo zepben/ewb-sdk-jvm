@@ -32,20 +32,11 @@ abstract class Sensor(mRID: String = "") : AuxiliaryEquipment(mRID) {
             getter = { _relayFunctions },
             setter = { _relayFunctions = it })
 
-    /**
-     * Get the number of [ProtectionRelayFunction]s influenced by this [Sensor].
-     *
-     * @return The number of [ProtectionRelayFunction]s influenced by this [Sensor].
-     */
-    fun numRelayFunctions(): Int = _relayFunctions?.size ?: 0
+    @Deprecated("BOILERPLATE: Use relayFunctions.size instead")
+    fun numRelayFunctions(): Int = relayFunctions.size
 
-    /**
-     * Get a [ProtectionRelayFunction] influenced by this [Sensor] by its mRID.
-     *
-     * @param mRID The mRID of the desired [ProtectionRelayFunction]
-     * @return The [ProtectionRelayFunction] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getRelayFunction(mRID: String): ProtectionRelayFunction? = _relayFunctions?.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use relayFunctions.getByMRID(mRID) instead")
+    fun getRelayFunction(mRID: String): ProtectionRelayFunction? = relayFunctions.getByMRID(mRID)
 
     /**
      * Associate this [Sensor] with a [ProtectionRelayFunction] it influences.

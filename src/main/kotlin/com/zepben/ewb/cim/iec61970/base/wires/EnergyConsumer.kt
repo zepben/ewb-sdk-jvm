@@ -49,13 +49,8 @@ class EnergyConsumer @JvmOverloads constructor(mRID: String = "") : EnergyConnec
     @Deprecated("BOILERPLATE: Use phases.size instead")
     fun numPhases(): Int = phases.size
 
-    /**
-     * The individual phase models for this energy consumer.
-     *
-     * @param mRID the mRID of the required [EnergyConsumerPhase]
-     * @return The [EnergyConsumerPhase] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getPhase(mRID: String): EnergyConsumerPhase? = _energyConsumerPhases?.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use phases.getByMRID(mRID) instead")
+    fun getPhase(mRID: String): EnergyConsumerPhase? = phases.getByMRID(mRID)
 
     fun addPhase(phase: EnergyConsumerPhase): EnergyConsumer {
         if (validateReference(phase, ::getPhase, "An EnergyConsumerPhase"))

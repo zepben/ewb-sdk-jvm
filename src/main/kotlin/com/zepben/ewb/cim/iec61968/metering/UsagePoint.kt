@@ -63,13 +63,8 @@ class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject
     @Deprecated("BOILERPLATE: Use equipment.size instead")
     fun numEquipment(): Int = equipment.size
 
-    /**
-     * All equipment connecting this usage point to the electrical grid.
-     *
-     * @param mRID the mRID of the required [Equipment]
-     * @return The [Equipment] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getEquipment(mRID: String): Equipment? = _equipment?.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use equipment.getByMRID(mRID) instead")
+    fun getEquipment(mRID: String): Equipment? = equipment.getByMRID(mRID)
 
     /**
      * Add an [Equipment] to this [UsagePoint].
@@ -111,13 +106,8 @@ class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject
     @Deprecated("BOILERPLATE: Use endDevices.size instead")
     fun numEndDevices(): Int = endDevices.size
 
-    /**
-     * All end devices at this usage point.
-     *
-     * @param mRID the mRID of the required [EndDevice]
-     * @return The [EndDevice] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getEndDevice(mRID: String): EndDevice? = _endDevices?.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use endDevices.getByMRID(mRID) instead")
+    fun getEndDevice(mRID: String): EndDevice? = endDevices.getByMRID(mRID)
 
     /**
      * Add an [EndDevice] to this [UsagePoint].

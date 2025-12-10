@@ -48,13 +48,8 @@ abstract class EndDevice(mRID: String = "") : AssetContainer(mRID) {
     @Deprecated("BOILERPLATE: Use usagePoints.size instead")
     fun numUsagePoints(): Int = usagePoints.size
 
-    /**
-     * Usage point to which this end device belongs.
-     *
-     * @param mRID the mRID of the required [UsagePoint]
-     * @return The [UsagePoint] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getUsagePoint(mRID: String): UsagePoint? = _usagePoints?.firstOrNull { it.mRID == mRID }
+    @Deprecated("BOILERPLATE: Use usagePoints.getByMRID(mRID) instead")
+    fun getUsagePoint(mRID: String): UsagePoint? = usagePoints.getByMRID(mRID)
 
     /**
      * @param usagePoint the usage point to associate with this end device.

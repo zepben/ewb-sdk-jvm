@@ -158,12 +158,8 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
             getter = { _thresholds },
             setter = { _thresholds = it })
 
-    /**
-     * Get the number of threshold [RelaySetting]s for this [ProtectionRelayFunction].
-     *
-     * @return The number of threshold [RelaySetting]s for this [ProtectionRelayFunction].
-     */
-    fun numThresholds(): Int = _thresholds?.size ?: 0
+    @Deprecated("BOILERPLATE: Use thresholds.size instead")
+    fun numThresholds(): Int = thresholds.size
 
     /**
      * Get a threshold [RelaySetting] for this [ProtectionRelayFunction] by its index. Thresholds are 0-indexed. Returns null for out-of-bound indices.
@@ -249,13 +245,8 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
      */
     fun numProtectedSwitches(): Int = _protectedSwitches?.size ?: 0
 
-    /**
-     * Get a [ProtectedSwitch] operated by this [ProtectionRelayFunction] by its mRID.
-     *
-     * @param mRID The mRID of the desired [ProtectedSwitch]
-     * @return The [ProtectedSwitch] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getProtectedSwitch(mRID: String): ProtectedSwitch? = _protectedSwitches?.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use protectedSwitches.getByMRID(mRID) instead")
+    fun getProtectedSwitch(mRID: String): ProtectedSwitch? = protectedSwitches.getByMRID(mRID)
 
     /**
      * Associate this [ProtectionRelayFunction] with a [ProtectedSwitch] that it operates.
@@ -292,20 +283,11 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
             getter = { _sensors },
             setter = { _sensors = it })
 
-    /**
-     * Get the number of [Sensor]s for this [ProtectionRelayFunction].
-     *
-     * @return The number of [Sensor]s for this [ProtectionRelayFunction].
-     */
-    fun numSensors(): Int = _sensors?.size ?: 0
+    @Deprecated("BOILERPLATE: Use sensors.getByMRID(mRID) instead")
+    fun numSensors(): Int = sensors.size
 
-    /**
-     * Get a [Sensor] for this [ProtectionRelayFunction] by its mRID.
-     *
-     * @param mRID The mRID of the desired [Sensor]
-     * @return The [Sensor] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getSensor(mRID: String): Sensor? = _sensors?.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use sensors.getByMRID(mRID) instead")
+    fun getSensor(mRID: String): Sensor? = sensors.getByMRID(mRID)
 
     /**
      * Associate this [ProtectionRelayFunction] with a [Sensor].
@@ -342,20 +324,11 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
             getter = { _schemes },
             setter = { _schemes = it })
 
-    /**
-     * Get the number of [ProtectionRelayScheme]s this [ProtectionRelayFunction] operates under.
-     *
-     * @return The number of [ProtectionRelayScheme]s this [ProtectionRelayFunction] operates under.
-     */
-    fun numSchemes(): Int = _schemes?.size ?: 0
+    @Deprecated("BOILERPLATE: Use schemes.size instead")
+    fun numSchemes(): Int = schemes.size
 
-    /**
-     * Get a [ProtectionRelayScheme] this [ProtectionRelayFunction] operates under by its mRID.
-     *
-     * @param mRID The mRID of the desired [ProtectionRelayScheme]
-     * @return The [ProtectionRelayScheme] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getScheme(mRID: String): ProtectionRelayScheme? = _schemes?.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use schemes.getByMRID(mRID) instead")
+    fun getScheme(mRID: String): ProtectionRelayScheme? = schemes.getByMRID(mRID)
 
     /**
      * Associate this [ProtectionRelayFunction] to a [ProtectionRelayScheme] it operates under.

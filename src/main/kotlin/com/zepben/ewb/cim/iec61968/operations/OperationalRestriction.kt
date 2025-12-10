@@ -11,6 +11,7 @@ package com.zepben.ewb.cim.iec61968.operations
 import com.zepben.ewb.cim.iec61968.common.Document
 import com.zepben.ewb.cim.iec61970.base.core.Equipment
 import com.zepben.ewb.services.common.extensions.asUnmodifiable
+import com.zepben.ewb.services.common.extensions.getByMRID
 import com.zepben.ewb.services.common.extensions.validateReference
 import com.zepben.ewb.testing.MRIDListWrapper
 
@@ -40,13 +41,8 @@ class OperationalRestriction @JvmOverloads constructor(mRID: String = "") : Docu
     @Deprecated("BOILERPLATE: Use equipment.size instead")
     fun numEquipment(): Int = equipment.size
 
-    /**
-     * All equipments to which this restriction applies.
-     *
-     * @param mRID the mRID of the required [Equipment]
-     * @return The [Equipment] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getEquipment(mRID: String): Equipment? = _equipment?.firstOrNull { it.mRID == mRID }
+    @Deprecated("BOILERPLATE: Use equipment.getByMRID(mRID) instead")
+    fun getEquipment(mRID: String): Equipment? = equipment.getByMRID(mRID)
 
     /**
      * Add equipment to which this restriction applies.

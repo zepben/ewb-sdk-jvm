@@ -12,6 +12,7 @@ import com.zepben.ewb.cim.iec61968.common.Document
 import com.zepben.ewb.cim.iec61970.base.core.Equipment
 import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import com.zepben.ewb.services.common.extensions.validateReference
+import com.zepben.ewb.testing.MRIDListWrapper
 
 /**
  * A document that can be associated with equipment to describe any sort of restrictions compared with the
@@ -31,7 +32,10 @@ class OperationalRestriction @JvmOverloads constructor(mRID: String = "") : Docu
     /**
      * All equipment to which this restriction applies. The returned collection is read only.
      */
-    val equipment: Collection<Equipment> get() = _equipment.asUnmodifiable()
+    val equipment: MRIDListWrapper<Equipment>
+        get() = MRIDListWrapper(
+            getter = { _equipment },
+            setter = { _equipment = it })
 
     /**
      * Get the number of entries in the [Equipment] collection.

@@ -14,6 +14,7 @@ import com.zepben.ewb.services.common.extensions.getByMRID
 import com.zepben.ewb.services.common.extensions.safeRemove
 import com.zepben.ewb.services.common.extensions.validateReference
 import com.zepben.ewb.services.network.ResistanceReactance
+import com.zepben.ewb.testing.MRIDListWrapper
 
 /**
  * Set of transformer tank data, from an equipment library.
@@ -29,7 +30,10 @@ class TransformerTankInfo @JvmOverloads constructor(mRID: String = "") : AssetIn
     /**
      * Data for all the ends described by this transformer tank data. The returned collection is read only.
      */
-    val transformerEndInfos: List<TransformerEndInfo> get() = _transformerEndInfos.asUnmodifiable()
+    val transformerEndInfos: MRIDListWrapper<TransformerEndInfo>
+        get() = MRIDListWrapper(
+            getter = { _transformerEndInfos },
+            setter = { _transformerEndInfos = it })
 
     /**
      * Get the number of entries in the [TransformerEndInfo] collection.

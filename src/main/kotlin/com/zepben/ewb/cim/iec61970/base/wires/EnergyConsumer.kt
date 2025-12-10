@@ -12,6 +12,7 @@ import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import com.zepben.ewb.services.common.extensions.getByMRID
 import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 import com.zepben.ewb.services.common.extensions.validateReference
+import com.zepben.ewb.testing.MRIDListWrapper
 
 /**
  * Generic user of energy - a  point of consumption on the power system model.
@@ -40,7 +41,10 @@ class EnergyConsumer @JvmOverloads constructor(mRID: String = "") : EnergyConnec
     /**
      * The individual phase models for this energy consumer. The returned collection is read only.
      */
-    val phases: Collection<EnergyConsumerPhase> get() = _energyConsumerPhases.asUnmodifiable()
+    val phases: MRIDListWrapper<EnergyConsumerPhase>
+        get() = MRIDListWrapper(
+            getter = { _energyConsumerPhases },
+            setter = { _energyConsumerPhases = it })
 
     /**
      * Get the number of entries in the [EnergyConsumerPhase] collection.

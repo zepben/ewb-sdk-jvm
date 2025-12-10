@@ -15,6 +15,7 @@ import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import com.zepben.ewb.services.common.extensions.getByMRID
 import com.zepben.ewb.services.common.extensions.safeRemove
 import com.zepben.ewb.services.common.extensions.validateReference
+import com.zepben.ewb.testing.MRIDListWrapper
 
 /**
  *  Abstract class, should only be used through subclasses.
@@ -41,7 +42,10 @@ abstract class PowerSystemResource(mRID: String = "") : IdentifiedObject(mRID) {
     /**
      * All assets represented by this power system resource. For example, multiple conductor assets are electrically modelled as a single AC line segment.
      */
-    val assets: Collection<Asset> get() = _assets.asUnmodifiable()
+    val assets: MRIDListWrapper<Asset>
+        get() = MRIDListWrapper(
+            getter = { _assets },
+            setter = { _assets = it })
 
     /**
      * Get the number of entries in the [Asset]s collection.

@@ -12,6 +12,8 @@ import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.iec61968.assets.AssetInfo
 import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import com.zepben.ewb.services.common.extensions.typeNameAndMRID
+import com.zepben.ewb.testing.ListWrapper
+import com.zepben.ewb.testing.MRIDListWrapper
 import java.util.function.BiConsumer
 
 /**
@@ -34,7 +36,10 @@ class RelayInfo @JvmOverloads constructor(mRID: String = "") : AssetInfo(mRID) {
     private var _recloseDelays: MutableList<Double>? = null
 
     @ZBEX
-    val recloseDelays: List<Double> get() = _recloseDelays.asUnmodifiable()
+    val recloseDelays: ListWrapper<Double>
+        get() = ListWrapper(
+            getter = { _recloseDelays },
+            setter = { _recloseDelays = it })
 
     /**
      * Returns the number of reclose delays for this [RelayInfo]

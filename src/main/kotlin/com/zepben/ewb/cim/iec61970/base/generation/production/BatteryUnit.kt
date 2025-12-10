@@ -15,6 +15,7 @@ import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import com.zepben.ewb.services.common.extensions.getByMRID
 import com.zepben.ewb.services.common.extensions.safeRemove
 import com.zepben.ewb.services.common.extensions.validateReference
+import com.zepben.ewb.testing.MRIDListWrapper
 
 /**
  * An electrochemical energy storage device.
@@ -33,7 +34,10 @@ class BatteryUnit @JvmOverloads constructor(mRID: String = "") : PowerElectronic
     private var _batteryControls: MutableList<BatteryControl>? = null
 
     @ZBEX
-    val controls: List<BatteryControl> get() = _batteryControls.asUnmodifiable()
+    val controls: MRIDListWrapper<BatteryControl>
+        get() = MRIDListWrapper(
+            getter = { _batteryControls },
+            setter = { _batteryControls = it })
 
     /**
      * Get the number of entries in the [BatteryControl] collection.

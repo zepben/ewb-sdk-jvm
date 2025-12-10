@@ -11,6 +11,8 @@ package com.zepben.ewb.cim.iec61970.base.diagramlayout
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import com.zepben.ewb.services.common.extensions.typeNameAndMRID
+import com.zepben.ewb.testing.ListWrapper
+import com.zepben.ewb.testing.MRIDListWrapper
 import java.util.function.BiConsumer
 
 /**
@@ -39,7 +41,10 @@ class DiagramObject @JvmOverloads constructor(mRID: String = "") : IdentifiedObj
     /**
      * The points for this diagram object. The returned collection is read only.
      */
-    val points: List<DiagramObjectPoint> get() = _diagramObjectPoints.asUnmodifiable()
+    val points: ListWrapper<DiagramObjectPoint>
+        get() = ListWrapper(
+            getter = { _diagramObjectPoints },
+            setter = { _diagramObjectPoints = it })
 
     /**
      * Get a count of the [DiagramObjectPoint]'s associated with this [DiagramObject]

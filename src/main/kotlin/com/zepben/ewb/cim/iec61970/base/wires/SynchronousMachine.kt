@@ -11,6 +11,7 @@ package com.zepben.ewb.cim.iec61970.base.wires
 import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import com.zepben.ewb.services.common.extensions.getByMRID
 import com.zepben.ewb.services.common.extensions.validateReference
+import com.zepben.ewb.testing.MRIDListWrapper
 
 /**
  * An electromechanical device that operates with shaft rotating synchronously with the network. It is a single machine operating either as a generator or
@@ -80,7 +81,10 @@ class SynchronousMachine @JvmOverloads constructor(mRID: String = "") : Rotating
      * All available [ReactiveCapabilityCurve] for this synchronous machine.
      * First entry is the default [ReactiveCapabilityCurve]
      */
-    val curves: Collection<ReactiveCapabilityCurve> get() = _reactiveCapabilityCurves.asUnmodifiable()
+    val curves: MRIDListWrapper<ReactiveCapabilityCurve>
+        get() = MRIDListWrapper(
+            getter = { _reactiveCapabilityCurves },
+            setter = { _reactiveCapabilityCurves = it })
 
     /**
      * Get the number of entries in the [ReactiveCapabilityCurve] collection.

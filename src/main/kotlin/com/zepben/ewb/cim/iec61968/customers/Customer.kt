@@ -12,6 +12,7 @@ import com.zepben.ewb.cim.iec61968.common.OrganisationRole
 import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import com.zepben.ewb.services.common.extensions.getByMRID
 import com.zepben.ewb.services.common.extensions.validateReference
+import com.zepben.ewb.testing.MRIDListWrapper
 
 /**
  * Organisation receiving services from service supplier.
@@ -36,7 +37,10 @@ class Customer @JvmOverloads constructor(mRID: String = "") : OrganisationRole(m
     /**
      * All agreements of this customer. The returned collection is read only.
      */
-    val agreements: Collection<CustomerAgreement> get() = _customerAgreements.asUnmodifiable()
+    val agreements: MRIDListWrapper<CustomerAgreement>
+        get() = MRIDListWrapper(
+            getter = { _customerAgreements },
+            setter = { _customerAgreements = it })
 
     /**
      * Get the number of entries in the [CustomerAgreement] collection.

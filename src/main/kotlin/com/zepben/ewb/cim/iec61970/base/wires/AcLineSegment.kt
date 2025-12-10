@@ -9,6 +9,7 @@
 package com.zepben.ewb.cim.iec61970.base.wires
 
 import com.zepben.ewb.services.common.extensions.*
+import com.zepben.ewb.testing.MRIDListWrapper
 
 /**
  * A wire or combination of wires, with consistent electrical characteristics, building a single electrical system, used to carry alternating current
@@ -46,7 +47,10 @@ class AcLineSegment @JvmOverloads constructor(mRID: String = "") : Conductor(mRI
             perLengthImpedance = it
         }
 
-    val cuts: List<Cut> get() = _cuts.asUnmodifiable()
+    val cuts: MRIDListWrapper<Cut>
+        get() = MRIDListWrapper(
+            getter = { _cuts },
+            setter = { _cuts = it })
 
     /**
      * Get the number of entries in the [Cut] collection.
@@ -98,7 +102,10 @@ class AcLineSegment @JvmOverloads constructor(mRID: String = "") : Conductor(mRI
         return this
     }
 
-    val clamps: List<Clamp> get() = _clamps.asUnmodifiable()
+    val clamps: MRIDListWrapper<Clamp>
+        get() = MRIDListWrapper(
+            getter = { _clamps },
+            setter = { _clamps = it })
 
     /**
      * Get the number of entries in the [Clamp] collection.

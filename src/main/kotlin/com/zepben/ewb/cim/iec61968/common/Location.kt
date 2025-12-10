@@ -11,6 +11,8 @@ package com.zepben.ewb.cim.iec61968.common
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import com.zepben.ewb.services.common.extensions.typeNameAndMRID
+import com.zepben.ewb.testing.ListWrapper
+import com.zepben.ewb.testing.MRIDListWrapper
 import java.util.function.BiConsumer
 
 /**
@@ -28,7 +30,10 @@ class Location @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(m
      * Sequence of [PositionPoint]s describing this location.
      * The returned collection is read only.
      */
-    val points: List<PositionPoint> get() = _positionPoints.asUnmodifiable()
+    val points: ListWrapper<PositionPoint>
+        get() = ListWrapper(
+            getter = { _positionPoints },
+            setter = { _positionPoints = it })
 
     /**
      * Get the number of entries in the [PositionPoint] collection.

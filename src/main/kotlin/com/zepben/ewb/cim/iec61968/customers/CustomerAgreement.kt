@@ -12,6 +12,7 @@ import com.zepben.ewb.cim.iec61968.common.Agreement
 import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import com.zepben.ewb.services.common.extensions.getByMRID
 import com.zepben.ewb.services.common.extensions.validateReference
+import com.zepben.ewb.testing.MRIDListWrapper
 
 /**
  * Agreement between the customer and the service supplier to pay for service at a specific service location. It
@@ -33,7 +34,10 @@ class CustomerAgreement @JvmOverloads constructor(mRID: String = "") : Agreement
     /**
      * All pricing structures applicable to this customer agreement. The returned collection is read only.
      */
-    val pricingStructures: Collection<PricingStructure> get() = _pricingStructures.asUnmodifiable()
+    val pricingStructures: MRIDListWrapper<PricingStructure>
+        get() = MRIDListWrapper(
+            getter = { _pricingStructures },
+            setter = { _pricingStructures = it })
 
     /**
      * Get the number of entries in the [PricingStructure] collection.

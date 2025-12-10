@@ -17,6 +17,8 @@ import com.zepben.ewb.cim.iec61970.base.core.PhaseCode
 import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import com.zepben.ewb.services.common.extensions.getByMRID
 import com.zepben.ewb.services.common.extensions.validateReference
+import com.zepben.ewb.testing.ListWrapper
+import com.zepben.ewb.testing.MRIDListWrapper
 
 
 /**
@@ -53,7 +55,10 @@ class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject
     /**
      *  All equipment connecting this usage point to the electrical grid. The returned collection is read only
      */
-    val equipment: Collection<Equipment> get() = _equipment.asUnmodifiable()
+    val equipment: MRIDListWrapper<Equipment>
+        get() = MRIDListWrapper(
+            getter = { _equipment },
+            setter = { _equipment = it })
 
     /**
      * Get the number of entries in the [Equipment] collection.
@@ -109,7 +114,10 @@ class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject
     /**
      * All end devices at this usage point. The returned collection is read only.
      */
-    val endDevices: Collection<EndDevice> get() = _endDevices.asUnmodifiable()
+    val endDevices: MRIDListWrapper<EndDevice>
+        get() = MRIDListWrapper(
+            getter = { _endDevices },
+            setter = { _endDevices = it })
 
     /**
      * Get the number of entries in the [EndDevice] collection.
@@ -163,7 +171,10 @@ class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject
     }
 
     @ZBEX
-    val contacts: Collection<ContactDetails> get() = _contacts.asUnmodifiable()
+    val contacts: ListWrapper<ContactDetails>
+        get() = ListWrapper(
+            getter = { _contacts },
+            setter = { _contacts = it })
 
     /**
      * Get the number of entries in the [ContactDetails] collection.

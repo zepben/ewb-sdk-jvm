@@ -14,6 +14,8 @@ import com.zepben.ewb.cim.extensions.iec61970.base.wires.TransformerEndRatedS
 import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import com.zepben.ewb.services.network.ResistanceReactance
 import com.zepben.ewb.services.network.mergeIfIncomplete
+import com.zepben.ewb.testing.ListWrapper
+import com.zepben.ewb.testing.MRIDListWrapper
 
 /**
  * A PowerTransformerEnd is associated with each Terminal of a PowerTransformer.
@@ -101,7 +103,10 @@ class PowerTransformerEnd @JvmOverloads constructor(mRID: String = "") : Transfo
      * The returned collection is read only.
      */
     @ZBEX
-    val sRatings: List<TransformerEndRatedS> get() = _sRatings.asUnmodifiable()
+    val sRatings: ListWrapper<TransformerEndRatedS>
+        get() = ListWrapper(
+            getter = { _sRatings },
+            setter = { _sRatings = it })
 
     fun getRating(coolingType: TransformerCoolingType): TransformerEndRatedS? = _sRatings?.find { it.coolingType == coolingType }
 

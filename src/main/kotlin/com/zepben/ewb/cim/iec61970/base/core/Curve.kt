@@ -10,6 +10,8 @@ package com.zepben.ewb.cim.iec61970.base.core
 
 import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import com.zepben.ewb.services.common.extensions.typeNameAndMRID
+import com.zepben.ewb.testing.ListWrapper
+import com.zepben.ewb.testing.MRIDListWrapper
 
 
 /**
@@ -22,7 +24,10 @@ abstract class Curve @JvmOverloads constructor(mRID: String = "") : IdentifiedOb
     /**
      * The point data values that define this curve. The returned collection is read only, sorted by [CurveData.xValue] in ascending order.
      */
-    val data: List<CurveData> get() = _data.asUnmodifiable()
+    val data: ListWrapper<CurveData>
+        get() = ListWrapper(
+            getter = { _data },
+            setter = { _data = it })
 
     /**
      * Returns number of data point for this [Curve].

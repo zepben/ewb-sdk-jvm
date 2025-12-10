@@ -9,6 +9,7 @@
 package com.zepben.ewb.cim.iec61970.base.core
 
 import com.zepben.ewb.services.common.extensions.*
+import com.zepben.ewb.testing.MRIDListWrapper
 
 /**
  * A geographical region of a power system network model.
@@ -20,28 +21,28 @@ class GeographicalRegion @JvmOverloads constructor(mRID: String = "") : Identifi
     /**
      * All sub-geographical regions within this geographical region. The returned collection is read only.
      */
-    val subGeographicalRegions: Collection<SubGeographicalRegion> get() = _subGeographicalRegions.asUnmodifiable()
+    val subGeographicalRegions: MRIDListWrapper<SubGeographicalRegion>
+        get() = MRIDListWrapper(
+            getter = { _subGeographicalRegions },
+            setter = { _subGeographicalRegions = it },
+            customAdd = { addSubGeographicalRegionInternal(it) })
 
-    /**
-     * Get the number of entries in the [SubGeographicalRegion] collection.
-     */
-    fun numSubGeographicalRegions(): Int = _subGeographicalRegions?.size ?: 0
 
-    /**
-     * All sub-geographical regions within this geographical region.
-     *
-     * @param mRID the mRID of the required [SubGeographicalRegion]
-     * @return The [SubGeographicalRegion] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getSubGeographicalRegion(mRID: String): SubGeographicalRegion? = _subGeographicalRegions.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use subGeographicalRegions.size instead")
+    fun numSubGeographicalRegions(): Int = subGeographicalRegions.size
 
-    /**
-     * @param subGeographicalRegion The sub geographical region to associate within this geographical region.
-     * @return A reference to this [GeographicalRegion] to allow fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use subGeographicalRegions.getByMRID(mRID) instead")
+    fun getSubGeographicalRegion(mRID: String): SubGeographicalRegion? = subGeographicalRegions.getByMRID(mRID)
+
+    @Deprecated("BOILERPLATE: Use subGeographicalRegions.add(subGeographicalRegion) instead")
     fun addSubGeographicalRegion(subGeographicalRegion: SubGeographicalRegion): GeographicalRegion {
+        subGeographicalRegions.add(subGeographicalRegion)
+        return this
+    }
+
+    private fun addSubGeographicalRegionInternal(subGeographicalRegion: SubGeographicalRegion): Boolean {
         if (validateReference(subGeographicalRegion, ::getSubGeographicalRegion, "A SubGeographicalRegion"))
-            return this
+            return false
 
         if (subGeographicalRegion.geographicalRegion == null)
             subGeographicalRegion.geographicalRegion = this
@@ -51,23 +52,15 @@ class GeographicalRegion @JvmOverloads constructor(mRID: String = "") : Identifi
         }
 
         _subGeographicalRegions = _subGeographicalRegions ?: mutableListOf()
-        _subGeographicalRegions!!.add(subGeographicalRegion)
-
-        return this
+        return _subGeographicalRegions!!.add(subGeographicalRegion)
     }
 
-    /**
-     * @param subGeographicalRegion The sub geographical region to disassociate from this geographical region.
-     * @return True if the subGeographicalRegion existed and was removed from this GeographicalRegion, false otherwise
-     */
-    fun removeSubGeographicalRegion(subGeographicalRegion: SubGeographicalRegion): Boolean {
-        val ret = _subGeographicalRegions.safeRemove(subGeographicalRegion)
-        if (_subGeographicalRegions.isNullOrEmpty()) _subGeographicalRegions = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use subGeographicalRegions.remove(subGeographicalRegion) instead")
+    fun removeSubGeographicalRegion(subGeographicalRegion: SubGeographicalRegion): Boolean = subGeographicalRegions.remove(subGeographicalRegion)
 
+    @Deprecated("BOILERPLATE: Use subGeographicalRegions.clear() instead")
     fun clearSubGeographicalRegions(): GeographicalRegion {
-        _subGeographicalRegions = null
+        subGeographicalRegions.clear()
         return this
     }
 }

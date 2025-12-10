@@ -14,6 +14,7 @@ import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import com.zepben.ewb.services.common.extensions.getByMRID
 import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 import com.zepben.ewb.services.common.extensions.validateReference
+import com.zepben.ewb.testing.MRIDListWrapper
 
 /**
  * A connection to the AC network for energy production or consumption that uses power electronics rather than
@@ -208,12 +209,18 @@ class PowerElectronicsConnection @JvmOverloads constructor(mRID: String = "") : 
     /**
      * The units for this power electronics connection. The returned collection is read only.
      */
-    val units: Collection<PowerElectronicsUnit> get() = _powerElectronicsUnits.asUnmodifiable()
+    val units: MRIDListWrapper<PowerElectronicsUnit>
+        get() = MRIDListWrapper(
+            getter = { _powerElectronicsUnits },
+            setter = { _powerElectronicsUnits = it })
 
     /**
      * The phases for this power electronics connection. The returned collection is read only.
      */
-    val phases: Collection<PowerElectronicsConnectionPhase> get() = _powerElectronicsConnectionPhases.asUnmodifiable()
+    val phases: MRIDListWrapper<PowerElectronicsConnectionPhase>
+        get() = MRIDListWrapper(
+            getter = { _powerElectronicsConnectionPhases },
+            setter = { _powerElectronicsConnectionPhases = it })
 
 
     /**

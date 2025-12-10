@@ -12,6 +12,7 @@ import com.zepben.ewb.cim.iec61968.common.Document
 import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import com.zepben.ewb.services.common.extensions.getByMRID
 import com.zepben.ewb.services.common.extensions.validateReference
+import com.zepben.ewb.testing.MRIDListWrapper
 
 /**
  * Grouping of pricing components and prices used in the creation of customer charges and the eligibility
@@ -26,7 +27,10 @@ class PricingStructure @JvmOverloads constructor(mRID: String = "") : Document(m
     /**
      * All tariffs used by this pricing structure. The returned collection is read only
      */
-    val tariffs: Collection<Tariff> get() = _tariffs.asUnmodifiable()
+    val tariffs: MRIDListWrapper<Tariff>
+        get() = MRIDListWrapper(
+            getter = { _tariffs },
+            setter = { _tariffs = it })
 
     /**
      * Get the number of entries in the [Tariff] collection.

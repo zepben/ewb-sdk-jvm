@@ -15,6 +15,7 @@ import com.zepben.ewb.cim.iec61970.base.wires.Line
 import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import com.zepben.ewb.services.common.extensions.getByMRID
 import com.zepben.ewb.services.common.extensions.validateReference
+import com.zepben.ewb.testing.MRIDListWrapper
 
 /**
  * <no description from CIM>
@@ -32,7 +33,10 @@ class Circuit @JvmOverloads constructor(mRID: String = "") : Line(mRID) {
      * <no description from CIM>
      * The returned collection is read only.
      */
-    val endTerminals: List<Terminal> get() = _endTerminals.asUnmodifiable()
+    val endTerminals: MRIDListWrapper<Terminal>
+        get() = MRIDListWrapper(
+            getter = { _endTerminals },
+            setter = { _endTerminals = it })
 
     /**
      * Get the number of entries in the [endTerminals] collection.
@@ -84,7 +88,10 @@ class Circuit @JvmOverloads constructor(mRID: String = "") : Line(mRID) {
      * Simplification of the CIM association via Bay to [Substation].
      * The returned collection is read only.
      */
-    val endSubstations: List<Substation> get() = _endSubstations.asUnmodifiable()
+    val endSubstations: MRIDListWrapper<Substation>
+        get() = MRIDListWrapper(
+            getter = { _endSubstations },
+            setter = { _endSubstations = it })
 
     /**
      * Get the number of entries in the [endSubstations] collection.

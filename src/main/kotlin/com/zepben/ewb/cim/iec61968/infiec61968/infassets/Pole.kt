@@ -14,6 +14,7 @@ import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import com.zepben.ewb.services.common.extensions.getByMRID
 import com.zepben.ewb.services.common.extensions.safeRemove
 import com.zepben.ewb.services.common.extensions.validateReference
+import com.zepben.ewb.testing.MRIDListWrapper
 
 /**
  * A Pole asset
@@ -29,7 +30,10 @@ class Pole @JvmOverloads constructor(mRID: String = "") : Structure(mRID) {
     /**
      * All streetlights attached to this Pole. Collection is read only.
      */
-    val streetlights: Collection<Streetlight> get() = _streetlights.asUnmodifiable()
+    val streetlights: MRIDListWrapper<Streetlight>
+        get() = MRIDListWrapper(
+            getter = { _streetlights },
+            setter = { _streetlights = it })
 
     /**
      * Get the number of entries in the [Streetlight] collection.

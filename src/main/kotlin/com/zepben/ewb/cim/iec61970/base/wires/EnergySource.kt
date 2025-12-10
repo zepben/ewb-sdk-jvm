@@ -12,6 +12,7 @@ import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import com.zepben.ewb.services.common.extensions.getByMRID
 import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 import com.zepben.ewb.services.common.extensions.validateReference
+import com.zepben.ewb.testing.MRIDListWrapper
 
 /**
  * A generic equivalent for an energy supplier on a transmission or distribution voltage level.
@@ -80,7 +81,10 @@ class EnergySource @JvmOverloads constructor(mRID: String = "") : EnergyConnecti
     /**
      * The phases for this energy source. The returned collection is read only.
      */
-    val phases: Collection<EnergySourcePhase> get() = _energySourcePhases.asUnmodifiable()
+    val phases: MRIDListWrapper<EnergySourcePhase>
+        get() = MRIDListWrapper(
+            getter = { _energySourcePhases },
+            setter = { _energySourcePhases = it })
 
     /**
      * Get the number of entries in the [EnergySourcePhase] collection.

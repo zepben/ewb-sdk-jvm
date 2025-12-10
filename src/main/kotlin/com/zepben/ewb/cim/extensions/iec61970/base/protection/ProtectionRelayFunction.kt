@@ -14,6 +14,8 @@ import com.zepben.ewb.cim.iec61970.base.auxiliaryequipment.Sensor
 import com.zepben.ewb.cim.iec61970.base.core.PowerSystemResource
 import com.zepben.ewb.cim.iec61970.base.wires.ProtectedSwitch
 import com.zepben.ewb.services.common.extensions.*
+import com.zepben.ewb.testing.ListWrapper
+import com.zepben.ewb.testing.MRIDListWrapper
 import java.util.function.BiConsumer
 
 /**
@@ -64,7 +66,10 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
     private var _schemes: MutableList<ProtectionRelayScheme>? = null
 
     @ZBEX
-    val timeLimits: List<Double> get() = _timeLimits.asUnmodifiable()
+    val timeLimits: ListWrapper<Double>
+        get() = ListWrapper(
+            getter = { _timeLimits },
+            setter = { _timeLimits = it })
 
     /**
      * Returns the number of time limits for this [ProtectionRelayFunction]
@@ -158,7 +163,10 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
     }
 
     @ZBEX
-    val thresholds: List<RelaySetting> get() = _thresholds.asUnmodifiable()
+    val thresholds: ListWrapper<RelaySetting>
+        get() = ListWrapper(
+            getter = { _thresholds },
+            setter = { _thresholds = it })
 
     /**
      * Get the number of threshold [RelaySetting]s for this [ProtectionRelayFunction].
@@ -248,7 +256,10 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
     }
 
     @ZBEX
-    val protectedSwitches: Collection<ProtectedSwitch> get() = _protectedSwitches.asUnmodifiable()
+    val protectedSwitches: MRIDListWrapper<ProtectedSwitch>
+        get() = MRIDListWrapper(
+            getter = { _protectedSwitches },
+            setter = { _protectedSwitches = it })
 
     /**
      * Get the number of [ProtectedSwitch]es operated by this [ProtectionRelayFunction].
@@ -304,7 +315,10 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
     }
 
     @ZBEX
-    val sensors: Collection<Sensor> get() = _sensors.asUnmodifiable()
+    val sensors: MRIDListWrapper<Sensor>
+        get() = MRIDListWrapper(
+            getter = { _sensors },
+            setter = { _sensors = it })
 
     /**
      * Get the number of [Sensor]s for this [ProtectionRelayFunction].
@@ -360,7 +374,10 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
     }
 
     @ZBEX
-    val schemes: Collection<ProtectionRelayScheme> get() = _schemes.asUnmodifiable()
+    val schemes: MRIDListWrapper<ProtectionRelayScheme>
+        get() = MRIDListWrapper(
+            getter = { _schemes },
+            setter = { _schemes = it })
 
     /**
      * Get the number of [ProtectionRelayScheme]s this [ProtectionRelayFunction] operates under.

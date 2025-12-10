@@ -134,7 +134,7 @@ open class MRIDListWrapper<S: IdentifiedObject> (
                 throw IllegalArgumentException("mRID DUPLICATES! (TODO: message)")
             }
         }
-        return super.add(element)
+        return super.defaultAdd(element)
     }
 }
 
@@ -163,15 +163,15 @@ open class CustomListWrapper<T> (
 class A {
 
     private var _items: MutableList<Int>? = null
-    val items: CustomListWrapper<Int>
-        get() = CustomListWrapper(
+    val items: ListWrapper<Int>
+        get() = ListWrapper(
                 getter = { _items },
                 setter = { _items = it }
             )
 
     private var _uniques: MutableList<Int>? = null
-    val uniques: CustomListWrapper<Int>
-        get() = CustomListWrapper(
+    val uniques: ListWrapper<Int>
+        get() = ListWrapper(
             getter = { _uniques },
             setter = { _uniques = it },
             customAdd = { addUnique(it) }

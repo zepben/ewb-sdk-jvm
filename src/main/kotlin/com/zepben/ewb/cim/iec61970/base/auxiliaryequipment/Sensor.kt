@@ -14,6 +14,7 @@ import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import com.zepben.ewb.services.common.extensions.getByMRID
 import com.zepben.ewb.services.common.extensions.safeRemove
 import com.zepben.ewb.services.common.extensions.validateReference
+import com.zepben.ewb.testing.MRIDListWrapper
 
 /**
  * This class describes devices that transform a measured quantity into signals that can be presented at displays,
@@ -26,7 +27,10 @@ abstract class Sensor(mRID: String = "") : AuxiliaryEquipment(mRID) {
     private var _relayFunctions: MutableList<ProtectionRelayFunction>? = null
 
     @ZBEX
-    val relayFunctions: Collection<ProtectionRelayFunction> get() = _relayFunctions.asUnmodifiable()
+    val relayFunctions: MRIDListWrapper<ProtectionRelayFunction>
+        get() = MRIDListWrapper(
+            getter = { _relayFunctions },
+            setter = { _relayFunctions = it })
 
     /**
      * Get the number of [ProtectionRelayFunction]s influenced by this [Sensor].

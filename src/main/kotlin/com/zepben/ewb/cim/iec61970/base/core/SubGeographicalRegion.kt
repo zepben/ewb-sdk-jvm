@@ -9,6 +9,7 @@
 package com.zepben.ewb.cim.iec61970.base.core
 
 import com.zepben.ewb.services.common.extensions.*
+import com.zepben.ewb.testing.MRIDListWrapper
 
 /**
  * A subset of a geographical region of a power system network model.
@@ -22,7 +23,10 @@ class SubGeographicalRegion @JvmOverloads constructor(mRID: String = "") : Ident
     /**
      * All substations belonging to this sub geographical region. The returned collection is read only.
      */
-    val substations: Collection<Substation> get() = _substations.asUnmodifiable()
+    val substations: MRIDListWrapper<Substation>
+        get() = MRIDListWrapper(
+            getter = { _substations },
+            setter = { _substations = it })
 
     /**
      * Get the number of entries in the [Substation] collection.

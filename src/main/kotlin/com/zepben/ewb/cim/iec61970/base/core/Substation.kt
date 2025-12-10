@@ -11,6 +11,7 @@ package com.zepben.ewb.cim.iec61970.base.core
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.ewb.services.common.extensions.*
+import com.zepben.ewb.testing.MRIDListWrapper
 
 /**
  * A collection of equipment for purposes other than generation or utilization, through which electric energy in bulk
@@ -29,7 +30,10 @@ class Substation @JvmOverloads constructor(mRID: String = "") : EquipmentContain
     /**
      * The normal energized feeders of the substation. Also used for naming purposes. The returned collection is read only.
      */
-    val feeders: Collection<Feeder> get() = _normalEnergizedFeeders.asUnmodifiable()
+    val feeders: MRIDListWrapper<Feeder>
+        get() = MRIDListWrapper(
+            getter = { _normalEnergizedFeeders },
+            setter = { _normalEnergizedFeeders = it })
 
     /**
      * Get the number of entries in the [Feeder] collection.
@@ -88,7 +92,10 @@ class Substation @JvmOverloads constructor(mRID: String = "") : EquipmentContain
      * <no description from CIM>
      * The returned collection is read only.
      */
-    val loops: List<Loop> get() = _loops.asUnmodifiable()
+    val loops: MRIDListWrapper<Loop>
+        get() = MRIDListWrapper(
+            getter = { _loops },
+            setter = { _loops = it })
 
     /**
      * Get the number of entries in the [loops] collection.
@@ -140,7 +147,10 @@ class Substation @JvmOverloads constructor(mRID: String = "") : EquipmentContain
      * <no description from CIM>
      * The returned collection is read only.
      */
-    val energizedLoops: List<Loop> get() = _energizedLoops.asUnmodifiable()
+    val energizedLoops: MRIDListWrapper<Loop>
+        get() = MRIDListWrapper(
+            getter = { _energizedLoops },
+            setter = { _energizedLoops = it })
 
     /**
      * Get the number of entries in the [energizedLoops] collection.
@@ -192,7 +202,10 @@ class Substation @JvmOverloads constructor(mRID: String = "") : EquipmentContain
      * Simplification of the CIM association via Bay to [Circuit].
      * The returned collection is read only.
      */
-    val circuits: List<Circuit> get() = _circuits.asUnmodifiable()
+    val circuits: MRIDListWrapper<Circuit>
+        get() = MRIDListWrapper(
+            getter = { _circuits },
+            setter = { _circuits = it })
 
     /**
      * Get the number of entries in the [circuits] collection.

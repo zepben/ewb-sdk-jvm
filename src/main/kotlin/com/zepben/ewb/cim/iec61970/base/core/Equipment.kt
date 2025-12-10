@@ -15,6 +15,7 @@ import com.zepben.ewb.cim.iec61968.operations.OperationalRestriction
 import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import com.zepben.ewb.services.common.extensions.getByMRID
 import com.zepben.ewb.services.common.extensions.validateReference
+import com.zepben.ewb.testing.MRIDListWrapper
 import java.time.Instant
 
 /**
@@ -49,7 +50,10 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
     /**
      * The equipment containers this equipment belongs to. The returned collection is read only.
      */
-    val containers: Collection<EquipmentContainer> get() = _equipmentContainers.asUnmodifiable()
+    val containers: MRIDListWrapper<EquipmentContainer>
+        get() = MRIDListWrapper(
+            getter = { _equipmentContainers },
+            setter = { _equipmentContainers = it })
 
     /**
      * Get the number of entries in the [EquipmentContainer] collection.
@@ -100,7 +104,10 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
     /**
      * The equipment containers this equipment belongs to in the current network state. The returned collection is read only.
      */
-    val currentContainers: Collection<EquipmentContainer> get() = _currentContainers.asUnmodifiable()
+    val currentContainers: MRIDListWrapper<EquipmentContainer>
+        get() = MRIDListWrapper(
+            getter = { _currentContainers },
+            setter = { _currentContainers = it })
 
     /**
      * Get the number of entries in the current [EquipmentContainer] collection.
@@ -151,7 +158,10 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
     /**
      * The usage points for this equipment. The returned collection is read only.
      */
-    val usagePoints: List<UsagePoint> get() = _usagePoints.asUnmodifiable()
+    val usagePoints: MRIDListWrapper<UsagePoint>
+        get() = MRIDListWrapper(
+            getter = { _usagePoints },
+            setter = { _usagePoints = it })
 
     /**
      * Get the number of entries in the [UsagePoint] collection.
@@ -203,7 +213,10 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
     /**
      *  [OperationalRestriction]'s that this equipment is associated with. The returned collection is read only.
      */
-    val operationalRestrictions: Collection<OperationalRestriction> get() = _operationalRestrictions.asUnmodifiable()
+    val operationalRestrictions: MRIDListWrapper<OperationalRestriction>
+        get() = MRIDListWrapper(
+            getter = { _operationalRestrictions },
+            setter = { _operationalRestrictions = it })
 
     /**
      * Get the number of entries in the [OperationalRestriction] collection.

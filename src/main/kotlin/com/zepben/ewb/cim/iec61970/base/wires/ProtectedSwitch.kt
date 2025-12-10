@@ -13,6 +13,7 @@ import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import com.zepben.ewb.services.common.extensions.getByMRID
 import com.zepben.ewb.services.common.extensions.safeRemove
 import com.zepben.ewb.services.common.extensions.validateReference
+import com.zepben.ewb.testing.MRIDListWrapper
 
 /**
  * A ProtectedSwitch is a switching device that can be operated by [ProtectionRelayFunction]s.
@@ -25,7 +26,10 @@ abstract class ProtectedSwitch(mRID: String = "") : Switch(mRID) {
     var breakingCapacity: Int? = null
     private var _relayFunctions: MutableList<ProtectionRelayFunction>? = null
 
-    val relayFunctions: Collection<ProtectionRelayFunction> get() = _relayFunctions.asUnmodifiable()
+    val relayFunctions: MRIDListWrapper<ProtectionRelayFunction>
+        get() = MRIDListWrapper(
+            getter = { _relayFunctions },
+            setter = { _relayFunctions = it })
 
     /**
      * Get the number of [ProtectionRelayFunction]s operating this [ProtectedSwitch].

@@ -13,6 +13,8 @@ import com.zepben.ewb.cim.iec61968.common.ElectronicAddress
 import com.zepben.ewb.cim.iec61968.common.StreetAddress
 import com.zepben.ewb.cim.iec61968.common.TelephoneNumber
 import com.zepben.ewb.services.common.extensions.asUnmodifiable
+import com.zepben.ewb.testing.ListWrapper
+import com.zepben.ewb.testing.MRIDListWrapper
 import java.util.*
 
 /**
@@ -62,7 +64,10 @@ class ContactDetails @JvmOverloads constructor(id: String = "") {
     @ZBEX
     private var _electronicAddresses: MutableList<ElectronicAddress>? = null
 
-    val phoneNumbers: Collection<TelephoneNumber> get() = _phoneNumbers.asUnmodifiable()
+    val phoneNumbers: ListWrapper<TelephoneNumber>
+        get() = ListWrapper(
+            getter = { _phoneNumbers },
+            setter = { _phoneNumbers = it })
 
     /**
      * Get the number of entries in the [TelephoneNumber] collection.
@@ -104,7 +109,10 @@ class ContactDetails @JvmOverloads constructor(id: String = "") {
         return this
     }
 
-    val electronicAddresses: Collection<ElectronicAddress> get() = _electronicAddresses.asUnmodifiable()
+    val electronicAddresses: ListWrapper<ElectronicAddress>
+        get() = ListWrapper(
+            getter = { _electronicAddresses },
+            setter = { _electronicAddresses = it })
 
     /**
      * Get the number of entries in the [ElectronicAddress] collection.

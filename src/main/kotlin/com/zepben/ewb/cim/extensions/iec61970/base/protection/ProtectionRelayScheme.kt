@@ -14,6 +14,7 @@ import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import com.zepben.ewb.services.common.extensions.getByMRID
 import com.zepben.ewb.services.common.extensions.safeRemove
 import com.zepben.ewb.services.common.extensions.validateReference
+import com.zepben.ewb.testing.MRIDListWrapper
 
 /**
  * [ZBEX] This extension is in-line with the CIM working group for replacing the `protection` package, can be replaced when the working
@@ -33,7 +34,10 @@ class ProtectionRelayScheme @JvmOverloads constructor(mRID: String = "") : Ident
     private var _functions: MutableList<ProtectionRelayFunction>? = null
 
     @ZBEX
-    val functions: Collection<ProtectionRelayFunction> get() = _functions.asUnmodifiable()
+    val functions: MRIDListWrapper<ProtectionRelayFunction>
+        get() = MRIDListWrapper(
+            getter = { _functions },
+            setter = { _functions = it })
 
     /**
      * Get the number of [ProtectionRelayFunction]s operated as a part of this [ProtectionRelayScheme].

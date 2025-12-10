@@ -14,6 +14,7 @@ import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import com.zepben.ewb.services.common.extensions.getByMRID
 import com.zepben.ewb.services.common.extensions.safeRemove
 import com.zepben.ewb.services.common.extensions.validateReference
+import com.zepben.ewb.testing.MRIDListWrapper
 
 /**
  * Asset container that performs one or more end device functions. One type of end device is a meter which can perform metering,
@@ -39,7 +40,10 @@ abstract class EndDevice(mRID: String = "") : AssetContainer(mRID) {
     private var _usagePoints: MutableList<UsagePoint>? = null
     private var _functions: MutableList<EndDeviceFunction>? = null
 
-    val usagePoints: Collection<UsagePoint> get() = _usagePoints.asUnmodifiable()
+    val usagePoints: MRIDListWrapper<UsagePoint>
+        get() = MRIDListWrapper(
+            getter = { _usagePoints },
+            setter = { _usagePoints = it })
 
     /**
      * Get the number of entries in the [UsagePoint] collection.
@@ -87,7 +91,10 @@ abstract class EndDevice(mRID: String = "") : AssetContainer(mRID) {
         return this
     }
 
-    val functions: List<EndDeviceFunction> get() = _functions.asUnmodifiable()
+    val functions: MRIDListWrapper<EndDeviceFunction>
+        get() = MRIDListWrapper(
+            getter = { _functions },
+            setter = { _functions = it })
 
     /**
      * Get the number of entries in the [EndDeviceFunction] collection.

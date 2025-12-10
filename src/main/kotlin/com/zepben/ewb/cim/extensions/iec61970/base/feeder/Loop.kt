@@ -15,6 +15,7 @@ import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import com.zepben.ewb.services.common.extensions.getByMRID
 import com.zepben.ewb.services.common.extensions.validateReference
+import com.zepben.ewb.testing.MRIDListWrapper
 
 /**
  * [ZBEX]
@@ -33,7 +34,10 @@ class Loop @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mRID)
      * The returned collection is read only.
      */
     @ZBEX
-    val circuits: List<Circuit> get() = _circuits.asUnmodifiable()
+    val circuits: MRIDListWrapper<Circuit>
+        get() = MRIDListWrapper(
+            getter = { _circuits },
+            setter = { _circuits = it })
 
     /**
      * Get the number of entries in the [circuits] collection.
@@ -86,7 +90,10 @@ class Loop @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mRID)
      * The returned collection is read only.
      */
     @ZBEX
-    val substations: List<Substation> get() = _substations.asUnmodifiable()
+    val substations: MRIDListWrapper<Substation>
+        get() = MRIDListWrapper(
+            getter = { _substations },
+            setter = { _substations = it })
 
     /**
      * Get the number of entries in the [substations] collection.
@@ -139,7 +146,10 @@ class Loop @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mRID)
      * The returned collection is read only.
      */
     @ZBEX
-    val energizingSubstations: List<Substation> get() = _energizingSubstations.asUnmodifiable()
+    val energizingSubstations: MRIDListWrapper<Substation>
+        get() = MRIDListWrapper(
+            getter = { _energizingSubstations },
+            setter = { _energizingSubstations = it })
 
     /**
      * Get the number of entries in the [energizingSubstations] collection.

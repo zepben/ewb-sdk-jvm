@@ -17,6 +17,7 @@ import com.zepben.ewb.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.ewb.cim.iec61970.base.core.ConnectivityNode
 import com.zepben.ewb.cim.iec61970.base.core.Terminal
 import com.zepben.ewb.services.common.extensions.*
+import com.zepben.ewb.testing.MRIDListWrapper
 
 /**
  * An electrical device consisting of  two or more coupled windings, with or without a magnetic core, for introducing mutual coupling
@@ -83,7 +84,10 @@ class PowerTransformer @JvmOverloads constructor(mRID: String = "") : Conducting
     /**
      * The PowerTransformerEnd's for this PowerTransformer. The returned collection is read only.
      */
-    val ends: List<PowerTransformerEnd> get() = _powerTransformerEnds.asUnmodifiable()
+    val ends: MRIDListWrapper<PowerTransformerEnd>
+        get() = MRIDListWrapper(
+            getter = { _powerTransformerEnds },
+            setter = { _powerTransformerEnds = it })
 
     /**
      * Get the number of entries in the [PowerTransformerEnd] collection.

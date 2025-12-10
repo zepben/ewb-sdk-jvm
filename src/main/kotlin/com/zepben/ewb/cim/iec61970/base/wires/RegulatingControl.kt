@@ -15,6 +15,7 @@ import com.zepben.ewb.cim.iec61970.base.core.Terminal
 import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import com.zepben.ewb.services.common.extensions.getByMRID
 import com.zepben.ewb.services.common.extensions.validateReference
+import com.zepben.ewb.testing.MRIDListWrapper
 
 /**
  * Specifies a set of equipment that works together to control a power system quantity such as voltage or flow.
@@ -87,7 +88,10 @@ abstract class RegulatingControl(mRID: String = "") : PowerSystemResource(mRID) 
 
     private var _regulatingCondEqs: MutableList<RegulatingCondEq>? = null
 
-    val regulatingCondEqs: List<RegulatingCondEq> get() = _regulatingCondEqs.asUnmodifiable()
+    val regulatingCondEqs: MRIDListWrapper<RegulatingCondEq>
+        get() = MRIDListWrapper(
+            getter = { _regulatingCondEqs },
+            setter = { _regulatingCondEqs = it })
 
     /**
      * Get the number of entries in the [RegulatingCondEq] collection.

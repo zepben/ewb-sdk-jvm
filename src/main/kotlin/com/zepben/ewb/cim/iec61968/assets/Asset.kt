@@ -15,6 +15,7 @@ import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import com.zepben.ewb.services.common.extensions.getByMRID
 import com.zepben.ewb.services.common.extensions.safeRemove
 import com.zepben.ewb.services.common.extensions.validateReference
+import com.zepben.ewb.testing.MRIDListWrapper
 
 /**
  * Tangible resource of the utility, including power system equipment, various end devices, cabinets, buildings, etc. For electrical
@@ -35,13 +36,19 @@ abstract class Asset(mRID: String = "") : IdentifiedObject(mRID) {
     /**
      * All roles an organisation plays for this asset. The returned collection is read only.
      */
-    val organisationRoles: Collection<AssetOrganisationRole> get() = _organisationRoles.asUnmodifiable()
+    val organisationRoles: MRIDListWrapper<AssetOrganisationRole>
+        get() = MRIDListWrapper(
+            getter = { _organisationRoles },
+            setter = { _organisationRoles = it })
 
     /**
      * All power system resources used to electrically model this asset. For example, transformer asset is electrically modelled with a transformer and its
      * windings and tap changer.
      */
-    val powerSystemResources: Collection<PowerSystemResource> get() = _powerSystemResources.asUnmodifiable()
+    val powerSystemResources: MRIDListWrapper<PowerSystemResource>
+        get() = MRIDListWrapper(
+            getter = { _powerSystemResources },
+            setter = { _powerSystemResources = it })
 
     /**
      * Get the number of entries in the [AssetOrganisationRole] collection.

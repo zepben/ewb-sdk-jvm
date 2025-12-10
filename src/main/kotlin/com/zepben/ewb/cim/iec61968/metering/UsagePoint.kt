@@ -114,7 +114,8 @@ class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject
     val contacts: ListWrapper<ContactDetails>
         get() = ListWrapper(
             getter = { _contacts },
-            setter = { _contacts = it })
+            setter = { _contacts = it },
+            customAdd = { addContactCustom(it) })
 
     @Deprecated("BOILERPLATE: Use contacts.size instead")
     fun numContacts(): Int = contacts.size
@@ -132,6 +133,14 @@ class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject
     fun addContact(contact: ContactDetails): UsagePoint {
         contacts.add(contact)
         return this
+    }
+
+    private fun addContactCustom(contact: ContactDetails): Boolean {
+        if (validateReference(contact, ContactDetails::id, ::getContact) { "A ContactDetails with ID ${contact.id}" })
+            return false
+
+        _contacts = _contacts ?: mutableListOf()
+        return _contacts!!.add(contact)
     }
 
     @Deprecated("BOILERPLATE: Use contacts.remove(contact) instead")

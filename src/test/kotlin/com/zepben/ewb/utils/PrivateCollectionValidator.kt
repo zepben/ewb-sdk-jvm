@@ -365,7 +365,7 @@ internal class PrivateCollectionValidator {
             expectedDuplicateErrors.forEach { (otherDuplicate, expectedError) ->
                 expect { add(it, otherDuplicate) }
                     .toThrow<IllegalArgumentException>()
-//                    .withMessage(Pattern.compile(expectedError)) TODO: Amend for messaages
+//                    .withMessage(Pattern.compile(expectedError)) TODO: Amend for messages
             }
         }
 

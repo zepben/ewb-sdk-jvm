@@ -77,12 +77,9 @@ class BatteryUnit @JvmOverloads constructor(mRID: String = "") : PowerElectronic
     @Deprecated("BOILERPLATE: Use controls.remove(control) instead")
     fun removeControl(control: BatteryControl): Boolean = controls.remove(control)
 
-    /**
-     * Clear all [BatteryControl]'s attached to this [BatteryUnit].
-     * @return This [BatteryUnit] for fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use controls.clear() instead")
     fun clearControls(): BatteryUnit {
-        _batteryControls = null
+        controls.clear()
         return this
     }
 

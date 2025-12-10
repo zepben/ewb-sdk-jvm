@@ -68,12 +68,9 @@ abstract class EndDevice(mRID: String = "") : AssetContainer(mRID) {
     @Deprecated("BOILERPLATE: Use usagePoints.remove(usagePoint) instead")
     fun removeUsagePoint(usagePoint: UsagePoint): Boolean = usagePoints.remove(usagePoint)
 
-    /**
-     * Clear all [UsagePoint]'s attached to this [EndDevice].
-     * @return This [EndDevice] for fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use usagePoints.clear() instead")
     fun clearUsagePoints(): EndDevice {
-        _usagePoints = null
+        usagePoints.clear()
         return this
     }
 
@@ -107,12 +104,9 @@ abstract class EndDevice(mRID: String = "") : AssetContainer(mRID) {
     @Deprecated("BOILERPLATE: Use functions.remove(function) instead")
     fun removeFunction(function: EndDeviceFunction): Boolean = functions.remove(function)
 
-    /**
-     * Clear all [EndDeviceFunction]'s attached to this [EndDevice].
-     * @return This [EndDevice] for fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use functions.clear() instead")
     fun clearFunctions(): EndDevice {
-        _functions = null
+        functions.clear()
         return this
     }
 

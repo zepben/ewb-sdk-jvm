@@ -115,12 +115,9 @@ class RelayInfo @JvmOverloads constructor(mRID: String = "") : AssetInfo(mRID) {
         return ret
     }
 
-    /**
-     * Clear [recloseDelays].
-     * @return This [RelayInfo] for fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use recloseDelays.clear() instead")
     fun clearDelays(): RelayInfo {
-        _recloseDelays = null
+        recloseDelays.clear()
         return this
     }
 

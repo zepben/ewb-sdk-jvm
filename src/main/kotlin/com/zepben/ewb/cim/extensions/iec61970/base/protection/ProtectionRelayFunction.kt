@@ -143,12 +143,9 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
         return ret
     }
 
-    /**
-     * Clear [timeLimits].
-     * @return This [ProtectionRelayFunction] for fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use timeLimits.clear() instead")
     fun clearTimeLimits(): ProtectionRelayFunction {
-        _timeLimits = null
+        timeLimits.clear()
         return this
     }
 
@@ -222,13 +219,9 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
         return null
     }
 
-    /**
-     * Removes all threshold [RelaySetting]s from this [ProtectionRelayFunction].
-     *
-     * @return A reference to this [ProtectionRelayFunction] for fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use thresholds.clear() instead")
     fun clearThresholds(): ProtectionRelayFunction {
-        _thresholds = null
+        thresholds.clear()
         return this
     }
 
@@ -267,13 +260,9 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
     @Deprecated("BOILERPLATE: Use protectedSwitches.remove(protectedSwitch) instead")
     fun removeProtectedSwitch(protectedSwitch: ProtectedSwitch): Boolean = protectedSwitches.remove(protectedSwitch)
 
-    /**
-     * Disassociate all [ProtectedSwitch]es from this [ProtectionRelayFunction].
-     *
-     * @return A reference to this [ProtectionRelayFunction] for fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use protectedSwitches.clear() instead")
     fun clearProtectedSwitches(): ProtectionRelayFunction {
-        _protectedSwitches = null
+        protectedSwitches.clear()
         return this
     }
 
@@ -308,13 +297,9 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
     @Deprecated("BOILERPLATE: Use sensors.remove(sensor) instead")
     fun removeSensor(sensor: Sensor): Boolean = sensors.remove(sensor)
 
-    /**
-     * Disassociate all [Sensor]s from this [ProtectionRelayFunction].
-     *
-     * @return A reference to this [ProtectionRelayFunction] for fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use sensors.clear() instead")
     fun clearSensors(): ProtectionRelayFunction {
-        _sensors = null
+        sensors.clear()
         return this
     }
 
@@ -349,13 +334,9 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
     @Deprecated("BOILERPLATE: Use schemes.remove(scheme) instead")
     fun removeScheme(scheme: ProtectionRelayScheme): Boolean = schemes.remove(scheme)
 
-    /**
-     * Disassociate all [ProtectionRelayScheme]s from this [ProtectionRelayFunction].
-     *
-     * @return A reference to this [ProtectionRelayFunction] for fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use schemes.clear() instead")
     fun clearSchemes(): ProtectionRelayFunction {
-        _schemes = null
+        schemes.clear()
         return this
     }
 

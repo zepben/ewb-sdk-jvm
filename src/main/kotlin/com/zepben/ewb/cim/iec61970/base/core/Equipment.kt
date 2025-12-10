@@ -75,15 +75,12 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
         return this
     }
 
-    @Deprecated("BOILERPLATE: Use equipmentContainers.remove(equipmentContainer) instead")
+    @Deprecated("BOILERPLATE: Use containers.remove(equipmentContainer) instead")
     fun removeContainer(equipmentContainer: EquipmentContainer): Boolean = containers.remove(equipmentContainer)
 
-    /**
-     * Clear this [Equipment]'s associated [EquipmentContainer]'s
-     * @return this [Equipment]
-     */
+    @Deprecated("BOILERPLATE: Use containers.clear() instead")
     fun clearContainers(): Equipment {
-        _equipmentContainers = null
+        containers.clear()
         return this
     }
 
@@ -118,12 +115,9 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
     @Deprecated("BOILERPLATE: Use currentContainers.remove(equipmentContainer) instead")
     fun removeCurrentContainer(equipmentContainer: EquipmentContainer): Boolean = currentContainers.remove(equipmentContainer)
 
-    /**
-     * Clear this [Equipment]'s associated current [EquipmentContainer]'s
-     * @return this [Equipment]
-     */
+    @Deprecated("BOILERPLATE: Use currentContainers.clear() instead")
     fun clearCurrentContainers(): Equipment {
-        _currentContainers = null
+        currentContainers.clear()
         return this
     }
 
@@ -159,12 +153,9 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
     @Deprecated("BOILERPLATE: Use usagePoints.remove(usagePoint) instead")
     fun removeUsagePoint(usagePoint: UsagePoint): Boolean = usagePoints.remove(usagePoint)
 
-    /**
-     * Clear this [Equipment]'s associated [UsagePoint]'s
-     * @return this [Equipment]
-     */
+    @Deprecated("BOILERPLATE: Use usagePoints.clear() instead")
     fun clearUsagePoints(): Equipment {
-        _usagePoints = null
+        usagePoints.clear()
         return this
     }
 
@@ -202,12 +193,9 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
     @Deprecated("BOILERPLATE: Use operationalRestrictions.remove(restriction) instead")
     fun removeOperationalRestriction(restriction: OperationalRestriction): Boolean = operationalRestrictions.remove(restriction)
 
-    /**
-     * Clear this [Equipment]'s associated [OperationalRestriction]'s
-     * @return this [Equipment]
-     */
+    @Deprecated("BOILERPLATE: Use operationalRestrictions.clear() instead")
     fun clearOperationalRestrictions(): Equipment {
-        _operationalRestrictions = null
+        operationalRestrictions.clear()
         return this
     }
 

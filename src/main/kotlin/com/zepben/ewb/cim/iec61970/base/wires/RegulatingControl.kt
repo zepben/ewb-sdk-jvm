@@ -117,12 +117,9 @@ abstract class RegulatingControl(mRID: String = "") : PowerSystemResource(mRID) 
     @Deprecated("BOILERPLATE: Use regulatingCondEqs.remove(regulatingCondEq) instead")
     fun removeRegulatingCondEq(regulatingCondEq: RegulatingCondEq): Boolean = regulatingCondEqs.remove(regulatingCondEq)
 
-    /**
-     * Clear this [RegulatingControl]'s associated [RegulatingCondEq]'s
-     * @return this [RegulatingControl]
-     */
+    @Deprecated("BOILERPLATE: Use regulatingCondEqs.clear() instead")
     fun clearRegulatingCondEqs(): RegulatingControl {
-        _regulatingCondEqs = null
+        regulatingCondEqs.clear()
         return this
     }
 }

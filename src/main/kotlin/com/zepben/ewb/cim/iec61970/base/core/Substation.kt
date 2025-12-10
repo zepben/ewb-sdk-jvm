@@ -65,12 +65,9 @@ class Substation @JvmOverloads constructor(mRID: String = "") : EquipmentContain
     @Deprecated("BOILERPLATE: Use feeders.remove(feeder) instead")
     fun removeFeeder(feeder: Feeder): Boolean = feeders.remove(feeder)
 
-    /**
-     * Clear this [Substation]'s [Feeder]'s
-     * @return this [Substation]
-     */
+    @Deprecated("BOILERPLATE: Use feeders.clear() instead")
     fun clearFeeders(): Substation {
-        _normalEnergizedFeeders = null
+        feeders.clear()
         return this
     }
 
@@ -106,12 +103,9 @@ class Substation @JvmOverloads constructor(mRID: String = "") : EquipmentContain
     @Deprecated("BOILERPLATE: Use loops.remove(loop) instead")
     fun removeLoop(loop: Loop): Boolean = loops.remove(loop)
 
-    /**
-     * Clear this [Substation]'s associated [loops].
-     * @return this [Substation]
-     */
+    @Deprecated("BOILERPLATE: Use loops.clear() instead")
     fun clearLoops(): Substation {
-        _loops = null
+        loops.clear()
         return this
     }
 
@@ -147,12 +141,9 @@ class Substation @JvmOverloads constructor(mRID: String = "") : EquipmentContain
     @Deprecated("BOILERPLATE: Use energizedLoops.remove(loop) instead")
     fun removeEnergizedLoop(loop: Loop): Boolean = energizedLoops.remove(loop)
 
-    /**
-     * Clear this [Substation]'s associated [energizedLoops].
-     * @return this [Substation]
-     */
+    @Deprecated("BOILERPLATE: Use energizedLoops.clear() instead")
     fun clearEnergizedLoops(): Substation {
-        _energizedLoops = null
+        energizedLoops.clear()
         return this
     }
 
@@ -188,12 +179,9 @@ class Substation @JvmOverloads constructor(mRID: String = "") : EquipmentContain
     @Deprecated("BOILERPLATE: Use circuits.remove(circuit) instead")
     fun removeCircuit(circuit: Circuit): Boolean = circuits.remove(circuit)
 
-    /**
-     * Clear this [Substation]'s associated [circuits].
-     * @return this [Substation]
-     */
+    @Deprecated("BOILERPLATE: Use circuits.clear() instead")
     fun clearCircuits(): Substation {
-        _circuits = null
+        circuits.clear()
         return this
     }
 }

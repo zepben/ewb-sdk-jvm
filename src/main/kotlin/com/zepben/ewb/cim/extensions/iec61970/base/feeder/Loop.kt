@@ -62,12 +62,9 @@ class Loop @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mRID)
     @Deprecated("BOILERPLATE: Use circuits.remove(circuit) instead")
     fun removeCircuit(circuit: Circuit): Boolean = circuits.remove(circuit)
 
-    /**
-     * Clear this [Loop]'s associated [circuits].
-     * @return this [Loop]
-     */
+    @Deprecated("BOILERPLATE: Use circuits.clear() instead")
     fun clearCircuits(): Loop {
-        _circuits = null
+        circuits.clear()
         return this
     }
 
@@ -104,12 +101,9 @@ class Loop @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mRID)
     @Deprecated("BOILERPLATE: Use substations.remove(substation) instead")
     fun removeSubstation(substation: Substation): Boolean = substations.remove(substation)
 
-    /**
-     * Clear this [Loop]'s associated [substations].
-     * @return this [Loop]
-     */
+    @Deprecated("BOILERPLATE: Use substations.clear() instead")
     fun clearSubstations(): Loop {
-        _substations = null
+        substations.clear()
         return this
     }
 
@@ -146,12 +140,9 @@ class Loop @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mRID)
     @Deprecated("BOILERPLATE: Use energizingSubstations.remove(substation) instead")
     fun removeEnergizingSubstation(substation: Substation): Boolean = energizingSubstations.remove(substation)
 
-    /**
-     * Clear this [Loop]'s associated [energizingSubstations].
-     * @return this [Loop]
-     */
+    @Deprecated("BOILERPLATE: Use energizingSubstations.clear() instead")
     fun clearEnergizingSubstations(): Loop {
-        _energizingSubstations = null
+        energizingSubstations.clear()
         return this
     }
 

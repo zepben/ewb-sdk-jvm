@@ -72,12 +72,9 @@ abstract class PowerSystemResource(mRID: String = "") : IdentifiedObject(mRID) {
     @Deprecated("BOILERPLATE: Use assets.remove(asset) instead")
     fun removeAsset(asset: Asset): Boolean = assets.remove(asset)
 
-    /**
-     * Remove all [Asset]s from this PowerSystemResource
-     * @return A reference to this [PowerSystemResource] to allow fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use assets.clear() instead")
     fun clearAssets(): PowerSystemResource {
-        _assets = null
+        assets.clear()
         return this
     }
 

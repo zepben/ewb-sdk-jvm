@@ -57,13 +57,9 @@ abstract class Sensor(mRID: String = "") : AuxiliaryEquipment(mRID) {
     @Deprecated("BOILERPLATE: Use relayFunctions.remove(relayFunction) instead")
     fun removeRelayFunction(relayFunction: ProtectionRelayFunction): Boolean = relayFunctions.remove(relayFunction)
 
-    /**
-     * Disassociate all [ProtectionRelayFunction]s from this [Sensor].
-     *
-     * @return A reference to this [Sensor] for fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use relayFunctions.clear() instead")
     fun clearRelayFunctions(): Sensor {
-        _relayFunctions = null
+        relayFunctions.clear()
         return this
     }
 

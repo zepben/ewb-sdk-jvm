@@ -88,13 +88,9 @@ class ContactDetails @JvmOverloads constructor(id: String = "") {
     @Deprecated("BOILERPLATE: Use phoneNumbers.remove(phoneNumber) instead")
     fun removePhoneNumber(phoneNumber: TelephoneNumber): Boolean = phoneNumbers.remove(phoneNumber)
 
-    /**
-     * Clear all [TelephoneNumber]'s from this [ContactDetails].
-     *
-     * @return This [ContactDetails] for fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use phoneNumbers.clear() instead")
     fun clearPhoneNumbers(): ContactDetails {
-        _phoneNumbers = null
+        phoneNumbers.clear()
         return this
     }
 
@@ -122,13 +118,9 @@ class ContactDetails @JvmOverloads constructor(id: String = "") {
     @Deprecated("BOILERPLATE: Use electronicAddresses.remove(electronicAddress) instead")
     fun removeElectronicAddress(electronicAddress: ElectronicAddress): Boolean = electronicAddresses.remove(electronicAddress)
 
-    /**
-     * Clear all [ElectronicAddress]'s from this [ContactDetails].
-     *
-     * @return This [ContactDetails] for fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use electronicAddresses.clear() instead")
     fun clearElectronicAddresses(): ContactDetails {
-        _electronicAddresses = null
+        electronicAddresses.clear()
         return this
     }
 

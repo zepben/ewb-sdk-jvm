@@ -67,12 +67,9 @@ class Customer @JvmOverloads constructor(mRID: String = "") : OrganisationRole(m
     @Deprecated("BOILERPLATE: Use customerAgreements.remove(customerAgreement) instead")
     fun removeAgreement(customerAgreement: CustomerAgreement): Boolean = agreements.remove(customerAgreement)
 
-    /**
-     * Clear all [CustomerAgreement]'s from this [Customer].
-     * @return this [Customer].
-     */
+    @Deprecated("BOILERPLATE: Use customerAgreements.clear() instead")
     fun clearAgreements(): Customer {
-        _customerAgreements = null
+        agreements.clear()
         return this
     }
 }

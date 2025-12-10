@@ -61,12 +61,9 @@ class Circuit @JvmOverloads constructor(mRID: String = "") : Line(mRID) {
     @Deprecated("BOILERPLATE: Use endTerminals.remove(endTerminal) instead")
     fun removeEndTerminal(endTerminal: Terminal): Boolean = endTerminals.remove(endTerminal)
 
-    /**
-     * Clear this [Circuit]'s associated [endTerminals].
-     * @return this [Circuit]
-     */
+    @Deprecated("BOILERPLATE: Use endTerminals.clear() instead")
     fun clearEndTerminals(): Circuit {
-        _endTerminals = null
+        endTerminals.clear()
         return this
     }
 
@@ -102,12 +99,9 @@ class Circuit @JvmOverloads constructor(mRID: String = "") : Line(mRID) {
     @Deprecated("BOILERPLATE: Use endSubstations.remove(substation) instead")
     fun removeEndSubstation(substation: Substation): Boolean = endSubstations.remove(substation)
 
-    /**
-     * Clear this [Circuit]'s associated [endSubstations].
-     * @return this [Circuit]
-     */
+    @Deprecated("BOILERPLATE: Use endSubstations.clear() instead")
     fun clearEndSubstations(): Circuit {
-        _endSubstations = null
+        endSubstations.clear()
         return this
     }
 }

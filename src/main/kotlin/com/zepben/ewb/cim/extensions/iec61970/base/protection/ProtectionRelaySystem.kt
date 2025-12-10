@@ -65,12 +65,9 @@ class ProtectionRelaySystem @JvmOverloads constructor(mRID: String = "") : Equip
     @Deprecated("BOILERPLATE: Use schemes.remove(scheme) instead")
     fun removeScheme(scheme: ProtectionRelayScheme): Boolean = schemes.remove(scheme)
 
-    /**
-     * Clear [schemes].
-     * @return This [ProtectionRelaySystem] for fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use schemes.clear() instead")
     fun clearSchemes(): ProtectionRelaySystem {
-        _schemes = null
+        schemes.clear()
         return this
     }
 

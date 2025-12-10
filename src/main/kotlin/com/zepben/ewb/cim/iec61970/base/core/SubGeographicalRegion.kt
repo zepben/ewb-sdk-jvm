@@ -58,12 +58,9 @@ class SubGeographicalRegion @JvmOverloads constructor(mRID: String = "") : Ident
     @Deprecated("BOILERPLATE: Use substations.remove(substation) instead")
     fun removeSubstation(substation: Substation): Boolean = substations.remove(substation)
 
-    /**
-     * Clear this [SubGeographicalRegion]'s [Substation]'s
-     * @return this [SubGeographicalRegion]
-     */
+    @Deprecated("BOILERPLATE: Use substations.clear() instead")
     fun clearSubstations(): SubGeographicalRegion {
-        _substations = null
+        substations.clear()
         return this
     }
 }

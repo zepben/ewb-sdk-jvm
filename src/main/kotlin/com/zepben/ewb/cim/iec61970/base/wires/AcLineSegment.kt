@@ -78,13 +78,9 @@ class AcLineSegment @JvmOverloads constructor(mRID: String = "") : Conductor(mRI
     @Deprecated("BOILERPLATE: Use cuts.remove(cut) instead")
     fun removeCut(cut: Cut): Boolean = cuts.remove(cut)
 
-    /**
-     * Clear all [Cut]'s from this [AcLineSegment]
-     *
-     * @return This [AcLineSegment] for fluent use
-     */
+    @Deprecated("BOILERPLATE: Use cuts.clear() instead")
     fun clearCuts(): AcLineSegment {
-        _cuts = null
+        cuts.clear()
         return this
     }
 
@@ -119,13 +115,9 @@ class AcLineSegment @JvmOverloads constructor(mRID: String = "") : Conductor(mRI
     @Deprecated("BOILERPLATE: Use clamps.remove(clamp) instead")
     fun removeClamp(clamp: Clamp): Boolean = clamps.remove(clamp)
 
-    /**
-     * Clear all [Clamp]'s from this [AcLineSegment]
-     *
-     * @return This [AcLineSegment] for fluent use
-     */
+    @Deprecated("BOILERPLATE: Use clamps.clear() instead")
     fun clearClamps(): AcLineSegment {
-        _clamps = null
+        clamps.clear()
         return this
     }
 

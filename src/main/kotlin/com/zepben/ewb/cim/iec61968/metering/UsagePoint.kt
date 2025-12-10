@@ -85,13 +85,9 @@ class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject
     @Deprecated("BOILERPLATE: Use equipment.remove(equipment) instead")
     fun removeEquipment(equipment: Equipment): Boolean = this.equipment.remove(equipment)
 
-    /**
-     * Clear all [Equipment] from this [UsagePoint].
-     *
-     * @return This [UsagePoint] for fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use equipment.clear() instead")
     fun clearEquipment(): UsagePoint {
-        _equipment = null
+        equipment.clear()
         return this
     }
 
@@ -128,13 +124,9 @@ class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject
     @Deprecated("BOILERPLATE: Use endDevices.remove(endDevice) instead")
     fun removeEndDevice(endDevice: EndDevice): Boolean = endDevices.remove(endDevice)
 
-    /**
-     * Clear all [EndDevice]'s from this [UsagePoint].
-     *
-     * @return This [UsagePoint] for fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use endDevices.clear() instead")
     fun clearEndDevices(): UsagePoint {
-        _endDevices = null
+        endDevices.clear()
         return this
     }
 
@@ -175,13 +167,9 @@ class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject
     @Deprecated("BOILERPLATE: Use contacts.remove(contact) instead")
     fun removeContact(contact: ContactDetails): Boolean = contacts.remove(contact)
 
-    /**
-     * Clear all [ContactDetails] from this [UsagePoint].
-     *
-     * @return This [UsagePoint] for fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use contacts.clear() instead")
     fun clearContacts(): UsagePoint {
-        _contacts = null
+        contacts.clear()
         return this
     }
 

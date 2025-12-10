@@ -64,13 +64,9 @@ class ProtectionRelayScheme @JvmOverloads constructor(mRID: String = "") : Ident
     @Deprecated("BOILERPLATE: Use functions.remove(function) instead")
     fun removeFunction(function: ProtectionRelayFunction): Boolean = functions.remove(function)
 
-    /**
-     * Disassociate all [ProtectionRelayFunction]s from this [ProtectionRelayScheme].
-     *
-     * @return A reference to this [ProtectionRelayScheme] for fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use functions.clear() instead")
     fun clearFunctions(): ProtectionRelayScheme {
-        _functions = null
+        functions.clear()
         return this
     }
 

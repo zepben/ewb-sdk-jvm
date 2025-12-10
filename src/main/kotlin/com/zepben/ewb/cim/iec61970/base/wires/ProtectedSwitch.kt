@@ -56,13 +56,9 @@ abstract class ProtectedSwitch(mRID: String = "") : Switch(mRID) {
     @Deprecated("BOILERPLATE: Use relayFunctions.remove(relayFunction) instead")
     fun removeRelayFunction(relayFunction: ProtectionRelayFunction): Boolean = relayFunctions.remove(relayFunction)
 
-    /**
-     * Disassociate all [ProtectionRelayFunction]s from this [ProtectedSwitch].
-     *
-     * @return A reference to this [ProtectedSwitch] for fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use relayFunctions.clear() instead")
     fun clearRelayFunctions(): ProtectedSwitch {
-        _relayFunctions = null
+        relayFunctions.clear()
         return this
     }
 

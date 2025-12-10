@@ -55,13 +55,9 @@ class PowerTransformerInfo @JvmOverloads constructor(mRID: String = "") : AssetI
     @Deprecated("BOILERPLATE: Use transformerTankInfos.remove(transformerTankInfo) instead")
     fun removeTransformerTankInfo(transformerTankInfo: TransformerTankInfo): Boolean = transformerTankInfos.remove(transformerTankInfo)
 
-    /**
-     * Clear all [TransformerTankInfo]'s from this [PowerTransformerInfo]
-     *
-     * @return This [PowerTransformerInfo] for fluent use
-     */
+    @Deprecated("BOILERPLATE: Use transformerTankInfos.clear() instead")
     fun clearTransformerTankInfos(): PowerTransformerInfo {
-        _transformerTankInfos = null
+        transformerTankInfos.clear()
         return this
     }
 

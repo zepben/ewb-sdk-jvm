@@ -10,6 +10,7 @@ package com.zepben.ewb.services.network.tracing.networktrace.operators
 
 import com.zepben.ewb.cim.iec61970.base.core.Equipment
 import com.zepben.ewb.cim.iec61970.base.core.EquipmentContainer
+import com.zepben.ewb.testing.MRIDListWrapper
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -17,6 +18,7 @@ import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Test
 import kotlin.reflect.KProperty1
+import kotlin.test.assertContentEquals
 
 internal class EquipmentContainerStateOperatorsTest {
 
@@ -44,16 +46,21 @@ internal class EquipmentContainerStateOperatorsTest {
 
     @Test
     fun getContainers() {
-        fun test(operators: EquipmentContainerStateOperators, containersProp: KProperty1<Equipment, Collection<EquipmentContainer>>) {
+        fun test(operators: EquipmentContainerStateOperators, containersProp: KProperty1<Equipment, MRIDListWrapper<EquipmentContainer>>) {
             val container1 = mockk<EquipmentContainer>()
             val container2 = mockk<EquipmentContainer>()
-            val containers = listOf(container1, container2)
+            var containers: MutableList<EquipmentContainer>? = mutableListOf(container1, container2)
+
             val equipment = mockk<Equipment>()
-            every { containersProp.get(equipment) } returns containers
+            val wrapper = MRIDListWrapper<EquipmentContainer>(
+                { containers },
+                { containers = it }
+            )
+            every { containersProp.get(equipment) } returns wrapper
 
             val result = operators.getContainers(equipment)
 
-            assertThat(result, equalTo(containers))
+            assertThat(result, equalTo(wrapper))
             verify { containersProp.get(equipment) }
         }
 

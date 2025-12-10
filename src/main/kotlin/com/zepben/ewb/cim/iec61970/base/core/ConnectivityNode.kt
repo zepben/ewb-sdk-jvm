@@ -30,13 +30,8 @@ class ConnectivityNode @JvmOverloads constructor(mRID: String = "") : Identified
      */
     fun numTerminals(): Int = _terminals.size
 
-    /**
-     * Terminals interconnected with zero impedance at this connectivity node.
-     *
-     * @param mRID the mRID of the required [Terminal]
-     * @return The [Terminal] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getTerminal(mRID: String): Terminal? = _terminals.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use terminals.getByMRID(mRID) instead")
+    fun getTerminal(mRID: String): Terminal? = terminals.getByMRID(mRID)
 
     /**
      * Add a [Terminal] to this [ConnectivityNode]

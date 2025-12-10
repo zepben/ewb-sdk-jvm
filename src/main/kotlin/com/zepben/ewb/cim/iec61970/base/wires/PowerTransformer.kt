@@ -92,13 +92,8 @@ class PowerTransformer @JvmOverloads constructor(mRID: String = "") : Conducting
     @Deprecated("BOILERPLATE: Use ends.size instead")
     fun numEnds(): Int = ends.size
 
-    /**
-     * Get a [PowerTransformerEnd] of this [PowerTransformer] by its [PowerTransformerEnd.mRID]
-     *
-     * @param mRID the mRID of the required [PowerTransformerEnd]
-     * @return The [PowerTransformerEnd] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getEnd(mRID: String): PowerTransformerEnd? = _powerTransformerEnds.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use powerTransformerEnds.getByMRID(mRID) instead")
+    fun getEnd(mRID: String): PowerTransformerEnd? = ends.getByMRID(mRID)
 
     /**
      * Get a [PowerTransformerEnd] of this [PowerTransformer] by its [PowerTransformerEnd.endNumber]

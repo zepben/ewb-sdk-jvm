@@ -96,13 +96,8 @@ abstract class RegulatingControl(mRID: String = "") : PowerSystemResource(mRID) 
     @Deprecated("BOILERPLATE: Use regulatingCondEqs.size instead")
     fun numRegulatingCondEqs(): Int = regulatingCondEqs.size
 
-    /**
-     * [RegulatingCondEq]'s controlled by this [RegulatingControl].
-     *
-     * @param mRID the mRID of the required [RegulatingCondEq]
-     * @return The [RegulatingCondEq] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getRegulatingCondEq(mRID: String): RegulatingCondEq? = _regulatingCondEqs.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use regulatingCondEqs.getByMRID(mRID) instead")
+    fun getRegulatingCondEq(mRID: String): RegulatingCondEq? = regulatingCondEqs.getByMRID(mRID)
 
     /**
      * @param regulatingCondEq the regulating conducting equipment controlled by this [RegulatingControl].

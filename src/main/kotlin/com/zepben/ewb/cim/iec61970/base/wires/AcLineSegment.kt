@@ -57,13 +57,8 @@ class AcLineSegment @JvmOverloads constructor(mRID: String = "") : Conductor(mRI
      */
     fun numCuts(): Int = _cuts?.size ?: 0
 
-    /**
-     * Get the [Cut] of this [AcLineSegment] represented by [mRID]
-     *
-     * @param mRID the mRID of the required [Cut]
-     * @return The [Cut] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getCut(mRID: String): Cut? = _cuts.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use cuts.getByMRID(mRID) instead")
+    fun getCut(mRID: String): Cut? = cuts.getByMRID(mRID)
 
     /**
      * Add a [Cut] to this [AcLineSegment]
@@ -112,13 +107,8 @@ class AcLineSegment @JvmOverloads constructor(mRID: String = "") : Conductor(mRI
      */
     fun numClamps(): Int = _clamps?.size ?: 0
 
-    /**
-     * Get the [Clamp] of this [AcLineSegment] represented by [mRID]
-     *
-     * @param mRID the mRID of the required [Clamp]
-     * @return The [Clamp] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getClamp(mRID: String): Clamp? = _clamps.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use clamps.getByMRID(mRID) instead")
+    fun getClamp(mRID: String): Clamp? = clamps.getByMRID(mRID)
 
     /**
      * Add a [Clamp] to this [AcLineSegment]

@@ -38,13 +38,8 @@ class TransformerTankInfo @JvmOverloads constructor(mRID: String = "") : AssetIn
     @Deprecated("BOILERPLATE: Use transformerEndInfos.size instead")
     fun numTransformerEndInfos(): Int = transformerEndInfos.size
 
-    /**
-     * Get the [TransformerEndInfo] of this [TransformerTankInfo] represented by [mRID]
-     *
-     * @param mRID the mRID of the required [TransformerEndInfo]
-     * @return The [TransformerEndInfo] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getTransformerEndInfo(mRID: String): TransformerEndInfo? = _transformerEndInfos.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use transformerEndInfos.getByMRID(mRID) instead")
+    fun getTransformerEndInfo(mRID: String): TransformerEndInfo? = transformerEndInfos.getByMRID(mRID)
 
     /**
      * Add a [TransformerEndInfo] to this [TransformerTankInfo]

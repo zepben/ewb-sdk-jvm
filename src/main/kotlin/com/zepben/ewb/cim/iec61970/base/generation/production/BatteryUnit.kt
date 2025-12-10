@@ -47,13 +47,8 @@ class BatteryUnit @JvmOverloads constructor(mRID: String = "") : PowerElectronic
     //
     fun numBatteryControls(): Int = _batteryControls?.size ?: 0
 
-    /**
-     * Get a [BatteryControl] of this [BatteryUnit] by its [BatteryControl.mRID]
-     *
-     * @param mRID the mRID of the required [BatteryControl]
-     * @return The [BatteryControl] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getControl(mRID: String): BatteryControl? = _batteryControls.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use batteryControls.getByMRID(mRID) instead")
+    fun getControl(mRID: String): BatteryControl? = controls.getByMRID(mRID)
 
     /**
      * Get a [BatteryControl] of this [BatteryUnit] by its [BatteryControl.controlMode]

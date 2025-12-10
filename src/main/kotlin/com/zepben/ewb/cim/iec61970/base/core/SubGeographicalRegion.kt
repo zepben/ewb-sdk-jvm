@@ -31,13 +31,8 @@ class SubGeographicalRegion @JvmOverloads constructor(mRID: String = "") : Ident
     @Deprecated("BOILERPLATE: Use substations.size instead")
     fun numSubstations(): Int = substations.size
 
-    /**
-     * The substations in this sub-geographical region.
-     *
-     * @param mRID the mRID of the required [Substation]
-     * @return The [Substation] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getSubstation(mRID: String): Substation? = _substations.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use substations.getByMRID(mRID) instead")
+    fun getSubstation(mRID: String): Substation? = substations.getByMRID(mRID)
 
     /**
      * @param substation the [Substation] to associate with this [SubGeographicalRegion].

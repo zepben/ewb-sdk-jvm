@@ -41,13 +41,8 @@ class Circuit @JvmOverloads constructor(mRID: String = "") : Line(mRID) {
     @Deprecated("BOILERPLATE: Use endTerminals.size instead")
     fun numEndTerminals(): Int = endTerminals.size
 
-    /**
-     * Retrieve a [Terminal] from the [endTerminals] collection.
-     *
-     * @param mRID the mRID of the required [Terminal]
-     * @return The [Terminal] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getEndTerminal(mRID: String): Terminal? = _endTerminals.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use endTerminals.getByMRID(mRID) instead")
+    fun getEndTerminal(mRID: String): Terminal? = endTerminals.getByMRID(mRID)
 
     /**
      * @param endTerminal the [Terminal] to associate with this [Circuit].
@@ -94,13 +89,8 @@ class Circuit @JvmOverloads constructor(mRID: String = "") : Line(mRID) {
     @Deprecated("BOILERPLATE: Use endSubstations.size instead")
     fun numEndSubstations(): Int = endSubstations.size
 
-    /**
-     * Retrieve a [Substation] that is associated with this [Circuit].
-     *
-     * @param mRID the mRID of the required [Substation]
-     * @return The [Substation] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getEndSubstation(mRID: String): Substation? = _endSubstations.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use endSubstations.getByMRID(mRID) instead")
+    fun getEndSubstation(mRID: String): Substation? = endSubstations.getByMRID(mRID)
 
     /**
      * @param substation the [Substation] to associate with this [Circuit].

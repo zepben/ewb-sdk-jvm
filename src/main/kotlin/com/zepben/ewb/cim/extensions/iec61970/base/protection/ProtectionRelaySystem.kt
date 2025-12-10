@@ -42,13 +42,8 @@ class ProtectionRelaySystem @JvmOverloads constructor(mRID: String = "") : Equip
     @Deprecated("BOILERPLATE: Use schemes.size instead")
     fun numSchemes(): Int = schemes.size
 
-    /**
-     * Get a scheme for this [ProtectionRelaySystem] by its mRID.
-     *
-     * @param mRID The mRID of the [ProtectionRelayScheme]
-     * @return The [ProtectionRelayScheme] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getScheme(mRID: String): ProtectionRelayScheme? = _schemes.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use schemes.getByMRID(mRID) instead")
+    fun getScheme(mRID: String): ProtectionRelayScheme? = schemes.getByMRID(mRID)
 
     /**
      * Add a scheme to this [ProtectionRelaySystem]

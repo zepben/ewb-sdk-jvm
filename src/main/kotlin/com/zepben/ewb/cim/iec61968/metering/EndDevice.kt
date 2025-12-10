@@ -97,13 +97,8 @@ abstract class EndDevice(mRID: String = "") : AssetContainer(mRID) {
     @Deprecated("BOILERPLATE: Use functions.size instead")
     fun numFunctions(): Int = functions.size
 
-    /**
-     * Get a [EndDeviceFunction] of this [EndDevice] by its [EndDeviceFunction.mRID]
-     *
-     * @param mRID the mRID of the required [EndDeviceFunction]
-     * @return The [EndDeviceFunction] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getFunction(mRID: String): EndDeviceFunction? = _functions.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use functions.getByMRID(mRID) instead")
+    fun getFunction(mRID: String): EndDeviceFunction? = functions.getByMRID(mRID)
 
     /**
      * Add a [EndDeviceFunction] for this [EndDevice]

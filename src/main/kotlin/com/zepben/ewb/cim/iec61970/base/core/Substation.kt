@@ -38,13 +38,8 @@ class Substation @JvmOverloads constructor(mRID: String = "") : EquipmentContain
     @Deprecated("BOILERPLATE: Use feeders.size instead")
     fun numFeeders(): Int = feeders.size
 
-    /**
-     * The normal energized feeders of the substation. Also used for naming purposes.
-     *
-     * @param mRID the mRID of the required [Feeder]
-     * @return The [Feeder] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getFeeder(mRID: String): Feeder? = _normalEnergizedFeeders.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use normalEnergizedFeeders.getByMRID(mRID) instead")
+    fun getFeeder(mRID: String): Feeder? = feeders.getByMRID(mRID)
 
     /**
      * @param feeder the [Feeder] to associate with this [Substation].
@@ -98,13 +93,8 @@ class Substation @JvmOverloads constructor(mRID: String = "") : EquipmentContain
     @Deprecated("BOILERPLATE: Use loops.size instead")
     fun numLoops(): Int = loops.size
 
-    /**
-     * Retrieve a [Loop] from the [loops] collection.
-     *
-     * @param mRID the mRID of the required [Loop]
-     * @return The [Loop] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getLoop(mRID: String): Loop? = _loops.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use loops.getByMRID(mRID) instead")
+    fun getLoop(mRID: String): Loop? = loops.getByMRID(mRID)
 
     /**
      * @param loop the [Loop] to associate with this [Substation].
@@ -151,13 +141,8 @@ class Substation @JvmOverloads constructor(mRID: String = "") : EquipmentContain
     @Deprecated("BOILERPLATE: Use energizedLoops.size instead")
     fun numEnergizedLoops(): Int = energizedLoops.size
 
-    /**
-     * Retrieve a [Loop] from the [energizedLoops] collection.
-     *
-     * @param mRID the mRID of the required [Loop]
-     * @return The [Loop] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getEnergizedLoop(mRID: String): Loop? = _energizedLoops.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use energizedLoops.getByMRID(mRID) instead")
+    fun getEnergizedLoop(mRID: String): Loop? = energizedLoops.getByMRID(mRID)
 
     /**
      * @param loop the [Loop] to associate with this [Substation].
@@ -204,13 +189,8 @@ class Substation @JvmOverloads constructor(mRID: String = "") : EquipmentContain
     @Deprecated("BOILERPLATE: Use circuits.size instead")
     fun numCircuits(): Int = circuits.size
 
-    /**
-     * Retrieve a [Circuit] from the [circuits] collection.
-     *
-     * @param mRID the mRID of the required [Circuit]
-     * @return The [Circuit] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getCircuit(mRID: String): Circuit? = _circuits.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use circuits.getByMRID(mRID) instead")
+    fun getCircuit(mRID: String): Circuit? = circuits.getByMRID(mRID)
 
     /**
      * @param circuit the [Circuit] to associate with this [Substation].

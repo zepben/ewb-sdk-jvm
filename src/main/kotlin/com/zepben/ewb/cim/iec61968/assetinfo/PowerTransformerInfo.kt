@@ -34,13 +34,8 @@ class PowerTransformerInfo @JvmOverloads constructor(mRID: String = "") : AssetI
     @Deprecated("BOILERPLATE: Use transformerTankInfos.size instead")
     fun numTransformerTankInfos(): Int = transformerTankInfos.size
 
-    /**
-     * Get the [TransformerTankInfo] of this [PowerTransformerInfo] represented by [mRID]
-     *
-     * @param mRID the mRID of the required [TransformerTankInfo]
-     * @return The [TransformerTankInfo] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getTransformerTankInfo(mRID: String): TransformerTankInfo? = _transformerTankInfos.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use transformerTankInfos.getByMRID(mRID) instead")
+    fun getTransformerTankInfo(mRID: String): TransformerTankInfo? = transformerTankInfos.getByMRID(mRID)
 
     /**
      * Add a [TransformerTankInfo] to this [PowerTransformerInfo]

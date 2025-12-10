@@ -50,13 +50,8 @@ abstract class PowerSystemResource(mRID: String = "") : IdentifiedObject(mRID) {
     @Deprecated("BOILERPLATE: Use assets.size instead")
     fun numAssets(): Int = assets.size
 
-    /**
-     * Get an [Asset] associated with this [PowerSystemResource]
-     *
-     * @param mRID the mRID of the required [Asset]
-     * @return The [Asset] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getAsset(mRID: String): Asset? = _assets.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use assets.getByMRID(mRID) instead")
+    fun getAsset(mRID: String): Asset? = assets.getByMRID(mRID)
 
     /**
      * Add an [Asset] to this PowerSystemResource

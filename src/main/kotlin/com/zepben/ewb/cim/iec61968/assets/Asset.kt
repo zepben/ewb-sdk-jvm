@@ -53,13 +53,8 @@ abstract class Asset(mRID: String = "") : IdentifiedObject(mRID) {
     @Deprecated("BOILERPLATE: Use organisationRoles.size instead")
     fun numOrganisationRoles(): Int = organisationRoles.size
 
-    /**
-     * All roles an organisation plays for this asset.
-     *
-     * @param mRID the mRID of the required [AssetOrganisationRole]
-     * @return The [AssetOrganisationRole] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getOrganisationRole(mRID: String): AssetOrganisationRole? = _organisationRoles.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use organisationRoles.getByMRID(mRID) instead")
+    fun getOrganisationRole(mRID: String): AssetOrganisationRole? = organisationRoles.getByMRID(mRID)
 
     /**
      * @param organisationRole the [AssetOrganisationRole] to associate with this [Asset].
@@ -93,13 +88,8 @@ abstract class Asset(mRID: String = "") : IdentifiedObject(mRID) {
     @Deprecated("BOILERPLATE: Use powerSystemResources.size instead")
     fun numPowerSystemResources(): Int = powerSystemResources.size
 
-    /**
-     * Get a [PowerSystemResource]s associated with this [Asset]
-     *
-     * @param mRID the mRID of the required [PowerSystemResource]
-     * @return The [PowerSystemResource] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getPowerSystemResource(mRID: String): PowerSystemResource? = _powerSystemResources.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use powerSystemResources.getByMRID(mRID) instead")
+    fun getPowerSystemResource(mRID: String): PowerSystemResource? = powerSystemResources.getByMRID(mRID)
 
     /**
      * Add a [PowerSystemResource] to this [Asset]

@@ -58,13 +58,8 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
     @Deprecated("BOILERPLATE: Use containers.size instead")
     fun numContainers(): Int = containers.size
 
-    /**
-     * [EquipmentContainer]'s that this equipment is associated with.
-     *
-     * @param mRID the mRID of the required [EquipmentContainer]
-     * @return The [EquipmentContainer] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getContainer(mRID: String): EquipmentContainer? = _equipmentContainers.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use equipmentContainers.getByMRID(mRID) instead")
+    fun getContainer(mRID: String): EquipmentContainer? = containers.getByMRID(mRID)
 
     /**
      * @param equipmentContainer the equipment container to associate with this equipment.
@@ -110,13 +105,8 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
     @Deprecated("BOILERPLATE: Use currentContainers.size instead")
     fun numCurrentContainers(): Int = currentContainers.size
 
-    /**
-     * [EquipmentContainer]'s that represent the current containers of the equipment.
-     *
-     * @param mRID the mRID of the required current [EquipmentContainer]
-     * @return The current [EquipmentContainer] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getCurrentContainer(mRID: String): EquipmentContainer? = _currentContainers.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use currentContainers.getByMRID(mRID) instead")
+    fun getCurrentContainer(mRID: String): EquipmentContainer? = currentContainers.getByMRID(mRID)
 
     /**
      * @param equipmentContainer the equipment container to associate with this equipment.
@@ -162,13 +152,8 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
     @Deprecated("BOILERPLATE: Use usagePoints.size instead")
     fun numUsagePoints(): Int = usagePoints.size
 
-    /**
-     * [UsagePoint]'s connected to the electrical grid through this equipment.
-     *
-     * @param mRID the mRID of the required [UsagePoint]
-     * @return The [UsagePoint] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getUsagePoint(mRID: String): UsagePoint? = _usagePoints.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use usagePoints.getByMRID(mRID) instead")
+    fun getUsagePoint(mRID: String): UsagePoint? = usagePoints.getByMRID(mRID)
 
     /**
      * @param usagePoint the usage point that connects to the electrical grid through this equipment.
@@ -215,13 +200,8 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
     @Deprecated("BOILERPLATE: Use operationalRestrictions.size instead")
     fun numOperationalRestrictions(): Int = operationalRestrictions.size
 
-    /**
-     * [OperationalRestriction]'s that this equipment is associated with.
-     *
-     * @param mRID the mRID of the required [OperationalRestriction]
-     * @return The [OperationalRestriction] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getOperationalRestriction(mRID: String): OperationalRestriction? = _operationalRestrictions.getByMRID(mRID)
+    @Deprecated("BOILERPLATE: Use operationalRestrictions.getByMRID(mRID) instead")
+    fun getOperationalRestriction(mRID: String): OperationalRestriction? = operationalRestrictions.getByMRID(mRID)
 
     /**
      * Add an operational restriction that applies to this equipment.

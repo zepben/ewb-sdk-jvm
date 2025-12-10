@@ -37,10 +37,8 @@ class OperationalRestriction @JvmOverloads constructor(mRID: String = "") : Docu
             getter = { _equipment },
             setter = { _equipment = it })
 
-    /**
-     * Get the number of entries in the [Equipment] collection.
-     */
-    fun numEquipment(): Int = _equipment?.size ?: 0
+    @Deprecated("BOILERPLATE: Use equipment.size instead")
+    fun numEquipment(): Int = equipment.size
 
     /**
      * All equipments to which this restriction applies.

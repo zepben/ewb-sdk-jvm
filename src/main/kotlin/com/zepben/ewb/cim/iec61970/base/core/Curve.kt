@@ -29,10 +29,8 @@ abstract class Curve @JvmOverloads constructor(mRID: String = "") : IdentifiedOb
             getter = { _data },
             setter = { _data = it })
 
-    /**
-     * Returns number of data point for this [Curve].
-     */
-    fun numData(): Int = _data?.size ?: 0
+    @Deprecated("BOILERPLATE: Use data.size instead")
+    fun numData(): Int = data.size
 
     /**
      * Get point data values by its xValue.

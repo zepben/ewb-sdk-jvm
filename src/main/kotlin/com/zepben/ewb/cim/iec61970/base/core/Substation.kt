@@ -35,10 +35,8 @@ class Substation @JvmOverloads constructor(mRID: String = "") : EquipmentContain
             getter = { _normalEnergizedFeeders },
             setter = { _normalEnergizedFeeders = it })
 
-    /**
-     * Get the number of entries in the [Feeder] collection.
-     */
-    fun numFeeders(): Int = _normalEnergizedFeeders?.size ?: 0
+    @Deprecated("BOILERPLATE: Use feeders.size instead")
+    fun numFeeders(): Int = feeders.size
 
     /**
      * The normal energized feeders of the substation. Also used for naming purposes.
@@ -97,10 +95,8 @@ class Substation @JvmOverloads constructor(mRID: String = "") : EquipmentContain
             getter = { _loops },
             setter = { _loops = it })
 
-    /**
-     * Get the number of entries in the [loops] collection.
-     */
-    fun numLoops(): Int = _loops?.size ?: 0
+    @Deprecated("BOILERPLATE: Use loops.size instead")
+    fun numLoops(): Int = loops.size
 
     /**
      * Retrieve a [Loop] from the [loops] collection.
@@ -152,10 +148,8 @@ class Substation @JvmOverloads constructor(mRID: String = "") : EquipmentContain
             getter = { _energizedLoops },
             setter = { _energizedLoops = it })
 
-    /**
-     * Get the number of entries in the [energizedLoops] collection.
-     */
-    fun numEnergizedLoops(): Int = _energizedLoops?.size ?: 0
+    @Deprecated("BOILERPLATE: Use energizedLoops.size instead")
+    fun numEnergizedLoops(): Int = energizedLoops.size
 
     /**
      * Retrieve a [Loop] from the [energizedLoops] collection.
@@ -207,10 +201,8 @@ class Substation @JvmOverloads constructor(mRID: String = "") : EquipmentContain
             getter = { _circuits },
             setter = { _circuits = it })
 
-    /**
-     * Get the number of entries in the [circuits] collection.
-     */
-    fun numCircuits(): Int = _circuits?.size ?: 0
+    @Deprecated("BOILERPLATE: Use circuits.size instead")
+    fun numCircuits(): Int = circuits.size
 
     /**
      * Retrieve a [Circuit] from the [circuits] collection.

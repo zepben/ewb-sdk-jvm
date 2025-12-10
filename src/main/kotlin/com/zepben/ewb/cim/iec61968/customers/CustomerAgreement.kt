@@ -39,10 +39,8 @@ class CustomerAgreement @JvmOverloads constructor(mRID: String = "") : Agreement
             getter = { _pricingStructures },
             setter = { _pricingStructures = it })
 
-    /**
-     * Get the number of entries in the [PricingStructure] collection.
-     */
-    fun numPricingStructures(): Int = _pricingStructures?.size ?: 0
+    @Deprecated("BOILERPLATE: Use pricingStructures.size instead")
+    fun numPricingStructures(): Int = pricingStructures.size
 
     /**
      * All pricing structures applicable to this customer agreement.

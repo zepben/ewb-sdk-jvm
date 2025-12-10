@@ -69,10 +69,8 @@ class ContactDetails @JvmOverloads constructor(id: String = "") {
             getter = { _phoneNumbers },
             setter = { _phoneNumbers = it })
 
-    /**
-     * Get the number of entries in the [TelephoneNumber] collection.
-     */
-    fun numPhoneNumbers(): Int = _phoneNumbers?.size ?: 0
+    @Deprecated("BOILERPLATE: Use phoneNumbers.size instead")
+    fun numPhoneNumbers(): Int = phoneNumbers.size
 
     /**
      * Add an [TelephoneNumber] to this [ContactDetails].
@@ -114,10 +112,8 @@ class ContactDetails @JvmOverloads constructor(id: String = "") {
             getter = { _electronicAddresses },
             setter = { _electronicAddresses = it })
 
-    /**
-     * Get the number of entries in the [ElectronicAddress] collection.
-     */
-    fun numElectronicAddresses(): Int = _electronicAddresses?.size ?: 0
+    @Deprecated("BOILERPLATE: Use electronicAddresses.size instead")
+    fun numElectronicAddresses(): Int = electronicAddresses.size
 
     /**
      * Add an [ElectronicAddress] to this [ContactDetails].

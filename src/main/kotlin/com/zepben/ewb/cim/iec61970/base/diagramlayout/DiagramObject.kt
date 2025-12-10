@@ -46,10 +46,8 @@ class DiagramObject @JvmOverloads constructor(mRID: String = "") : IdentifiedObj
             getter = { _diagramObjectPoints },
             setter = { _diagramObjectPoints = it })
 
-    /**
-     * Get a count of the [DiagramObjectPoint]'s associated with this [DiagramObject]
-     */
-    fun numPoints(): Int = _diagramObjectPoints?.size ?: 0
+    @Deprecated("BOILERPLATE: Use diagramObjectPoints.size instead")
+    fun numPoints(): Int = points.size
 
     /**
      * A diagram object can have 0 or more points to reflect its layout position, routing

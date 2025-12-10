@@ -71,10 +71,8 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
             getter = { _timeLimits },
             setter = { _timeLimits = it })
 
-    /**
-     * Returns the number of time limits for this [ProtectionRelayFunction]
-     */
-    fun numTimeLimits(): Int = _timeLimits?.size ?: 0
+    @Deprecated("BOILERPLATE: Use timeLimits.size instead")
+    fun numTimeLimits(): Int = timeLimits.size
 
     /**
      * Get the time limit of this [ProtectionRelayFunction] with index [sequenceNumber] if it exists, otherwise null.

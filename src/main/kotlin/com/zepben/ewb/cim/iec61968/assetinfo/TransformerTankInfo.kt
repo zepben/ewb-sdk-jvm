@@ -35,10 +35,8 @@ class TransformerTankInfo @JvmOverloads constructor(mRID: String = "") : AssetIn
             getter = { _transformerEndInfos },
             setter = { _transformerEndInfos = it })
 
-    /**
-     * Get the number of entries in the [TransformerEndInfo] collection.
-     */
-    fun numTransformerEndInfos(): Int = _transformerEndInfos?.size ?: 0
+    @Deprecated("BOILERPLATE: Use transformerEndInfos.size instead")
+    fun numTransformerEndInfos(): Int = transformerEndInfos.size
 
     /**
      * Get the [TransformerEndInfo] of this [TransformerTankInfo] represented by [mRID]

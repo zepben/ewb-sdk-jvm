@@ -35,10 +35,8 @@ class Pole @JvmOverloads constructor(mRID: String = "") : Structure(mRID) {
             getter = { _streetlights },
             setter = { _streetlights = it })
 
-    /**
-     * Get the number of entries in the [Streetlight] collection.
-     */
-    fun numStreetlights(): Int = _streetlights?.size ?: 0
+    @Deprecated("BOILERPLATE: Use streetlights.size instead")
+    fun numStreetlights(): Int = streetlights.size
 
     /**
      * Get a [Streetlight] attached to this Pole by its mRID.

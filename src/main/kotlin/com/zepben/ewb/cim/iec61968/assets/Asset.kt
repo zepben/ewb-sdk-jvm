@@ -50,10 +50,8 @@ abstract class Asset(mRID: String = "") : IdentifiedObject(mRID) {
             getter = { _powerSystemResources },
             setter = { _powerSystemResources = it })
 
-    /**
-     * Get the number of entries in the [AssetOrganisationRole] collection.
-     */
-    fun numOrganisationRoles(): Int = _organisationRoles?.size ?: 0
+    @Deprecated("BOILERPLATE: Use organisationRoles.size instead")
+    fun numOrganisationRoles(): Int = organisationRoles.size
 
     /**
      * All roles an organisation plays for this asset.
@@ -92,10 +90,8 @@ abstract class Asset(mRID: String = "") : IdentifiedObject(mRID) {
         return this
     }
 
-    /**
-     * Get the number of entries in the [PowerSystemResource] collection.
-     */
-    fun numPowerSystemResources(): Int = _powerSystemResources?.size ?: 0
+    @Deprecated("BOILERPLATE: Use powerSystemResources.size instead")
+    fun numPowerSystemResources(): Int = powerSystemResources.size
 
     /**
      * Get a [PowerSystemResource]s associated with this [Asset]

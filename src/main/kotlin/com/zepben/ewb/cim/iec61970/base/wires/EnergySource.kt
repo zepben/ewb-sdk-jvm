@@ -86,10 +86,8 @@ class EnergySource @JvmOverloads constructor(mRID: String = "") : EnergyConnecti
             getter = { _energySourcePhases },
             setter = { _energySourcePhases = it })
 
-    /**
-     * Get the number of entries in the [EnergySourcePhase] collection.
-     */
-    fun numPhases(): Int = _energySourcePhases?.size ?: 0
+    @Deprecated("BOILERPLATE: Use phases.size instead")
+    fun numPhases(): Int = phases.size
 
     /**
      * The individual phase information of the energy source.

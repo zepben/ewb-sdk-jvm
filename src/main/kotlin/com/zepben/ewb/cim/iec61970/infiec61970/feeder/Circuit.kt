@@ -38,10 +38,8 @@ class Circuit @JvmOverloads constructor(mRID: String = "") : Line(mRID) {
             getter = { _endTerminals },
             setter = { _endTerminals = it })
 
-    /**
-     * Get the number of entries in the [endTerminals] collection.
-     */
-    fun numEndTerminals(): Int = _endTerminals?.size ?: 0
+    @Deprecated("BOILERPLATE: Use endTerminals.size instead")
+    fun numEndTerminals(): Int = endTerminals.size
 
     /**
      * Retrieve a [Terminal] from the [endTerminals] collection.
@@ -93,10 +91,8 @@ class Circuit @JvmOverloads constructor(mRID: String = "") : Line(mRID) {
             getter = { _endSubstations },
             setter = { _endSubstations = it })
 
-    /**
-     * Get the number of entries in the [endSubstations] collection.
-     */
-    fun numEndSubstations(): Int = _endSubstations?.size ?: 0
+    @Deprecated("BOILERPLATE: Use endSubstations.size instead")
+    fun numEndSubstations(): Int = endSubstations.size
 
     /**
      * Retrieve a [Substation] that is associated with this [Circuit].

@@ -41,10 +41,8 @@ class RelayInfo @JvmOverloads constructor(mRID: String = "") : AssetInfo(mRID) {
             getter = { _recloseDelays },
             setter = { _recloseDelays = it })
 
-    /**
-     * Returns the number of reclose delays for this [RelayInfo]
-     */
-    fun numDelays(): Int = _recloseDelays?.size ?: 0
+    @Deprecated("BOILERPLATE: Use recloseDelays.size instead")
+    fun numDelays(): Int = recloseDelays.size
 
     /**
      * Get the reclose delay at the specified index, if it exists. Otherwise, this returns null.

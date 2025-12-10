@@ -31,10 +31,8 @@ class Diagram @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mR
      */
     val diagramObjects: Collection<DiagramObject> get() = _diagramObjects?.values.asUnmodifiable()
 
-    /**
-     * Get the number of entries in the [DiagramObject] collection.
-     */
-    fun numDiagramObjects(): Int = _diagramObjects?.size ?: 0
+    @Deprecated("BOILERPLATE: Use diagramObjects.size instead")
+    fun numDiagramObjects(): Int = diagramObjects.size
 
     /**
      * A diagram is made up of multiple diagram objects.

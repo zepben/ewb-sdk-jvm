@@ -93,10 +93,8 @@ abstract class RegulatingControl(mRID: String = "") : PowerSystemResource(mRID) 
             getter = { _regulatingCondEqs },
             setter = { _regulatingCondEqs = it })
 
-    /**
-     * Get the number of entries in the [RegulatingCondEq] collection.
-     */
-    fun numRegulatingCondEqs(): Int = _regulatingCondEqs?.size ?: 0
+    @Deprecated("BOILERPLATE: Use regulatingCondEqs.size instead")
+    fun numRegulatingCondEqs(): Int = regulatingCondEqs.size
 
     /**
      * [RegulatingCondEq]'s controlled by this [RegulatingControl].

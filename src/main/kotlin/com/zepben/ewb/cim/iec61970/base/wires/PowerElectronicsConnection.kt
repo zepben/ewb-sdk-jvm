@@ -223,10 +223,8 @@ class PowerElectronicsConnection @JvmOverloads constructor(mRID: String = "") : 
             setter = { _powerElectronicsConnectionPhases = it })
 
 
-    /**
-     * Get the number of entries in the [PowerElectronicsUnit] collection.
-     */
-    fun numUnits(): Int = _powerElectronicsUnits?.size ?: 0
+    @Deprecated("BOILERPLATE: Use units.size instead")
+    fun numUnits(): Int = units.size
 
     /**
      * The individual unit information of the power electronics connection.
@@ -257,10 +255,8 @@ class PowerElectronicsConnection @JvmOverloads constructor(mRID: String = "") : 
         return this
     }
 
-    /**
-     * Get the number of entries in the [PowerElectronicsConnectionPhase] collection.
-     */
-    fun numPhases(): Int = _powerElectronicsConnectionPhases?.size ?: 0
+    @Deprecated("BOILERPLATE: Use phases.size instead")
+    fun numPhases(): Int = phases.size
 
     /**
      * The individual phase information of the power electronics connection.

@@ -39,10 +39,8 @@ class Loop @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mRID)
             getter = { _circuits },
             setter = { _circuits = it })
 
-    /**
-     * Get the number of entries in the [circuits] collection.
-     */
-    fun numCircuits(): Int = _circuits?.size ?: 0
+    @Deprecated("BOILERPLATE: Use circuits.size instead")
+    fun numCircuits(): Int = circuits.size
 
     /**
      * Retrieve a [Circuit] from the [circuits] collection.
@@ -95,10 +93,8 @@ class Loop @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mRID)
             getter = { _substations },
             setter = { _substations = it })
 
-    /**
-     * Get the number of entries in the [substations] collection.
-     */
-    fun numSubstations(): Int = _substations?.size ?: 0
+    @Deprecated("BOILERPLATE: Use substations.size instead")
+    fun numSubstations(): Int = substations.size
 
     /**
      * Retrieve a [Substation] that is powered by this [Loop].
@@ -151,10 +147,8 @@ class Loop @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mRID)
             getter = { _energizingSubstations },
             setter = { _energizingSubstations = it })
 
-    /**
-     * Get the number of entries in the [energizingSubstations] collection.
-     */
-    fun numEnergizingSubstations(): Int = _energizingSubstations?.size ?: 0
+    @Deprecated("BOILERPLATE: Use energizingSubstations.size instead")
+    fun numEnergizingSubstations(): Int = energizingSubstations.size
 
     /**
      * Retrieve a [Substation] that is energizing this [Loop].

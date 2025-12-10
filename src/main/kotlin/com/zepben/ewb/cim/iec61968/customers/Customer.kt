@@ -42,10 +42,8 @@ class Customer @JvmOverloads constructor(mRID: String = "") : OrganisationRole(m
             getter = { _customerAgreements },
             setter = { _customerAgreements = it })
 
-    /**
-     * Get the number of entries in the [CustomerAgreement] collection.
-     */
-    fun numAgreements(): Int = _customerAgreements?.size ?: 0
+    @Deprecated("BOILERPLATE: Use agreements.size instead")
+    fun numAgreements(): Int = agreements.size
 
     /**
      * All agreements of this customer.

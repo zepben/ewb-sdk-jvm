@@ -55,10 +55,8 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
             getter = { _equipmentContainers },
             setter = { _equipmentContainers = it })
 
-    /**
-     * Get the number of entries in the [EquipmentContainer] collection.
-     */
-    fun numContainers(): Int = _equipmentContainers?.size ?: 0
+    @Deprecated("BOILERPLATE: Use containers.size instead")
+    fun numContainers(): Int = containers.size
 
     /**
      * [EquipmentContainer]'s that this equipment is associated with.
@@ -109,10 +107,8 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
             getter = { _currentContainers },
             setter = { _currentContainers = it })
 
-    /**
-     * Get the number of entries in the current [EquipmentContainer] collection.
-     */
-    fun numCurrentContainers(): Int = _currentContainers?.size ?: 0
+    @Deprecated("BOILERPLATE: Use currentContainers.size instead")
+    fun numCurrentContainers(): Int = currentContainers.size
 
     /**
      * [EquipmentContainer]'s that represent the current containers of the equipment.
@@ -163,10 +159,8 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
             getter = { _usagePoints },
             setter = { _usagePoints = it })
 
-    /**
-     * Get the number of entries in the [UsagePoint] collection.
-     */
-    fun numUsagePoints(): Int = _usagePoints?.size ?: 0
+    @Deprecated("BOILERPLATE: Use usagePoints.size instead")
+    fun numUsagePoints(): Int = usagePoints.size
 
     /**
      * [UsagePoint]'s connected to the electrical grid through this equipment.
@@ -218,10 +212,8 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
             getter = { _operationalRestrictions },
             setter = { _operationalRestrictions = it })
 
-    /**
-     * Get the number of entries in the [OperationalRestriction] collection.
-     */
-    fun numOperationalRestrictions(): Int = _operationalRestrictions?.size ?: 0
+    @Deprecated("BOILERPLATE: Use operationalRestrictions.size instead")
+    fun numOperationalRestrictions(): Int = operationalRestrictions.size
 
     /**
      * [OperationalRestriction]'s that this equipment is associated with.

@@ -46,10 +46,8 @@ class EnergyConsumer @JvmOverloads constructor(mRID: String = "") : EnergyConnec
             getter = { _energyConsumerPhases },
             setter = { _energyConsumerPhases = it })
 
-    /**
-     * Get the number of entries in the [EnergyConsumerPhase] collection.
-     */
-    fun numPhases(): Int = _energyConsumerPhases?.size ?: 0
+    @Deprecated("BOILERPLATE: Use phases.size instead")
+    fun numPhases(): Int = phases.size
 
     /**
      * The individual phase models for this energy consumer.

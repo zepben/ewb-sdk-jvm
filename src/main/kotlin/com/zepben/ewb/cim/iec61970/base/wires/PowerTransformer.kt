@@ -89,10 +89,8 @@ class PowerTransformer @JvmOverloads constructor(mRID: String = "") : Conducting
             getter = { _powerTransformerEnds },
             setter = { _powerTransformerEnds = it })
 
-    /**
-     * Get the number of entries in the [PowerTransformerEnd] collection.
-     */
-    fun numEnds(): Int = _powerTransformerEnds?.size ?: 0
+    @Deprecated("BOILERPLATE: Use ends.size instead")
+    fun numEnds(): Int = ends.size
 
     /**
      * Get a [PowerTransformerEnd] of this [PowerTransformer] by its [PowerTransformerEnd.mRID]

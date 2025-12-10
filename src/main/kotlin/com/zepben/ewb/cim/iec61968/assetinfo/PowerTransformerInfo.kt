@@ -31,10 +31,8 @@ class PowerTransformerInfo @JvmOverloads constructor(mRID: String = "") : AssetI
             getter = { _transformerTankInfos },
             setter = { _transformerTankInfos = it })
 
-    /**
-     * Get the number of entries in the [TransformerTankInfo] collection.
-     */
-    fun numTransformerTankInfos(): Int = _transformerTankInfos?.size ?: 0
+    @Deprecated("BOILERPLATE: Use transformerTankInfos.size instead")
+    fun numTransformerTankInfos(): Int = transformerTankInfos.size
 
     /**
      * Get the [TransformerTankInfo] of this [PowerTransformerInfo] represented by [mRID]

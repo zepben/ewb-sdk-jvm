@@ -47,10 +47,8 @@ abstract class PowerSystemResource(mRID: String = "") : IdentifiedObject(mRID) {
             getter = { _assets },
             setter = { _assets = it })
 
-    /**
-     * Get the number of entries in the [Asset]s collection.
-     */
-    fun numAssets(): Int = _assets?.size ?: 0
+    @Deprecated("BOILERPLATE: Use assets.size instead")
+    fun numAssets(): Int = assets.size
 
     /**
      * Get an [Asset] associated with this [PowerSystemResource]

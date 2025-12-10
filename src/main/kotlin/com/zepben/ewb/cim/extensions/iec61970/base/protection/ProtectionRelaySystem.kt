@@ -39,10 +39,8 @@ class ProtectionRelaySystem @JvmOverloads constructor(mRID: String = "") : Equip
             getter = { _schemes },
             setter = { _schemes = it })
 
-    /**
-     * Returns the number of schemes for this [ProtectionRelaySystem]
-     */
-    fun numSchemes(): Int = _schemes?.size ?: 0
+    @Deprecated("BOILERPLATE: Use schemes.size instead")
+    fun numSchemes(): Int = schemes.size
 
     /**
      * Get a scheme for this [ProtectionRelaySystem] by its mRID.

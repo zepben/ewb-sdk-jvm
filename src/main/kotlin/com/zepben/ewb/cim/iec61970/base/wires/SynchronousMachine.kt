@@ -86,10 +86,8 @@ class SynchronousMachine @JvmOverloads constructor(mRID: String = "") : Rotating
             getter = { _reactiveCapabilityCurves },
             setter = { _reactiveCapabilityCurves = it })
 
-    /**
-     * Get the number of entries in the [ReactiveCapabilityCurve] collection.
-     */
-    fun numCurves(): Int = _reactiveCapabilityCurves?.size ?: 0
+    @Deprecated("BOILERPLATE: Use curves.size instead")
+    fun numCurves(): Int = curves.size
 
     /**
      * The individual [ReactiveCapabilityCurve] for this [SynchronousMachine]

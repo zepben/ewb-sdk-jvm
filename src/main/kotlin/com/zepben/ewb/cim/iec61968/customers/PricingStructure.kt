@@ -32,10 +32,8 @@ class PricingStructure @JvmOverloads constructor(mRID: String = "") : Document(m
             getter = { _tariffs },
             setter = { _tariffs = it })
 
-    /**
-     * Get the number of entries in the [Tariff] collection.
-     */
-    fun numTariffs(): Int = _tariffs?.size ?: 0
+    @Deprecated("BOILERPLATE: Use tariffs.size instead")
+    fun numTariffs(): Int = tariffs.size
 
     /**
      * All tariffs used by this pricing structure.

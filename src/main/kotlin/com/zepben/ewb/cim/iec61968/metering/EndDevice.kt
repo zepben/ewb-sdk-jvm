@@ -45,10 +45,8 @@ abstract class EndDevice(mRID: String = "") : AssetContainer(mRID) {
             getter = { _usagePoints },
             setter = { _usagePoints = it })
 
-    /**
-     * Get the number of entries in the [UsagePoint] collection.
-     */
-    fun numUsagePoints(): Int = _usagePoints?.size ?: 0
+    @Deprecated("BOILERPLATE: Use usagePoints.size instead")
+    fun numUsagePoints(): Int = usagePoints.size
 
     /**
      * Usage point to which this end device belongs.
@@ -96,10 +94,8 @@ abstract class EndDevice(mRID: String = "") : AssetContainer(mRID) {
             getter = { _functions },
             setter = { _functions = it })
 
-    /**
-     * Get the number of entries in the [EndDeviceFunction] collection.
-     */
-    fun numFunctions(): Int = _functions?.size ?: 0
+    @Deprecated("BOILERPLATE: Use functions.size instead")
+    fun numFunctions(): Int = functions.size
 
     /**
      * Get a [EndDeviceFunction] of this [EndDevice] by its [EndDeviceFunction.mRID]

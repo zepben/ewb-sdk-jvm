@@ -60,10 +60,8 @@ class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject
             getter = { _equipment },
             setter = { _equipment = it })
 
-    /**
-     * Get the number of entries in the [Equipment] collection.
-     */
-    fun numEquipment(): Int = _equipment?.size ?: 0
+    @Deprecated("BOILERPLATE: Use equipment.size instead")
+    fun numEquipment(): Int = equipment.size
 
     /**
      * All equipment connecting this usage point to the electrical grid.
@@ -119,10 +117,8 @@ class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject
             getter = { _endDevices },
             setter = { _endDevices = it })
 
-    /**
-     * Get the number of entries in the [EndDevice] collection.
-     */
-    fun numEndDevices(): Int = _endDevices?.size ?: 0
+    @Deprecated("BOILERPLATE: Use endDevices.size instead")
+    fun numEndDevices(): Int = endDevices.size
 
     /**
      * All end devices at this usage point.
@@ -176,10 +172,8 @@ class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject
             getter = { _contacts },
             setter = { _contacts = it })
 
-    /**
-     * Get the number of entries in the [ContactDetails] collection.
-     */
-    fun numContacts(): Int = _contacts?.size ?: 0
+    @Deprecated("BOILERPLATE: Use contacts.size instead")
+    fun numContacts(): Int = contacts.size
 
     /**
      * All end devices at this usage point.

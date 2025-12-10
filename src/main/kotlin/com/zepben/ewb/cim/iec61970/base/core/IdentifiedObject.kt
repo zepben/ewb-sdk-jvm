@@ -58,10 +58,8 @@ abstract class IdentifiedObject(mRID: String = "") {
      */
     val names: Collection<Name> get() = _names?.toSet() ?: emptySet()
 
-    /**
-     * Get the number of entries in the [Name] collection.
-     */
-    fun numNames(): Int = _names?.size ?: 0
+    @Deprecated("BOILERPLATE: Use names.size instead")
+    fun numNames(): Int = names.size
 
     /**
      * The individual name information of the identified object.

@@ -28,10 +28,8 @@ class SubGeographicalRegion @JvmOverloads constructor(mRID: String = "") : Ident
             getter = { _substations },
             setter = { _substations = it })
 
-    /**
-     * Get the number of entries in the [Substation] collection.
-     */
-    fun numSubstations(): Int = _substations?.size ?: 0
+    @Deprecated("BOILERPLATE: Use substations.size instead")
+    fun numSubstations(): Int = substations.size
 
     /**
      * The substations in this sub-geographical region.

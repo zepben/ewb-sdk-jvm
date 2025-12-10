@@ -20,10 +20,8 @@ class PerLengthPhaseImpedance @JvmOverloads constructor(mRID: String = "") : Per
 
     val data: List<com.zepben.ewb.cim.iec61970.base.wires.PhaseImpedanceData> get() = _data.asUnmodifiable()
 
-    /**
-     * Get the number of entries in the [PhaseImpedanceData] collection.
-     */
-    fun numData(): Int = _data?.size ?: 0
+    @Deprecated("BOILERPLATE: Use data.size instead")
+    fun numData(): Int = data.size
 
     /**
      * Get only the diagonal elements of the matrix, i.e toPhase == fromPhase.

@@ -35,10 +35,8 @@ class Location @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(m
             getter = { _positionPoints },
             setter = { _positionPoints = it })
 
-    /**
-     * Get the number of entries in the [PositionPoint] collection.
-     */
-    fun numPoints(): Int = _positionPoints?.size ?: 0
+    @Deprecated("BOILERPLATE: Use points.size instead")
+    fun numPoints(): Int = points.size
 
     /**
      * Get a [PositionPoint] of this [Location] by its sequence number.

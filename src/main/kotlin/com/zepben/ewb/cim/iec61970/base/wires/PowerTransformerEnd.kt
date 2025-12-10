@@ -136,17 +136,8 @@ class PowerTransformerEnd @JvmOverloads constructor(mRID: String = "") : Transfo
 
     fun addRating(rating: TransformerEndRatedS): PowerTransformerEnd = addRating(rating.ratedS, rating.coolingType)
 
-    /**
-     * Remove [rating] from the [sRatings] collection.
-     *
-     * @param rating The [TransformerEndRatedS] to remove.
-     * @return true if [rating] was removed.
-     */
-    fun removeRating(rating: TransformerEndRatedS): Boolean {
-        val ret = _sRatings?.remove(rating) == true
-        if (_sRatings.isNullOrEmpty()) _sRatings = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use sRatings.remove(rating) instead")
+    fun removeRating(rating: TransformerEndRatedS): Boolean = sRatings.remove(rating)
 
     /**
      * Remove the [TransformerEndRatedS] from the [sRatings] collection with a cooling type of [coolingType]

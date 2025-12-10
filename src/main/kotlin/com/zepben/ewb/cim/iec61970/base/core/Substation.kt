@@ -62,15 +62,8 @@ class Substation @JvmOverloads constructor(mRID: String = "") : EquipmentContain
         return this
     }
 
-    /**
-     * @param feeder the [Feeder] to disassociate with this [Substation].
-     * @return true if the feeder is disassociated.
-     */
-    fun removeFeeder(feeder: Feeder): Boolean {
-        val ret = _normalEnergizedFeeders.safeRemove(feeder)
-        if (_normalEnergizedFeeders.isNullOrEmpty()) _normalEnergizedFeeders = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use feeders.remove(feeder) instead")
+    fun removeFeeder(feeder: Feeder): Boolean = feeders.remove(feeder)
 
     /**
      * Clear this [Substation]'s [Feeder]'s
@@ -110,15 +103,8 @@ class Substation @JvmOverloads constructor(mRID: String = "") : EquipmentContain
         return this
     }
 
-    /**
-     * @param loop the [Loop] to disassociate with this [Substation].
-     * @return `true` if [loop] has been successfully removed; `false` if it was not present.
-     */
-    fun removeLoop(loop: Loop): Boolean {
-        val ret = _loops?.remove(loop) == true
-        if (_loops.isNullOrEmpty()) _loops = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use loops.remove(loop) instead")
+    fun removeLoop(loop: Loop): Boolean = loops.remove(loop)
 
     /**
      * Clear this [Substation]'s associated [loops].
@@ -158,15 +144,8 @@ class Substation @JvmOverloads constructor(mRID: String = "") : EquipmentContain
         return this
     }
 
-    /**
-     * @param loop the [Loop] to disassociate with this [Substation].
-     * @return `true` if [loop] has been successfully removed; `false` if it was not present.
-     */
-    fun removeEnergizedLoop(loop: Loop): Boolean {
-        val ret = _energizedLoops?.remove(loop) == true
-        if (_energizedLoops.isNullOrEmpty()) _energizedLoops = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use energizedLoops.remove(loop) instead")
+    fun removeEnergizedLoop(loop: Loop): Boolean = energizedLoops.remove(loop)
 
     /**
      * Clear this [Substation]'s associated [energizedLoops].
@@ -206,15 +185,8 @@ class Substation @JvmOverloads constructor(mRID: String = "") : EquipmentContain
         return this
     }
 
-    /**
-     * @param circuit the [Circuit] to disassociate with this [Substation].
-     * @return `true` if [circuit] has been successfully removed; `false` if it was not present.
-     */
-    fun removeCircuit(circuit: Circuit): Boolean {
-        val ret = _circuits?.remove(circuit) == true
-        if (_circuits.isNullOrEmpty()) _circuits = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use circuits.remove(circuit) instead")
+    fun removeCircuit(circuit: Circuit): Boolean = circuits.remove(circuit)
 
     /**
      * Clear this [Substation]'s associated [circuits].

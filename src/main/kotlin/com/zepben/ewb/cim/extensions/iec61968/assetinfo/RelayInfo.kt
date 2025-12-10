@@ -100,16 +100,8 @@ class RelayInfo @JvmOverloads constructor(mRID: String = "") : AssetInfo(mRID) {
         return this
     }
 
-    /**
-     * Remove a delay by its value.
-     * @param delay The value of the delay to remove.
-     * @return true if a delay was removed, false otherwise.
-     */
-    fun removeDelay(delay: Double): Boolean {
-        val ret = _recloseDelays?.remove(delay) == true
-        if (_recloseDelays.isNullOrEmpty()) _recloseDelays = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use recloseDelays.remove(delay) instead")
+    fun removeDelay(delay: Double): Boolean = recloseDelays.remove(delay)
 
     /**
      * Remove a delay from the list.

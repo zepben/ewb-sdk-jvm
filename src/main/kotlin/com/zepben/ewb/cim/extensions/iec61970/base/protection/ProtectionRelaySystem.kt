@@ -62,16 +62,8 @@ class ProtectionRelaySystem @JvmOverloads constructor(mRID: String = "") : Equip
         return this
     }
 
-    /**
-     * Remove a scheme from this [ProtectionRelaySystem].
-     * @param scheme The [ProtectionRelayScheme] to remove.
-     * @return true if the scheme was removed.
-     */
-    fun removeScheme(scheme: ProtectionRelayScheme): Boolean {
-        val ret = _schemes.safeRemove(scheme)
-        if (_schemes.isNullOrEmpty()) _schemes = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use schemes.remove(scheme) instead")
+    fun removeScheme(scheme: ProtectionRelayScheme): Boolean = schemes.remove(scheme)
 
     /**
      * Clear [schemes].

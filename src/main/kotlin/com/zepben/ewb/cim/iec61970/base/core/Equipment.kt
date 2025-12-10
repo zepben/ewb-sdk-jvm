@@ -75,15 +75,8 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
         return this
     }
 
-    /**
-     * @param equipmentContainer the equipment container to disassociate with this equipment.
-     * @return `true` if [equipmentContainer] has been successfully removed; `false` if it was not present in the set.
-     */
-    fun removeContainer(equipmentContainer: EquipmentContainer): Boolean {
-        val ret = _equipmentContainers?.remove(equipmentContainer) == true
-        if (_equipmentContainers.isNullOrEmpty()) _equipmentContainers = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use equipmentContainers.remove(equipmentContainer) instead")
+    fun removeContainer(equipmentContainer: EquipmentContainer): Boolean = containers.remove(equipmentContainer)
 
     /**
      * Clear this [Equipment]'s associated [EquipmentContainer]'s
@@ -122,15 +115,8 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
         return this
     }
 
-    /**
-     * @param equipmentContainer the equipment container to disassociate with this equipment.
-     * @return `true` if [equipmentContainer] has been successfully removed; `false` if it was not present in the set.
-     */
-    fun removeCurrentContainer(equipmentContainer: EquipmentContainer): Boolean {
-        val ret = _currentContainers?.remove(equipmentContainer) == true
-        if (_currentContainers.isNullOrEmpty()) _currentContainers = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use currentContainers.remove(equipmentContainer) instead")
+    fun removeCurrentContainer(equipmentContainer: EquipmentContainer): Boolean = currentContainers.remove(equipmentContainer)
 
     /**
      * Clear this [Equipment]'s associated current [EquipmentContainer]'s
@@ -170,15 +156,8 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
         return this
     }
 
-    /**
-     * @param usagePoint the usage point to disconnect from this equipment.
-     * @return this [Equipment]
-     */
-    fun removeUsagePoint(usagePoint: UsagePoint): Boolean {
-        val ret = _usagePoints?.remove(usagePoint) == true
-        if (_usagePoints.isNullOrEmpty()) _usagePoints = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use usagePoints.remove(usagePoint) instead")
+    fun removeUsagePoint(usagePoint: UsagePoint): Boolean = usagePoints.remove(usagePoint)
 
     /**
      * Clear this [Equipment]'s associated [UsagePoint]'s
@@ -220,16 +199,8 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
         return this
     }
 
-    /**
-     * Removes an operational restriction that has been associated with this equipment.
-     * @param restriction The operational restriction to be removed.
-     * @return this [Equipment]
-     */
-    fun removeOperationalRestriction(restriction: OperationalRestriction): Boolean {
-        val ret = _operationalRestrictions?.remove(restriction) == true
-        if (_operationalRestrictions.isNullOrEmpty()) _operationalRestrictions = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use operationalRestrictions.remove(restriction) instead")
+    fun removeOperationalRestriction(restriction: OperationalRestriction): Boolean = operationalRestrictions.remove(restriction)
 
     /**
      * Clear this [Equipment]'s associated [OperationalRestriction]'s

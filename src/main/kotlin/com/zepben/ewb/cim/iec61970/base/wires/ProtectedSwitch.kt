@@ -62,17 +62,8 @@ abstract class ProtectedSwitch(mRID: String = "") : Switch(mRID) {
         return this
     }
 
-    /**
-     * Disassociate this [ProtectedSwitch] from a [ProtectionRelayFunction].
-     *
-     * @param relayFunction The [ProtectionRelayFunction] to disassociate from this [ProtectedSwitch].
-     * @return true if the [ProtectionRelayFunction] was disassociated.
-     */
-    fun removeRelayFunction(relayFunction: ProtectionRelayFunction): Boolean {
-        val ret = _relayFunctions.safeRemove(relayFunction)
-        if (_relayFunctions.isNullOrEmpty()) _relayFunctions = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use relayFunctions.remove(relayFunction) instead")
+    fun removeRelayFunction(relayFunction: ProtectionRelayFunction): Boolean = relayFunctions.remove(relayFunction)
 
     /**
      * Disassociate all [ProtectionRelayFunction]s from this [ProtectedSwitch].

@@ -87,17 +87,8 @@ class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject
         return this
     }
 
-    /**
-     * Remove an [Equipment] from this [UsagePoint].
-     *
-     * @param equipment The [Equipment] to remove.
-     * @return true if the [Equipment] was removed.
-     */
-    fun removeEquipment(equipment: Equipment): Boolean {
-        val ret = _equipment?.remove(equipment) == true
-        if (_equipment.isNullOrEmpty()) _equipment = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use equipment.remove(equipment) instead")
+    fun removeEquipment(equipment: Equipment): Boolean = this.equipment.remove(equipment)
 
     /**
      * Clear all [Equipment] from this [UsagePoint].
@@ -144,17 +135,8 @@ class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject
         return this
     }
 
-    /**
-     * Remove an [EndDevice] from this [UsagePoint].
-     *
-     * @param endDevice The [EndDevice] to remove.
-     * @return true if the [EndDevice] was removed.
-     */
-    fun removeEndDevice(endDevice: EndDevice): Boolean {
-        val ret = _endDevices?.remove(endDevice) == true
-        if (_endDevices.isNullOrEmpty()) _endDevices = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use endDevices.remove(endDevice) instead")
+    fun removeEndDevice(endDevice: EndDevice): Boolean = endDevices.remove(endDevice)
 
     /**
      * Clear all [EndDevice]'s from this [UsagePoint].
@@ -200,17 +182,8 @@ class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject
         return this
     }
 
-    /**
-     * Remove a [ContactDetails] from this [UsagePoint].
-     *
-     * @param contact The [ContactDetails] to remove.
-     * @return true if the [ContactDetails] were removed.
-     */
-    fun removeContact(contact: ContactDetails): Boolean {
-        val ret = _contacts?.remove(contact) == true
-        if (_contacts.isNullOrEmpty()) _contacts = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use contacts.remove(contact) instead")
+    fun removeContact(contact: ContactDetails): Boolean = contacts.remove(contact)
 
     /**
      * Clear all [ContactDetails] from this [UsagePoint].

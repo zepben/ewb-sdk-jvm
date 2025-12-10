@@ -88,16 +88,8 @@ class DiagramObject @JvmOverloads constructor(mRID: String = "") : IdentifiedObj
         return this
     }
 
-    /**
-     * Remove a [DiagramObjectPoint] from this [DiagramObject]
-     * @param diagramObjectPoint The [DiagramObjectPoint] to remove.
-     * @return true if the [DiagramObjectPoint] was removed.
-     */
-    fun removePoint(diagramObjectPoint: DiagramObjectPoint): Boolean {
-        val ret = _diagramObjectPoints?.remove(diagramObjectPoint) == true
-        if (_diagramObjectPoints.isNullOrEmpty()) _diagramObjectPoints = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use diagramObjectPoints.remove(diagramObjectPoint) instead")
+    fun removePoint(diagramObjectPoint: DiagramObjectPoint): Boolean = points.remove(diagramObjectPoint)
 
     /**
      * Remove a [DiagramObjectPoint] from this [DiagramObject] by its sequence number.

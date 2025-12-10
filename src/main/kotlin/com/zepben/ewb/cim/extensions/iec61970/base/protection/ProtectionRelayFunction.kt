@@ -128,16 +128,8 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
         return this
     }
 
-    /**
-     * Remove a time limit from the list.
-     * @param timeLimit The time limit to remove.
-     * @return true if the time limit was found and removed.
-     */
-    fun removeTimeLimit(timeLimit: Double): Boolean {
-        val ret = _timeLimits?.remove(timeLimit) ?: false
-        if (_sensors.isNullOrEmpty()) _sensors = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use timeLimits.remove(timeLimit) instead")
+    fun removeTimeLimit(timeLimit: Double): Boolean = timeLimits.remove(timeLimit)
 
     /**
      * Remove a time limit from the list.
@@ -210,17 +202,8 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
         return this
     }
 
-    /**
-     * Removes a threshold [RelaySetting] from this [ProtectionRelayFunction].
-     *
-     * @param threshold The threshold [RelaySetting] to disassociate from this [ProtectionRelayFunction].
-     * @return true if the threshold [RelaySetting] was disassociated.
-     */
-    fun removeThreshold(threshold: RelaySetting): Boolean {
-        val ret = _thresholds?.remove(threshold) == true
-        if (_thresholds.isNullOrEmpty()) _thresholds = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use thresholds.remove(threshold) instead")
+    fun removeThreshold(threshold: RelaySetting): Boolean = thresholds.remove(threshold)
 
     /**
      * Remove a threshold [RelaySetting] from this [ProtectionRelayFunction] by its sequence number.
@@ -290,17 +273,8 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
         return this
     }
 
-    /**
-     * Disassociate this [ProtectionRelayFunction] from a [ProtectedSwitch].
-     *
-     * @param protectedSwitch The [ProtectedSwitch] to disassociate from this [ProtectionRelayFunction].
-     * @return true if the [ProtectedSwitch] was disassociated.
-     */
-    fun removeProtectedSwitch(protectedSwitch: ProtectedSwitch): Boolean {
-        val ret = _protectedSwitches.safeRemove(protectedSwitch)
-        if (_protectedSwitches.isNullOrEmpty()) _protectedSwitches = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use protectedSwitches.remove(protectedSwitch) instead")
+    fun removeProtectedSwitch(protectedSwitch: ProtectedSwitch): Boolean = protectedSwitches.remove(protectedSwitch)
 
     /**
      * Disassociate all [ProtectedSwitch]es from this [ProtectionRelayFunction].
@@ -349,17 +323,8 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
         return this
     }
 
-    /**
-     * Disassociate this [ProtectionRelayFunction] from a [Sensor].
-     *
-     * @param sensor The [Sensor] to disassociate from this [ProtectionRelayFunction].
-     * @return true if the [Sensor] was disassociated.
-     */
-    fun removeSensor(sensor: Sensor): Boolean {
-        val ret = _sensors.safeRemove(sensor)
-        if (_sensors.isNullOrEmpty()) _sensors = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use sensors.remove(sensor) instead")
+    fun removeSensor(sensor: Sensor): Boolean = sensors.remove(sensor)
 
     /**
      * Disassociate all [Sensor]s from this [ProtectionRelayFunction].
@@ -408,17 +373,8 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
         return this
     }
 
-    /**
-     * Disassociate this [ProtectionRelayFunction] from a [ProtectionRelayScheme].
-     *
-     * @param scheme The [ProtectionRelayScheme] to disassociate from this [ProtectionRelayFunction].
-     * @return true if the [ProtectionRelayScheme] was disassociated.
-     */
-    fun removeScheme(scheme: ProtectionRelayScheme): Boolean {
-        val ret = _schemes.safeRemove(scheme)
-        if (_schemes.isNullOrEmpty()) _schemes = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use schemes.remove(scheme) instead")
+    fun removeScheme(scheme: ProtectionRelayScheme): Boolean = schemes.remove(scheme)
 
     /**
      * Disassociate all [ProtectionRelayScheme]s from this [ProtectionRelayFunction].

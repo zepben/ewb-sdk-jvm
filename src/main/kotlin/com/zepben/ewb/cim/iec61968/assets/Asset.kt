@@ -70,15 +70,8 @@ abstract class Asset(mRID: String = "") : IdentifiedObject(mRID) {
         return this
     }
 
-    /**
-     * @param organisationRole the [AssetOrganisationRole] to disassociate with this [Asset].
-     * @return true if the organisation role is disassociated.
-     */
-    fun removeOrganisationRole(organisationRole: AssetOrganisationRole): Boolean {
-        val ret = _organisationRoles.safeRemove(organisationRole)
-        if (_organisationRoles.isNullOrEmpty()) _organisationRoles = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use organisationRoles.remove(organisationRole) instead")
+    fun removeOrganisationRole(organisationRole: AssetOrganisationRole): Boolean = organisationRoles.remove(organisationRole)
 
     fun clearOrganisationRoles(): Asset {
         _organisationRoles = null
@@ -107,15 +100,8 @@ abstract class Asset(mRID: String = "") : IdentifiedObject(mRID) {
         return this
     }
 
-    /**
-     * @param powerSystemResource the [PowerSystemResource] to disassociate from this [Asset].
-     * @return true if the [PowerSystemResource] is disassociated.
-     */
-    fun removePowerSystemResource(powerSystemResource: PowerSystemResource): Boolean {
-        val ret = _powerSystemResources.safeRemove(powerSystemResource)
-        if (_powerSystemResources.isNullOrEmpty()) _powerSystemResources = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use powerSystemResources.remove(powerSystemResource) instead")
+    fun removePowerSystemResource(powerSystemResource: PowerSystemResource): Boolean = powerSystemResources.remove(powerSystemResource)
 
     /**
      * Remove all [PowerSystemResource]s from this [Asset]

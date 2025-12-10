@@ -70,17 +70,8 @@ class ProtectionRelayScheme @JvmOverloads constructor(mRID: String = "") : Ident
         return this
     }
 
-    /**
-     * Disassociate a [ProtectionRelayFunction] from this [ProtectionRelayScheme].
-     *
-     * @param function The [ProtectionRelayFunction] to disassociate from this [ProtectionRelayScheme].
-     * @return true if the [ProtectionRelayFunction] was disassociated.
-     */
-    fun removeFunction(function: ProtectionRelayFunction): Boolean {
-        val ret = _functions.safeRemove(function)
-        if (_functions.isNullOrEmpty()) _functions = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use functions.remove(function) instead")
+    fun removeFunction(function: ProtectionRelayFunction): Boolean = functions.remove(function)
 
     /**
      * Disassociate all [ProtectionRelayFunction]s from this [ProtectionRelayScheme].

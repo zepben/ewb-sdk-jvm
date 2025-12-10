@@ -85,17 +85,8 @@ class ContactDetails @JvmOverloads constructor(id: String = "") {
         return this
     }
 
-    /**
-     * Remove an [TelephoneNumber] from this [ContactDetails].
-     *
-     * @param phoneNumber The [TelephoneNumber] to remove.
-     * @return true if the [TelephoneNumber] was removed.
-     */
-    fun removePhoneNumber(phoneNumber: TelephoneNumber): Boolean {
-        val ret = _phoneNumbers?.remove(phoneNumber) == true
-        if (_phoneNumbers.isNullOrEmpty()) _phoneNumbers = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use phoneNumbers.remove(phoneNumber) instead")
+    fun removePhoneNumber(phoneNumber: TelephoneNumber): Boolean = phoneNumbers.remove(phoneNumber)
 
     /**
      * Clear all [TelephoneNumber]'s from this [ContactDetails].
@@ -128,17 +119,8 @@ class ContactDetails @JvmOverloads constructor(id: String = "") {
         return this
     }
 
-    /**
-     * Remove an [ElectronicAddress] from this [ContactDetails].
-     *
-     * @param electronicAddress The [ElectronicAddress] to remove.
-     * @return true if the [ElectronicAddress] was removed.
-     */
-    fun removeElectronicAddress(electronicAddress: ElectronicAddress): Boolean {
-        val ret = _electronicAddresses?.remove(electronicAddress) == true
-        if (_electronicAddresses.isNullOrEmpty()) _electronicAddresses = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use electronicAddresses.remove(electronicAddress) instead")
+    fun removeElectronicAddress(electronicAddress: ElectronicAddress): Boolean = electronicAddresses.remove(electronicAddress)
 
     /**
      * Clear all [ElectronicAddress]'s from this [ContactDetails].

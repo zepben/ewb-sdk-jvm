@@ -74,16 +74,8 @@ abstract class Curve @JvmOverloads constructor(mRID: String = "") : IdentifiedOb
      */
     fun addData(curveData: CurveData): Curve = addData(curveData.xValue, curveData.y1Value, curveData.y2Value, curveData.y3Value)
 
-    /**
-     * Remove data point from the this [Curve].
-     *
-     * @return true if data point was removed.
-     */
-    fun removeData(curveData: CurveData): Boolean {
-        val ret = _data?.remove(curveData) == true
-        if (_data.isNullOrEmpty()) _data = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use data.remove(curveData) instead")
+    fun removeData(curveData: CurveData): Boolean = data.remove(curveData)
 
     /**
      * Remove data point from the this [Curve].

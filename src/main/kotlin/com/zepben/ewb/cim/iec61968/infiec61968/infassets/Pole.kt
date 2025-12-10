@@ -55,15 +55,8 @@ class Pole @JvmOverloads constructor(mRID: String = "") : Structure(mRID) {
         return this
     }
 
-    /**
-     * @param streetlight The [Streetlight] to remove from this [Pole].
-     * @return true if the streetlight is removed.
-     */
-    fun removeStreetlight(streetlight: Streetlight): Boolean {
-        val ret = _streetlights.safeRemove(streetlight)
-        if (_streetlights.isNullOrEmpty()) _streetlights = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use streetlights.remove(streetlight) instead")
+    fun removeStreetlight(streetlight: Streetlight): Boolean = streetlights.remove(streetlight)
 
     /**
      * Clear all [Streetlight]s attached to this [Pole].

@@ -74,15 +74,8 @@ class BatteryUnit @JvmOverloads constructor(mRID: String = "") : PowerElectronic
         return this
     }
 
-    /**
-     * @param control the [BatteryControl] to disassociate with this battery unit.
-     * @return true if the [BatteryControl] is disassociated.
-     */
-    fun removeControl(control: BatteryControl): Boolean {
-        val ret = _batteryControls.safeRemove(control)
-        if (_batteryControls.isNullOrEmpty()) _batteryControls = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use controls.remove(control) instead")
+    fun removeControl(control: BatteryControl): Boolean = controls.remove(control)
 
     /**
      * Clear all [BatteryControl]'s attached to this [BatteryUnit].

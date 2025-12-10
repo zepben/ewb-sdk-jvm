@@ -69,15 +69,8 @@ abstract class PowerSystemResource(mRID: String = "") : IdentifiedObject(mRID) {
         return this
     }
 
-    /**
-     * @param asset the [Asset] to disassociate from this [PowerSystemResource].
-     * @return true if the [Asset] is disassociated.
-     */
-    fun removeAsset(asset: Asset): Boolean {
-        val ret = _assets.safeRemove(asset)
-        if (_assets.isNullOrEmpty()) _assets = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use assets.remove(asset) instead")
+    fun removeAsset(asset: Asset): Boolean = assets.remove(asset)
 
     /**
      * Remove all [Asset]s from this PowerSystemResource

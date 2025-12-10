@@ -70,15 +70,8 @@ abstract class EndDevice(mRID: String = "") : AssetContainer(mRID) {
         return this
     }
 
-    /**
-     * @param usagePoint the usage point to disassociate with this end device.
-     * @return true if the usage point is disassociated.
-     */
-    fun removeUsagePoint(usagePoint: UsagePoint): Boolean {
-        val ret = _usagePoints?.remove(usagePoint) == true
-        if (_usagePoints.isNullOrEmpty()) _usagePoints = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use usagePoints.remove(usagePoint) instead")
+    fun removeUsagePoint(usagePoint: UsagePoint): Boolean = usagePoints.remove(usagePoint)
 
     /**
      * Clear all [UsagePoint]'s attached to this [EndDevice].
@@ -116,15 +109,8 @@ abstract class EndDevice(mRID: String = "") : AssetContainer(mRID) {
         return this
     }
 
-    /**
-     * @param function the [EndDeviceFunction] to disassociate with this end device.
-     * @return true if the [EndDeviceFunction] is disassociated.
-     */
-    fun removeFunction(function: EndDeviceFunction): Boolean {
-        val ret = _functions.safeRemove(function)
-        if (_functions.isNullOrEmpty()) _functions = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use functions.remove(function) instead")
+    fun removeFunction(function: EndDeviceFunction): Boolean = functions.remove(function)
 
     /**
      * Clear all [EndDeviceFunction]'s attached to this [EndDevice].

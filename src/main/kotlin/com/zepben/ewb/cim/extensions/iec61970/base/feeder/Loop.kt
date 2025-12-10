@@ -59,15 +59,8 @@ class Loop @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mRID)
         return this
     }
 
-    /**
-     * @param circuit the [Circuit] to disassociate with this [Loop].
-     * @return `true` if [circuit] has been successfully removed; `false` if it was not present.
-     */
-    fun removeCircuit(circuit: Circuit): Boolean {
-        val ret = _circuits?.remove(circuit) == true
-        if (_circuits.isNullOrEmpty()) _circuits = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use circuits.remove(circuit) instead")
+    fun removeCircuit(circuit: Circuit): Boolean = circuits.remove(circuit)
 
     /**
      * Clear this [Loop]'s associated [circuits].
@@ -108,15 +101,8 @@ class Loop @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mRID)
         return this
     }
 
-    /**
-     * @param substation the [Substation] no longer powered by this [Loop].
-     * @return `true` if [substation] has been successfully removed; `false` if it was not present.
-     */
-    fun removeSubstation(substation: Substation): Boolean {
-        val ret = _substations?.remove(substation) == true
-        if (_substations.isNullOrEmpty()) _substations = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use substations.remove(substation) instead")
+    fun removeSubstation(substation: Substation): Boolean = substations.remove(substation)
 
     /**
      * Clear this [Loop]'s associated [substations].
@@ -157,15 +143,8 @@ class Loop @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mRID)
         return this
     }
 
-    /**
-     * @param substation the [Substation] that is no longer energizing this [Loop].
-     * @return `true` if [substation] has been successfully removed; `false` if it was not present.
-     */
-    fun removeEnergizingSubstation(substation: Substation): Boolean {
-        val ret = _energizingSubstations?.remove(substation) == true
-        if (_energizingSubstations.isNullOrEmpty()) _energizingSubstations = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use energizingSubstations.remove(substation) instead")
+    fun removeEnergizingSubstation(substation: Substation): Boolean = energizingSubstations.remove(substation)
 
     /**
      * Clear this [Loop]'s associated [energizingSubstations].

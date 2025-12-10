@@ -69,17 +69,8 @@ class Customer @JvmOverloads constructor(mRID: String = "") : OrganisationRole(m
         return this
     }
 
-    /**
-     * Remove a customerAgreement from this [Customer].
-     *
-     * @param customerAgreement The [CustomerAgreement] to remove.
-     * @return true if [customerAgreement] is removed from the collection.
-     */
-    fun removeAgreement(customerAgreement: CustomerAgreement): Boolean {
-        val ret = _customerAgreements?.remove(customerAgreement) == true
-        if (_customerAgreements.isNullOrEmpty()) _customerAgreements = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use customerAgreements.remove(customerAgreement) instead")
+    fun removeAgreement(customerAgreement: CustomerAgreement): Boolean = agreements.remove(customerAgreement)
 
     /**
      * Clear all [CustomerAgreement]'s from this [Customer].

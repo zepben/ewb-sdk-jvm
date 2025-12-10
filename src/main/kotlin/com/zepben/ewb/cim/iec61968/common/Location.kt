@@ -74,16 +74,8 @@ class Location @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(m
         return this
     }
 
-    /**
-     * Remove a [PositionPoint] from this [Location]
-     * @param positionPoint The [PositionPoint] to remove.
-     * @return true if the [PositionPoint] was removed.
-     */
-    fun removePoint(positionPoint: PositionPoint): Boolean {
-        val ret = _positionPoints?.remove(positionPoint) == true
-        if (_positionPoints.isNullOrEmpty()) _positionPoints = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use positionPoints.remove(positionPoint) instead")
+    fun removePoint(positionPoint: PositionPoint): Boolean = points.remove(positionPoint)
 
     /**
      * Remove a [PositionPoint] from this [Location] by its sequence number.

@@ -114,15 +114,8 @@ abstract class RegulatingControl(mRID: String = "") : PowerSystemResource(mRID) 
         return this
     }
 
-    /**
-     * @param regulatingCondEq the regulating conducting equipment to disassociate from this [RegulatingControl].
-     * @return this [RegulatingControl]
-     */
-    fun removeRegulatingCondEq(regulatingCondEq: RegulatingCondEq): Boolean {
-        val ret = _regulatingCondEqs?.remove(regulatingCondEq) == true
-        if (_regulatingCondEqs.isNullOrEmpty()) _regulatingCondEqs = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use regulatingCondEqs.remove(regulatingCondEq) instead")
+    fun removeRegulatingCondEq(regulatingCondEq: RegulatingCondEq): Boolean = regulatingCondEqs.remove(regulatingCondEq)
 
     /**
      * Clear this [RegulatingControl]'s associated [RegulatingCondEq]'s

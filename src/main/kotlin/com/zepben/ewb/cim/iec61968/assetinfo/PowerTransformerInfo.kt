@@ -52,17 +52,8 @@ class PowerTransformerInfo @JvmOverloads constructor(mRID: String = "") : AssetI
         return this
     }
 
-    /**
-     * Remove a [TransformerTankInfo] from this [PowerTransformerInfo]
-     *
-     * @param transformerTankInfo The [TransformerTankInfo] to remove
-     * @return true if [transformerTankInfo] is removed from the collection
-     */
-    fun removeTransformerTankInfo(transformerTankInfo: TransformerTankInfo): Boolean {
-        val ret = _transformerTankInfos.safeRemove(transformerTankInfo)
-        if (_transformerTankInfos.isNullOrEmpty()) _transformerTankInfos = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use transformerTankInfos.remove(transformerTankInfo) instead")
+    fun removeTransformerTankInfo(transformerTankInfo: TransformerTankInfo): Boolean = transformerTankInfos.remove(transformerTankInfo)
 
     /**
      * Clear all [TransformerTankInfo]'s from this [PowerTransformerInfo]

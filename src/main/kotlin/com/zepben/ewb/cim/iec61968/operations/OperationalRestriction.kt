@@ -64,16 +64,8 @@ class OperationalRestriction @JvmOverloads constructor(mRID: String = "") : Docu
         return this
     }
 
-    /**
-     * Remove equipment already associated with this restriction.
-     *
-     * @param equipment The equipment tor remove.
-     */
-    fun removeEquipment(equipment: Equipment): Boolean {
-        val ret = _equipment?.remove(equipment) == true
-        if (_equipment.isNullOrEmpty()) _equipment = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use restriction.equipment.remove(equipment) instead")
+    fun removeEquipment(equipment: Equipment): Boolean = this.equipment.remove(equipment)
 
     fun clearEquipment(): OperationalRestriction {
         _equipment = null

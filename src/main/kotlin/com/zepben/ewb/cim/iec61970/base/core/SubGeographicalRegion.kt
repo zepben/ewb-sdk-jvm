@@ -26,7 +26,8 @@ class SubGeographicalRegion @JvmOverloads constructor(mRID: String = "") : Ident
     val substations: MRIDListWrapper<Substation>
         get() = MRIDListWrapper(
             getter = { _substations },
-            setter = { _substations = it })
+            setter = { _substations = it },
+            customAdd = { addSubstationCustom(it) })
 
     @Deprecated("BOILERPLATE: Use substations.size instead")
     fun numSubstations(): Int = substations.size
@@ -34,13 +35,19 @@ class SubGeographicalRegion @JvmOverloads constructor(mRID: String = "") : Ident
     @Deprecated("BOILERPLATE: Use substations.getByMRID(mRID) instead")
     fun getSubstation(mRID: String): Substation? = substations.getByMRID(mRID)
 
+    @Deprecated("BOILERPLATE: Use substations.add(substation) instead")
+    fun addSubstation(substation: Substation): SubGeographicalRegion {
+        substations.add(substation)
+        return this
+    }
+
     /**
      * @param substation the [Substation] to associate with this [SubGeographicalRegion].
      * @return A reference to this [SubGeographicalRegion] to allow fluent use.
      */
-    fun addSubstation(substation: Substation): SubGeographicalRegion {
+    private fun addSubstationCustom(substation: Substation): Boolean {
         if (validateReference(substation, ::getSubstation, "A Substation"))
-            return this
+            return false
 
         if (substation.subGeographicalRegion == null)
             substation.subGeographicalRegion = this
@@ -52,7 +59,7 @@ class SubGeographicalRegion @JvmOverloads constructor(mRID: String = "") : Ident
         _substations = _substations ?: mutableListOf()
         _substations!!.add(substation)
 
-        return this
+        return true
     }
 
     @Deprecated("BOILERPLATE: Use substations.remove(substation) instead")

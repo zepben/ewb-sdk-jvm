@@ -87,12 +87,13 @@ class PowerTransformer @JvmOverloads constructor(mRID: String = "") : Conducting
     val ends: MRIDListWrapper<PowerTransformerEnd>
         get() = MRIDListWrapper(
             getter = { _powerTransformerEnds },
-            setter = { _powerTransformerEnds = it })
+            setter = { _powerTransformerEnds = it },
+            customAdd = { addEndCustom(it) })
 
     @Deprecated("BOILERPLATE: Use ends.size instead")
     fun numEnds(): Int = ends.size
 
-    @Deprecated("BOILERPLATE: Use powerTransformerEnds.getByMRID(mRID) instead")
+    @Deprecated("BOILERPLATE: Use ends.getByMRID(mRID) instead")
     fun getEnd(mRID: String): PowerTransformerEnd? = ends.getByMRID(mRID)
 
     /**
@@ -144,6 +145,7 @@ class PowerTransformer @JvmOverloads constructor(mRID: String = "") : Conducting
      */
     fun getBaseVoltage(connectivityNode: ConnectivityNode): BaseVoltage? = getEnd(connectivityNode)?.baseVoltage
 
+
     /**
      * Add a [PowerTransformerEnd] to this [PowerTransformer]
      *
@@ -152,8 +154,14 @@ class PowerTransformer @JvmOverloads constructor(mRID: String = "") : Conducting
      *         the same endNumber already exists.
      * @return This [PowerTransformer] for fluent use
      */
+    @Deprecated("BOILERPLATE: Use ends.add(end) instead")
     fun addEnd(end: PowerTransformerEnd): PowerTransformer {
-        if (validateEnd(end)) return this
+        ends.add(end)
+        return this
+    }
+
+    private fun addEndCustom(end: PowerTransformerEnd): Boolean {
+        if (validateEnd(end)) return false
 
         if (end.endNumber == 0)
             end.endNumber = numEnds() + 1
@@ -164,17 +172,15 @@ class PowerTransformer @JvmOverloads constructor(mRID: String = "") : Conducting
         _powerTransformerEnds!!.add(end)
         _powerTransformerEnds!!.sortBy { it.endNumber }
 
-        return this
+        return true
     }
 
-    fun removeEnd(end: PowerTransformerEnd): Boolean {
-        val ret = _powerTransformerEnds.safeRemove(end)
-        if (_powerTransformerEnds.isNullOrEmpty()) _powerTransformerEnds = null
-        return ret
-    }
+    @Deprecated("BOILERPLATE: Use ends.remove(end) instead")
+    fun removeEnd(end: PowerTransformerEnd): Boolean = ends.remove(end)
 
+    @Deprecated("BOILERPLATE: Use ends.clear() instead")
     fun clearEnds(): PowerTransformer {
-        _powerTransformerEnds = null
+        ends.clear()
         return this
     }
 

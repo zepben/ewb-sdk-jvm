@@ -50,7 +50,8 @@ class AcLineSegment @JvmOverloads constructor(mRID: String = "") : Conductor(mRI
     val cuts: MRIDListWrapper<Cut>
         get() = MRIDListWrapper(
             getter = { _cuts },
-            setter = { _cuts = it })
+            setter = { _cuts = it },
+            customAdd = { addCutCustom(it) })
 
     /**
      * Get the number of entries in the [Cut] collection.
@@ -60,19 +61,23 @@ class AcLineSegment @JvmOverloads constructor(mRID: String = "") : Conductor(mRI
     @Deprecated("BOILERPLATE: Use cuts.getByMRID(mRID) instead")
     fun getCut(mRID: String): Cut? = cuts.getByMRID(mRID)
 
+    @Deprecated("BOILERPLATE: Use cuts.add(cut) instead")
+    fun addCut(cut: Cut): AcLineSegment {
+        cuts.add(cut)
+        return this
+    }
+
     /**
      * Add a [Cut] to this [AcLineSegment]
      *
      * @return This [AcLineSegment] for fluent use
      */
-    fun addCut(cut: Cut): AcLineSegment {
+    private fun addCutCustom(cut: Cut): Boolean {
         if (validateCut(cut))
-            return this
+            return false
 
         _cuts = _cuts ?: mutableListOf()
-        _cuts!!.add(cut)
-
-        return this
+        return _cuts!!.add(cut)
     }
 
     @Deprecated("BOILERPLATE: Use cuts.remove(cut) instead")
@@ -87,7 +92,8 @@ class AcLineSegment @JvmOverloads constructor(mRID: String = "") : Conductor(mRI
     val clamps: MRIDListWrapper<Clamp>
         get() = MRIDListWrapper(
             getter = { _clamps },
-            setter = { _clamps = it })
+            setter = { _clamps = it },
+            customAdd = { addClampCustom(it) })
 
     /**
      * Get the number of entries in the [Clamp] collection.
@@ -97,19 +103,22 @@ class AcLineSegment @JvmOverloads constructor(mRID: String = "") : Conductor(mRI
     @Deprecated("BOILERPLATE: Use clamps.getByMRID(mRID) instead")
     fun getClamp(mRID: String): Clamp? = clamps.getByMRID(mRID)
 
+    @Deprecated("BOILERPLATE: Use clamps.add(clamp) instead")
+    fun addClamp(clamp: Clamp): AcLineSegment {
+        clamps.add(clamp)
+        return this
+    }
     /**
      * Add a [Clamp] to this [AcLineSegment]
      *
      * @return This [AcLineSegment] for fluent use
      */
-    fun addClamp(clamp: Clamp): AcLineSegment {
+    private fun addClampCustom(clamp: Clamp): Boolean {
         if (validateClamp(clamp))
-            return this
+            return false
 
         _clamps = _clamps ?: mutableListOf()
-        _clamps!!.add(clamp)
-
-        return this
+        return _clamps!!.add(clamp)
     }
 
     @Deprecated("BOILERPLATE: Use clamps.remove(clamp) instead")

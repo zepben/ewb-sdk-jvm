@@ -58,19 +58,9 @@ class BatteryUnit @JvmOverloads constructor(mRID: String = "") : PowerElectronic
      */
     fun getControl(controlMode: BatteryControlMode): BatteryControl? = _batteryControls?.firstOrNull { it.controlMode == controlMode }
 
-    /**
-     * Add a [BatteryControl] for this [BatteryUnit]
-     *
-     * @throws IllegalStateException if the [BatteryControl] references another [BatteryUnit]
-     * @param control the [BatteryControl] to be added to this [BatteryUnit]
-     *
-     * @return This [BatteryUnit] for fluent use
-     */
+    @Deprecated("BOILERPLATE: Use batteryControls.add(control) instead")
     fun addControl(control: BatteryControl): BatteryUnit {
-        if (validateControl(control)) return this
-
-        _batteryControls = _batteryControls.or(::mutableListOf) { add(control) }
-
+        controls.add(control)
         return this
     }
 
@@ -82,9 +72,4 @@ class BatteryUnit @JvmOverloads constructor(mRID: String = "") : PowerElectronic
         controls.clear()
         return this
     }
-
-    private fun validateControl(control: BatteryControl): Boolean {
-        return validateReference(control, ::getControl, "A BatteryControl")
-    }
-
 }

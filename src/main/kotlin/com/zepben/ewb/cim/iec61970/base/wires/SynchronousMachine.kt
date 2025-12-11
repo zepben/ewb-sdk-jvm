@@ -92,17 +92,9 @@ class SynchronousMachine @JvmOverloads constructor(mRID: String = "") : Rotating
     @Deprecated("BOILERPLATE: Use curves.getByMRID(mRID) instead")
     fun getCurve(mRID: String): ReactiveCapabilityCurve? = curves.getByMRID(mRID)
 
-    /**
-     * Add a [ReactiveCapabilityCurve] for this [SynchronousMachine]
-     *
-     * @param rcc the [ReactiveCapabilityCurve] to be added from this [SynchronousMachine]
-     */
+    @Deprecated("BOILERPLATE: Use curves.add(rcc) instead")
     fun addCurve(rcc: ReactiveCapabilityCurve): SynchronousMachine {
-        if (validateReference(rcc, ::getCurve, "A ReactiveCapabilityCurve"))
-            return this
-
-        _reactiveCapabilityCurves = _reactiveCapabilityCurves.or(::mutableListOf) { add(rcc) }
-
+        curves.add(rcc)
         return this
     }
 

@@ -72,16 +72,9 @@ class ContactDetails @JvmOverloads constructor(id: String = "") {
     @Deprecated("BOILERPLATE: Use phoneNumbers.size instead")
     fun numPhoneNumbers(): Int = phoneNumbers.size
 
-    /**
-     * Add an [TelephoneNumber] to this [ContactDetails].
-     *
-     * @param phoneNumber The [TelephoneNumber] to add.
-     * @return This [ContactDetails] for fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use phoneNumbers.add(phoneNumber) instead")
     fun addPhoneNumber(phoneNumber: TelephoneNumber): ContactDetails {
-        _phoneNumbers = _phoneNumbers ?: mutableListOf()
-        _phoneNumbers!!.add(phoneNumber)
-
+        phoneNumbers.add(phoneNumber)
         return this
     }
 
@@ -102,16 +95,9 @@ class ContactDetails @JvmOverloads constructor(id: String = "") {
     @Deprecated("BOILERPLATE: Use electronicAddresses.size instead")
     fun numElectronicAddresses(): Int = electronicAddresses.size
 
-    /**
-     * Add an [ElectronicAddress] to this [ContactDetails].
-     *
-     * @param electronicAddress The [ElectronicAddress] to add.
-     * @return This [ContactDetails] for fluent use.
-     */
+    @Deprecated("BOILERPLATE: Use electronicAddresses.add(electronicAddress) instead")
     fun addElectronicAddress(electronicAddress: ElectronicAddress): ContactDetails {
-        _electronicAddresses = _electronicAddresses ?: mutableListOf()
-        _electronicAddresses!!.add(electronicAddress)
-
+        electronicAddresses.add(electronicAddress)
         return this
     }
 

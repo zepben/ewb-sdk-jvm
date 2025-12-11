@@ -33,7 +33,8 @@ class Substation @JvmOverloads constructor(mRID: String = "") : EquipmentContain
     val feeders: MRIDListWrapper<Feeder>
         get() = MRIDListWrapper(
             getter = { _normalEnergizedFeeders },
-            setter = { _normalEnergizedFeeders = it })
+            setter = { _normalEnergizedFeeders = it },
+            customAdd = {addFeederCustom(it) })
 
     @Deprecated("BOILERPLATE: Use feeders.size instead")
     fun numFeeders(): Int = feeders.size
@@ -41,13 +42,19 @@ class Substation @JvmOverloads constructor(mRID: String = "") : EquipmentContain
     @Deprecated("BOILERPLATE: Use normalEnergizedFeeders.getByMRID(mRID) instead")
     fun getFeeder(mRID: String): Feeder? = feeders.getByMRID(mRID)
 
+    @Deprecated("BOILERPLATE: Use feeders.add(feeder) instead")
+    fun addFeeder(feeder: Feeder): Substation {
+        feeders.add(feeder)
+        return this
+    }
+
     /**
      * @param feeder the [Feeder] to associate with this [Substation].
      * @return A reference to this [Substation] to allow fluent use.
      */
-    fun addFeeder(feeder: Feeder): Substation {
+    private fun addFeederCustom(feeder: Feeder): Boolean {
         if (validateReference(feeder, ::getFeeder, "A Feeder"))
-            return this
+            return false
 
         if (feeder.normalEnergizingSubstation == null)
             feeder.normalEnergizingSubstation = this
@@ -57,9 +64,7 @@ class Substation @JvmOverloads constructor(mRID: String = "") : EquipmentContain
         }
 
         _normalEnergizedFeeders = _normalEnergizedFeeders ?: mutableListOf()
-        _normalEnergizedFeeders!!.add(feeder)
-
-        return this
+        return _normalEnergizedFeeders!!.add(feeder)
     }
 
     @Deprecated("BOILERPLATE: Use feeders.remove(feeder) instead")

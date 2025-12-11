@@ -148,20 +148,10 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
     @Deprecated("BOILERPLATE: Use operationalRestrictions.getByMRID(mRID) instead")
     fun getOperationalRestriction(mRID: String): OperationalRestriction? = operationalRestrictions.getByMRID(mRID)
 
-    /**
-     * Add an operational restriction that applies to this equipment.
-     *
-     * @param restriction The operational restriction that applies to this equipment.
-     * @return true if the operation restriction was added.
-     * @return A reference to this [Equipment] to allow fluent use.
-     */
+
+    @Deprecated("BOILERPLATE: Use operationalRestrictions.add(restriction) instead")
     fun addOperationalRestriction(restriction: OperationalRestriction): Equipment {
-        if (validateReference(restriction, ::getOperationalRestriction, "An OperationalRestriction"))
-            return this
-
-        _operationalRestrictions = _operationalRestrictions ?: mutableListOf()
-        _operationalRestrictions!!.add(restriction)
-
+        operationalRestrictions.add(restriction)
         return this
     }
 

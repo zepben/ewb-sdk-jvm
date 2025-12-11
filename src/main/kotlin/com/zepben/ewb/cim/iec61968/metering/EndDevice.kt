@@ -77,19 +77,9 @@ abstract class EndDevice(mRID: String = "") : AssetContainer(mRID) {
     @Deprecated("BOILERPLATE: Use functions.getByMRID(mRID) instead")
     fun getFunction(mRID: String): EndDeviceFunction? = functions.getByMRID(mRID)
 
-    /**
-     * Add a [EndDeviceFunction] for this [EndDevice]
-     *
-     * @throws IllegalStateException if the [EndDeviceFunction] references another [EndDevice]
-     * @param function the [EndDeviceFunction] to be added to this [EndDevice]
-     *
-     * @return This [EndDevice] for fluent use
-     */
+    @Deprecated("BOILERPLATE: Use functions.add(function) instead")
     fun addFunction(function: EndDeviceFunction): EndDevice {
-        if (validateFunction(function)) return this
-
-        _functions = _functions.or(::mutableListOf) { add(function) }
-
+        functions.add(function)
         return this
     }
 
@@ -100,10 +90,6 @@ abstract class EndDevice(mRID: String = "") : AssetContainer(mRID) {
     fun clearFunctions(): EndDevice {
         functions.clear()
         return this
-    }
-
-    private fun validateFunction(function: EndDeviceFunction): Boolean {
-        return validateReference(function, ::getFunction, "A EndDeviceFunction")
     }
 
 }

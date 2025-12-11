@@ -51,7 +51,7 @@ class AcLineSegment @JvmOverloads constructor(mRID: String = "") : Conductor(mRI
         get() = MRIDListWrapper(
             getter = { _cuts },
             setter = { _cuts = it },
-            customAdd = { addCutCustom(it) })
+            validate = ::validateCut)
 
     /**
      * Get the number of entries in the [Cut] collection.
@@ -67,19 +67,6 @@ class AcLineSegment @JvmOverloads constructor(mRID: String = "") : Conductor(mRI
         return this
     }
 
-    /**
-     * Add a [Cut] to this [AcLineSegment]
-     *
-     * @return This [AcLineSegment] for fluent use
-     */
-    private fun addCutCustom(cut: Cut): Boolean {
-        if (validateCut(cut))
-            return false
-
-        _cuts = _cuts ?: mutableListOf()
-        return _cuts!!.add(cut)
-    }
-
     @Deprecated("BOILERPLATE: Use cuts.remove(cut) instead")
     fun removeCut(cut: Cut): Boolean = cuts.remove(cut)
 
@@ -93,12 +80,10 @@ class AcLineSegment @JvmOverloads constructor(mRID: String = "") : Conductor(mRI
         get() = MRIDListWrapper(
             getter = { _clamps },
             setter = { _clamps = it },
-            customAdd = { addClampCustom(it) })
+            validate = ::validateClamp)
 
-    /**
-     * Get the number of entries in the [Clamp] collection.
-     */
-    fun numClamps(): Int = _clamps?.size ?: 0
+    @Deprecated("BOILERPLATE: Use clamps.size instead")
+    fun numClamps(): Int = clamps.size
 
     @Deprecated("BOILERPLATE: Use clamps.getByMRID(mRID) instead")
     fun getClamp(mRID: String): Clamp? = clamps.getByMRID(mRID)
@@ -107,18 +92,6 @@ class AcLineSegment @JvmOverloads constructor(mRID: String = "") : Conductor(mRI
     fun addClamp(clamp: Clamp): AcLineSegment {
         clamps.add(clamp)
         return this
-    }
-    /**
-     * Add a [Clamp] to this [AcLineSegment]
-     *
-     * @return This [AcLineSegment] for fluent use
-     */
-    private fun addClampCustom(clamp: Clamp): Boolean {
-        if (validateClamp(clamp))
-            return false
-
-        _clamps = _clamps ?: mutableListOf()
-        return _clamps!!.add(clamp)
     }
 
     @Deprecated("BOILERPLATE: Use clamps.remove(clamp) instead")
@@ -131,9 +104,6 @@ class AcLineSegment @JvmOverloads constructor(mRID: String = "") : Conductor(mRI
     }
 
     private fun validateCut(cut: Cut): Boolean {
-        if (validateReference(cut, ::getCut, "A Cut"))
-            return true
-
         if (cut.acLineSegment == null)
             cut.acLineSegment = this
 
@@ -144,9 +114,6 @@ class AcLineSegment @JvmOverloads constructor(mRID: String = "") : Conductor(mRI
     }
 
     private fun validateClamp(clamp: Clamp): Boolean {
-        if (validateReference(clamp, ::getClamp, "A Clamp"))
-            return true
-
         if (clamp.acLineSegment == null)
             clamp.acLineSegment = this
 

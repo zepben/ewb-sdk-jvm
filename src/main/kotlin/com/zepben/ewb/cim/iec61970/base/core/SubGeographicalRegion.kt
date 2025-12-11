@@ -27,7 +27,16 @@ class SubGeographicalRegion @JvmOverloads constructor(mRID: String = "") : Ident
         get() = MRIDListWrapper(
             getter = { _substations },
             setter = { _substations = it },
-            customAdd = { addSubstationCustom(it) })
+            link = ::linkSubstation)
+
+    private fun linkSubstation(substation: Substation) {
+        if (substation.subGeographicalRegion == null)
+            substation.subGeographicalRegion = this
+
+        require(substation.subGeographicalRegion === this) {
+            "${substation.typeNameAndMRID()} `subGeographicalRegion` property references ${substation.subGeographicalRegion!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
+        }
+    }
 
     @Deprecated("BOILERPLATE: Use substations.size instead")
     fun numSubstations(): Int = substations.size
@@ -41,27 +50,6 @@ class SubGeographicalRegion @JvmOverloads constructor(mRID: String = "") : Ident
         return this
     }
 
-    /**
-     * @param substation the [Substation] to associate with this [SubGeographicalRegion].
-     * @return A reference to this [SubGeographicalRegion] to allow fluent use.
-     */
-    private fun addSubstationCustom(substation: Substation): Boolean {
-        if (validateReference(substation, ::getSubstation, "A Substation"))
-            return false
-
-        if (substation.subGeographicalRegion == null)
-            substation.subGeographicalRegion = this
-
-        require(substation.subGeographicalRegion === this) {
-            "${substation.typeNameAndMRID()} `subGeographicalRegion` property references ${substation.subGeographicalRegion!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
-        }
-
-        _substations = _substations ?: mutableListOf()
-        _substations!!.add(substation)
-
-        return true
-    }
-
     @Deprecated("BOILERPLATE: Use substations.remove(substation) instead")
     fun removeSubstation(substation: Substation): Boolean = substations.remove(substation)
 
@@ -70,4 +58,6 @@ class SubGeographicalRegion @JvmOverloads constructor(mRID: String = "") : Ident
         substations.clear()
         return this
     }
+
+
 }

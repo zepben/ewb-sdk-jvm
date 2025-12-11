@@ -120,11 +120,27 @@ open class ListWrapper<T> (
     }
 }
 
-open class MRIDListWrapper<S: IdentifiedObject> (
+open class MRIDListWrapper<S: IdentifiedObject> private constructor(
     getter: () -> MutableList<S>?,
     setter: (MutableList<S>?) -> Unit,
-    customAdd: ((S) -> Boolean)? = null
+    customAdd: ((S) -> Boolean)? = null,
+    val validate: ((S) -> Boolean)? = null,
+    val link: ((S) -> Unit)? = null,
 ): ListWrapper<S>(getter, setter, customAdd) {
+
+    constructor(
+        getter: () -> MutableList<S>?,
+        setter: (MutableList<S>?) -> Unit,
+        customAdd: ((S) -> Boolean)? = null,
+    ): this(getter, setter, customAdd, null, null)
+
+    constructor(
+        getter: () -> MutableList<S>?,
+        setter: (MutableList<S>?) -> Unit,
+        validate: ((S) -> Boolean)? = null,
+        link: ((S) -> Unit)? = null,
+    ): this(getter, setter, null, validate, link)
+
     override fun defaultAdd(element: S): Boolean {
         val list = getNotNull()
         for(other in list) {
@@ -134,6 +150,11 @@ open class MRIDListWrapper<S: IdentifiedObject> (
                 throw IllegalArgumentException("mRID DUPLICATES! (TODO: message)")
             }
         }
+
+        validate?.invoke(element)
+
+        link?.invoke(element)
+
         return super.defaultAdd(element)
     }
 }

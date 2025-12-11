@@ -25,7 +25,7 @@ class GeographicalRegion @JvmOverloads constructor(mRID: String = "") : Identifi
         get() = MRIDListWrapper(
             getter = { _subGeographicalRegions },
             setter = { _subGeographicalRegions = it },
-            customAdd = { addSubGeographicalRegionInternal(it) })
+            customAdd = { addSubGeographicalRegionCustom(it) })
 
 
     @Deprecated("BOILERPLATE: Use subGeographicalRegions.size instead")
@@ -40,7 +40,7 @@ class GeographicalRegion @JvmOverloads constructor(mRID: String = "") : Identifi
         return this
     }
 
-    private fun addSubGeographicalRegionInternal(subGeographicalRegion: SubGeographicalRegion): Boolean {
+    private fun addSubGeographicalRegionCustom(subGeographicalRegion: SubGeographicalRegion): Boolean {
         if (validateReference(subGeographicalRegion, ::getSubGeographicalRegion, "A SubGeographicalRegion"))
             return false
 

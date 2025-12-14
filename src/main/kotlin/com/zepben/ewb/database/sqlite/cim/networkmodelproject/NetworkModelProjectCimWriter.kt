@@ -93,20 +93,11 @@ class NetworkModelProjectCimWriter(
         val table = databaseTables.getTable<TableObjectModifications>()
         val insert = databaseTables.getInsert<TableObjectModifications>()
 
-        // FIXME: no mRID, should we introduce an ID, or mix the 2 classes into the same table / GRPC message...
-        //insert.setNullableString(table.OBJECT_REVERSE_MODIFICATION_MRID.queryIndex, objectModification.objectReverseModification.mRID)
+        objectModification.objectReverseModification?.let {
+            insert.setNullableString(table.OBJECT_REVERSE_MODIFICATION_TARGET_OBJECT_MRID.queryIndex, it.targetObject.mRID)
+        }
 
         return writeChangeSetMember(table, insert, objectModification, "object modification")
-    }
-
-    fun write(objectReverseModification: ObjectReverseModification): Boolean {
-        val table = databaseTables.getTable<TableObjectReverseModifications>()
-        val insert = databaseTables.getInsert<TableObjectReverseModifications>()
-
-        // FIXME: no mRID, should we introduce an ID, or mix the 2 classes into the same table / GRPC message...
-        //insert.setNullableString(table.OBJECT_MODIFICATION_MRID.queryIndex, objectReverseModification.objectModification.mRID)
-
-        return writeChangeSetMember(table, insert, objectReverseModification, "object reverse modification")
     }
 
     private fun writeAssociation(changeSet: ChangeSet, changeSetMember: ChangeSetMember): Boolean {

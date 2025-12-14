@@ -18,34 +18,26 @@ import java.time.Instant
 @ZBEX
 abstract class NetworkModelProjectComponent (
     mRID: String,
-    created: Instant = Instant.now(),
-    updated: Instant? = null,
-    closed: Instant? = null,
-    parent: NetworkModelProject? = null
 ) : IdentifiedObject(mRID) {
-
-    private var _created: Instant = created
-    private var _updated: Instant? = updated
-    private var _closed: Instant? = closed
-    private var _parent: NetworkModelProject? = parent
+    var _parent: NetworkModelProject? = null
 
     /**
      * [ZBEX] When the component was created.
      */
     @ZBEX
-    val created: Instant get() = _created
+    var created: Instant? = null
 
     /**
      * [ZBEX] When the component was last updated.
      */
     @ZBEX
-    val updated: Instant? get() = _updated
+    var updated: Instant? = null
 
     /**
      * [ZBEX] When the component was deleted.
      */
     @ZBEX
-    val closed: Instant? get() = _closed
+    var closed: Instant? = null
 
     /**
      * [ZBEX] The contained Network Model Project Component (Restricted to just NetworkModelProject)
@@ -59,12 +51,12 @@ abstract class NetworkModelProjectComponent (
      * @return true if the [NetworkModelProjectComponent] was deleted, false otherwise.
      */
     fun delete(): Boolean {
-        require(_closed == null) {
+        require(closed == null) {
             "${javaClass.simpleName} already marked as deleted."
             return false
         }
 
-        _closed = Instant.now()
+        closed = Instant.now()
         return true
     }
 

@@ -14,6 +14,7 @@ import com.zepben.ewb.database.sql.TableVersion
 import com.zepben.ewb.database.sqlite.cim.customer.CustomerDatabaseTables
 import com.zepben.ewb.database.sqlite.cim.diagram.DiagramDatabaseTables
 import com.zepben.ewb.database.sqlite.cim.network.NetworkDatabaseTables
+import com.zepben.ewb.database.sqlite.cim.networkmodelproject.NetworkModelProjectDatabaseTables
 import com.zepben.ewb.database.sqlite.common.SqliteTable
 import com.zepben.testutils.exception.ExpectException.Companion.expect
 import org.hamcrest.MatcherAssert.assertThat
@@ -37,7 +38,7 @@ internal class CimDatabaseTablesTest {
             .map { it.simpleName }
             .toSet()
 
-        val usedTables = sequenceOf(CustomerDatabaseTables(), DiagramDatabaseTables(), NetworkDatabaseTables())
+        val usedTables = sequenceOf(CustomerDatabaseTables(), DiagramDatabaseTables(), NetworkDatabaseTables(), NetworkModelProjectDatabaseTables())
             .flatMap { it.tables.keys }
             .filter { !it.isSubclassOf(TableVersion::class) }
             .map { it.simpleName!! }

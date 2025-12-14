@@ -13,12 +13,12 @@ import com.zepben.ewb.database.sql.Column
 /**
  * A class representing the ObjectModification columns required for the database table.
  *
- * @property OBJECT_REVERSE_MODIFICATION_MRID A column storing the mRID of the ObjectReverseModification specifying precondition properties for a preconditioned update.
+ * @property OBJECT_REVERSE_MODIFICATION_TARGET_OBJECT_MRID A column storing the mRID of the expected IdentifiedObject in the base network before modification.
  */
 @Suppress("PropertyName")
 class TableObjectModifications : TableChangeSetMembers() {
 
-    val OBJECT_REVERSE_MODIFICATION_MRID: Column = Column(++columnIndex, "object_reverse_modification_mrid", Column.Type.STRING, Column.Nullable.NULL)
+    val OBJECT_REVERSE_MODIFICATION_TARGET_OBJECT_MRID: Column = Column(++columnIndex, "object_reverse_modification_mrid", Column.Type.STRING, Column.Nullable.NULL)
 
     override val name: String = "object_modifications"
 

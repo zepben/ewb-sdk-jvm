@@ -24,5 +24,7 @@ class AnnotatedProjectDependency(
     var dependencyDependingStage: NetworkModelProjectStage
 
 ) : IdentifiedObject(mRID) {
-
+    init {
+        // TODO: reverse link the stages back to this
+    }
 }

@@ -9,7 +9,7 @@
 package com.zepben.ewb.database.sqlite.cim.tables.iec61970.infiec61970.part303.genericdataset
 
 import com.zepben.ewb.database.sql.Column
-
+// TODO: DELETE?
 /**
  * A class representing the ObjectReverseModification columns required for the database table.
  *

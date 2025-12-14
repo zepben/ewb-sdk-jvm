@@ -15,6 +15,8 @@ import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelayFun
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelayScheme
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelaySystem
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.BatteryControl
+import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProject
+import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectComponent
 import com.zepben.ewb.cim.iec61968.assetinfo.*
 import com.zepben.ewb.cim.iec61968.assets.Asset
 import com.zepben.ewb.cim.iec61968.assets.AssetOrganisationRole
@@ -48,6 +50,9 @@ import com.zepben.ewb.cim.iec61970.base.scada.RemoteControl
 import com.zepben.ewb.cim.iec61970.base.scada.RemoteSource
 import com.zepben.ewb.cim.iec61970.base.wires.*
 import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
+import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStage
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSetMember
 import kotlin.reflect.KClass
 
 
@@ -511,6 +516,18 @@ internal object AssetToPowerSystemResourceResolver : ReferenceResolver<Asset, Po
 
 internal object PowerSystemResourceToAssetResolver : ReferenceResolver<PowerSystemResource, Asset> by KReferenceResolver(
     PowerSystemResource::class, Asset::class, PowerSystemResource::addAsset
+)
+
+internal object NetworkModelProjectToNetworkModelProjectComponentResolver : ReferenceResolver<NetworkModelProject, NetworkModelProjectComponent> by KReferenceResolver(
+    NetworkModelProject::class, NetworkModelProjectComponent::class, NetworkModelProject::addChild
+)
+
+internal object NetworkModelProjectStageToChangeSet : ReferenceResolver<NetworkModelProjectStage, ChangeSet> by KReferenceResolver(
+    NetworkModelProjectStage::class, ChangeSet::class, NetworkModelProjectStage::setChangeSet
+)
+
+internal object ChangeSetToChangeSetMemberResolver : ReferenceResolver<ChangeSet, ChangeSetMember> by KReferenceResolver(
+    ChangeSet::class, ChangeSetMember::class, ChangeSet::addChangeSetMember
 )
 
 //-------------------------------------------//

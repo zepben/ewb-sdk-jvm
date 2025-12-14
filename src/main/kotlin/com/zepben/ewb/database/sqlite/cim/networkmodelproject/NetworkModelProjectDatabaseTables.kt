@@ -29,6 +29,6 @@ class NetworkModelProjectDatabaseTables : CimDatabaseTables() {
             TableObjectCreations(),
             TableObjectDeletions(),
             TableObjectModifications(),
-            TableObjectReverseModifications(),
+            // TODO: DELETE? TableObjectReverseModifications(),
         )
 }

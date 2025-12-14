@@ -23,6 +23,15 @@ class ObjectModification(changeSet: ChangeSet, targetObject: IdentifiedObject) :
      */
     var objectReverseModification: ObjectReverseModification? = null
 
+    fun setObjectReverseModification(targetObject: IdentifiedObject): ObjectModification {
+        require(objectReverseModification == null) {"objectReverseModification already set"}
+        objectReverseModification = ObjectReverseModification(changeSet, targetObject).also {
+            require(it.objectModification == null) {"objectModification already set"}
+            it.objectModification = this
+        }
+        return this
+    }
+
     companion object {
         fun createObjectModification(changeSet: ChangeSet, modifiedObject: IdentifiedObject, originalObject: IdentifiedObject? = null): ObjectModification {
             return ObjectModification(changeSet, modifiedObject).also {

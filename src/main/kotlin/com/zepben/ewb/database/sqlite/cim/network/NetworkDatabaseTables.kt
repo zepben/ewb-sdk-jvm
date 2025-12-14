@@ -176,7 +176,7 @@ class NetworkDatabaseTables : CimDatabaseTables() {
             TableUsagePoints(),
             TableUsagePointsEndDevices(),
             TableUsagePointsContactDetails(),
-            TableVoltageRelays()
+            TableVoltageRelays(),
         )
 
 }

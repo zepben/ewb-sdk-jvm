@@ -16,7 +16,7 @@ import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
  * @param changeSet [ChangeSet] this [ChangeSetMember] belongs to.
  * @param targetObject The registered CIM object.
  */
-abstract class ChangeSetMember (
+abstract class ChangeSetMember(
 
     /**
      * [ChangeSet] this [ChangeSetMember] belongs to.

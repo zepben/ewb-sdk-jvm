@@ -105,6 +105,7 @@ class NetworkModelProjectStage(mRID: String) : NetworkModelProjectComponent(mRID
      * @param type the [DependencyKind] describing the type of dependency.
      */
     fun addDependentOnStage (stage: NetworkModelProjectStage, type: DependencyKind) {
+        //FIXME: this is dumb.
         if (_dependentOnStage == null)
             _dependentOnStage = mutableListOf()
 
@@ -139,6 +140,7 @@ class NetworkModelProjectStage(mRID: String) : NetworkModelProjectComponent(mRID
      * @param type the [DependencyKind] describing the type of dependency.
      */
     fun addDependingStage (stage: NetworkModelProjectStage, type: DependencyKind) {
+        //FIXME: this is also dumb.
         if (_dependingStage == null)
             _dependingStage = mutableListOf()
 

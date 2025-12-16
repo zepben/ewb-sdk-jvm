@@ -1936,8 +1936,8 @@ fun toCim(pb: PBAccumulator, networkService: NetworkService): Accumulator =
  */
 fun toCim(pb: PBAnalog, networkService: NetworkService): Analog =
     Analog(pb.mRID()).apply {
-        toCim(pb.measurement, this, networkService)
         positiveFlowIn = pb.positiveFlowInSet.takeUnless { pb.hasPositiveFlowInNull() }
+        toCim(pb.measurement, this, networkService)
     }
 
 /**

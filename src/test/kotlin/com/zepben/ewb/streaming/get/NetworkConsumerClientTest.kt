@@ -10,6 +10,7 @@ package com.zepben.ewb.streaming.get
 
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
+import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvSubstation
 import com.zepben.ewb.cim.iec61968.operations.OperationalRestriction
 import com.zepben.ewb.cim.iec61970.base.core.*
 import com.zepben.ewb.cim.iec61970.base.wires.AcLineSegment
@@ -313,6 +314,67 @@ internal class NetworkConsumerClientTest {
         verify(consumerService.onGetNetworkHierarchy).invoke(eq(GetNetworkHierarchyRequest.newBuilder().build()), any())
         assertThat("getNetworkHierarchy should succeed", result.wasSuccessful)
         validateNetworkHierarchy(result.value, NetworkHierarchyAllTypes.createNetworkHierarchy())
+    }
+
+    @Test
+    internal fun `can optionally retrieve parts of network hierarchy`() {
+        consumerService.onGetNetworkHierarchy = spy { _, response -> response.onNext(NetworkHierarchyAllTypes.createResponse()) }
+
+        var result = consumerClient.getNetworkHierarchy(false)
+        var request = GetNetworkHierarchyRequest.newBuilder().also { it.includeGeographicalRegions = false }
+
+        verify(consumerService.onGetNetworkHierarchy).invoke(eq(request.build()), any())
+        assertThat("getNetworkHierarchy should succeed", result.wasSuccessful)
+        validateNetworkHierarchy(result.value, NetworkHierarchyAllTypes.createNetworkHierarchy(includeGeographicalRegions = false))
+
+        result = consumerClient.getNetworkHierarchy(includeSubgeographicalRegions = false)
+        request = GetNetworkHierarchyRequest.newBuilder().also { it.includeSubgeographicalRegions = false }
+
+        verify(consumerService.onGetNetworkHierarchy).invoke(eq(request.build()), any())
+        assertThat("getNetworkHierarchy should succeed", result.wasSuccessful)
+        validateNetworkHierarchy(result.value, NetworkHierarchyAllTypes.createNetworkHierarchy(includeSubgeographicalRegions = false))
+
+        result = consumerClient.getNetworkHierarchy(includeSubstations = false)
+        request = GetNetworkHierarchyRequest.newBuilder().also { it.includeSubstations = false }
+
+        verify(consumerService.onGetNetworkHierarchy).invoke(eq(request.build()), any())
+        assertThat("getNetworkHierarchy should succeed", result.wasSuccessful)
+        validateNetworkHierarchy(result.value, NetworkHierarchyAllTypes.createNetworkHierarchy(includeSubstations = false))
+
+        result = consumerClient.getNetworkHierarchy(includeFeeders = false)
+        request = GetNetworkHierarchyRequest.newBuilder().also { it.includeFeeders = false }
+
+        verify(consumerService.onGetNetworkHierarchy).invoke(eq(request.build()), any())
+        assertThat("getNetworkHierarchy should succeed", result.wasSuccessful)
+        validateNetworkHierarchy(result.value, NetworkHierarchyAllTypes.createNetworkHierarchy(includeFeeders = false))
+
+        result = consumerClient.getNetworkHierarchy(includeCircuits = false)
+        request = GetNetworkHierarchyRequest.newBuilder().also { it.includeCircuits = false }
+
+        verify(consumerService.onGetNetworkHierarchy).invoke(eq(request.build()), any())
+        assertThat("getNetworkHierarchy should succeed", result.wasSuccessful)
+        validateNetworkHierarchy(result.value, NetworkHierarchyAllTypes.createNetworkHierarchy(includeCircuits = false))
+
+        result = consumerClient.getNetworkHierarchy(includeLoops = false)
+        request = GetNetworkHierarchyRequest.newBuilder().also { it.includeLoops = false }
+
+        verify(consumerService.onGetNetworkHierarchy).invoke(eq(request.build()), any())
+        assertThat("getNetworkHierarchy should succeed", result.wasSuccessful)
+        validateNetworkHierarchy(result.value, NetworkHierarchyAllTypes.createNetworkHierarchy(includeLoops = false))
+
+        result = consumerClient.getNetworkHierarchy(includeLvSubstations = false)
+        request = GetNetworkHierarchyRequest.newBuilder().also { it.includeLvSubstations = false }
+
+        verify(consumerService.onGetNetworkHierarchy).invoke(eq(request.build()), any())
+        assertThat("getNetworkHierarchy should succeed", result.wasSuccessful)
+        validateNetworkHierarchy(result.value, NetworkHierarchyAllTypes.createNetworkHierarchy(includeLvSubstations = false))
+
+        result = consumerClient.getNetworkHierarchy(includeLvFeeders = false)
+        request = GetNetworkHierarchyRequest.newBuilder().also { it.includeLvFeeders = false }
+
+        verify(consumerService.onGetNetworkHierarchy).invoke(eq(request.build()), any())
+        assertThat("getNetworkHierarchy should succeed", result.wasSuccessful)
+        validateNetworkHierarchy(result.value, NetworkHierarchyAllTypes.createNetworkHierarchy(includeLvFeeders = false))
     }
 
     @Test
@@ -881,7 +943,9 @@ internal class NetworkConsumerClientTest {
                     expectedService.listOf(),
                     expectedService.listOf(),
                     expectedService.listOf(),
-                    expectedService.listOf()
+                    expectedService.listOf(),
+                    expectedService.listOf(),
+                    expectedService.listOf(),
                 )
             )
         }
@@ -944,7 +1008,9 @@ internal class NetworkConsumerClientTest {
         substations: List<Substation>,
         feeders: List<Feeder>,
         circuits: List<Circuit>,
-        loops: List<Loop>
+        loops: List<Loop>,
+        lvSubstations: List<LvSubstation>,
+        lvFeeders: List<LvFeeder>
     ): GetNetworkHierarchyResponse = GetNetworkHierarchyResponse.newBuilder()
         .addAllGeographicalRegions(geographicalRegions.map { it.toPb() })
         .addAllSubGeographicalRegions(subGeographicalRegions.map { it.toPb() })
@@ -952,6 +1018,8 @@ internal class NetworkConsumerClientTest {
         .addAllFeeders(feeders.map { it.toPb() })
         .addAllCircuits(circuits.map { it.toPb() })
         .addAllLoops(loops.map { it.toPb() })
+        .addAllLvSubstations(lvSubstations.map { it.toPb() })
+        .addAllLvFeeders(lvFeeders.map { it.toPb() })
         .build()
 
     private fun validateFeederNetwork(actual: NetworkService?, expectedService: NetworkService) {

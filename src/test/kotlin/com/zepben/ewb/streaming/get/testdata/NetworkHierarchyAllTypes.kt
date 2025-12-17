@@ -162,8 +162,26 @@ object NetworkHierarchyAllTypes {
         Feeder("fdr2").apply { name = "fdr 2"; normalEnergizingSubstation = sub1 }.also { sub1.addFeeder(it); service.add(it) }
     }
 
-    fun createNetworkHierarchy(): NetworkHierarchy = createService().let {
-        NetworkHierarchy(it.mapOf(), it.mapOf(), it.mapOf(), it.mapOf(), it.mapOf(), it.mapOf())
+    fun createNetworkHierarchy(
+        includeGeographicalRegions: Boolean = true,
+        includeSubgeographicalRegions: Boolean = true,
+        includeSubstations: Boolean = true,
+        includeFeeders: Boolean = true,
+        includeCircuits: Boolean = true,
+        includeLoops: Boolean = true,
+        includeLvSubstations: Boolean = true,
+        includeLvFeeders: Boolean = true,
+    ): NetworkHierarchy = createService().let {
+        NetworkHierarchy(
+            if (includeGeographicalRegions) it.mapOf() else emptyMap(),
+            if (includeSubgeographicalRegions)it.mapOf() else emptyMap(),
+            if (includeSubstations) it.mapOf() else emptyMap(),
+            if (includeFeeders) it.mapOf() else emptyMap(),
+            if (includeCircuits) it.mapOf() else emptyMap(),
+            if (includeLoops) it.mapOf() else emptyMap(),
+            if (includeLvSubstations) it.mapOf() else emptyMap(),
+            if (includeLvFeeders) it.mapOf() else emptyMap()
+        )
     }
 
 }

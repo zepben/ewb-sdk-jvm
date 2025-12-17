@@ -11,6 +11,7 @@ package com.zepben.ewb.cim.extensions.iec61970.base.feeder
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.iec61970.base.core.EquipmentContainer
 import com.zepben.ewb.cim.iec61970.base.core.Feeder
+import com.zepben.ewb.cim.iec61970.base.wires.Switch
 import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import com.zepben.ewb.services.common.extensions.validateReference
 
@@ -243,4 +244,13 @@ class LvSubstation(mRID: String) : EquipmentContainer(mRID) {
         return this
     }
 
+    /**
+     * Retrieves all normally energized LvFeeders that represent low voltage network connected below a switch on the edge of this LvSubstation. This is all LvFeeders in the normalEnergizedLvFeeders that has a normalHeadTerminal attached to a Switch.
+     */
+    fun normalEnergizedLvSwitchFeeders(): List<LvFeeder> = normalEnergizedLvFeeders.filter { it.normalHeadTerminal?.conductingEquipment is Switch }
+
+    /**
+     * Retrieves all currently energized LvFeeders that represent low voltage network connected below a switch on the edge of this LvSubstation. This is all LvFeeders in the currentEnergizedLvFeeders that has a normalHeadTerminal attached to a Switch.
+     */
+    fun currentEnergizedLvSwitchFeeders(): List<LvFeeder> = currentEnergizedLvFeeders.filter { it.normalHeadTerminal?.conductingEquipment is Switch }
 }

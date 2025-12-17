@@ -9,7 +9,10 @@
 package com.zepben.ewb.cim.iec61970.base.core
 
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
+import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvSubstation
 import com.zepben.ewb.services.common.testdata.generateId
+import com.zepben.ewb.services.network.tracing.networktrace.operators.NetworkStateOperators
+import com.zepben.ewb.testing.TestNetworkBuilder
 import com.zepben.ewb.utils.PrivateCollectionValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
@@ -103,4 +106,72 @@ internal class EquipmentContainerTest {
         assertThat(equipmentContainer.currentFeeders(), containsInAnyOrder(fdr1, fdr2, fdr3))
     }
 
+    @Test
+    internal fun detectsEdgeTerminalsCorrectly() {
+        val network = TestNetworkBuilder()
+            .fromPowerTransformer()  // tx0
+            .toBusbarSection()       // bbs1
+            .toBreaker()             // b2  edge of substation, feeder
+            .toAcls()                // c3
+            .toPowerTransformer()    // tx4 edge of feeder, lv substation, tx4 lv feeder
+            .toBusbarSection()       // bbs5
+            .toBreaker()             // b6  edge of lv substation, tx4 lv feeder, b6 lv feeder
+            .toAcls()                // c7
+            .toEnergyConsumer()      // ec8
+            .branchFrom("tx0")
+            .toBreaker()             // b9  edge of substation
+            .toAcls(mRID = "outsideSubConductor")
+            .addFeeder("b2")    // f10
+            .addLvFeeder("tx4") // lvf11
+            .addLvFeeder("b6")  // lvf12
+            .addLvSubstation("tx4", "bbs5", "b6")   // lvs13
+            .addSubstation("tx0", "bbs1", "b2")     // sub14
+            .build()
+
+        val feeder = network.get<Feeder>("f10")!!
+        val lvfTx = network.get<LvFeeder>("lvf11")!!
+        val lvfB = network.get<LvFeeder>("lvf12")!!
+        val lvSub = network.get<LvSubstation>("lvs13")!!
+        val sub = network.get<LvSubstation>("sub14")!!
+
+
+        assertThat(edgeEquipMrids(feeder), contains("b2", "tx4"))
+        assertThat(edgeEquipMrids(lvfTx), contains("tx4", "b6"))
+        assertThat(edgeEquipMrids(lvfB), contains("b6"))
+        assertThat(edgeEquipMrids(lvSub), contains("tx4", "b6"))
+        assertThat(edgeEquipMrids(sub), contains("b2", "b9"))
+
+        assertThat(edgeEquipMrids(feeder, NetworkStateOperators.CURRENT), contains("b2", "tx4"))
+        assertThat(edgeEquipMrids(lvfTx, NetworkStateOperators.CURRENT), contains("tx4", "b6"))
+        assertThat(edgeEquipMrids(lvfB, NetworkStateOperators.CURRENT), contains("b6"))
+        assertThat(edgeEquipMrids(lvSub, NetworkStateOperators.CURRENT), contains("tx4", "b6"))
+        assertThat(edgeEquipMrids(sub, NetworkStateOperators.CURRENT), contains("b2", "b9"))
+    }
+
+    @Test
+    internal fun detectsEdgeTerminalsForOpenSwitch() {
+        val network = TestNetworkBuilder()
+            .fromPowerTransformer()  // tx0
+            .toBusbarSection()       // bbs1
+            .toBreaker()             // b2
+            .toAcls()                // c3
+            .branchFrom("tx0")
+            .toAcls()                // c4
+            .toBreaker(isNormallyOpen = true, isOpen = true)  // b5
+            .toAcls()               // c6
+            .branchFrom("bbs1")
+            .toAcls()               // c7
+            .toBreaker()            // b8
+            .toAcls()               // c9
+            .addSubstation("tx0", "bbs1", "b2", "c4", "b5") // sub10
+            .build()
+
+        val sub = network.get<LvSubstation>("sub10")!!
+
+        assertThat(edgeEquipMrids(sub), contains("b2", "b5", "b8"))
+        assertThat(edgeEquipMrids(sub, NetworkStateOperators.CURRENT), contains("b2", "b5", "b8"))
+    }
+
+    private fun edgeEquipMrids(ec: EquipmentContainer, stateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL) =
+        ec.edgeTerminals().mapNotNull { it.conductingEquipment }.map { it.mRID }
 }

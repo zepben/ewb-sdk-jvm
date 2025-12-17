@@ -10,6 +10,8 @@ package com.zepben.ewb.cim.iec61970.base.core
 
 import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import com.zepben.ewb.services.common.extensions.validateReference
+import com.zepben.ewb.services.network.NetworkService
+import com.zepben.ewb.services.network.tracing.networktrace.operators.NetworkStateOperators
 
 /**
  * A modeling construct to provide a root class for containing equipment.
@@ -121,4 +123,23 @@ abstract class EquipmentContainer(mRID: String) : ConnectivityNodeContainer(mRID
      * Clear all Equipment associated with this [Feeder]
      */
     open fun clearCurrentEquipment(): EquipmentContainer = clearEquipment()
+
+    /**
+     * Retrieve all terminals that are located on the edge of this EquipmentContainer. This is determined by any terminal that connects to another terminal on a
+     * ConductingEquipment that is not a member of this EquipmentContainer. This will explicitly exclude equipment with only one terminal that do not
+     * provide connectivity to the rest of the network.
+     *
+     * @param stateOperator The network state to operate on.
+     */
+    fun edgeTerminals(stateOperator: NetworkStateOperators = NetworkStateOperators.NORMAL): List<Terminal> =
+        stateOperator.getEquipment(this)
+            .asSequence()
+            .filterIsInstance<ConductingEquipment>()
+            .flatMap { it.terminals }
+            .flatMap { NetworkService.connectedTerminals(it) }
+            .filter { it.to?.getContainer(this.mRID) == null }
+            .map { it.fromTerminal }
+            .distinct()
+            .toList()
+
 }

@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.cim.iec61970.base.wires
 
+import com.zepben.ewb.cim.iec61968.assetinfo.WireInfo
 import com.zepben.ewb.services.common.extensions.*
 
 /**
@@ -242,5 +243,12 @@ class AcLineSegment(mRID: String) : Conductor(mRID) {
         _phases = null
         return this
     }
+
+    /**
+     * Retrieve the WireInfo associated with the requested [phase]. If no specific [WireInfo] is available for the given [phase], [AcLineSegment.assetInfo] will be returned.
+     *
+     * @param phase the phase to retrieve [WireInfo] for.
+     */
+    fun wireInfoForPhase(phase: SinglePhaseKind): WireInfo? = phases.find { it.phase == phase }?.assetInfo ?: assetInfo
 
 }

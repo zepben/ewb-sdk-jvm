@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.cim.iec61970.base.wires
 
+import com.zepben.ewb.cim.iec61968.assetinfo.OverheadWireInfo
 import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.utils.PrivateCollectionValidator
@@ -149,5 +150,24 @@ internal class AcLineSegmentTest {
         )
     }
 
+    @Test
+    internal fun retrievesWireInfoForPhase() {
+        val wi = OverheadWireInfo(generateId())
+        val acls = AcLineSegment(generateId()).also { it.assetInfo = wi }
+        val phaseA = AcLineSegmentPhase(generateId()).apply { acLineSegment = acls; phase = SinglePhaseKind.A; acls.addPhase(this) }
+        val phaseB = AcLineSegmentPhase(generateId()).apply { acLineSegment = acls; phase = SinglePhaseKind.B; acls.addPhase(this) }
+        val phaseC = AcLineSegmentPhase(generateId()).apply { acLineSegment = acls; phase = SinglePhaseKind.C; acls.addPhase(this) }
+
+        assertThat(acls.wireInfoForPhase(SinglePhaseKind.A), equalTo(phaseA))
+        assertThat(acls.wireInfoForPhase(SinglePhaseKind.B), equalTo(phaseB))
+        assertThat(acls.wireInfoForPhase(SinglePhaseKind.C), equalTo(phaseC))
+        assertThat(acls.wireInfoForPhase(SinglePhaseKind.N), equalTo(wi))
+        assertThat(acls.wireInfoForPhase(SinglePhaseKind.NONE), equalTo(wi))
+        assertThat(acls.wireInfoForPhase(SinglePhaseKind.INVALID), equalTo(wi))
+        assertThat(acls.wireInfoForPhase(SinglePhaseKind.X), equalTo(wi))
+        assertThat(acls.wireInfoForPhase(SinglePhaseKind.Y), equalTo(wi))
+        assertThat(acls.wireInfoForPhase(SinglePhaseKind.s1), equalTo(wi))
+        assertThat(acls.wireInfoForPhase(SinglePhaseKind.s2), equalTo(wi))
+    }
 
 }

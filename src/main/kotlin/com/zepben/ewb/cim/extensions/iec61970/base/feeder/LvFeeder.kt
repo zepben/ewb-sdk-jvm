@@ -21,6 +21,11 @@ import com.zepben.ewb.services.common.extensions.validateReference
  * A branch of LV network starting at a distribution substation and continuing until the end of the LV network.
  *
  * @property normalHeadTerminal [ZBEX] The normal head terminal of this LV feeder, typically the LV terminal of a distribution substation.
+ * @property normalEnergizingFeeders [ZBEX] The HV/MV feeders that energize this LV feeder.
+ * @property currentEnergizingFeeders [ZBEX] The HV/MV feeders that energize this LV feeder in the current state of the network.
+ * @property currentEquipment [ZBEX] Contained equipment using the current state of the network.
+ * @property normalEnergizingLvSubstations [ZBEX] The LvSubstations that nominally energize the LvFeeder. Also used for naming purposes.
+ * @property currentEnergizingLvSubstations [ZBEX] The LvSubstations that currently energize the LvFeeder. Also used for naming purposes.
  */
 @ZBEX
 class LvFeeder(mRID: String) : EquipmentContainer(mRID) {
@@ -38,6 +43,8 @@ class LvFeeder(mRID: String) : EquipmentContainer(mRID) {
     private var _normalEnergizingFeedersById: MutableMap<String?, Feeder>? = null
     private var _currentEnergizingFeedersById: MutableMap<String?, Feeder>? = null
     private var _currentEquipmentById: MutableMap<String?, Equipment>? = null
+    private var _normalEnergizingLvSubstationsById: MutableMap<String?, LvSubstation>? = null
+    private var _currentEnergizingLvSubstationsById: MutableMap<String?, LvSubstation>? = null
 
     /**
      * [ZBEX] The HV/MV feeders that normally energize this LV feeder. The returned collection is read only.
@@ -205,4 +212,117 @@ class LvFeeder(mRID: String) : EquipmentContainer(mRID) {
         return this
     }
 
+    /**
+     * [ZBEX] The LvSubstations that nominally energize the LvFeeder. Also used for naming purposes.
+     */
+    @ZBEX
+    val normalEnergizingLvSubstations: Collection<LvSubstation> get() = _normalEnergizingLvSubstationsById?.values.asUnmodifiable()
+
+    /**
+     * Get the number of entries in the normal [LvSubstation] collection.
+     */
+    fun numNormalEnergizingLvSubstations(): Int = _normalEnergizingLvSubstationsById?.size ?: 0
+
+    /**
+     * Energizing feeder using the normal state of the network.
+     *
+     * @param mRID the mRID of the required normal [LvSubstation]
+     * @return The [LvSubstation] with the specified [mRID] if it exists, otherwise null
+     */
+    fun getNormalEnergizingLvSubstation(mRID: String): LvSubstation? = _normalEnergizingLvSubstationsById?.get(mRID)
+
+    /**
+     * Associate this [LvFeeder] with a [LvSubstation] in the normal state of the network.
+     *
+     * @param lvSubstation the [LvSubstation] to associate with this LV feeder in the normal state of the network.
+     * @return This [LvFeeder] for fluent use.
+     */
+    fun addNormalEnergizingLvSubstation(lvSubstation: LvSubstation): LvFeeder {
+        if (validateReference(lvSubstation, ::getNormalEnergizingLvSubstation, "An LvSubstation"))
+            return this
+
+        _normalEnergizingLvSubstationsById = _normalEnergizingLvSubstationsById ?: mutableMapOf()
+        _normalEnergizingLvSubstationsById!!.putIfAbsent(lvSubstation.mRID, lvSubstation)
+
+        return this
+    }
+
+    /**
+     * Disassociate this [LvFeeder] from a [LvSubstation] in the normal state of the network.
+     *
+     * @param lvSubstation the [LvSubstation] to disassociate from this LV feeder in the normal state of the network.
+     * @return true if a matching [LvSubstation] is removed from the collection.
+     */
+    fun removeNormalEnergizingLvSubstation(lvSubstation: LvSubstation): Boolean {
+        val ret = _normalEnergizingLvSubstationsById?.remove(lvSubstation.mRID)
+        if (_normalEnergizingLvSubstationsById.isNullOrEmpty()) _normalEnergizingLvSubstationsById = null
+        return ret != null
+    }
+
+    /**
+     * Clear all [LvSubstation]'s associated with this [LvFeeder] in the normal state of the network.
+     *
+     * @return This [LvFeeder] for fluent use.
+     */
+    fun clearNormalEnergizingLvSubstations(): LvFeeder {
+        _normalEnergizingLvSubstationsById = null
+        return this
+    }
+
+    /**
+     * [ZBEX] The LvSubstations that currently energize the LvFeeder. Also used for naming purposes.
+     */
+    @ZBEX
+    val currentEnergizingLvSubstations: Collection<LvSubstation> get() = _currentEnergizingLvSubstationsById?.values.asUnmodifiable()
+
+    /**
+     * Get the number of entries in the current [LvSubstation] collection.
+     */
+    fun numCurrentEnergizingLvSubstations(): Int = _currentEnergizingLvSubstationsById?.size ?: 0
+
+    /**
+     * Energizing feeder using the current state of the network.
+     *
+     * @param mRID the mRID of the required current [LvSubstation]
+     * @return The [LvSubstation] with the specified [mRID] if it exists, otherwise null
+     */
+    fun getCurrentEnergizingLvSubstation(mRID: String): LvSubstation? = _currentEnergizingLvSubstationsById?.get(mRID)
+
+    /**
+     * Associate this [LvFeeder] with a [LvSubstation] in the current state of the network.
+     *
+     * @param lvSubstation the [LvSubstation] to associate with this LV feeder in the current state of the network.
+     * @return This [LvFeeder] for fluent use.
+     */
+    fun addCurrentEnergizingLvSubstation(lvSubstation: LvSubstation): LvFeeder {
+        if (validateReference(lvSubstation, ::getCurrentEnergizingLvSubstation, "An LvSubstation"))
+            return this
+
+        _currentEnergizingLvSubstationsById = _currentEnergizingLvSubstationsById ?: mutableMapOf()
+        _currentEnergizingLvSubstationsById!!.putIfAbsent(lvSubstation.mRID, lvSubstation)
+
+        return this
+    }
+
+    /**
+     * Disassociate this [LvFeeder] from a [LvSubstation] in the current state of the network.
+     *
+     * @param lvSubstation the [LvSubstation] to disassociate from this LV feeder in the current state of the network.
+     * @return true if a matching [LvSubstation] is removed from the collection.
+     */
+    fun removeCurrentEnergizingLvSubstation(lvSubstation: LvSubstation): Boolean {
+        val ret = _currentEnergizingLvSubstationsById?.remove(lvSubstation.mRID)
+        if (_currentEnergizingLvSubstationsById.isNullOrEmpty()) _currentEnergizingLvSubstationsById = null
+        return ret != null
+    }
+
+    /**
+     * Clear all [LvSubstation]'s associated with this [LvFeeder] in the current state of the network.
+     *
+     * @return This [LvFeeder] for fluent use.
+     */
+    fun clearCurrentEnergizingLvSubstations(): LvFeeder {
+        _currentEnergizingLvSubstationsById = null
+        return this
+    }
 }

@@ -14,14 +14,16 @@ import com.zepben.ewb.services.common.extensions.getByMRID
 import com.zepben.ewb.services.common.extensions.validateReference
 
 /**
- * Grouping of pricing components and prices used in the creation of customer charges and the eligibility
- * criteria under which these terms may be offered to a customer. The reasons for grouping include state,
- * customer classification, site characteristics, classification (i.e. fee price structure, deposit price
- * structure, electric service price structure, etc.) and accounting requirements.
+ * Grouping of pricing components and prices used in the creation of customer charges and the eligibility criteria under which these terms may be offered to a customer. The reasons for grouping include state, customer classification, site characteristics, classification (i.e. fee price structure, deposit price structure, electric service price structure, etc.) and accounting requirements.
+ *
+ * @property code Unique user-allocated key for this pricing structure, used by company representatives to identify the correct price structure for allocating to a customer. For rate schedules it is often prefixed by a state code.
+ * @property tariffs All tariffs used by this pricing structure.
  */
 class PricingStructure(mRID: String) : Document(mRID) {
 
     private var _tariffs: MutableList<Tariff>? = null
+
+    var code: String? = null
 
     /**
      * All tariffs used by this pricing structure. The returned collection is read only

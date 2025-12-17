@@ -91,6 +91,34 @@ internal class LvFeederTest {
     }
 
     @Test
+    internal fun normalEnergizingLvSubstations() {
+        PrivateCollectionValidator.validateUnordered(
+            ::LvFeeder,
+            ::LvSubstation,
+            LvFeeder::normalEnergizingLvSubstations,
+            LvFeeder::numNormalEnergizingLvSubstations,
+            LvFeeder::getNormalEnergizingLvSubstation,
+            LvFeeder::addNormalEnergizingLvSubstation,
+            LvFeeder::removeNormalEnergizingLvSubstation,
+            LvFeeder::clearNormalEnergizingLvSubstations
+        )
+    }
+
+    @Test
+    internal fun currentEnergizingLvSubstations() {
+        PrivateCollectionValidator.validateUnordered(
+            ::LvFeeder,
+            ::LvSubstation,
+            LvFeeder::currentEnergizingLvSubstations,
+            LvFeeder::numCurrentEnergizingLvSubstations,
+            LvFeeder::getCurrentEnergizingLvSubstation,
+            LvFeeder::addCurrentEnergizingLvSubstation,
+            LvFeeder::removeCurrentEnergizingLvSubstation,
+            LvFeeder::clearCurrentEnergizingLvSubstations
+        )
+    }
+
+    @Test
     internal fun `can set feeder head terminal on feeder without equipment`() {
         val terminal = Terminal(generateId())
         val terminal2 = Terminal(generateId())

@@ -488,6 +488,12 @@ fun WireInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true)
 
     material = WireMaterialKind.aaac
     ratedCurrent = 123
+    sizeDescription = "6.7"
+    strandCount = "8"
+    coreStrandCount = "4"
+    insulated = true
+    insulatationMaterial = WireInsulationKind.doubleWireArmour
+    insulatationThickness = 1.2
 
     return this
 }

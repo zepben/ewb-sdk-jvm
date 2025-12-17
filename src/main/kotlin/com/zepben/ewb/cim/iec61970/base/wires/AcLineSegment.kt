@@ -33,6 +33,7 @@ class AcLineSegment(mRID: String) : Conductor(mRID) {
     var perLengthImpedance: PerLengthImpedance? = null
     private var _cuts: MutableList<Cut>? = null
     private var _clamps: MutableList<Clamp>? = null
+    private var _phases: MutableList<AcLineSegmentPhase>? = null
 
     var perLengthSequenceImpedance: PerLengthSequenceImpedance?
         get() = perLengthImpedance as? PerLengthSequenceImpedance
@@ -174,6 +175,72 @@ class AcLineSegment(mRID: String) : Conductor(mRID) {
             "${clamp.typeNameAndMRID()} `acLineSegment` property references ${clamp.acLineSegment!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
         }
         return false
+    }
+
+    /**
+     * The individual phase models for this AcLineSegment. The returned collection is read only.
+     */
+    val phases: Collection<AcLineSegmentPhase> get() = _phases.asUnmodifiable()
+
+    /**
+     * Get the number of entries in the [AcLineSegmentPhase] collection.
+     */
+    fun numPhases(): Int = _phases?.size ?: 0
+
+    /**
+     * The individual phase models for this AcLineSegment.
+     *
+     * @param mRID the mRID of the required [AcLineSegmentPhase]
+     * @return The [AcLineSegmentPhase] with the specified [mRID] if it exists, otherwise null
+     */
+    fun getPhase(mRID: String): AcLineSegmentPhase? = _phases?.getByMRID(mRID)
+
+    /**
+     * Add an [AcLineSegmentPhase] to this [AcLineSegment].
+     *
+     * @param phase The [AcLineSegmentPhase] to add.
+     * @return This [AcLineSegment] for fluent use.
+     */
+    fun addPhase(phase: AcLineSegmentPhase): AcLineSegment {
+        if (validateReference(phase, ::getPhase, "An ACLineSegmentPhase"))
+            return this
+
+        if (phase.acLineSegment == null)
+            phase.acLineSegment = this
+
+        require(_phases?.none { it.phase == phase.phase } ?: true) {
+            "Could not add ${phase.typeNameAndMRID()} to ${typeNameAndMRID()} as ${phase.phase} was already present in the phases collection for this conductor. Ensure you are not adding duplicate phases."
+        }
+        require(phase.acLineSegment === this) {
+            "${phase.typeNameAndMRID()} `acLineSegment` property references ${phase.acLineSegment!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
+        }
+
+        _phases = _phases ?: mutableListOf()
+        _phases!!.add(phase)
+
+        return this
+    }
+
+    /**
+     * Remove an [AcLineSegmentPhase] from this [AcLineSegment].
+     *
+     * @param phase The [AcLineSegmentPhase] to remove.
+     * @return true if [phase] is removed from the collection.
+     */
+    fun removePhase(phase: AcLineSegmentPhase): Boolean {
+        val ret = _phases?.remove(phase) == true
+        if (_phases.isNullOrEmpty()) _phases = null
+        return ret
+    }
+
+    /**
+     * Clear all [AcLineSegmentPhase]'s from this [AcLineSegment].
+     *
+     * @return This [AcLineSegment] for fluent use.
+     */
+    fun clearPhases(): AcLineSegment {
+        _phases = null
+        return this
     }
 
 }

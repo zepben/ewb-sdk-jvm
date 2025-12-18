@@ -10,6 +10,7 @@ package com.zepben.ewb.services.network.tracing.feeder
 
 import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
+import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvSubstation
 import com.zepben.ewb.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
 import com.zepben.ewb.cim.iec61970.base.core.*
 import com.zepben.ewb.cim.iec61970.base.wires.PowerElectronicsConnection
@@ -143,7 +144,7 @@ class AssignToFeeders(
             feedersToAssign.associateEquipment(stepPath.toEquipment)
 
             when (stepPath.toEquipment) {
-                is PowerTransformer -> feedersToAssign.tryEnergizeLvFeeders(stepPath.toEquipment, lvFeederStartPoints)
+                is PowerTransformer -> feedersToAssign.tryEnergizeLvSubstationsAndFeeders(stepPath.toEquipment, lvFeederStartPoints)
                 is ProtectedSwitch -> feedersToAssign.associateRelaySystems(stepPath.toEquipment)
                 is PowerElectronicsConnection -> feedersToAssign.associatePowerElectronicUnits(stepPath.toEquipment)
             }
@@ -168,22 +169,34 @@ class AssignToFeeders(
             associateEquipment(toEquipment.units)
         }
 
-        private fun Iterable<Feeder>.tryEnergizeLvFeeders(toEquipment: PowerTransformer, lvFeederStartPoints: Set<ConductingEquipment>) {
+        private fun Iterable<Feeder>.tryEnergizeLvSubstationsAndFeeders(toEquipment: PowerTransformer, lvFeederStartPoints: Set<ConductingEquipment>) {
             //
             // NOTE: This will need to change if we stop assigning site internals to the HV feeder as it will stop before it gets here.
             //
 
             // Check to see if the change to LV is part of a dist transformer site. If so, we want to energize all LV feeders on any equipment
             // in the site, not just the one on the first LV terminal; otherwise, just energize the LV feeders on this equipment.
-            val sites = toEquipment.getFilteredContainers<Site>(stateOperators)
-            if (sites.isNotEmpty())
-                energizes(sites.findLvFeeders(lvFeederStartPoints, stateOperators))
+            // Note LvSubstation will eventually replace Site here, but for the moment we handle both Site and LvSubstation.
+            //
+            // NOTE: Sites aren't added to the current state containers, so they will always need to be looked up from the normal containers,
+            //       regardless of the state operators being used.
+            //
+            val sitesAndSubstations = toEquipment.containers.filterIsInstance<Site>() + toEquipment.getFilteredContainers<LvSubstation>(stateOperators)
+            if (sitesAndSubstations.isNotEmpty())
+                energizes(sitesAndSubstations.findLvFeeders(lvFeederStartPoints, stateOperators))
             else
                 energizes(toEquipment.getFilteredContainers<LvFeeder>(stateOperators))
+
+            // Also energise any LvSubstations found on the transformer. LvSubstations should gradually replace Sites.
+            energizes(toEquipment.getFilteredContainers<LvSubstation>(stateOperators))
         }
 
         private fun Iterable<Feeder>.energizes(lvFeeders: Iterable<LvFeeder>) = forEach { feeder ->
             lvFeeders.forEach { stateOperators.associateEnergizingFeeder(feeder, it) }
+        }
+
+        private fun Iterable<Feeder>.energizes(lvSubstations: Iterable<LvSubstation>) = forEach { feeder ->
+            lvSubstations.forEach { stateOperators.associateEnergizingFeeder(feeder, it) }
         }
 
     }

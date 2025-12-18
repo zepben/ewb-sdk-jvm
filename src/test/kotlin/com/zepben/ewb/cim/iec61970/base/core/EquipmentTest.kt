@@ -10,6 +10,7 @@ package com.zepben.ewb.cim.iec61970.base.core
 
 import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
+import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvSubstation
 import com.zepben.ewb.cim.iec61968.metering.UsagePoint
 import com.zepben.ewb.cim.iec61968.operations.OperationalRestriction
 import com.zepben.ewb.services.common.testdata.generateId
@@ -120,6 +121,8 @@ internal class EquipmentTest {
         val lvFeeder4 = LvFeeder(generateId())
         val substation1 = Substation(generateId())
         val substation2 = Substation(generateId())
+        val lvSub1 = LvSubstation(generateId())
+        val lvSub2 = LvSubstation(generateId())
 
         equipment.addContainer(site1)
         equipment.addContainer(site2)
@@ -129,11 +132,15 @@ internal class EquipmentTest {
         equipment.addContainer(lvFeeder2)
         equipment.addContainer(substation1)
         equipment.addContainer(substation2)
+        equipment.addContainer(lvSub1)
+        equipment.addContainer(lvSub2)
 
         equipment.addCurrentContainer(feeder3)
         equipment.addCurrentContainer(feeder4)
         equipment.addCurrentContainer(lvFeeder3)
         equipment.addCurrentContainer(lvFeeder4)
+        equipment.addCurrentContainer(lvSub1)
+        equipment.addCurrentContainer(lvSub2)
 
         assertThat(equipment.sites, containsInAnyOrder(site1, site2))
         assertThat(equipment.normalFeeders, containsInAnyOrder(feeder1, feeder2))
@@ -141,6 +148,8 @@ internal class EquipmentTest {
         assertThat(equipment.normalLvFeeders, containsInAnyOrder(lvFeeder1, lvFeeder2))
         assertThat(equipment.currentLvFeeders, containsInAnyOrder(lvFeeder3, lvFeeder4))
         assertThat(equipment.substations, containsInAnyOrder(substation1, substation2))
+        assertThat(equipment.normalLvSubstations, containsInAnyOrder(lvSub1, lvSub2))
+        assertThat(equipment.currentLvSubstations, containsInAnyOrder(lvSub1, lvSub2))
     }
 
 }

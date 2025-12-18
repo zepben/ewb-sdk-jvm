@@ -20,9 +20,10 @@ fun Terminal.isFeederHeadTerminal(): Boolean = when (val ce = conductingEquipmen
 }
 
 /**
- * Find all LV feeders containing any [Equipment] in the [Site].
+ * Find all LV feeders containing any [Equipment] in the [EquipmentContainer].
+ * Note this is primarily used for Sites and LvSubstations, as they will typically contain LvFeeder start points.
  */
-fun Collection<Site>.findLvFeeders(lvFeederStartPoints: Set<ConductingEquipment>, stateOperators: NetworkStateOperators): Iterable<LvFeeder> =
+fun Collection<EquipmentContainer>.findLvFeeders(lvFeederStartPoints: Set<ConductingEquipment>, stateOperators: NetworkStateOperators): Iterable<LvFeeder> =
     asSequence()
         .flatMap { stateOperators.getEquipment(it) }
         .filterIsInstance<ConductingEquipment>()

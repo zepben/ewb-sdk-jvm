@@ -10,6 +10,7 @@ package com.zepben.ewb.services.network.tracing.feeder
 
 import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
+import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvSubstation
 import com.zepben.ewb.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
 import com.zepben.ewb.cim.iec61970.base.core.*
 import com.zepben.ewb.cim.iec61970.base.wires.PowerElectronicsConnection
@@ -168,9 +169,13 @@ class AssignToLvFeeders(
             if (foundLvFeeder) {
                 val foundLvFeeders = stepPath.toEquipment.findLvFeeders(lvFeederStartPoints)
 
-                // Energize the LV feeders are a processing by the energizing feeders of what we found.
-                lvFeedersToAssign.energizedBy(foundLvFeeders.flatMap { stateOperators.getEnergizingFeeders(it) })
+                // Energize the LV feeders we are processing by the energizing LvSubstations of what we found.
+                lvFeedersToAssign.energizedBy(foundLvFeeders.flatMap { stateOperators.getEnergizingLvSubstations(it) })
+                // Energize the LV feeders we found by the energizing LvSubstations we are processing
+                foundLvFeeders.energizedBy(lvFeedersToAssign.flatMap { stateOperators.getEnergizingLvSubstations(it) })
 
+                // Energize the LV feeders we are processing by the energizing feeders of what we found.
+                lvFeedersToAssign.energizedBy(foundLvFeeders.flatMap { stateOperators.getEnergizingFeeders(it) })
                 // Energize the LV feeders we found by the energizing feeders we are processing
                 foundLvFeeders.energizedBy(lvFeedersToAssign.flatMap { stateOperators.getEnergizingFeeders(it) })
             }
@@ -191,9 +196,9 @@ class AssignToLvFeeders(
             // NOTE: Sites aren't added to the current state containers, so they will always need to be looked up from the normal containers,
             //       regardless of the state operators being used.
             //
-            val sites = containers.filterIsInstance<Site>()
-            return if (sites.isNotEmpty())
-                sites.findLvFeeders(lvFeederStartPoints, stateOperators)
+            val sitesAndLvSubstations = containers.filterIsInstance<Site>() + getFilteredContainers<LvSubstation>(stateOperators)
+            return if (sitesAndLvSubstations.isNotEmpty())
+                sitesAndLvSubstations.findLvFeeders(lvFeederStartPoints, stateOperators)
             else
                 getFilteredContainers<LvFeeder>(stateOperators)
         }
@@ -219,8 +224,17 @@ class AssignToLvFeeders(
         }
 
         private fun Iterable<LvFeeder>.energizedBy(feeders: Iterable<Feeder>) = forEach { lvFeeder ->
-            feeders.forEach { stateOperators.associateEnergizingFeeder(it, lvFeeder) }
+            feeders.forEach {
+                stateOperators.associateEnergizingFeeder(it, lvFeeder)
+            }
         }
+
+        private fun Iterable<LvFeeder>.energizedBy(lvSubstations: Iterable<LvSubstation>) = forEach { lvFeeder ->
+            lvSubstations.forEach {
+                stateOperators.associateEnergizingLvSubstation(lvFeeder, it)
+            }
+        }
+
 
     }
 

@@ -8,6 +8,8 @@
 
 package com.zepben.ewb.services.network.tracing.feeder
 
+import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
+import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvSubstation
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelayScheme
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelaySystem
 import com.zepben.ewb.cim.iec61970.base.auxiliaryequipment.CurrentTransformer
@@ -296,6 +298,53 @@ internal class AssignToFeedersTest {
         // marked as energized through the dist substation site.
         validateEquipment(feeder.equipment, "b0", "c1", "tx2")
         assertThat(feeder.normalEnergizedLvFeeders.map { it.mRID }, containsInAnyOrder("lvf9", "lvf10", "lvf11"))
+    }
+
+    @Test
+    internal fun `energizes all LV feeders for a LvSubstation that is energized`() {
+        //
+        //                              1--c4--21 b5 2
+        // 1 b0 21--c1--21 tx2 21--c3--2
+        //                              1--c6--21 b7 2
+        //
+        val network = TestNetworkBuilder()
+            .fromBreaker { baseVoltage = hvBaseVoltage } // b0
+            .toAcls { baseVoltage = hvBaseVoltage } // c1
+            .toPowerTransformer(endActions = listOf({ ratedU = hvBaseVoltage.nominalVoltage }, { ratedU = lvBaseVoltage.nominalVoltage })) // tx2
+            .toAcls { baseVoltage = lvBaseVoltage } // c3
+            .toAcls { baseVoltage = lvBaseVoltage } // c4
+            .toBreaker { baseVoltage = lvBaseVoltage } // b5
+            .fromAcls { baseVoltage = lvBaseVoltage } // c6
+            .toBreaker { baseVoltage = lvBaseVoltage } // b7
+            .connect("c3", "c6", 2, 1)
+            .addFeeder("b0") // fdr8
+            .addLvFeeder("tx2") // lvf9
+            .addLvFeeder("b5") // lvf10
+            .addLvFeeder("b7") // lvf11
+            .addLvSubstation("tx2", "c3", "c4", "b5", "c6", "b7") // lvs12
+            .network
+
+        val feeder = network.get<Feeder>("fdr8")!!
+        val lvSub = network.get<LvSubstation>("lvs12")!!
+        val lvf9 = network.get<LvFeeder>("lvf9")!!
+        val lvf10 = network.get<LvFeeder>("lvf9")!!
+        val lvf11 = network.get<LvFeeder>("lvf9")!!
+
+        assignToFeeders.run(network, NetworkStateOperators.NORMAL)
+
+        // We ensure the HV trace stopped at the transformer, but the additional LV feeders from b5 and b7 are still
+        // marked as energized through the dist substation site.
+        validateEquipment(feeder.equipment, "b0", "c1", "tx2")
+        assertThat(feeder.normalEnergizedLvFeeders.map { it.mRID }, containsInAnyOrder("lvf9", "lvf10", "lvf11"))
+        assertThat(feeder.normalEnergizedLvSubstations.map { it.mRID }, containsInAnyOrder("lvs12"))
+        assertThat(lvSub.normalEnergizedLvFeeders.map { it.mRID }, containsInAnyOrder("lvf9", "lvf10", "lvf11"))
+        assertThat(lvSub.normalEnergizingFeeders.map { it.mRID }, containsInAnyOrder("fdr8"))
+        assertThat(lvf9.normalEnergizingLvSubstations.map { it.mRID }, containsInAnyOrder("lvs12"))
+        assertThat(lvf10.normalEnergizingLvSubstations.map { it.mRID }, containsInAnyOrder("lvs12"))
+        assertThat(lvf11.normalEnergizingLvSubstations.map { it.mRID }, containsInAnyOrder("lvs12"))
+        assertThat(lvf9.normalEnergizingFeeders.map { it.mRID }, containsInAnyOrder("fdr8"))
+        assertThat(lvf10.normalEnergizingFeeders.map { it.mRID }, containsInAnyOrder("fdr8"))
+        assertThat(lvf11.normalEnergizingFeeders.map { it.mRID }, containsInAnyOrder("fdr8"))
     }
 
     @Test

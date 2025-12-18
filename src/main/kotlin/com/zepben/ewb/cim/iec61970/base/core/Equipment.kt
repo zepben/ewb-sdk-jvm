@@ -10,6 +10,7 @@ package com.zepben.ewb.cim.iec61970.base.core
 
 import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
+import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvSubstation
 import com.zepben.ewb.cim.iec61968.metering.UsagePoint
 import com.zepben.ewb.cim.iec61968.operations.OperationalRestriction
 import com.zepben.ewb.services.common.extensions.asUnmodifiable
@@ -41,10 +42,12 @@ abstract class Equipment(mRID: String) : PowerSystemResource(mRID) {
     val sites: List<Site> get() = _equipmentContainers.ofType()
     val normalFeeders: List<Feeder> get() = _equipmentContainers.ofType()
     val normalLvFeeders: List<LvFeeder> get() = _equipmentContainers.ofType()
+    val normalLvSubstations: List<LvSubstation> get() = _equipmentContainers.ofType()
     val substations: List<Substation> get() = _equipmentContainers.ofType()
 
     val currentFeeders: List<Feeder> get() = _currentContainers.ofType()
     val currentLvFeeders: List<LvFeeder> get() = _currentContainers.ofType()
+    val currentLvSubstations: List<LvSubstation> get() = _currentContainers.ofType()
 
     /**
      * The equipment containers this equipment belongs to. The returned collection is read only.

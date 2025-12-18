@@ -3120,6 +3120,14 @@ class NetworkCimToProto : BaseCimToProto() {
      */
     fun toPb(cim: Site): PBSite = cim.toPb()
 
+    /**
+     * Convert the [HvCustomer] into its protobuf counterpart.
+     *
+     * @param cim The [HvCustomer] to convert.
+     * @return The protobuf form of [cim].
+     */
+    fun toPb(cim: HvCustomer): PBHvCustomer = cim.toPb()
+
     // ###################################
     // # Extensions IEC61970 Base Feeder #
     // ###################################
@@ -3139,6 +3147,14 @@ class NetworkCimToProto : BaseCimToProto() {
      * @return The protobuf form of [cim].
      */
     fun toPb(cim: LvFeeder): PBLvFeeder = cim.toPb()
+
+    /**
+     * Convert the [LvSubstation] into its protobuf counterpart.
+     *
+     * @param cim The [LvSubstation] to convert.
+     * @return The protobuf form of [cim].
+     */
+    fun toPb(cim: LvSubstation): PBLvSubstation = cim.toPb()
 
     // ##################################################
     // # Extensions IEC61970 Base Generation Production #
@@ -3603,6 +3619,14 @@ class NetworkCimToProto : BaseCimToProto() {
      * @return The protobuf form of [cim].
      */
     fun toPb(cim: AcLineSegment): PBAcLineSegment = cim.toPb()
+
+    /**
+     * Convert the [AcLineSegmentPhase] into its protobuf counterpart.
+     *
+     * @param cim The [AcLineSegmentPhase] to convert.
+     * @return The protobuf form of [cim].
+     */
+    fun toPb(cim: AcLineSegmentPhase): PBAcLineSegmentPhase = cim.toPb()
 
     /**
      * Convert the [Breaker] into its protobuf counterpart.

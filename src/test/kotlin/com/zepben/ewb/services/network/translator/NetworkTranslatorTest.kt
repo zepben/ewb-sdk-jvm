@@ -10,9 +10,11 @@ package com.zepben.ewb.services.network.translator
 
 import com.zepben.ewb.cim.extensions.iec61968.assetinfo.RelayInfo
 import com.zepben.ewb.cim.extensions.iec61968.metering.PanDemandResponseFunction
+import com.zepben.ewb.cim.extensions.iec61970.base.core.HvCustomer
 import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
+import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvSubstation
 import com.zepben.ewb.cim.extensions.iec61970.base.generation.production.EvChargingUnit
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.*
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.BatteryControl
@@ -96,6 +98,7 @@ internal class NetworkTranslatorTest : TranslatorTestBase<NetworkService>(
         // #################################
 
         ValidationInfo(::Site, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::HvCustomer, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
 
         // ###################################
         // # Extensions IEC61970 Base Feeder #
@@ -103,6 +106,7 @@ internal class NetworkTranslatorTest : TranslatorTestBase<NetworkService>(
 
         ValidationInfo(::Loop, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
         ValidationInfo(::LvFeeder, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::LvSubstation, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
 
         // ##################################################
         // # Extensions IEC61970 Base Generation Production #
@@ -242,6 +246,7 @@ internal class NetworkTranslatorTest : TranslatorTestBase<NetworkService>(
         // #######################
 
         ValidationInfo(::AcLineSegment, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::AcLineSegmentPhase, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
         ValidationInfo(::Breaker, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
         ValidationInfo(::BusbarSection, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
         ValidationInfo(::Clamp, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),

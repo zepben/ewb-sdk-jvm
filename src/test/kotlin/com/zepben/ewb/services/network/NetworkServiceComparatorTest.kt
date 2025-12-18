@@ -10,9 +10,11 @@ package com.zepben.ewb.services.network
 
 import com.zepben.ewb.cim.extensions.iec61968.assetinfo.RelayInfo
 import com.zepben.ewb.cim.extensions.iec61968.metering.PanDemandResponseFunction
+import com.zepben.ewb.cim.extensions.iec61970.base.core.HvCustomer
 import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
+import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvSubstation
 import com.zepben.ewb.cim.extensions.iec61970.base.generation.production.EvChargingUnit
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.*
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.*
@@ -100,6 +102,11 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
     // #################################
 
     @Test
+    internal fun compareHvCustomer() {
+        compareEquipmentContainer { HvCustomer(it) }
+    }
+
+    @Test
     internal fun compareSite() {
         compareEquipmentContainer { Site(it) }
     }
@@ -163,6 +170,37 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             LvFeeder::currentEnergizingFeeders,
             LvFeeder::addCurrentEnergizingFeeder,
             { LvFeeder(it) },
+            { Feeder("lvf1") },
+            { Feeder("lvf2") },
+            ::ObjectCollectionDifference,
+        )
+
+    }
+
+    @Test
+    internal fun compareLvSubstation() {
+        compareEquipmentContainer { LvSubstation(it) }
+
+        comparatorValidator.validateCollection(
+            LvSubstation::currentEquipment,
+            LvSubstation::addCurrentEquipment,
+            { LvSubstation(it) },
+            { Junction("j1") },
+            { Junction("j2") },
+            ::ObjectCollectionDifference,
+        )
+        comparatorValidator.validateCollection(
+            LvSubstation::normalEnergizingFeeders,
+            LvSubstation::addNormalEnergizingFeeder,
+            { LvSubstation(it) },
+            { Feeder("lvf1") },
+            { Feeder("lvf2") },
+            ::ObjectCollectionDifference,
+        )
+        comparatorValidator.validateCollection(
+            LvSubstation::currentEnergizingFeeders,
+            LvSubstation::addCurrentEnergizingFeeder,
+            { LvSubstation(it) },
             { Feeder("lvf1") },
             { Feeder("lvf2") },
             ::ObjectCollectionDifference,

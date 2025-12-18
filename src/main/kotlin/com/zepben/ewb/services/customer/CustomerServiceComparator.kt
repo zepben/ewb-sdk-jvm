@@ -54,6 +54,7 @@ class CustomerServiceComparator : BaseServiceComparator() {
             compareDocument()
 
             compareIdReferenceCollections(PricingStructure::tariffs)
+            compareValues(PricingStructure::code)
         }
 
     private fun compareTariff(source: Tariff, target: Tariff): ObjectDifference<Tariff> =

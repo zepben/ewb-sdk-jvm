@@ -110,6 +110,8 @@ fun toCim(pb: PBPricingStructure, customerService: CustomerService): PricingStru
         pb.tariffMRIDsList.forEach {
             customerService.resolveOrDeferReference(Resolvers.tariffs(this), it)
         }
+        code = pb.codeSet.takeUnless { pb.hasCodeNull() }
+
         toCim(pb.doc, this, customerService)
     }
 

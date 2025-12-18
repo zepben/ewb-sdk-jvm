@@ -11,6 +11,7 @@ package com.zepben.ewb.services.common
 import com.zepben.ewb.cim.extensions.iec61968.assetinfo.RelayInfo
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
+import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvSubstation
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelayFunction
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelayScheme
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelaySystem
@@ -71,12 +72,20 @@ object Resolvers {
         BoundReferenceResolver(acLineSegment, AcLineSegmentToClampResolver, ClampToAcLineSegmentResolver)
 
     @JvmStatic
+    fun phases(acLineSegment: AcLineSegment): BoundReferenceResolver<AcLineSegment, AcLineSegmentPhase> =
+        BoundReferenceResolver(acLineSegment, AcLineSegmentToAcLineSegmentPhaseResolver, AcLineSegmentPhaseToAcLineSegmentResolver)
+
+    @JvmStatic
     fun acLineSegment(cut: Cut): BoundReferenceResolver<Cut, AcLineSegment> =
         BoundReferenceResolver(cut, CutToAcLineSegmentResolver, AcLineSegmentToCutResolver)
 
     @JvmStatic
     fun acLineSegment(clamp: Clamp): BoundReferenceResolver<Clamp, AcLineSegment> =
         BoundReferenceResolver(clamp, ClampToAcLineSegmentResolver, AcLineSegmentToClampResolver)
+
+    @JvmStatic
+    fun acLineSegment(phase: AcLineSegmentPhase): BoundReferenceResolver<AcLineSegmentPhase, AcLineSegment> =
+        BoundReferenceResolver(phase, AcLineSegmentPhaseToAcLineSegmentResolver, AcLineSegmentToAcLineSegmentPhaseResolver)
 
     @JvmStatic
     fun organisationRoles(asset: Asset): BoundReferenceResolver<Asset, AssetOrganisationRole> =
@@ -103,6 +112,10 @@ object Resolvers {
         BoundReferenceResolver(conductor, ConductorToWireInfoResolver, null)
 
     @JvmStatic
+    fun assetInfo(acLineSegmentPhase: AcLineSegmentPhase): BoundReferenceResolver<AcLineSegmentPhase, WireInfo> =
+        BoundReferenceResolver(acLineSegmentPhase, AcLineSegmentPhaseToWireInfoResolver, null)
+
+    @JvmStatic
     fun assetInfo(currentTransformer: CurrentTransformer): BoundReferenceResolver<CurrentTransformer, CurrentTransformerInfo> =
         BoundReferenceResolver(currentTransformer, CurrentTransformerToCurrentTransformerInfoResolver, null)
 
@@ -117,6 +130,10 @@ object Resolvers {
     @JvmStatic
     fun assetInfo(shuntCompensator: ShuntCompensator): BoundReferenceResolver<ShuntCompensator, ShuntCompensatorInfo> =
         BoundReferenceResolver(shuntCompensator, ShuntCompensatorToShuntCompensatorInfoResolver, null)
+
+    @JvmStatic
+    fun terminal(shuntCompensator: ShuntCompensator): BoundReferenceResolver<ShuntCompensator, Terminal> =
+        BoundReferenceResolver(shuntCompensator, ShuntCompensatorToTerminalResolver, null)
 
     @JvmStatic
     fun assetInfo(switch: Switch): BoundReferenceResolver<Switch, SwitchInfo> =
@@ -217,6 +234,22 @@ object Resolvers {
     @JvmStatic
     fun currentEnergizedLvFeeders(feeder: Feeder): BoundReferenceResolver<Feeder, LvFeeder> =
         BoundReferenceResolver(feeder, FeederToCurrentEnergizedLvFeedersResolver, LvFeederToCurrentEnergizingFeedersResolver)
+
+    @JvmStatic
+    fun normalEnergizedLvSubstations(feeder: Feeder): BoundReferenceResolver<Feeder, LvSubstation> =
+        BoundReferenceResolver(feeder, FeederToNormalEnergizedLvSubstationsResolver, LvSubstationToNormalEnergizingFeedersResolver)
+
+    @JvmStatic
+    fun currentEnergizedLvSubstations(feeder: Feeder): BoundReferenceResolver<Feeder, LvSubstation> =
+        BoundReferenceResolver(feeder, FeederToCurrentEnergizedLvSubstationsResolver, LvSubstationToCurrentEnergizingFeedersResolver)
+
+    @JvmStatic
+    fun normalEnergizedLvFeeders(lvSubstation: LvSubstation): BoundReferenceResolver<LvSubstation, LvFeeder> =
+        BoundReferenceResolver(lvSubstation, LvSubstationToNormalEnergizedLvFeedersResolver, LvFeederToNormalEnergizingLvSubstationsResolver)
+
+    @JvmStatic
+    fun currentEnergizedLvFeeders(lvSubstation: LvSubstation): BoundReferenceResolver<LvSubstation, LvFeeder> =
+        BoundReferenceResolver(lvSubstation, LvSubstationToCurrentEnergizedLvFeedersResolver, LvFeederToCurrentEnergizingLvSubstationsResolver)
 
     @JvmStatic
     fun subGeographicalRegions(geographicalRegion: GeographicalRegion): BoundReferenceResolver<GeographicalRegion, SubGeographicalRegion> =
@@ -357,6 +390,22 @@ object Resolvers {
     @JvmStatic
     fun currentEnergizingFeeders(lvFeeder: LvFeeder): BoundReferenceResolver<LvFeeder, Feeder> =
         BoundReferenceResolver(lvFeeder, LvFeederToCurrentEnergizingFeedersResolver, FeederToCurrentEnergizedLvFeedersResolver)
+
+    @JvmStatic
+    fun normalEnergizingFeeders(lvSubstation: LvSubstation): BoundReferenceResolver<LvSubstation, Feeder> =
+        BoundReferenceResolver(lvSubstation, LvSubstationToNormalEnergizingFeedersResolver, FeederToNormalEnergizedLvSubstationsResolver)
+
+    @JvmStatic
+    fun currentEnergizingFeeders(lvSubstation: LvSubstation): BoundReferenceResolver<LvSubstation, Feeder> =
+        BoundReferenceResolver(lvSubstation, LvSubstationToCurrentEnergizingFeedersResolver, FeederToCurrentEnergizedLvSubstationsResolver)
+
+    @JvmStatic
+    fun normalEnergizingLvSubstations(lvFeeder: LvFeeder): BoundReferenceResolver<LvFeeder, LvSubstation> =
+        BoundReferenceResolver(lvFeeder, LvFeederToNormalEnergizingLvSubstationsResolver, LvSubstationToNormalEnergizedLvFeedersResolver)
+
+    @JvmStatic
+    fun currentEnergizingLvSubstations(lvFeeder: LvFeeder): BoundReferenceResolver<LvFeeder, LvSubstation> =
+        BoundReferenceResolver(lvFeeder, LvFeederToCurrentEnergizingLvSubstationsResolver, LvSubstationToCurrentEnergizedLvFeedersResolver)
 
     @JvmStatic
     fun powerElectronicsConnection(powerElectronicsUnit: PowerElectronicsUnit): BoundReferenceResolver<PowerElectronicsUnit, PowerElectronicsConnection> =

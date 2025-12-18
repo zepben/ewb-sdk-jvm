@@ -8,12 +8,15 @@
 
 package com.zepben.ewb.services.network.translator
 
+import com.google.protobuf.NullValue
 import com.zepben.ewb.cim.extensions.iec61968.assetinfo.RelayInfo
 import com.zepben.ewb.cim.extensions.iec61968.common.ContactDetails
 import com.zepben.ewb.cim.extensions.iec61968.metering.PanDemandResponseFunction
+import com.zepben.ewb.cim.extensions.iec61970.base.core.HvCustomer
 import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
+import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvSubstation
 import com.zepben.ewb.cim.extensions.iec61970.base.generation.production.EvChargingUnit
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.*
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.*
@@ -45,9 +48,11 @@ import com.zepben.protobuf.nc.NetworkIdentifiedObject.IdentifiedObjectCase.*
 import com.zepben.protobuf.cim.extensions.iec61968.assetinfo.RelayInfo as PBRelayInfo
 import com.zepben.protobuf.cim.extensions.iec61968.common.ContactDetails as PBContactDetails
 import com.zepben.protobuf.cim.extensions.iec61968.metering.PanDemandResponseFunction as PBPanDemandResponseFunction
+import com.zepben.protobuf.cim.extensions.iec61970.base.core.HvCustomer as PBHvCustomer
 import com.zepben.protobuf.cim.extensions.iec61970.base.core.Site as PBSite
 import com.zepben.protobuf.cim.extensions.iec61970.base.feeder.Loop as PBLoop
 import com.zepben.protobuf.cim.extensions.iec61970.base.feeder.LvFeeder as PBLvFeeder
+import com.zepben.protobuf.cim.extensions.iec61970.base.feeder.LvSubstation as PBLvSubstation
 import com.zepben.protobuf.cim.extensions.iec61970.base.generation.production.EvChargingUnit as PBEvChargingUnit
 import com.zepben.protobuf.cim.extensions.iec61970.base.protection.DirectionalCurrentRelay as PBDirectionalCurrentRelay
 import com.zepben.protobuf.cim.extensions.iec61970.base.protection.DistanceRelay as PBDistanceRelay
@@ -133,6 +138,7 @@ import com.zepben.protobuf.cim.iec61970.base.scada.RemoteControl as PBRemoteCont
 import com.zepben.protobuf.cim.iec61970.base.scada.RemotePoint as PBRemotePoint
 import com.zepben.protobuf.cim.iec61970.base.scada.RemoteSource as PBRemoteSource
 import com.zepben.protobuf.cim.iec61970.base.wires.AcLineSegment as PBAcLineSegment
+import com.zepben.protobuf.cim.iec61970.base.wires.AcLineSegmentPhase as PBAcLineSegmentPhase
 import com.zepben.protobuf.cim.iec61970.base.wires.Breaker as PBBreaker
 import com.zepben.protobuf.cim.iec61970.base.wires.BusbarSection as PBBusbarSection
 import com.zepben.protobuf.cim.iec61970.base.wires.Clamp as PBClamp
@@ -279,6 +285,9 @@ fun NetworkService.addFromPb(pb: NetworkIdentifiedObject): AddFromPbResult =
         CUT -> getOrAddFromPb(pb.cut.mRID()) { addFromPb(pb.cut) }
         CLAMP -> getOrAddFromPb(pb.clamp.mRID()) { addFromPb(pb.clamp) }
         DIRECTIONALCURRENTRELAY -> getOrAddFromPb(pb.directionalCurrentRelay.mRID()) { addFromPb(pb.directionalCurrentRelay) }
+        HVCUSTOMER -> getOrAddFromPb(pb.hvCustomer.mRID()) { addFromPb(pb.hvCustomer) }
+        LVSUBSTATION -> getOrAddFromPb(pb.lvSubstation.mRID()) { addFromPb(pb.lvSubstation) }
+        ACLINESEGMENTPHASE -> getOrAddFromPb(pb.acLineSegmentPhase.mRID()) { addFromPb(pb.acLineSegmentPhase) }
         OTHER, IDENTIFIEDOBJECT_NOT_SET, null -> throw UnsupportedOperationException(
             "Identified object type ${pb.identifiedObjectCase} is not supported by the network service"
         )
@@ -363,6 +372,18 @@ fun NetworkService.addFromPb(pb: PBPanDemandResponseFunction): PanDemandResponse
 // #################################
 
 /**
+ * Convert the protobuf [PBHvCustomer] into its CIM counterpart.
+ *
+ * @param pb The protobuf [PBHvCustomer] to convert.
+ * @param networkService The [NetworkService] the converted CIM object will be added too.
+ * @return The converted [pb] as a CIM [HvCustomer].
+ */
+fun toCim(pb: PBHvCustomer, networkService: NetworkService): HvCustomer =
+    HvCustomer(pb.mRID()).apply {
+        toCim(pb.ec, this, networkService)
+    }
+
+/**
  * Convert the protobuf [PBSite] into its CIM counterpart.
  *
  * @param pb The protobuf [PBSite] to convert.
@@ -373,6 +394,11 @@ fun toCim(pb: PBSite, networkService: NetworkService): Site =
     Site(pb.mRID()).apply {
         toCim(pb.ec, this, networkService)
     }
+
+/**
+ * An extension to add a converted copy of the protobuf [PBHvCustomer] to the [NetworkService].
+ */
+fun NetworkService.addFromPb(pb: PBHvCustomer): HvCustomer? = tryAddOrNull(toCim(pb, this))
 
 /**
  * An extension to add a converted copy of the protobuf [PBSite] to the [NetworkService].
@@ -422,8 +448,46 @@ fun toCim(pb: PBLvFeeder, networkService: NetworkService): LvFeeder =
         pb.currentlyEnergizingFeederMRIDsList.forEach { currentEnergizingFeederMRID ->
             networkService.resolveOrDeferReference(Resolvers.currentEnergizingFeeders(this), currentEnergizingFeederMRID)
         }
+
+        pb.normalEnergizingLvSubstationMRIDsList.forEach { normalEnergizingLvSubstationMRID ->
+            networkService.resolveOrDeferReference(Resolvers.normalEnergizingLvSubstations(this), normalEnergizingLvSubstationMRID)
+        }
+
+        pb.currentlyEnergizingLvSubstationMRIDsList.forEach { currentEnergizingLvSubstationMRID ->
+            networkService.resolveOrDeferReference(Resolvers.currentEnergizingLvSubstations(this), currentEnergizingLvSubstationMRID)
+        }
+
         toCim(pb.ec, this, networkService)
     }
+
+/**
+ * Convert the protobuf [PBLvSubstation] into its CIM counterpart.
+ *
+ * @param pb The protobuf [PBLvSubstation] to convert.
+ * @param networkService The [NetworkService] the converted CIM object will be added too.
+ * @return The converted [pb] as a CIM [LvSubstation].
+ */
+fun toCim(pb: PBLvSubstation, networkService: NetworkService): LvSubstation =
+    LvSubstation(pb.mRID()).apply {
+        pb.normalEnergizingFeederMRIDsList.forEach { normalEnergizingFeederMRID ->
+            networkService.resolveOrDeferReference(Resolvers.normalEnergizingFeeders(this), normalEnergizingFeederMRID)
+        }
+
+        pb.currentlyEnergizingFeederMRIDsList.forEach { currentEnergizingFeederMRID ->
+            networkService.resolveOrDeferReference(Resolvers.currentEnergizingFeeders(this), currentEnergizingFeederMRID)
+        }
+
+        pb.normalEnergizedLvFeederMRIDsList.forEach { normalEnergizedLvFeederMRID ->
+            networkService.resolveOrDeferReference(Resolvers.normalEnergizedLvFeeders(this), normalEnergizedLvFeederMRID)
+        }
+
+        pb.currentlyEnergizedLvFeederMRIDsList.forEach { currentEnergizedLvFeederMRID ->
+            networkService.resolveOrDeferReference(Resolvers.currentEnergizedLvFeeders(this), currentEnergizedLvFeederMRID)
+        }
+
+    }
+
+
 
 /**
  * An extension to add a converted copy of the protobuf [PBLoop] to the [NetworkService].
@@ -434,6 +498,11 @@ fun NetworkService.addFromPb(pb: PBLoop): Loop? = tryAddOrNull(toCim(pb, this))
  * An extension to add a converted copy of the protobuf [PBLvFeeder] to the [NetworkService].
  */
 fun NetworkService.addFromPb(pb: PBLvFeeder): LvFeeder? = tryAddOrNull(toCim(pb, this))
+
+/**
+ * An extension to add a converted copy of the protobuf [PBLvSubstation] to the [NetworkService].
+ */
+fun NetworkService.addFromPb(pb: PBLvSubstation): LvSubstation? = tryAddOrNull(toCim(pb, this))
 
 // ##################################################
 // # Extensions IEC61970 Base Generation Production #
@@ -839,6 +908,13 @@ fun toCim(pb: PBWireInfo, cim: WireInfo, networkService: NetworkService): WireIn
     cim.apply {
         ratedCurrent = pb.ratedCurrentSet.takeUnless { pb.hasRatedCurrentNull() }
         material = mapWireMaterialKind.toCim(pb.material)
+        sizeDescription = pb.sizeDescriptionSet.takeUnless { pb.hasSizeDescriptionNull() }
+        strandCount = pb.strandCountSet.takeUnless { pb.hasStrandCountNull() }
+        coreStrandCount = pb.coreStrandCountSet.takeUnless { pb.hasCoreStrandCountNull() }
+        insulated = pb.insulatedSet.takeUnless { pb.hasInsulatedNull() }
+        insulationMaterial = mapWireInsulationKind.toCim(pb.insulationMaterial)
+        insulationThickness = pb.insulationThicknessSet.takeUnless { pb.hasInsulationThicknessNull() }
+
         toCim(pb.ai, this, networkService)
     }
 
@@ -1568,6 +1644,13 @@ fun toCim(pb: PBFeeder, networkService: NetworkService): Feeder =
             networkService.resolveOrDeferReference(Resolvers.currentEnergizedLvFeeders(this), currentEnergizedLvFeederMRID)
         }
 
+        pb.normalEnergizedLvSubstationMRIDsList.forEach { normalEnergizedLvSubstationMRID ->
+            networkService.resolveOrDeferReference(Resolvers.normalEnergizedLvSubstations(this), normalEnergizedLvSubstationMRID)
+        }
+
+        pb.currentlyEnergizedLvSubstationMRIDsList.forEach { currentEnergizedLvSubstationMRID ->
+            networkService.resolveOrDeferReference(Resolvers.currentEnergizedLvSubstations(this), currentEnergizedLvSubstationMRID)
+        }
         toCim(pb.ec, this, networkService)
     }
 
@@ -2036,7 +2119,28 @@ fun toCim(pb: PBAcLineSegment, networkService: NetworkService): AcLineSegment =
         pb.clampMRIDsList.forEach { clampMRID ->
             networkService.resolveOrDeferReference(Resolvers.clamps(this), clampMRID)
         }
+        pb.phaseMRIDsList.forEach { phaseMRIDs ->
+            networkService.resolveOrDeferReference(Resolvers.phases(this), phaseMRIDs)
+        }
+
         toCim(pb.cd, this, networkService)
+    }
+
+/**
+ * Convert the protobuf [PBAcLineSegmentPhase] into its CIM counterpart.
+ *
+ * @param pb The protobuf [PBAcLineSegmentPhase] to convert.
+ * @param networkService The [NetworkService] the converted CIM object will be added too.
+ * @return The converted [pb] as a CIM [AcLineSegmentPhase].
+ */
+fun toCim(pb: PBAcLineSegmentPhase, networkService: NetworkService): AcLineSegmentPhase =
+    AcLineSegmentPhase(pb.mRID()).apply {
+        networkService.resolveOrDeferReference(Resolvers.acLineSegment(this), pb.acLineSegmentMRID)
+        phase = mapSinglePhaseKind.toCim(pb.phase)
+        sequenceNumber = pb.sequenceNumberSet.takeUnless { pb.hasSequenceNumberNull() }
+        networkService.resolveOrDeferReference(Resolvers.assetInfo(this), pb.assetInfoMRID())
+
+        toCim(pb.psr, this, networkService)
     }
 
 /**
@@ -2714,6 +2818,7 @@ fun toCim(pb: PBShuntCompensator, cim: ShuntCompensator, networkService: Network
         grounded = pb.groundedSet.takeUnless { pb.hasGroundedNull() }
         nomU = pb.nomUSet.takeUnless { pb.hasNomUNull() }
         phaseConnection = mapPhaseShuntConnectionKind.toCim(pb.phaseConnection)
+        networkService.resolveOrDeferReference(Resolvers.terminal(this), pb.groundingTerminalMRID)
         toCim(pb.rce, this, networkService)
     }
 
@@ -2888,6 +2993,11 @@ fun toCim(pb: PBTransformerStarImpedance, networkService: NetworkService): Trans
  * An extension to add a converted copy of the protobuf [PBAcLineSegment] to the [NetworkService].
  */
 fun NetworkService.addFromPb(pb: PBAcLineSegment): AcLineSegment? = tryAddOrNull(toCim(pb, this))
+
+/**
+ * An extension to add a converted copy of the protobuf [PBAcLineSegmentPhase] to the [NetworkService].
+ */
+fun NetworkService.addFromPb(pb: PBAcLineSegmentPhase): AcLineSegmentPhase? = tryAddOrNull(toCim(pb, this))
 
 /**
  * An extension to add a converted copy of the protobuf [PBBreaker] to the [NetworkService].
@@ -3134,6 +3244,14 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
      */
     fun addFromPb(pb: PBSite): Site? = networkService.addFromPb(pb)
 
+    /**
+     * Add a converted copy of the protobuf [PBHvCustomer] to the [NetworkService].
+     *
+     * @param pb The [PBHvCustomer] to convert.
+     * @return The converted [HvCustomer]
+     */
+    fun addFromPb(pb: PBHvCustomer): HvCustomer? = networkService.addFromPb(pb)
+
     // ###################################
     // # Extensions IEC61970 Base Feeder #
     // ###################################
@@ -3153,6 +3271,14 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
      * @return The converted [LvFeeder]
      */
     fun addFromPb(pb: PBLvFeeder): LvFeeder? = networkService.addFromPb(pb)
+
+    /**
+     * Add a converted copy of the protobuf [PBLvSubstation] to the [NetworkService].
+     *
+     * @param pb The [PBLvSubstation] to convert.
+     * @return The converted [LvSubstation]
+     */
+    fun addFromPb(pb: PBLvSubstation): LvSubstation? = networkService.addFromPb(pb)
 
     // ##################################################
     // # Extensions IEC61970 Base Generation Production #
@@ -3625,6 +3751,14 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
      * @return The converted [AcLineSegment]
      */
     fun addFromPb(pb: PBAcLineSegment): AcLineSegment? = networkService.addFromPb(pb)
+
+    /**
+     * Add a converted copy of the protobuf [PBAcLineSegmentPhase] to the [NetworkService].
+     *
+     * @param pb The [PBAcLineSegmentPhase] to convert.
+     * @return The converted [AcLineSegmentPhase]
+     */
+    fun addFromPb(pb: PBAcLineSegmentPhase): AcLineSegmentPhase? = networkService.addFromPb(pb)
 
     /**
      * Add a converted copy of the protobuf [PBBreaker] to the [NetworkService].

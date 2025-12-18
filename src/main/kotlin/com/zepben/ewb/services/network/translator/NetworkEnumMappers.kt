@@ -15,6 +15,7 @@ import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionKind
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.BatteryControlMode
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.TransformerCoolingType
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.VectorGroup
+import com.zepben.ewb.cim.iec61968.assetinfo.WireInsulationKind
 import com.zepben.ewb.cim.iec61968.assetinfo.WireMaterialKind
 import com.zepben.ewb.cim.iec61968.infiec61968.infassetinfo.TransformerConstructionKind
 import com.zepben.ewb.cim.iec61968.infiec61968.infassetinfo.TransformerFunctionKind
@@ -34,6 +35,7 @@ import com.zepben.protobuf.cim.extensions.iec61970.base.protection.ProtectionKin
 import com.zepben.protobuf.cim.extensions.iec61970.base.wires.BatteryControlMode as PBBatteryControlMode
 import com.zepben.protobuf.cim.extensions.iec61970.base.wires.TransformerCoolingType as PBTransformerCoolingType
 import com.zepben.protobuf.cim.extensions.iec61970.base.wires.VectorGroup as PBVectorGroup
+import com.zepben.protobuf.cim.iec61968.assetinfo.WireInsulationKind as PBWireInsulationKind
 import com.zepben.protobuf.cim.iec61968.assetinfo.WireMaterialKind as PBWireMaterialKind
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.TransformerConstructionKind as PBTransformerConstructionKind
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.TransformerFunctionKind as PBTransformerFunctionKind
@@ -74,3 +76,4 @@ internal val mapUnitSymbol = EnumMapper(UnitSymbol.entries, PBUnitSymbol.entries
 internal val mapVectorGroup = EnumMapper(VectorGroup.entries, PBVectorGroup.entries)
 internal val mapWindingConnection = EnumMapper(WindingConnection.entries, PBWindingConnection.entries)
 internal val mapWireMaterialKind = EnumMapper(WireMaterialKind.entries, PBWireMaterialKind.entries)
+internal val mapWireInsulationKind = EnumMapper(WireInsulationKind.entries, PBWireInsulationKind.entries)

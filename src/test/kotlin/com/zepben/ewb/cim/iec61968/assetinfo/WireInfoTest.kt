@@ -39,8 +39,8 @@ internal class WireInfoTest {
         assertThat(wireInfo.strandCount, nullValue())
         assertThat(wireInfo.coreStrandCount, nullValue())
         assertThat(wireInfo.insulated, nullValue())
-        assertThat(wireInfo.insulatationMaterial, equalTo(WireInsulationKind.UNKNOWN))
-        assertThat(wireInfo.insulatationThickness, nullValue())
+        assertThat(wireInfo.insulationMaterial, equalTo(WireInsulationKind.UNKNOWN))
+        assertThat(wireInfo.insulationThickness, nullValue())
 
         wireInfo.fillFields(NetworkService())
 
@@ -50,8 +50,8 @@ internal class WireInfoTest {
         assertThat(wireInfo.strandCount, equalTo("8"))
         assertThat(wireInfo.coreStrandCount, equalTo("4"))
         assertThat(wireInfo.insulated, equalTo(true))
-        assertThat(wireInfo.insulatationMaterial, equalTo(WireInsulationKind.doubleWireArmour))
-        assertThat(wireInfo.insulatationThickness, equalTo(1.2))
+        assertThat(wireInfo.insulationMaterial, equalTo(WireInsulationKind.doubleWireArmour))
+        assertThat(wireInfo.insulationThickness, equalTo(1.2))
     }
 
 }

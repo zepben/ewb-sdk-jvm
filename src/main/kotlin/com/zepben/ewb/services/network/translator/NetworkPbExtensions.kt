@@ -11,9 +11,11 @@ package com.zepben.ewb.services.network.translator
 import com.zepben.ewb.services.common.translator.mRID
 import com.zepben.protobuf.cim.extensions.iec61968.assetinfo.RelayInfo
 import com.zepben.protobuf.cim.extensions.iec61968.metering.PanDemandResponseFunction
+import com.zepben.protobuf.cim.extensions.iec61970.base.core.HvCustomer
 import com.zepben.protobuf.cim.extensions.iec61970.base.core.Site
 import com.zepben.protobuf.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.protobuf.cim.extensions.iec61970.base.feeder.LvFeeder
+import com.zepben.protobuf.cim.extensions.iec61970.base.feeder.LvSubstation
 import com.zepben.protobuf.cim.extensions.iec61970.base.generation.production.EvChargingUnit
 import com.zepben.protobuf.cim.extensions.iec61970.base.protection.*
 import com.zepben.protobuf.cim.extensions.iec61970.base.wires.BatteryControl
@@ -71,6 +73,11 @@ fun PanDemandResponseFunction.mRID(): String = edf.mRID()
  */
 fun Site.mRID(): String = ec.mRID()
 
+/**
+ * Extract the mRID from the composed classes.
+ */
+fun HvCustomer.mRID(): String = ec.mRID()
+
 // ###################################
 // # Extensions IEC61970 Base Feeder #
 // ###################################
@@ -84,6 +91,11 @@ fun Loop.mRID(): String = io.mrid
  * Extract the mRID from the composed classes.
  */
 fun LvFeeder.mRID(): String = ec.mRID()
+
+/**
+ * Extract the mRID from the composed classes.
+ */
+fun LvSubstation.mRID(): String = ec.mRID()
 
 // ##################################################
 // # Extensions IEC61970 Base Generation Production #
@@ -550,6 +562,11 @@ fun AcLineSegment.mRID(): String = cd.mRID()
 /**
  * Extract the mRID from the composed classes.
  */
+fun AcLineSegmentPhase.mRID(): String = psr.mRID()
+
+/**
+ * Extract the mRID from the composed classes.
+ */
 fun Breaker.mRID(): String = sw.mRID()
 
 /**
@@ -781,6 +798,11 @@ fun TransformerEnd.mRID(): String = io.mrid
  * Extract the mRID from the composed classes.
  */
 fun TransformerStarImpedance.mRID(): String = io.mrid
+
+/**
+ * Extract the asset info mRID from the composed classes.
+ */
+fun AcLineSegmentPhase.assetInfoMRID(): String = psr.assetInfoMRID
 
 /**
  * Extract the asset info mRID from the composed classes.

@@ -492,8 +492,8 @@ fun WireInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true)
     strandCount = "8"
     coreStrandCount = "4"
     insulated = true
-    insulatationMaterial = WireInsulationKind.doubleWireArmour
-    insulatationThickness = 1.2
+    insulationMaterial = WireInsulationKind.doubleWireArmour
+    insulationThickness = 1.2
 
     return this
 }

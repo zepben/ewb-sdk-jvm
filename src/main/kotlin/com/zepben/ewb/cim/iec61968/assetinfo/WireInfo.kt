@@ -19,8 +19,8 @@ import com.zepben.ewb.cim.iec61968.assets.AssetInfo
  * @property strandCount Number of strands in the conductor.
  * @property coreStrandCount (if used) Number of strands in the steel core.
  * @property insulated True if conductor is insulated.
- * @property insulatationMaterial (if insulated conductor) Material used for insulation.
- * @property insulatationThickness (if insulated conductor) Thickness of the insulation.
+ * @property insulationMaterial (if insulated conductor) Material used for insulation.
+ * @property insulationThickness (if insulated conductor) Thickness of the insulation.
  */
 abstract class WireInfo(mRID: String) : AssetInfo(mRID) {
 
@@ -36,8 +36,8 @@ abstract class WireInfo(mRID: String) : AssetInfo(mRID) {
 
     var insulated: Boolean? = null
 
-    var insulatationMaterial: WireInsulationKind = WireInsulationKind.UNKNOWN
+    var insulationMaterial: WireInsulationKind = WireInsulationKind.UNKNOWN
 
-    var insulatationThickness: Double? = null
+    var insulationThickness: Double? = null
 
 }

@@ -173,6 +173,10 @@ class AssignToLvFeeders(
                 lvFeedersToAssign.energizedBy(foundLvFeeders.flatMap { stateOperators.getEnergizingFeeders(it) })
                 // Energize the LV feeders we found by the energizing feeders we are processing
                 foundLvFeeders.energizedBy(lvFeedersToAssign.flatMap { stateOperators.getEnergizingFeeders(it) })
+
+                // Energize any LvSubstations for these LvFeeders by the same feeders.
+                val foundLvSubstations = foundLvFeeders.mapNotNull { it.normalEnergizingLvSubstation } + lvFeedersToAssign.mapNotNull { it.normalEnergizingLvSubstation }
+                foundLvSubstations.lvSubstationEnergizedBy(foundLvFeeders.flatMap { stateOperators.getEnergizingFeeders(it) })
             }
 
             lvFeedersToAssign.associateEquipment(terminalToAuxEquipment[stepPath.toTerminal].orEmpty())
@@ -221,6 +225,12 @@ class AssignToLvFeeders(
         private fun Iterable<LvFeeder>.energizedBy(feeders: Iterable<Feeder>) = forEach { lvFeeder ->
             feeders.forEach {
                 stateOperators.associateEnergizingFeeder(it, lvFeeder)
+            }
+        }
+
+        private fun Iterable<LvSubstation>.lvSubstationEnergizedBy(feeders: Iterable<Feeder>) = forEach { lvSubstation ->
+            feeders.forEach {
+                stateOperators.associateEnergizingFeeder(it, lvSubstation)
             }
         }
 

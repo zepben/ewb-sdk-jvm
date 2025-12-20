@@ -4,7 +4,23 @@
 * You must now provide an `mRID` for all `IdentifiedObject` instances, the auto-generated default `mRID` has been removed.
 
 ### New Features
-* None.
+* Added new classes to the model:
+  * `HvCustomer` - [ZBEX] an `EquipmentContainer` for high voltage customer assets.
+  * `LvSubstation` - [ZBEX] an `EquipmentContainer` to represent distribution transformer sites, with associations to `Feeder` and `LvFeeder`
+  * `AcLineSegmentPhase` - Details about an individual phase of an `AcLineSegment`.
+* Added new properties to the model:
+  * `PricingStructure.code` - User allocated key for a pricing structure.
+  * `ShuntCompensator.groundingTerminal` - [ZBEX] The terminal connecting to grounded network.
+  * `WireInfo` - extra properties for conductors:
+    * `sizeDescription`
+    * `strandCount`
+    * `coreStrandCount`
+    * `insulated`
+    * `insulationMaterial`
+    * `insulationThickness`
+* Added new enum `WireInsulationKind` with extensions.
+* Added helper function `AcLineSegment.wireInfoForPhase()` for retrieving the `WireInfo` for a given phase of a conductor.
+* Added helper function `EquipmentContainer.edgeTerminals()` for retrieving all terminals on the edge of an `EquipmentContainer`.
 
 ### Enhancements
 * None.

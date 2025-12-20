@@ -9,6 +9,7 @@
 package com.zepben.ewb.services.network.tracing.feeder
 
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
+import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvSubstation
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelayScheme
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelaySystem
 import com.zepben.ewb.cim.iec61970.base.auxiliaryequipment.CurrentTransformer
@@ -407,9 +408,10 @@ internal class AssignToLvFeedersTest {
             val b7 = network.get<Breaker>("b7")!!
 
             val feeder = Feeder(generateId())
-            val lvFeeder8 = network.get<LvFeeder>("lvf8")!!.also { operators.associateEnergizingFeeder(feeder, it) }
-            val lvFeeder9 = network.get<LvFeeder>("lvf9")!!.also { operators.associateEnergizingFeeder(feeder, it) }
-            val lvFeeder10 = network.get<LvFeeder>("lvf10")!!.also { operators.associateEnergizingFeeder(feeder, it) }
+            val lvSub = network.get<LvSubstation>("lvs12")!!.also { operators.associateEnergizingFeeder(feeder, it) }
+            val lvFeeder8 = network.get<LvFeeder>("lvf8")!!.also { operators.associateEnergizingFeeder(feeder, it); it.normalEnergizingLvSubstation = lvSub }
+            val lvFeeder9 = network.get<LvFeeder>("lvf9")!!.also { operators.associateEnergizingFeeder(feeder, it); it.normalEnergizingLvSubstation = lvSub }
+            val lvFeeder10 = network.get<LvFeeder>("lvf10")!!.also { operators.associateEnergizingFeeder(feeder, it); it.normalEnergizingLvSubstation = lvSub }
 
             // We create an LV feeder to assign from b7 with its associated energizing feeder, which we will test is assigned to all LV feeders
             // in the dist substation site, not just the one on b5.
@@ -436,6 +438,7 @@ internal class AssignToLvFeedersTest {
             assertThat(operators.getEnergizingFeeders(lvFeeder8), containsInAnyOrder(feeder, backFeed))
             assertThat(operators.getEnergizingFeeders(lvFeeder9), containsInAnyOrder(feeder, backFeed))
             assertThat(operators.getEnergizingFeeders(lvFeeder10), containsInAnyOrder(feeder, backFeed))
+            assertThat(operators.getEnergizingFeeders(lvSub), containsInAnyOrder(feeder, backFeed))
         }
 
         runWithOperators(NetworkStateOperators.NORMAL)

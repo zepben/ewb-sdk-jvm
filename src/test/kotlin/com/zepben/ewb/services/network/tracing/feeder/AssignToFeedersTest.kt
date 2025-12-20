@@ -328,8 +328,8 @@ internal class AssignToFeedersTest {
         val feeder = network.get<Feeder>("fdr8")!!
         val lvSub = network.get<LvSubstation>("lvs12")!!
         val lvf9 = network.get<LvFeeder>("lvf9")!!
-        val lvf10 = network.get<LvFeeder>("lvf9")!!
-        val lvf11 = network.get<LvFeeder>("lvf9")!!
+        val lvf10 = network.get<LvFeeder>("lvf10")!!
+        val lvf11 = network.get<LvFeeder>("lvf11")!!
 
         assignToFeeders.run(network, NetworkStateOperators.NORMAL)
 

@@ -42,7 +42,8 @@ private val `Create table hv customers` = Change(
             location_mrid TEXT NULL,
             num_controls INTEGER NULL
         );""".trimIndent(),
-        "CREATE UNIQUE INDEX hv_customer_mrid ON hv_customers (mrid);",
+        "CREATE UNIQUE INDEX hv_customers_mrid ON hv_customers (mrid);",
+        "CREATE INDEX hv_customers_name ON hv_customers (name);",
     ),
     targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )
@@ -58,7 +59,8 @@ private val `Create table lv substations` = Change(
             location_mrid TEXT NULL,
             num_controls INTEGER NULL
         );""".trimIndent(),
-        "CREATE UNIQUE INDEX lv_substation_mrid ON lv_substations (mrid);",
+        "CREATE UNIQUE INDEX lv_substations_mrid ON lv_substations (mrid);",
+        "CREATE INDEX lv_substations_name ON lv_substations (name);",
     ),
     targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )
@@ -73,12 +75,13 @@ private val `Create table ac line segment phases` = Change(
             num_diagram_objects INTEGER NULL,
             location_mrid TEXT NULL,
             num_controls INTEGER NULL,
-            phase TEXT NULL,
+            phase TEXT NOT NULL,
             sequence_number INTEGER NULL,
             wire_info_mrid TEXT NULL,
             ac_line_segment_mrid TEXT NULL
         );""".trimIndent(),
         "CREATE UNIQUE INDEX ac_line_segment_phases_mrid ON ac_line_segment_phases (mrid);",
+        "CREATE INDEX ac_line_segment_phases_name ON ac_line_segment_phases (name);",
         "CREATE INDEX ac_line_segment_phases_ac_line_segment_mrid ON ac_line_segment_phases (ac_line_segment_mrid);",
         "CREATE INDEX ac_line_segment_phases_wire_info_mrid ON ac_line_segment_phases (wire_info_mrid);"
     ),
@@ -89,6 +92,7 @@ private val `Create table ac line segment phases` = Change(
 private val `Add grounding terminal to shunt compensators` = Change(
     listOf(
         "ALTER TABLE linear_shunt_compensators ADD COLUMN grounding_terminal_mrid TEXT NULL;",
+        "CREATE INDEX linear_shunt_compensators_grounding_terminal_mrid ON linear_shunt_compensators (grounding_terminal_mrid);",
     ),
     targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )
@@ -101,13 +105,13 @@ private val `Add fields to wire info tables` = Change(
         "ALTER TABLE overhead_wire_info ADD COLUMN strand_count TEXT NULL;",
         "ALTER TABLE overhead_wire_info ADD COLUMN core_strand_count TEXT NULL;",
         "ALTER TABLE overhead_wire_info ADD COLUMN insulated BOOLEAN NULL;",
-        "ALTER TABLE overhead_wire_info ADD COLUMN insulation_material TEXT NULL;",
+        "ALTER TABLE overhead_wire_info ADD COLUMN insulation_material TEXT NOT NULL DEFAULT 'UNKNOWN';",
         "ALTER TABLE overhead_wire_info ADD COLUMN insulation_thickness NUMBER NULL;",
         "ALTER TABLE cable_info ADD COLUMN size_description TEXT NULL;",
         "ALTER TABLE cable_info ADD COLUMN strand_count TEXT NULL;",
         "ALTER TABLE cable_info ADD COLUMN core_strand_count TEXT NULL;",
         "ALTER TABLE cable_info ADD COLUMN insulated BOOLEAN NULL;",
-        "ALTER TABLE cable_info ADD COLUMN insulation_material TEXT NULL;",
+        "ALTER TABLE cable_info ADD COLUMN insulation_material TEXT NOT NULL DEFAULT 'UNKNOWN';",
         "ALTER TABLE cable_info ADD COLUMN insulation_thickness NUMBER NULL;",
     ),
     targetDatabases = setOf(DatabaseType.NETWORK_MODEL)

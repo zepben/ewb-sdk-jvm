@@ -13,18 +13,6 @@ import com.zepben.ewb.database.sql.Column.Nullable.*
 import com.zepben.ewb.database.sql.Column.Type
 import com.zepben.ewb.database.sqlite.cim.tables.iec61968.assets.TableAssetInfo
 
-/**
- * Wire data that can be specified per line segment phase, or for the line segment as a whole in case its phases all have the same wire characteristics.
- *
- * @property ratedCurrent Current carrying capacity of the wire under stated thermal conditions.
- * @property material Conductor material.
- * @property sizeDescription Describes the wire gauge or cross section (e.g., 4/0,
- * @property strandCount Number of strands in the conductor.
- * @property coreStrandCount (if used) Number of strands in the steel core.
- * @property insulated True if conductor is insulated.
- * @property insulatationMaterial (if insulated conductor) Material used for insulation.
- * @property insulatationThickness (if insulated conductor) Thickness of the insulation.
- */
 @Suppress("PropertyName")
 abstract class TableWireInfo : TableAssetInfo() {
 
@@ -34,6 +22,6 @@ abstract class TableWireInfo : TableAssetInfo() {
     val STRAND_COUNT: Column = Column(++columnIndex, "strand_count", Type.STRING, NULL)
     val CORE_STRAND_COUNT: Column = Column(++columnIndex, "core_strand_count", Type.STRING, NULL)
     val INSULATED: Column = Column(++columnIndex, "insulated", Type.BOOLEAN, NULL)
-    val INSULATATION_MATERIAL: Column = Column(++columnIndex, "insulatation_material", Type.STRING, NOT_NULL)
-    val INSULATATION_THICKNESS: Column = Column(++columnIndex, "insulatation_thickness", Type.DOUBLE, NULL)
+    val INSULATION_MATERIAL: Column = Column(++columnIndex, "insulation_material", Type.STRING, NOT_NULL)
+    val INSULATION_THICKNESS: Column = Column(++columnIndex, "insulation_thickness", Type.DOUBLE, NULL)
 }

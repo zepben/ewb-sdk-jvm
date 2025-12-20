@@ -176,7 +176,8 @@ class AssignToFeeders(
 
             // Check to see if the change to LV is part of a dist transformer site. If so, we want to energize all LV feeders on any equipment
             // in the site, not just the one on the first LV terminal; otherwise, just energize the LV feeders on this equipment.
-            // Note LvSubstation will eventually replace Site here, but for the moment we handle both Site and LvSubstation.
+            // NOTE: LvSubstation will eventually replace Site here, but for the moment we handle both Site and LvSubstation. When we eventually remove Site,
+            //       we will need a corresponding database upgrade that converts existing Sites containing distribution transformers to LvSubstations
             //
             // NOTE: Sites and LvSubstations aren't added to the current state containers, so they will always need to be looked up from the normal containers,
             //       regardless of the state operators being used.

@@ -84,6 +84,7 @@ internal class ChangeSetTest {
         ChangeSet61DiagramValidator,
         ChangeSet62DiagramValidator,
         NoChanges(DatabaseType.DIAGRAM, 63),
+        NoChanges(DatabaseType.DIAGRAM, 64),
     ).associateBy { it.version }
 
     private val networkChangeSetValidators = listOf(

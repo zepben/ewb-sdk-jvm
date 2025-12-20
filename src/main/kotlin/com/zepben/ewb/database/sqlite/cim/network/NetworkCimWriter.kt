@@ -745,8 +745,8 @@ class NetworkCimWriter(
         insert.setNullableString(table.STRAND_COUNT.queryIndex, wireInfo.strandCount)
         insert.setNullableString(table.CORE_STRAND_COUNT.queryIndex, wireInfo.coreStrandCount)
         insert.setNullableBoolean(table.INSULATED.queryIndex, wireInfo.insulated)
-        insert.setNullableString(table.INSULATATION_MATERIAL.queryIndex, wireInfo.insulationMaterial.name)
-        insert.setNullableDouble(table.INSULATATION_THICKNESS.queryIndex, wireInfo.insulationThickness)
+        insert.setNullableString(table.INSULATION_MATERIAL.queryIndex, wireInfo.insulationMaterial.name)
+        insert.setNullableDouble(table.INSULATION_THICKNESS.queryIndex, wireInfo.insulationThickness)
 
         return writeAssetInfo(table, insert, wireInfo, description)
     }

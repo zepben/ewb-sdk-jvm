@@ -910,8 +910,8 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
             strandCount = resultSet.getNullableString(table.STRAND_COUNT.queryIndex)
             coreStrandCount = resultSet.getNullableString(table.CORE_STRAND_COUNT.queryIndex)
             insulated = resultSet.getNullableBoolean(table.INSULATED.queryIndex)
-            insulationMaterial = WireInsulationKind.valueOf(resultSet.getString(table.INSULATATION_MATERIAL.queryIndex))
-            insulationThickness = resultSet.getNullableDouble(table.INSULATATION_THICKNESS.queryIndex)
+            insulationMaterial = WireInsulationKind.valueOf(resultSet.getString(table.INSULATION_MATERIAL.queryIndex))
+            insulationThickness = resultSet.getNullableDouble(table.INSULATION_THICKNESS.queryIndex)
         }
 
         return readAssetInfo(wireInfo, table, resultSet)

@@ -178,24 +178,29 @@ class AssignToFeeders(
             // in the site, not just the one on the first LV terminal; otherwise, just energize the LV feeders on this equipment.
             // Note LvSubstation will eventually replace Site here, but for the moment we handle both Site and LvSubstation.
             //
-            // NOTE: Sites aren't added to the current state containers, so they will always need to be looked up from the normal containers,
+            // NOTE: Sites and LvSubstations aren't added to the current state containers, so they will always need to be looked up from the normal containers,
             //       regardless of the state operators being used.
             //
-            val sitesAndSubstations = toEquipment.containers.filterIsInstance<Site>() + toEquipment.getFilteredContainers<LvSubstation>(stateOperators)
-            if (sitesAndSubstations.isNotEmpty())
-                energizes(sitesAndSubstations.findLvFeeders(lvFeederStartPoints, stateOperators))
-            else
+            val sites = toEquipment.containers.filterIsInstance<Site>()
+            val substations = toEquipment.containers.filterIsInstance<LvSubstation>()
+            if (substations.isNotEmpty()) {
+                energizes(substations.findLvFeeders(lvFeederStartPoints, stateOperators))
+                // Also energise any LvSubstations found on the transformer. LvSubstations should gradually replace Sites.
+                energizesLvSubstations(substations)
+            } else if (sites.isNotEmpty()) {
+                // TODO: Log deprecation warning here after March 2026, and remove sometime later.
+                energizes(sites.findLvFeeders(lvFeederStartPoints, stateOperators))
+            } else {
                 energizes(toEquipment.getFilteredContainers<LvFeeder>(stateOperators))
+            }
 
-            // Also energise any LvSubstations found on the transformer. LvSubstations should gradually replace Sites.
-            energizes(toEquipment.getFilteredContainers<LvSubstation>(stateOperators))
         }
 
         private fun Iterable<Feeder>.energizes(lvFeeders: Iterable<LvFeeder>) = forEach { feeder ->
             lvFeeders.forEach { stateOperators.associateEnergizingFeeder(feeder, it) }
         }
 
-        private fun Iterable<Feeder>.energizes(lvSubstations: Iterable<LvSubstation>) = forEach { feeder ->
+        private fun Iterable<Feeder>.energizesLvSubstations(lvSubstations: Iterable<LvSubstation>) = forEach { feeder ->
             lvSubstations.forEach { stateOperators.associateEnergizingFeeder(feeder, it) }
         }
 

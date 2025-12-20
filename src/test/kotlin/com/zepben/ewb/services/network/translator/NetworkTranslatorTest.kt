@@ -97,8 +97,8 @@ internal class NetworkTranslatorTest : TranslatorTestBase<NetworkService>(
         // # Extensions IEC61970 Base Core #
         // #################################
 
-        ValidationInfo(::Site, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
         ValidationInfo(::HvCustomer, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(::Site, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
 
         // ###################################
         // # Extensions IEC61970 Base Feeder #

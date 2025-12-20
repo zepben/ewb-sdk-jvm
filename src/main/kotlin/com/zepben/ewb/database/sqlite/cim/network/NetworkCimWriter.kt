@@ -11,9 +11,11 @@ package com.zepben.ewb.database.sqlite.cim.network
 import com.zepben.ewb.cim.extensions.iec61968.assetinfo.RelayInfo
 import com.zepben.ewb.cim.extensions.iec61968.common.ContactDetails
 import com.zepben.ewb.cim.extensions.iec61968.metering.PanDemandResponseFunction
+import com.zepben.ewb.cim.extensions.iec61970.base.core.HvCustomer
 import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
+import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvSubstation
 import com.zepben.ewb.cim.extensions.iec61970.base.generation.production.EvChargingUnit
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.*
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.BatteryControl
@@ -53,6 +55,8 @@ import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.common.Tabl
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.common.TableContactDetailsStreetAddresses
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.common.TableContactDetailsTelephoneNumbers
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.metering.TablePanDemandResponseFunctions
+import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61970.base.core.TableHvCustomers
+import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61970.base.core.TableLvSubstations
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61970.base.core.TableSites
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61970.base.feeder.TableLoops
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61970.base.feeder.TableLvFeeders
@@ -211,6 +215,22 @@ class NetworkCimWriter(
     // #################################
 
     /**
+     * Write the [HvCustomer] fields to [TableHvCustomers].
+     *
+     * @param hvCustomer The [HvCustomer] instance to write to the database.
+     *
+     * @return true if the [HvCustomer] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
+    fun write(hvCustomer: HvCustomer): Boolean {
+        val table = databaseTables.getTable<TableHvCustomers>()
+        val insert = databaseTables.getInsert<TableHvCustomers>()
+
+        return writeEquipmentContainer(table, insert, hvCustomer, "hv customer")
+    }
+
+    /**
      * Write the [Site] fields to [TableSites].
      *
      * @param site The [Site] instance to write to the database.
@@ -264,8 +284,26 @@ class NetworkCimWriter(
         val insert = databaseTables.getInsert<TableLvFeeders>()
 
         insert.setNullableString(table.NORMAL_HEAD_TERMINAL_MRID.queryIndex, lvFeeder.normalHeadTerminal?.mRID)
+        insert.setNullableString(table.LV_SUBSTATION_MRID.queryIndex, lvFeeder.normalEnergizingLvSubstation?.mRID)
 
         return writeEquipmentContainer(table, insert, lvFeeder, "lv feeder")
+    }
+
+
+    /**
+     * Write the [LvSubstation] fields to [TableLvSubstations].
+     *
+     * @param lvSubstation The [LvSubstation] instance to write to the database.
+     *
+     * @return true if the [LvSubstation] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
+    fun write(lvSubstation: LvSubstation): Boolean {
+        val table = databaseTables.getTable<TableLvSubstations>()
+        val insert = databaseTables.getInsert<TableLvSubstations>()
+
+        return writeEquipmentContainer(table, insert, lvSubstation, "lv substation")
     }
 
     // ##################################################
@@ -703,6 +741,12 @@ class NetworkCimWriter(
     private fun writeWireInfo(table: TableWireInfo, insert: PreparedStatement, wireInfo: WireInfo, description: String): Boolean {
         insert.setNullableInt(table.RATED_CURRENT.queryIndex, wireInfo.ratedCurrent)
         insert.setNullableString(table.MATERIAL.queryIndex, wireInfo.material.name)
+        insert.setNullableString(table.SIZE_DESCRIPTION.queryIndex, wireInfo.sizeDescription)
+        insert.setNullableString(table.STRAND_COUNT.queryIndex, wireInfo.strandCount)
+        insert.setNullableString(table.CORE_STRAND_COUNT.queryIndex, wireInfo.coreStrandCount)
+        insert.setNullableBoolean(table.INSULATED.queryIndex, wireInfo.insulated)
+        insert.setNullableString(table.INSULATATION_MATERIAL.queryIndex, wireInfo.insulationMaterial.name)
+        insert.setNullableDouble(table.INSULATATION_THICKNESS.queryIndex, wireInfo.insulationThickness)
 
         return writeAssetInfo(table, insert, wireInfo, description)
     }
@@ -1702,6 +1746,27 @@ class NetworkCimWriter(
     }
 
     /**
+     * Write the [AcLineSegmentPhase] fields to [TableAcLineSegmentPhases].
+     *
+     * @param acLineSegmentPhase The [AcLineSegmentPhase] instance to write to the database.
+     *
+     * @return true if the [AcLineSegmentPhase] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
+    fun write(acLineSegmentPhase: AcLineSegmentPhase): Boolean {
+        val table = databaseTables.getTable<TableAcLineSegmentPhases>()
+        val insert = databaseTables.getInsert<TableAcLineSegmentPhases>()
+
+        insert.setNullableString(table.AC_LINE_SEGMENT_MRID.queryIndex, acLineSegmentPhase.acLineSegment?.mRID)
+        insert.setNullableString(table.PHASE.queryIndex, acLineSegmentPhase.phase.name)
+        insert.setNullableInt(table.SEQUENCE_NUMBER.queryIndex, acLineSegmentPhase.sequenceNumber)
+        insert.setNullableString(table.WIRE_INFO_MRID.queryIndex, acLineSegmentPhase.assetInfo?.mRID)
+
+        return writePowerSystemResource(table, insert, acLineSegmentPhase, "AC line segment phase")
+    }
+
+    /**
      * Write the [Breaker] fields to [TableBreakers].
      *
      * @param breaker The [Breaker] instance to write to the database.
@@ -2443,6 +2508,7 @@ class NetworkCimWriter(
         insert.setNullableInt(table.NOM_U.queryIndex, shuntCompensator.nomU)
         insert.setNullableString(table.PHASE_CONNECTION.queryIndex, shuntCompensator.phaseConnection.name)
         insert.setNullableDouble(table.SECTIONS.queryIndex, shuntCompensator.sections)
+        insert.setNullableString(table.GROUNDING_TERMINAL_MRID.queryIndex, shuntCompensator.groundingTerminal?.mRID)
 
         return writeRegulatingCondEq(table, insert, shuntCompensator, description)
     }
@@ -2797,7 +2863,7 @@ class NetworkCimWriter(
     }
 
     private fun EquipmentContainer.shouldExportContainerContents(): Boolean = when (this) {
-        is Site, is Substation, is Circuit -> true
+        is Site, is Substation, is Circuit, is HvCustomer, is LvSubstation -> true
         else -> false
     }
 

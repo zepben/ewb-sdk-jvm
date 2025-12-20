@@ -9,6 +9,7 @@
 package com.zepben.ewb.services.common.translator
 
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
+import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvSubstation
 import com.zepben.ewb.cim.iec61968.operations.OperationalRestriction
 import com.zepben.ewb.cim.iec61970.base.core.*
 import com.zepben.ewb.database.sqlite.cim.CimDatabaseTables
@@ -186,6 +187,9 @@ internal abstract class TranslatorTestBase<S : BaseService>(
                 cim.clearTerminals()
 
             if (cim is LvFeeder)
+                cim.clearCurrentEquipment()
+
+            if (cim is LvSubstation)
                 cim.clearCurrentEquipment()
         }
 

@@ -258,8 +258,8 @@ class NetworkConsumerClient(
         includeFeeders: Boolean = true,
         includeCircuits: Boolean = true,
         includeLoops: Boolean = true,
-        includeLvSubstations: Boolean = true,
-        includeLvFeeders: Boolean = true,
+        includeLvSubstations: Boolean = false,
+        includeLvFeeders: Boolean = false,
     ): GrpcResult<NetworkHierarchy> =
         tryRpc {
             if (networkHierarchy == null) {

@@ -12,9 +12,11 @@ import com.zepben.ewb.cim.extensions.iec61968.assetinfo.RelayInfo
 import com.zepben.ewb.cim.extensions.iec61968.common.ContactDetails
 import com.zepben.ewb.cim.extensions.iec61968.common.ContactMethodType
 import com.zepben.ewb.cim.extensions.iec61968.metering.PanDemandResponseFunction
+import com.zepben.ewb.cim.extensions.iec61970.base.core.HvCustomer
 import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
+import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvSubstation
 import com.zepben.ewb.cim.extensions.iec61970.base.generation.production.EvChargingUnit
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.*
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.BatteryControl
@@ -139,6 +141,11 @@ fun PanDemandResponseFunction.fillFields(service: NetworkService, includeRuntime
 // # Extension IEC61970 Base Core #
 // ################################
 
+fun HvCustomer.fillFields(service: NetworkService, includeRuntime: Boolean = true): HvCustomer {
+    (this as EquipmentContainer).fillFields(service, includeRuntime)
+    return this
+}
+
 fun Site.fillFields(service: NetworkService, includeRuntime: Boolean = true): Site {
     (this as EquipmentContainer).fillFields(service, includeRuntime)
     return this
@@ -180,6 +187,11 @@ fun LvFeeder.fillFields(service: NetworkService, includeRuntime: Boolean = true)
         conductingEquipment!!.addTerminal(this)
     }.also { service.add(it) }
 
+    normalEnergizingLvSubstation = LvSubstation(generateId()).also {
+        it.addNormalEnergizedLvFeeder(this)
+        service.add(it)
+    }
+
     if (includeRuntime) {
         @Suppress("unused")
         for (i in 0..1) {
@@ -197,6 +209,41 @@ fun LvFeeder.fillFields(service: NetworkService, includeRuntime: Boolean = true)
                 it.addCurrentContainer(this)
                 service.add(it)
             })
+        }
+    } else {
+        equipment.forEach { it.removeContainer(this) }
+        clearEquipment()
+    }
+
+    return this
+}
+
+fun LvSubstation.fillFields(service: NetworkService, includeRuntime: Boolean = true): LvSubstation {
+    (this as EquipmentContainer).fillFields(service, includeRuntime)
+
+    if (includeRuntime) {
+        @Suppress("unused")
+        for (i in 0..1) {
+            addNormalEnergizingFeeder(Feeder(generateId()).also {
+                it.addNormalEnergizedLvSubstation(this)
+                service.add(it)
+            })
+
+            addCurrentEnergizingFeeder(Feeder(generateId()).also {
+                it.addCurrentEnergizedLvSubstation(this)
+                service.add(it)
+            })
+
+            addCurrentEquipment(Junction(generateId()).also {
+                it.addCurrentContainer(this)
+                service.add(it)
+            })
+
+            addNormalEnergizedLvFeeder(LvFeeder(generateId()).also {
+                it.normalEnergizingLvSubstation = this
+                service.add(it)
+            })
+
         }
     } else {
         equipment.forEach { it.removeContainer(this) }
@@ -893,6 +940,16 @@ fun Feeder.fillFields(service: NetworkService, includeRuntime: Boolean = true): 
                 service.add(it)
             })
 
+            addNormalEnergizedLvSubstation(LvSubstation(generateId()).also {
+                it.addNormalEnergizingFeeder(this)
+                service.add(it)
+            })
+
+            addCurrentEnergizedLvSubstation(LvSubstation(generateId()).also {
+                it.addCurrentEnergizingFeeder(this)
+                service.add(it)
+            })
+
             addCurrentEquipment(Junction(generateId()).also {
                 it.addCurrentContainer(this)
                 service.add(it)
@@ -1185,7 +1242,26 @@ fun AcLineSegment.fillFields(service: NetworkService, includeRuntime: Boolean = 
     for (i in 0..1) {
         addCut(Cut(generateId()).also { service.add(it) })
         addClamp(Clamp(generateId()).also { service.add(it) })
+        addPhase(AcLineSegmentPhase(generateId()).also {
+            it.phase = SinglePhaseKind[i]
+            service.add(it)
+        })
     }
+
+    return this
+}
+
+fun AcLineSegmentPhase.fillFields(service: NetworkService, includeRuntime: Boolean = true): AcLineSegmentPhase {
+    (this as PowerSystemResource).fillFields(service, includeRuntime)
+
+    acLineSegment = AcLineSegment(generateId()).also {
+        it.addPhase(this)
+        service.add(it)
+    }
+
+    phase = SinglePhaseKind.A
+    sequenceNumber = 0
+    assetInfo = OverheadWireInfo(generateId()).also { service.add(it) }
 
     return this
 }

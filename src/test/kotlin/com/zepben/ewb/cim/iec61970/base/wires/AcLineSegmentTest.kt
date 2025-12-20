@@ -9,6 +9,9 @@
 package com.zepben.ewb.cim.iec61970.base.wires
 
 import com.zepben.ewb.cim.iec61968.assetinfo.OverheadWireInfo
+import com.zepben.ewb.cim.iec61968.common.Location
+import com.zepben.ewb.cim.iec61968.common.PositionPoint
+import com.zepben.ewb.cim.iec61968.common.forEachPoint
 import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.utils.PrivateCollectionValidator
@@ -88,18 +91,6 @@ internal class AcLineSegmentTest {
     }
 
     @Test
-    internal fun rejectsDuplicatePhase() {
-        val acls = AcLineSegment(generateId())
-        val phase1 = AcLineSegmentPhase(generateId()).apply { phase = SinglePhaseKind.A }
-        val phase2 = AcLineSegmentPhase(generateId()).apply { phase = SinglePhaseKind.A }
-
-        acls.addPhase(phase1)
-        expect { acls.addPhase(phase2) }
-            .toThrow<IllegalArgumentException>()
-            .withMessage("Could not add ${phase2.typeNameAndMRID()} to ${acls.typeNameAndMRID()} as ${phase2.phase} was already present in the phases collection for this conductor. Ensure you are not adding duplicate phases.")
-    }
-
-    @Test
     internal fun supportsDifferentPhase() {
         val acls = AcLineSegment(generateId())
         val phase1 = AcLineSegmentPhase(generateId()).apply { phase = SinglePhaseKind.A }
@@ -154,13 +145,16 @@ internal class AcLineSegmentTest {
     internal fun retrievesWireInfoForPhase() {
         val wi = OverheadWireInfo(generateId())
         val acls = AcLineSegment(generateId()).also { it.assetInfo = wi }
-        val phaseA = AcLineSegmentPhase(generateId()).apply { acLineSegment = acls; phase = SinglePhaseKind.A; acls.addPhase(this) }
-        val phaseB = AcLineSegmentPhase(generateId()).apply { acLineSegment = acls; phase = SinglePhaseKind.B; acls.addPhase(this) }
-        val phaseC = AcLineSegmentPhase(generateId()).apply { acLineSegment = acls; phase = SinglePhaseKind.C; acls.addPhase(this) }
+        val wiA = OverheadWireInfo(generateId())
+        val wiB = OverheadWireInfo(generateId())
+        val wiC = OverheadWireInfo(generateId())
+        AcLineSegmentPhase(generateId()).apply { acLineSegment = acls; phase = SinglePhaseKind.A; acls.addPhase(this); assetInfo = wiA }
+        AcLineSegmentPhase(generateId()).apply { acLineSegment = acls; phase = SinglePhaseKind.B; acls.addPhase(this); assetInfo = wiB }
+        AcLineSegmentPhase(generateId()).apply { acLineSegment = acls; phase = SinglePhaseKind.C; acls.addPhase(this); assetInfo = wiC }
 
-        assertThat(acls.wireInfoForPhase(SinglePhaseKind.A), equalTo(phaseA))
-        assertThat(acls.wireInfoForPhase(SinglePhaseKind.B), equalTo(phaseB))
-        assertThat(acls.wireInfoForPhase(SinglePhaseKind.C), equalTo(phaseC))
+        assertThat(acls.wireInfoForPhase(SinglePhaseKind.A), equalTo(wiA))
+        assertThat(acls.wireInfoForPhase(SinglePhaseKind.B), equalTo(wiB))
+        assertThat(acls.wireInfoForPhase(SinglePhaseKind.C), equalTo(wiC))
         assertThat(acls.wireInfoForPhase(SinglePhaseKind.N), equalTo(wi))
         assertThat(acls.wireInfoForPhase(SinglePhaseKind.NONE), equalTo(wi))
         assertThat(acls.wireInfoForPhase(SinglePhaseKind.INVALID), equalTo(wi))

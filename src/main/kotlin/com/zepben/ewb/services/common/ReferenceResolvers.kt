@@ -244,16 +244,8 @@ internal object LvSubstationToNormalEnergizedLvFeedersResolver : ReferenceResolv
     LvSubstation::class, LvFeeder::class, LvSubstation::addNormalEnergizedLvFeeder
 )
 
-internal object LvSubstationToCurrentEnergizedLvFeedersResolver : ReferenceResolver<LvSubstation, LvFeeder> by KReferenceResolver(
-    LvSubstation::class, LvFeeder::class, LvSubstation::addCurrentEnergizedLvFeeder
-)
-
 internal object LvFeederToNormalEnergizingLvSubstationsResolver : ReferenceResolver<LvFeeder, LvSubstation> by KReferenceResolver(
-    LvFeeder::class, LvSubstation::class, LvFeeder::addNormalEnergizingLvSubstation
-)
-
-internal object LvFeederToCurrentEnergizingLvSubstationsResolver : ReferenceResolver<LvFeeder, LvSubstation> by KReferenceResolver(
-    LvFeeder::class, LvSubstation::class, LvFeeder::addCurrentEnergizingLvSubstation
+    LvFeeder::class, LvSubstation::class, LvFeeder::normalEnergizingLvSubstation.setter
 )
 
 internal object GeographicalRegionToSubGeographicalRegionResolver : ReferenceResolver<GeographicalRegion, SubGeographicalRegion> by KReferenceResolver(

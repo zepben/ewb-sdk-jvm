@@ -10,9 +10,11 @@ package com.zepben.ewb.database.sqlite.cim.network
 
 import com.zepben.ewb.cim.extensions.iec61968.assetinfo.RelayInfo
 import com.zepben.ewb.cim.extensions.iec61968.metering.PanDemandResponseFunction
+import com.zepben.ewb.cim.extensions.iec61970.base.core.HvCustomer
 import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
+import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvSubstation
 import com.zepben.ewb.cim.extensions.iec61970.base.generation.production.EvChargingUnit
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.*
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.BatteryControl
@@ -131,6 +133,7 @@ class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkD
         // # Extensions IEC61970 Base Core #
         // #################################
 
+        validateSchema(SchemaServices.networkServicesOf(::HvCustomer, HvCustomer::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::Site, Site::fillFields))
 
         // ###################################
@@ -139,6 +142,7 @@ class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkD
 
         validateSchema(SchemaServices.networkServicesOf(::Loop, Loop::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::LvFeeder, LvFeeder::fillFields).also { it.assignEquipmentToLvFeeders() })
+        validateSchema(SchemaServices.networkServicesOf(::LvSubstation, LvSubstation::fillFields).also { it.assignEquipmentToFeeders() })
 
         // ##################################################
         // # Extensions IEC61970 Base Generation Production #
@@ -281,6 +285,7 @@ class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkD
         // #######################
 
         validateSchema(SchemaServices.networkServicesOf(::AcLineSegment, AcLineSegment::fillFields))
+        validateSchema(SchemaServices.networkServicesOf(::AcLineSegmentPhase, AcLineSegmentPhase::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::Breaker, Breaker::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::BusbarSection, BusbarSection::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::Clamp, Clamp::fillFields))

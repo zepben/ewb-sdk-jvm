@@ -16,6 +16,8 @@ import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.common.Tabl
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.common.TableContactDetailsStreetAddresses
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.common.TableContactDetailsTelephoneNumbers
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.metering.TablePanDemandResponseFunctions
+import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61970.base.core.TableHvCustomers
+import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61970.base.core.TableLvSubstations
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61970.base.core.TableSites
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61970.base.feeder.TableLoops
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61970.base.feeder.TableLvFeeders
@@ -63,6 +65,7 @@ class NetworkDatabaseTables : CimDatabaseTables() {
 
     override val includedTables: Sequence<SqliteTable> =
         super.includedTables + sequenceOf(
+            TableAcLineSegmentPhases(),
             TableAcLineSegments(),
             TableAccumulators(),
             TableAnalogs(),
@@ -111,6 +114,7 @@ class NetworkDatabaseTables : CimDatabaseTables() {
             TableGrounds(),
             TableGroundDisconnectors(),
             TableGroundingImpedances(),
+            TableHvCustomers(),
             TableJumpers(),
             TableJunctions(),
             TableLinearShuntCompensators(),
@@ -120,6 +124,7 @@ class NetworkDatabaseTables : CimDatabaseTables() {
             TableLoops(),
             TableLoopsSubstations(),
             TableLvFeeders(),
+            TableLvSubstations(),
             TableMeters(),
             TableNoLoadTests(),
             TableOpenCircuitTests(),

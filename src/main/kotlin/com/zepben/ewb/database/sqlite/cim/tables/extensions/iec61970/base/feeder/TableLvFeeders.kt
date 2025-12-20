@@ -16,6 +16,15 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.core.TableEquipme
 class TableLvFeeders : TableEquipmentContainers() {
 
     val NORMAL_HEAD_TERMINAL_MRID: Column = Column(++columnIndex, "normal_head_terminal_mrid", Column.Type.STRING, NULL)
+    val LV_SUBSTATION_MRID: Column = Column(++columnIndex, "normal_energizing_lv_substation_mrid", Column.Type.STRING, NULL)
 
     override val name: String = "lv_feeders"
+
+    init {
+        addNonUniqueIndexes(
+            listOf(NORMAL_HEAD_TERMINAL_MRID),
+            listOf(LV_SUBSTATION_MRID)
+        )
+    }
+
 }

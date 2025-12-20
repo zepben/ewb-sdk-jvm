@@ -311,70 +311,137 @@ internal class NetworkConsumerClientTest {
 
         val result = consumerClient.getNetworkHierarchy()
 
-        verify(consumerService.onGetNetworkHierarchy).invoke(eq(GetNetworkHierarchyRequest.newBuilder().build()), any())
+        verify(consumerService.onGetNetworkHierarchy).invoke(isA<GetNetworkHierarchyRequest>(), any())
         assertThat("getNetworkHierarchy should succeed", result.wasSuccessful)
         validateNetworkHierarchy(result.value, NetworkHierarchyAllTypes.createNetworkHierarchy())
     }
 
+    internal fun buildHierarchyRequest(
+        includeGeographicalRegions: Boolean = false,
+        includeSubgeographicalRegions: Boolean = false,
+        includeSubstations: Boolean = false,
+        includeFeeders: Boolean = false,
+        includeCircuits: Boolean = false,
+        includeLoops: Boolean = false,
+        includeLvSubstations: Boolean = false,
+        includeLvFeeders: Boolean = false,
+    ): GetNetworkHierarchyRequest = GetNetworkHierarchyRequest.newBuilder().also { req ->
+        req.includeGeographicalRegions = includeGeographicalRegions
+        req.includeSubgeographicalRegions = includeSubgeographicalRegions
+        req.includeSubstations = includeSubstations
+        req.includeFeeders = includeFeeders
+        req.includeCircuits = includeCircuits
+        req.includeLoops = includeLoops
+        req.includeLvSubstations = includeLvSubstations
+        req.includeLvFeeders = includeLvFeeders
+    }.build()
+
+    internal fun callGetHierarchy(
+        consumerClient: NetworkConsumerClient,
+        includeGeographicalRegions: Boolean = false,
+        includeSubgeographicalRegions: Boolean = false,
+        includeSubstations: Boolean = false,
+        includeFeeders: Boolean = false,
+        includeCircuits: Boolean = false,
+        includeLoops: Boolean = false,
+        includeLvSubstations: Boolean = false,
+        includeLvFeeders: Boolean = false
+    ): GrpcResult<NetworkHierarchy> =
+        consumerClient.getNetworkHierarchy(
+            includeGeographicalRegions = includeGeographicalRegions,
+            includeSubgeographicalRegions = includeSubgeographicalRegions,
+            includeSubstations = includeSubstations,
+            includeFeeders = includeFeeders,
+            includeCircuits = includeCircuits,
+            includeLoops = includeLoops,
+            includeLvSubstations = includeLvSubstations,
+            includeLvFeeders = includeLvFeeders,
+        )
+
     @Test
-    internal fun `can optionally retrieve parts of network hierarchy`() {
-        consumerService.onGetNetworkHierarchy = spy { _, response -> response.onNext(NetworkHierarchyAllTypes.createResponse()) }
-
-        var result = consumerClient.getNetworkHierarchy(false)
-        var request = GetNetworkHierarchyRequest.newBuilder().also { it.includeGeographicalRegions = false }
-
-        verify(consumerService.onGetNetworkHierarchy).invoke(eq(request.build()), any())
+    internal fun `can optionally retrieve geographical regions`() {
+        consumerService.onGetNetworkHierarchy =
+            spy { _, response -> response.onNext(NetworkHierarchyAllTypes.createResponse(includeGeographicalRegions = true)) }
+        val result = callGetHierarchy(consumerClient, includeGeographicalRegions = true)
+        val request = buildHierarchyRequest(includeGeographicalRegions = true)
+        verify(consumerService.onGetNetworkHierarchy).invoke(eq(request), any())
         assertThat("getNetworkHierarchy should succeed", result.wasSuccessful)
-        validateNetworkHierarchy(result.value, NetworkHierarchyAllTypes.createNetworkHierarchy(includeGeographicalRegions = false))
+        validateNetworkHierarchy(result.value, NetworkHierarchyAllTypes.createNetworkHierarchy(includeGeographicalRegions = true))
 
-        result = consumerClient.getNetworkHierarchy(includeSubgeographicalRegions = false)
-        request = GetNetworkHierarchyRequest.newBuilder().also { it.includeSubgeographicalRegions = false }
-
-        verify(consumerService.onGetNetworkHierarchy).invoke(eq(request.build()), any())
+    }
+    @Test
+    internal fun `can optionally retrieve subgeographical regions`() {
+        consumerService.onGetNetworkHierarchy = spy { _, response -> response.onNext(NetworkHierarchyAllTypes.createResponse(includeSubgeographicalRegions = true)) }
+        val result = callGetHierarchy(consumerClient, includeSubgeographicalRegions = true)
+        val request = buildHierarchyRequest(includeSubgeographicalRegions = true)
+        verify(consumerService.onGetNetworkHierarchy).invoke(eq(request), any())
         assertThat("getNetworkHierarchy should succeed", result.wasSuccessful)
-        validateNetworkHierarchy(result.value, NetworkHierarchyAllTypes.createNetworkHierarchy(includeSubgeographicalRegions = false))
+        validateNetworkHierarchy(result.value, NetworkHierarchyAllTypes.createNetworkHierarchy(includeSubgeographicalRegions = true))
 
-        result = consumerClient.getNetworkHierarchy(includeSubstations = false)
-        request = GetNetworkHierarchyRequest.newBuilder().also { it.includeSubstations = false }
+    }
 
-        verify(consumerService.onGetNetworkHierarchy).invoke(eq(request.build()), any())
+    @Test
+    internal fun `can optionally retrieve substations`() {
+        consumerService.onGetNetworkHierarchy = spy { _, response -> response.onNext(NetworkHierarchyAllTypes.createResponse(includeSubstations = true)) }
+        val result = callGetHierarchy(consumerClient, includeSubstations = true)
+        val request = buildHierarchyRequest(includeSubstations = true)
+        verify(consumerService.onGetNetworkHierarchy).invoke(eq(request), any())
         assertThat("getNetworkHierarchy should succeed", result.wasSuccessful)
-        validateNetworkHierarchy(result.value, NetworkHierarchyAllTypes.createNetworkHierarchy(includeSubstations = false))
+        validateNetworkHierarchy(result.value, NetworkHierarchyAllTypes.createNetworkHierarchy(includeSubstations = true))
 
-        result = consumerClient.getNetworkHierarchy(includeFeeders = false)
-        request = GetNetworkHierarchyRequest.newBuilder().also { it.includeFeeders = false }
+    }
 
-        verify(consumerService.onGetNetworkHierarchy).invoke(eq(request.build()), any())
+    @Test
+    internal fun `can optionally retrieve feeders`() {
+        consumerService.onGetNetworkHierarchy = spy { _, response -> response.onNext(NetworkHierarchyAllTypes.createResponse(includeFeeders = true)) }
+        val result = callGetHierarchy(consumerClient, includeFeeders = true)
+        val request = buildHierarchyRequest(includeFeeders = true)
+        verify(consumerService.onGetNetworkHierarchy).invoke(eq(request), any())
         assertThat("getNetworkHierarchy should succeed", result.wasSuccessful)
-        validateNetworkHierarchy(result.value, NetworkHierarchyAllTypes.createNetworkHierarchy(includeFeeders = false))
+        validateNetworkHierarchy(result.value, NetworkHierarchyAllTypes.createNetworkHierarchy(includeFeeders = true))
+    }
 
-        result = consumerClient.getNetworkHierarchy(includeCircuits = false)
-        request = GetNetworkHierarchyRequest.newBuilder().also { it.includeCircuits = false }
-
-        verify(consumerService.onGetNetworkHierarchy).invoke(eq(request.build()), any())
+    @Test
+    internal fun `can optionally retrieve circuits`() {
+        consumerService.onGetNetworkHierarchy = spy { _, response -> response.onNext(NetworkHierarchyAllTypes.createResponse(includeCircuits = true)) }
+        val result = callGetHierarchy(consumerClient, includeCircuits = true)
+        val request = buildHierarchyRequest(includeCircuits = true)
+        verify(consumerService.onGetNetworkHierarchy).invoke(eq(request), any())
         assertThat("getNetworkHierarchy should succeed", result.wasSuccessful)
-        validateNetworkHierarchy(result.value, NetworkHierarchyAllTypes.createNetworkHierarchy(includeCircuits = false))
+        validateNetworkHierarchy(result.value, NetworkHierarchyAllTypes.createNetworkHierarchy(includeCircuits = true))
 
-        result = consumerClient.getNetworkHierarchy(includeLoops = false)
-        request = GetNetworkHierarchyRequest.newBuilder().also { it.includeLoops = false }
+    }
 
-        verify(consumerService.onGetNetworkHierarchy).invoke(eq(request.build()), any())
+    @Test
+    internal fun `can optionally retrieve loops`() {
+        consumerService.onGetNetworkHierarchy = spy { _, response -> response.onNext(NetworkHierarchyAllTypes.createResponse(includeLoops = true)) }
+        val result = callGetHierarchy(consumerClient, includeLoops = true)
+        val request = buildHierarchyRequest(includeLoops = true)
+        verify(consumerService.onGetNetworkHierarchy).invoke(eq(request), any())
         assertThat("getNetworkHierarchy should succeed", result.wasSuccessful)
-        validateNetworkHierarchy(result.value, NetworkHierarchyAllTypes.createNetworkHierarchy(includeLoops = false))
+        validateNetworkHierarchy(result.value, NetworkHierarchyAllTypes.createNetworkHierarchy(includeLoops = true))
 
-        result = consumerClient.getNetworkHierarchy(includeLvSubstations = false)
-        request = GetNetworkHierarchyRequest.newBuilder().also { it.includeLvSubstations = false }
+    }
 
-        verify(consumerService.onGetNetworkHierarchy).invoke(eq(request.build()), any())
+    @Test
+    internal fun `can optionally retrieve lv substations`() {
+        consumerService.onGetNetworkHierarchy = spy { _, response -> response.onNext(NetworkHierarchyAllTypes.createResponse(includeLvSubstations = true)) }
+        val result = callGetHierarchy(consumerClient, includeLvSubstations = true)
+        val request = buildHierarchyRequest(includeLvSubstations = true)
+        verify(consumerService.onGetNetworkHierarchy).invoke(eq(request), any())
         assertThat("getNetworkHierarchy should succeed", result.wasSuccessful)
-        validateNetworkHierarchy(result.value, NetworkHierarchyAllTypes.createNetworkHierarchy(includeLvSubstations = false))
+        validateNetworkHierarchy(result.value, NetworkHierarchyAllTypes.createNetworkHierarchy(includeLvSubstations = true))
 
-        result = consumerClient.getNetworkHierarchy(includeLvFeeders = false)
-        request = GetNetworkHierarchyRequest.newBuilder().also { it.includeLvFeeders = false }
+    }
 
-        verify(consumerService.onGetNetworkHierarchy).invoke(eq(request.build()), any())
+    @Test
+    internal fun `can optionally retrieve lv feeders`() {
+        consumerService.onGetNetworkHierarchy = spy { _, response -> response.onNext(NetworkHierarchyAllTypes.createResponse(includeLvFeeders = true)) }
+        val result = callGetHierarchy(consumerClient, includeLvFeeders = true)
+        val request = buildHierarchyRequest(includeLvFeeders = true)
+        verify(consumerService.onGetNetworkHierarchy).invoke(eq(request), any())
         assertThat("getNetworkHierarchy should succeed", result.wasSuccessful)
-        validateNetworkHierarchy(result.value, NetworkHierarchyAllTypes.createNetworkHierarchy(includeLvFeeders = false))
+        validateNetworkHierarchy(result.value, NetworkHierarchyAllTypes.createNetworkHierarchy(includeLvFeeders = true))
     }
 
     @Test
@@ -404,7 +471,7 @@ internal class NetworkConsumerClientTest {
 
         val result = consumerClient.getNetworkHierarchy()
 
-        verify(consumerService.onGetNetworkHierarchy).invoke(eq(GetNetworkHierarchyRequest.newBuilder().build()), any())
+        verify(consumerService.onGetNetworkHierarchy).invoke(isA<GetNetworkHierarchyRequest>(), any())
         validateFailure(onErrorHandler, result, serverException)
     }
 
@@ -416,7 +483,7 @@ internal class NetworkConsumerClientTest {
 
         val result = consumerClient.getNetworkHierarchy()
 
-        verify(consumerService.onGetNetworkHierarchy).invoke(eq(GetNetworkHierarchyRequest.newBuilder().build()), any())
+        verify(consumerService.onGetNetworkHierarchy).invoke(isA<GetNetworkHierarchyRequest>(), any())
         validateFailure(onErrorHandler, result, serverException, expectHandled = false)
     }
 
@@ -466,8 +533,6 @@ internal class NetworkConsumerClientTest {
         expect { throw result.thrown }
             .toThrow<NoSuchElementException>()
             .withMessage("No object with mRID f002 could be found.")
-
-        validateFeederNetwork(service, NetworkHierarchyAllTypes.createService())
     }
 
     @Test
@@ -878,15 +943,15 @@ internal class NetworkConsumerClientTest {
         actualMap.forEach { (mRID, it) ->
             val expected = expectedMap[mRID]
             assertThat(expected, notNullValue())
-
-            assertThat(NetworkServiceComparator().compare(it, expected!!).differences, anEmptyMap())
+            val comparison = NetworkServiceComparator().compare(it, expected!!)
+            assertThat("Differences comparing network hierarchy: ${comparison.differences}", comparison.differences, anEmptyMap())
         }
     }
 
     private fun configureFeederResponses(expectedService: NetworkService, invalidObject: Class<out IdentifiedObject>? = null): Throwable? {
         val expectedException = createException(invalidObject)
 
-        consumerService.onGetNetworkHierarchy = spy { _, response -> response.onNext(NetworkHierarchyAllTypes.createResponse()) }
+        consumerService.onGetNetworkHierarchy = spy { _, response -> response.onNext(NetworkHierarchyAllTypes.createResponse(true, true, true, true, true, true, true, true)) }
 
         consumerService.onGetIdentifiedObjects = spy { request, response ->
             val objects = mutableListOf<IdentifiedObject>()

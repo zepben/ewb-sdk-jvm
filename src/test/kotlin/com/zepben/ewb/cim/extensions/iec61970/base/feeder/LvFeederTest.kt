@@ -38,14 +38,17 @@ internal class LvFeederTest {
     @Test
     internal fun accessorCoverage() {
         val terminal = Terminal(generateId())
+        val lvSub = LvSubstation(generateId())
 
         assertThat(lvFeeder.normalHeadTerminal, nullValue())
 
         lvFeeder.apply {
             normalHeadTerminal = terminal
+            normalEnergizingLvSubstation = lvSub
         }
 
         assertThat(lvFeeder.normalHeadTerminal, equalTo(terminal))
+        assertThat(lvFeeder.normalEnergizingLvSubstation, equalTo(lvSub))
     }
 
     @Test
@@ -87,34 +90,6 @@ internal class LvFeederTest {
             LvFeeder::addCurrentEquipment,
             LvFeeder::removeCurrentEquipment,
             LvFeeder::clearCurrentEquipment
-        )
-    }
-
-    @Test
-    internal fun normalEnergizingLvSubstations() {
-        PrivateCollectionValidator.validateUnordered(
-            ::LvFeeder,
-            ::LvSubstation,
-            LvFeeder::normalEnergizingLvSubstations,
-            LvFeeder::numNormalEnergizingLvSubstations,
-            LvFeeder::getNormalEnergizingLvSubstation,
-            LvFeeder::addNormalEnergizingLvSubstation,
-            LvFeeder::removeNormalEnergizingLvSubstation,
-            LvFeeder::clearNormalEnergizingLvSubstations
-        )
-    }
-
-    @Test
-    internal fun currentEnergizingLvSubstations() {
-        PrivateCollectionValidator.validateUnordered(
-            ::LvFeeder,
-            ::LvSubstation,
-            LvFeeder::currentEnergizingLvSubstations,
-            LvFeeder::numCurrentEnergizingLvSubstations,
-            LvFeeder::getCurrentEnergizingLvSubstation,
-            LvFeeder::addCurrentEnergizingLvSubstation,
-            LvFeeder::removeCurrentEnergizingLvSubstation,
-            LvFeeder::clearCurrentEnergizingLvSubstations
         )
     }
 

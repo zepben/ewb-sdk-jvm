@@ -125,8 +125,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
             compareIdReferences(LvFeeder::normalHeadTerminal)
             compareIdReferenceCollections(LvFeeder::normalEnergizingFeeders)
             compareIdReferenceCollections(LvFeeder::currentEnergizingFeeders)
-            compareIdReferenceCollections(LvFeeder::normalEnergizingLvSubstations)
-            compareIdReferenceCollections(LvFeeder::currentEnergizingLvSubstations)
+            compareIdReferences(LvFeeder::normalEnergizingLvSubstation)
             if (options.compareFeederEquipment) {
                 compareIdReferenceCollections(LvFeeder::currentEquipment)
             }
@@ -138,9 +137,8 @@ class NetworkServiceComparator @JvmOverloads constructor(
             compareIdReferenceCollections(LvSubstation::normalEnergizingFeeders)
             compareIdReferenceCollections(LvSubstation::currentEnergizingFeeders)
             compareIdReferenceCollections(LvSubstation::normalEnergizedLvFeeders)
-            compareIdReferenceCollections(LvSubstation::currentEnergizedLvFeeders)
-            if (options.compareFeederEquipment) {
-                compareIdReferenceCollections(LvSubstation::currentEquipment)
+            if (options.compareEquipmentContainers) {
+                compareEquipmentContainer()
             }
         }
 

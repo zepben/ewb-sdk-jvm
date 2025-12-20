@@ -20,7 +20,6 @@ import com.zepben.ewb.services.common.extensions.validateReference
  * @property normalEnergizingFeeders [ZBEX] The Feeders that nominally energize the substation. Also used for naming purposes.
  * @property normalEnergizedLvFeeders [ZBEX] The LvFeeders that are nominally energized by this LvSubstation. Also used for naming purposes.
  * @property currentEnergizingFeeders [ZBEX] The Feeders that currently energize the substation. Also used for naming purposes.
- * @property currentEnergizedLvFeeders [ZBEX] The LvFeeders that are currently energized by this LvSubstation. Also used for naming purposes.
  */
 @ZBEX
 class LvSubstation(mRID: String) : EquipmentContainer(mRID) {
@@ -28,8 +27,6 @@ class LvSubstation(mRID: String) : EquipmentContainer(mRID) {
     private var _normalEnergizingFeedersById: MutableMap<String?, Feeder>? = null
     private var _currentEnergizingFeedersById: MutableMap<String?, Feeder>? = null
     private var _normalEnergizedLvFeedersById: MutableMap<String?, LvFeeder>? = null
-    private var _currentEnergizedLvFeedersById: MutableMap<String?, LvFeeder>? = null
-
 
     /**
      * [ZBEX] The HV/MV feeders that normally energize this [LvSubstation]. The returned collection is read only.
@@ -194,63 +191,8 @@ class LvSubstation(mRID: String) : EquipmentContainer(mRID) {
     }
 
     /**
-     * The LV feeders that are currently energized by the [LvSubstation]. The returned collection is read only.
-     */
-    @ZBEX
-    val currentEnergizedLvFeeders: Collection<LvFeeder> get() = _currentEnergizedLvFeedersById?.values.asUnmodifiable()
-
-    /**
-     * Get the number of entries in the current [LvFeeder] collection.
-     */
-    fun numCurrentEnergizedLvFeeders(): Int = _currentEnergizedLvFeedersById?.size ?: 0
-
-    /**
-     * Retrieve an energized LV feeder using the current state of the network.
-     *
-     * @param mRID the mRID of the required current [LvFeeder]
-     * @return The [LvFeeder] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getCurrentEnergizedLvFeeder(mRID: String): LvFeeder? = _currentEnergizedLvFeedersById?.get(mRID)
-
-    /**
-     * @param lvFeeder the LV feeder to associate with this feeder in the current state of the network.
-     */
-    fun addCurrentEnergizedLvFeeder(lvFeeder: LvFeeder): LvSubstation {
-        if (validateReference(lvFeeder, ::getCurrentEnergizedLvFeeder, "An LvFeeder"))
-            return this
-
-        _currentEnergizedLvFeedersById = _currentEnergizedLvFeedersById ?: mutableMapOf()
-        _currentEnergizedLvFeedersById!!.putIfAbsent(lvFeeder.mRID, lvFeeder)
-
-        return this
-    }
-
-    /**
-     * @param lvFeeder the LV feeder to disassociate from this HV/MV feeder in the current state of the network.
-     */
-    fun removeCurrentEnergizedLvFeeder(lvFeeder: LvFeeder): Boolean {
-        val ret = _currentEnergizedLvFeedersById?.remove(lvFeeder.mRID)
-        if (_currentEnergizedLvFeedersById.isNullOrEmpty()) _currentEnergizedLvFeedersById = null
-        return ret != null
-    }
-
-    /**
-     * Clear all [LvFeeder]'s associated with this [LvSubstation] in the current state of the network.
-     *
-     * @return This [LvFeeder] for fluent use.
-     */
-    fun clearCurrentEnergizedLvFeeders(): LvSubstation {
-        _currentEnergizedLvFeedersById = null
-        return this
-    }
-
-    /**
      * Retrieves all normally energized LvFeeders that represent low voltage network connected below a switch on the edge of this LvSubstation. This is all LvFeeders in the normalEnergizedLvFeeders that has a normalHeadTerminal attached to a Switch.
      */
     fun normalEnergizedLvSwitchFeeders(): List<LvFeeder> = normalEnergizedLvFeeders.filter { it.normalHeadTerminal?.conductingEquipment is Switch }
 
-    /**
-     * Retrieves all currently energized LvFeeders that represent low voltage network connected below a switch on the edge of this LvSubstation. This is all LvFeeders in the currentEnergizedLvFeeders that has a normalHeadTerminal attached to a Switch.
-     */
-    fun currentEnergizedLvSwitchFeeders(): List<LvFeeder> = currentEnergizedLvFeeders.filter { it.normalHeadTerminal?.conductingEquipment is Switch }
 }

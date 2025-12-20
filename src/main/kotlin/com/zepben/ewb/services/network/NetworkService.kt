@@ -112,22 +112,6 @@ class NetworkService(metadata: MetadataCollection = MetadataCollection()) : Base
     // #################################
 
     /**
-     * Add the [Site] to this service.
-     *
-     * @param site The [Site] to add.
-     * @return `true` if the item was added to the service, otherwise false.
-     */
-    fun add(site: Site): Boolean = super.add(site)
-
-    /**
-     * Remove the [Site] from this service.
-     *
-     * @param site The [Site] to remove.
-     * @return `true` if the item was removed from the service, otherwise false.
-     */
-    fun remove(site: Site): Boolean = super.remove(site)
-
-    /**
      * Add the [HvCustomer] to this service.
      *
      * @param hvCustomer The [HvCustomer] to add.
@@ -142,6 +126,22 @@ class NetworkService(metadata: MetadataCollection = MetadataCollection()) : Base
      * @return `true` if the item was removed from the service, otherwise false.
      */
     fun remove(hvCustomer: HvCustomer): Boolean = super.remove(hvCustomer)
+
+    /**
+     * Add the [Site] to this service.
+     *
+     * @param site The [Site] to add.
+     * @return `true` if the item was added to the service, otherwise false.
+     */
+    fun add(site: Site): Boolean = super.add(site)
+
+    /**
+     * Remove the [Site] from this service.
+     *
+     * @param site The [Site] to remove.
+     * @return `true` if the item was removed from the service, otherwise false.
+     */
+    fun remove(site: Site): Boolean = super.remove(site)
 
     // ###################################
     // # Extensions IEC61970 Base Feeder #

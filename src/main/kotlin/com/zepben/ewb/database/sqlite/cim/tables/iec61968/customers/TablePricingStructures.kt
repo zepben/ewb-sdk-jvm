@@ -8,9 +8,14 @@
 
 package com.zepben.ewb.database.sqlite.cim.tables.iec61968.customers
 
+import com.zepben.ewb.database.sql.Column
+import com.zepben.ewb.database.sql.Column.Nullable
+import com.zepben.ewb.database.sql.Column.Type
 import com.zepben.ewb.database.sqlite.cim.tables.iec61968.common.TableDocuments
 
 class TablePricingStructures : TableDocuments() {
+
+    val CODE: Column = Column(++columnIndex, "code", Type.STRING, Nullable.NULL)
 
     override val name: String = "pricing_structures"
 

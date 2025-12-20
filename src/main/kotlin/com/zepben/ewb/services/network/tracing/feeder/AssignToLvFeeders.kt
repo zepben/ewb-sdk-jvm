@@ -169,11 +169,6 @@ class AssignToLvFeeders(
             if (foundLvFeeder) {
                 val foundLvFeeders = stepPath.toEquipment.findLvFeeders(lvFeederStartPoints)
 
-                // Energize the LV feeders we are processing by the energizing LvSubstations of what we found.
-                lvFeedersToAssign.energizedBy(foundLvFeeders.flatMap { stateOperators.getEnergizingLvSubstations(it) })
-                // Energize the LV feeders we found by the energizing LvSubstations we are processing
-                foundLvFeeders.energizedBy(lvFeedersToAssign.flatMap { stateOperators.getEnergizingLvSubstations(it) })
-
                 // Energize the LV feeders we are processing by the energizing feeders of what we found.
                 lvFeedersToAssign.energizedBy(foundLvFeeders.flatMap { stateOperators.getEnergizingFeeders(it) })
                 // Energize the LV feeders we found by the energizing feeders we are processing
@@ -195,8 +190,8 @@ class AssignToLvFeeders(
             //
             // NOTE: Sites aren't added to the current state containers, so they will always need to be looked up from the normal containers,
             //       regardless of the state operators being used.
-            //
-            val sitesAndLvSubstations = containers.filterIsInstance<Site>() + getFilteredContainers<LvSubstation>(stateOperators)
+            // TODO: Remove site processing when we remove it in AssignToFeeders
+            val sitesAndLvSubstations = containers.filterIsInstance<Site>() + containers.filterIsInstance<LvSubstation>()
             return if (sitesAndLvSubstations.isNotEmpty())
                 sitesAndLvSubstations.findLvFeeders(lvFeederStartPoints, stateOperators)
             else
@@ -228,13 +223,6 @@ class AssignToLvFeeders(
                 stateOperators.associateEnergizingFeeder(it, lvFeeder)
             }
         }
-
-        private fun Iterable<LvFeeder>.energizedBy(lvSubstations: Iterable<LvSubstation>) = forEach { lvFeeder ->
-            lvSubstations.forEach {
-                stateOperators.associateEnergizingLvSubstation(lvFeeder, it)
-            }
-        }
-
 
     }
 

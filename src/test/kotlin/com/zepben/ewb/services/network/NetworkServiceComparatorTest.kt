@@ -150,6 +150,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         compareEquipmentContainer { LvFeeder(it) }
 
         comparatorValidator.validateProperty(LvFeeder::normalHeadTerminal, { LvFeeder(it) }, { Terminal("t1") }, { Terminal("t2") })
+        comparatorValidator.validateProperty(LvFeeder::normalEnergizingLvSubstation, { LvFeeder(it) }, { LvSubstation("lvs1") }, { LvSubstation("lvs2") })
         comparatorValidator.validateCollection(
             LvFeeder::currentEquipment,
             LvFeeder::addCurrentEquipment,
@@ -174,21 +175,12 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             { Feeder("lvf2") },
             ::ObjectCollectionDifference,
         )
-
     }
 
     @Test
     internal fun compareLvSubstation() {
         compareEquipmentContainer { LvSubstation(it) }
 
-        comparatorValidator.validateCollection(
-            LvSubstation::currentEquipment,
-            LvSubstation::addCurrentEquipment,
-            { LvSubstation(it) },
-            { Junction("j1") },
-            { Junction("j2") },
-            ::ObjectCollectionDifference,
-        )
         comparatorValidator.validateCollection(
             LvSubstation::normalEnergizingFeeders,
             LvSubstation::addNormalEnergizingFeeder,
@@ -206,6 +198,14 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             ::ObjectCollectionDifference,
         )
 
+        comparatorValidator.validateCollection(
+            LvSubstation::normalEnergizedLvFeeders,
+            LvSubstation::addNormalEnergizedLvFeeder,
+            { LvSubstation(it) },
+            { LvFeeder("lvf1") },
+            { LvFeeder("lvf2") },
+            ::ObjectCollectionDifference,
+        )
     }
 
     // ##################################################
@@ -491,6 +491,16 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
 
         comparatorValidator.validateProperty(WireInfo::ratedCurrent, createWireInfo, { 1 }, { 2 })
         comparatorValidator.validateProperty(WireInfo::material, createWireInfo, { WireMaterialKind.aluminum }, { WireMaterialKind.copperCadmium })
+        comparatorValidator.validateProperty(WireInfo::sizeDescription, createWireInfo, { "1" }, { "2" })
+        comparatorValidator.validateProperty(WireInfo::strandCount, createWireInfo, { "3" }, { "4" })
+        comparatorValidator.validateProperty(WireInfo::coreStrandCount, createWireInfo, { "5" }, { "6" })
+        comparatorValidator.validateProperty(WireInfo::insulated, createWireInfo, { true }, { false })
+        comparatorValidator.validateProperty(
+            WireInfo::insulationMaterial,
+            createWireInfo,
+            { WireInsulationKind.doubleWireArmour },
+            { WireInsulationKind.beltedPilc })
+        comparatorValidator.validateProperty(WireInfo::insulationThickness, createWireInfo, { 1.0 }, { 2.0 })
     }
 
     // ###################
@@ -930,6 +940,23 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             ::ObjectCollectionDifference,
         )
 
+        comparatorValidator.validateCollection(
+            Feeder::normalEnergizedLvSubstations,
+            Feeder::addNormalEnergizedLvSubstation,
+            { Feeder(it) },
+            { LvSubstation("lvs1") },
+            { LvSubstation("lvs2") },
+            ::ObjectCollectionDifference,
+        )
+        comparatorValidator.validateCollection(
+            Feeder::currentEnergizedLvSubstations,
+            Feeder::addCurrentEnergizedLvSubstation,
+            { Feeder(it) },
+            { LvSubstation("lvs1") },
+            { LvSubstation("lvs2") },
+            ::ObjectCollectionDifference,
+        )
+
     }
 
     @Test
@@ -1223,6 +1250,31 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             { Clamp("c2") },
             ::ObjectCollectionDifference,
         )
+        comparatorValidator.validateCollection(
+            AcLineSegment::phases,
+            AcLineSegment::addPhase,
+            { AcLineSegment(it) },
+            { AcLineSegmentPhase("p1") },
+            { AcLineSegmentPhase("p2") },
+            ::ObjectCollectionDifference,
+        )
+    }
+
+    @Test
+    internal fun compareAcLineSegmentPhase() {
+        comparePowerSystemResource { AcLineSegmentPhase(it) }
+
+        comparatorValidator.validateProperty(
+            AcLineSegmentPhase::acLineSegment,
+            { AcLineSegmentPhase(it) },
+            { AcLineSegment("c1") },
+            { AcLineSegment("c2") }
+        )
+
+        comparatorValidator.validateProperty(AcLineSegmentPhase::assetInfo, { AcLineSegmentPhase(it) }, { CableInfo("c1") }, { CableInfo("c2") })
+        comparatorValidator.validateProperty(AcLineSegmentPhase::phase, { AcLineSegmentPhase(it) }, { SinglePhaseKind.A }, { SinglePhaseKind.B })
+        comparatorValidator.validateProperty(AcLineSegmentPhase::sequenceNumber, { AcLineSegmentPhase(it) }, { 1 }, { 2 })
+
     }
 
     @Test
@@ -1733,6 +1785,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             { PhaseShuntConnectionKind.G }
         )
         comparatorValidator.validateProperty(ShuntCompensator::sections, createShuntCompensator, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(ShuntCompensator::groundingTerminal, createShuntCompensator, { Terminal("t1") }, { Terminal("t2") })
     }
 
     @Test

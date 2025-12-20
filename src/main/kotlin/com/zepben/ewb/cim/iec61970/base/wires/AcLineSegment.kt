@@ -197,27 +197,33 @@ class AcLineSegment(mRID: String) : Conductor(mRID) {
     fun getPhase(mRID: String): AcLineSegmentPhase? = _phases?.getByMRID(mRID)
 
     /**
+     * The individual phase models for this AcLineSegment.
+     *
+     * @param phase the phase of the required [AcLineSegmentPhase]
+     * @return The [AcLineSegmentPhase] with the specified [phase] if it exists, otherwise null
+     */
+    fun getPhase(phase: SinglePhaseKind): AcLineSegmentPhase? = _phases?.find { it.phase == phase }
+
+    /**
      * Add an [AcLineSegmentPhase] to this [AcLineSegment].
      *
      * @param phase The [AcLineSegmentPhase] to add.
      * @return This [AcLineSegment] for fluent use.
      */
     fun addPhase(phase: AcLineSegmentPhase): AcLineSegment {
-        if (validateReference(phase, ::getPhase, "An ACLineSegmentPhase"))
+        if (validateReference(phase, ::getPhase, "An AcLineSegmentPhase"))
             return this
 
         if (phase.acLineSegment == null)
             phase.acLineSegment = this
 
-        require(_phases?.none { it.phase == phase.phase } ?: true) {
-            "Could not add ${phase.typeNameAndMRID()} to ${typeNameAndMRID()} as ${phase.phase} was already present in the phases collection for this conductor. Ensure you are not adding duplicate phases."
-        }
         require(phase.acLineSegment === this) {
             "${phase.typeNameAndMRID()} `acLineSegment` property references ${phase.acLineSegment!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
         }
 
         _phases = _phases ?: mutableListOf()
         _phases!!.add(phase)
+        _phases!!.sortBy { it.sequenceNumber }
 
         return this
     }

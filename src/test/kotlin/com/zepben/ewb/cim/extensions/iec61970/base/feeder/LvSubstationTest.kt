@@ -40,20 +40,6 @@ class LvSubstationTest {
     }
 
     @Test
-    internal fun currentEnergizedLvFeeders() {
-        PrivateCollectionValidator.validateUnordered(
-            ::LvSubstation,
-            ::LvFeeder,
-            LvSubstation::currentEnergizedLvFeeders,
-            LvSubstation::numCurrentEnergizedLvFeeders,
-            LvSubstation::getCurrentEnergizedLvFeeder,
-            LvSubstation::addCurrentEnergizedLvFeeder,
-            LvSubstation::removeCurrentEnergizedLvFeeder,
-            LvSubstation::clearCurrentEnergizedLvFeeders
-        )
-    }
-
-    @Test
     internal fun normalEnergizingFeeders() {
         PrivateCollectionValidator.validateUnordered(
             ::LvSubstation,
@@ -85,19 +71,16 @@ class LvSubstationTest {
     internal fun lvSwitchFeeders() {
         val ptt = Terminal(generateId())
         val ft = Terminal(generateId())
-        val pt = PowerTransformer(generateId()).apply { addTerminal(ptt) }
-        val fuse = Fuse(generateId()).apply { addTerminal(ft) }
+        PowerTransformer(generateId()).apply { addTerminal(ptt) }
+        Fuse(generateId()).apply { addTerminal(ft) }
         val lvf1 = LvFeeder(generateId()).apply { normalHeadTerminal = ptt }
         val lvf2 = LvFeeder(generateId()).apply { normalHeadTerminal = ft }
         val lvSub = LvSubstation(generateId()).apply {
             addNormalEnergizedLvFeeder(lvf1)
             addNormalEnergizedLvFeeder(lvf2)
-            addCurrentEnergizedLvFeeder(lvf1)
-            addCurrentEnergizedLvFeeder(lvf2)
         }
 
         assertThat(lvSub.normalEnergizedLvSwitchFeeders(), contains(lvf2))
-        assertThat(lvSub.currentEnergizedLvSwitchFeeders(), contains(lvf2))
     }
 
 }

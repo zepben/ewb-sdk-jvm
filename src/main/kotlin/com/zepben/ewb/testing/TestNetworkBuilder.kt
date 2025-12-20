@@ -799,7 +799,9 @@ open class TestNetworkBuilder {
             LvSubstation(id).apply {
                 equipmentMrids.map { network.get<Equipment>(it)!! }.forEach {
                     addEquipment(it)
+                    addCurrentEquipment(it)
                     it.addContainer(this)
+                    it.addCurrentContainer(this)
                 }
 
                 add(this)

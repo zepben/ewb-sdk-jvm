@@ -446,11 +446,7 @@ fun toPb(cim: LvFeeder, pb: PBLvFeeder.Builder): PBLvFeeder.Builder =
         cim.normalEnergizingFeeders.forEach { addNormalEnergizingFeederMRIDs(it.mRID) }
         clearCurrentlyEnergizingFeederMRIDs()
         cim.currentEnergizingFeeders.forEach { addCurrentlyEnergizingFeederMRIDs(it.mRID) }
-
-        clearNormalEnergizingLvSubstationMRIDs()
-        cim.normalEnergizingLvSubstations.forEach { addNormalEnergizingLvSubstationMRIDs(it.mRID) }
-        clearCurrentlyEnergizingLvSubstationMRIDs()
-        cim.currentEnergizingLvSubstations.forEach { addCurrentlyEnergizingLvSubstationMRIDs(it.mRID) }
+        cim.normalEnergizingLvSubstation?.also { normalEnergizingLvSubstationMRID = it.mRID } ?: clearNormalEnergizingLvSubstationMRID()
 
         toPb(cim, ecBuilder)
     }
@@ -471,8 +467,6 @@ fun toPb(cim: LvSubstation, pb: PBLvSubstation.Builder): PBLvSubstation.Builder 
 
         clearNormalEnergizedLvFeederMRIDs()
         cim.normalEnergizedLvFeeders.forEach { addNormalEnergizedLvFeederMRIDs(it.mRID) }
-        clearCurrentlyEnergizedLvFeederMRIDs()
-        cim.currentEnergizedLvFeeders.forEach { addCurrentlyEnergizedLvFeederMRIDs(it.mRID) }
 
         toPb(cim, ecBuilder)
     }

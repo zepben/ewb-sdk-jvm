@@ -10,9 +10,11 @@ package com.zepben.ewb.services.network
 
 import com.zepben.ewb.cim.extensions.iec61968.assetinfo.RelayInfo
 import com.zepben.ewb.cim.extensions.iec61968.metering.PanDemandResponseFunction
+import com.zepben.ewb.cim.extensions.iec61970.base.core.HvCustomer
 import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
+import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvSubstation
 import com.zepben.ewb.cim.extensions.iec61970.base.generation.production.EvChargingUnit
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.DirectionalCurrentRelay
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.DistanceRelay
@@ -155,6 +157,9 @@ internal class NetworkServiceUtilsTest {
         isCut: (Cut) -> String,
         isClamp: (Clamp) -> String,
         isDirectionalCurrentRelay: (DirectionalCurrentRelay) -> String,
+        isHvCustomer: (HvCustomer) -> String,
+        isLvSubstation: (LvSubstation) -> String,
+        isAcLineSegmentPhase: (AcLineSegmentPhase) -> String,
         isOther: (IdentifiedObject) -> String
     ): String = whenNetworkServiceObject(
         identifiedObject,
@@ -245,6 +250,9 @@ internal class NetworkServiceUtilsTest {
         isCut = isCut,
         isClamp = isClamp,
         isDirectionalCurrentRelay = isDirectionalCurrentRelay,
+        isHvCustomer = isHvCustomer,
+        isLvSubstation = isLvSubstation,
+        isAcLineSegmentPhase = isAcLineSegmentPhase,
         isOther = isOther
     )
 

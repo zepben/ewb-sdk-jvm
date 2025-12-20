@@ -29,6 +29,7 @@ import com.zepben.ewb.testing.TestNetworkBuilder
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.containsInAnyOrder
+import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -337,11 +338,7 @@ internal class AssignToFeedersTest {
         validateEquipment(feeder.equipment, "b0", "c1", "tx2")
         assertThat(feeder.normalEnergizedLvFeeders.map { it.mRID }, containsInAnyOrder("lvf9", "lvf10", "lvf11"))
         assertThat(feeder.normalEnergizedLvSubstations.map { it.mRID }, containsInAnyOrder("lvs12"))
-        assertThat(lvSub.normalEnergizedLvFeeders.map { it.mRID }, containsInAnyOrder("lvf9", "lvf10", "lvf11"))
         assertThat(lvSub.normalEnergizingFeeders.map { it.mRID }, containsInAnyOrder("fdr8"))
-        assertThat(lvf9.normalEnergizingLvSubstations.map { it.mRID }, containsInAnyOrder("lvs12"))
-        assertThat(lvf10.normalEnergizingLvSubstations.map { it.mRID }, containsInAnyOrder("lvs12"))
-        assertThat(lvf11.normalEnergizingLvSubstations.map { it.mRID }, containsInAnyOrder("lvs12"))
         assertThat(lvf9.normalEnergizingFeeders.map { it.mRID }, containsInAnyOrder("fdr8"))
         assertThat(lvf10.normalEnergizingFeeders.map { it.mRID }, containsInAnyOrder("fdr8"))
         assertThat(lvf11.normalEnergizingFeeders.map { it.mRID }, containsInAnyOrder("fdr8"))

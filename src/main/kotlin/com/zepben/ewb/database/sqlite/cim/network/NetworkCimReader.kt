@@ -12,9 +12,11 @@ import com.zepben.ewb.cim.extensions.iec61968.assetinfo.RelayInfo
 import com.zepben.ewb.cim.extensions.iec61968.common.ContactDetails
 import com.zepben.ewb.cim.extensions.iec61968.common.ContactMethodType
 import com.zepben.ewb.cim.extensions.iec61968.metering.PanDemandResponseFunction
+import com.zepben.ewb.cim.extensions.iec61970.base.core.HvCustomer
 import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
+import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvSubstation
 import com.zepben.ewb.cim.extensions.iec61970.base.generation.production.EvChargingUnit
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.*
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.BatteryControl
@@ -52,6 +54,8 @@ import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.common.Tabl
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.common.TableContactDetailsStreetAddresses
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.common.TableContactDetailsTelephoneNumbers
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.metering.TablePanDemandResponseFunctions
+import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61970.base.core.TableHvCustomers
+import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61970.base.core.TableLvSubstations
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61970.base.core.TableSites
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61970.base.feeder.TableLoops
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61970.base.feeder.TableLvFeeders
@@ -274,6 +278,24 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
     // #################################
 
     /**
+     * Create a [HvCustomer] and populate its fields from [TableHvCustomers].
+     *
+     * @param service The [NetworkService] used to store any items read from the database.
+     * @param table The database table to read the [HvCustomer] fields from.
+     * @param resultSet The record in the database table containing the fields for this [HvCustomer].
+     * @param setIdentifier A callback to register the mRID of this [HvCustomer] for logging purposes.
+     *
+     * @return true if the [HvCustomer] was successfully read from the database and added to the service.
+     * @throws SQLException For any errors encountered reading from the database.
+     */
+    @Throws(SQLException::class)
+    fun read(service: NetworkService, table: TableHvCustomers, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val hvCustomer = HvCustomer(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
+
+        return readEquipmentContainer(service, hvCustomer, table, resultSet) && service.addOrThrow(hvCustomer)
+    }
+
+    /**
      * Create a [Site] and populate its fields from [TableSites].
      *
      * @param service The [NetworkService] used to store any items read from the database.
@@ -331,9 +353,29 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
                 resultSet.getNullableString(table.NORMAL_HEAD_TERMINAL_MRID.queryIndex),
                 typeNameAndMRID()
             )
+            normalEnergizingLvSubstation = service.ensureGet(resultSet.getNullableString(table.LV_SUBSTATION_MRID.queryIndex), typeNameAndMRID())
+            normalEnergizingLvSubstation?.addNormalEnergizedLvFeeder(this)
         }
 
         return readEquipmentContainer(service, lvFeeder, table, resultSet) && service.addOrThrow(lvFeeder)
+    }
+
+    /**
+     * Create a [LvSubstation] and populate its fields from [TableLvSubstations].
+     *
+     * @param service The [NetworkService] used to store any items read from the database.
+     * @param table The database table to read the [LvSubstation] fields from.
+     * @param resultSet The record in the database table containing the fields for this [LvSubstation].
+     * @param setIdentifier A callback to register the mRID of this [LvSubstation] for logging purposes.
+     *
+     * @return true if the [LvSubstation] was successfully read from the database and added to the service.
+     * @throws SQLException For any errors encountered reading from the database.
+     */
+    @Throws(SQLException::class)
+    fun read(service: NetworkService, table: TableLvSubstations, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val lvSubstation = LvSubstation(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
+
+        return readEquipmentContainer(service, lvSubstation, table, resultSet) && service.addOrThrow(lvSubstation)
     }
 
     // ##################################################
@@ -864,6 +906,12 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
         wireInfo.apply {
             ratedCurrent = resultSet.getNullableInt(table.RATED_CURRENT.queryIndex)
             material = WireMaterialKind.valueOf(resultSet.getString(table.MATERIAL.queryIndex))
+            sizeDescription = resultSet.getNullableString(table.SIZE_DESCRIPTION.queryIndex)
+            strandCount = resultSet.getNullableString(table.STRAND_COUNT.queryIndex)
+            coreStrandCount = resultSet.getNullableString(table.CORE_STRAND_COUNT.queryIndex)
+            insulated = resultSet.getNullableBoolean(table.INSULATED.queryIndex)
+            insulationMaterial = WireInsulationKind.valueOf(resultSet.getString(table.INSULATATION_MATERIAL.queryIndex))
+            insulationThickness = resultSet.getNullableDouble(table.INSULATATION_THICKNESS.queryIndex)
         }
 
         return readAssetInfo(wireInfo, table, resultSet)
@@ -1962,6 +2010,30 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
     }
 
     /**
+     * Create a [AcLineSegmentPhase] and populate its fields from [TableAcLineSegmentPhases].
+     *
+     * @param service The [NetworkService] used to store any items read from the database.
+     * @param table The database table to read the [AcLineSegmentPhase] fields from.
+     * @param resultSet The record in the database table containing the fields for this [AcLineSegmentPhase].
+     * @param setIdentifier A callback to register the mRID of this [AcLineSegmentPhase] for logging purposes.
+     *
+     * @return true if the [AcLineSegmentPhase] was successfully read from the database and added to the service.
+     * @throws SQLException For any errors encountered reading from the database.
+     */
+    @Throws(SQLException::class)
+    fun read(service: NetworkService, table: TableAcLineSegmentPhases, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val acLineSegmentPhase = AcLineSegmentPhase(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
+            assetInfo = service.ensureGet(resultSet.getNullableString(table.WIRE_INFO_MRID.queryIndex), typeNameAndMRID())
+            acLineSegment = service.ensureGet(resultSet.getNullableString(table.AC_LINE_SEGMENT_MRID.queryIndex), typeNameAndMRID())
+            acLineSegment?.addPhase(this)
+            phase = SinglePhaseKind.valueOf(resultSet.getString(table.PHASE.queryIndex))
+            sequenceNumber = resultSet.getNullableInt(table.SEQUENCE_NUMBER.queryIndex)
+        }
+
+        return readPowerSystemResource(service, acLineSegmentPhase, table, resultSet) && service.addOrThrow(acLineSegmentPhase)
+    }
+
+    /**
      * Create a [Breaker] and populate its fields from [TableBreakers].
      *
      * @param service The [NetworkService] used to store any items read from the database.
@@ -2795,6 +2867,10 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
             nomU = resultSet.getNullableInt(table.NOM_U.queryIndex)
             phaseConnection = PhaseShuntConnectionKind.valueOf(resultSet.getString(table.PHASE_CONNECTION.queryIndex))
             sections = resultSet.getNullableDouble(table.SECTIONS.queryIndex)
+
+            // We use a resolver here because there is an ordering conflict between Terminal, ConductingEquipment, and ShuntCompensator
+            // We check this resolver has actually been resolved in the afterServiceRead of the database read and throw there if it hasn't.
+            service.resolveOrDeferReference(Resolvers.terminal(this), resultSet.getNullableString(table.GROUNDING_TERMINAL_MRID.queryIndex))
         }
 
         return readRegulatingCondEq(service, shuntCompensator, table, resultSet)

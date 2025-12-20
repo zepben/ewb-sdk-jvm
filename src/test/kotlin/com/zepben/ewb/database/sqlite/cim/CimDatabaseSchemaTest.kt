@@ -138,9 +138,9 @@ abstract class CimDatabaseSchemaTest<TService : BaseService, TWriter : CimDataba
         if (differences.modifications().isNotEmpty())
             System.err.println(differences.toString())
 
-        assertThat("unexpected objects found in read service", differences.missingFromTarget(), empty())
-        assertThat("unexpected modifications", differences.modifications(), anEmptyMap())
-        assertThat("objects missing from read service", differences.missingFromSource(), empty())
+        assertThat("unexpected objects found in read service: ${differences.missingFromTarget()}", differences.missingFromTarget(), empty())
+        assertThat("unexpected modifications ${differences.modifications()}", differences.modifications(), anEmptyMap())
+        assertThat("objects missing from read service: ${differences.missingFromSource()}", differences.missingFromSource(), empty())
     }
 
 }

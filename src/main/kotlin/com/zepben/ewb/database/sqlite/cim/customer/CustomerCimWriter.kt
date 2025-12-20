@@ -108,6 +108,8 @@ class CustomerCimWriter(
         val table = databaseTables.getTable<TablePricingStructures>()
         val insert = databaseTables.getInsert<TablePricingStructures>()
 
+        insert.setNullableString(table.CODE.queryIndex, pricingStructure.code)
+
         var status = true
         pricingStructure.tariffs.forEach { status = status and writeAssociation(pricingStructure, it) }
 

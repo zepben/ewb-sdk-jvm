@@ -17,6 +17,8 @@ import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.common.Tabl
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.common.TableContactDetailsStreetAddresses
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.common.TableContactDetailsTelephoneNumbers
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.metering.TablePanDemandResponseFunctions
+import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61970.base.core.TableHvCustomers
+import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61970.base.core.TableLvSubstations
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61970.base.core.TableSites
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61970.base.feeder.TableLoops
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61970.base.feeder.TableLvFeeders
@@ -107,11 +109,13 @@ internal class NetworkServiceReader(
             readEach<TableSubGeographicalRegions>(service, reader::read) and
             readEach<TableSubstations>(service, reader::read) and
             readEach<TableSites>(service, reader::read) and
+            readEach<TableHvCustomers>(service, reader::read) and
             readEach<TablePerLengthPhaseImpedances>(service, reader::read) and
             readEach<TablePhaseImpedanceData>(service, reader::read) and
             readEach<TablePerLengthSequenceImpedances>(service, reader::read) and
             readEach<TableEquivalentBranches>(service, reader::read) and
             readEach<TableAcLineSegments>(service, reader::read) and
+            readEach<TableAcLineSegmentPhases>(service, reader::read) and
             readEach<TableBreakers>(service, reader::read) and
             readEach<TableLoadBreakSwitches>(service, reader::read) and
             readEach<TableBusbarSections>(service, reader::read) and
@@ -137,7 +141,6 @@ internal class NetworkServiceReader(
             readEach<TableGroundDisconnectors>(service, reader::read) and
             readEach<TableSeriesCompensators>(service, reader::read) and
             readEach<TableStaticVarCompensators>(service, reader::read) and
-            readEach<TableLinearShuntCompensators>(service, reader::read) and
             readEach<TablePowerTransformers>(service, reader::read) and
             readEach<TableReclosers>(service, reader::read) and
             readEach<TablePowerElectronicsConnections>(service, reader::read) and
@@ -146,6 +149,7 @@ internal class NetworkServiceReader(
             readEach<TablePetersenCoils>(service, reader::read) and
             readEach<TableGroundingImpedances>(service, reader::read) and
             readEach<TableSynchronousMachines>(service, reader::read) and
+            readEach<TableLinearShuntCompensators>(service, reader::read) and
             readEach<TableTerminals>(service, reader::read) and
             readEach<TableTapChangerControls>(service, reader::read) and
             readEach<TablePowerElectronicsConnectionPhases>(service, reader::read) and
@@ -164,6 +168,7 @@ internal class NetworkServiceReader(
             readEach<TablePotentialTransformers>(service, reader::read) and
             readEach<TableFeeders>(service, reader::read) and
             readEach<TableLoops>(service, reader::read) and
+            readEach<TableLvSubstations>(service, reader::read) and
             readEach<TableLvFeeders>(service, reader::read) and
             readEach<TableCircuits>(service, reader::read) and
             readEach<TablePositionPoints>(service, reader::read) and

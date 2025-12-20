@@ -120,28 +120,28 @@ internal class EquipmentContainerTest {
             .toEnergyConsumer()      // ec8
             .branchFrom("tx0")
             .toBreaker()             // b9  edge of substation
-            .toAcls(mRID = "outsideSubConductor")
-            .addFeeder("b2")    // f10
-            .addLvFeeder("tx4") // lvf11
-            .addLvFeeder("b6")  // lvf12
-            .addLvSubstation("tx4", "bbs5", "b6")   // lvs13
-            .addSubstation("tx0", "bbs1", "b2")     // sub14
+            .toAcls()                // c10
+            .addFeeder("b2")    // fdr11
+            .addLvFeeder("tx4") // lvf12
+            .addLvFeeder("b6")  // lvf13
+            .addLvSubstation("tx4", "bbs5", "b6")   // lvs14
+            .addSubstation("tx0", "bbs1", "b2", "b9")     // sub15
             .build()
 
-        val feeder = network.get<Feeder>("f10")!!
-        val lvfTx = network.get<LvFeeder>("lvf11")!!
-        val lvfB = network.get<LvFeeder>("lvf12")!!
-        val lvSub = network.get<LvSubstation>("lvs13")!!
-        val sub = network.get<LvSubstation>("sub14")!!
+        val feeder = network.get<Feeder>("fdr11")!!
+        val lvfTx = network.get<LvFeeder>("lvf12")!!
+        val lvfB = network.get<LvFeeder>("lvf13")!!
+        val lvSub = network.get<LvSubstation>("lvs14")!!
+        val sub = network.get<Substation>("sub15")!!
 
 
-        assertThat(edgeEquipMrids(feeder), contains("b2", "tx4"))
+        assertThat(edgeEquipMrids(feeder), contains("b2"))
         assertThat(edgeEquipMrids(lvfTx), contains("tx4", "b6"))
         assertThat(edgeEquipMrids(lvfB), contains("b6"))
         assertThat(edgeEquipMrids(lvSub), contains("tx4", "b6"))
         assertThat(edgeEquipMrids(sub), contains("b2", "b9"))
 
-        assertThat(edgeEquipMrids(feeder, NetworkStateOperators.CURRENT), contains("b2", "tx4"))
+        assertThat(edgeEquipMrids(feeder, NetworkStateOperators.CURRENT), contains("b2"))
         assertThat(edgeEquipMrids(lvfTx, NetworkStateOperators.CURRENT), contains("tx4", "b6"))
         assertThat(edgeEquipMrids(lvfB, NetworkStateOperators.CURRENT), contains("b6"))
         assertThat(edgeEquipMrids(lvSub, NetworkStateOperators.CURRENT), contains("tx4", "b6"))
@@ -155,7 +155,7 @@ internal class EquipmentContainerTest {
             .toBusbarSection()       // bbs1
             .toBreaker()             // b2
             .toAcls()                // c3
-            .branchFrom("tx0")
+            .branchFrom("tx0", 1)
             .toAcls()                // c4
             .toBreaker(isNormallyOpen = true, isOpen = true)  // b5
             .toAcls()               // c6
@@ -163,15 +163,15 @@ internal class EquipmentContainerTest {
             .toAcls()               // c7
             .toBreaker()            // b8
             .toAcls()               // c9
-            .addSubstation("tx0", "bbs1", "b2", "c4", "b5") // sub10
+            .addSubstation("tx0", "bbs1", "b2", "c4", "b5", "c7") // sub10
             .build()
 
-        val sub = network.get<LvSubstation>("sub10")!!
+        val sub = network.get<Substation>("sub10")!!
 
-        assertThat(edgeEquipMrids(sub), contains("b2", "b5", "b8"))
-        assertThat(edgeEquipMrids(sub, NetworkStateOperators.CURRENT), contains("b2", "b5", "b8"))
+        assertThat(edgeEquipMrids(sub), containsInAnyOrder("b2", "b5", "c7"))
+        assertThat(edgeEquipMrids(sub, NetworkStateOperators.CURRENT), containsInAnyOrder("b2", "b5", "c7"))
     }
 
     private fun edgeEquipMrids(ec: EquipmentContainer, stateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL) =
-        ec.edgeTerminals().mapNotNull { it.conductingEquipment }.map { it.mRID }
+        ec.edgeTerminals(stateOperators).mapNotNull { it.conductingEquipment }.map { it.mRID }
 }

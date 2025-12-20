@@ -248,10 +248,6 @@ object Resolvers {
         BoundReferenceResolver(lvSubstation, LvSubstationToNormalEnergizedLvFeedersResolver, LvFeederToNormalEnergizingLvSubstationsResolver)
 
     @JvmStatic
-    fun currentEnergizedLvFeeders(lvSubstation: LvSubstation): BoundReferenceResolver<LvSubstation, LvFeeder> =
-        BoundReferenceResolver(lvSubstation, LvSubstationToCurrentEnergizedLvFeedersResolver, LvFeederToCurrentEnergizingLvSubstationsResolver)
-
-    @JvmStatic
     fun subGeographicalRegions(geographicalRegion: GeographicalRegion): BoundReferenceResolver<GeographicalRegion, SubGeographicalRegion> =
         BoundReferenceResolver(geographicalRegion, GeographicalRegionToSubGeographicalRegionResolver, SubGeographicalRegionToGeographicalRegionResolver)
 
@@ -402,10 +398,6 @@ object Resolvers {
     @JvmStatic
     fun normalEnergizingLvSubstations(lvFeeder: LvFeeder): BoundReferenceResolver<LvFeeder, LvSubstation> =
         BoundReferenceResolver(lvFeeder, LvFeederToNormalEnergizingLvSubstationsResolver, LvSubstationToNormalEnergizedLvFeedersResolver)
-
-    @JvmStatic
-    fun currentEnergizingLvSubstations(lvFeeder: LvFeeder): BoundReferenceResolver<LvFeeder, LvSubstation> =
-        BoundReferenceResolver(lvFeeder, LvFeederToCurrentEnergizingLvSubstationsResolver, LvSubstationToCurrentEnergizedLvFeedersResolver)
 
     @JvmStatic
     fun powerElectronicsConnection(powerElectronicsUnit: PowerElectronicsUnit): BoundReferenceResolver<PowerElectronicsUnit, PowerElectronicsConnection> =

@@ -28,7 +28,7 @@ class ChangeSet (mRID: String) : DataSet(mRID) {
 
     internal fun addChangeSetMember(member: ChangeSetMember): Boolean {
         require(member.changeSet === this) {  // TODO: This code should never be hit, it exists incase the init of ChangeSetMember changes.
-            "${member.javaClass.simpleName} `changeSet` property references ${member.changeSet.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
+            "${member.javaClass.simpleName} `changeSet` property references ${member.changeSet?.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
             return false
         }
         _changeSetMembers.add(member)

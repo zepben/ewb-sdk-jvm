@@ -191,7 +191,7 @@ import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Circuit as PBCircuit
 /**
  * Convert the [IdentifiedObject] to a [NetworkIdentifiedObject] representation.
  */
-fun networkIdentifiedObject(identifiedObject: IdentifiedObject): NetworkIdentifiedObject =
+fun networkIdent1ifiedObject(identifiedObject: IdentifiedObject): NetworkIdentifiedObject =
     NetworkIdentifiedObject.newBuilder().apply {
         whenNetworkServiceObject(
             identifiedObject,
@@ -282,6 +282,18 @@ fun networkIdentifiedObject(identifiedObject: IdentifiedObject): NetworkIdentifi
             isCut = { cut = it.toPb() },
             isClamp = { clamp = it.toPb() },
             isDirectionalCurrentRelay = { directionalCurrentRelay = it.toPb() },
+            isNetworkModelProjectStageConflict = { networkModelProjectStageConflict = it.toPb() },
+            isNetworkModelProjectComponent = { networkModelProjectComponent = it.toPb() },
+            isNetworkModelProject = { networkModelProject = it.toPb() },
+            isObjectReverseModification = { objectReverseModification = it.toPb() },
+            isObjectModification = { objectModification = it.toPb() },
+            isObjectDeletion = { objectDeletion = it.toPb() },
+            isObjectCreation = { objectCreation = it.toPb() },
+            isDataSet = { dataSet = it.toPb() },
+            isChangeSetMember = { changeSetMember = it.toPb() },
+            isChangeSet = { changeSet = it.toPb() },
+            isNetworkModelProjectStage = { networkModelProjectStage = it.toPb() },
+            isAnnotatedProjectDependency = { annotatedProjectDependency = it.toPb() },
         )
     }.build()
 

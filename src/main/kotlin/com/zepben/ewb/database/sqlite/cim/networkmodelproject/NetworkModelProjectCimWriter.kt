@@ -43,8 +43,8 @@ class NetworkModelProjectCimWriter(
         changeSetMember: ChangeSetMember,
         description: String
     ): Boolean {
-        insert.setString(table.CHANGE_SET_MRID.queryIndex, changeSetMember.changeSet.mRID)
-        insert.setString(table.TARGET_OBJECT_MRID.queryIndex, changeSetMember.targetObject.mRID)
+        insert.setNullableString(table.CHANGE_SET_MRID.queryIndex, changeSetMember.changeSet?.mRID)
+        insert.setNullableString(table.TARGET_OBJECT_MRID.queryIndex, changeSetMember.targetObject?.mRID)
 
         return insert.tryExecuteSingleUpdate(description)
 
@@ -94,7 +94,7 @@ class NetworkModelProjectCimWriter(
         val insert = databaseTables.getInsert<TableObjectModifications>()
 
         objectModification.objectReverseModification?.let {
-            insert.setNullableString(table.OBJECT_REVERSE_MODIFICATION_TARGET_OBJECT_MRID.queryIndex, it.targetObject.mRID)
+            insert.setNullableString(table.OBJECT_REVERSE_MODIFICATION_TARGET_OBJECT_MRID.queryIndex, it.targetObject?.mRID)
         }
 
         return writeChangeSetMember(table, insert, objectModification, "object modification")

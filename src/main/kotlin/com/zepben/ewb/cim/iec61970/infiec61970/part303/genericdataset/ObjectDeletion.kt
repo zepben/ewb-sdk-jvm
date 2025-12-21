@@ -16,4 +16,4 @@ import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
  * @param changeSet [ChangeSet] this [ObjectDeletion] belongs to.
  * @param targetObject [IdentifiedObject] to be deleted by this [ObjectDeletion].
  */
-class ObjectDeletion(changeSet: ChangeSet, targetObject: IdentifiedObject) : ChangeSetMember(changeSet, targetObject)
+class ObjectDeletion: ChangeSetMember()

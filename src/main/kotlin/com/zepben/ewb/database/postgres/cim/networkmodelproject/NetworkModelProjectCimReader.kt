@@ -101,7 +101,7 @@ internal class NetworkModelProjectCimReader(
                 lastConflictCheckedAt = resultSet.getInstant(table.LAST_CONFLICT_CHECKED_AT.queryIndex)
                 userComments = resultSet.getNullableString(table.USER_COMMENTS.queryIndex)
                 resultSet.getNullableString(table.CHANGE_SET_MRID.queryIndex)?.let {
-                    service.getChangeSet(it)
+                    // service.getChangeSet(it)
                     // TODO: cross service lookup... doesnt feel like it should be in here.
                 }
             }

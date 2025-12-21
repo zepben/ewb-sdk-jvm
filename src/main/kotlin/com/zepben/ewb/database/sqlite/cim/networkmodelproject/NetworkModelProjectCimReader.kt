@@ -49,22 +49,23 @@ internal class NetworkModelProjectCimReader : CimReader<NetworkModelProjectServi
         return readDataSet(changeSet, table, resultSet)
     }
 
-    private fun <T: ChangeSetMember>readChangeSetMember(
+    private fun readChangeSetMember(
         service: NetworkModelProjectService,
-        changeSetMemberClass: (ChangeSet, IdentifiedObject) -> T,
+        changeSetMember: ChangeSetMember,
         table: TableChangeSetMembers,
         resultSet: ResultSet,
         setIdentifier: (String) -> String
-    ): T {
-        val changeSetMRID = setIdentifier(resultSet.getString(table.CHANGE_SET_MRID.queryIndex))
-        changeSetById.getOrThrow(changeSetMRID, setIdentifier("$changeSetMRID ObjectCreation")).also {
-            return changeSetMemberClass(
-                it, service.getOrThrow(
-                    resultSet.getString(table.TARGET_OBJECT_MRID.queryIndex),
-                    "${changeSetMemberClass.javaClass.simpleName} to IdentifiedObject association"
-                )
+    ): Boolean {
+        changeSetMember.apply {
+            val changeSetMRID = setIdentifier(resultSet.getString(table.CHANGE_SET_MRID.queryIndex))
+            setChangeSet(changeSetById.getOrThrow(changeSetMRID, setIdentifier("$changeSetMRID ObjectCreation")))
+            targetObject = service.getOrThrow(
+                resultSet.getString(table.TARGET_OBJECT_MRID.queryIndex),
+                "${changeSetMember.javaClass.simpleName} to IdentifiedObject association"
             )
+
         }
+        return true
     }
 
     private fun readDataSet(
@@ -81,19 +82,24 @@ internal class NetworkModelProjectCimReader : CimReader<NetworkModelProjectServi
     }
 
     fun read(service: NetworkModelProjectService, table: TableObjectCreations, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
-        readChangeSetMember(service, ::ObjectCreation, table, resultSet, setIdentifier)
+        ObjectCreation().also {
+            readChangeSetMember(service, it, table, resultSet, setIdentifier)
+        }
         return true
     }
 
     fun read(service: NetworkModelProjectService, table: TableObjectDeletions, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
-        readChangeSetMember(service, ::ObjectDeletion, table, resultSet, setIdentifier)
+        ObjectDeletion().also {
+            readChangeSetMember(service, it, table, resultSet, setIdentifier)
+        }
         return true
     }
 
     fun read(service: NetworkModelProjectService, table: TableObjectModifications, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
-        readChangeSetMember(service, ::ObjectModification, table, resultSet, setIdentifier).apply {
-            resultSet.getNullableString(table.OBJECT_REVERSE_MODIFICATION_TARGET_OBJECT_MRID.queryIndex)?.let {
-                setObjectReverseModification(service.getOrThrow(it, "ObjectModification reverseObjectModification targetObject $it association"))
+        ObjectModification().also {
+            readChangeSetMember(service, it, table, resultSet, setIdentifier)
+            resultSet.getNullableString(table.OBJECT_REVERSE_MODIFICATION_TARGET_OBJECT_MRID.queryIndex)?.let { ormMRID ->
+                it.setObjectReverseModification(service.getOrThrow(ormMRID, "ObjectModification reverseObjectModification targetObject $ormMRID association"))
             }
         }
         return true

@@ -16,7 +16,7 @@ import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
  * @param changeSet [ChangeSet] this [ObjectReverseModification] belongs to.
  * @param targetObject original, unmodified [IdentifiedObject] to be modified by the [objectModification] property of this [ObjectReverseModification].
  */
-class ObjectReverseModification(changeSet: ChangeSet, targetObject: IdentifiedObject) : ChangeSetMember(changeSet, targetObject) {
+class ObjectReverseModification: ChangeSetMember() {
 
     /**
      * ObjectModification specifying modifications to an object already existing.

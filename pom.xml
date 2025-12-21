@@ -68,7 +68,7 @@
         <dependency>
             <groupId>com.zepben</groupId>
             <artifactId>protobuf</artifactId>
-            <version>1.2.0b2-LOCAL</version>
+            <version>1.2.0b3-LOCAL</version>
         </dependency>
         <dependency>
             <groupId>com.zepben</groupId>

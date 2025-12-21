@@ -16,7 +16,7 @@ import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
  * @param changeSet [ChangeSet] this [ObjectModification] belongs to.
  * @param targetObject [IdentifiedObject] to be modified by this [ObjectModification].
  */
-class ObjectModification(changeSet: ChangeSet, targetObject: IdentifiedObject) : ChangeSetMember(changeSet, targetObject) {
+class ObjectModification: ChangeSetMember() {
 
     /**
      * ObjectReverseModification specifying precondition properties for a preconditioned update.
@@ -25,7 +25,10 @@ class ObjectModification(changeSet: ChangeSet, targetObject: IdentifiedObject) :
 
     fun setObjectReverseModification(targetObject: IdentifiedObject): ObjectModification {
         require(objectReverseModification == null) {"objectReverseModification already set"}
-        objectReverseModification = ObjectReverseModification(changeSet, targetObject).also {
+        require(changeSet != null) {"set changeset before calling this helper."}
+        objectReverseModification = ObjectReverseModification().also {
+            it.changeSet = changeSet!!
+            it.targetObject = targetObject
             require(it.objectModification == null) {"objectModification already set"}
             it.objectModification = this
         }
@@ -34,9 +37,14 @@ class ObjectModification(changeSet: ChangeSet, targetObject: IdentifiedObject) :
 
     companion object {
         fun createObjectModification(changeSet: ChangeSet, modifiedObject: IdentifiedObject, originalObject: IdentifiedObject? = null): ObjectModification {
-            return ObjectModification(changeSet, modifiedObject).also {
+            return ObjectModification().also {
+                it.setChangeSet(changeSet)
+                it.targetObject = modifiedObject
                 originalObject?.let{ _ ->
-                    it.objectReverseModification = ObjectReverseModification(changeSet, originalObject)
+                    it.objectReverseModification = ObjectReverseModification().also { orm ->
+                        orm.changeSet = changeSet
+                        orm.targetObject = originalObject
+                    }
                 }
             }
         }

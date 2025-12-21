@@ -16,21 +16,21 @@ import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
  * @param changeSet [ChangeSet] this [ChangeSetMember] belongs to.
  * @param targetObject The registered CIM object.
  */
-abstract class ChangeSetMember(
-
+abstract class ChangeSetMember {
     /**
      * [ChangeSet] this [ChangeSetMember] belongs to.
      */
-    val changeSet: ChangeSet,
+    var changeSet: ChangeSet? = null
 
     /**
      * The registered CIM object.
      */
-    val targetObject: IdentifiedObject,
+    var targetObject: IdentifiedObject? = null
 
-) {
-    init {
+    fun setChangeSet(changeSet: ChangeSet) {
+        require(this.changeSet == null) { "changeSet already exists" }
         changeSet.addChangeSetMember(this)
+        this.changeSet = changeSet
     }
 
 }

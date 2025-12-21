@@ -16,4 +16,6 @@ import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
  * @param changeSet [ChangeSet] this [ObjectCreation] belongs to.
  * @param targetObject [IdentifiedObject] to be created by this [ObjectCreation].
  */
-class ObjectCreation(changeSet: ChangeSet, targetObject: IdentifiedObject) : ChangeSetMember(changeSet, targetObject)
+class ObjectCreation : ChangeSetMember() {
+
+}

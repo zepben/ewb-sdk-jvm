@@ -12,7 +12,6 @@ import com.google.protobuf.NullValue
 import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProject
 import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectComponent
 import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStageConflict
-import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.AnnotatedProjectDependency
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStage
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
@@ -23,8 +22,12 @@ import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectDele
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectModification
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectReverseModification
 import com.zepben.ewb.services.common.translator.*
-import com.zepben.ewb.services.networkmodelproject.whenNetworkModelProjectServiceObject
-import com.zepben.protobuf.nc.NetworkIdentifiedObject
+import com.zepben.ewb.services.network.translator.networkIdent1ifiedObject
+import com.zepben.ewb.services.network.translator.toPb
+import com.zepben.ewb.services.networkmodelproject.whenVariantChangeSetMember
+import com.zepben.ewb.services.networkmodelproject.whenVariantDataSet
+import com.zepben.protobuf.vc.VariantChangeSetMember
+import com.zepben.protobuf.vc.VariantDataSet
 import java.time.Instant
 import com.zepben.protobuf.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProject as PBNetworkModelProject
 import com.zepben.protobuf.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectComponent as PBNetworkModelProjectComponent
@@ -40,20 +43,26 @@ import com.zepben.protobuf.cim.iec61970.infiec61970.part303.genericdataset.Objec
 import com.zepben.protobuf.cim.iec61970.infiec61970.part303.genericdataset.ObjectReverseModification as PBObjectReverseModification
 
 /**
- * Convert the [IdentifiedObject] to a [NetworkIdentifiedObject] representation.
+ * Convert the [DataSet] to a [VariantDataSet] representation.
  */
 /**
- * Convert the [DataSet] to a [NetworkIdentifiedObject] representation.
+ * Convert the [DataSet] to a [VariantDataSet] representation.
  */
-fun networkModelProjectDataSet(dataSet: DataSet): NetworkIdentifiedObject =
-    NetworkIdentifiedObject.newBuilder().apply {
-        whenNetworkModelProjectServiceObject(
+fun variantDataSet(dataSet: DataSet): VariantDataSet =
+    VariantDataSet.newBuilder().apply {
+        whenVariantDataSet(
             dataSet,
-            isChangeSet = { changeSet = it.toPb() },
+            isChangeSet = { changeSet = it.toPb() }
+        )
+    }.build()
+
+fun variantChangeSetMember(changeSetMember: ChangeSetMember): VariantChangeSetMember =
+    VariantChangeSetMember.newBuilder().apply {
+        whenVariantChangeSetMember(
+            changeSetMember,
             isObjectCreation = { objectCreation = it.toPb() },
             isObjectDeletion = { objectDeletion = it.toPb() },
             isObjectModification = { objectModification = it.toPb() },
-            isObjectReverseModification = { objectReverseModification = it.toPb() }
         )
     }.build()
 
@@ -171,7 +180,7 @@ fun toPb(cim: NetworkModelProjectStage, pb: PBNetworkModelProjectStage.Builder):
             addDependingStage( it.toPb() )
         }
         cim.equipmentContainers.forEach {
-            addEquipmentContainers( it.toPb() )
+            addEquipmentContainers( networkIdent1ifiedObject(it) ) // TODO: this seems both right, and nasty.
         }
         toPb(cim, pb.nmpcBuilder)
     }
@@ -214,7 +223,7 @@ fun toPb(cim: DataSet, pb: PBDataSet.Builder): PBDataSet.Builder =
 fun toPb(cim: ChangeSet, pb: PBChangeSet.Builder): PBChangeSet.Builder =
     pb.apply {
         cim.changeSetMembers.forEach {
-            addChangeSetMembers( it.toPb() )
+            addChangeSetMembers( variantChangeSetMember(it) )
         }
         toPb(cim, datasetBuilder)
     }
@@ -228,8 +237,8 @@ fun toPb(cim: ChangeSet, pb: PBChangeSet.Builder): PBChangeSet.Builder =
  */
 fun toPb(cim: ChangeSetMember, pb: PBChangeSetMember.Builder): PBChangeSetMember.Builder =
     pb.apply {
-        changeSetMRID = cim.changeSet.mRID
-        targetObject = toPb(cim.targetObject, pb.targetObjectBuilder).build()
+        cim.getChangeSet?.let { changeSetMRID = it.mRID }
+        cim.targetObject?.let { targetObject = networkIdent1ifiedObject(it) }  // TODO: i mean, maybe?
     }
 
 /**

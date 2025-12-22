@@ -13,6 +13,7 @@ package com.zepben.ewb.services.networkmodelproject
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.generation.production.BatteryUnit
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSetMember
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.DataSet
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectCreation
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectDeletion
@@ -36,22 +37,28 @@ import com.zepben.ewb.services.network.NetworkService
  * @param identifiedObject The identified object to handle.
  * @param isBatteryUnit Handler when the [identifiedObject] is a [BatteryUnit]
  */
-@JvmOverloads
-inline fun <R> whenNetworkModelProjectServiceObject(
-    obj: Any,  // FIXME: seems filthy, but DataSet and ChangeSetMember dont inherit from a common base
+inline fun <R> whenVariantDataSet(
+    obj: DataSet,  // FIXME: seems filthy, but DataSet and ChangeSetMember dont inherit from a common base
     isChangeSet: (ChangeSet) -> R,
-    isObjectCreation: (ObjectCreation) -> R,
-    isObjectDeletion: (ObjectDeletion) -> R,
-    isObjectModification: (ObjectModification) -> R,
-    isObjectReverseModification: (ObjectReverseModification) -> R,
     isOther: (Any) -> R = {obj: Any ->
         throw IllegalArgumentException("Identified object type ${obj::class} is not supported by the network model project service")
     }
 ): R = when (obj) {
     is ChangeSet -> isChangeSet(obj)
+    else -> isOther(obj)
+}
+
+inline fun <R> whenVariantChangeSetMember(
+    obj: ChangeSetMember,  // FIXME: seems filthy, but DataSet and ChangeSetMember dont inherit from a common base
+    isObjectCreation: (ObjectCreation) -> R,
+    isObjectDeletion: (ObjectDeletion) -> R,
+    isObjectModification: (ObjectModification) -> R,
+    isOther: (Any) -> R = {obj: Any ->
+        throw IllegalArgumentException("Identified object type ${obj::class} is not supported by the network model project service")
+    }
+): R = when (obj) {
     is ObjectCreation -> isObjectCreation(obj)
     is ObjectDeletion -> isObjectDeletion(obj)
     is ObjectModification -> isObjectModification(obj)
-    is ObjectReverseModification -> isObjectReverseModification(obj)
     else -> isOther(obj)
 }

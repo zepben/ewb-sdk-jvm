@@ -27,8 +27,8 @@ class ChangeSet (mRID: String) : DataSet(mRID) {
     val changeSetMembers: List<ChangeSetMember> get() = _changeSetMembers.asUnmodifiable()
 
     internal fun addChangeSetMember(member: ChangeSetMember): Boolean {
-        require(member.changeSet === this) {  // TODO: This code should never be hit, it exists incase the init of ChangeSetMember changes.
-            "${member.javaClass.simpleName} `changeSet` property references ${member.changeSet?.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
+        require(member.getChangeSet === this) {  // TODO: This code should never be hit, it exists incase the init of ChangeSetMember changes.
+            "${member.javaClass.simpleName} `changeSet` property references ${member.getChangeSet?.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
             return false
         }
         _changeSetMembers.add(member)

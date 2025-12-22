@@ -43,7 +43,7 @@ class NetworkModelProjectCimWriter(
         changeSetMember: ChangeSetMember,
         description: String
     ): Boolean {
-        insert.setNullableString(table.CHANGE_SET_MRID.queryIndex, changeSetMember.changeSet?.mRID)
+        insert.setNullableString(table.CHANGE_SET_MRID.queryIndex, changeSetMember.getChangeSet?.mRID)
         insert.setNullableString(table.TARGET_OBJECT_MRID.queryIndex, changeSetMember.targetObject?.mRID)
 
         return insert.tryExecuteSingleUpdate(description)

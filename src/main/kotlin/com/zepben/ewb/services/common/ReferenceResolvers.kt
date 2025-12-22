@@ -53,6 +53,7 @@ import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStage
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSetMember
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.DataSet
 import kotlin.reflect.KClass
 
 
@@ -522,17 +523,27 @@ internal object NetworkModelProjectToNetworkModelProjectComponentResolver : Refe
     NetworkModelProject::class, NetworkModelProjectComponent::class, NetworkModelProject::addChild
 )
 
-internal object NetworkModelProjectStageToChangeSet : ReferenceResolver<NetworkModelProjectStage, ChangeSet> by KReferenceResolver(
+internal object NetworkModelProjectStageToChangeSet : ReferenceResolver<NetworkModelProjectStage, ChangeSet> by KReferenceResolverIO2DS(
     NetworkModelProjectStage::class, ChangeSet::class, NetworkModelProjectStage::setChangeSet
-)
-
-internal object ChangeSetToChangeSetMemberResolver : ReferenceResolver<ChangeSet, ChangeSetMember> by KReferenceResolver(
-    ChangeSet::class, ChangeSetMember::class, ChangeSet::addChangeSetMember
 )
 
 //-------------------------------------------//
 
 class KReferenceResolver<T : IdentifiedObject, R : IdentifiedObject>(
+    private val fromKClass: KClass<T>,
+    private val toKClass: KClass<R>,
+    private val resolveFun: (T, R) -> Unit
+) : ReferenceResolver<T, R> {
+
+    override val fromClass: Class<T> get() = fromKClass.java
+    override val toClass: Class<R> get() = toKClass.java
+
+    override fun resolve(from: T, to: R) {
+        resolveFun(from, to)
+    }
+}
+
+class KReferenceResolverIO2DS<T : IdentifiedObject, R : DataSet>(
     private val fromKClass: KClass<T>,
     private val toKClass: KClass<R>,
     private val resolveFun: (T, R) -> Unit

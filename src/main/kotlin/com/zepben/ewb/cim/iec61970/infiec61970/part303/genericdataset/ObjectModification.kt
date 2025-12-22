@@ -25,9 +25,9 @@ class ObjectModification: ChangeSetMember() {
 
     fun setObjectReverseModification(targetObject: IdentifiedObject): ObjectModification {
         require(objectReverseModification == null) {"objectReverseModification already set"}
-        require(changeSet != null) {"set changeset before calling this helper."}
+        require(getChangeSet != null) {"set changeset before calling this helper."}
         objectReverseModification = ObjectReverseModification().also {
-            it.changeSet = changeSet!!
+            it.setChangeSet(getChangeSet!!)
             it.targetObject = targetObject
             require(it.objectModification == null) {"objectModification already set"}
             it.objectModification = this
@@ -42,7 +42,7 @@ class ObjectModification: ChangeSetMember() {
                 it.targetObject = modifiedObject
                 originalObject?.let{ _ ->
                     it.objectReverseModification = ObjectReverseModification().also { orm ->
-                        orm.changeSet = changeSet
+                        orm.setChangeSet(changeSet)
                         orm.targetObject = originalObject
                     }
                 }

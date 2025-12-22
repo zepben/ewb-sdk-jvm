@@ -15,6 +15,8 @@ import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelayFun
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelayScheme
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelaySystem
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.BatteryControl
+import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProject
+import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectComponent
 import com.zepben.ewb.cim.iec61968.assetinfo.*
 import com.zepben.ewb.cim.iec61968.assets.Asset
 import com.zepben.ewb.cim.iec61968.assets.AssetOrganisationRole
@@ -48,6 +50,8 @@ import com.zepben.ewb.cim.iec61970.base.scada.RemoteControl
 import com.zepben.ewb.cim.iec61970.base.scada.RemoteSource
 import com.zepben.ewb.cim.iec61970.base.wires.*
 import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
+import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStage
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
 
 /**
  * These should be used to access [ReferenceResolver] instances for use with [BaseService.resolveOrDeferReference] and
@@ -553,5 +557,13 @@ object Resolvers {
     @JvmStatic
     fun assets(powerSystemResource: PowerSystemResource): BoundReferenceResolver<PowerSystemResource, Asset> =
         BoundReferenceResolver(powerSystemResource, PowerSystemResourceToAssetResolver, AssetToPowerSystemResourceResolver)
+
+    @JvmStatic
+    fun changeSets(networkModelProjectStage: NetworkModelProjectStage): BoundReferenceResolver<NetworkModelProjectStage, ChangeSet> =
+        BoundReferenceResolver(networkModelProjectStage, NetworkModelProjectStageToChangeSet, null)
+
+    @JvmStatic
+    fun networkModelProjectComponents(networkModelProject: NetworkModelProject): BoundReferenceResolver<NetworkModelProject, NetworkModelProjectComponent> =
+        BoundReferenceResolver(networkModelProject, NetworkModelProjectToNetworkModelProjectComponentResolver, null)
 
 }

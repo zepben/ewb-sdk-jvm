@@ -66,7 +66,7 @@ class NetworkModelProjectStage(mRID: String) : NetworkModelProjectComponent(mRID
     /**
      * [ZBEX] The set of changes that this stage of the project will do.
      */
-    val changeSet: ChangeSet? get() = _changeSet
+    val changeSet: ChangeSet? get() = _changeSet  // TODO: should this be a lazy call to the service to load the changeSet from blob?
 
     /**
      * Associate a [ChangeSet] with this [NetworkModelProjectStage].

@@ -282,18 +282,6 @@ fun networkIdent1ifiedObject(identifiedObject: IdentifiedObject): NetworkIdentif
             isCut = { cut = it.toPb() },
             isClamp = { clamp = it.toPb() },
             isDirectionalCurrentRelay = { directionalCurrentRelay = it.toPb() },
-            isNetworkModelProjectStageConflict = { networkModelProjectStageConflict = it.toPb() },
-            isNetworkModelProjectComponent = { networkModelProjectComponent = it.toPb() },
-            isNetworkModelProject = { networkModelProject = it.toPb() },
-            isObjectReverseModification = { objectReverseModification = it.toPb() },
-            isObjectModification = { objectModification = it.toPb() },
-            isObjectDeletion = { objectDeletion = it.toPb() },
-            isObjectCreation = { objectCreation = it.toPb() },
-            isDataSet = { dataSet = it.toPb() },
-            isChangeSetMember = { changeSetMember = it.toPb() },
-            isChangeSet = { changeSet = it.toPb() },
-            isNetworkModelProjectStage = { networkModelProjectStage = it.toPb() },
-            isAnnotatedProjectDependency = { annotatedProjectDependency = it.toPb() },
         )
     }.build()
 

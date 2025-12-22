@@ -20,7 +20,9 @@ abstract class ChangeSetMember {
     /**
      * [ChangeSet] this [ChangeSetMember] belongs to.
      */
-    var changeSet: ChangeSet? = null
+    private var _changeSet: ChangeSet? = null
+
+    val getChangeSet: ChangeSet? get() = _changeSet
 
     /**
      * The registered CIM object.
@@ -28,9 +30,9 @@ abstract class ChangeSetMember {
     var targetObject: IdentifiedObject? = null
 
     fun setChangeSet(changeSet: ChangeSet) {
-        require(this.changeSet == null) { "changeSet already exists" }
+        require(this._changeSet == null) { "changeSet already exists" }
         changeSet.addChangeSetMember(this)
-        this.changeSet = changeSet
+        this._changeSet = changeSet
     }
 
 }

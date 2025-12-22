@@ -10,15 +10,21 @@ package com.zepben.ewb.services.networkmodelproject
 
 import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProject
 import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStageConflict
+import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.AnnotatedProjectDependency
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStage
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.DataSet
 import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.common.meta.MetadataCollection
+import com.zepben.ewb.services.network.NetworkService
+import kotlin.reflect.KClass
 
 /**
  * Maintains an in-memory model of NetworkModelProjects.
  */
-class NetworkModelProjectService(metadata: MetadataCollection = MetadataCollection()) : BaseService("networkmodelproject", metadata) {
+class NetworkModelProjectService (name: String = "networkmodelproject", metadata: MetadataCollection = MetadataCollection()) : NetworkService(name, metadata) {
+
+    val changeSetsByMRID: MutableMap<String, DataSet> = mutableMapOf()
 
     // #######################################################
     // # Extensions IEC61970 InfPart303 NetworkModelProjects #

@@ -462,8 +462,8 @@ fun toPb(cim: LvSubstation, pb: PBLvSubstation.Builder): PBLvSubstation.Builder 
     pb.apply {
         clearNormalEnergizingFeederMRIDs()
         cim.normalEnergizingFeeders.forEach { addNormalEnergizingFeederMRIDs(it.mRID) }
-        clearCurrentlyEnergizingFeederMRIDs()
-        cim.currentEnergizingFeeders.forEach { addCurrentlyEnergizingFeederMRIDs(it.mRID) }
+        clearCurrentEnergizingFeederMRIDs()
+        cim.currentEnergizingFeeders.forEach { addCurrentEnergizingFeederMRIDs(it.mRID) }
 
         clearNormalEnergizedLvFeederMRIDs()
         cim.normalEnergizedLvFeeders.forEach { addNormalEnergizedLvFeederMRIDs(it.mRID) }

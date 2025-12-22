@@ -467,7 +467,7 @@ fun toCim(pb: PBLvSubstation, networkService: NetworkService): LvSubstation =
             networkService.resolveOrDeferReference(Resolvers.normalEnergizingFeeders(this), normalEnergizingFeederMRID)
         }
 
-        pb.currentlyEnergizingFeederMRIDsList.forEach { currentEnergizingFeederMRID ->
+        pb.currentEnergizingFeederMRIDsList.forEach { currentEnergizingFeederMRID ->
             networkService.resolveOrDeferReference(Resolvers.currentEnergizingFeeders(this), currentEnergizingFeederMRID)
         }
 

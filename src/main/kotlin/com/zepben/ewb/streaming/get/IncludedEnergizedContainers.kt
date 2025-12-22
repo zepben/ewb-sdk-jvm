@@ -24,8 +24,12 @@ enum class IncludedEnergizedContainers {
     FEEDERS,
 
     /**
-     * Energized HV feeders and LV feeders should be included.
+     * Energized HV feeders, LV substations, and LV feeders should be included.
      */
     LV_FEEDERS,
 
+    /**
+     * Energized HV feeders and LV substations should be included.
+     */
+    LV_SUBSTATIONS
 }

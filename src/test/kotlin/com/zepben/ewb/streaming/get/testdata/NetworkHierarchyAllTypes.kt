@@ -44,8 +44,7 @@ object NetworkHierarchyAllTypes {
                 "setNameSet" to "gr 1",
                 "setDescriptionNull" to NullValue.NULL_VALUE,
                 "setNumDiagramObjectsNull" to NullValue.NULL_VALUE,
-
-                )
+            )
 
             if (includeSubgeographicalRegions) {
                 buildFromBuilder(geoRegionsBuilder, "addAllSubGeographicalRegionMRIDs" to listOf("sgr1", "sgr2"))

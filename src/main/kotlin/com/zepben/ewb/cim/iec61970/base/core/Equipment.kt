@@ -47,7 +47,6 @@ abstract class Equipment(mRID: String) : PowerSystemResource(mRID) {
 
     val currentFeeders: List<Feeder> get() = _currentContainers.ofType()
     val currentLvFeeders: List<LvFeeder> get() = _currentContainers.ofType()
-    val currentLvSubstations: List<LvSubstation> get() = _currentContainers.ofType()
 
     /**
      * The equipment containers this equipment belongs to. The returned collection is read only.

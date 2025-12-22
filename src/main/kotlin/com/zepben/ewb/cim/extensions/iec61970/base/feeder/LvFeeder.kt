@@ -20,10 +20,12 @@ import com.zepben.ewb.services.common.extensions.validateReference
  * [ZBEX]
  * A branch of LV network starting at a distribution substation and continuing until the end of the LV network.
  *
- * @property normalHeadTerminal [ZBEX] The normal head terminal of this LV feeder, typically the LV terminal of a distribution substation.
+ * @property normalHeadTerminal [ZBEX] The normal head terminal of this LV feeder, typically the LV terminal of a distribution transformer, or the downstream
+ * terminal of a LV switch below a distribution transformer.
  * @property normalEnergizingFeeders [ZBEX] The HV/MV feeders that energize this LV feeder.
  * @property currentEnergizingFeeders [ZBEX] The HV/MV feeders that energize this LV feeder in the current state of the network.
  * @property currentEquipment [ZBEX] Contained equipment using the current state of the network.
+ * @property normalEnergizingLvSubstation [ZBEX] The normally energizing [LvSubstation] for this [LvFeeder].
  */
 @ZBEX
 class LvFeeder(mRID: String) : EquipmentContainer(mRID) {

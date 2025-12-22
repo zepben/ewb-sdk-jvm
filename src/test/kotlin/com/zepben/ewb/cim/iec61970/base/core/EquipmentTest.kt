@@ -149,7 +149,6 @@ internal class EquipmentTest {
         assertThat(equipment.currentLvFeeders, containsInAnyOrder(lvFeeder3, lvFeeder4))
         assertThat(equipment.substations, containsInAnyOrder(substation1, substation2))
         assertThat(equipment.normalLvSubstations, containsInAnyOrder(lvSub1, lvSub2))
-        assertThat(equipment.currentLvSubstations, containsInAnyOrder(lvSub1, lvSub2))
     }
 
 }

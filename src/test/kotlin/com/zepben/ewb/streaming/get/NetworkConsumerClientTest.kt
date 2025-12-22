@@ -17,6 +17,7 @@ import com.zepben.ewb.cim.iec61970.base.wires.AcLineSegment
 import com.zepben.ewb.cim.iec61970.base.wires.Breaker
 import com.zepben.ewb.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
+import com.zepben.ewb.cim.validateEnum
 import com.zepben.ewb.services.common.Resolvers
 import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 import com.zepben.ewb.services.common.testdata.generateId
@@ -367,8 +368,8 @@ internal class NetworkConsumerClientTest {
         verify(consumerService.onGetNetworkHierarchy).invoke(eq(request), any())
         assertThat("getNetworkHierarchy should succeed", result.wasSuccessful)
         validateNetworkHierarchy(result.value, NetworkHierarchyAllTypes.createNetworkHierarchy(includeGeographicalRegions = true))
-
     }
+
     @Test
     internal fun `can optionally retrieve subgeographical regions`() {
         consumerService.onGetNetworkHierarchy = spy { _, response -> response.onNext(NetworkHierarchyAllTypes.createResponse(includeSubgeographicalRegions = true)) }
@@ -1110,6 +1111,12 @@ internal class NetworkConsumerClientTest {
             assertThat(request.includeEnergizedContainers, equalTo(includeEnergizedContainers))
             assertThat(request.networkState, equalTo(networkState))
         }
+    }
+
+    @Test
+    internal fun validateVsPb() {
+        validateEnum(IncludedEnergizingContainers.entries, com.zepben.protobuf.nc.IncludedEnergizingContainers.entries)
+        validateEnum(IncludedEnergizedContainers.entries, com.zepben.protobuf.nc.IncludedEnergizedContainers.entries)
     }
 
 }

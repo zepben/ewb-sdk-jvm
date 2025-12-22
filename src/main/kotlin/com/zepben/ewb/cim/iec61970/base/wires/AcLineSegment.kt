@@ -26,6 +26,7 @@ import com.zepben.ewb.services.common.extensions.*
  * @property perLengthSequenceImpedance Per-length sequence impedance of this line segment.
  * @property cuts Cuts applied to the line segment.
  * @property clamps The clamps connected to the line segment.
+ * @property phases The individual phase models for this AcLineSegment.
  */
 class AcLineSegment(mRID: String) : Conductor(mRID) {
 

@@ -19,13 +19,18 @@ enum class IncludedEnergizingContainers {
     NONE,
 
     /**
-     * Energizing feeders should be included.
+     * Energizing LV substations and feeders should be included.
      */
     FEEDERS,
 
     /**
-     * Energizing feeders and substations should be included.
+     * Energizing LV substations, feeders and substations should be included.
      */
     SUBSTATIONS,
+
+    /**
+     * Energizing LV substations should be included.
+     */
+    LV_SUBSTATIONS
 
 }

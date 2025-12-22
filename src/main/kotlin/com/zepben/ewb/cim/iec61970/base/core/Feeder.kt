@@ -20,7 +20,7 @@ import com.zepben.ewb.services.common.extensions.validateReference
  * @property normalHeadTerminal The normal head terminal or terminals of the feeder.
  * @property normalEnergizingSubstation The substation that normally energizes this feeder.
  * @property normalEnergizedLvFeeders [ZBEX] The LV feeders that are normally energized by this feeder.
- * @property currentlyEnergizedLvFeeders [ZBEX] The LV feeders that are currently energized by this feeder.
+ * @property currentEnergizedLvFeeders [ZBEX] The LV feeders that are currently energized by this feeder.
  * @property normalEnergizedLvSubstations [ZBEX] The normal energized LvSubstations of the feeder. Also used for naming purposes.
  * @property currentEnergizedLvSubstations [ZBEX] The current energized LvSubstations of the feeder. Also used for naming purposes.
  */

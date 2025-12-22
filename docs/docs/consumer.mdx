@@ -305,8 +305,10 @@ Connect.connectWithAccessToken(
 ## Network Hierarchy
 
 The network can be built with a hierarchy as discussed earlier [here](datamodel.mdx#network-hierarchy). This allows you
-to easily identify and request smaller chunks of the network, so you can focus on areas of concern. Here is an example
-of how to request the network hierarchy and print it out as a tree to the console.
+to easily identify and request smaller chunks of the network, so you can focus on areas of concern.
+
+The default `getNetworkHierarchy()` called below will retrieve the network hierarchy from GeographicalRegions down to the level of Feeder,
+and will pretty print the result as a tree, with indentation indicating the level of each container in the hierarchy.
 
 <Tabs
     groupId="code-example"
@@ -324,13 +326,13 @@ void printNetworkHierarchy(NetworkConsumerClient client) {
     if (hierarchy == null)
         return;
 
-    hierarchy.getGeographicalRegions().values().forEach(region -> {
+    hierarchy.getGeographicalRegions().forEach(region -> {
         System.out.println(String.format("- %s [%s]", region.getName(), region.getMRID()));
-        region.getSubGeographicalRegions().values().forEach(subRegion -> {
+        region.getSubGeographicalRegions().forEach(subRegion -> {
             System.out.println(String.format("  |- %s [%s]", subRegion.getName(), subRegion.getMRID()));
-            subRegion.getSubstations().values().forEach(substation -> {
+            subRegion.getSubstations().forEach(substation -> {
                 System.out.println(String.format("    |- %s [%s]", substation.getName(), substation.getMRID()));
-                substation.getFeeders().values().forEach(feeder -> {}
+                substation.getFeeders()forEach(feeder -> {}
                     System.out.println(String.format("      |- %s [%s]", feeder.getName(), feeder.getMRID()));
                 });
             });
@@ -347,11 +349,11 @@ fun printNetworkHierarchy(client: NetworkConsumerClient) {
     val hierarchy: NetworkHierarchy = client.getNetworkHierarchy().result ?: return
     hierarchy.geographicalRegions.values.forEach { region ->
         println("- ${region.name} [${region.mRID}]")
-        region.subGeographicalRegions.values.forEach { subRegion ->
+        region.subGeographicalRegions.forEach { subRegion ->
             println("  |- ${subRegion.name} [${subRegion.mRID}]")
-            subRegion.substations.values.forEach { substation ->
+            subRegion.substations.forEach { substation ->
                 println("    |- ${substation.name} [${substation.mRID}]")
-                substation.feeders.values.forEach { feeder ->
+                substation.feeders.forEach { feeder ->
                     println("      |- ${feeder.name} [${feeder.mRID}]")
                 }
             }
@@ -366,6 +368,67 @@ fun printNetworkHierarchy(client: NetworkConsumerClient) {
 Each item from the hierarchy result contains an identified object mRID and its name. This simplified data structure
 enables you to do things like easily build a suitable UI component allowing a user to select a portion of the network
 they wish to use, without needing to pull back large amounts of full object data.
+
+Clients can also request a subset of the NetworkHierarchy, if you are only interested in specific types of containers. For example,
+to only include `Feeders` and `LvFeeders`, you could make the following request:
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+void printNetworkHierarchy(NetworkConsumerClient client) {
+    NetworkHierarchy hierarchy = client.getNetworkHierarchy( false, false, false, true, false, false, false, true).throwOnError().getResult();
+    if (hierarchy == null)
+        return;
+    hierarchy.getFeeders().values().forEach(feeder -> {}
+        System.out.println(String.format("      |- %s [%s]", feeder.getName(), feeder.getMRID()));
+        feeder.getNormalEnergizedLvFeeders().forEach(lvFeeder -> {}
+            System.out.println(String.format("          |- %s [%s]", lvFeeder.getName(), lvFeeder.getMRID()));
+        });
+    });
+}
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+fun printNetworkHierarchy(client: NetworkConsumerClient) {
+    val hierarchy: NetworkHierarchy = client.getNetworkHierarchy(
+       includeGeographicalRegions = false,
+       includeSubgeographicalRegions = false,
+       includeSubstations = false,
+       includeFeeders = true,
+       includeCircuits = false,
+       includeLoops = false,
+       includeLvSubstations = false,
+       includeLvFeeders = true
+    ).throwOnError().result!!
+
+    hierarchy.feeders.values.forEach { feeder ->
+        println("      |- ${feeder.name} [${feeder.mRID}]")
+        feeder.normalEnergizedLvFeeders.forEach { lvFeeder ->
+            println("          |- ${lvFeeder.name} [${lvFeeder.mRID}]")
+        }
+    }
+}
+```
+
+</TabItem>
+</Tabs>
+
+:::warning
+The NetworkHierarchy is one protobuf message, and on a large network can be significant in size. There is a maximum default message size limit of 20mb, at which point
+the request will fail. If you are breaching this request size, you can try making multiple calls to `getNetworkHierarchy()` to break it into separate messages.
+Note that in terms of quantity, LvFeeders and LvSubstations tend to be the largest collections, with generally an order of magnitude more entries than Feeders,
+which is typically the next largest.
 
 ## Requesting Identified Objects
 

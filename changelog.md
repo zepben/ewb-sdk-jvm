@@ -21,6 +21,10 @@
 * Added new enum `WireInsulationKind` with extensions.
 * Added helper function `AcLineSegment.wireInfoForPhase()` for retrieving the `WireInfo` for a given phase of a conductor.
 * Added helper function `EquipmentContainer.edgeTerminals()` for retrieving all terminals on the edge of an `EquipmentContainer`.
+* Added support to filter NetworkHierarchy responses when calling `NetworkConsumerClient.getNetworkHierarchy()`. A client can now choose what hierarchy containers should
+  be populated in the response.
+* Added `EquipmentContainer.edgeTerminals()` to retrieve all terminals connecting outside of the `EquipmentContainer`.
+* Added `AcLineSegment.wireInfoForPhase(phase: SinglePhaseKind)` to retrieve the `WireInfo` associated with a given phase of a conductor.
 
 ### Enhancements
 * None.

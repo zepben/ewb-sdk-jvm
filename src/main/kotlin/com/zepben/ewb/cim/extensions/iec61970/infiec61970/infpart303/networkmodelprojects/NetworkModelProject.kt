@@ -17,7 +17,7 @@ import java.time.Instant
 /**
  * [ZBEX] A grouping of network model stages. Primarily used to organize the stages of an overall project.
  */
-class NetworkModelProject(mRID: String) : NetworkModelProjectComponent(mRID) {
+class NetworkModelProject (mRID: String) : NetworkModelProjectComponent(mRID) {
 
     var _children: MutableList<NetworkModelProjectComponent>? = null
 

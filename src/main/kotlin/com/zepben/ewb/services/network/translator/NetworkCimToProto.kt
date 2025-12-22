@@ -191,7 +191,7 @@ import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Circuit as PBCircuit
 /**
  * Convert the [IdentifiedObject] to a [NetworkIdentifiedObject] representation.
  */
-fun networkIdent1ifiedObject(identifiedObject: IdentifiedObject): NetworkIdentifiedObject =
+fun networkIdentifiedObject(identifiedObject: IdentifiedObject): NetworkIdentifiedObject =
     NetworkIdentifiedObject.newBuilder().apply {
         whenNetworkServiceObject(
             identifiedObject,

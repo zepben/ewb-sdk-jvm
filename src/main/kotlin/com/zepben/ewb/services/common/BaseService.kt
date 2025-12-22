@@ -626,7 +626,7 @@ abstract class BaseService(
                     "return type for '${it.second}' needs to be Boolean"
                 }
 
-                require((it.second.parameters[0].type.classifier as KClass<*>).isFinal) {
+                require((it.second.parameters[1].type.classifier as KClass<*>).isFinal) { // FIXME: WHY DID THIS CHANGE???? open NetworkService class??
                     "${it.second} does not accept a leaf class. " +
                         "Only leafs should be used to reduce chances of edge case issues and potential undefined behaviour"
                 }

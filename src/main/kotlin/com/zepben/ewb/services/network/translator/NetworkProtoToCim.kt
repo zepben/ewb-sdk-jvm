@@ -8,7 +8,6 @@
 
 package com.zepben.ewb.services.network.translator
 
-import com.google.common.graph.Network
 import com.zepben.ewb.cim.extensions.iec61968.assetinfo.RelayInfo
 import com.zepben.ewb.cim.extensions.iec61968.common.ContactDetails
 import com.zepben.ewb.cim.extensions.iec61968.metering.PanDemandResponseFunction
@@ -40,8 +39,6 @@ import com.zepben.ewb.cim.iec61970.base.wires.*
 import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.ewb.services.common.Resolvers
 import com.zepben.ewb.services.common.translator.*
-import com.zepben.ewb.services.common.translator.getOrAddFromPb
-import com.zepben.ewb.services.common.translator.mRID
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.protobuf.nc.NetworkIdentifiedObject
 import com.zepben.protobuf.nc.NetworkIdentifiedObject.IdentifiedObjectCase.*

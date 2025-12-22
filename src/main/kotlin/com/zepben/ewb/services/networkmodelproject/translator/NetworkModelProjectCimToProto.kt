@@ -22,7 +22,7 @@ import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectDele
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectModification
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectReverseModification
 import com.zepben.ewb.services.common.translator.*
-import com.zepben.ewb.services.network.translator.networkIdent1ifiedObject
+import com.zepben.ewb.services.network.translator.networkIdentifiedObject
 import com.zepben.ewb.services.network.translator.toPb
 import com.zepben.ewb.services.networkmodelproject.whenVariantChangeSetMember
 import com.zepben.ewb.services.networkmodelproject.whenVariantDataSet
@@ -180,7 +180,7 @@ fun toPb(cim: NetworkModelProjectStage, pb: PBNetworkModelProjectStage.Builder):
             addDependingStage( it.toPb() )
         }
         cim.equipmentContainers.forEach {
-            addEquipmentContainers( networkIdent1ifiedObject(it) ) // TODO: this seems both right, and nasty.
+            addEquipmentContainers( networkIdentifiedObject(it) ) // TODO: this seems both right, and nasty.
         }
         toPb(cim, pb.nmpcBuilder)
     }
@@ -238,7 +238,7 @@ fun toPb(cim: ChangeSet, pb: PBChangeSet.Builder): PBChangeSet.Builder =
 fun toPb(cim: ChangeSetMember, pb: PBChangeSetMember.Builder): PBChangeSetMember.Builder =
     pb.apply {
         cim.getChangeSet?.let { changeSetMRID = it.mRID }
-        cim.targetObject?.let { targetObject = networkIdent1ifiedObject(it) }  // TODO: i mean, maybe?
+        cim.targetObject?.let { targetObject = networkIdentifiedObject(it) }  // TODO: i mean, maybe?
     }
 
 /**

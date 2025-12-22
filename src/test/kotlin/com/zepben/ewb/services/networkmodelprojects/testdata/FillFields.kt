@@ -10,7 +10,6 @@ package com.zepben.ewb.services.networkmodelprojects.testdata
 
 import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProject
 import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectComponent
-import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStageConflict
 import com.zepben.ewb.cim.iec61970.base.core.Feeder
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.wires.AcLineSegment
@@ -56,13 +55,6 @@ fun NetworkModelProjectComponent.fillFields(service: NetworkModelProjectService,
     return this
 }
 
-// TODO: DELETE? check note in class file.
-fun NetworkModelProjectStageConflict.fillFields(service: NetworkModelProjectService, includeRuntime: Boolean = true): NetworkModelProjectStageConflict {
-    (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
-
-    return this
-}
-
 // ############################################
 // # IEC61970 InfPart303 NetworkModelProjects #
 // ############################################
@@ -94,9 +86,10 @@ fun NetworkModelProjectStage.fillFields(service: NetworkModelProjectService, inc
             DependencyKind.mutuallyExclusive)
 
         addEquipmentContainer(
-            Feeder("${mRID}-equipment-container") // TODO: .also { service.add(it) }
+            Feeder("${mRID}-equipment-container")
         )
     }
+    service.add(this)
 
     return this
 }
@@ -110,14 +103,17 @@ fun ChangeSet.fillFields(service: NetworkModelProjectService, includeRuntime: Bo
 
     if (includeRuntime) {
         for (i in 0..3) {
-            addChangeSetMember(ObjectCreation(
-                changeSet = this,
-                targetObject = AcLineSegment()
-            ))
-            addChangeSetMember(ObjectDeletion(
-                changeSet = this,
-                targetObject = AcLineSegment()
-            ))
+            addChangeSetMember(
+                ObjectCreation().also {
+                    it.setChangeSet(this)
+                    it.targetObject = AcLineSegment()
+                })
+            addChangeSetMember(
+                ObjectDeletion().also {
+                    it.setChangeSet(this)
+                    it.targetObject = AcLineSegment()
+                }
+            )
             addChangeSetMember(ObjectModification.createObjectModification(
                 changeSet = this,
                 modifiedObject = AcLineSegment("${mRID}-modified-${i}"),
@@ -135,22 +131,26 @@ fun DataSet.fillFieldsCommon(service: NetworkModelProjectService, @Suppress("UNU
 
     return this
 }
-
 fun ChangeSetMember.generateMRID(suffix: String): String = "${UUID.randomUUID()}-${suffix}"
 
-fun ObjectCreation.fillFields(service: NetworkModelProjectService, includeRuntime: Boolean = true): ObjectCreation {
-    return ObjectCreation(
-        changeSet = ChangeSet(generateMRID("change-set")),
+fun ChangeSetMember.fillFields(csm: ChangeSetMember, changeSet: ChangeSet? = null): Boolean {
+    csm.apply {
+        setChangeSet(changeSet ?: ChangeSet(generateMRID("change-set")))
         targetObject = AcLineSegment()
-    )
+    }
+    return true
 }
 
-fun ObjectDeletion.fillFields(service: NetworkModelProjectService, includeRuntime: Boolean = true): ObjectDeletion {
-    return ObjectDeletion(
-        changeSet = ChangeSet(generateMRID("change-set")),
-        targetObject = AcLineSegment()
-    )
-}
+
+fun ObjectCreation.fillFields(service: NetworkModelProjectService, includeRuntime: Boolean = true): ObjectCreation =
+    ObjectCreation().also {
+        it.fillFields(it as ChangeSetMember)
+    }
+
+fun ObjectDeletion.fillFields(service: NetworkModelProjectService, includeRuntime: Boolean = true): ObjectDeletion =
+    ObjectDeletion().also {
+        it.fillFields(it as ChangeSetMember)
+    }
 
 fun ObjectModification.fillFields(service: NetworkModelProjectService, includeRuntime: Boolean = true): ObjectModification {
     val baseUUID = UUID.randomUUID().toString()
@@ -161,6 +161,3 @@ fun ObjectModification.fillFields(service: NetworkModelProjectService, includeRu
         originalObject = AcLineSegment("${baseUUID}-original")
     )
 }
-
-// This is tested in ObjectModification.fillFields above, and i dont think we want the SDK using this object directly..?
-// ObjectReverseModification.fillFields

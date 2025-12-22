@@ -14,7 +14,6 @@ import com.zepben.ewb.database.sqlite.cim.tables.iec61970.infiec61970.part303.ge
 import com.zepben.ewb.database.sqlite.cim.tables.iec61970.infiec61970.part303.genericdataset.TableObjectCreations
 import com.zepben.ewb.database.sqlite.cim.tables.iec61970.infiec61970.part303.genericdataset.TableObjectDeletions
 import com.zepben.ewb.database.sqlite.cim.tables.iec61970.infiec61970.part303.genericdataset.TableObjectModifications
-import com.zepben.ewb.database.sqlite.cim.tables.iec61970.infiec61970.part303.genericdataset.TableObjectReverseModifications
 import com.zepben.ewb.database.sqlite.common.SqliteTable
 
 /**
@@ -29,6 +28,5 @@ class NetworkModelProjectDatabaseTables : CimDatabaseTables() {
             TableObjectCreations(),
             TableObjectDeletions(),
             TableObjectModifications(),
-            // TODO: DELETE? TableObjectReverseModifications(),
         )
 }

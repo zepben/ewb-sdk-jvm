@@ -44,7 +44,17 @@ internal class CimDatabaseTablesTest {
             .map { it.simpleName!! }
             .toSet()
 
-        assertThat(usedTables, equalTo(allFinalTables))
+        // Catch the AssertionError that dumps a relatively not useful list of used tables vs expected complete list of tables
+        // and instead print the list of tables that were missed.
+        try {
+            assertThat(usedTables, equalTo(allFinalTables))
+        } catch (assertionError: AssertionError) {
+            allFinalTables.filterNot {
+                usedTables.contains(it)
+            }.also {
+                throw AssertionError("Unused Tables: ${it.joinToString(", ")}", assertionError)
+            }
+        }
     }
 
     @Test

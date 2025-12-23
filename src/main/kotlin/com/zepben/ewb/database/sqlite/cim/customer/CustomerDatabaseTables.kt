@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.database.sqlite.cim.customer
 
+import com.zepben.ewb.database.sql.SqlTable
 import com.zepben.ewb.database.sqlite.cim.CimDatabaseTables
 import com.zepben.ewb.database.sqlite.cim.tables.associations.TableCustomerAgreementsPricingStructures
 import com.zepben.ewb.database.sqlite.cim.tables.associations.TablePricingStructuresTariffs
@@ -23,7 +24,7 @@ import com.zepben.ewb.database.sqlite.common.SqliteTable
  */
 class CustomerDatabaseTables : CimDatabaseTables() {
 
-    override val includedTables: Sequence<SqliteTable> =
+    override val includedTables: Sequence<SqlTable> =
         super.includedTables + sequenceOf(
             TableCustomerAgreements(),
             TableCustomerAgreementsPricingStructures(),

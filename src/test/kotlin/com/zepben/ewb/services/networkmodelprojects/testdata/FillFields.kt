@@ -40,7 +40,7 @@ fun NetworkModelProject.fillFields(service: NetworkModelProjectService, includeR
     @Suppress("unused")
     if (includeRuntime) {
         for (i in 0..1) {
-            addChild(NetworkModelProjectStage("${mRID}-child-1").also {
+            addChild(NetworkModelProjectStage("$mRID-child-$i").also {
                 service.add(it)
             })
         }
@@ -62,8 +62,8 @@ fun NetworkModelProjectComponent.fillFields(service: NetworkModelProjectService,
 fun AnnotatedProjectDependency.fillFields(service: NetworkModelProjectService, includeRuntime: Boolean = true): AnnotatedProjectDependency {
     (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
     dependencyType = DependencyKind.mutuallyExclusive
-    dependencyDependentOnStage = NetworkModelProjectStage("${mRID}-dependent-on-stage").also { service.add(it) }
-    dependencyDependingStage = NetworkModelProjectStage("${mRID}-depending-on-stage").also { service.add(it) }
+    addDependencyDependentOnStage(NetworkModelProjectStage("${mRID}-dependent-on-stage").also { service.add(it) })
+    addDependencyDependingStage(NetworkModelProjectStage("${mRID}-depending-on-stage").also { service.add(it) })
 
     return this
 }
@@ -79,11 +79,18 @@ fun NetworkModelProjectStage.fillFields(service: NetworkModelProjectService, inc
     if (includeRuntime) {
         setChangeSet(ChangeSet("${mRID}-changeset-1"))
         addDependingStage(
-            NetworkModelProjectStage("${mRID}-depending-stage").also { service.add(it) },
-            DependencyKind.required)
+            AnnotatedProjectDependency("$mRID-apd").apply {
+                dependencyType = DependencyKind.required
+                addDependencyDependentOnStage(NetworkModelProjectStage("${mRID}-dependent-on-stage").also { service.add(it) })
+            }
+        )
+
         addDependentOnStage(
-            NetworkModelProjectStage("${mRID}-dependent-on-stage").also { service.add(it) },
-            DependencyKind.mutuallyExclusive)
+            AnnotatedProjectDependency("$mRID-apd").apply {
+                addDependencyDependingStage(NetworkModelProjectStage("${mRID}-depending-stage").also { service.add(it) })
+                dependencyType = DependencyKind.mutuallyExclusive
+            }
+        )
 
         addEquipmentContainer(
             Feeder("${mRID}-equipment-container")
@@ -106,12 +113,12 @@ fun ChangeSet.fillFields(service: NetworkModelProjectService, includeRuntime: Bo
             addChangeSetMember(
                 ObjectCreation().also {
                     it.setChangeSet(this)
-                    it.targetObject = AcLineSegment()
+                    it.targetObject = AcLineSegment("${mRID}-creation-target")
                 })
             addChangeSetMember(
                 ObjectDeletion().also {
                     it.setChangeSet(this)
-                    it.targetObject = AcLineSegment()
+                    it.targetObject = AcLineSegment("$mRID-deletion-target")
                 }
             )
             addChangeSetMember(ObjectModification.createObjectModification(
@@ -136,7 +143,7 @@ fun ChangeSetMember.generateMRID(suffix: String): String = "${UUID.randomUUID()}
 fun ChangeSetMember.fillFields(csm: ChangeSetMember, changeSet: ChangeSet? = null): Boolean {
     csm.apply {
         setChangeSet(changeSet ?: ChangeSet(generateMRID("change-set")))
-        targetObject = AcLineSegment()
+        targetObject = AcLineSegment("${changeSet!!.mRID}-target")
     }
     return true
 }

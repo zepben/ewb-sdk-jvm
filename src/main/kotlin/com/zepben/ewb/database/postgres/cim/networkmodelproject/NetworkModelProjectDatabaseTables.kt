@@ -13,13 +13,13 @@ import com.zepben.ewb.database.postgres.cim.tables.extensions.iec61970.infpart30
 import com.zepben.ewb.database.postgres.cim.tables.iec61970.infiec61970.infpart303.networkmodelprojects.TableAnnotatedProjectDependencies
 import com.zepben.ewb.database.postgres.cim.tables.iec61970.infiec61970.infpart303.networkmodelprojects.TableNetworkModelProjectStageEquipmentContainers
 import com.zepben.ewb.database.postgres.cim.tables.iec61970.infiec61970.infpart303.networkmodelprojects.TableNetworkModelProjectStages
-import com.zepben.ewb.database.sql.BaseDatabaseTables
 import com.zepben.ewb.database.sql.SqlTable
+import com.zepben.ewb.database.sqlite.cim.CimDatabaseTables
 
 /**
  * The collection of tables for our network model project databases.
  */
-class NetworkModelProjectDatabaseTables : BaseDatabaseTables() {
+class NetworkModelProjectDatabaseTables : CimDatabaseTables() {
 
     override val includedTables: Sequence<SqlTable> =
         super.includedTables + sequenceOf(

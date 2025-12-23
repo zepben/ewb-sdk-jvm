@@ -12,6 +12,7 @@ import com.google.protobuf.NullValue
 import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProject
 import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectComponent
 import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStageConflict
+import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.AnnotatedProjectDependency
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStage
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
@@ -23,11 +24,12 @@ import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectModi
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectReverseModification
 import com.zepben.ewb.services.common.translator.*
 import com.zepben.ewb.services.network.translator.networkIdentifiedObject
-import com.zepben.ewb.services.network.translator.toPb
 import com.zepben.ewb.services.networkmodelproject.whenVariantChangeSetMember
 import com.zepben.ewb.services.networkmodelproject.whenVariantDataSet
+import com.zepben.ewb.services.networkmodelproject.whenVariantIdentifiedObject
 import com.zepben.protobuf.vc.VariantChangeSetMember
 import com.zepben.protobuf.vc.VariantDataSet
+import com.zepben.protobuf.vc.VariantIdentifiedObject
 import java.time.Instant
 import com.zepben.protobuf.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProject as PBNetworkModelProject
 import com.zepben.protobuf.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectComponent as PBNetworkModelProjectComponent
@@ -48,6 +50,16 @@ import com.zepben.protobuf.cim.iec61970.infiec61970.part303.genericdataset.Objec
 /**
  * Convert the [DataSet] to a [VariantDataSet] representation.
  */
+fun variantIdentifiedObject(identifiedObject: IdentifiedObject): VariantIdentifiedObject =
+    VariantIdentifiedObject.newBuilder().apply {
+        whenVariantIdentifiedObject(
+            identifiedObject,
+            isNetworkModelProject = { networkModelProject = it.toPb() },
+            isNetworkModelProjectStage = { networkModelProjectStage = it.toPb() },
+            isAnnotatedProjectDependency = { annotatedProjectDependency = it.toPb() }
+        )
+    }.build()
+
 fun variantDataSet(dataSet: DataSet): VariantDataSet =
     VariantDataSet.newBuilder().apply {
         whenVariantDataSet(
@@ -148,9 +160,10 @@ fun NetworkModelProjectComponent.toPb(): PBNetworkModelProjectComponent = toPb(t
  */
 fun toPb(cim: AnnotatedProjectDependency, pb: PBAnnotatedProjectDependency.Builder): PBAnnotatedProjectDependency.Builder =
     pb.apply {
-        dependencyType = mapDependencyKind.toPb(cim.dependencyType)
-        dependencyDependingStageMRID = cim.dependencyDependingStage.mRID
-        dependencyDependentOnStageMRID = cim.dependencyDependentOnStage.mRID
+        cim.dependencyType?.also { dependencyType = mapDependencyKind.toPb(it) }
+        cim.dependencyDependingStage?.also { dependencyDependingStageMRID = it.mRID }
+        cim.dependencyDependentOnStage?.also { dependencyDependentOnStageMRID = it.mRID }
+
         toPb(cim, ioBuilder)
     }
 

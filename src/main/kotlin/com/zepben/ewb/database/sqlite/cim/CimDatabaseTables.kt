@@ -9,6 +9,7 @@
 package com.zepben.ewb.database.sqlite.cim
 
 import com.zepben.ewb.database.sql.BaseDatabaseTables
+import com.zepben.ewb.database.sql.SqlTable
 import com.zepben.ewb.database.sqlite.cim.tables.TableMetadataDataSources
 import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.core.TableNameTypes
 import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.core.TableNames
@@ -20,7 +21,7 @@ import com.zepben.ewb.database.sqlite.common.SqliteTable
  */
 open class CimDatabaseTables internal constructor() : BaseDatabaseTables() {
 
-    override val includedTables: Sequence<SqliteTable> = sequenceOf(
+    override val includedTables: Sequence<SqlTable> = sequenceOf(
         tableCimVersion,
         TableMetadataDataSources(),
         TableNameTypes(),

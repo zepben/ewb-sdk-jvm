@@ -8,23 +8,44 @@
 
 package com.zepben.ewb.services.networkmodelprojects.translator
 
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.DataSet
+import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProject
+import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.AnnotatedProjectDependency
+import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStage
+import com.zepben.ewb.database.postgres.cim.networkmodelproject.NetworkModelProjectDatabaseTables
 import com.zepben.ewb.services.common.translator.TranslatorTestBase
 import com.zepben.ewb.services.networkmodelproject.NetworkModelProjectService
+import com.zepben.ewb.services.networkmodelproject.NetworkModelProjectServiceComparator
 import com.zepben.ewb.services.networkmodelproject.translator.NetworkModelProjectCimToProto
 import com.zepben.ewb.services.networkmodelproject.translator.addFromPb
+import com.zepben.ewb.services.networkmodelproject.translator.variantIdentifiedObject
+import com.zepben.ewb.services.networkmodelprojects.testdata.fillFields
 
 internal class VariantTranslatorTest : TranslatorTestBase<NetworkModelProjectService>(
     ::NetworkModelProjectService,
-    TODO()
+    NetworkModelProjectServiceComparator(),
+    NetworkModelProjectDatabaseTables(),
+    NetworkModelProjectService::addFromPb,
+    ::variantIdentifiedObject
 
 ){
     private val vsToPb = NetworkModelProjectCimToProto()
 
     override val validationInfo = listOf(
-        ValidationInfo<DataSet>(::ChangeSet, { fillFields(it) }, { addFromPb(vsToPb.toPb(it)) }),  // TODO: datasets not being IO's bites me in the ass again.
+
+        // #######################################################
+        // # Extensions IEC61970 InfPart303 NetworkModelProjects #
+        // #######################################################
+
+        ValidationInfo(::NetworkModelProject, { fillFields(it) }, { addFromPb(vsToPb.toPb(it)) }),
+
+        // ############################################
+        // # IEC61970 InfPart303 NetworkModelProjects #
+        // ############################################
+
+        ValidationInfo(::AnnotatedProjectDependency, { fillFields(it) }, { addFromPb(vsToPb.toPb(it)) }),
+        ValidationInfo(::NetworkModelProjectStage, { fillFields(it) }, { addFromPb(vsToPb.toPb(it)) }),
+
+        //ValidationInfo(::ChangeSet, { fillFields(it) }, { addFromPb(vsToPb.toPb(it)) }),  // TODO: datasets not being IO's bites me in the ass again.
 
     )
-    TODO()
 }

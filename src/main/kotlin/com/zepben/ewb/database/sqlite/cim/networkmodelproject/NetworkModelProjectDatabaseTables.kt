@@ -8,6 +8,10 @@
 
 package com.zepben.ewb.database.sqlite.cim.networkmodelproject
 
+import com.zepben.ewb.database.postgres.cim.tables.extensions.iec61970.infpart303.networkmodelprojects.TableNetworkModelProjectNetworkModelProjectComponents
+import com.zepben.ewb.database.postgres.cim.tables.iec61970.infiec61970.infpart303.networkmodelprojects.TableAnnotatedProjectDependencies
+import com.zepben.ewb.database.postgres.cim.tables.iec61970.infiec61970.infpart303.networkmodelprojects.TableNetworkModelProjectStageEquipmentContainers
+import com.zepben.ewb.database.sql.SqlTable
 import com.zepben.ewb.database.sqlite.cim.CimDatabaseTables
 import com.zepben.ewb.database.sqlite.cim.tables.iec61970.infiec61970.part303.genericdataset.TableChangeSetChangeSetMembers
 import com.zepben.ewb.database.sqlite.cim.tables.iec61970.infiec61970.part303.genericdataset.TableChangeSets
@@ -21,8 +25,11 @@ import com.zepben.ewb.database.sqlite.common.SqliteTable
  */
 class NetworkModelProjectDatabaseTables : CimDatabaseTables() {
 
-    override val includedTables: Sequence<SqliteTable> =
+    override val includedTables: Sequence<SqlTable> =
         super.includedTables + sequenceOf(
+            TableAnnotatedProjectDependencies(),
+            TableNetworkModelProjectStageEquipmentContainers(),
+            TableNetworkModelProjectNetworkModelProjectComponents(),
             TableChangeSetChangeSetMembers(),
             TableChangeSets(),
             TableObjectCreations(),

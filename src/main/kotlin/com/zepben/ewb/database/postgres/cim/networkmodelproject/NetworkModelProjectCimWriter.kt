@@ -78,10 +78,10 @@ class NetworkModelProjectCimWriter(
     fun write(annotatedProjectDependency: AnnotatedProjectDependency): Boolean {
         val table = databaseTables.getTable<TableAnnotatedProjectDependencies>()
         val insert = databaseTables.getInsert<TableAnnotatedProjectDependencies>()
-
-        insert.setString(table.DEPENDENCY_TYPE.queryIndex, annotatedProjectDependency.dependencyType.name)
-        insert.setString(table.DEPENDENCY_DEPENDENT_ON_STAGE_MRID.queryIndex, annotatedProjectDependency.dependencyDependentOnStage.mRID)
-        insert.setString(table.DEPENDENCY_DEPENDING_STAGE_MRID.queryIndex, annotatedProjectDependency.dependencyDependingStage.mRID)
+        // TODO: handle allfieldsnull
+        insert.setString(table.DEPENDENCY_TYPE.queryIndex, annotatedProjectDependency.dependencyType?.name)
+        insert.setString(table.DEPENDENCY_DEPENDENT_ON_STAGE_MRID.queryIndex, annotatedProjectDependency.dependencyDependentOnStage?.mRID)
+        insert.setString(table.DEPENDENCY_DEPENDING_STAGE_MRID.queryIndex, annotatedProjectDependency.dependencyDependingStage?.mRID)
 
         return writeIdentifiedObject(table, insert, annotatedProjectDependency, "annotated project dependency")
 

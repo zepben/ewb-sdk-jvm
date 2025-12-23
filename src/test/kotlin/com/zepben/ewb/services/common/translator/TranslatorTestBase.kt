@@ -73,9 +73,21 @@ internal abstract class TranslatorTestBase<S : BaseService>(
             val actual = validationInfo.map { it.cim::class.simpleName!! }.toSet()
             val expected = (databaseTables.tables.keys - excludedTables).map { it.simpleName!!.removePrefix("Table") }.toSet()
 
-            val potentialSuffixes = listOf("", "s", "es")
-            val actualWithSuffixes = actual.flatMap { potentialSuffixes.map { suffix -> "$it$suffix" } }.toSet()
-            val expectedWithoutSuffixes = expected.flatMap { potentialSuffixes.map { suffix -> it.removeSuffix(suffix) } }.toSet()
+            val potentialSuffixes = listOf("", "s", "es", "cies")
+            val actualWithSuffixes = actual.flatMap {
+                potentialSuffixes.map { suffix ->
+                    "${it.removeSuffix("cy")}$suffix"
+                }
+            }.toSet()
+            val expectedWithoutSuffixes = expected.flatMap {
+                potentialSuffixes.map { suffix ->
+                    if (it.endsWith("cies")) {
+                        "${it.removeSuffix("cies")}cy"
+                    } else {
+                        it.removeSuffix(suffix)
+                    }
+                }
+            }.toSet()
 
             fail(
                 "The number of items being validated did not match the number of items written to the database. Did you forget to validate an item, " +

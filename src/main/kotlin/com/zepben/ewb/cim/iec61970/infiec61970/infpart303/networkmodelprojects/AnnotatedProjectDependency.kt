@@ -17,14 +17,19 @@ import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
  * @param dependencyDependentOnStage NetworkModelProjectStage representing the "to" stage. // TODO: GRPC
  * @param dependencyDependingStage NetworkModelProjectStage representing the "from" stage.
  */
-class AnnotatedProjectDependency(
-    mRID: String,
-    var dependencyType: DependencyKind,
-    var dependencyDependentOnStage: NetworkModelProjectStage,
-    var dependencyDependingStage: NetworkModelProjectStage
+class AnnotatedProjectDependency(mRID: String) : IdentifiedObject(mRID) {
 
-) : IdentifiedObject(mRID) {
-    init {
-        // TODO: reverse link the stages back to this
+    var dependencyType: DependencyKind? = null
+    var dependencyDependentOnStage: NetworkModelProjectStage? = null
+    var dependencyDependingStage: NetworkModelProjectStage? = null
+
+    fun addDependencyDependentOnStage(stage: NetworkModelProjectStage) {
+        dependencyDependingStage = stage
+        stage.addDependingStage(this)
+    }
+
+    fun addDependencyDependingStage(stage: NetworkModelProjectStage) {
+        dependencyDependingStage = stage
+        stage.addDependingStage(this)
     }
 }

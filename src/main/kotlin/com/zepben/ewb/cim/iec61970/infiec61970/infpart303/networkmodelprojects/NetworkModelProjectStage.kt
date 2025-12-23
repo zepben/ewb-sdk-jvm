@@ -96,33 +96,21 @@ class NetworkModelProjectStage(mRID: String) : NetworkModelProjectComponent(mRID
     val dependentOnStage: Collection<AnnotatedProjectDependency> get() = _dependentOnStage.asUnmodifiable()
 
     /**
-     * Create an [AnnotatedProjectDependency] where this stage is a dependency of [stage].
+     * Create an [AnnotatedProjectDependency] where the other stage in [annotatedProjectDependency] depends on this stage.
      *
      * eg:
-     *   to apply the [ChangeSet]s in [stage] we MUST resolve the dependency.
+     *   to apply the [ChangeSet]s in the other stage we MUST resolve the dependency.
      *   to apply the [ChangeSet]s in this stage we do not resolve the dependency.
      *
-     * @param stage the [NetworkModelProjectStage] that has a dependency on this stage.
-     * @param type the [DependencyKind] describing the type of dependency.
+     * @param annotatedProjectDependency the [AnnotatedProjectDependency] specifying the dependency link on this stage.
      */
-    fun addDependentOnStage (stage: NetworkModelProjectStage, type: DependencyKind) {
-        //FIXME: this is dumb.
+    fun addDependentOnStage (annotatedProjectDependency: AnnotatedProjectDependency) {
+
         if (_dependentOnStage == null)
             _dependentOnStage = mutableListOf()
 
-        val apd = AnnotatedProjectDependency(
-            mRID = UUID.randomUUID().toString(),
-            dependencyType = type,
-            dependencyDependentOnStage = this,
-            dependencyDependingStage = stage
-        )
+        _dependentOnStage!!.add(annotatedProjectDependency)
 
-        _dependentOnStage!!.add(apd)
-
-        if (stage._dependingStage == null)
-            stage._dependingStage = mutableListOf()
-
-        stage._dependingStage!!.add(apd)
     }
 
     /**
@@ -131,40 +119,21 @@ class NetworkModelProjectStage(mRID: String) : NetworkModelProjectComponent(mRID
     val dependingStage: Collection<AnnotatedProjectDependency> get() = _dependingStage.asUnmodifiable()
 
     /**
-     * Create an [AnnotatedProjectDependency] where [stage] is a dependency of this stage.
+     * Create an [AnnotatedProjectDependency] where this stage depends on the other stage in [annotatedProjectDependency].
      *
      * eg:
-     *   to apply the [ChangeSet]s in [stage] we do not resolve the dependency.
+     *   to apply the [ChangeSet]s in the other stage we do not resolve the dependency.
      *   to apply the [ChangeSet]s in this stage we MUST resolve the dependency.
      *
-     * @param stage the [NetworkModelProjectStage] that this stage has a dependency on.
-     * @param type the [DependencyKind] describing the type of dependency.
+     * @param annotatedProjectDependency the [AnnotatedProjectDependency] specifying the dependency link on this stage.
      */
-    fun addDependingStage (stage: NetworkModelProjectStage, type: DependencyKind) {
-        //FIXME: this is also dumb.
+    fun addDependingStage (annotatedProjectDependency: AnnotatedProjectDependency) {
+
         if (_dependingStage == null)
             _dependingStage = mutableListOf()
 
-        val apd = AnnotatedProjectDependency(
-            mRID = UUID.randomUUID().toString(),
-            dependencyType = type,
-            dependencyDependentOnStage = stage,
-            dependencyDependingStage = this
-        )
-
-        _dependingStage!!.add(apd)
-
-        if (stage._dependentOnStage == null)
-            _dependentOnStage = mutableListOf()
-
-        stage._dependentOnStage!!.add(apd)
+        _dependingStage!!.add(annotatedProjectDependency)
     }
-
-    /**
-     * [ZBEX] The conflicts of this stage against the base model.
-     */
-    // TODO: DELETEME?
-    var conflicts: NetworkModelProjectStageConflict? = null
 
     /**
      * [ZBEX] The equipment containers this stage is related to.

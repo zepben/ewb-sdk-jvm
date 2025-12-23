@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.database.sqlite.cim.diagram
 
+import com.zepben.ewb.database.sql.SqlTable
 import com.zepben.ewb.database.sqlite.cim.CimDatabaseTables
 import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.diagramlayout.TableDiagramObjectPoints
 import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.diagramlayout.TableDiagramObjects
@@ -19,7 +20,7 @@ import com.zepben.ewb.database.sqlite.common.SqliteTable
  */
 class DiagramDatabaseTables : CimDatabaseTables() {
 
-    override val includedTables: Sequence<SqliteTable> =
+    override val includedTables: Sequence<SqlTable> =
         super.includedTables + sequenceOf(
             TableDiagramObjectPoints(),
             TableDiagramObjects(),

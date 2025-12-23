@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.services.networkmodelproject.translator
 
+import com.zepben.protobuf.cim.iec61970.base.core.NameType as PBNameType
 import com.zepben.protobuf.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProject as PBNetworkModelProject
 import com.zepben.protobuf.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectComponent as PBNetworkModelProjectComponent
 import com.zepben.protobuf.cim.iec61970.infiec61970.infpart303.networkmodelprojects.AnnotatedProjectDependency as PBAnnotatedProjectDependency
@@ -20,7 +21,7 @@ import com.zepben.protobuf.cim.iec61970.infiec61970.part303.genericdataset.Objec
 import com.zepben.protobuf.cim.iec61970.infiec61970.part303.genericdataset.ObjectModification as PBObjectModification
 import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProject
 import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectComponent
-import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.ewb.cim.iec61970.base.core.NameType
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.AnnotatedProjectDependency
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStage
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
@@ -29,13 +30,14 @@ import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.DataSet
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectCreation
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectDeletion
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectModification
-import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.common.Resolvers
 import com.zepben.ewb.services.common.extensions.getOrThrow
 import com.zepben.ewb.services.common.translator.AddFromPbResult
 import com.zepben.ewb.services.common.translator.BaseProtoToCim
 import com.zepben.ewb.services.common.translator.getOrAddFromPb
+import com.zepben.ewb.services.common.translator.toCim
 import com.zepben.ewb.services.common.translator.toInstant
+import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.translator.addFromPb
 import com.zepben.ewb.services.networkmodelproject.NetworkModelProjectService
 import com.zepben.protobuf.vc.VariantChangeSetMember
@@ -43,9 +45,9 @@ import com.zepben.protobuf.vc.VariantChangeSetMember.ChangeSetMemberCase.OBJECTC
 import com.zepben.protobuf.vc.VariantChangeSetMember.ChangeSetMemberCase.OBJECTDELETION
 import com.zepben.protobuf.vc.VariantChangeSetMember.ChangeSetMemberCase.OBJECTMODIFICATION
 import com.zepben.protobuf.vc.VariantChangeSetMember.ChangeSetMemberCase.CHANGESETMEMBER_NOT_SET
-import com.zepben.protobuf.vc.VariantDataSet
-import com.zepben.protobuf.vc.VariantDataSet.DataSetCase.CHANGESET
-import com.zepben.protobuf.vc.VariantDataSet.DataSetCase.DATASET_NOT_SET
+//import com.zepben.protobuf.vc.VariantDataSet
+//import com.zepben.protobuf.vc.VariantDataSet.DataSetCase.CHANGESET
+//import com.zepben.protobuf.vc.VariantDataSet.DataSetCase.DATASET_NOT_SET
 import com.zepben.protobuf.vc.VariantIdentifiedObject
 import com.zepben.protobuf.vc.VariantIdentifiedObject.IdentifiedObjectCase.*
 
@@ -142,10 +144,11 @@ fun toCim(pb: PBNetworkModelProjectComponent, cim: NetworkModelProjectComponent,
 fun toCim(pb: PBAnnotatedProjectDependency, networkService: NetworkModelProjectService): AnnotatedProjectDependency =
     AnnotatedProjectDependency(
         pb.mRID(),
-        mapDependencyKind.toCim(pb.dependencyType),
-        networkService.getOrThrow(pb.dependencyDependentOnStageMRID, "TODO:"),
-        networkService.getOrThrow(pb.dependencyDependingStageMRID, "")
-    )
+    ).apply {
+        mapDependencyKind.toCim(pb.dependencyType)
+        addDependencyDependentOnStage(networkService.getOrThrow<NetworkModelProjectStage>(pb.dependencyDependentOnStageMRID, "TODO:"))
+        addDependencyDependingStage(networkService.getOrThrow<NetworkModelProjectStage>(pb.dependencyDependingStageMRID, ""))
+    }
 
 /**
  * An extension to add a converted copy of the protobuf [PBAnnotatedProjectDependency] to the [NetworkModelProjectService].
@@ -164,6 +167,11 @@ fun toCim(pb: PBDataSet, cim: DataSet, networkService: NetworkModelProjectServic
         description = pb.descriptionSet.takeUnless { pb.hasDescriptionNull() }
         name = pb.nameSet.takeUnless { pb.hasNameNull() }
     }
+
+/**
+ * An extension to add a converted copy of the protobuf [PBNameType] to the [NetworkService].
+ */
+fun NetworkService.addFromPb(pb: PBNameType): NameType = toCim(pb, this) // Special case
 
 /**
  * Convert the protobuf [PBChangeSet] into its CIM counterpart.

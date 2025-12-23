@@ -50,6 +50,7 @@ import com.zepben.ewb.cim.iec61970.base.scada.RemoteControl
 import com.zepben.ewb.cim.iec61970.base.scada.RemoteSource
 import com.zepben.ewb.cim.iec61970.base.wires.*
 import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
+import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.AnnotatedProjectDependency
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStage
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSetMember

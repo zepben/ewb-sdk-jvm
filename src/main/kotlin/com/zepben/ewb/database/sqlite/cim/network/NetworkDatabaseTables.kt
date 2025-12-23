@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.database.sqlite.cim.network
 
+import com.zepben.ewb.database.sql.SqlTable
 import com.zepben.ewb.database.sqlite.cim.CimDatabaseTables
 import com.zepben.ewb.database.sqlite.cim.tables.associations.*
 import com.zepben.ewb.database.sqlite.cim.tables.extensions.iec61968.assetinfo.TableRecloseDelays
@@ -61,7 +62,7 @@ import com.zepben.ewb.database.sqlite.common.SqliteTable
  */
 class NetworkDatabaseTables : CimDatabaseTables() {
 
-    override val includedTables: Sequence<SqliteTable> =
+    override val includedTables: Sequence<SqlTable> =
         super.includedTables + sequenceOf(
             TableAcLineSegments(),
             TableAccumulators(),

@@ -81,10 +81,11 @@ internal class NetworkModelProjectCimReader(
         return service.addOrThrow(
             AnnotatedProjectDependency(
                 apdMRID,
-                DependencyKind.valueOf(resultSet.getString(table.DEPENDENCY_TYPE.queryIndex)),
-                service.getOrThrow(resultSet.getString(table.DEPENDENCY_DEPENDENT_ON_STAGE_MRID.queryIndex), "annotated project dependency $apdMRID dependency dependent on stage"),
-                service.getOrThrow(resultSet.getString(table.DEPENDENCY_DEPENDING_STAGE_MRID.queryIndex),"annotated project dependency $apdMRID dependency depending stage"),
-            ).also {
+            ).apply {
+                dependencyType = DependencyKind.valueOf(resultSet.getString(table.DEPENDENCY_TYPE.queryIndex))
+                addDependencyDependentOnStage(service.getOrThrow(resultSet.getString(table.DEPENDENCY_DEPENDENT_ON_STAGE_MRID.queryIndex), "annotated project dependency $apdMRID dependency dependent on stage"))
+                addDependencyDependingStage(service.getOrThrow(resultSet.getString(table.DEPENDENCY_DEPENDING_STAGE_MRID.queryIndex),"annotated project dependency $apdMRID dependency depending stage"))
+            }.also {
                 readIdentifiedObject(it, table, resultSet)
             }
         )

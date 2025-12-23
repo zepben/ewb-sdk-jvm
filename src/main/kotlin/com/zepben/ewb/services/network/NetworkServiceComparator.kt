@@ -95,16 +95,12 @@ class NetworkServiceComparator @JvmOverloads constructor(
 
     private fun compareHvCustomer(source: HvCustomer, target: HvCustomer): ObjectDifference<HvCustomer> =
         ObjectDifference(source, target).apply {
-            if (options.compareEquipmentContainers) {
-                compareEquipmentContainer()
-            }
+            compareEquipmentContainer()
         }
 
     private fun compareSite(source: Site, target: Site): ObjectDifference<Site> =
         ObjectDifference(source, target).apply {
-            if (options.compareEquipmentContainers) {
-                compareEquipmentContainer()
-            }
+            compareEquipmentContainer()
         }
 
     // ###################################
@@ -134,12 +130,10 @@ class NetworkServiceComparator @JvmOverloads constructor(
     private fun compareLvSubstation(source: LvSubstation, target: LvSubstation): ObjectDifference<LvSubstation> =
         ObjectDifference(source, target).apply {
             compareEquipmentContainer()
+
             compareIdReferenceCollections(LvSubstation::normalEnergizingFeeders)
             compareIdReferenceCollections(LvSubstation::currentEnergizingFeeders)
             compareIdReferenceCollections(LvSubstation::normalEnergizedLvFeeders)
-            if (options.compareEquipmentContainers) {
-                compareEquipmentContainer()
-            }
         }
 
     // ##################################################

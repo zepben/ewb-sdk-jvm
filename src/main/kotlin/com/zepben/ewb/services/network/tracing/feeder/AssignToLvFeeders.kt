@@ -194,7 +194,7 @@ class AssignToLvFeeders(
             //
             // NOTE: Sites aren't added to the current state containers, so they will always need to be looked up from the normal containers,
             //       regardless of the state operators being used.
-            // TODO: Remove site processing when we remove it in AssignToFeeders
+            // TODO: DEV-6373 - Remove site processing when we remove it in AssignToFeeders
             val sitesAndLvSubstations = containers.filterIsInstance<Site>() + containers.filterIsInstance<LvSubstation>()
             return if (sitesAndLvSubstations.isNotEmpty())
                 sitesAndLvSubstations.findLvFeeders(lvFeederStartPoints, stateOperators)

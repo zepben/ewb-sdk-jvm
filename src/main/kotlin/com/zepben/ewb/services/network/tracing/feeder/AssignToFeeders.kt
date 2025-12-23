@@ -189,7 +189,7 @@ class AssignToFeeders(
                 // Also energise any LvSubstations found on the transformer. LvSubstations should gradually replace Sites.
                 energizesLvSubstations(substations)
             } else if (sites.isNotEmpty()) {
-                // TODO: Log deprecation warning here after March 2026, and remove sometime later.
+                // TODO: DEV-6373 - Log deprecation warning here after March 2026, and remove sometime later.
                 energizes(sites.findLvFeeders(lvFeederStartPoints, stateOperators))
             } else {
                 energizes(toEquipment.getFilteredContainers<LvFeeder>(stateOperators))

@@ -1,7 +1,9 @@
 # Zepben EWB SDK changelog
 ## [1.3.0] - UNRELEASED
 ### Breaking Changes
-* You must now provide an `mRID` for all `IdentifiedObject` instances, the auto-generated default `mRID` has been removed.
+* You must now provide an `mRID` for all `IdentifiedObject` instances, the auto-generated default `mRID` has been removed. The helper function 
+  `generateId()` has been added which can be used to auto-generate a UUID. Note this is discouraged for production use, and reproducible mRIDs 
+  are preferred.
 
 ### New Features
 * Added new classes to the model:

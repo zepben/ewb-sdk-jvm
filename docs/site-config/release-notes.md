@@ -2,6 +2,7 @@
 
 | Version                  | Released              |
 | ------------------------ | --------------------- |
+|[1.3.0](#130)| `23 December 2025` |
 |[1.2.0](#120)| `05 December 2025` |
 | [1.1.0](#110)            | `30 September 2025`   |
 | [1.0.1](#101)            | `19 September 2025`   |
@@ -42,6 +43,47 @@
 ---
 
 NOTE: This library is not yet stable, and breaking changes should be expected until a 1.0.0 release.
+
+---
+
+## [1.3.0]
+
+### Breaking Changes
+* You must now provide an `mRID` for all `IdentifiedObject` instances, the auto-generated default `mRID` has been removed. The helper function 
+  `generateId()` has been added which can be used to auto-generate a UUID. Note this is discouraged for production use, and reproducible mRIDs 
+  are preferred.
+
+### New Features
+* Added new classes to the model:
+  * `HvCustomer` - [ZBEX] an `EquipmentContainer` for high voltage customer assets.
+  * `LvSubstation` - [ZBEX] an `EquipmentContainer` to represent distribution transformer sites, with associations to `Feeder` and `LvFeeder`
+  * `AcLineSegmentPhase` - Details about an individual phase of an `AcLineSegment`.
+* Added new properties to the model:
+  * `PricingStructure.code` - User allocated key for a pricing structure.
+  * `ShuntCompensator.groundingTerminal` - [ZBEX] The terminal connecting to grounded network.
+  * `WireInfo` - extra properties for conductors:
+    * `sizeDescription`
+    * `strandCount`
+    * `coreStrandCount`
+    * `insulated`
+    * `insulationMaterial`
+    * `insulationThickness`
+* Added new enum `WireInsulationKind` with extensions.
+* Added helper function `AcLineSegment.wireInfoForPhase()` for retrieving the `WireInfo` for a given phase of a conductor.
+* Added helper function `EquipmentContainer.edgeTerminals()` for retrieving all terminals on the edge of an `EquipmentContainer`.
+* Added support to filter NetworkHierarchy responses when calling `NetworkConsumerClient.getNetworkHierarchy()`. A client can now choose what hierarchy containers should
+  be populated in the response.
+* Added `EquipmentContainer.edgeTerminals()` to retrieve all terminals connecting outside of the `EquipmentContainer`.
+* Added `AcLineSegment.wireInfoForPhase(phase: SinglePhaseKind)` to retrieve the `WireInfo` associated with a given phase of a conductor.
+
+### Enhancements
+* None.
+
+### Fixes
+* None.
+
+### Notes
+* None.
 
 ---
 

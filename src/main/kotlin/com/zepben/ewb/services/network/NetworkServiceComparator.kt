@@ -11,9 +11,11 @@ package com.zepben.ewb.services.network
 import com.zepben.ewb.cim.extensions.iec61968.assetinfo.RelayInfo
 import com.zepben.ewb.cim.extensions.iec61968.common.ContactDetails
 import com.zepben.ewb.cim.extensions.iec61968.metering.PanDemandResponseFunction
+import com.zepben.ewb.cim.extensions.iec61970.base.core.HvCustomer
 import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
+import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvSubstation
 import com.zepben.ewb.cim.extensions.iec61970.base.generation.production.EvChargingUnit
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.*
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.BatteryControl
@@ -91,11 +93,14 @@ class NetworkServiceComparator @JvmOverloads constructor(
     // # Extensions IEC61970 Base Core #
     // #################################
 
+    private fun compareHvCustomer(source: HvCustomer, target: HvCustomer): ObjectDifference<HvCustomer> =
+        ObjectDifference(source, target).apply {
+            compareEquipmentContainer()
+        }
+
     private fun compareSite(source: Site, target: Site): ObjectDifference<Site> =
         ObjectDifference(source, target).apply {
-            if (options.compareEquipmentContainers) {
-                compareEquipmentContainer()
-            }
+            compareEquipmentContainer()
         }
 
     // ###################################
@@ -116,8 +121,19 @@ class NetworkServiceComparator @JvmOverloads constructor(
             compareIdReferences(LvFeeder::normalHeadTerminal)
             compareIdReferenceCollections(LvFeeder::normalEnergizingFeeders)
             compareIdReferenceCollections(LvFeeder::currentEnergizingFeeders)
-            if (options.compareFeederEquipment)
+            compareIdReferences(LvFeeder::normalEnergizingLvSubstation)
+            if (options.compareFeederEquipment) {
                 compareIdReferenceCollections(LvFeeder::currentEquipment)
+            }
+        }
+
+    private fun compareLvSubstation(source: LvSubstation, target: LvSubstation): ObjectDifference<LvSubstation> =
+        ObjectDifference(source, target).apply {
+            compareEquipmentContainer()
+
+            compareIdReferenceCollections(LvSubstation::normalEnergizingFeeders)
+            compareIdReferenceCollections(LvSubstation::currentEnergizingFeeders)
+            compareIdReferenceCollections(LvSubstation::normalEnergizedLvFeeders)
         }
 
     // ##################################################
@@ -339,7 +355,16 @@ class NetworkServiceComparator @JvmOverloads constructor(
         apply {
             compareAssetInfo()
 
-            compareValues(WireInfo::ratedCurrent, WireInfo::material)
+            compareValues(
+                WireInfo::ratedCurrent,
+                WireInfo::material,
+                WireInfo::sizeDescription,
+                WireInfo::strandCount,
+                WireInfo::coreStrandCount,
+                WireInfo::insulated,
+                WireInfo::insulationMaterial,
+                WireInfo::insulationThickness,
+            )
         }
 
     // ###################
@@ -609,6 +634,8 @@ class NetworkServiceComparator @JvmOverloads constructor(
             compareIdReferences(Feeder::normalHeadTerminal, Feeder::normalEnergizingSubstation)
             compareIdReferenceCollections(Feeder::normalEnergizedLvFeeders)
             compareIdReferenceCollections(Feeder::currentEnergizedLvFeeders)
+            compareIdReferenceCollections(Feeder::normalEnergizedLvSubstations)
+            compareIdReferenceCollections(Feeder::currentEnergizedLvSubstations)
             if (options.compareFeederEquipment)
                 compareIdReferenceCollections(Feeder::currentEquipment)
         }
@@ -804,6 +831,18 @@ class NetworkServiceComparator @JvmOverloads constructor(
             compareIdReferences(AcLineSegment::perLengthImpedance)
             compareIdReferenceCollections(AcLineSegment::cuts)
             compareIdReferenceCollections(AcLineSegment::clamps)
+            compareIdReferenceCollections(AcLineSegment::phases)
+        }
+
+    private fun compareAcLineSegmentPhase(source: AcLineSegmentPhase, target: AcLineSegmentPhase): ObjectDifference<AcLineSegmentPhase> =
+        ObjectDifference(source, target).apply {
+            comparePowerSystemResource()
+
+            compareIdReferences(AcLineSegmentPhase::acLineSegment)
+            compareValues(
+                AcLineSegmentPhase::phase,
+                AcLineSegmentPhase::sequenceNumber,
+            )
         }
 
     private fun compareBreaker(source: Breaker, target: Breaker): ObjectDifference<Breaker> =
@@ -1179,6 +1218,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
         apply {
             compareRegulatingCondEq()
 
+            compareIdReferences(ShuntCompensator::groundingTerminal)
             compareValues(ShuntCompensator::grounded, ShuntCompensator::nomU, ShuntCompensator::phaseConnection, ShuntCompensator::sections)
         }
 

@@ -10,6 +10,7 @@ package com.zepben.ewb.testing
 
 import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
+import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvSubstation
 import com.zepben.ewb.cim.iec61970.base.core.*
 import com.zepben.ewb.cim.iec61970.base.wires.*
 import com.zepben.ewb.services.network.NetworkService
@@ -614,6 +615,20 @@ open class TestNetworkBuilder {
     }
 
     /**
+     * Create a new [LvSubstation] containing the specified equipment.
+     *
+     * @param equipmentMrids The mRID's of the equipment to add to the site.
+     * @param mRID Optional mRID for the new [LvSubstation].
+     *
+     * @return This [TestNetworkBuilder] to allow for fluent use.
+     */
+    @JvmOverloads
+    fun addLvSubstation(vararg equipmentMrids: String, mRID: String? = null): TestNetworkBuilder {
+        network.createLvSubstation(mRID, equipmentMrids)
+        return this
+    }
+
+    /**
      * Create a new [Site] containing the specified equipment.
      *
      * @param equipmentMrids The mRID's of the equipment to add to the site.
@@ -627,6 +642,19 @@ open class TestNetworkBuilder {
         return this
     }
 
+    /**
+     * Create a new [LvSubstation] containing the specified equipment.
+     *
+     * @param equipmentMrids The mRID's of the equipment to add to the site.
+     * @param mRID Optional mRID for the new [LvSubstation].
+     *
+     * @return This [TestNetworkBuilder] to allow for fluent use.
+     */
+    @JvmOverloads
+    fun addSubstation(vararg equipmentMrids: String, mRID: String? = null): TestNetworkBuilder {
+        network.createSubstation(mRID, equipmentMrids)
+        return this
+    }
     /**
      * Get the [NetworkService] after apply traced phasing, feeder directions, and HV/LV feeder assignment.
      *
@@ -766,6 +794,20 @@ open class TestNetworkBuilder {
             }
         }
 
+    private fun NetworkService.createLvSubstation(mRID: String?, equipmentMrids: Array<out String>) =
+        mRID.orNextId("lvs").let { id ->
+            LvSubstation(id).apply {
+                equipmentMrids.map { network.get<Equipment>(it)!! }.forEach {
+                    addEquipment(it)
+                    addCurrentEquipment(it)
+                    it.addContainer(this)
+                    it.addCurrentContainer(this)
+                }
+
+                add(this)
+            }
+        }
+
     private fun NetworkService.createSite(mRID: String?, equipmentMrids: Array<out String>) =
         mRID.orNextId("site").let { id ->
             Site(id).also { site ->
@@ -775,6 +817,18 @@ open class TestNetworkBuilder {
                 }
 
                 add(site)
+            }
+        }
+
+    private fun NetworkService.createSubstation(mRID: String?, equipmentMrids: Array<out String>) =
+        mRID.orNextId("sub").let { id ->
+            Substation(id).apply {
+                equipmentMrids.map { network.get<Equipment>(it)!! }.forEach {
+                    addEquipment(it)
+                    it.addContainer(this)
+                }
+
+                add(this)
             }
         }
 

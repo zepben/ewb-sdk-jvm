@@ -9,14 +9,19 @@
 package com.zepben.ewb.database.sqlite.cim.tables.iec61968.assetinfo
 
 import com.zepben.ewb.database.sql.Column
-import com.zepben.ewb.database.sql.Column.Nullable.NOT_NULL
-import com.zepben.ewb.database.sql.Column.Nullable.NULL
+import com.zepben.ewb.database.sql.Column.Nullable.*
+import com.zepben.ewb.database.sql.Column.Type
 import com.zepben.ewb.database.sqlite.cim.tables.iec61968.assets.TableAssetInfo
 
 @Suppress("PropertyName")
 abstract class TableWireInfo : TableAssetInfo() {
 
-    val RATED_CURRENT: Column = Column(++columnIndex, "rated_current", Column.Type.DOUBLE, NULL)
-    val MATERIAL: Column = Column(++columnIndex, "material", Column.Type.STRING, NOT_NULL)
-
+    val RATED_CURRENT: Column = Column(++columnIndex, "rated_current", Type.DOUBLE, NULL)
+    val MATERIAL: Column = Column(++columnIndex, "material", Type.STRING, NOT_NULL)
+    val SIZE_DESCRIPTION: Column = Column(++columnIndex, "size_description", Type.STRING, NULL)
+    val STRAND_COUNT: Column = Column(++columnIndex, "strand_count", Type.STRING, NULL)
+    val CORE_STRAND_COUNT: Column = Column(++columnIndex, "core_strand_count", Type.STRING, NULL)
+    val INSULATED: Column = Column(++columnIndex, "insulated", Type.BOOLEAN, NULL)
+    val INSULATION_MATERIAL: Column = Column(++columnIndex, "insulation_material", Type.STRING, NOT_NULL)
+    val INSULATION_THICKNESS: Column = Column(++columnIndex, "insulation_thickness", Type.DOUBLE, NULL)
 }

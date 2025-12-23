@@ -38,14 +38,17 @@ internal class LvFeederTest {
     @Test
     internal fun accessorCoverage() {
         val terminal = Terminal(generateId())
+        val lvSub = LvSubstation(generateId())
 
         assertThat(lvFeeder.normalHeadTerminal, nullValue())
 
         lvFeeder.apply {
             normalHeadTerminal = terminal
+            normalEnergizingLvSubstation = lvSub
         }
 
         assertThat(lvFeeder.normalHeadTerminal, equalTo(terminal))
+        assertThat(lvFeeder.normalEnergizingLvSubstation, equalTo(lvSub))
     }
 
     @Test

@@ -38,6 +38,7 @@ internal class ShuntCompensatorTest {
         assertThat(shuntCompensator.nomU, nullValue())
         assertThat(shuntCompensator.phaseConnection, equalTo(PhaseShuntConnectionKind.UNKNOWN))
         assertThat(shuntCompensator.sections, nullValue())
+        assertThat(shuntCompensator.groundingTerminal, nullValue())
 
         shuntCompensator.fillFields(NetworkService())
 
@@ -47,6 +48,7 @@ internal class ShuntCompensatorTest {
         assertThat(shuntCompensator.nomU, equalTo(1))
         assertThat(shuntCompensator.phaseConnection, equalTo(PhaseShuntConnectionKind.I))
         assertThat(shuntCompensator.sections, equalTo(2.2))
+        assertThat(shuntCompensator.groundingTerminal, notNullValue())
     }
 
 }

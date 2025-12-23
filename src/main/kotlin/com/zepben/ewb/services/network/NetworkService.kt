@@ -10,9 +10,11 @@ package com.zepben.ewb.services.network
 
 import com.zepben.ewb.cim.extensions.iec61968.assetinfo.RelayInfo
 import com.zepben.ewb.cim.extensions.iec61968.metering.PanDemandResponseFunction
+import com.zepben.ewb.cim.extensions.iec61970.base.core.HvCustomer
 import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
+import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvSubstation
 import com.zepben.ewb.cim.extensions.iec61970.base.generation.production.EvChargingUnit
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.*
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.BatteryControl
@@ -110,6 +112,22 @@ class NetworkService(metadata: MetadataCollection = MetadataCollection()) : Base
     // #################################
 
     /**
+     * Add the [HvCustomer] to this service.
+     *
+     * @param hvCustomer The [HvCustomer] to add.
+     * @return `true` if the item was added to the service, otherwise false.
+     */
+    fun add(hvCustomer: HvCustomer): Boolean = super.add(hvCustomer)
+
+    /**
+     * Remove the [HvCustomer] from this service.
+     *
+     * @param hvCustomer The [HvCustomer] to remove.
+     * @return `true` if the item was removed from the service, otherwise false.
+     */
+    fun remove(hvCustomer: HvCustomer): Boolean = super.remove(hvCustomer)
+
+    /**
      * Add the [Site] to this service.
      *
      * @param site The [Site] to add.
@@ -160,6 +178,22 @@ class NetworkService(metadata: MetadataCollection = MetadataCollection()) : Base
      * @return `true` if the item was removed from the service, otherwise false.
      */
     fun remove(lvFeeder: LvFeeder): Boolean = super.remove(lvFeeder)
+
+    /**
+     * Add the [LvSubstation] to this service.
+     *
+     * @param lvSubstation The [LvSubstation] to add.
+     * @return `true` if the item was added to the service, otherwise false.
+     */
+    fun add(lvSubstation: LvSubstation): Boolean = super.add(lvSubstation)
+
+    /**
+     * Remove the [LvSubstation] from this service.
+     *
+     * @param lvSubstation The [LvSubstation] to remove.
+     * @return `true` if the item was removed from the service, otherwise false.
+     */
+    fun remove(lvSubstation: LvSubstation): Boolean = super.remove(lvSubstation)
 
     // ##################################################
     // # Extensions IEC61970 Base Generation Production #
@@ -1025,6 +1059,22 @@ class NetworkService(metadata: MetadataCollection = MetadataCollection()) : Base
      * @return `true` if the item was removed from the service, otherwise false.
      */
     fun remove(acLineSegment: AcLineSegment): Boolean = super.remove(acLineSegment)
+
+    /**
+     * Add the [AcLineSegmentPhase] to this service.
+     *
+     * @param acLineSegmentPhase The [AcLineSegmentPhase] to add.
+     * @return `true` if the item was added to the service, otherwise false.
+     */
+    fun add(acLineSegmentPhase: AcLineSegmentPhase): Boolean = super.add(acLineSegmentPhase)
+
+    /**
+     * Remove the [AcLineSegmentPhase] from this service.
+     *
+     * @param acLineSegmentPhase The [AcLineSegmentPhase] to remove.
+     * @return `true` if the item was removed from the service, otherwise false.
+     */
+    fun remove(acLineSegmentPhase: AcLineSegmentPhase): Boolean = super.remove(acLineSegmentPhase)
 
     /**
      * Add the [Breaker] to this service.

@@ -107,6 +107,7 @@ fun toPb(cim: PricingStructure, pb: PBPricingStructure.Builder): PBPricingStruct
     pb.apply {
         clearTariffMRIDs()
         cim.tariffs.forEach { addTariffMRIDs(it.mRID) }
+        cim.code?.also { pb.codeSet = it } ?: run { pb.codeNull = NullValue.NULL_VALUE }
         toPb(cim, docBuilder)
     }
 

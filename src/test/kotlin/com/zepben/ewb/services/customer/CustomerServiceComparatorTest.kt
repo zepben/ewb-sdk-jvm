@@ -67,6 +67,7 @@ internal class CustomerServiceComparatorTest : BaseServiceComparatorTest() {
             { Tariff("2") },
             ::ObjectCollectionDifference,
         )
+        comparatorValidator.validateProperty(PricingStructure::code, { PricingStructure(it) }, { "1" }, { "2" })
     }
 
     @Test

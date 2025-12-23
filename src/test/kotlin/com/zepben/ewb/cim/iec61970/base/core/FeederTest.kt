@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.cim.iec61970.base.core
 
+import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvSubstation
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
 import com.zepben.ewb.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.ewb.services.common.testdata.generateId
@@ -80,6 +81,34 @@ internal class FeederTest {
 
     @Test
     internal fun currentEnergizedLvFeeders() {
+        PrivateCollectionValidator.validateUnordered(
+            ::Feeder,
+            ::LvFeeder,
+            Feeder::currentEnergizedLvFeeders,
+            Feeder::numCurrentEnergizedLvFeeders,
+            Feeder::getCurrentEnergizedLvFeeder,
+            Feeder::addCurrentEnergizedLvFeeder,
+            Feeder::removeCurrentEnergizedLvFeeder,
+            Feeder::clearCurrentEnergizedLvFeeders
+        )
+    }
+
+    @Test
+    internal fun normalEnergizedLvSubstations() {
+        PrivateCollectionValidator.validateUnordered(
+            ::Feeder,
+            ::LvSubstation,
+            Feeder::normalEnergizedLvSubstations,
+            Feeder::numNormalEnergizedLvSubstations,
+            Feeder::getNormalEnergizedLvSubstation,
+            Feeder::addNormalEnergizedLvSubstation,
+            Feeder::removeNormalEnergizedLvSubstation,
+            Feeder::clearNormalEnergizedLvSubstations
+        )
+    }
+
+    @Test
+    internal fun currentEnergizedLvSubstations() {
         PrivateCollectionValidator.validateUnordered(
             ::Feeder,
             ::LvFeeder,

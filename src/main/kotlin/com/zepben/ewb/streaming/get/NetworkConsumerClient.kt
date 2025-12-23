@@ -246,27 +246,47 @@ class NetworkConsumerClient(
     fun getTerminalsForConnectivityNode(mRID: String): GrpcResult<MultiObjectResult> =
         handleMultiObjectRPC { processConnectivityNode(mRID) }
 
-    /***
+    /**
      * Retrieve the network hierarchy.
-     *
      *
      * @return A simplified version of the network hierarchy that can be used to make further in-depth requests.
      */
-    fun getNetworkHierarchy(): GrpcResult<NetworkHierarchy> =
+    fun getNetworkHierarchy(
+        includeGeographicalRegions: Boolean = true,
+        includeSubgeographicalRegions: Boolean = true,
+        includeSubstations: Boolean = true,
+        includeFeeders: Boolean = true,
+        includeCircuits: Boolean = true,
+        includeLoops: Boolean = true,
+        includeLvSubstations: Boolean = false,
+        includeLvFeeders: Boolean = false,
+    ): GrpcResult<NetworkHierarchy> =
         tryRpc {
             if (networkHierarchy == null) {
                 val streamObserver = AwaitableStreamObserver<GetNetworkHierarchyResponse> { response ->
                     networkHierarchy = NetworkHierarchy(
-                        toMap(response.geographicalRegionsList) { getOrAdd(it.mRID()) { addFromPb(it) } },
-                        toMap(response.subGeographicalRegionsList) { getOrAdd(it.mRID()) { addFromPb(it) } },
-                        toMap(response.substationsList) { getOrAdd(it.mRID()) { addFromPb(it) } },
-                        toMap(response.feedersList) { getOrAdd(it.mRID()) { addFromPb(it) } },
-                        toMap(response.circuitsList) { getOrAdd(it.mRID()) { addFromPb(it) } },
-                        toMap(response.loopsList) { getOrAdd(it.mRID()) { addFromPb(it) } }
+                        if (includeGeographicalRegions) toMap(response.geographicalRegionsList) { getOrAdd(it.mRID()) { addFromPb(it) } } else emptyMap(),
+                        if (includeSubgeographicalRegions) toMap(response.subGeographicalRegionsList) { getOrAdd(it.mRID()) { addFromPb(it) } } else emptyMap(),
+                        if (includeSubstations) toMap(response.substationsList) { getOrAdd(it.mRID()) { addFromPb(it) } } else emptyMap(),
+                        if (includeFeeders) toMap(response.feedersList) { getOrAdd(it.mRID()) { addFromPb(it) } } else emptyMap(),
+                        if (includeCircuits) toMap(response.circuitsList) { getOrAdd(it.mRID()) { addFromPb(it) } } else emptyMap(),
+                        if (includeLoops) toMap(response.loopsList) { getOrAdd(it.mRID()) { addFromPb(it) } } else emptyMap(),
+                        if (includeLvSubstations) toMap(response.lvSubstationsList) { getOrAdd(it.mRID()) { addFromPb(it) } } else emptyMap(),
+                        if (includeLvFeeders) toMap(response.lvFeedersList) { getOrAdd(it.mRID()) { addFromPb(it) } } else emptyMap(),
                     )
                 }
 
-                stub.getNetworkHierarchy(GetNetworkHierarchyRequest.newBuilder().build(), streamObserver)
+                val request = GetNetworkHierarchyRequest.newBuilder().also {
+                    it.includeGeographicalRegions = includeGeographicalRegions
+                    it.includeSubgeographicalRegions = includeSubgeographicalRegions
+                    it.includeSubstations = includeSubstations
+                    it.includeFeeders = includeFeeders
+                    it.includeCircuits = includeCircuits
+                    it.includeLoops = includeLoops
+                    it.includeLvSubstations = includeLvSubstations
+                    it.includeLvFeeders = includeLvFeeders
+                }
+                stub.getNetworkHierarchy(request.build(), streamObserver)
 
                 streamObserver.await()
             }

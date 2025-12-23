@@ -13,9 +13,11 @@ package com.zepben.ewb.services.network
 
 import com.zepben.ewb.cim.extensions.iec61968.assetinfo.RelayInfo
 import com.zepben.ewb.cim.extensions.iec61968.metering.PanDemandResponseFunction
+import com.zepben.ewb.cim.extensions.iec61970.base.core.HvCustomer
 import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
+import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvSubstation
 import com.zepben.ewb.cim.extensions.iec61970.base.generation.production.EvChargingUnit
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.*
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.BatteryControl
@@ -243,6 +245,9 @@ inline fun <R> whenNetworkServiceObject(
     isCut: (Cut) -> R,
     isClamp: (Clamp) -> R,
     isDirectionalCurrentRelay: (DirectionalCurrentRelay) -> R,
+    isLvSubstation: (LvSubstation) -> R,
+    isHvCustomer: (HvCustomer) -> R,
+    isAcLineSegmentPhase: (AcLineSegmentPhase) -> R,
     isOther: (IdentifiedObject) -> R = { idObj: IdentifiedObject ->
         throw IllegalArgumentException("Identified object type ${idObj::class} is not supported by the network service")
     }
@@ -334,6 +339,9 @@ inline fun <R> whenNetworkServiceObject(
     is Cut -> isCut(identifiedObject)
     is Clamp -> isClamp(identifiedObject)
     is DirectionalCurrentRelay -> isDirectionalCurrentRelay(identifiedObject)
+    is LvSubstation -> isLvSubstation(identifiedObject)
+    is HvCustomer -> isHvCustomer(identifiedObject)
+    is AcLineSegmentPhase -> isAcLineSegmentPhase(identifiedObject)
     else -> isOther(identifiedObject)
 }
 

@@ -9,8 +9,10 @@
 package com.zepben.ewb.database.sqlite.cim.network
 
 import com.google.common.reflect.ClassPath
+import com.zepben.ewb.cim.extensions.iec61970.base.core.HvCustomer
 import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
+import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvSubstation
 import com.zepben.ewb.cim.iec61970.base.core.EquipmentContainer
 import com.zepben.ewb.cim.iec61970.base.core.Feeder
 import com.zepben.ewb.cim.iec61970.base.core.Substation
@@ -66,7 +68,7 @@ class NetworkCimWriterTest {
             .filter { EquipmentContainer::class.java.isAssignableFrom(it) }
             .toSet()
 
-        val shouldExport = listOf(Site(generateId()), Substation(generateId()), Circuit(generateId()))
+        val shouldExport = listOf(Site(generateId()), Substation(generateId()), Circuit(generateId()), HvCustomer(generateId()), LvSubstation(generateId()))
         val shouldIgnore = listOf(Feeder(generateId()), LvFeeder(generateId()))
 
         assertThat(

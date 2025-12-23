@@ -70,6 +70,8 @@ fun CustomerAgreement.fillFields(service: CustomerService, includeRuntime: Boole
 fun PricingStructure.fillFields(service: CustomerService, includeRuntime: Boolean = true): PricingStructure {
     (this as Document).fillFieldsCommon(service, includeRuntime)
 
+    code = "XB1"
+
     for (i in 0..1)
         addTariff(Tariff(generateId()).also { service.add(it) })
 

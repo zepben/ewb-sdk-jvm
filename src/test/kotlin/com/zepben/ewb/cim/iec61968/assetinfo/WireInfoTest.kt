@@ -35,11 +35,23 @@ internal class WireInfoTest {
 
         assertThat(wireInfo.material, equalTo(WireMaterialKind.UNKNOWN))
         assertThat(wireInfo.ratedCurrent, nullValue())
+        assertThat(wireInfo.sizeDescription, nullValue())
+        assertThat(wireInfo.strandCount, nullValue())
+        assertThat(wireInfo.coreStrandCount, nullValue())
+        assertThat(wireInfo.insulated, nullValue())
+        assertThat(wireInfo.insulationMaterial, equalTo(WireInsulationKind.UNKNOWN))
+        assertThat(wireInfo.insulationThickness, nullValue())
 
         wireInfo.fillFields(NetworkService())
 
         assertThat(wireInfo.material, equalTo(WireMaterialKind.aaac))
         assertThat(wireInfo.ratedCurrent, equalTo(123))
+        assertThat(wireInfo.sizeDescription, equalTo("6.7"))
+        assertThat(wireInfo.strandCount, equalTo("8"))
+        assertThat(wireInfo.coreStrandCount, equalTo("4"))
+        assertThat(wireInfo.insulated, equalTo(true))
+        assertThat(wireInfo.insulationMaterial, equalTo(WireInsulationKind.doubleWireArmour))
+        assertThat(wireInfo.insulationThickness, equalTo(1.2))
     }
 
 }

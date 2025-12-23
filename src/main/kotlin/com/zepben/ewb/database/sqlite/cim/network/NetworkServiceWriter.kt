@@ -10,9 +10,11 @@ package com.zepben.ewb.database.sqlite.cim.network
 
 import com.zepben.ewb.cim.extensions.iec61968.assetinfo.RelayInfo
 import com.zepben.ewb.cim.extensions.iec61968.metering.PanDemandResponseFunction
+import com.zepben.ewb.cim.extensions.iec61970.base.core.HvCustomer
 import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
+import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvSubstation
 import com.zepben.ewb.cim.extensions.iec61970.base.generation.production.EvChargingUnit
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.*
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.BatteryControl
@@ -82,6 +84,7 @@ internal class NetworkServiceWriter(
             writeEach<Feeder>(writer::write) and
             writeEach<GeographicalRegion>(writer::write) and
             writeEach<Site>(writer::write) and
+            writeEach<HvCustomer>(writer::write) and
             writeEach<SubGeographicalRegion>(writer::write) and
             writeEach<Substation>(writer::write) and
             writeEach<Terminal>(writer::write) and
@@ -90,6 +93,7 @@ internal class NetworkServiceWriter(
             writeEach<PhotoVoltaicUnit>(writer::write) and
             writeEach<PowerElectronicsWindUnit>(writer::write) and
             writeEach<AcLineSegment>(writer::write) and
+            writeEach<AcLineSegmentPhase>(writer::write) and
             writeEach<Breaker>(writer::write) and
             writeEach<LoadBreakSwitch>(writer::write) and
             writeEach<BusbarSection>(writer::write) and
@@ -116,6 +120,7 @@ internal class NetworkServiceWriter(
             writeEach<Circuit>(writer::write) and
             writeEach<Loop>(writer::write) and
             writeEach<LvFeeder>(writer::write) and
+            writeEach<LvSubstation>(writer::write) and
             writeEach<Analog>(writer::write) and
             writeEach<Accumulator>(writer::write) and
             writeEach<Discrete>(writer::write) and

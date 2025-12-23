@@ -109,7 +109,9 @@ internal class CustomerCimReader : CimReader<CustomerService>() {
      */
     @Throws(SQLException::class)
     fun read(service: CustomerService, table: TablePricingStructures, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
-        val pricingStructure = PricingStructure(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
+        val pricingStructure = PricingStructure(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
+            code = resultSet.getNullableString(table.CODE.queryIndex)
+        }
 
         return readDocument(pricingStructure, table, resultSet) && service.addOrThrow(pricingStructure)
     }

@@ -8,7 +8,9 @@
 
 package com.zepben.ewb.streaming.get.hierarchy
 
+import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvSubstation
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
+import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
 import com.zepben.ewb.cim.iec61970.base.core.Feeder
 import com.zepben.ewb.cim.iec61970.base.core.GeographicalRegion
 import com.zepben.ewb.cim.iec61970.base.core.SubGeographicalRegion
@@ -24,5 +26,7 @@ class NetworkHierarchy(
     val substations: Map<String, Substation>,
     val feeders: Map<String, Feeder>,
     val circuits: Map<String, Circuit>,
-    val loops: Map<String, Loop>
+    val loops: Map<String, Loop>,
+    val lvSubstations: Map<String, LvSubstation>,
+    val lvFeeders: Map<String, LvFeeder>,
 )

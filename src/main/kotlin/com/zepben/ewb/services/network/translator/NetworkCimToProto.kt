@@ -12,9 +12,11 @@ import com.google.protobuf.NullValue
 import com.zepben.ewb.cim.extensions.iec61968.assetinfo.RelayInfo
 import com.zepben.ewb.cim.extensions.iec61968.common.ContactDetails
 import com.zepben.ewb.cim.extensions.iec61968.metering.PanDemandResponseFunction
+import com.zepben.ewb.cim.extensions.iec61970.base.core.HvCustomer
 import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
+import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvSubstation
 import com.zepben.ewb.cim.extensions.iec61970.base.generation.production.EvChargingUnit
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.*
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.BatteryControl
@@ -52,9 +54,11 @@ import com.zepben.protobuf.nc.NetworkIdentifiedObject
 import com.zepben.protobuf.cim.extensions.iec61968.assetinfo.RelayInfo as PBRelayInfo
 import com.zepben.protobuf.cim.extensions.iec61968.common.ContactDetails as PBContactDetails
 import com.zepben.protobuf.cim.extensions.iec61968.metering.PanDemandResponseFunction as PBPanDemandResponseFunction
+import com.zepben.protobuf.cim.extensions.iec61970.base.core.HvCustomer as PBHvCustomer
 import com.zepben.protobuf.cim.extensions.iec61970.base.core.Site as PBSite
 import com.zepben.protobuf.cim.extensions.iec61970.base.feeder.Loop as PBLoop
 import com.zepben.protobuf.cim.extensions.iec61970.base.feeder.LvFeeder as PBLvFeeder
+import com.zepben.protobuf.cim.extensions.iec61970.base.feeder.LvSubstation as PBLvSubstation
 import com.zepben.protobuf.cim.extensions.iec61970.base.generation.production.EvChargingUnit as PBEvChargingUnit
 import com.zepben.protobuf.cim.extensions.iec61970.base.protection.DirectionalCurrentRelay as PBDirectionalCurrentRelay
 import com.zepben.protobuf.cim.extensions.iec61970.base.protection.DistanceRelay as PBDistanceRelay
@@ -138,6 +142,7 @@ import com.zepben.protobuf.cim.iec61970.base.scada.RemoteControl as PBRemoteCont
 import com.zepben.protobuf.cim.iec61970.base.scada.RemotePoint as PBRemotePoint
 import com.zepben.protobuf.cim.iec61970.base.scada.RemoteSource as PBRemoteSource
 import com.zepben.protobuf.cim.iec61970.base.wires.AcLineSegment as PBAcLineSegment
+import com.zepben.protobuf.cim.iec61970.base.wires.AcLineSegmentPhase as PBAcLineSegmentPhase
 import com.zepben.protobuf.cim.iec61970.base.wires.Breaker as PBBreaker
 import com.zepben.protobuf.cim.iec61970.base.wires.BusbarSection as PBBusbarSection
 import com.zepben.protobuf.cim.iec61970.base.wires.Clamp as PBClamp
@@ -282,6 +287,9 @@ fun networkIdentifiedObject(identifiedObject: IdentifiedObject): NetworkIdentifi
             isCut = { cut = it.toPb() },
             isClamp = { clamp = it.toPb() },
             isDirectionalCurrentRelay = { directionalCurrentRelay = it.toPb() },
+            isLvSubstation = { lvSubstation = it.toPb() },
+            isHvCustomer = { hvCustomer = it.toPb() },
+            isAcLineSegmentPhase = { acLineSegmentPhase = it.toPb() },
         )
     }.build()
 
@@ -369,6 +377,16 @@ fun PanDemandResponseFunction.toPb(): PBPanDemandResponseFunction = toPb(this, P
 // #################################
 
 /**
+ * Convert the [HvCustomer] into its protobuf counterpart.
+ *
+ * @param cim The [HvCustomer] to convert.
+ * @param pb The protobuf builder to populate.
+ * @return [pb] for fluent use.
+ */
+fun toPb(cim: HvCustomer, pb: PBHvCustomer.Builder): PBHvCustomer.Builder =
+    pb.apply { toPb(cim, ecBuilder) }
+
+/**
  * Convert the [Site] into its protobuf counterpart.
  *
  * @param cim The [Site] to convert.
@@ -377,6 +395,11 @@ fun PanDemandResponseFunction.toPb(): PBPanDemandResponseFunction = toPb(this, P
  */
 fun toPb(cim: Site, pb: PBSite.Builder): PBSite.Builder =
     pb.apply { toPb(cim, ecBuilder) }
+
+/**
+ * An extension for converting any [HvCustomer] into its protobuf counterpart.
+ */
+fun HvCustomer.toPb(): PBHvCustomer = toPb(this, PBHvCustomer.newBuilder()).build()
 
 /**
  * An extension for converting any [Site] into its protobuf counterpart.
@@ -423,10 +446,30 @@ fun toPb(cim: LvFeeder, pb: PBLvFeeder.Builder): PBLvFeeder.Builder =
         cim.normalEnergizingFeeders.forEach { addNormalEnergizingFeederMRIDs(it.mRID) }
         clearCurrentlyEnergizingFeederMRIDs()
         cim.currentEnergizingFeeders.forEach { addCurrentlyEnergizingFeederMRIDs(it.mRID) }
+        cim.normalEnergizingLvSubstation?.also { normalEnergizingLvSubstationMRID = it.mRID } ?: clearNormalEnergizingLvSubstationMRID()
 
         toPb(cim, ecBuilder)
     }
 
+/**
+ * Convert the [LvSubstation] into its protobuf counterpart.
+ *
+ * @param cim The [LvSubstation] to convert.
+ * @param pb The protobuf builder to populate.
+ * @return [pb] for fluent use.
+ */
+fun toPb(cim: LvSubstation, pb: PBLvSubstation.Builder): PBLvSubstation.Builder =
+    pb.apply {
+        clearNormalEnergizingFeederMRIDs()
+        cim.normalEnergizingFeeders.forEach { addNormalEnergizingFeederMRIDs(it.mRID) }
+        clearCurrentEnergizingFeederMRIDs()
+        cim.currentEnergizingFeeders.forEach { addCurrentEnergizingFeederMRIDs(it.mRID) }
+
+        clearNormalEnergizedLvFeederMRIDs()
+        cim.normalEnergizedLvFeeders.forEach { addNormalEnergizedLvFeederMRIDs(it.mRID) }
+
+        toPb(cim, ecBuilder)
+    }
 /**
  * An extension for converting any [Loop] into its protobuf counterpart.
  */
@@ -436,6 +479,11 @@ fun Loop.toPb(): PBLoop = toPb(this, PBLoop.newBuilder()).build()
  * An extension for converting any [LvFeeder] into its protobuf counterpart.
  */
 fun LvFeeder.toPb(): PBLvFeeder = toPb(this, PBLvFeeder.newBuilder()).build()
+
+/**
+ * An extension for converting any [LvSubstation] into its protobuf counterpart.
+ */
+fun LvSubstation.toPb(): PBLvSubstation = toPb(this, PBLvSubstation.newBuilder()).build()
 
 // ##################################################
 // # Extensions IEC61970 Base Generation Production #
@@ -822,6 +870,13 @@ fun toPb(cim: WireInfo, pb: PBWireInfo.Builder): PBWireInfo.Builder =
     pb.apply {
         cim.ratedCurrent?.also { ratedCurrentSet = it } ?: run { ratedCurrentNull = NullValue.NULL_VALUE }
         material = mapWireMaterialKind.toPb(cim.material)
+        cim.sizeDescription?.also { sizeDescriptionSet = it } ?: run { sizeDescriptionNull = NullValue.NULL_VALUE }
+        cim.strandCount?.also { strandCountSet = it } ?: run { strandCountNull = NullValue.NULL_VALUE }
+        cim.coreStrandCount?.also { coreStrandCountSet = it } ?: run { coreStrandCountNull = NullValue.NULL_VALUE }
+        cim.insulated?.also { insulatedSet = it } ?: run { insulatedNull = NullValue.NULL_VALUE }
+        insulationMaterial = mapWireInsulationKind.toPb(cim.insulationMaterial)
+        cim.insulationThickness?.also { insulationThicknessSet = it } ?: run { insulationThicknessNull = NullValue.NULL_VALUE }
+
         toPb(cim, aiBuilder)
     }
 
@@ -1534,6 +1589,11 @@ fun toPb(cim: Feeder, pb: PBFeeder.Builder): PBFeeder.Builder =
         clearCurrentlyEnergizedLvFeedersMRIDs()
         cim.currentEnergizedLvFeeders.forEach { addCurrentlyEnergizedLvFeedersMRIDs(it.mRID) }
 
+        clearNormalEnergizedLvSubstationMRIDs()
+        cim.normalEnergizedLvSubstations.forEach { addNormalEnergizedLvSubstationMRIDs(it.mRID) }
+        clearCurrentlyEnergizedLvSubstationMRIDs()
+        cim.currentEnergizedLvSubstations.forEach { addCurrentlyEnergizedLvSubstationMRIDs(it.mRID) }
+
         toPb(cim, ecBuilder)
     }
 
@@ -1971,7 +2031,25 @@ fun toPb(cim: AcLineSegment, pb: PBAcLineSegment.Builder): PBAcLineSegment.Build
         cim.cuts.forEach { addCutMRIDs(it.mRID) }
         clearClampMRIDs()
         cim.clamps.forEach { addClampMRIDs(it.mRID) }
+        clearPhaseMRIDs()
+        cim.phases.forEach { addPhaseMRIDs(it.mRID) }
         toPb(cim, cdBuilder)
+    }
+
+/**
+ * Convert the [AcLineSegmentPhase] into its protobuf counterpart.
+ *
+ * @param cim The [AcLineSegmentPhase] to convert.
+ * @param pb The protobuf builder to populate.
+ * @return [pb] for fluent use.
+ */
+fun toPb(cim: AcLineSegmentPhase, pb: PBAcLineSegmentPhase.Builder): PBAcLineSegmentPhase.Builder =
+    pb.apply {
+        cim.acLineSegment?.also { acLineSegmentMRID = it.mRID } ?: clearAcLineSegmentMRID()
+        phase = mapSinglePhaseKind.toPb(cim.phase)
+        cim.sequenceNumber?.also { sequenceNumberSet = it } ?: run { sequenceNumberNull = NullValue.NULL_VALUE }
+
+        toPb(cim, psrBuilder)
     }
 
 /**
@@ -2609,6 +2687,8 @@ fun toPb(cim: ShuntCompensator, pb: PBShuntCompensator.Builder): PBShuntCompensa
         cim.grounded?.also { groundedSet = it } ?: run { groundedNull = NullValue.NULL_VALUE }
         cim.nomU?.also { nomUSet = it } ?: run { nomUNull = NullValue.NULL_VALUE }
         phaseConnection = mapPhaseShuntConnectionKind.toPb(cim.phaseConnection)
+        cim.groundingTerminal?.also { groundingTerminalMRID = it.mRID } ?: clearGroundingTerminalMRID()
+
         toPb(cim, rceBuilder)
     }
 
@@ -2782,6 +2862,11 @@ fun toPb(cim: TransformerStarImpedance, pb: PBTransformerStarImpedance.Builder):
  * An extension for converting any [AcLineSegment] into its protobuf counterpart.
  */
 fun AcLineSegment.toPb(): PBAcLineSegment = toPb(this, PBAcLineSegment.newBuilder()).build()
+
+/**
+ * An extension for converting any [AcLineSegmentPhase] into its protobuf counterpart.
+ */
+fun AcLineSegmentPhase.toPb(): PBAcLineSegmentPhase = toPb(this, PBAcLineSegmentPhase.newBuilder()).build()
 
 /**
  * An extension for converting any [Breaker] into its protobuf counterpart.
@@ -3029,6 +3114,14 @@ class NetworkCimToProto : BaseCimToProto() {
      */
     fun toPb(cim: Site): PBSite = cim.toPb()
 
+    /**
+     * Convert the [HvCustomer] into its protobuf counterpart.
+     *
+     * @param cim The [HvCustomer] to convert.
+     * @return The protobuf form of [cim].
+     */
+    fun toPb(cim: HvCustomer): PBHvCustomer = cim.toPb()
+
     // ###################################
     // # Extensions IEC61970 Base Feeder #
     // ###################################
@@ -3048,6 +3141,14 @@ class NetworkCimToProto : BaseCimToProto() {
      * @return The protobuf form of [cim].
      */
     fun toPb(cim: LvFeeder): PBLvFeeder = cim.toPb()
+
+    /**
+     * Convert the [LvSubstation] into its protobuf counterpart.
+     *
+     * @param cim The [LvSubstation] to convert.
+     * @return The protobuf form of [cim].
+     */
+    fun toPb(cim: LvSubstation): PBLvSubstation = cim.toPb()
 
     // ##################################################
     // # Extensions IEC61970 Base Generation Production #
@@ -3512,6 +3613,14 @@ class NetworkCimToProto : BaseCimToProto() {
      * @return The protobuf form of [cim].
      */
     fun toPb(cim: AcLineSegment): PBAcLineSegment = cim.toPb()
+
+    /**
+     * Convert the [AcLineSegmentPhase] into its protobuf counterpart.
+     *
+     * @param cim The [AcLineSegmentPhase] to convert.
+     * @return The protobuf form of [cim].
+     */
+    fun toPb(cim: AcLineSegmentPhase): PBAcLineSegmentPhase = cim.toPb()
 
     /**
      * Convert the [Breaker] into its protobuf counterpart.

@@ -8,16 +8,17 @@
 
 package com.zepben.ewb.cim.iec61970.base.wires
 
+import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.iec61968.assetinfo.ShuntCompensatorInfo
+import com.zepben.ewb.cim.iec61970.base.core.Terminal
 
 /**
- * A shunt capacitor or reactor or switchable bank of shunt capacitors or reactors. A section of a shunt compensator is an individual
- * capacitor or reactor.  A negative value for reactivePerSection indicates that the compensator is a reactor. ShuntCompensator is a
- * single terminal device.  Ground is implied.
- *
+ * A shunt capacitor or reactor or switchable bank of shunt capacitors or reactors. A section of a shunt compensator is an individual capacitor or reactor.  A negative value for reactivePerSection indicates that the compensator is a reactor. ShuntCompensator is a single terminal device.  Ground is implied.
+ * 
  * @property grounded Used for Yn and Zn connections. True if the neutral is solidly grounded.
  * @property nomU The voltage at which the nominal reactive power may be calculated. This should normally be within 10% of the voltage at which the capacitor is connected to the network.
  * @property phaseConnection The type of phase connection, such as wye or delta.
+ * @property groundingTerminal [ZBEX] The terminal connecting to grounded network.
  * @property sections Shunt compensator sections in use.
  *                    Starting value for steady state solution. Non integer values are allowed to support continuous variables.
  *                    The reasons for continuous value are to support study cases where no discrete shunt compensator's has yet been
@@ -39,4 +40,8 @@ abstract class ShuntCompensator(mRID: String) : RegulatingCondEq(mRID) {
     var nomU: Int? = null
     var phaseConnection: PhaseShuntConnectionKind = PhaseShuntConnectionKind.UNKNOWN
     var sections: Double? = null
+
+    @ZBEX
+    var groundingTerminal: Terminal? = null
+
 }

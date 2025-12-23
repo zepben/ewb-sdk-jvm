@@ -11,6 +11,7 @@ package com.zepben.ewb.services.common
 import com.zepben.ewb.cim.extensions.iec61968.assetinfo.RelayInfo
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
+import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvSubstation
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelayFunction
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelayScheme
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelaySystem
@@ -71,6 +72,18 @@ internal object ClampToAcLineSegmentResolver : ReferenceResolver<Clamp, AcLineSe
     Clamp::class, AcLineSegment::class, Clamp::acLineSegment.setter
 )
 
+internal object AcLineSegmentToAcLineSegmentPhaseResolver : ReferenceResolver<AcLineSegment, AcLineSegmentPhase> by KReferenceResolver(
+    AcLineSegment::class, AcLineSegmentPhase::class, AcLineSegment::addPhase
+)
+
+internal object AcLineSegmentPhaseToAcLineSegmentResolver : ReferenceResolver<AcLineSegmentPhase, AcLineSegment> by KReferenceResolver(
+    AcLineSegmentPhase::class, AcLineSegment::class, AcLineSegmentPhase::acLineSegment.setter
+)
+
+internal object AcLineSegmentPhaseToWireInfoResolver : ReferenceResolver<AcLineSegmentPhase, WireInfo> by KReferenceResolver(
+    AcLineSegmentPhase::class, WireInfo::class, AcLineSegmentPhase::assetInfo.setter
+)
+
 internal object AssetToAssetOrganisationRoleResolver : ReferenceResolver<Asset, AssetOrganisationRole> by KReferenceResolver(
     Asset::class, AssetOrganisationRole::class, Asset::addOrganisationRole
 )
@@ -122,6 +135,10 @@ internal object PowerTransformerToPowerTransformerInfoResolver : ReferenceResolv
 
 internal object ShuntCompensatorToShuntCompensatorInfoResolver : ReferenceResolver<ShuntCompensator, ShuntCompensatorInfo> by KReferenceResolver(
     ShuntCompensator::class, ShuntCompensatorInfo::class, ShuntCompensator::assetInfo.setter
+)
+
+internal object ShuntCompensatorToTerminalResolver : ReferenceResolver<ShuntCompensator, Terminal> by KReferenceResolver(
+    ShuntCompensator::class, Terminal::class, ShuntCompensator::groundingTerminal.setter
 )
 
 internal object SwitchToSwitchInfoResolver : ReferenceResolver<Switch, SwitchInfo> by KReferenceResolver(
@@ -221,6 +238,14 @@ internal object FeederToNormalEnergizedLvFeedersResolver : ReferenceResolver<Fee
 
 internal object FeederToCurrentEnergizedLvFeedersResolver : ReferenceResolver<Feeder, LvFeeder> by KReferenceResolver(
     Feeder::class, LvFeeder::class, Feeder::addCurrentEnergizedLvFeeder
+)
+
+internal object LvSubstationToNormalEnergizedLvFeedersResolver : ReferenceResolver<LvSubstation, LvFeeder> by KReferenceResolver(
+    LvSubstation::class, LvFeeder::class, LvSubstation::addNormalEnergizedLvFeeder
+)
+
+internal object LvFeederToNormalEnergizingLvSubstationsResolver : ReferenceResolver<LvFeeder, LvSubstation> by KReferenceResolver(
+    LvFeeder::class, LvSubstation::class, LvFeeder::normalEnergizingLvSubstation.setter
 )
 
 internal object GeographicalRegionToSubGeographicalRegionResolver : ReferenceResolver<GeographicalRegion, SubGeographicalRegion> by KReferenceResolver(
@@ -377,6 +402,22 @@ internal object LvFeederToNormalEnergizingFeedersResolver : ReferenceResolver<Lv
 
 internal object LvFeederToCurrentEnergizingFeedersResolver : ReferenceResolver<LvFeeder, Feeder> by KReferenceResolver(
     LvFeeder::class, Feeder::class, LvFeeder::addCurrentEnergizingFeeder
+)
+
+internal object LvSubstationToNormalEnergizingFeedersResolver : ReferenceResolver<LvSubstation, Feeder> by KReferenceResolver(
+    LvSubstation::class, Feeder::class, LvSubstation::addNormalEnergizingFeeder
+)
+
+internal object LvSubstationToCurrentEnergizingFeedersResolver : ReferenceResolver<LvSubstation, Feeder> by KReferenceResolver(
+    LvSubstation::class, Feeder::class, LvSubstation::addCurrentEnergizingFeeder
+)
+
+internal object FeederToNormalEnergizedLvSubstationsResolver : ReferenceResolver<Feeder, LvSubstation> by KReferenceResolver(
+    Feeder::class, LvSubstation::class, Feeder::addNormalEnergizedLvSubstation
+)
+
+internal object FeederToCurrentEnergizedLvSubstationsResolver : ReferenceResolver<Feeder, LvSubstation> by KReferenceResolver(
+    Feeder::class, LvSubstation::class, Feeder::addCurrentEnergizedLvSubstation
 )
 
 internal object PowerElectronicsConnectionToPowerElectronicsConnectionPhaseResolver :

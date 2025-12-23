@@ -20,5 +20,12 @@ abstract class TableShuntCompensators : TableRegulatingCondEq() {
     val NOM_U: Column = Column(++columnIndex, "nom_u", Column.Type.INTEGER, NULL)
     val PHASE_CONNECTION: Column = Column(++columnIndex, "phase_connection", Column.Type.STRING, NOT_NULL)
     val SECTIONS: Column = Column(++columnIndex, "sections", Column.Type.DOUBLE, NULL)
+    val GROUNDING_TERMINAL_MRID: Column = Column(++columnIndex, "grounding_terminal_mrid", Column.Type.STRING, NULL)
+
+    init {
+        addNonUniqueIndexes(
+            listOf(GROUNDING_TERMINAL_MRID)
+        )
+    }
 
 }

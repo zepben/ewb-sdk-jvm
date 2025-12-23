@@ -8,10 +8,14 @@
 
 package com.zepben.ewb.cim.iec61968.customers
 
+import com.zepben.ewb.services.common.testdata.generateId
+import com.zepben.ewb.services.customer.CustomerService
+import com.zepben.ewb.services.customer.testdata.fillFields
 import com.zepben.ewb.utils.PrivateCollectionValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -24,6 +28,17 @@ internal class PricingStructureTest {
     @Test
     internal fun constructorCoverage() {
         assertThat(PricingStructure("id").mRID, equalTo("id"))
+    }
+
+    @Test
+    internal fun accessorCoverage() {
+        val ps = PricingStructure(generateId())
+
+        assertThat(ps.code, nullValue())
+
+        ps.fillFields(CustomerService())
+
+        assertThat(ps.code, equalTo("XB1"))
     }
 
     @Test

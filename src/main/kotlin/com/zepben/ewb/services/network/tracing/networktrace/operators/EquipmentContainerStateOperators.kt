@@ -9,6 +9,7 @@
 package com.zepben.ewb.services.network.tracing.networktrace.operators
 
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
+import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvSubstation
 import com.zepben.ewb.cim.iec61970.base.core.Equipment
 import com.zepben.ewb.cim.iec61970.base.core.EquipmentContainer
 import com.zepben.ewb.cim.iec61970.base.core.Feeder
@@ -43,12 +44,44 @@ interface EquipmentContainerStateOperators {
     fun getEnergizingFeeders(lvFeeder: LvFeeder): Collection<Feeder>
 
     /**
+     * Retrieves a collection of feeders that energize the given [lvSubstation].
+     *
+     * @param lvSubstation The [LvSubstation] for which to get the energizing feeders.
+     * @return A collection of feeders that energize the given [lvSubstation].
+     */
+    fun getEnergizingFeeders(lvSubstation: LvSubstation): Collection<Feeder>
+
+    /**
+     * Retrieves a collection of [LvSubstation]s that energize the given [LvFeeder].
+     *
+     * @param lvFeeder The LV feeder for which to get the energizing [LvSubstation]s.
+     * @return A collection of [LvSubstation]s that energize the given [lvFeeder].
+     */
+    fun getEnergizingLvSubstation(lvFeeder: LvFeeder): LvSubstation?
+
+    /**
      * Retrieves a collection of LV feeders energized by the given feeder.
      *
      * @param feeder The feeder for which to get the energized LV feeders.
      * @return A collection of LV feeders energized by the given feeder.
      */
     fun getEnergizedLvFeeders(feeder: Feeder): Collection<LvFeeder>
+
+    /**
+     * Retrieves a collection of [LvSubstation]s energized by the given feeder.
+     *
+     * @param feeder The feeder for which to get the energized [LvSubstation]s.
+     * @return A collection of [LvSubstation]s energized by the given feeder.
+     */
+    fun getEnergizedLvSubstations(feeder: Feeder): Collection<LvSubstation>
+
+    /**
+     * Retrieves a collection of LV feeders energized by the given [lvSubstation].
+     *
+     * @param lvSubstation The [LvSubstation] for which to get the energized LV feeders.
+     * @return A collection of LV feeders energized by the given [lvSubstation].
+     */
+    fun getEnergizedLvFeeders(lvSubstation: LvSubstation): Collection<LvFeeder>
 
     /**
      * Adds the specified equipment to the given container.
@@ -121,6 +154,38 @@ interface EquipmentContainerStateOperators {
     fun addEnergizedLvFeederToFeeder(lvFeeder: LvFeeder, feeder: Feeder)
 
     /**
+     * Adds the specified energizing [feeder] to the given [lvSubstation].
+     *
+     * @param feeder The energizing [feeder] to add to the [lvSubstation].
+     * @param lvSubstation The [LvSubstation] to add to the [feeder].
+     */
+    fun addEnergizingFeederToLvSubstation(feeder: Feeder, lvSubstation: LvSubstation)
+
+    /**
+     * Adds the specified energized [lvSubstation] to the given [feeder].
+     *
+     * @param feeder The [feeder] to which the [lvSubstation] will be added.
+     * @param lvSubstation The [LvSubstation] to which the [feeder] will be added.
+     */
+    fun addEnergizedLvSubstationToFeeder(lvSubstation: LvSubstation, feeder: Feeder)
+
+    /**
+     * Adds the specified energizing [lvSubstation] to the given [lvFeeder].
+     *
+     * @param lvSubstation The energizing [lvSubstation] to add to the [lvFeeder].
+     * @param lvFeeder The [lvFeeder] to add to the [LvSubstation].
+     */
+    fun addEnergizingLvSubstationToLvFeeder(lvSubstation: LvSubstation, lvFeeder: LvFeeder)
+
+    /**
+     * Adds the specified energized [lvFeeder] to the given [lvSubstation].
+     *
+     * @param lvFeeder The [LvFeeder] to which the [lvSubstation] will be added.
+     * @param lvSubstation The [LvSubstation] to which the [lvFeeder] will be added.
+     */
+    fun addEnergizedLvFeederToLvSubstation(lvFeeder: LvFeeder, lvSubstation: LvSubstation)
+
+    /**
      * Establishes a bidirectional association between the specified feeder and LV feeder.
      *
      * @param feeder The feeder energizing the lv feeder.
@@ -129,6 +194,28 @@ interface EquipmentContainerStateOperators {
     fun associateEnergizingFeeder(feeder: Feeder, lvFeeder: LvFeeder) {
         addEnergizingFeederToLvFeeder(feeder, lvFeeder)
         addEnergizedLvFeederToFeeder(lvFeeder, feeder)
+    }
+
+    /**
+     * Establishes a bidirectional association between the specified feeder and LV feeder.
+     *
+     * @param feeder The feeder energizing the lv feeder.
+     * @param lvSubstation The lv feeder energized by the feeder.
+     */
+    fun associateEnergizingFeeder(feeder: Feeder, lvSubstation: LvSubstation) {
+        addEnergizingFeederToLvSubstation(feeder, lvSubstation)
+        addEnergizedLvSubstationToFeeder(lvSubstation, feeder)
+    }
+
+    /**
+     * Establishes a bidirectional association between the specified [lvFeeder] and [lvSubstation].
+     *
+     * @param lvFeeder The [LvFeeder] energized by [lvSubstation].
+     * @param lvSubstation The lv feeder energizing [lvFeeder].
+     */
+    fun associateEnergizingLvSubstation(lvFeeder: LvFeeder, lvSubstation: LvSubstation) {
+        addEnergizingLvSubstationToLvFeeder(lvSubstation, lvFeeder)
+        addEnergizedLvFeederToLvSubstation(lvFeeder, lvSubstation)
     }
 
     companion object {
@@ -155,7 +242,15 @@ private class NormalEquipmentContainerStateOperators : EquipmentContainerStateOp
 
     override fun getEnergizingFeeders(lvFeeder: LvFeeder): Collection<Feeder> = lvFeeder.normalEnergizingFeeders
 
+    override fun getEnergizingFeeders(lvSubstation: LvSubstation): Collection<Feeder> = lvSubstation.normalEnergizingFeeders
+
+    override fun getEnergizingLvSubstation(lvFeeder: LvFeeder): LvSubstation? = lvFeeder.normalEnergizingLvSubstation
+
     override fun getEnergizedLvFeeders(feeder: Feeder): Collection<LvFeeder> = feeder.normalEnergizedLvFeeders
+
+    override fun getEnergizedLvFeeders(lvSubstation: LvSubstation): Collection<LvFeeder> = lvSubstation.normalEnergizedLvFeeders
+
+    override fun getEnergizedLvSubstations(feeder: Feeder): Collection<LvSubstation> = feeder.normalEnergizedLvSubstations
 
     override fun addEquipmentToContainer(equipment: Equipment, container: EquipmentContainer) {
         container.addEquipment(equipment)
@@ -180,6 +275,22 @@ private class NormalEquipmentContainerStateOperators : EquipmentContainerStateOp
     override fun addEnergizedLvFeederToFeeder(lvFeeder: LvFeeder, feeder: Feeder) {
         feeder.addNormalEnergizedLvFeeder(lvFeeder)
     }
+
+    override fun addEnergizingFeederToLvSubstation(feeder: Feeder, lvSubstation: LvSubstation) {
+        lvSubstation.addNormalEnergizingFeeder(feeder)
+    }
+
+    override fun addEnergizedLvSubstationToFeeder(lvSubstation: LvSubstation, feeder: Feeder) {
+        feeder.addNormalEnergizedLvSubstation(lvSubstation)
+    }
+
+    override fun addEnergizingLvSubstationToLvFeeder(lvSubstation: LvSubstation, lvFeeder: LvFeeder) {
+        lvFeeder.normalEnergizingLvSubstation = lvSubstation
+    }
+
+    override fun addEnergizedLvFeederToLvSubstation(lvFeeder: LvFeeder, lvSubstation: LvSubstation) {
+        lvSubstation.addNormalEnergizedLvFeeder(lvFeeder)
+    }
 }
 
 private class CurrentEquipmentContainerStateOperators : EquipmentContainerStateOperators {
@@ -189,7 +300,15 @@ private class CurrentEquipmentContainerStateOperators : EquipmentContainerStateO
 
     override fun getEnergizingFeeders(lvFeeder: LvFeeder): Collection<Feeder> = lvFeeder.currentEnergizingFeeders
 
+    override fun getEnergizingFeeders(lvSubstation: LvSubstation): Collection<Feeder> = lvSubstation.currentEnergizingFeeders
+
+    override fun getEnergizingLvSubstation(lvFeeder: LvFeeder): LvSubstation? = lvFeeder.normalEnergizingLvSubstation
+
     override fun getEnergizedLvFeeders(feeder: Feeder): Collection<LvFeeder> = feeder.currentEnergizedLvFeeders
+
+    override fun getEnergizedLvFeeders(lvSubstation: LvSubstation): Collection<LvFeeder> = lvSubstation.normalEnergizedLvFeeders
+
+    override fun getEnergizedLvSubstations(feeder: Feeder): Collection<LvSubstation> = feeder.currentEnergizedLvSubstations
 
     override fun addEquipmentToContainer(equipment: Equipment, container: EquipmentContainer) {
         container.addCurrentEquipment(equipment)
@@ -213,5 +332,21 @@ private class CurrentEquipmentContainerStateOperators : EquipmentContainerStateO
 
     override fun addEnergizedLvFeederToFeeder(lvFeeder: LvFeeder, feeder: Feeder) {
         feeder.addCurrentEnergizedLvFeeder(lvFeeder)
+    }
+
+    override fun addEnergizingFeederToLvSubstation(feeder: Feeder, lvSubstation: LvSubstation) {
+        lvSubstation.addCurrentEnergizingFeeder(feeder)
+    }
+
+    override fun addEnergizedLvSubstationToFeeder(lvSubstation: LvSubstation, feeder: Feeder) {
+        feeder.addCurrentEnergizedLvSubstation(lvSubstation)
+    }
+
+    override fun addEnergizingLvSubstationToLvFeeder(lvSubstation: LvSubstation, lvFeeder: LvFeeder) {
+        lvFeeder.normalEnergizingLvSubstation = lvSubstation
+    }
+
+    override fun addEnergizedLvFeederToLvSubstation(lvFeeder: LvFeeder, lvSubstation: LvSubstation) {
+        lvSubstation.addNormalEnergizedLvFeeder(lvFeeder)
     }
 }

@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.cim.iec61970.base.wires
 
+import com.zepben.ewb.cim.iec61968.assetinfo.WireInfo
 import com.zepben.ewb.services.common.extensions.*
 
 /**
@@ -25,6 +26,7 @@ import com.zepben.ewb.services.common.extensions.*
  * @property perLengthSequenceImpedance Per-length sequence impedance of this line segment.
  * @property cuts Cuts applied to the line segment.
  * @property clamps The clamps connected to the line segment.
+ * @property phases The individual phase models for this AcLineSegment.
  */
 class AcLineSegment(mRID: String) : Conductor(mRID) {
 
@@ -33,6 +35,7 @@ class AcLineSegment(mRID: String) : Conductor(mRID) {
     var perLengthImpedance: PerLengthImpedance? = null
     private var _cuts: MutableList<Cut>? = null
     private var _clamps: MutableList<Clamp>? = null
+    private var _phases: MutableList<AcLineSegmentPhase>? = null
 
     var perLengthSequenceImpedance: PerLengthSequenceImpedance?
         get() = perLengthImpedance as? PerLengthSequenceImpedance
@@ -175,5 +178,84 @@ class AcLineSegment(mRID: String) : Conductor(mRID) {
         }
         return false
     }
+
+    /**
+     * The individual phase models for this AcLineSegment. The returned collection is read only.
+     */
+    val phases: Collection<AcLineSegmentPhase> get() = _phases.asUnmodifiable()
+
+    /**
+     * Get the number of entries in the [AcLineSegmentPhase] collection.
+     */
+    fun numPhases(): Int = _phases?.size ?: 0
+
+    /**
+     * The individual phase models for this AcLineSegment.
+     *
+     * @param mRID the mRID of the required [AcLineSegmentPhase]
+     * @return The [AcLineSegmentPhase] with the specified [mRID] if it exists, otherwise null
+     */
+    fun getPhase(mRID: String): AcLineSegmentPhase? = _phases?.getByMRID(mRID)
+
+    /**
+     * The individual phase models for this AcLineSegment.
+     *
+     * @param phase the phase of the required [AcLineSegmentPhase]
+     * @return The [AcLineSegmentPhase] with the specified [phase] if it exists, otherwise null
+     */
+    fun getPhase(phase: SinglePhaseKind): AcLineSegmentPhase? = _phases?.find { it.phase == phase }
+
+    /**
+     * Add an [AcLineSegmentPhase] to this [AcLineSegment].
+     *
+     * @param phase The [AcLineSegmentPhase] to add.
+     * @return This [AcLineSegment] for fluent use.
+     */
+    fun addPhase(phase: AcLineSegmentPhase): AcLineSegment {
+        if (validateReference(phase, ::getPhase, "An AcLineSegmentPhase"))
+            return this
+
+        if (phase.acLineSegment == null)
+            phase.acLineSegment = this
+
+        require(phase.acLineSegment === this) {
+            "${phase.typeNameAndMRID()} `acLineSegment` property references ${phase.acLineSegment!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
+        }
+
+        _phases = _phases ?: mutableListOf()
+        _phases!!.add(phase)
+        _phases!!.sortBy { it.sequenceNumber }
+
+        return this
+    }
+
+    /**
+     * Remove an [AcLineSegmentPhase] from this [AcLineSegment].
+     *
+     * @param phase The [AcLineSegmentPhase] to remove.
+     * @return true if [phase] is removed from the collection.
+     */
+    fun removePhase(phase: AcLineSegmentPhase): Boolean {
+        val ret = _phases?.remove(phase) == true
+        if (_phases.isNullOrEmpty()) _phases = null
+        return ret
+    }
+
+    /**
+     * Clear all [AcLineSegmentPhase]'s from this [AcLineSegment].
+     *
+     * @return This [AcLineSegment] for fluent use.
+     */
+    fun clearPhases(): AcLineSegment {
+        _phases = null
+        return this
+    }
+
+    /**
+     * Retrieve the WireInfo associated with the requested [phase]. If no specific [WireInfo] is available for the given [phase], [AcLineSegment.assetInfo] will be returned.
+     *
+     * @param phase the phase to retrieve [WireInfo] for.
+     */
+    fun wireInfoForPhase(phase: SinglePhaseKind): WireInfo? = phases.find { it.phase == phase }?.assetInfo ?: assetInfo
 
 }

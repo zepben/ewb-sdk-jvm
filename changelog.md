@@ -1,4 +1,20 @@
 # Zepben EWB SDK changelog
+## [1.4.0] - UNRELEASED
+### Breaking Changes
+* None.
+
+### New Features
+* None.
+
+### Enhancements
+* None.
+
+### Fixes
+* None.
+
+### Notes
+* None.
+
 ## [1.3.0] - 2025-12-23
 ### Breaking Changes
 * You must now provide an `mRID` for all `IdentifiedObject` instances, the auto-generated default `mRID` has been removed. The helper function 

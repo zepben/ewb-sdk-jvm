@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.database.sql.extensions
 
+import com.zepben.ewb.cim.iec61968.infiec61968.infcommon.Ratio
 import com.zepben.ewb.utils.createMockResultSet
 import io.mockk.every
 import org.hamcrest.MatcherAssert.assertThat
@@ -165,6 +166,24 @@ internal class ResultSetExtensionsTest {
         }
 
         assertThat(rs.getNullableLong(1), nullValue())
+    }
+
+    @Test
+    internal fun `getNullableRatio returns a ratio`() {
+        val rs = createMockResultSet {
+            every { it.getDouble(any<Int>()) } returns 1.0 andThen 2.0
+        }
+
+        assertThat(rs.getNullableRatio(1, 1), equalTo(Ratio(2.0, 1.0)))
+    }
+
+    @Test
+    internal fun `getNullableRatio returns a null`() {
+        val rs = createMockResultSet(wasNull = true) {
+            every { it.getDouble(any<Int>()) } returns 0.0
+        }
+
+        assertThat(rs.getNullableRatio(1, 1), nullValue())
     }
 
     @Test

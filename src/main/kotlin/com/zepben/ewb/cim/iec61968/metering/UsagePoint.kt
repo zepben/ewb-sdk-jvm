@@ -30,7 +30,7 @@ import com.zepben.ewb.services.common.extensions.validateReference
  *                     i.e., there is a logical point in the network where a meter could be located to collect meter readings.
  * @property connectionCategory A code used to specify the connection category, e.g., low voltage or low pressure, where the usage point is defined.
  * @property ratedPower Active power that this usage point is configured to deliver in watts.
- * @property approvedInverterCapacity [ZBEX] ]The approved inverter capacity at this UsagePoint in volt-amperes.
+ * @property approvedInverterCapacity [ZBEX] The approved inverter capacity at this UsagePoint in volt-amperes.
  * @property phaseCode Phase code. Number of wires and specific nominal phases can be deduced from enumeration literal values. For example, ABCN is three-phase,
  *                     four-wire, s12n (splitSecondary12N) is single-phase, three-wire, and s1n and s2n are single-phase, two-wire.
  * @property contacts [ZBEX] All contact details for this UsagePoint.

@@ -11,6 +11,11 @@ package com.zepben.ewb.database
 import java.sql.ResultSet
 import java.time.Instant
 
+//
+// NOTE: These are copies of the real functions that take a column name rather than the index. These shouldn't be promoted
+//       into the public API as we want to use indexes in real code, rather than column name lookups.
+//
+
 internal fun ResultSet.getNullableBoolean(columnName: String): Boolean? =
     getBoolean(columnName).takeUnless { wasNull() }
 

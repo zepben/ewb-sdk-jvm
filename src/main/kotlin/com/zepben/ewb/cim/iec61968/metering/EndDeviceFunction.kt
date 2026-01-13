@@ -13,7 +13,7 @@ import com.zepben.ewb.cim.iec61968.assets.AssetFunction
 /**
  * Function performed by an end device such as a meter, communication equipment, controllers, etc.
  *
- *  @property enabled True if the function is enabled.
+ * @property enabled True if the function is enabled.
  */
 abstract class EndDeviceFunction(mRID: String) : AssetFunction(mRID) {
 

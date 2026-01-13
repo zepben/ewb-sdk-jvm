@@ -13,9 +13,9 @@ import com.zepben.ewb.cim.iec61968.customers.Customer
 import com.zepben.ewb.cim.iec61968.customers.CustomerAgreement
 import com.zepben.ewb.cim.iec61968.customers.PricingStructure
 import com.zepben.ewb.cim.iec61968.customers.Tariff
-import com.zepben.ewb.database.sqlite.cim.customer.CustomerDatabaseTables
-import com.zepben.ewb.database.sqlite.cim.tables.associations.TableCustomerAgreementsPricingStructures
-import com.zepben.ewb.database.sqlite.cim.tables.associations.TablePricingStructuresTariffs
+import com.zepben.ewb.database.sql.cim.customer.CustomerDatabaseTables
+import com.zepben.ewb.database.sql.cim.tables.associations.TableCustomerAgreementsPricingStructures
+import com.zepben.ewb.database.sql.cim.tables.associations.TablePricingStructuresTariffs
 import com.zepben.ewb.services.common.testdata.fillFieldsCommon
 import com.zepben.ewb.services.common.translator.TranslatorTestBase
 import com.zepben.ewb.services.customer.CustomerService

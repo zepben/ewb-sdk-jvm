@@ -8,10 +8,11 @@
 
 package com.zepben.ewb.database.sqlite
 
-import com.zepben.ewb.database.sql.SqlTable
-import com.zepben.ewb.database.sqlite.cim.customer.CustomerDatabaseTables
-import com.zepben.ewb.database.sqlite.cim.diagram.DiagramDatabaseTables
-import com.zepben.ewb.database.sqlite.cim.network.NetworkDatabaseTables
+import com.zepben.ewb.database.sql.cim.customer.CustomerDatabaseTables
+import com.zepben.ewb.database.sql.cim.diagram.DiagramDatabaseTables
+import com.zepben.ewb.database.sql.cim.network.NetworkDatabaseTables
+import com.zepben.ewb.database.sql.common.tables.SqlTable
+import com.zepben.ewb.database.sql.generators.SqliteGenerator
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
@@ -26,8 +27,8 @@ class GenerateSqliteSql {
     @Disabled
     fun `print database create statements`() {
         printStatements { table ->
-            println(table.createTableSql + ";")
-            table.createIndexesSql.forEach { println("$it;") }
+            println(SqliteGenerator.createTableSql(table) + ";")
+            SqliteGenerator.createIndexesSql(table).forEach { println("$it;") }
             println("")
         }
     }

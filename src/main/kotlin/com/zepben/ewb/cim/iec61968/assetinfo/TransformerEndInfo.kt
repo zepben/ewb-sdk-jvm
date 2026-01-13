@@ -38,7 +38,6 @@ import kotlin.math.sqrt
  * @property groundedEndShortCircuitTests All short-circuit test measurements in which this transformer end was energised.
  * @property openEndOpenCircuitTests All open-circuit test measurements in which this transformer end was not excited.
  * @property energisedEndOpenCircuitTests All open-circuit test measurements in which this transformer end was excited.
-
  */
 class TransformerEndInfo(mRID: String) : AssetInfo(mRID) {
 

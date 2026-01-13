@@ -19,7 +19,7 @@ import com.zepben.ewb.services.common.extensions.validateReference
  * This class describes devices that transform a measured quantity into signals that can be presented at displays,
  * used in control or be recorded.
  *
- * @property relayFunctions [ZBEX] ]The relay functions influenced by this [Sensor].
+ * @property relayFunctions [ZBEX] The relay functions influenced by this [Sensor].
  */
 abstract class Sensor(mRID: String) : AuxiliaryEquipment(mRID) {
 

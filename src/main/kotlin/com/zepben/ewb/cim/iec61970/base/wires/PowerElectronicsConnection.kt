@@ -32,30 +32,30 @@ import com.zepben.ewb.services.common.extensions.validateReference
  *                  to IEC 60909. The attribute shall be a positive value.
  * @property units An AC network connection may have several power electronics units connecting through it.
  * @property phases The individual units models for the power electronics connection.
- * @property inverterStandard  [ZBEX] The standard this inverter follows, such as AS4777.2:2020
- * @property sustainOpOvervoltLimit  [ZBEX] Indicates the sustained operation overvoltage limit in volts, when the average voltage for a 10-minute period exceeds the V¬nom-max.
- * @property stopAtOverFreq  [ZBEX] Over frequency (stop) in Hz. Permitted range is between 51 and 52 (inclusive)
- * @property stopAtUnderFreq  [ZBEX] Under frequency (stop) in Hz Permitted range is between 47 and 49 (inclusive)
+ * @property inverterStandard [ZBEX] The standard this inverter follows, such as AS4777.2:2020
+ * @property sustainOpOvervoltLimit [ZBEX] Indicates the sustained operation overvoltage limit in volts, when the average voltage for a 10-minute period exceeds the V¬nom-max.
+ * @property stopAtOverFreq [ZBEX] Over frequency (stop) in Hz. Permitted range is between 51 and 52 (inclusive)
+ * @property stopAtUnderFreq [ZBEX] Under frequency (stop) in Hz Permitted range is between 47 and 49 (inclusive)
  * @property invVoltWattRespMode [ZBEX] Volt-Watt response mode allows an inverter to reduce is real power output depending on the measured voltage. This mode is further described in AS4777.2:2015, section 6.3.2.2. True implies the mode is enabled.
- * @property invWattRespV1  [ZBEX] Set point 1 in volts for inverter Volt-Watt response mode. Permitted range is between 200 and 300 (inclusive).
- * @property invWattRespV2  [ZBEX] Set point 2 in volts for inverter Volt-Watt response mode. Permitted range is between 216 and 230 (inclusive).
- * @property invWattRespV3  [ZBEX] Set point 3 in volts for inverter Volt-Watt response mode. Permitted range is between 235 and 255 (inclusive).
- * @property invWattRespV4  [ZBEX] Set point 4 in volts for inverter Volt-Watt response mode. Permitted range is between 244 and 265 (inclusive).
- * @property invWattRespPAtV1  [ZBEX] Power output set point 1 as a percentage of rated output for inverter Volt-Watt response mode. Permitted range is between 0 and 1 (inclusive).
- * @property invWattRespPAtV2  [ZBEX] Power output set point 2 as a percentage of rated output for inverter Volt-Watt response mode. Permitted range is between 0 and 1 (inclusive).
- * @property invWattRespPAtV3  [ZBEX] Power output set point 3 as a percentage of rated output for inverter Volt-Watt response mode. Permitted range is between 0 and 1 (inclusive).
- * @property invWattRespPAtV4  [ZBEX] Power output set point 4 as a percentage of rated output for inverter Volt-Watt response mode. Permitted range is between 0 and 0.2 (inclusive).
+ * @property invWattRespV1 [ZBEX] Set point 1 in volts for inverter Volt-Watt response mode. Permitted range is between 200 and 300 (inclusive).
+ * @property invWattRespV2 [ZBEX] Set point 2 in volts for inverter Volt-Watt response mode. Permitted range is between 216 and 230 (inclusive).
+ * @property invWattRespV3 [ZBEX] Set point 3 in volts for inverter Volt-Watt response mode. Permitted range is between 235 and 255 (inclusive).
+ * @property invWattRespV4 [ZBEX] Set point 4 in volts for inverter Volt-Watt response mode. Permitted range is between 244 and 265 (inclusive).
+ * @property invWattRespPAtV1 [ZBEX] Power output set point 1 as a percentage of rated output for inverter Volt-Watt response mode. Permitted range is between 0 and 1 (inclusive).
+ * @property invWattRespPAtV2 [ZBEX] Power output set point 2 as a percentage of rated output for inverter Volt-Watt response mode. Permitted range is between 0 and 1 (inclusive).
+ * @property invWattRespPAtV3 [ZBEX] Power output set point 3 as a percentage of rated output for inverter Volt-Watt response mode. Permitted range is between 0 and 1 (inclusive).
+ * @property invWattRespPAtV4 [ZBEX] Power output set point 4 as a percentage of rated output for inverter Volt-Watt response mode. Permitted range is between 0 and 0.2 (inclusive).
  * @property invVoltVarRespMode [ZBEX] Volt-VAr response mode allows an inverter to consume (sink) or produce (source) reactive power depending on the measured voltage. This mode is further described in AS4777.2:2015, section 6.3.2.3. True implies the mode is enabled.
- * @property invVarRespV1  [ZBEX] Set point 1 in volts for inverter Volt-VAr response mode. Permitted range is between 200 and 300 (inclusive).
- * @property invVarRespV2  [ZBEX] Set point 2 in volts for inverter Volt-VAr response mode. Permitted range is between 200 and 300 (inclusive).
- * @property invVarRespV3  [ZBEX] Set point 3 in volts for inverter Volt-VAr response mode. Permitted range is between 200 and 300 (inclusive).
- * @property invVarRespV4  [ZBEX] Set point 4 in volts for inverter Volt-VAr response mode. Permitted range is between 200 and 300 (inclusive).
- * @property invVarRespQAtV1  [ZBEX] Power output set point 1 as a percentage of rated output for inverter Volt-VAr response mode. Permitted range is between 0 and 0.6 (inclusive).
- * @property invVarRespQAtV2  [ZBEX] Power output set point 2 as a percentage of rated output for inverter Volt-VAr response mode. Permitted range is between -1 and 1 (inclusive) with a negative number referring to a sink.
- * @property invVarRespQAtV3  [ZBEX] Power output set point 3 as a percentage of rated output for inverter Volt-VAr response mode. Permitted range is between -1 and 1 (inclusive) with a negative number referring to a sink.
- * @property invVarRespQAtV4  [ZBEX] Power output set point 4 as a percentage of rated output for inverter Volt-VAr response mode. Permitted range is between -0.6 and 0 (inclusive) with a negative number referring to a sink.
+ * @property invVarRespV1 [ZBEX] Set point 1 in volts for inverter Volt-VAr response mode. Permitted range is between 200 and 300 (inclusive).
+ * @property invVarRespV2 [ZBEX] Set point 2 in volts for inverter Volt-VAr response mode. Permitted range is between 200 and 300 (inclusive).
+ * @property invVarRespV3 [ZBEX] Set point 3 in volts for inverter Volt-VAr response mode. Permitted range is between 200 and 300 (inclusive).
+ * @property invVarRespV4 [ZBEX] Set point 4 in volts for inverter Volt-VAr response mode. Permitted range is between 200 and 300 (inclusive).
+ * @property invVarRespQAtV1 [ZBEX] Power output set point 1 as a percentage of rated output for inverter Volt-VAr response mode. Permitted range is between 0 and 0.6 (inclusive).
+ * @property invVarRespQAtV2 [ZBEX] Power output set point 2 as a percentage of rated output for inverter Volt-VAr response mode. Permitted range is between -1 and 1 (inclusive) with a negative number referring to a sink.
+ * @property invVarRespQAtV3 [ZBEX] Power output set point 3 as a percentage of rated output for inverter Volt-VAr response mode. Permitted range is between -1 and 1 (inclusive) with a negative number referring to a sink.
+ * @property invVarRespQAtV4 [ZBEX] Power output set point 4 as a percentage of rated output for inverter Volt-VAr response mode. Permitted range is between -0.6 and 0 (inclusive) with a negative number referring to a sink.
  * @property invReactivePowerMode [ZBEX] If true, enables Static Reactive Power mode on the inverter. Note: It must be false if invVoltVarRespMode or InvVoltWattRespMode is true.
- * @property invFixReactivePower  [ZBEX] Static Reactive Power, specified in a percentage output of the system. Permitted range is between -1.0 and 1.0 (inclusive), with a negative sign referring to “sink”.
+ * @property invFixReactivePower [ZBEX] Static Reactive Power, specified in a percentage output of the system. Permitted range is between -1.0 and 1.0 (inclusive), with a negative sign referring to “sink”.
  */
 class PowerElectronicsConnection(mRID: String) : RegulatingCondEq(mRID) {
 

@@ -1,0 +1,26 @@
+/*
+ * Copyright 2026 Zeppelin Bend Pty Ltd
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+package com.zepben.ewb.database.sql.cim.tables.iec61970.base.wires
+
+import com.zepben.ewb.database.sql.common.tables.Column
+import com.zepben.ewb.database.sql.common.tables.Column.Nullable.NULL
+
+/**
+ * A class representing the `Breaker` columns required for the database table.
+ *
+ * @property IN_TRANSIT_TIME The transition time from open to close in seconds.
+ */
+@Suppress("PropertyName")
+class TableBreakers : TableProtectedSwitches() {
+
+    val IN_TRANSIT_TIME: Column = Column(++columnIndex, "in_transit_time", Column.Type.DOUBLE, NULL)
+
+    override val name: String = "breakers"
+
+}

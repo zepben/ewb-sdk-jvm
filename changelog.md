@@ -1,10 +1,14 @@
 # Zepben EWB SDK changelog
 ## [1.4.0] - UNRELEASED
 ### Breaking Changes
-* None.
+* Major rework of the database package, mostly contained to the package internals, so if you aren't using them you should have minimal issues.
+  * Moved most sub-packages from `com.zepben.ewb.database.sqlite` and `com.zepben.ewb.database.postgres` to `com.zepben.ewb.database.sql`, so you will need to
+    update your imports.
+  * Removed `SqliteTable` and `PostregTable`, you should now just use `SqlTable`.
 
 ### New Features
-* None.
+* You can now pass an `SqliteGenerator` to the `*DatabaseTables` to change the target database dialect.
+* `*DatabaseWriter` can now be passed a `DatabaseInitialiser` and `DatabaseTables` (including its `SqliteGenerator`) to change the database type being written.
 
 ### Enhancements
 * `MetricsDatabaseWriter.writeData()` now ensures that the target `modelPath` exists if one is supplied, creating parent directories as well if needed.

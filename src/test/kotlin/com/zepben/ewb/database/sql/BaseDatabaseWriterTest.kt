@@ -8,6 +8,13 @@
 
 package com.zepben.ewb.database.sql
 
+import com.zepben.ewb.database.sql.common.BaseDatabaseTables
+import com.zepben.ewb.database.sql.common.BaseDatabaseWriter
+import com.zepben.ewb.database.sql.common.MissingTableConfigException
+import com.zepben.ewb.database.sql.common.tables.SqlTable
+import com.zepben.ewb.database.sql.common.tables.TableVersion
+import com.zepben.ewb.database.sql.generators.SqlGenerator
+import com.zepben.ewb.database.sql.initialisers.DatabaseInitialiser
 import com.zepben.testutils.exception.ExpectException
 import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.*
@@ -43,18 +50,26 @@ internal class BaseDatabaseWriterTest {
         justRun { commit() }
         justRun { close() }
     }
-    private val getConnection = spyk({ connection })
+    private val initialiser = mockk<DatabaseInitialiser<BaseDatabaseTables>> {
+        every { connect() } returns connection
+        every { beforeConnect(any()) } returns true
+        every { afterConnectBeforePrepare(any(), any(), any()) } returns true
+        every { afterWriteBeforeCommit(any(), any(), any()) } returns true
+    }
+    private val writeDataMock = mockk<(Any) -> Boolean>().also { every { it(any()) } returns true }
     private val data = mockk<Any>()
 
-    private val versionTable = mockk<GenericTableVersion> {
+    private val versionTable = mockk<TableVersion> {
         every { supportedVersion } returns 1
         every { getVersion(connection) } returns 1
     }
     private val tables = spyk(object : BaseDatabaseTables() {
+        override val sqlGenerator: SqlGenerator
+            // Unused by CimDatabaseTables internally, so just return a mockk with no configuration that will break if it is actually used.
+            get() = mockk()
         override val includedTables: Sequence<SqlTable> get() = sequenceOf(versionTable)
     }) { justRun { prepareInsertStatements(connection) } }
 
-    private val writerCalls = spyk<ProtectedWriteCalls>()
     private val writer = createWriter()
 
     @Test
@@ -67,10 +82,10 @@ internal class BaseDatabaseWriterTest {
         every { connection.commit() } throws SQLException()
         validateCalls(expectedResult = false)
 
-        every { writerCalls.afterWriteBeforeCommit(any()) } returns false
+        every { initialiser.afterWriteBeforeCommit(any(), any(), any()) } returns false
         validateCalls(expectCommit = false)
 
-        every { writerCalls.writeData(any()) } returns false
+        every { writeDataMock(any()) } returns false
         validateCalls(expectAfterWriteBeforeCommit = false)
 
         every { tables.prepareInsertStatements(any()) } throws SQLException()
@@ -79,13 +94,13 @@ internal class BaseDatabaseWriterTest {
         every { versionTable.getVersion(connection) } returns 2
         validateCalls(expectPrepareInsertStatements = false)
 
-        every { writerCalls.afterConnectBeforePrepare(any()) } returns false
+        every { initialiser.afterConnectBeforePrepare(any(), any(), any()) } returns false
         validateCalls(expectVersionMatches = false)
 
-        every { getConnection() } throws SQLException()
+        every { initialiser.connect() } throws SQLException()
         validateCalls(expectAfterConnectBeforePrepare = false)
 
-        every { writerCalls.beforeConnect() } returns false
+        every { initialiser.beforeConnect(any()) } returns false
         validateCalls(expectConnect = false)
     }
 
@@ -115,31 +130,34 @@ internal class BaseDatabaseWriterTest {
 
     @Test
     internal fun `handles errors in processors`() {
-        every { writerCalls.beforeConnect() } throws SQLException("SQL error message")
+        every { initialiser.beforeConnect(any()) } throws SQLException("SQL error message")
         writer.write(data)
 
         assertThat(systemErr.log, containsString("Failed to write the database: SQL error message"))
         systemErr.clearCapturedLog()
 
-        every { writerCalls.beforeConnect() } throws MissingTableConfigException("tables error message")
+        every { initialiser.beforeConnect(any()) } throws MissingTableConfigException("tables error message")
         writer.write(data)
 
         assertThat(systemErr.log, containsString("Failed to write the database: tables error message"))
         systemErr.clearCapturedLog()
 
-        every { writerCalls.beforeConnect() } throws Exception("unhandled error message")
+        every { initialiser.beforeConnect(any()) } throws Exception("unhandled error message")
         ExpectException.expect { writer.write(data) }
             .toThrow<Exception>()
             .withMessage("unhandled error message")
     }
 
-    private fun createWriter(): BaseDatabaseWriter<BaseDatabaseTables, Any> =
-        object : BaseDatabaseWriter<BaseDatabaseTables, Any>(tables, getConnection) {
-            override fun beforeConnect(): Boolean = writerCalls.beforeConnect()
-            override fun afterConnectBeforePrepare(connection: Connection): Boolean = writerCalls.afterConnectBeforePrepare(connection)
-            override fun writeData(data: Any): Boolean = writerCalls.writeData(data)
-            override fun afterWriteBeforeCommit(connection: Connection): Boolean = writerCalls.afterWriteBeforeCommit(connection)
+    private fun createWriter(): BaseDatabaseWriter<BaseDatabaseTables, Any> {
+        return object : BaseDatabaseWriter<BaseDatabaseTables, Any>() {
+            override val databaseTables: BaseDatabaseTables
+                get() = tables
+            override val databaseInitialiser: DatabaseInitialiser<BaseDatabaseTables>
+                get() = initialiser
+
+            override fun writeData(data: Any): Boolean = writeDataMock(data)
         }
+    }
 
     private fun validateCalls(
         expectConnect: Boolean = true,
@@ -151,18 +169,18 @@ internal class BaseDatabaseWriterTest {
         expectCommit: Boolean = expectAfterWriteBeforeCommit,
         expectedResult: Boolean = expectCommit
     ) {
-        clearMocks(writerCalls, getConnection, connection, tables, statement, resultSet, versionTable, answers = false)
+        clearMocks(initialiser, writeDataMock, connection, tables, statement, resultSet, versionTable, answers = false)
         assertThat(writer.write(data), equalTo(expectedResult))
 
         verifySequence {
-            writerCalls.beforeConnect()
+            initialiser.beforeConnect(any())
 
             if (expectConnect)
-                getConnection()
+                initialiser.connect()
 
             if (expectAfterConnectBeforePrepare) {
                 connection.autoCommit = false
-                writerCalls.afterConnectBeforePrepare(connection)
+                initialiser.afterConnectBeforePrepare(connection, tables, any())
             }
 
             if (expectVersionMatches) {
@@ -175,10 +193,10 @@ internal class BaseDatabaseWriterTest {
                 tables.prepareInsertStatements(connection)
 
             if (expectWriteData)
-                writerCalls.writeData(data)
+                writeDataMock(data)
 
             if (expectAfterWriteBeforeCommit)
-                writerCalls.afterWriteBeforeCommit(connection)
+                initialiser.afterWriteBeforeCommit(connection, tables, any())
 
             if (expectCommit)
                 connection.commit()
@@ -189,23 +207,7 @@ internal class BaseDatabaseWriterTest {
                 connection.close()
         }
 
-        confirmVerified(writerCalls, getConnection, connection, tables, statement, resultSet, versionTable)
+        confirmVerified(initialiser, writeDataMock, connection, tables, statement, resultSet, versionTable)
     }
-
-    // A class that is used to capture the calls to the private methods of the writer.
-    private class ProtectedWriteCalls {
-        fun beforeConnect(): Boolean = true
-
-        @Suppress("UNUSED_PARAMETER")
-        fun afterConnectBeforePrepare(connection: Connection): Boolean = true
-
-        @Suppress("UNUSED_PARAMETER")
-        fun writeData(data: Any): Boolean = true
-
-        @Suppress("UNUSED_PARAMETER")
-        fun afterWriteBeforeCommit(connection: Connection): Boolean = true
-    }
-
-    private abstract class GenericTableVersion : TableVersion, SqlTable()
 
 }

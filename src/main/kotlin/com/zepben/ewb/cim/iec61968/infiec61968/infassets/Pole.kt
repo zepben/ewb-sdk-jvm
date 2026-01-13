@@ -17,11 +17,11 @@ import com.zepben.ewb.services.common.extensions.validateReference
 
 /**
  * A Pole asset
+ *
+ * @property classification Pole class: 1, 2, 3, 4, 5, 6, 7, H1, H2, Other, Unknown.
  */
 class Pole(mRID: String) : Structure(mRID) {
-    /**
-     * Pole class: 1, 2, 3, 4, 5, 6, 7, H1, H2, Other, Unknown.
-     */
+
     var classification: String? = null
 
     private var _streetlights: MutableList<Streetlight>? = null

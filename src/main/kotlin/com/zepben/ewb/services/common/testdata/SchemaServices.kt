@@ -45,8 +45,7 @@ object SchemaServices {
                 throw IllegalArgumentException("Class should have a single mRID constructor: ${IO::class}", ex)
             }.apply {
                 addName(nameType, "name1")
-            }.also {
-                tryAdd(it)
+                tryAdd(this)
             }
 
             NameType("typeNullDescription").also {
@@ -90,14 +89,14 @@ object SchemaServices {
     private fun fillRequired(service: NetworkService, io: IdentifiedObject) {
         when (io) {
             is EnergyConsumerPhase -> {
-                io.energyConsumer = EnergyConsumer().also {
+                io.energyConsumer = EnergyConsumer(generateId()).also {
                     it.addPhase(io)
                     service.add(it)
                 }
             }
 
             is EnergySourcePhase -> {
-                io.energySource = EnergySource().also {
+                io.energySource = EnergySource(generateId()).also {
                     it.addPhase(io)
                     service.add(it)
                 }

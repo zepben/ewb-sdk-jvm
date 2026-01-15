@@ -50,7 +50,7 @@ fun OrganisationRole.fillFieldsCommon(service: BaseService, includeRuntime: Bool
     (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
 
     organisation = Organisation(generateId()).also {
-        assertThat("Initial tryAdd should return true", service.tryAdd(it))
+        require(service.tryAdd(it)) {"Initial tryAdd should return true" }
     }
 
     return this

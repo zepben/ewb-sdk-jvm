@@ -8,7 +8,6 @@
 
 package com.zepben.ewb.database.sql.cim.customer
 
-import com.zepben.ewb.database.sql.cim.CimDatabaseSchemaTest
 import com.zepben.ewb.cim.iec61968.common.Organisation
 import com.zepben.ewb.cim.iec61968.customers.Customer
 import com.zepben.ewb.cim.iec61968.customers.CustomerAgreement
@@ -16,6 +15,7 @@ import com.zepben.ewb.cim.iec61968.customers.PricingStructure
 import com.zepben.ewb.cim.iec61968.customers.Tariff
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.database.sql.cim.CimDatabaseSchemaTest
+import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.common.Resolvers
 import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 import com.zepben.ewb.services.common.testdata.SchemaServices

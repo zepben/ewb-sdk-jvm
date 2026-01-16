@@ -23,7 +23,7 @@ import java.sql.Connection
  * @property reader The [CimReader] used to read the objects from the database.
  */
 internal abstract class BaseServiceReader<TService : BaseService>(
-    databaseTables: BaseDatabaseTables,
+    databaseTables: CimDatabaseTables,
     connection: Connection,
     protected open val reader: CimReader<TService>,
 ) : BaseCollectionReader<TService>(databaseTables, connection) {

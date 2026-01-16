@@ -7,7 +7,7 @@
 * None.
 
 ### Enhancements
-* None.
+* `MetricsDatabaseWriter.writeData()` now ensures that the target `modelPath` exists if one is supplied, creating parent directories as well if needed.
 
 ### Fixes
 * None.

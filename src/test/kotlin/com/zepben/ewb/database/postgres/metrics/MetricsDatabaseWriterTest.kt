@@ -106,4 +106,38 @@ internal class MetricsDatabaseWriterTest {
         verify { writer.write(job) }
     }
 
+    @Test
+    internal fun createsDirectoriesIfNeeded() {
+        val innerPath = modelPath.resolve("inner1").resolve("inner2")
+
+        val success = MetricsDatabaseWriter(
+            { connection },
+            tables,
+            modelPath = innerPath,
+            createMetricsWriter = { writer }
+        ).write(job)
+
+        assertThat("write should be successful", success)
+        assertThat("Job ID file should exist", innerPath.resolve("$uuid.$JOB_ID_FILE_EXTENSION").exists())
+
+        verify { writer.write(job) }
+    }
+
+    @Test
+    internal fun failsIfFilePreventsDirectoryCreation() {
+        val innerPath = modelPath.resolve("inner1").resolve("inner2")
+        modelPath.resolve("inner1").createFile()
+
+        val success = MetricsDatabaseWriter(
+            { connection },
+            tables,
+            modelPath = innerPath,
+            createMetricsWriter = { writer }
+        ).write(job)
+
+        assertThat("write should be unsuccessful", !success)
+
+        verify { writer.write(job) }
+    }
+
 }

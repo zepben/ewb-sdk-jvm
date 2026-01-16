@@ -15,6 +15,7 @@ import java.nio.file.Path
 import java.sql.Connection
 import kotlin.io.path.absolute
 import kotlin.io.path.createFile
+import kotlin.io.path.createParentDirectories
 import kotlin.io.path.deleteIfExists
 import kotlin.io.path.listDirectoryEntries
 
@@ -58,6 +59,13 @@ class MetricsDatabaseWriter internal constructor(
 
     private fun createJobIdFile(job: IngestionJob): Boolean {
         if (modelPath == null) return true
+
+        try {
+            modelPath.resolve("someFile").createParentDirectories()
+        } catch (e: IOException) {
+            logger.error("Could not ensure directory $modelPath exists. Please ensure the program has the correct permissions.", e)
+            return false
+        }
 
         // To avoid multiple job ID files in a single directory, we delete any leftover from previous runs
         modelPath.listDirectoryEntries("*.$JOB_ID_FILE_EXTENSION").forEach { jobIdFile ->

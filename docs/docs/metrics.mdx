@@ -88,7 +88,9 @@ public class IngestionJobExample {
         MetricsDatabaseWriter metricsDatabaseWriter = new MetricsDatabaseWriter(
             // Factory function for connections to the database to write to.
             IngestionJobExample::getMetricsConnection,
-            Path.of("path/to/model") // Optional: Folder containing files for the model exported by the ingestion job. The network, customer, and diagram databases should be located here.
+            // Optional: Folder containing files for the model exported by the ingestion job. The network, customer, and diagram databases should be located here.
+            //           This, along with any missing parent directories, will be created by the `write` method if it is missing.
+            Path.of("path/to/model")
         );
         if (metricsDatabaseWriter.write(ingestionJob)) {
             System.out.println("Ingestion job saved successfully");
@@ -148,7 +150,9 @@ fun main() {
     val metricsDatabaseWriter = MetricsDatabaseWriter(
         // Factory function for connections to the database to write to. Change JDBC URL, username, and password as needed.
         { DriverManager.getConnection("jdbc:postgresql://localhost:5432/metrics", "username", "password") },
-        Path.of("path/to/model") // Optional: Folder containing files for the model exported by the ingestion job. The network, customer, and diagram databases should be located here.
+        // Optional: Folder containing files for the model exported by the ingestion job. The network, customer, and diagram databases should be located here.
+        //           This, along with any missing parent directories, will be created by the `write` method if it is missing.
+        Path.of("path/to/model")
     )
     if (metricsDatabaseWriter.write(ingestionJob)) {
         println("Ingestion job saved successfully")

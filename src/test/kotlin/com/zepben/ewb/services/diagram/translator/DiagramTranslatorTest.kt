@@ -10,8 +10,8 @@ package com.zepben.ewb.services.diagram.translator
 
 import com.zepben.ewb.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.ewb.cim.iec61970.base.diagramlayout.DiagramObject
-import com.zepben.ewb.database.sqlite.cim.diagram.DiagramDatabaseTables
-import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.diagramlayout.TableDiagramObjectPoints
+import com.zepben.ewb.database.sql.cim.diagram.DiagramDatabaseTables
+import com.zepben.ewb.database.sql.cim.tables.iec61970.base.diagramlayout.TableDiagramObjectPoints
 import com.zepben.ewb.services.common.translator.TranslatorTestBase
 import com.zepben.ewb.services.diagram.DiagramService
 import com.zepben.ewb.services.diagram.DiagramServiceComparator

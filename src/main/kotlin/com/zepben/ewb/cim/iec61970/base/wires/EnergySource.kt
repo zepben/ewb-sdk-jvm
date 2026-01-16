@@ -50,7 +50,6 @@ import com.zepben.ewb.services.common.extensions.validateReference
  * @property xMax Maximum positive sequence Thevenin reactance.
  * @property xnMax Maximum negative sequence Thevenin resistance.
  * @property x0Max Maximum zero sequence Thevenin reactance.
-
  */
 class EnergySource(mRID: String) : EnergyConnection(mRID) {
 

@@ -8,16 +8,29 @@
 
 package com.zepben.ewb.database.sql.extensions
 
+import com.zepben.ewb.cim.iec61968.infiec61968.infcommon.Ratio
 import com.zepben.ewb.services.common.extensions.internEmpty
 import java.sql.ResultSet
 import java.time.Instant
 
+/**
+ * Get a nullable `Boolean` from the record set.
+ * @param queryIndex The index of the column to read.
+ */
 internal fun ResultSet.getNullableBoolean(queryIndex: Int): Boolean? =
     getBoolean(queryIndex).takeUnless { wasNull() }
 
+/**
+ * Get a nullable `String` from the record set.
+ * @param queryIndex The index of the column to read.
+ */
 internal fun ResultSet.getNullableString(queryIndex: Int): String? =
     getString(queryIndex).takeUnless { wasNull() }?.internEmpty()
 
+/**
+ * Get a nullable `Double` from the record set.
+ * @param queryIndex The index of the column to read.
+ */
 internal fun ResultSet.getNullableDouble(queryIndex: Int): Double? {
     // Annoyingly getDouble will return 0.0 for string values, so we need to check all 0.0's for NaN.
     val dbl = getDouble(queryIndex).takeUnless { wasNull() }
@@ -30,6 +43,10 @@ internal fun ResultSet.getNullableDouble(queryIndex: Int): Double? {
         dbl
 }
 
+/**
+ * Get a nullable `Float` from the record set.
+ * @param queryIndex The index of the column to read.
+ */
 internal fun ResultSet.getNullableFloat(queryIndex: Int): Float? {
     // Annoyingly getFloat will return 0.0 for string values, so we need to check all 0.0's for NaN.
     val float = getFloat(queryIndex).takeUnless { wasNull() }
@@ -42,11 +59,33 @@ internal fun ResultSet.getNullableFloat(queryIndex: Int): Float? {
         float
 }
 
+/**
+ * Get a nullable `Int` from the record set.
+ * @param queryIndex The index of the column to read.
+ */
 internal fun ResultSet.getNullableInt(queryIndex: Int): Int? =
     getInt(queryIndex).takeUnless { wasNull() }
 
+/**
+ * Get a nullable `Long` from the record set.
+ * @param queryIndex The index of the column to read.
+ */
 internal fun ResultSet.getNullableLong(queryIndex: Int): Long? =
     getLong(queryIndex).takeUnless { wasNull() }
 
+/**
+ * Get a nullable `Ratio` from the record set.
+ * @param numeratorIndex The index of the column to read containing the numerator.
+ * @param denominatorIndex The index of the column to read containing the denominator.
+ */
+internal fun ResultSet.getNullableRatio(numeratorIndex: Int, denominatorIndex: Int): Ratio? =
+    getNullableDouble(denominatorIndex)?.let { denominator ->
+        getNullableDouble(numeratorIndex)?.let { numerator -> Ratio(numerator, denominator) }
+    }
+
+/**
+ * Get a nullable `Instant` from the record set.
+ * @param queryIndex The index of the column to read.
+ */
 internal fun ResultSet.getInstant(queryIndex: Int): Instant? =
     getString(queryIndex).takeUnless { wasNull() }?.let { Instant.parse(it) }

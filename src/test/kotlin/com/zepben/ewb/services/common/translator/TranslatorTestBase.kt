@@ -12,12 +12,12 @@ import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvSubstation
 import com.zepben.ewb.cim.iec61968.operations.OperationalRestriction
 import com.zepben.ewb.cim.iec61970.base.core.*
-import com.zepben.ewb.database.sqlite.cim.CimDatabaseTables
-import com.zepben.ewb.database.sqlite.cim.tables.TableMetadataDataSources
-import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.core.TableNameTypes
-import com.zepben.ewb.database.sqlite.cim.tables.iec61970.base.core.TableNames
-import com.zepben.ewb.database.sqlite.common.SqliteTable
-import com.zepben.ewb.database.sqlite.common.SqliteTableVersion
+import com.zepben.ewb.database.sql.cim.CimDatabaseTables
+import com.zepben.ewb.database.sql.cim.tables.TableMetadataDataSources
+import com.zepben.ewb.database.sql.cim.tables.iec61970.base.core.TableNameTypes
+import com.zepben.ewb.database.sql.cim.tables.iec61970.base.core.TableNames
+import com.zepben.ewb.database.sql.common.tables.SqlTable
+import com.zepben.ewb.database.sql.common.tables.TableVersion
 import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.common.BaseServiceComparator
 import com.zepben.ewb.services.common.testdata.SchemaServices
@@ -61,8 +61,8 @@ internal abstract class TranslatorTestBase<S : BaseService>(
      *
      * You should add any tables for each specific database type via an appropriate override calling this base method.
      */
-    protected open val excludedTables: Set<KClass<out SqliteTable>> = setOf(
-        SqliteTableVersion::class,
+    protected open val excludedTables: Set<KClass<out SqlTable>> = setOf(
+        TableVersion::class,
         TableMetadataDataSources::class,
         TableNameTypes::class,
         TableNames::class,

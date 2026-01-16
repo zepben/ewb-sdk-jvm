@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.database.sql.extensions
 
+import com.zepben.ewb.cim.iec61968.infiec61968.infcommon.Ratio
 import org.slf4j.Logger
 import java.security.AccessController
 import java.security.PrivilegedActionException
@@ -19,6 +20,12 @@ import java.time.Instant
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.isAccessible
 
+/**
+ * Execute a [PreparedStatement] that should update exactly 1 entry.
+ *
+ * @param onError A callback which is triggered if the update fails, or updates too many records.
+ * @return true is a single record is updates, otherwise false.
+ */
 @Throws(SQLException::class)
 internal fun PreparedStatement.tryExecuteSingleUpdate(onError: () -> Unit): Boolean {
     if (executeSingleUpdate())
@@ -29,6 +36,12 @@ internal fun PreparedStatement.tryExecuteSingleUpdate(onError: () -> Unit): Bool
     return false
 }
 
+/**
+ * A helper function to log a failure when using a [PreparedStatement].
+ *
+ * @param logger The logger to use for the failure message.
+ * @param description The description of what was being written when the failure occurred.
+ */
 internal fun PreparedStatement.logFailure(logger: Logger, description: String) {
     logger.warn(
         "Failed to write $description.\n" +
@@ -37,6 +50,11 @@ internal fun PreparedStatement.logFailure(logger: Logger, description: String) {
     )
 }
 
+/**
+ * Set a column to a nullable `Boolean`.
+ * @param queryIndex The index of the column to set.
+ * @param value The value to assign to the column.
+ */
 internal fun PreparedStatement.setNullableBoolean(queryIndex: Int, value: Boolean?) {
     if (value == null)
         setNull(queryIndex, BOOLEAN)
@@ -44,6 +62,11 @@ internal fun PreparedStatement.setNullableBoolean(queryIndex: Int, value: Boolea
         setBoolean(queryIndex, value)
 }
 
+/**
+ * Set a column to a nullable `String`.
+ * @param queryIndex The index of the column to set.
+ * @param value The value to assign to the column.
+ */
 internal fun PreparedStatement.setNullableString(queryIndex: Int, value: String?) {
     when (value) {
         null -> setNull(queryIndex, VARCHAR)
@@ -51,6 +74,11 @@ internal fun PreparedStatement.setNullableString(queryIndex: Int, value: String?
     }
 }
 
+/**
+ * Set a column to a nullable `Double`.
+ * @param queryIndex The index of the column to set.
+ * @param value The value to assign to the column.
+ */
 internal fun PreparedStatement.setNullableDouble(queryIndex: Int, value: Double?) {
     when {
         value == null -> this.setNull(queryIndex, DOUBLE)
@@ -59,6 +87,11 @@ internal fun PreparedStatement.setNullableDouble(queryIndex: Int, value: Double?
     }
 }
 
+/**
+ * Set a column to a nullable `Float`.
+ * @param queryIndex The index of the column to set.
+ * @param value The value to assign to the column.
+ */
 internal fun PreparedStatement.setNullableFloat(queryIndex: Int, value: Float?) {
     when {
         value == null -> this.setNull(queryIndex, FLOAT)
@@ -67,6 +100,11 @@ internal fun PreparedStatement.setNullableFloat(queryIndex: Int, value: Float?) 
     }
 }
 
+/**
+ * Set a column to a nullable `Int`.
+ * @param queryIndex The index of the column to set.
+ * @param value The value to assign to the column.
+ */
 internal fun PreparedStatement.setNullableInt(queryIndex: Int, value: Int?) {
     if (value == null)
         this.setNull(queryIndex, INTEGER)
@@ -74,6 +112,11 @@ internal fun PreparedStatement.setNullableInt(queryIndex: Int, value: Int?) {
         this.setInt(queryIndex, value)
 }
 
+/**
+ * Set a column to a nullable `Long`.
+ * @param queryIndex The index of the column to set.
+ * @param value The value to assign to the column.
+ */
 internal fun PreparedStatement.setNullableLong(queryIndex: Int, value: Long?) {
     if (value == null)
         this.setNull(queryIndex, INTEGER)
@@ -81,6 +124,27 @@ internal fun PreparedStatement.setNullableLong(queryIndex: Int, value: Long?) {
         this.setLong(queryIndex, value)
 }
 
+/**
+ * Set a column to a nullable `Ratio`.
+ * @param numeratorIndex The index of the column to set as the numerator.
+ * @param denominatorIndex The index of the column to set as the denominator.
+ * @param value The value to assign to the columns.
+ */
+internal fun PreparedStatement.setNullableRatio(numeratorIndex: Int, denominatorIndex: Int, value: Ratio?) {
+    if (value == null) {
+        this.setNull(denominatorIndex, DOUBLE)
+        this.setNull(numeratorIndex, DOUBLE)
+    } else {
+        this.setDouble(denominatorIndex, value.denominator)
+        this.setDouble(numeratorIndex, value.numerator)
+    }
+}
+
+/**
+ * Set a column to a nullable `Instant`.
+ * @param queryIndex The index of the column to set.
+ * @param value The value to assign to the columns.
+ */
 internal fun PreparedStatement.setInstant(queryIndex: Int, value: Instant?) {
     when (value) {
         null -> setNull(queryIndex, VARCHAR)

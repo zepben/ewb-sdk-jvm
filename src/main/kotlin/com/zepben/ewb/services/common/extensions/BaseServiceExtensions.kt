@@ -10,8 +10,8 @@ package com.zepben.ewb.services.common.extensions
 
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.core.NameType
-import com.zepben.ewb.database.sqlite.common.MRIDLookupException
-import com.zepben.ewb.database.sqlite.common.NameTypeLookupException
+import com.zepben.ewb.database.sql.common.MRIDLookupException
+import com.zepben.ewb.database.sql.common.NameTypeLookupException
 import com.zepben.ewb.services.common.BaseService
 
 

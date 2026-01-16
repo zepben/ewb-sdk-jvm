@@ -22,17 +22,17 @@ import java.util.function.BiConsumer
  *
  * A function that a relay implements to protect equipment.
  *
- * @property model [ZBEX]  The protection equipment type name (manufacturer information)
- * @property reclosing [ZBEX]  True if the protection equipment is reclosing or False otherwise.
- * @property relayDelayTime [ZBEX]  The time delay from detection of abnormal conditions to relay operation in seconds.
- * @property protectionKind [ZBEX]  The kind of protection being provided by this [ProtectionRelayFunction].
- * @property directable [ZBEX]  Whether this [ProtectionRelayFunction] responds to power flow in a given direction.
- * @property powerDirection [ZBEX]  The flow of power direction used by this [ProtectionRelayFunction].
- * @property timeLimits [ZBEX]  The time limits (in seconds) for this relay function. Order of entries corresponds to the order of entries in thresholds.
- * @property thresholds [ZBEX]  The thresholds for this relay function. The order of thresholds corresponds to the order of time limits.
- * @property protectedSwitches [ZBEX]  The [ProtectedSwitch]es operated by this [ProtectionRelayFunction].
- * @property sensors [ZBEX]  The [Sensor]s for this relay function.
- * @property schemes [ZBEX]  The schemes this function operates under.
+ * @property model [ZBEX] The protection equipment type name (manufacturer information)
+ * @property reclosing [ZBEX] True if the protection equipment is reclosing or False otherwise.
+ * @property relayDelayTime [ZBEX] The time delay from detection of abnormal conditions to relay operation in seconds.
+ * @property protectionKind [ZBEX] The kind of protection being provided by this [ProtectionRelayFunction].
+ * @property directable [ZBEX] Whether this [ProtectionRelayFunction] responds to power flow in a given direction.
+ * @property powerDirection [ZBEX] The flow of power direction used by this [ProtectionRelayFunction].
+ * @property timeLimits [ZBEX] The time limits (in seconds) for this relay function. Order of entries corresponds to the order of entries in thresholds.
+ * @property thresholds [ZBEX] The thresholds for this relay function. The order of thresholds corresponds to the order of time limits.
+ * @property protectedSwitches [ZBEX] The [ProtectedSwitch]es operated by this [ProtectionRelayFunction].
+ * @property sensors [ZBEX] The [Sensor]s for this relay function.
+ * @property schemes [ZBEX] The schemes this function operates under.
  */
 @ZBEX
 abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID) {

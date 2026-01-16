@@ -13,23 +13,15 @@ import com.zepben.ewb.cim.iec61968.infiec61968.infassets.StreetlightLampKind
 
 /**
  * A Streetlight asset
+ *
+ * @property pole The [Pole] this [Streetlight] is attached to.
+ * @property lightRating Power rating of light
+ * @property lampKind The kind of lamp
  */
 class Streetlight(mRID: String) : Asset(mRID) {
 
-    /**
-     * The [Pole] this [Streetlight] is attached to.
-     */
     var pole: Pole? = null
-
-    /**
-     * Power rating of light
-     */
     var lightRating: Int? = null
-
-    /**
-     * The kind of lamp
-     */
     var lampKind: StreetlightLampKind = StreetlightLampKind.UNKNOWN
-
 
 }

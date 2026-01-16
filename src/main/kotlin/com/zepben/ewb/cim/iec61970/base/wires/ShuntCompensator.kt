@@ -31,6 +31,7 @@ import com.zepben.ewb.cim.iec61970.base.core.Terminal
  *
  *                    For [NonlinearShuntCompensator]-s shall only be set to one of the NonlinearShuntCompensatorPoint.sectionNumber.
  *                    There is no interpolation between NonlinearShuntCompensatorPoint-s.
+ * @property groundingTerminal [ZBEX] The terminal connecting to grounded network.
  */
 abstract class ShuntCompensator(mRID: String) : RegulatingCondEq(mRID) {
 

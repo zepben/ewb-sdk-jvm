@@ -28,7 +28,7 @@ import java.sql.Connection
  *
  * @property logger The [Logger] to use for this reader.
  */
-abstract class CimDatabaseReader<TTables : BaseDatabaseTables, TService : BaseService> internal constructor(
+abstract class CimDatabaseReader<TTables : CimDatabaseTables, TService : BaseService> internal constructor(
     private val connection: Connection,
     private val databaseDescription: String,
     private val databaseTables: TTables,

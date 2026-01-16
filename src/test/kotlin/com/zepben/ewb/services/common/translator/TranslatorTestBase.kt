@@ -34,7 +34,7 @@ import com.zepben.protobuf.cim.iec61970.base.core.NameType as PBNameType
 internal abstract class TranslatorTestBase<S : BaseService>(
     val createService: () -> S,
     private val comparator: BaseServiceComparator,
-    private val databaseTables: BaseDatabaseTables,
+    private val databaseTables: CimDatabaseTables,
     private val addFromPb: S.(PBNameType) -> NameType,
     private val createServiceIdentifiedObject: (IdentifiedObject) -> Any
 ) {

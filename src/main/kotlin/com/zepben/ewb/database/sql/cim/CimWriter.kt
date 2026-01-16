@@ -33,7 +33,7 @@ import java.sql.SQLException
  * @property databaseTables The tables that are available in the database.
  */
 abstract class CimWriter(
-    protected open val databaseTables: BaseDatabaseTables
+    protected open val databaseTables: CimDatabaseTables
 ) : BaseEntryWriter() {
 
     // ###################

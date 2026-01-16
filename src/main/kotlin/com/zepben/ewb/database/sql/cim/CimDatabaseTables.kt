@@ -14,14 +14,17 @@ import com.zepben.ewb.database.sql.cim.tables.iec61970.base.core.TableNames
 import com.zepben.ewb.database.sql.cim.tables.tableCimVersion
 import com.zepben.ewb.database.sql.common.BaseDatabaseTables
 import com.zepben.ewb.database.sql.common.tables.SqlTable
+import com.zepben.ewb.database.sql.common.tables.TableVersion
 
 /**
  * The base collection of tables for all our CIM databases.
  */
-abstract class CimDatabaseTables internal constructor() : BaseDatabaseTables() {
+abstract class CimDatabaseTables internal constructor(
+    tableVersion: TableVersion = tableCimVersion,
+) : BaseDatabaseTables() {
 
     override val includedTables: Sequence<SqlTable> = sequenceOf(
-        tableCimVersion,
+        tableVersion,
         TableMetadataDataSources(),
         TableNameTypes(),
         TableNames()

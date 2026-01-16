@@ -61,7 +61,6 @@ class MetricsDatabaseWriter internal constructor(
         if (modelPath == null) return true
 
         try {
-            logger.info("Ensuring model directory $modelPath exists...")
             modelPath.resolve("someFile").createParentDirectories()
         } catch (e: IOException) {
             logger.error("Could not ensure directory $modelPath exists. Please ensure the program has the correct permissions.", e)

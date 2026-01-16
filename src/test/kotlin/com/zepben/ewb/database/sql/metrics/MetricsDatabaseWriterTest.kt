@@ -116,8 +116,8 @@ internal class MetricsDatabaseWriterTest {
         val innerPath = modelPath.resolve("inner1").resolve("inner2")
 
         val success = MetricsDatabaseWriter(
-            { connection },
             tables,
+            NoOpDatabaseInitialiser { connection },
             modelPath = innerPath,
             createMetricsWriter = { writer }
         ).write(job)
@@ -134,8 +134,8 @@ internal class MetricsDatabaseWriterTest {
         modelPath.resolve("inner1").createFile()
 
         val success = MetricsDatabaseWriter(
-            { connection },
             tables,
+            NoOpDatabaseInitialiser { connection },
             modelPath = innerPath,
             createMetricsWriter = { writer }
         ).write(job)

@@ -133,7 +133,6 @@ fun ChangeSetMember.generateMRID(suffix: String): String = "${UUID.randomUUID()}
 fun ChangeSetMember.fillFields(csm: ChangeSetMember, changeSet: ChangeSet? = null): Boolean {
     val changeSet = changeSet ?: ChangeSet(generateMRID("change-set"))
     csm.apply {
-        setChangeSet(changeSet)
         targetObjectMRID = "${changeSet.mRID}-target"
     }
     return true

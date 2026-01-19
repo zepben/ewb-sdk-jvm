@@ -21,10 +21,10 @@ abstract class ChangeSetMember {
     val changeSet: ChangeSet? get() = _changeSet
     var targetObjectMRID: String? = null
 
-    fun setChangeSet(changeSet: ChangeSet) {
+    fun setChangeSet(changeSet: ChangeSet): Boolean{
         require(this._changeSet == null) { "changeSet already exists" }
-        changeSet.addChangeSetMember(this)
         this._changeSet = changeSet
+        return true
     }
 
 }

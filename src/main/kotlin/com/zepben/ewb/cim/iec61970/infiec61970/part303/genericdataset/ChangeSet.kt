@@ -20,15 +20,23 @@ import com.zepben.ewb.services.common.extensions.asUnmodifiable
  */
 class ChangeSet(mRID: String) : DataSet(mRID) {
 
-    private var _changeSetMembers: MutableList<ChangeSetMember> = mutableListOf()
+    private var _changeSetMembers: MutableSet<ChangeSetMember> = mutableSetOf()
 
-    val changeSetMembers: List<ChangeSetMember> get() = _changeSetMembers.asUnmodifiable()
+    val changeSetMembers: List<ChangeSetMember> get() = _changeSetMembers.toList().asUnmodifiable()
     var networkModelProjectStage: NetworkModelProjectStage? = null
 
 
     internal fun addChangeSetMember(member: ChangeSetMember): Boolean {
-        require(member.changeSet === this) {  // TODO: This code should never be hit, it exists incase the init of ChangeSetMember changes.
-            "${member.javaClass.simpleName} `changeSet` property references ${member.changeSet?.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
+        if (member.changeSet == null) {
+            member.setChangeSet(this)
+        } else {
+            require(member.changeSet !== this) {
+                "${member.javaClass.simpleName} `changeSet` property references ${member.changeSet?.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
+                return false
+            }
+        }
+        require(!_changeSetMembers.contains(member)) {
+            "${member.javaClass.simpleName} `changeSet` already exists in changeSetMembers."
             return false
         }
         _changeSetMembers.add(member)

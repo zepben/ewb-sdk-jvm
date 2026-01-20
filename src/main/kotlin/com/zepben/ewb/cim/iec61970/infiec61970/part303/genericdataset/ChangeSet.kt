@@ -26,7 +26,7 @@ class ChangeSet(mRID: String) : DataSet(mRID) {
     var networkModelProjectStage: NetworkModelProjectStage? = null
 
 
-    internal fun addChangeSetMember(member: ChangeSetMember): Boolean {
+    fun addChangeSetMember(member: ChangeSetMember): Boolean {
         if (member.changeSet == null) {
             member.setChangeSet(this)
         } else {

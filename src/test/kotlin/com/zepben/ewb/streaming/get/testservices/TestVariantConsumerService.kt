@@ -8,23 +8,28 @@
 
 package com.zepben.ewb.streaming.get.testservices
 
-import com.zepben.protobuf.cc.*
+import com.zepben.protobuf.dc.*
 import com.zepben.protobuf.metadata.GetMetadataRequest
 import com.zepben.protobuf.metadata.GetMetadataResponse
+import com.zepben.protobuf.vc.GetChangeSetsRequest
+import com.zepben.protobuf.vc.GetChangeSetsResponse
+import com.zepben.protobuf.vc.GetNetworkModelProjectsRequest
+import com.zepben.protobuf.vc.GetNetworkModelProjectsResponse
+import com.zepben.protobuf.vc.VariantConsumerGrpc
 import io.grpc.Status
 import io.grpc.stub.StreamObserver
 
-internal class TestCustomerConsumerService : CustomerConsumerGrpc.CustomerConsumerImplBase() {
+internal class TestVariantConsumerService : VariantConsumerGrpc.VariantConsumerImplBase() {
 
-    lateinit var onGetIdentifiedObjects: (request: GetIdentifiedObjectsRequest, response: StreamObserver<GetIdentifiedObjectsResponse>) -> Unit
-    lateinit var onGetCustomersForContainer: (request: GetCustomersForContainerRequest, response: StreamObserver<GetCustomersForContainerResponse>) -> Unit
+    lateinit var onGetNetworkModelProjects: (request: GetNetworkModelProjectsRequest, response: StreamObserver<GetNetworkModelProjectsResponse>) -> Unit
+    lateinit var onGetChangeSets: (request: GetChangeSetsRequest, response: StreamObserver<GetChangeSetsResponse>) -> Unit
     lateinit var onGetMetadataRequest: (request: GetMetadataRequest, response: StreamObserver<GetMetadataResponse>) -> Unit
 
-    override fun getIdentifiedObjects(response: StreamObserver<GetIdentifiedObjectsResponse>): StreamObserver<GetIdentifiedObjectsRequest> =
-        TestStreamObserver(response, onGetIdentifiedObjects)
+    override fun getNetworkModelProjects(response: StreamObserver<GetNetworkModelProjectsResponse>): StreamObserver<GetNetworkModelProjectsRequest> =
+        TestStreamObserver(response, onGetNetworkModelProjects)
 
-    override fun getCustomersForContainer(responseObserver: StreamObserver<GetCustomersForContainerResponse>?): StreamObserver<GetCustomersForContainerRequest> =
-        TestStreamObserver(responseObserver!!, onGetCustomersForContainer)
+    override fun getChangeSets(response: StreamObserver<GetChangeSetsResponse>): StreamObserver<GetChangeSetsRequest> =
+        TestStreamObserver(response, onGetChangeSets)
 
     override fun getMetadata(request: GetMetadataRequest, responseObserver: StreamObserver<GetMetadataResponse>) =
         runGrpc(request, responseObserver, onGetMetadataRequest)

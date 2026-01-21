@@ -464,8 +464,9 @@ internal class GrpcChannelBuilderTest {
     }
 
     @Test
-    fun testGrpcClientConnectionTests() {
-        //Doesn't actually check that they are covering all the stubs etc. but it's a start.
+    fun `Test all GRPC Clients in code are being tested`() {
+        // If this test fails, probably add your client to GRPC_CLIENT_CONNECTION_TESTS
+        // Doesn't actually check that they are covering all the stubs etc. but it's a start.
         val grpcClients = ClassPath.from(ClassLoader.getSystemClassLoader())
             .getTopLevelClassesRecursive("com.zepben.ewb")
             .asSequence()

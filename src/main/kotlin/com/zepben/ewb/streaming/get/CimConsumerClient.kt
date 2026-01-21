@@ -9,6 +9,8 @@
 package com.zepben.ewb.streaming.get
 
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.DataSet
 import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.common.meta.ServiceInfo
 import com.zepben.ewb.services.common.meta.fromPb
@@ -33,7 +35,7 @@ data class MultiObjectResult(val objects: MutableMap<String, IdentifiedObject> =
  * @property mRID The corresponding mRID of [identifiedObject]. Typically only used if [identifiedObject] is null.
  */
 data class ExtractResult(val identifiedObject: IdentifiedObject?, val mRID: String)
-
+data class DSExtractResult(val dataSet: DataSet?, val mRID: String)
 /**
  * Base class that defines some helpful functions when producer clients are sending to the server.
  *
@@ -161,7 +163,7 @@ abstract class CimConsumerClient<T : BaseService, U : BaseProtoToCim>(executor: 
         tryRpc {
             val results = mutableMapOf<String, IdentifiedObject>()
             val failed = mRIDs?.toMutableSet() ?: mutableSetOf()
-            processor().forEach { (identifiedObject, mRID) ->
+            processor().forEach { (identifiedObject, mRID): ExtractResult ->
                 identifiedObject?.let {
                     results[it.mRID] = it
                     failed.remove(it.mRID)

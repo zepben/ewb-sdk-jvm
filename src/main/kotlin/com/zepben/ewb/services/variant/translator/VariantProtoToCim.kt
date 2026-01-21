@@ -292,7 +292,7 @@ fun VariantService.addFromPb(pb: PBChangeSet): ChangeSet = toCim(pb, this)
  *
  * @property networkService The [VariantService] all converted objects should be added to.
  */
-class NetworkModelProjectProtoToCim(val networkService: VariantService) : BaseProtoToCim() {
+class VariantProtoToCim(val networkService: VariantService) : BaseProtoToCim() {
 
     /**
      * Add a converted copy of the protobuf [PBAnnotatedProjectDependency] to the [VariantService].

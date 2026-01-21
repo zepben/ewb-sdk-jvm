@@ -16,6 +16,7 @@ import com.zepben.protobuf.dc.DiagramConsumerGrpc
 import com.zepben.protobuf.nc.NetworkConsumerGrpc
 import com.zepben.protobuf.ns.QueryNetworkStateServiceGrpc
 import com.zepben.protobuf.ns.UpdateNetworkStateServiceGrpc
+import com.zepben.protobuf.vc.VariantConsumerGrpc
 import io.grpc.*
 import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder
 import io.grpc.stub.ClientCalls
@@ -49,6 +50,7 @@ internal val GRPC_CLIENT_CONNECTION_TESTS: Map<String, MethodDescriptor<CheckCon
     "NetworkConsumerClient" to NetworkConsumerGrpc.getCheckConnectionMethod(),
     "CustomerConsumerClient" to CustomerConsumerGrpc.getCheckConnectionMethod(),
     "DiagramConsumerClient" to DiagramConsumerGrpc.getCheckConnectionMethod(),
+    "VariantConsumerClient" to VariantConsumerGrpc.getCheckConnectionMethod(),
     "UpdateNetworkStateClient" to UpdateNetworkStateServiceGrpc.getCheckConnectionMethod(),
     "QueryNetworkStateClient" to QueryNetworkStateServiceGrpc.getCheckConnectionMethod(),
 )

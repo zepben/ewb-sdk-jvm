@@ -28,7 +28,7 @@ class ChangeSet(mRID: String) : DataSet(mRID) {
 
     fun addChangeSetMember(member: ChangeSetMember): Boolean {
         if (member.changeSet == null) {
-            member.setChangeSet(this)
+            member.setChangeSet(this) // TODO: handle false being returned from setChangeSet
         } else {
             require(member.changeSet !== this) {
                 "${member.javaClass.simpleName} `changeSet` property references ${member.changeSet?.typeNameAndMRID()}, expected ${typeNameAndMRID()}."

@@ -24,8 +24,7 @@ internal class ChangeSetServiceWriter(
 ) : BaseServiceWriter<VariantService>(writer) {
 
     override fun VariantService.writeService(): Boolean =
-        writeEachDataSet<ChangeSet>(writer::write).also {
-        }
+        writeEachDataSet<ChangeSet>(writer::write)
 
     private inline fun <reified T : DataSet> VariantService.writeEachDataSet(noinline writer: (T) -> Boolean): Boolean {
         var status = true

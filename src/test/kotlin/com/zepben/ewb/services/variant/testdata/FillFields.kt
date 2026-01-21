@@ -96,28 +96,22 @@ fun NetworkModelProjectStage.fillFields(service: VariantService, includeRuntime:
 fun ChangeSet.fillFields(service: VariantService, includeRuntime: Boolean = true): ChangeSet {
     (this as DataSet).fillFieldsCommon(service, includeRuntime)
 
-    if (includeRuntime) {
-        for (i in 0..3) {
-            addChangeSetMember(ObjectCreation().fillFields(service, includeRuntime))
-            addChangeSetMember(ObjectDeletion().fillFields(service, includeRuntime))
-            addChangeSetMember(
-                ObjectCreation().also {
-                    it.setChangeSet(this)
-                    it.targetObjectMRID = "${mRID}-creation-target"
-                })
-            addChangeSetMember(
-                ObjectDeletion().also {
-                    it.setChangeSet(this)
-                    it.targetObjectMRID = "$mRID-deletion-target"
-                }
-            )
-            addChangeSetMember(ObjectModification.createObjectModification(
-                changeSet = this,
-                modifiedObjectMRID = "${mRID}-modified-${i}",
-                originalObjectMRID = "${mRID}-original-${i}"
-            ))
+    addChangeSetMember(ObjectCreation().fillFields(service, includeRuntime))
+    addChangeSetMember(ObjectDeletion().fillFields(service, includeRuntime))
+    addChangeSetMember(
+        ObjectCreation().also {
+            it.targetObjectMRID = "${mRID}-creation-target"
+        })
+    addChangeSetMember(
+        ObjectDeletion().also {
+            it.targetObjectMRID = "$mRID-deletion-target"
         }
-    }
+    )
+    addChangeSetMember(ObjectModification.createObjectModification(
+        changeSet = this,
+        modifiedObjectMRID = "${mRID}-modified",
+        originalObjectMRID = "${mRID}-original"
+    ))
 
     return this
 }
@@ -140,13 +134,13 @@ fun ChangeSetMember.fillFields(csm: ChangeSetMember, changeSet: ChangeSet? = nul
 
 
 fun ObjectCreation.fillFields(service: VariantService, includeRuntime: Boolean = true): ObjectCreation =
-    this.also {
-        it.fillFields(it as ChangeSetMember)
+    ObjectCreation().also {
+        fillFields(it as ChangeSetMember)
     }
 
 fun ObjectDeletion.fillFields(service: VariantService, includeRuntime: Boolean = true): ObjectDeletion =
-    this.also {
-        it.fillFields(it as ChangeSetMember)
+    ObjectDeletion().also {
+        fillFields(it as ChangeSetMember)
     }
 
 fun ObjectModification.fillFields(service: VariantService, includeRuntime: Boolean = true): ObjectModification {

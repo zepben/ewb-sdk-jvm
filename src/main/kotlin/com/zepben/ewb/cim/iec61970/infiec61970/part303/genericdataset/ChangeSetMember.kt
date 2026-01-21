@@ -21,7 +21,7 @@ abstract class ChangeSetMember {
     val changeSet: ChangeSet? get() = _changeSet
     var targetObjectMRID: String? = null
 
-    fun setChangeSet(changeSet: ChangeSet): Boolean{
+    internal fun setChangeSet(changeSet: ChangeSet): Boolean{
         require(this._changeSet == null) { "changeSet already exists" }
         this._changeSet = changeSet
         return true

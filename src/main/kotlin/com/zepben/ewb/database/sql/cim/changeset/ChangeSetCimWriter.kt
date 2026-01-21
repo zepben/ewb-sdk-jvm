@@ -62,6 +62,14 @@ class ChangeSetCimWriter(
         changeSet.networkModelProjectStage?.let {
             insert.setNullableString(table.NETWORK_MODEL_PROJECT_STAGE_MRID.queryIndex, it.mRID)
         }
+        changeSet.changeSetMembers.forEach {
+            when (it) {
+                is ObjectCreation -> write(it)
+                is ObjectDeletion -> write(it)
+                is ObjectModification -> write(it)
+                else -> throw NotImplementedError()
+            }
+        }
 
         return writeDataSet(table, insert, changeSet, "change set")
     }

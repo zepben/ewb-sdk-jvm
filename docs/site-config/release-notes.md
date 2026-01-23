@@ -2,6 +2,7 @@
 
 | Version                  | Released              |
 | ------------------------ | --------------------- |
+|[1.4.0](#140)| `23 January 2026` |
 |[1.3.0](#130)| `23 December 2025` |
 |[1.2.0](#120)| `05 December 2025` |
 | [1.1.0](#110)            | `30 September 2025`   |
@@ -43,6 +44,29 @@
 ---
 
 NOTE: This library is not yet stable, and breaking changes should be expected until a 1.0.0 release.
+
+---
+
+## [1.4.0]
+
+### Breaking Changes
+* Major rework of the database package, mostly contained to the package internals, so if you aren't using them you should have minimal issues.
+  * Moved most sub-packages from `com.zepben.ewb.database.sqlite` and `com.zepben.ewb.database.postgres` to `com.zepben.ewb.database.sql`, so you will need to
+    update your imports.
+  * Removed `SqliteTable` and `PostregTable`, you should now just use `SqlTable`.
+
+### New Features
+* You can now pass an `SqliteGenerator` to the `*DatabaseTables` to change the target database dialect.
+* `*DatabaseWriter` can now be passed a `DatabaseInitialiser` and `DatabaseTables` (including its `SqliteGenerator`) to change the database type being written.
+
+### Enhancements
+* `MetricsDatabaseWriter.writeData()` now ensures that the target `modelPath` exists if one is supplied, creating parent directories as well if needed.
+
+### Fixes
+* None.
+
+### Notes
+* None.
 
 ---
 

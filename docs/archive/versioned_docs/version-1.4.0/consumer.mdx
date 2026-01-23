@@ -1,0 +1,580 @@
+---
+id: sdk-consumer
+title: Requesting Models
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+The SDK provides a client to request models to a remote data server via [gRPC](https://grpc.io/). The service and proto 
+definitions for this API can be found [here](https://github.com/evolve-grpc). An implementation of the consumer
+server is provided with the Evolve platform data services.
+
+When working with models, it is often impractical to load a whole model to a client due to the size of the data. This 
+is generally not a problem however, as most use cases only operate on a small subsection of the model at a time, such
+as a Feeder. So, the consumer API provides the ability to request smaller portions of the model quickly and easily.
+The other benefit to this is you can set up many clients in parallel operating on different chunks of the model to reduce
+the amount of time to run any analytics you may wish to perform across the whole model.
+
+## Connecting to a server
+
+There are many helper functions to connect to a Energy Workbench server (EWB). All authenticated connections are based on OAuth2 flows, and
+you will need to use the correct function for the configuration of the server, and for which credentials you plan to use.
+This will typically be one of the following:
+
+1. `connectInsecure()`, for unauthenticated, insecure connections. Cannot be used against a secured (HTTPS) EWB.
+1. `connectTls()`, for unauthenticated, but https connections. Can only be used if EWB is configured without auth.
+1. `connectWithPassword()`, for authenticating with a username, password, and client ID.
+1. `connectWithSecret()`, for authenticating with a client ID and secret, typically used for machine-to-machine services.
+1. `connectWithIdentity()`, for authenticating with an Azure managed identity.
+1. `connectWithAccessToken()` for authenticating with a Personal Access Token.
+1. `connectWithAccessTokenInsecure()` for authenticating using a Personal Access Token over a non-SSL/TLS connection. Cannot be used against a secured (HTTPS) EWB.
+
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+// Insecure
+try (GrpcChannel channel = Connect.connectInsecure("example.zepben.com", 443)) {
+    NetworkConsumerClient client = new NetworkConsumerClient(channel);
+    GrpcResult result = client.getEquipmentContainer("container_mrid").throwOnError();
+    NetworkService ns = client.getService();
+}
+
+// With SSL
+try (GrpcChannel channel = Connect.connectTls("example.zepben.com", 443, "ca.cert")) {
+    NetworkConsumerClient client = new NetworkConsumerClient(channel);
+    GrpcResult result = client.getEquipmentContainer("container_mrid").throwOnError();
+    NetworkService ns = client.getService();
+}
+
+// With SSL and OAuth2
+try (GrpcChannel channel = Connect.connectWithSecret(
+    "client_id",
+    "client_secret",
+    "example.zepben.com", // rpc hostname
+    443,                  // rpc port
+    "config_address",     // set to null to fetch configuration from "https://{rpc hostname}/ewb/auth"
+    "config_CA_filename", // set to null to use system CAs for fetching configuration
+    "auth_CA_filename",   // set to null to use system CAs for fetching access tokens
+    "path/to/ca.cert"     // set to null to use system CAs for server cert verification
+    )
+) {
+    NetworkConsumerClient client = new NetworkConsumerClient(channel);
+    GrpcResult result = client.getEquipmentContainer("container_mrid").throwOnError();
+    NetworkService ns = client.getService();
+}
+
+// With an Azure managed identity
+try (GrpcChannel channel = Connect.connectWithIdentity(
+    "client_id",
+    "example.zepben.com", // rpc hostname
+    443,                  // rpc port
+    "path/to/ca.cert"     // set to null to use system CAs for server cert verification
+    )
+) {
+    NetworkConsumerClient client = new NetworkConsumerClient(channel);
+    GrpcResult result = client.getEquipmentContainer("container_mrid").throwOnError();
+    NetworkService ns = client.getService();
+}
+
+// With a personal access token and SSL
+try (GrpcChannel channel = Connect.connectWithAccessToken(
+    "example.zepben.com", // rpc hostname
+    443,                  // rpc port
+    "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJhdWQiOiJzZGtfZXhhbXBsZV9hdWRpZW5jZSJ9.",  // personal access token generated from EAS
+    "path/to/ca.cert",    // set to null to use system CAs for server cert verification
+    true                  // set to false to disable cert verification, true by default
+    )
+) {
+    NetworkConsumerClient client = new NetworkConsumerClient(channel);
+    GrpcResult result = client.getEquipmentContainer("container_mrid").throwOnError();
+    NetworkService ns = client.getService();
+}
+
+// With a personal access token without SSL
+try (GrpcChannel channel = Connect.connectWithAccessTokenInsecure(
+    "example.zepben.com", // rpc hostname
+    443,                  // rpc port
+    "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJhdWQiOiJzZGtfZXhhbXBsZV9hdWRpZW5jZSJ9."  // personal access token generated from EAS
+    )
+) {
+    NetworkConsumerClient client = new NetworkConsumerClient(channel);
+    GrpcResult result = client.getEquipmentContainer("container_mrid").throwOnError();
+    NetworkService ns = client.getService();
+}
+
+// Or specify the authentication configuration directly:
+try (GrpcChannel channel = Connect.connectWithSecret(
+    "client_id",
+    "client_secret",
+    "https://evolve-ewb/",
+    "zepben.au.auth0.com",
+    "example.zepben.com", // rpc hostname
+    443,                  // rpc port
+    AuthMethod.Auth0,
+    "auth_CA_filename",   // set to null to use system CAs for fetching access tokens
+    "path/to/ca.cert"     // set to null to use system CAs for server cert verification
+    )
+) {
+    NetworkConsumerClient client = new NetworkConsumerClient(channel);
+    GrpcResult result = client.getEquipmentContainer("container_mrid").throwOnError();
+    NetworkService ns = client.getService();
+}
+
+// With SSL and client authentication
+try (GrpcChannel channel = new GrpcChannelBuilder().forAddress("example.zepben.com", 443)
+    .makeSecure("ca.cert", "certchain.pem", "private_key").build()) {
+    NetworkConsumerClient client = new NetworkConsumerClient(channel);
+    GrpcResult result = client.getEquipmentContainer("container_mrid").throwOnError();
+    NetworkService ns = client.getService();
+}
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+// Insecure
+Connect.connectInsecure("example.zepben.com", 443).use { channel ->
+    val client = NetworkConsumerClient(channel)
+    val result = client.getEquipmentContainer("container_mrid").throwOnError()
+    val ns = client.service
+}
+
+// With just SSL
+Connect.connectTls(
+    "example.zepben.com",
+    443,
+    "path/to/ca.cert",
+    true                  // set to false to disable cert verification, true by default
+).use { channel ->
+    val client = NetworkConsumerClient(channel)
+    val result = client.getEquipmentContainer("container_mrid").throwOnError()
+    val ns = client.service
+}
+
+// With SSL and OAuth2
+Connect.connectWithSecret(
+    "client_id",
+    "client_secret",
+    "example.zepben.com", // rpc hostname
+    443,                  // rpc port
+    "config_address",     // set to null to fetch configuration from "https://{rpc hostname}/ewb/auth"
+    "config_CA_filename", // Do not pass if you intend to use system CAs for fetching EWB configuration
+    "auth_CA_filename",   // Do not pass if you intend to use system CAs for fetching access tokens
+    "path/to/ca.cert"     // Do not pass if you intend to use system CAs for server cert verification
+).use { channel ->
+    val client = NetworkConsumerClient(channel)
+    val result = client.getEquipmentContainer("container_mrid").throwOnError()
+    val ns = client.service
+}
+
+// With an Azure managed identity
+Connect.connectWithIdentity(
+    "client_id",
+    "example.zepben.com", // rpc hostname
+    443,                  // rpc port
+    "path/to/ca.cert"     // Do not pass if you intend to use system CAs for server cert verification
+).use { channel ->
+     val client = NetworkConsumerClient(channel)
+     val result = client.getEquipmentContainer("container_mrid").throwOnError()
+     val ns = client.service
+}
+
+// With a personal access token and SSL
+Connect.connectWithAccessToken(
+    "example.zepben.com", // rpc hostname
+    443,                  // rpc port
+    "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJhdWQiOiJzZGtfZXhhbXBsZV9hdWRpZW5jZSJ9.",  // personal access token generated from EAS
+    "path/to/ca.cert"     // Do not pass if you intend to use system CAs for server cert verification
+).use { channel ->
+     val client = NetworkConsumerClient(channel)
+     val result = client.getEquipmentContainer("container_mrid").throwOnError()
+     val ns = client.service
+}
+
+// With a personal access token but without SSL
+Connect.connectWithAccessTokenInsecure(
+    "example.zepben.com", // rpc hostname
+    443,                  // rpc port
+    "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJhdWQiOiJzZGtfZXhhbXBsZV9hdWRpZW5jZSJ9." // personal access token generated from EAS
+).use { channel ->
+     val client = NetworkConsumerClient(channel)
+     val result = client.getEquipmentContainer("container_mrid").throwOnError()
+     val ns = client.service
+}
+
+// Or specify the authentication configuration directly:
+Connect.connectWithSecret(
+    "client_id",
+    "client_secret",
+    "https://evolve-ewb/",
+    "zepben.au.auth0.com",
+    "example.zepben.com", // rpc hostname
+    443,                  // rpc port
+    AuthMethod.Auth0,
+    "auth_CA_filename",   // Do not pass if you intend to use system CAs for fetching access tokens
+    "path/to/ca.cert"     // Do not pass if you intend to use system CAs for server cert verification
+).use { channel ->
+    val client = NetworkConsumerClient(channel)
+    val result = client.getEquipmentContainer("container_mrid").throwOnError()
+    val ns = client.service
+}
+
+// With SSL and client authentication
+GrpcChannelBuilder().forAddress("example.zepben.com", 443).makeSecure("ca.cert", "certchain.pem", "private_key").build().use { channel ->
+    val client = NetworkConsumerClient(channel)
+    val result = client.getEquipmentContainer("container_mrid").throwOnError()
+    val ns = client.service
+}
+```
+
+</TabItem>
+</Tabs>
+
+### Specifying gRPC build args
+
+The `connect` functions listed above also allow passing `GrpcBuildArgs`, which provides some options for managing the underlying connection:
+
+1. `skipConnectionTest`: Will skip the initial connection test on the channel. Instead the connection will be lazily established upon the first query.1
+2. `debugConnectionTest`: If set to true will provide all errors found during the connection test. A lot of this may be noise, as it's only expected that at least one test succeeds.
+3. `connectionTestTimeoutMs`: The time in milliseconds to wait for the connection test to complete. Conservatively defaults to 10 seconds.
+4. `maxInboundMessageSize`: The maximum size of a protobuf message that can be received via gRPC calls. Conservatively defaults to 20 megabytes.
+
+You can specify these settings like so:
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+// With a personal access token and SSL
+try (GrpcChannel channel = Connect.connectWithAccessToken(
+    "example.zepben.com", // rpc hostname
+    443,                  // rpc port
+    "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJhdWQiOiJzZGtfZXhhbXBsZV9hdWRpZW5jZSJ9.",  // personal access token generated from EAS
+    "path/to/ca.cert",     // set to null to use system CAs for server cert verification
+    new GrpcBuildArgs(true, false, 0, 1024 * 1024 * 40)   // Specify to skip connection tests, change connection test timeout to 0, and increase max message size to 40mb.
+    )
+) {
+    NetworkConsumerClient client = new NetworkConsumerClient(channel);
+    GrpcResult result = client.getEquipmentContainer("container_mrid").throwOnError();
+    NetworkService ns = client.getService();
+}
+
+
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+Connect.connectWithAccessToken(
+    "example.zepben.com", // rpc hostname
+    443,                  // rpc port
+    "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJhdWQiOiJzZGtfZXhhbXBsZV9hdWRpZW5jZSJ9.",  // personal access token generated from EAS
+    "path/to/ca.cert",     // Do not pass if you intend to use system CAs for server cert verification
+    GrpcBuildArgs(skipConnectionTest=true, debugConnectionTest=false, connectionTestTimeoutMs=5000, maxInboundMessageSize=1024 * 1024 * 40)  // Specify to skip connection tests, change connection test timeout to 0, and increase max message size to 40mb.
+).use { channel ->
+     val client = NetworkConsumerClient(channel)
+     val result = client.getEquipmentContainer("container_mrid").throwOnError()
+     val ns = client.service
+}
+
+```
+
+</TabItem>
+</Tabs>
+
+
+## Network Hierarchy
+
+The network can be built with a hierarchy as discussed earlier [here](datamodel.mdx#network-hierarchy). This allows you
+to easily identify and request smaller chunks of the network, so you can focus on areas of concern.
+
+The default `getNetworkHierarchy()` called below will retrieve the network hierarchy from GeographicalRegions down to the level of Feeder,
+and will pretty print the result as a tree, with indentation indicating the level of each container in the hierarchy.
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+void printNetworkHierarchy(NetworkConsumerClient client) {
+    NetworkHierarchy hierarchy = client.getNetworkHierarchy().getResult();
+    if (hierarchy == null)
+        return;
+
+    hierarchy.getGeographicalRegions().forEach(region -> {
+        System.out.println(String.format("- %s [%s]", region.getName(), region.getMRID()));
+        region.getSubGeographicalRegions().forEach(subRegion -> {
+            System.out.println(String.format("  |- %s [%s]", subRegion.getName(), subRegion.getMRID()));
+            subRegion.getSubstations().forEach(substation -> {
+                System.out.println(String.format("    |- %s [%s]", substation.getName(), substation.getMRID()));
+                substation.getFeeders()forEach(feeder -> {}
+                    System.out.println(String.format("      |- %s [%s]", feeder.getName(), feeder.getMRID()));
+                });
+            });
+        });
+    });
+}
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+fun printNetworkHierarchy(client: NetworkConsumerClient) {
+    val hierarchy: NetworkHierarchy = client.getNetworkHierarchy().result ?: return
+    hierarchy.geographicalRegions.values.forEach { region ->
+        println("- ${region.name} [${region.mRID}]")
+        region.subGeographicalRegions.forEach { subRegion ->
+            println("  |- ${subRegion.name} [${subRegion.mRID}]")
+            subRegion.substations.forEach { substation ->
+                println("    |- ${substation.name} [${substation.mRID}]")
+                substation.feeders.forEach { feeder ->
+                    println("      |- ${feeder.name} [${feeder.mRID}]")
+                }
+            }
+        }
+    }
+}
+```
+
+</TabItem>
+</Tabs>
+
+Each item from the hierarchy result contains an identified object mRID and its name. This simplified data structure
+enables you to do things like easily build a suitable UI component allowing a user to select a portion of the network
+they wish to use, without needing to pull back large amounts of full object data.
+
+Clients can also request a subset of the NetworkHierarchy, if you are only interested in specific types of containers. For example,
+to only include `Feeders` and `LvFeeders`, you could make the following request:
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+void printNetworkHierarchy(NetworkConsumerClient client) {
+    NetworkHierarchy hierarchy = client.getNetworkHierarchy( false, false, false, true, false, false, false, true).throwOnError().getResult();
+    if (hierarchy == null)
+        return;
+    hierarchy.getFeeders().values().forEach(feeder -> {}
+        System.out.println(String.format("      |- %s [%s]", feeder.getName(), feeder.getMRID()));
+        feeder.getNormalEnergizedLvFeeders().forEach(lvFeeder -> {}
+            System.out.println(String.format("          |- %s [%s]", lvFeeder.getName(), lvFeeder.getMRID()));
+        });
+    });
+}
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+fun printNetworkHierarchy(client: NetworkConsumerClient) {
+    val hierarchy: NetworkHierarchy = client.getNetworkHierarchy(
+       includeGeographicalRegions = false,
+       includeSubgeographicalRegions = false,
+       includeSubstations = false,
+       includeFeeders = true,
+       includeCircuits = false,
+       includeLoops = false,
+       includeLvSubstations = false,
+       includeLvFeeders = true
+    ).throwOnError().result!!
+
+    hierarchy.feeders.values.forEach { feeder ->
+        println("      |- ${feeder.name} [${feeder.mRID}]")
+        feeder.normalEnergizedLvFeeders.forEach { lvFeeder ->
+            println("          |- ${lvFeeder.name} [${lvFeeder.mRID}]")
+        }
+    }
+}
+```
+
+</TabItem>
+</Tabs>
+
+:::warning
+The NetworkHierarchy is one protobuf message, and on a large network can be significant in size. There is a maximum default message size limit of 20mb, at which point
+the request will fail. If you are breaching this request size, you can try making multiple calls to `getNetworkHierarchy()` to break it into separate messages.
+Note that in terms of quantity, LvFeeders and LvSubstations tend to be the largest collections, with generally an order of magnitude more entries than Feeders,
+which is typically the next largest.
+
+## Requesting Identified Objects
+
+:::warning
+The *ConsumerClient APIs will take care of this for you, and you typically only need these functions if you're
+developing the consumer client APIs themselves. Make sure what you want to achieve isn't already covered by the
+API before delving into this code.
+:::
+
+Identified objects can be requested to build a model client side. When identified objects are loaded, any referenced
+objects that have not been previously requested need to be requested explicitly.
+
+To find the mRIDs of any references that need to be requested you can use the [deferred reference](services.mdx#deferred-references) 
+functions on the service provided when requesting identified objects.
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+void getWithBaseVoltage(NetworkService service, NetworkConsumerClient client, String mrid) {
+    IdentifiedObject equipment = client.getIdentifiedObject(service, mrid).getResult();
+    if (equipment == null || !(equipment instanceof ConductingEquipment)) {
+        return;
+    }
+    
+    Set<String> mrids = service.getUnresolvedReferenceMrids(Resolvers.baseVoltage(equipment));
+    if (!mrids.isEmpty()) {
+        client.getIdentifiedObject(service, mrids.iterator().next());
+    }
+}
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+fun getWithBaseVoltage(service: NetworkService, client: NetworkConsumerClient, mrid: String) {
+    val equipment = client.getIdentifiedObject(service, mrid).result
+    if (equipment == null || equipment !is ConductingEquipment) {
+        return
+    }
+
+    service.getUnresolvedReferenceMrids(Resolvers.baseVoltage(equipment)).firstOrNull()
+        ?.let { client.getIdentifiedObject(service, it) }
+}
+```
+
+</TabItem>
+</Tabs>
+
+You can also query the services UnresolvedReferences in the following ways:
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+String mrid = "feeder1";
+
+// To get unresolved references pointing from `equipment` to other objects
+List<UnresolvedReferences> references = service.getUnresolvedReferencesFrom(mrid);
+
+for (UnresolvedReference ref: references) {
+    client.getIdentifiedObject(service, ref.toMrid)
+}
+
+// To get unresolved references pointing to `equipment`
+references = service.getUnresolvedReferencesFrom(mrid);
+
+for (UnresolvedReference ref: references) {
+    client.getIdentifiedObject(service, ref.from.mRID)
+}
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+val mrid = "feeder1"
+
+service.getUnresolvedReferencesFrom(mrid).forEach {
+    client.getIdentifiedObject(service, ref.toMrid)
+}
+
+service.getUnresolvedReferencesTo(mrid).forEach {
+    client.getIdentifiedObject(service, ref.from.mRID)
+}
+```
+
+</TabItem>
+</Tabs>
+
+## Service metadata
+
+Metadata about the servers title, version, and data sources can be retrieved via the `getMetadata()` call.
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+ServiceInfo serviceInfo = client.getMetadata();
+
+System.out.println(serviceInfo.title);
+
+System.out.println("Data sources:");
+for (DataSource ds : serviceInfo.dataSources) {
+    System.out.println("  " + ds.title);
+    System.out.println("  " + ds.version);
+    System.out.println("  " + ds.timestamp);
+}
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+val serviceInfo = client.getMetadata()
+println(serviceInfo.title)
+
+println("Data sources:")
+serviceInfo.dataSources.forEach {
+    println("  ${ds.title}")
+    println("  ${ds.version}")
+    println("  ${ds.timestamp}")
+}
+```
+
+</TabItem>
+</Tabs>

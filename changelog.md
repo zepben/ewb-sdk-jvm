@@ -1,4 +1,20 @@
 # Zepben EWB SDK changelog
+## [1.5.0] - UNRELEASED
+### Breaking Changes
+* None.
+
+### New Features
+* None.
+
+### Enhancements
+* None.
+
+### Fixes
+* None.
+
+### Notes
+* None.
+
 ## [1.4.0] - 2026-01-23
 ### Breaking Changes
 * Major rework of the database package, mostly contained to the package internals, so if you aren't using them you should have minimal issues.

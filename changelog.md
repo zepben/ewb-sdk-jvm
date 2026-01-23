@@ -1,5 +1,5 @@
 # Zepben EWB SDK changelog
-## [1.4.0] - UNRELEASED
+## [1.4.0] - 2026-01-23
 ### Breaking Changes
 * Major rework of the database package, mostly contained to the package internals, so if you aren't using them you should have minimal issues.
   * Moved most sub-packages from `com.zepben.ewb.database.sqlite` and `com.zepben.ewb.database.postgres` to `com.zepben.ewb.database.sql`, so you will need to

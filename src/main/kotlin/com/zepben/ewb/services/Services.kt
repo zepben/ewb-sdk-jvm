@@ -9,6 +9,9 @@
 package com.zepben.ewb.services
 
 import com.zepben.ewb.annotations.ZepbenExperimental
+import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.ewb.cim.iec61970.base.core.NameType
+import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.customer.CustomerService
 import com.zepben.ewb.services.diagram.DiagramService
 import com.zepben.ewb.services.network.NetworkService
@@ -55,14 +58,39 @@ open class Services @ZepbenExperimental constructor(
     open operator fun component3(): CustomerService = customerService
 
     /**
-     * Accessor of the [customerDiagramService] to allow for destructuring.
-     */
-    @OptIn(ZepbenExperimental::class)
-    open operator fun component4(): DiagramService = customerDiagramService
-
-    /**
      * Accessor of the [variantService] to allow for destructuring.
      */
     operator fun component4(): VariantService = variantService
 
+    /**
+     * Accessor of the [customerDiagramService] to allow for destructuring.
+     */
+    @OptIn(ZepbenExperimental::class)
+    open operator fun component5(): DiagramService = customerDiagramService
+
+    /*
+     * Check all available services for [mRID].
+     *
+     * @param mRID The [IdentifiedObject] with this [mRID] to retrieve.
+     * @return The [IdentifiedObject], or null if a matching [IdentifiedObject] could not be found in any service.
+     * @throws ClassCastException if the [IdentifiedObject] exists but is not of the specified type [T].
+     */
+    @OptIn(ZepbenExperimental::class)
+    inline operator fun <reified T : IdentifiedObject> get(mRID: String?): T? {
+        return networkService.get(T::class, mRID)
+            ?: diagramService.get(T::class, mRID)
+            ?: customerService.get(T::class, mRID)
+            ?: customerDiagramService.get(T::class, mRID)
+    }
+
+    /**
+     * Retrieve the service that contains a particular [IdentifiedObject] with the given [mRID].
+     *
+     * @param mRID The [IdentifiedObject] with this [mRID] to look for.
+     * @return The relevant service, or null if a matching [IdentifiedObject] could not be found in any service.
+     */
+    @OptIn(ZepbenExperimental::class)
+    fun which(mRID: String): BaseService? {
+        return networkService.takeIf { it.contains(mRID) } ?: diagramService.takeIf { it.contains(mRID) } ?: customerService.takeIf { it.contains(mRID) } ?: customerDiagramService.takeIf { it.contains(mRID) }
+    }
 }

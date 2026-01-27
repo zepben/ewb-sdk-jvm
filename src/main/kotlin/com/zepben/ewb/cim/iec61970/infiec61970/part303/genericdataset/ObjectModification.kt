@@ -10,12 +10,11 @@ package com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset
 
 /**
  * An object already exists and is to be modified.
+ *
+ * @property objectReverseModification ObjectReverseModification specifying precondition properties for a preconditioned update.
  */
 class ObjectModification : ChangeSetMember() {
 
-    /**
-     * ObjectReverseModification specifying precondition properties for a preconditioned update.
-     */
     var objectReverseModification: ObjectReverseModification? = null
 
     fun setObjectReverseModification(targetObjectMRID: String): ObjectModification {

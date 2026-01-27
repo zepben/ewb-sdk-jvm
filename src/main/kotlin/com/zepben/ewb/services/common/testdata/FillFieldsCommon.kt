@@ -14,7 +14,6 @@ import com.zepben.ewb.cim.iec61968.common.OrganisationRole
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.core.NameType
 import com.zepben.ewb.services.common.BaseService
-import org.hamcrest.MatcherAssert.assertThat
 import java.time.Instant
 import java.util.*
 
@@ -51,7 +50,7 @@ fun OrganisationRole.fillFieldsCommon(service: BaseService, includeRuntime: Bool
     (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
 
     organisation = Organisation(generateId()).also {
-        assertThat("Initial tryAdd should return true", service.tryAdd(it))
+        require(service.tryAdd(it)) {"Initial tryAdd should return true" }
     }
 
     return this

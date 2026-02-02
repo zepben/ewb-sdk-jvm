@@ -11,6 +11,7 @@ package com.zepben.ewb.database.sql.metrics
 import com.zepben.ewb.database.sql.common.tables.TableVersion
 import com.zepben.ewb.database.sql.initialisers.NoOpDatabaseInitialiser
 import com.zepben.ewb.metrics.IngestionJob
+import com.zepben.ewb.metrics.variants.VariantMetrics
 import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.every
 import io.mockk.justRun
@@ -56,8 +57,9 @@ internal class MetricsDatabaseWriterTest {
     private val uuid = UUID.randomUUID()
     private val job = IngestionJob(uuid, mockk())
 
-    private val writer = mockk<MetricsWriter> {
-        every { write(any()) } returns true
+    private val writer = mockk<MetricsServiceWriter> {
+        every { write(any<VariantMetrics>()) } returns true
+        every { write(any<IngestionJob>()) } returns true
     }
 
     @Test
@@ -66,7 +68,7 @@ internal class MetricsDatabaseWriterTest {
             tables,
             connectionyStuff,
             modelPath = null,
-            createMetricsServiceWriter = { writer }
+            createMetricsWriter = { writer }
         ).write(job)
 
         assertThat("Should have written successfully", result)
@@ -81,7 +83,7 @@ internal class MetricsDatabaseWriterTest {
             tables,
             connectionyStuff,
             modelPath = modelPath,
-            createMetricsServiceWriter = { writer }
+            createMetricsWriter = { writer }
         ).write(job)
 
         assertThat("Job ID file should exist", modelPath.resolve("$uuid.${JOB_ID_FILE_EXTENSION}").exists())
@@ -101,7 +103,7 @@ internal class MetricsDatabaseWriterTest {
             tables,
             connectionyStuff,
             modelPath = modelPath,
-            createMetricsServiceWriter = { writer }
+            createMetricsWriter = { writer }
         ).write(job)
 
         assertThat("Old job ID file should be deleted", modelPath.resolve("$uuid2.${JOB_ID_FILE_EXTENSION}").notExists())
@@ -119,7 +121,7 @@ internal class MetricsDatabaseWriterTest {
             tables,
             NoOpDatabaseInitialiser { connection },
             modelPath = innerPath,
-            createMetricsServiceWriter = { writer }
+            createMetricsWriter = { writer }
         ).write(job)
 
         assertThat("write should be successful", success)
@@ -137,7 +139,7 @@ internal class MetricsDatabaseWriterTest {
             tables,
             NoOpDatabaseInitialiser { connection },
             modelPath = innerPath,
-            createMetricsServiceWriter = { writer }
+            createMetricsWriter = { writer }
         ).write(job)
 
         assertThat("write should be unsuccessful", !success)

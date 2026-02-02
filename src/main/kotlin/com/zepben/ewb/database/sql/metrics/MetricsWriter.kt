@@ -21,9 +21,9 @@ import com.zepben.ewb.metrics.variants.VariantMetrics
 internal class MetricsWriter(
     databaseTables: MetricsDatabaseTables,
     private val writer: MetricsEntryWriter = MetricsEntryWriter(databaseTables)
-) : BaseCollectionWriter<IngestionJob>() {
+) : BaseCollectionWriter() {
 
-    override fun write(data: IngestionJob): Boolean =
+    fun write(data: IngestionJob): Boolean =
         writer.write(data.id, data.metadata) and
             writeEach(data.sources.entries, { writer.writeSource(data.id, it) }) { jobSource, e ->
                 logger.error("Failed to write job source $jobSource: ${e.message}")
@@ -32,4 +32,8 @@ internal class MetricsWriter(
                 logger.error("Failed to write metric $metric: ${e.message}")
             }
 
+    fun write(data: VariantMetrics): Boolean =
+        writeEach(data.metrics, { writer.writeVariantMetricEntry(data.networkModelProjectId, data.networkModelProjectStageId, data.baseModelVersion, it) }) { metricEntry, e ->
+            logger.error("Failed to write metric entry $metricEntry: ${e.message}")
+        }
 }

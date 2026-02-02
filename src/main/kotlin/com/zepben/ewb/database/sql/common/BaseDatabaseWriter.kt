@@ -14,6 +14,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.sql.Connection
 import java.sql.SQLException
+import kotlin.reflect.KClass
 
 /**
  * A base class for writing objects to one of our databases.
@@ -22,21 +23,14 @@ import java.sql.SQLException
  * @property databaseTables The tables to create in the database.
  * @property databaseInitialiser The hooks used to initilise the database.
  */
-abstract class BaseDatabaseWriter<TTables : BaseDatabaseTables, T> internal constructor() {
+abstract class BaseDatabaseWriter<TTables : BaseDatabaseTables> internal constructor() {
 
     protected val logger: Logger = LoggerFactory.getLogger(javaClass)
 
     protected abstract val databaseTables: TTables
     protected abstract val databaseInitialiser: DatabaseInitialiser<TTables>
 
-    /**
-     * Write to the database.
-     *
-     * @param data The data to write to the database.
-     *
-     * @return true if the database was successfully written, otherwise false.
-     */
-    fun write(data: T): Boolean {
+    protected fun connectAndWrite(doWrite: () -> Boolean): Boolean {
         try {
             if (!databaseInitialiser.beforeConnect(logger))
                 return false
@@ -45,7 +39,7 @@ abstract class BaseDatabaseWriter<TTables : BaseDatabaseTables, T> internal cons
                 databaseInitialiser.afterConnectBeforePrepare(connection, databaseTables, logger)
                     && versionMatches(connection)
                     && prepareInsertStatements(connection)
-                    && writeData(data)
+                    && doWrite()
                     && databaseInitialiser.afterWriteBeforeCommit(connection, databaseTables, logger)
                     && commit(connection)
             }
@@ -60,6 +54,13 @@ abstract class BaseDatabaseWriter<TTables : BaseDatabaseTables, T> internal cons
             }
         }
     }
+    /**
+     * Write to the database.
+     *
+     * @param data The data to write to the database.
+     *
+     * @return true if the database was successfully written, otherwise false.
+     */
 
     /**
      * Write the actual data to the database.
@@ -67,7 +68,7 @@ abstract class BaseDatabaseWriter<TTables : BaseDatabaseTables, T> internal cons
      * @param data The data to write.
      * @return true if the processing was successful, otherwise false.
      */
-    protected abstract fun writeData(data: T): Boolean
+
 
     private fun connect(): Connection {
         logger.info("Connecting to database...")

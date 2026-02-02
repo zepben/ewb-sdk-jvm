@@ -22,9 +22,9 @@ import com.zepben.ewb.services.common.extensions.typeNameAndMRID
  */
 internal abstract class BaseServiceWriter<TService : BaseService>(
     protected open val writer: CimWriter
-) : BaseCollectionWriter<TService>() {
+) : BaseCollectionWriter() {
 
-    final override fun write(data: TService): Boolean =
+    fun write(data: TService): Boolean =
         data.writeNameTypes() and
             data.writeService()
 

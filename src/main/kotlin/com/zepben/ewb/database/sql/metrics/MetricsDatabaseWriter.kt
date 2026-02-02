@@ -12,6 +12,7 @@ import com.zepben.ewb.database.sql.common.BaseDatabaseWriter
 import com.zepben.ewb.database.sql.initialisers.DatabaseInitialiser
 import com.zepben.ewb.database.sql.initialisers.NoOpDatabaseInitialiser
 import com.zepben.ewb.metrics.IngestionJob
+import com.zepben.ewb.metrics.variants.VariantMetrics
 import com.zepben.ewb.services.metrics.MetricsService
 import java.io.IOException
 import java.nio.file.Path
@@ -30,14 +31,14 @@ internal const val JOB_ID_FILE_EXTENSION = "zjid"
  * @property databaseInitialiser The hooks used to initilise the database.
  * @param modelPath The directory containing the output model files for the ingestion job. If specified, a file will be created in this directory and
  *                  named using the UUID of the ingestion job.
- * @param createMetricsServiceWriter Factory for creating the [MetricsServiceWriter] to use.
+ * @param createMetricsWriter Factory for creating the [MetricsServiceWriter] to use.
  */
 class MetricsDatabaseWriter internal constructor(
     override val databaseTables: MetricsDatabaseTables,
     override val databaseInitialiser: DatabaseInitialiser<MetricsDatabaseTables>,
     private val modelPath: Path?,
-    private val createMetricsServiceWriter: (MetricsDatabaseTables) -> MetricsServiceWriter,
-) : BaseDatabaseWriter<MetricsDatabaseTables, MetricsService>() {
+    private val createMetricsWriter: (MetricsDatabaseTables) -> MetricsWriter,
+) : BaseDatabaseWriter<MetricsDatabaseTables>() {
 
     /**
      * @param getConnection Provider of the connection to the metrics database.
@@ -52,7 +53,7 @@ class MetricsDatabaseWriter internal constructor(
         MetricsDatabaseTables(),
         NoOpDatabaseInitialiser(getConnection),
         modelPath,
-        { MetricsServiceWriter(it) },
+        { MetricsWriter(it) },
     )
 
     /**
@@ -61,12 +62,9 @@ class MetricsDatabaseWriter internal constructor(
      * @param data The [MetricsService] to write.
      * @return true if the [MetricsService] was successfully written, otherwise false.
      */
-    override fun writeData(data: MetricsService): Boolean {
-        var successful = true
-        if (createMetricsServiceWriter(databaseTables).write(data))
-            data.ingestionJobs.forEach { if (!createJobIdFile(it)) successful = false }
-        return successful
-    }
+    fun write(data: IngestionJob): Boolean = connectAndWrite { createMetricsWriter(databaseTables).write(data) } && createJobIdFile(data)
+
+    fun write(data: VariantMetrics): Boolean = connectAndWrite { createMetricsWriter(databaseTables).write(data) }
 
     private fun createJobIdFile(job: IngestionJob): Boolean {
         if (modelPath == null) return true

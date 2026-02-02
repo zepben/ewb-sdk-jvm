@@ -86,6 +86,11 @@ class Column internal constructor(
          */
         BYTES(sqlite = "BLOB", postgres = "BYTEA"),
 
+        /**
+         * The column stores a JSONB.
+         */
+        JSON(sqlite = "TEXT", postgres = "JSONB"),
+
     }
 
     init {

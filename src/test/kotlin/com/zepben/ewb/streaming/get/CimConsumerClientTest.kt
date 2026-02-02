@@ -19,9 +19,13 @@ import io.mockk.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
+import java.util.concurrent.ExecutorService
 import com.zepben.protobuf.metadata.ServiceInfo as PBServiceInfo
 
 internal class TestCimConsumerClient {
+
+    abstract class Layer(executor: ExecutorService?) : CimConsumerClient<BaseService, BaseProtoToCim>(executor) {
+    }
 
     private val baseConsumerClient = mockk<CimConsumerClient<BaseService, BaseProtoToCim>>()
 

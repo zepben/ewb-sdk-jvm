@@ -66,7 +66,7 @@ internal class MetricsDatabaseWriterTest {
             tables,
             connectionyStuff,
             modelPath = null,
-            createMetricsWriter = { writer }
+            createMetricsServiceWriter = { writer }
         ).write(job)
 
         assertThat("Should have written successfully", result)
@@ -81,7 +81,7 @@ internal class MetricsDatabaseWriterTest {
             tables,
             connectionyStuff,
             modelPath = modelPath,
-            createMetricsWriter = { writer }
+            createMetricsServiceWriter = { writer }
         ).write(job)
 
         assertThat("Job ID file should exist", modelPath.resolve("$uuid.${JOB_ID_FILE_EXTENSION}").exists())
@@ -101,7 +101,7 @@ internal class MetricsDatabaseWriterTest {
             tables,
             connectionyStuff,
             modelPath = modelPath,
-            createMetricsWriter = { writer }
+            createMetricsServiceWriter = { writer }
         ).write(job)
 
         assertThat("Old job ID file should be deleted", modelPath.resolve("$uuid2.${JOB_ID_FILE_EXTENSION}").notExists())
@@ -119,7 +119,7 @@ internal class MetricsDatabaseWriterTest {
             tables,
             NoOpDatabaseInitialiser { connection },
             modelPath = innerPath,
-            createMetricsWriter = { writer }
+            createMetricsServiceWriter = { writer }
         ).write(job)
 
         assertThat("write should be successful", success)
@@ -137,7 +137,7 @@ internal class MetricsDatabaseWriterTest {
             tables,
             NoOpDatabaseInitialiser { connection },
             modelPath = innerPath,
-            createMetricsWriter = { writer }
+            createMetricsServiceWriter = { writer }
         ).write(job)
 
         assertThat("write should be unsuccessful", !success)

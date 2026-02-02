@@ -12,6 +12,7 @@ import com.zepben.ewb.database.sql.common.BaseDatabaseWriter
 import com.zepben.ewb.database.sql.initialisers.DatabaseInitialiser
 import com.zepben.ewb.database.sql.initialisers.NoOpDatabaseInitialiser
 import com.zepben.ewb.metrics.IngestionJob
+import com.zepben.ewb.services.metrics.MetricsService
 import java.io.IOException
 import java.nio.file.Path
 import java.sql.Connection
@@ -29,19 +30,19 @@ internal const val JOB_ID_FILE_EXTENSION = "zjid"
  * @property databaseInitialiser The hooks used to initilise the database.
  * @param modelPath The directory containing the output model files for the ingestion job. If specified, a file will be created in this directory and
  *                  named using the UUID of the ingestion job.
- * @param createMetricsWriter Factory for creating the [MetricsWriter] to use.
+ * @param createMetricsServiceWriter Factory for creating the [MetricsServiceWriter] to use.
  */
 class MetricsDatabaseWriter internal constructor(
     override val databaseTables: MetricsDatabaseTables,
     override val databaseInitialiser: DatabaseInitialiser<MetricsDatabaseTables>,
     private val modelPath: Path?,
-    private val createMetricsWriter: (MetricsDatabaseTables) -> MetricsWriter,
-) : BaseDatabaseWriter<MetricsDatabaseTables, IngestionJob>() {
+    private val createMetricsServiceWriter: (MetricsDatabaseTables) -> MetricsServiceWriter,
+) : BaseDatabaseWriter<MetricsDatabaseTables, MetricsService>() {
 
     /**
      * @param getConnection Provider of the connection to the metrics database.
-     * @param modelPath The directory containing the output model files for the ingestion job. If specified, a file will be created in this directory and
-     *                  named using the UUID of the ingestion job.
+     * @param modelPath The directory containing the output model files for the ingestion jobs. If specified, a file will be created in this directory for each
+     *                  injection job in the metrics service and named using the UUID of the ingestion job.
      */
     @JvmOverloads
     constructor(
@@ -51,16 +52,21 @@ class MetricsDatabaseWriter internal constructor(
         MetricsDatabaseTables(),
         NoOpDatabaseInitialiser(getConnection),
         modelPath,
-        { MetricsWriter(it) },
+        { MetricsServiceWriter(it) },
     )
 
     /**
      * Write the ingestion job (and associated data).
      *
-     * @param data The [IngestionJob] to write.
-     * @return true if the [IngestionJob] was successfully written, otherwise false.
+     * @param data The [MetricsService] to write.
+     * @return true if the [MetricsService] was successfully written, otherwise false.
      */
-    override fun writeData(data: IngestionJob): Boolean = createMetricsWriter(databaseTables).write(data) && createJobIdFile(data)
+    override fun writeData(data: MetricsService): Boolean {
+        var successful = true
+        if (createMetricsServiceWriter(databaseTables).write(data))
+            data.ingestionJobs.forEach { if (!createJobIdFile(it)) successful = false }
+        return successful
+    }
 
     private fun createJobIdFile(job: IngestionJob): Boolean {
         if (modelPath == null) return true

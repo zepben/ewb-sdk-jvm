@@ -13,7 +13,9 @@ import com.zepben.ewb.database.sql.extensions.setNullableString
 import com.zepben.ewb.database.sql.metrics.tables.TableJobSources
 import com.zepben.ewb.database.sql.metrics.tables.TableJobs
 import com.zepben.ewb.database.sql.metrics.tables.TableNetworkContainerMetrics
+import com.zepben.ewb.database.sql.metrics.tables.TableVariantMetrics
 import com.zepben.ewb.metrics.*
+import com.zepben.ewb.metrics.variants.VariantMetricEntry
 import java.sql.Timestamp
 import java.sql.Types.VARCHAR
 import java.util.*
@@ -101,6 +103,34 @@ internal class MetricsEntryWriter(
         }
 
         return insert.executeBatch().none { it < 0 }
+    }
+
+    /**
+     * Write a [VariantMetricEntry] to the `variant_metrics` table.
+     *
+     * @param variantMetricEntry A single Variant Metric entry. // TODO: Think
+     * @return true if the [VariantMetricEntry] was written successfully.
+     */
+    fun writeVariantMetricEntry(
+        networkModelProjectId: UUID,
+        networkModelProjectStageId: UUID,
+        baseModelVersion: String,
+        variantMetricEntry: VariantMetricEntry
+    ): Boolean {
+        val table = databaseTables.getTable<TableVariantMetrics>()
+        val insert = databaseTables.getInsert<TableVariantMetrics>()
+
+
+        insert.setObject(table.NETWORK_MODEL_PROJECT_ID.queryIndex, networkModelProjectId)
+        insert.setObject(table.NETWORK_MODEL_PROJECT_STAGE_ID.queryIndex, networkModelProjectStageId)
+        insert.setString(table.BASE_MODEL_VERSION.queryIndex, baseModelVersion)
+        insert.setString(table.TYPE.queryIndex, variantMetricEntry.type)
+        insert.setString(table.NAME.queryIndex, variantMetricEntry.name)
+        insert.setInt(table.VALUE.queryIndex, variantMetricEntry.value)
+        insert.setString(table.METADATA.queryIndex, variantMetricEntry.metadata.joinToString(prefix = "[ \"", separator = "\", \"", postfix = "\"]")) // TODO: not this
+
+
+        return insert.tryExecuteSingleUpdate("variant metric")
     }
 
 }

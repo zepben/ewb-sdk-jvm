@@ -25,6 +25,12 @@ import org.slf4j.Logger
 
 /**
  * Convenience class that provides methods for setting feeder direction on a [NetworkService]
+ *
+ * NOTE: The feeder head equipment must be assigned to its [Feeder] before this is run. If you don't,
+ *       the feeder direction will be assigned back through feeder heads when they are run in parallel.
+ *
+ * @param debugLogger An optional [Logger] that can be used to log debug messages on what the underlying trace is doing. This
+ * should only ever be used in a debug cycle, and should always be `null` in production code.
  */
 class SetDirection(
     private val debugLogger: Logger?

@@ -54,6 +54,7 @@ import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.NetworkServiceComparator
 import com.zepben.ewb.services.network.testdata.*
 import com.zepben.ewb.services.network.testdata.stupid.StupidlyLargeNetwork
+import com.zepben.ewb.testing.TestNetworkBuilder
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.containsString
 import org.hamcrest.Matchers.equalTo
@@ -336,6 +337,24 @@ class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkD
         validateUnresolvedFailure("PowerElectronicsConnection pec1", "RegulatingControl tcc") {
             resolveOrDeferReference(Resolvers.regulatingControl(PowerElectronicsConnection("pec1")), "tcc")
         }
+    }
+
+    @Test
+    internal fun `assigns feeders in parallel correctly`() {
+        // This test is to ensure parallel feeders don't assign directions back through the feeder heads. This was seen in the wild when
+        // the feeder directions were set before the equipment was assigned, meaning no feeder heads were detected in the tracing.
+        val ns = TestNetworkBuilder()
+            .fromSource() // s0
+            .toBreaker() // b1
+            .toAcls() // c2
+            .toBreaker() // b3
+            .toSource() // s4
+            .addFeeder("b1", 2)
+            .addFeeder("b3", 1)
+            .build(applyDirectionsFromSources = false)
+
+        // If the read from the database matches the test network we built, then the equipment is correctly assigned.
+        validateSchema(ns)
     }
 
     @Test

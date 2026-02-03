@@ -10,7 +10,7 @@
 * None.
 
 ### Fixes
-* None.
+* Reordered the feeder equipment and direction assignment on database read to prevent parallel feeders from tracing back into the zone substation.
 
 ### Notes
 * None.

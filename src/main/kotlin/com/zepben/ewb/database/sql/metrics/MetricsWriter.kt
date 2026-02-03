@@ -20,9 +20,9 @@ import com.zepben.ewb.metrics.IngestionJob
 internal class MetricsWriter(
     databaseTables: MetricsDatabaseTables,
     private val writer: MetricsEntryWriter = MetricsEntryWriter(databaseTables)
-) : BaseCollectionWriter<IngestionJob>() {
+) : BaseCollectionWriter() {
 
-    override fun write(data: IngestionJob): Boolean =
+    fun write(data: IngestionJob): Boolean =
         writer.write(data.id, data.metadata) and
             writeEach(data.sources.entries, { writer.writeSource(data.id, it) }) { jobSource, e ->
                 logger.error("Failed to write job source $jobSource: ${e.message}")

@@ -36,7 +36,7 @@ class MetricsDatabaseWriter internal constructor(
     override val databaseInitialiser: DatabaseInitialiser<MetricsDatabaseTables>,
     private val modelPath: Path?,
     private val createMetricsWriter: (MetricsDatabaseTables) -> MetricsWriter,
-) : BaseDatabaseWriter<MetricsDatabaseTables, IngestionJob>() {
+) : BaseDatabaseWriter<MetricsDatabaseTables>() {
 
     /**
      * @param getConnection Provider of the connection to the metrics database.
@@ -60,7 +60,7 @@ class MetricsDatabaseWriter internal constructor(
      * @param data The [IngestionJob] to write.
      * @return true if the [IngestionJob] was successfully written, otherwise false.
      */
-    override fun writeData(data: IngestionJob): Boolean = createMetricsWriter(databaseTables).write(data) && createJobIdFile(data)
+    fun write(data: IngestionJob): Boolean = connectAndWrite { createMetricsWriter(databaseTables).write(data) } && createJobIdFile(data)
 
     private fun createJobIdFile(job: IngestionJob): Boolean {
         if (modelPath == null) return true

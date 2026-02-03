@@ -56,8 +56,9 @@ internal class BaseDatabaseWriterTest {
         every { afterConnectBeforePrepare(any(), any(), any()) } returns true
         every { afterWriteBeforeCommit(any(), any(), any()) } returns true
     }
-    private val writeDataMock = mockk<(Any) -> Boolean>().also { every { it(any()) } returns true }
-    private val data = mockk<Any>()
+    private val myWriteDataFunction = mockk<() -> Boolean> {
+        every { this@mockk() } returns true
+    }
 
     private val versionTable = mockk<TableVersion> {
         every { supportedVersion } returns 1
@@ -85,7 +86,7 @@ internal class BaseDatabaseWriterTest {
         every { initialiser.afterWriteBeforeCommit(any(), any(), any()) } returns false
         validateCalls(expectCommit = false)
 
-        every { writeDataMock(any()) } returns false
+        every { myWriteDataFunction() } returns false
         validateCalls(expectAfterWriteBeforeCommit = false)
 
         every { tables.prepareInsertStatements(any()) } throws SQLException()
@@ -107,7 +108,7 @@ internal class BaseDatabaseWriterTest {
     @Test
     internal fun `detects older version mismatches`() {
         every { versionTable.supportedVersion } returns 0
-        writer.write(data)
+        writer.connectAndWrite(myWriteDataFunction)
 
         assertThat(systemErr.log, containsString("Unsupported version in database file (got 1, expected 0)"))
     }
@@ -115,7 +116,7 @@ internal class BaseDatabaseWriterTest {
     @Test
     internal fun `detects newer version mismatches`() {
         every { versionTable.supportedVersion } returns 2
-        writer.write(data)
+        writer.connectAndWrite(myWriteDataFunction)
 
         assertThat(systemErr.log, containsString("Unsupported version in database file (got 1, expected 2)"))
     }
@@ -123,7 +124,7 @@ internal class BaseDatabaseWriterTest {
     @Test
     internal fun `detects missing version mismatches`() {
         every { versionTable.getVersion(connection) } returns null
-        writer.write(data)
+        writer.connectAndWrite(myWriteDataFunction)
 
         assertThat(systemErr.log, containsString("Missing version table in database file, cannot check compatibility"))
     }
@@ -131,31 +132,29 @@ internal class BaseDatabaseWriterTest {
     @Test
     internal fun `handles errors in processors`() {
         every { initialiser.beforeConnect(any()) } throws SQLException("SQL error message")
-        writer.write(data)
+        writer.connectAndWrite(myWriteDataFunction)
 
         assertThat(systemErr.log, containsString("Failed to write the database: SQL error message"))
         systemErr.clearCapturedLog()
 
         every { initialiser.beforeConnect(any()) } throws MissingTableConfigException("tables error message")
-        writer.write(data)
+        writer.connectAndWrite(myWriteDataFunction)
 
         assertThat(systemErr.log, containsString("Failed to write the database: tables error message"))
         systemErr.clearCapturedLog()
 
         every { initialiser.beforeConnect(any()) } throws Exception("unhandled error message")
-        ExpectException.expect { writer.write(data) }
+        ExpectException.expect { writer.connectAndWrite(myWriteDataFunction) }
             .toThrow<Exception>()
             .withMessage("unhandled error message")
     }
 
-    private fun createWriter(): BaseDatabaseWriter<BaseDatabaseTables, Any> {
-        return object : BaseDatabaseWriter<BaseDatabaseTables, Any>() {
+    private fun createWriter(): BaseDatabaseWriter<BaseDatabaseTables> {
+        return object : BaseDatabaseWriter<BaseDatabaseTables>() {
             override val databaseTables: BaseDatabaseTables
                 get() = tables
             override val databaseInitialiser: DatabaseInitialiser<BaseDatabaseTables>
                 get() = initialiser
-
-            override fun writeData(data: Any): Boolean = writeDataMock(data)
         }
     }
 
@@ -169,8 +168,8 @@ internal class BaseDatabaseWriterTest {
         expectCommit: Boolean = expectAfterWriteBeforeCommit,
         expectedResult: Boolean = expectCommit
     ) {
-        clearMocks(initialiser, writeDataMock, connection, tables, statement, resultSet, versionTable, answers = false)
-        assertThat(writer.write(data), equalTo(expectedResult))
+        clearMocks(initialiser, connection, tables, statement, resultSet, versionTable, myWriteDataFunction, answers = false)
+        assertThat(writer.connectAndWrite(myWriteDataFunction), equalTo(expectedResult))
 
         verifySequence {
             initialiser.beforeConnect(any())
@@ -193,7 +192,7 @@ internal class BaseDatabaseWriterTest {
                 tables.prepareInsertStatements(connection)
 
             if (expectWriteData)
-                writeDataMock(data)
+                myWriteDataFunction()
 
             if (expectAfterWriteBeforeCommit)
                 initialiser.afterWriteBeforeCommit(connection, tables, any())
@@ -207,7 +206,7 @@ internal class BaseDatabaseWriterTest {
                 connection.close()
         }
 
-        confirmVerified(initialiser, writeDataMock, connection, tables, statement, resultSet, versionTable)
+        confirmVerified(initialiser, connection, tables, statement, resultSet, versionTable, myWriteDataFunction)
     }
 
 }

@@ -1,7 +1,8 @@
 # Zepben EWB SDK changelog
 ## [1.5.0] - UNRELEASED
 ### Breaking Changes
-* None.
+* `BaseDatabaseWriter` (no longer defines a type of data to be written and instead accepts an arbitrary function that it wraps in the existing initialization and version checking) abstract class no longer defines an abstract `writeData` function. Instead `write` -> `connectAndWrite` now accepts an arbitrary function to perform writes to
+  the database rather than accepting a generic data type.
 
 ### New Features
 * None.

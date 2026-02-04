@@ -122,6 +122,12 @@ internal class NetworkDatabaseReaderTest {
             networkServiceReader.read(service)
             service.unresolvedReferences()
 
+            assignToFeeders.run(service, NetworkStateOperators.NORMAL)
+            assignToFeeders.run(service, NetworkStateOperators.CURRENT)
+
+            assignToLvFeeders.run(service, NetworkStateOperators.NORMAL)
+            assignToLvFeeders.run(service, NetworkStateOperators.CURRENT)
+
             setFeederDirections.run(service, NetworkStateOperators.NORMAL)
             setFeederDirections.run(service, NetworkStateOperators.CURRENT)
 
@@ -130,12 +136,6 @@ internal class NetworkDatabaseReaderTest {
 
             phaseInferrer.run(service, NetworkStateOperators.NORMAL)
             phaseInferrer.run(service, NetworkStateOperators.CURRENT)
-
-            assignToFeeders.run(service, NetworkStateOperators.NORMAL)
-            assignToFeeders.run(service, NetworkStateOperators.CURRENT)
-
-            assignToLvFeeders.run(service, NetworkStateOperators.NORMAL)
-            assignToLvFeeders.run(service, NetworkStateOperators.CURRENT)
 
             // calls for _validate_equipment_containers(), including the sequenceOf which is called inside listOf.
             service.listOf<Equipment>(any<(Equipment) -> Boolean>())

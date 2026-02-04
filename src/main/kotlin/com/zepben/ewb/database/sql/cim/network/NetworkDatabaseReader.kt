@@ -93,6 +93,21 @@ class NetworkDatabaseReader internal constructor(
 
     override fun afterServiceRead(service: NetworkService): Boolean =
         super.afterServiceRead(service).also {
+            //
+            // NOTE: We need to have the feeder head equipment assigned before we can set the feeder directions to prevent
+            //       tracing back into the zone substation in parallel feeders. Rather than splitting the feeder assignment
+            //       into two passes, we can just assign the equipment to feeders before we set the directions.
+            //
+            logger.info("Assigning equipment to feeders...")
+            assignToFeeders.run(service, NetworkStateOperators.NORMAL)
+            assignToFeeders.run(service, NetworkStateOperators.CURRENT)
+            logger.info("Equipment assigned to feeders.")
+
+            logger.info("Assigning equipment to LV feeders...")
+            assignToLvFeeders.run(service, NetworkStateOperators.NORMAL)
+            assignToLvFeeders.run(service, NetworkStateOperators.CURRENT)
+            logger.info("Equipment assigned to LV feeders.")
+
             logger.info("Applying feeder direction to network...")
             setFeederDirection.run(service, NetworkStateOperators.NORMAL)
             setFeederDirection.run(service, NetworkStateOperators.CURRENT)
@@ -108,16 +123,6 @@ class NetworkDatabaseReader internal constructor(
                 )
             }
             logger.info("Phasing applied to network.")
-
-            logger.info("Assigning equipment to feeders...")
-            assignToFeeders.run(service, NetworkStateOperators.NORMAL)
-            assignToFeeders.run(service, NetworkStateOperators.CURRENT)
-            logger.info("Equipment assigned to feeders.")
-
-            logger.info("Assigning equipment to LV feeders...")
-            assignToLvFeeders.run(service, NetworkStateOperators.NORMAL)
-            assignToLvFeeders.run(service, NetworkStateOperators.CURRENT)
-            logger.info("Equipment assigned to LV feeders.")
 
             logger.info("Validating that each equipment is assigned to a container...")
             validateEquipmentContainers(service)

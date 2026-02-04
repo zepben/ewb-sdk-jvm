@@ -12,7 +12,6 @@ package com.zepben.ewb.services.variant
 
 import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProject
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
-import com.zepben.ewb.cim.iec61970.base.generation.production.BatteryUnit
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.AnnotatedProjectDependency
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStage
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
@@ -21,6 +20,7 @@ import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.DataSet
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectCreation
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectDeletion
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectModification
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectReverseModification
 import com.zepben.ewb.services.network.NetworkService
 
 /**

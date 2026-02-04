@@ -18,6 +18,7 @@ import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectDele
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectModification
 
 import com.zepben.ewb.services.common.verifyWhenServiceFunctionSupportsAllServiceTypes
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectReverseModification
 import com.zepben.testutils.junit.SystemLogExtension
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension

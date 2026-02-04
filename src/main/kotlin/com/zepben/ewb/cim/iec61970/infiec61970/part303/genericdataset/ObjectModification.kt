@@ -21,7 +21,7 @@ class ObjectModification : ChangeSetMember() {
         require(objectReverseModification == null) { "objectReverseModification already set" }
         require(changeSet != null) { "set changeset before calling this helper." }
         objectReverseModification = ObjectReverseModification().also {
-            it.setChangeSet(changeSet!!)
+            changeSet!!.addChangeSetMember(it)
             it.targetObjectMRID = targetObjectMRID
             require(it.objectModification == null) { "objectModification already set" }
             it.objectModification = this
@@ -32,12 +32,12 @@ class ObjectModification : ChangeSetMember() {
     companion object {
         fun createObjectModification(changeSet: ChangeSet, modifiedObjectMRID: String, originalObjectMRID: String? = null): ObjectModification {
             return ObjectModification().also {
-                it.setChangeSet(changeSet)
+                changeSet.addChangeSetMember(it)
                 it.targetObjectMRID = modifiedObjectMRID
                 originalObjectMRID?.let { _ ->
                     it.objectReverseModification = ObjectReverseModification().also { orm ->
-                        orm.setChangeSet(changeSet)
                         orm.targetObjectMRID = originalObjectMRID
+                        orm.objectModification = it
                     }
                 }
             }

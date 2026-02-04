@@ -14,6 +14,7 @@ import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.DataSet
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectCreation
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectDeletion
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectModification
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectReverseModification
 import com.zepben.ewb.database.sql.cim.CimWriter
 import com.zepben.ewb.database.sql.extensions.setNullableString
 import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.genericdataset.TableChangeSetChangeSetMembers
@@ -67,6 +68,9 @@ class ChangeSetCimWriter(
                 is ObjectCreation -> write(it)
                 is ObjectDeletion -> write(it)
                 is ObjectModification -> write(it)
+                is ObjectReverseModification -> { } // this is a no-op as ObjectModification handles the logic that
+                                                    // would be here, but we also don't want to error when we have
+                                                    // ObjectReverseModifications in the ChangeSet
                 else -> throw NotImplementedError()
             }
         }

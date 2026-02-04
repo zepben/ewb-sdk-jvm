@@ -102,8 +102,7 @@ internal class VariantCimReader : CimReader<VariantService>(), AutoCloseable{
                 lastConflictCheckedAt = resultSet.getInstant(table.LAST_CONFLICT_CHECKED_AT.queryIndex)
                 userComments = resultSet.getNullableString(table.USER_COMMENTS.queryIndex)
                 resultSet.getNullableString(table.CHANGE_SET_MRID.queryIndex)?.let {
-                    // service.getChangeSet(it)
-                    // TODO: cross service lookup... doesnt feel like it should be in here.
+                    setChangeSetMRID(it)
                 }
             }
         )

@@ -12,10 +12,7 @@ import com.zepben.ewb.database.sql.common.BaseDatabaseTables
 import com.zepben.ewb.database.sql.common.tables.SqlTable
 import com.zepben.ewb.database.sql.generators.PostgresGenerator
 import com.zepben.ewb.database.sql.generators.SqlGenerator
-import com.zepben.ewb.database.sql.metrics.tables.TableJobSources
-import com.zepben.ewb.database.sql.metrics.tables.TableJobs
-import com.zepben.ewb.database.sql.metrics.tables.TableNetworkContainerMetrics
-import com.zepben.ewb.database.sql.metrics.tables.tableMetricsVersion
+import com.zepben.ewb.database.sql.metrics.tables.*
 
 /**
  * The collection of tables for our metrics databases.
@@ -29,7 +26,8 @@ class MetricsDatabaseTables internal constructor(
             tableMetricsVersion,
             TableJobs(),
             TableJobSources(),
-            TableNetworkContainerMetrics()
+            TableNetworkContainerMetrics(),
+            TableVariantMetrics()
         )
 
 }

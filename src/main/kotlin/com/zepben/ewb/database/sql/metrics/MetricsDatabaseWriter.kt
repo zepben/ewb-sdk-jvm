@@ -12,6 +12,7 @@ import com.zepben.ewb.database.sql.common.BaseDatabaseWriter
 import com.zepben.ewb.database.sql.initialisers.DatabaseInitialiser
 import com.zepben.ewb.database.sql.initialisers.NoOpDatabaseInitialiser
 import com.zepben.ewb.metrics.IngestionJob
+import com.zepben.ewb.metrics.variants.VariantMetrics
 import java.io.IOException
 import java.nio.file.Path
 import java.sql.Connection
@@ -61,6 +62,14 @@ class MetricsDatabaseWriter internal constructor(
      * @return true if the [IngestionJob] was successfully written, otherwise false.
      */
     fun write(data: IngestionJob): Boolean = connectAndWrite { createMetricsWriter(databaseTables).write(data) } && createJobIdFile(data)
+
+    /**
+     * Write the variant metrics related to a particular network project stage id. //TODO: what is the thing this list of metrics is actually related to referred to?
+     *
+     * @param variantMetrics The [VariantMetrics] to write.
+     * @return true if the [VariantMetrics] was successfully written, otherwise false.
+     */
+    fun write(variantMetrics: VariantMetrics): Boolean = connectAndWrite { createMetricsWriter(databaseTables).write(variantMetrics) }
 
     private fun createJobIdFile(job: IngestionJob): Boolean {
         if (modelPath == null) return true

@@ -10,6 +10,7 @@ package com.zepben.ewb.database.sql.metrics
 
 import com.zepben.ewb.database.sql.common.BaseCollectionWriter
 import com.zepben.ewb.metrics.IngestionJob
+import com.zepben.ewb.metrics.variants.VariantMetrics
 
 /**
  * Class for writing an ingestion job (and associated metadata, metrics, and sources) to the tables in a metrics database.
@@ -31,4 +32,8 @@ internal class MetricsWriter(
                 logger.error("Failed to write metric $metric: ${e.message}")
             }
 
+    fun write(data: VariantMetrics): Boolean =
+        writeEach(data.metrics, { writer.writeVariantMetricEntry(data.networkModelProjectId, data.networkModelProjectStageId, data.baseModelVersion, it) } ) { metricEntry, e ->
+            logger.error("Failed to write metric entry $metricEntry: ${e.message}")
+        }
 }

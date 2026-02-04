@@ -17,10 +17,27 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.testcontainers.containers.PostgreSQLContainer
+import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.Timestamp
 import java.time.Instant
 import java.util.*
+
+private val POSTGRES_VERSION = "14.1"
+
+
+object Myne {
+    private val databaseContainer: PostgreSQLContainer<out PostgreSQLContainer<*>> by lazy {
+        PostgreSQLContainer("postgres:$POSTGRES_VERSION").also { c ->
+            Runtime.getRuntime().addShutdownHook(Thread {
+                c.stop()
+            })
+            c.start()
+        }
+    }
+        fun getConnection(): Connection = DriverManager.getConnection(databaseContainer.jdbcUrl + "&user=${databaseContainer.username}&password=${databaseContainer.password}")
+    }
 
 internal class MetricsSchemaTest {
 
@@ -30,9 +47,10 @@ internal class MetricsSchemaTest {
 
     private val uuid = UUID.randomUUID()
 
-    private val connection = getConnection()
+    private val connection = Myne.getConnection()
 
-    private fun getConnection() = DriverManager.getConnection("jdbc:h2:mem:metrics;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH")
+
+    private fun getConnection() = Myne.getConnection()
 
     @BeforeEach
     internal fun createSchema() {
@@ -52,7 +70,15 @@ internal class MetricsSchemaTest {
     }
 
     @AfterEach
-    internal fun closeConnection() = connection.close()
+    internal fun closeConnection() {
+        connection.createStatement().use { statement ->
+            val tables = MetricsDatabaseTables()
+            tables.forEachTable {
+                statement.executeUpdate("DROP TABLE ${it.name};")
+            }
+        }
+        connection.close()
+    }
 
     @Test
     internal fun `writes job metadata`() = validateJob(

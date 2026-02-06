@@ -9,7 +9,6 @@
 package com.zepben.ewb.database.sql.metrics
 
 import com.zepben.ewb.database.sql.common.BaseEntryWriter
-import com.zepben.ewb.database.sql.extensions.setJson
 import com.zepben.ewb.database.sql.extensions.setNullableString
 import com.zepben.ewb.database.sql.metrics.tables.TableJobSources
 import com.zepben.ewb.database.sql.metrics.tables.TableJobs
@@ -27,9 +26,16 @@ import java.util.*
  * Class for writing entries to the metrics database.
  *
  * @param databaseTables The tables in the metrics database.
+ * @param jsonMapper Used to encode objects to JSON Strings
  */
 internal class MetricsEntryWriter(
-    private val databaseTables: MetricsDatabaseTables
+    private val databaseTables: MetricsDatabaseTables,
+    private val jsonMapper: Json = Json {
+        encodeDefaults = true
+        //explicitNulls = true //this is true by default but requires an optIn to explicitly set
+        ignoreUnknownKeys = false
+        isLenient = false
+    }
 ) : BaseEntryWriter() {
 
     /**
@@ -111,7 +117,10 @@ internal class MetricsEntryWriter(
     /**
      * Write a [VariantMetricEntry] to the `variant_metrics` table.
      *
-     * @param variantMetricEntry A single Variant Metric entry. // TODO: Think
+     * @param networkModelProjectId The network model project ID of the variant metric to be written.
+     * @param networkModelProjectStageId The network model project stage ID of the variant metric to be written.
+     * @param baseModelVersion The base model version of the variant metric to be written.
+     * @param variantMetricEntry The [VariantMetricEntry] to write.
      * @return true if the [VariantMetricEntry] was written successfully.
      */
     fun writeVariantMetricEntry(
@@ -129,8 +138,8 @@ internal class MetricsEntryWriter(
         insert.setString(table.BASE_MODEL_VERSION.queryIndex, baseModelVersion)
         insert.setString(table.TYPE.queryIndex, variantMetricEntry.type.name)
         insert.setString(table.NAME.queryIndex, variantMetricEntry.name)
-        insert.setInt(table.VALUE.queryIndex, variantMetricEntry.value)
-        insert.setJson<List<String>>(table.METADATA.queryIndex, variantMetricEntry.metadata)
+        insert.setInt(table.METRIC_VALUE.queryIndex, variantMetricEntry.value)
+        insert.setString(table.METADATA.queryIndex, jsonMapper.encodeToString(variantMetricEntry.metadata))
 
         return insert.tryExecuteSingleUpdate("variant metric")
     }

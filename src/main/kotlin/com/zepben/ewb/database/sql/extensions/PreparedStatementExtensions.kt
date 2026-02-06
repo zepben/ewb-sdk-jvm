@@ -155,11 +155,11 @@ internal fun PreparedStatement.setInstant(queryIndex: Int, value: Instant?) {
 }
 
 /**
- * Set a column to a Json String.
+ * Set a column to a nullable Json String.
  * @param queryIndex The index of the column to set.
  * @param value The value to assign to the column.
  */
-internal inline fun <reified T>PreparedStatement.setJson(queryIndex: Int, value: T) {
+internal inline fun <reified T>PreparedStatement.setNullableJson(queryIndex: Int, value: T) {
     when (value) {
         null -> setNull(queryIndex, VARCHAR)
         else -> setString(queryIndex, Json.encodeToString<T>(value))

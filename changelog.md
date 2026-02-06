@@ -5,7 +5,14 @@
   the database rather than accepting a generic data type.
 
 ### New Features
-* None.
+* Added table `TableVariantMetrics` to the metrics database.
+  * Using `MetricsDatabaseWriter`, a `VariantMetics` class containing a set of metrics related to a single `variant` may be saved to the database.
+
+* Added new classes:
+  * VariantMetrics
+
+* Added new enums:
+  * VariantMetricKind
 
 ### Enhancements
 * None.

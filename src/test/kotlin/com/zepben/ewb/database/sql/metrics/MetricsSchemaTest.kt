@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.database.sql.metrics
 
+import com.zepben.ewb.database.sql.TestDatabaseContainer
 import com.zepben.ewb.database.sql.metrics.tables.tableMetricsVersion
 import com.zepben.ewb.metrics.*
 import com.zepben.testutils.junit.SystemLogExtension
@@ -17,27 +18,10 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.testcontainers.containers.PostgreSQLContainer
-import java.sql.Connection
-import java.sql.DriverManager
 import java.sql.Timestamp
 import java.time.Instant
 import java.util.*
 
-private val POSTGRES_VERSION = "14.1"
-
-
-object Myne {
-    private val databaseContainer: PostgreSQLContainer<out PostgreSQLContainer<*>> by lazy {
-        PostgreSQLContainer("postgres:$POSTGRES_VERSION").also { c ->
-            Runtime.getRuntime().addShutdownHook(Thread {
-                c.stop()
-            })
-            c.start()
-        }
-    }
-        fun getConnection(): Connection = DriverManager.getConnection(databaseContainer.jdbcUrl + "&user=${databaseContainer.username}&password=${databaseContainer.password}")
-    }
 
 internal class MetricsSchemaTest {
 
@@ -47,37 +31,30 @@ internal class MetricsSchemaTest {
 
     private val uuid = UUID.randomUUID()
 
-    private val connection = Myne.getConnection()
-
-
-    private fun getConnection() = Myne.getConnection()
+    private fun getConnection() = TestDatabaseContainer.getConnection()
 
     @BeforeEach
     internal fun createSchema() {
         // The MetricsDatabaseWriter assumes that the schema has been created already, so we create it here
-        connection.createStatement().use { statement ->
-            val tables = MetricsDatabaseTables()
-            tables.forEachTable {
-                statement.executeUpdate(tables.sqlGenerator.createTableSql(it))
-            }
+        TestDatabaseContainer.getConnection().use { conn ->
+            conn.createStatement().use { statement ->
+                val tables = MetricsDatabaseTables()
+                tables.forEachTable {
+                    statement.executeUpdate(tables.sqlGenerator.createTableSql(it))
+                }
 
-            // Add the version number to the database.
-            connection.prepareStatement(tableMetricsVersion.preparedInsertSql).use { insert ->
-                insert.setInt(tableMetricsVersion.VERSION.queryIndex, tableMetricsVersion.supportedVersion)
-                insert.executeUpdate()
+                // Add the version number to the database.
+                conn.prepareStatement(tableMetricsVersion.preparedInsertSql).use { insert ->
+                    insert.setInt(tableMetricsVersion.VERSION.queryIndex, tableMetricsVersion.supportedVersion)
+                    insert.executeUpdate()
+                }
             }
         }
     }
 
     @AfterEach
     internal fun closeConnection() {
-        connection.createStatement().use { statement ->
-            val tables = MetricsDatabaseTables()
-            tables.forEachTable {
-                statement.executeUpdate("DROP TABLE ${it.name};")
-            }
-        }
-        connection.close()
+        TestDatabaseContainer.resetDatabaseContainer()
     }
 
     @Test

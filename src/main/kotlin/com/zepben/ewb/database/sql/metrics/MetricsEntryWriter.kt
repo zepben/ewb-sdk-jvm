@@ -32,7 +32,6 @@ internal class MetricsEntryWriter(
     private val databaseTables: MetricsDatabaseTables,
     private val jsonMapper: Json = Json {
         encodeDefaults = true
-        //explicitNulls = true //this is true by default but requires an optIn to explicitly set
         ignoreUnknownKeys = false
         isLenient = false
     }

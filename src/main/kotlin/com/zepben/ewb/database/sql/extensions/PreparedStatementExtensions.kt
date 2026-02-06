@@ -9,8 +9,6 @@
 package com.zepben.ewb.database.sql.extensions
 
 import com.zepben.ewb.cim.iec61968.infiec61968.infcommon.Ratio
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import org.slf4j.Logger
 import java.security.AccessController
 import java.security.PrivilegedActionException
@@ -151,18 +149,6 @@ internal fun PreparedStatement.setInstant(queryIndex: Int, value: Instant?) {
     when (value) {
         null -> setNull(queryIndex, VARCHAR)
         else -> setString(queryIndex, value.toString())
-    }
-}
-
-/**
- * Set a column to a nullable Json String.
- * @param queryIndex The index of the column to set.
- * @param value The value to assign to the column.
- */
-internal inline fun <reified T>PreparedStatement.setNullableJson(queryIndex: Int, value: T) {
-    when (value) {
-        null -> setNull(queryIndex, VARCHAR)
-        else -> setString(queryIndex, Json.encodeToString<T>(value))
     }
 }
 

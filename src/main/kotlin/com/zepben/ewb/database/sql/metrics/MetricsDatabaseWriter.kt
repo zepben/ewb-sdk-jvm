@@ -64,7 +64,7 @@ class MetricsDatabaseWriter internal constructor(
     fun write(data: IngestionJob): Boolean = connectAndWrite { createMetricsWriter(databaseTables).write(data) } && createJobIdFile(data)
 
     /**
-     * Write the variant metrics related to a particular network project stage id. //TODO: what is the thing this list of metrics is actually related to referred to?
+     * Write the variant metrics related to a particular network project stage id.
      *
      * @param variantMetrics The [VariantMetrics] to write.
      * @return true if the [VariantMetrics] was successfully written, otherwise false.

@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.database.sql.metrics
 
+import com.zepben.ewb.database.sql.TestDatabaseContainer
 import com.zepben.ewb.database.sql.metrics.tables.tableMetricsVersion
 import com.zepben.ewb.metrics.*
 import com.zepben.testutils.junit.SystemLogExtension
@@ -17,10 +18,10 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import java.sql.DriverManager
 import java.sql.Timestamp
 import java.time.Instant
 import java.util.*
+
 
 internal class MetricsSchemaTest {
 
@@ -30,29 +31,31 @@ internal class MetricsSchemaTest {
 
     private val uuid = UUID.randomUUID()
 
-    private val connection = getConnection()
-
-    private fun getConnection() = DriverManager.getConnection("jdbc:h2:mem:metrics;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH")
+    private fun getConnection() = TestDatabaseContainer.getConnection()
 
     @BeforeEach
     internal fun createSchema() {
         // The MetricsDatabaseWriter assumes that the schema has been created already, so we create it here
-        connection.createStatement().use { statement ->
-            val tables = MetricsDatabaseTables()
-            tables.forEachTable {
-                statement.executeUpdate(tables.sqlGenerator.createTableSql(it))
-            }
+        TestDatabaseContainer.getConnection().use { conn ->
+            conn.createStatement().use { statement ->
+                val tables = MetricsDatabaseTables()
+                tables.forEachTable {
+                    statement.executeUpdate(tables.sqlGenerator.createTableSql(it))
+                }
 
-            // Add the version number to the database.
-            connection.prepareStatement(tableMetricsVersion.preparedInsertSql).use { insert ->
-                insert.setInt(tableMetricsVersion.VERSION.queryIndex, tableMetricsVersion.supportedVersion)
-                insert.executeUpdate()
+                // Add the version number to the database.
+                conn.prepareStatement(tableMetricsVersion.preparedInsertSql).use { insert ->
+                    insert.setInt(tableMetricsVersion.VERSION.queryIndex, tableMetricsVersion.supportedVersion)
+                    insert.executeUpdate()
+                }
             }
         }
     }
 
     @AfterEach
-    internal fun closeConnection() = connection.close()
+    internal fun closeConnection() {
+        TestDatabaseContainer.resetDatabaseContainer()
+    }
 
     @Test
     internal fun `writes job metadata`() = validateJob(

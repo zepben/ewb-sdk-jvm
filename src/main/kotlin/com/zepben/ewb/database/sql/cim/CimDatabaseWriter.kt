@@ -24,7 +24,7 @@ import com.zepben.ewb.services.common.BaseService
 abstract class CimDatabaseWriter<TTables : CimDatabaseTables, TService : BaseService> internal constructor(
     private val createMetadataWriter: (TTables) -> MetadataCollectionWriter,
     private val createServiceWriter: (TTables) -> BaseServiceWriter<TService>
-) : BaseDatabaseWriter<TTables, TService>() {
+) : BaseDatabaseWriter<TTables>() {
 
     /**
      * Write metadata and service.
@@ -32,7 +32,5 @@ abstract class CimDatabaseWriter<TTables : CimDatabaseTables, TService : BaseSer
      * @param data The [TService] containing the metadata and service to write.
      * @return true if the [data] was successfully written to the database, otherwise false.
      */
-    override fun writeData(data: TService): Boolean =
-        createMetadataWriter(databaseTables).write(data.metadata) and createServiceWriter(databaseTables).write(data)
-
+    fun write(data: TService): Boolean = connectAndWrite { createMetadataWriter(databaseTables).write(data.metadata) and createServiceWriter(databaseTables).write(data) }
 }

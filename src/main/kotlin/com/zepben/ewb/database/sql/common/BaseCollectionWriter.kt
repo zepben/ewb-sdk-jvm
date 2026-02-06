@@ -17,18 +17,9 @@ import java.sql.SQLException
  *
  * @property logger The logger to use for this collection reader.
  */
-internal abstract class BaseCollectionWriter<T> {
+internal abstract class BaseCollectionWriter {
 
     protected val logger: Logger = LoggerFactory.getLogger(javaClass)
-
-    /**
-     * Write all the objects in the provided data to the database.
-     *
-     * @param data The data to write.
-     *
-     * @return true if the `write` was successful, otherwise false.
-     */
-    abstract fun write(data: T): Boolean
 
     /**
      * Write each of the [items] to the database.

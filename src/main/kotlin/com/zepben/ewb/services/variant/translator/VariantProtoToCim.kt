@@ -139,7 +139,7 @@ fun toCim(pb: PBNetworkModelProjectStage, networkService: VariantService): Netwo
  */
 fun toCim(pb: PBNetworkModelProjectComponent, cim: NetworkModelProjectComponent, networkService: VariantService): NetworkModelProjectComponent =
     cim.apply {
-        created = pb.created.toInstant()
+        created = pb.createdSet.takeUnless { pb.hasCreatedNull() }?.toInstant()
         updated = pb.updatedSet.takeUnless { pb.hasUpdatedNull() }?.toInstant()
         closed = pb.closedSet.takeUnless { pb.hasClosedNull() }?.toInstant()
 

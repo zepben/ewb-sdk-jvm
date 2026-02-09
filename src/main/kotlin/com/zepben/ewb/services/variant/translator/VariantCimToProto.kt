@@ -108,7 +108,7 @@ fun toPb(cim: NetworkModelProject, pb: PBNetworkModelProject.Builder): PBNetwork
  */
 fun toPb(cim: NetworkModelProjectComponent, pb: PBNetworkModelProjectComponent.Builder): PBNetworkModelProjectComponent.Builder =
     pb.apply {
-        created = cim.created?.toTimestamp() ?: Instant.now().toTimestamp()
+        cim.created?.also { createdSet = it.toTimestamp() } ?: run { createdNull = NullValue.NULL_VALUE }
         cim.updated?.also { updatedSet = it.toTimestamp() } ?: run { updatedNull = NullValue.NULL_VALUE }
         cim.closed?.also { closedSet = it.toTimestamp() } ?: run { closedNull = NullValue.NULL_VALUE }
         cim.parent?.let {

@@ -32,7 +32,6 @@ class TableNetworkModelProjectStages : TableIdentifiedObjects() {
     val LAST_CONFLICT_CHECKED_AT: Column = Column(++columnIndex, "last_conflict_checked_at", Column.Type.TIMESTAMP, Column.Nullable.NULL)
     val USER_COMMENTS: Column = Column(++columnIndex, "user_comments", Column.Type.STRING, Column.Nullable.NULL)
     val CHANGE_SET_MRID: Column = Column(++columnIndex, "change_set_mrid", Column.Type.STRING, Column.Nullable.NULL)
-    // TODO: conflicts... delete?
 
     override val name: String = "network_model_project_stages"
 

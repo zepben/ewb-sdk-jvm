@@ -30,6 +30,7 @@ internal class MetricsSchemaTest {
     val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     private val uuid = UUID.randomUUID()
+    private val tables = MetricsDatabaseTables()
 
     private fun getConnection() = TestDatabaseContainer.getConnection()
 
@@ -38,7 +39,6 @@ internal class MetricsSchemaTest {
         // The MetricsDatabaseWriter assumes that the schema has been created already, so we create it here
         TestDatabaseContainer.getConnection().use { conn ->
             conn.createStatement().use { statement ->
-                val tables = MetricsDatabaseTables()
                 tables.forEachTable {
                     statement.executeUpdate(tables.sqlGenerator.createTableSql(it))
                 }
@@ -53,8 +53,16 @@ internal class MetricsSchemaTest {
     }
 
     @AfterEach
-    internal fun closeConnection() {
-        TestDatabaseContainer.resetDatabaseContainer()
+    internal fun removeSchema() {
+        // Since we created the schema, we should be a good citizen and clean it up. This allows us to reuse the same
+        // test container and prevent the ~2-second startup delay on each test.
+        TestDatabaseContainer.getConnection().use { conn ->
+            conn.createStatement().use { statement ->
+                tables.forEachTable {
+                    statement.executeUpdate("DROP TABLE IF EXISTS ${it.name}")
+                }
+            }
+        }
     }
 
     @Test

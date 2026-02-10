@@ -22,11 +22,6 @@ object TestDatabaseContainer {
         }
     }
 
-    fun resetDatabaseContainer() {
-        databaseContainer.stop()
-        databaseContainer.start()
-    }
-
     fun getConnection(): Connection =
         DriverManager.getConnection(databaseContainer.jdbcUrl + "&user=${databaseContainer.username}&password=${databaseContainer.password}")
 

@@ -108,7 +108,7 @@ internal class BaseDatabaseWriterTest {
     @Test
     internal fun `detects older version mismatches`() {
         every { versionTable.supportedVersion } returns 0
-        writer.connectAndWrite(myWriteDataFunction)
+        writer.callConnectAndWrite(myWriteDataFunction)
 
         assertThat(systemErr.log, containsString("Unsupported version in database file (got 1, expected 0)"))
     }
@@ -116,7 +116,7 @@ internal class BaseDatabaseWriterTest {
     @Test
     internal fun `detects newer version mismatches`() {
         every { versionTable.supportedVersion } returns 2
-        writer.connectAndWrite(myWriteDataFunction)
+        writer.callConnectAndWrite(myWriteDataFunction)
 
         assertThat(systemErr.log, containsString("Unsupported version in database file (got 1, expected 2)"))
     }
@@ -124,7 +124,7 @@ internal class BaseDatabaseWriterTest {
     @Test
     internal fun `detects missing version mismatches`() {
         every { versionTable.getVersion(connection) } returns null
-        writer.connectAndWrite(myWriteDataFunction)
+        writer.callConnectAndWrite(myWriteDataFunction)
 
         assertThat(systemErr.log, containsString("Missing version table in database file, cannot check compatibility"))
     }
@@ -132,31 +132,31 @@ internal class BaseDatabaseWriterTest {
     @Test
     internal fun `handles errors in processors`() {
         every { initialiser.beforeConnect(any()) } throws SQLException("SQL error message")
-        writer.connectAndWrite(myWriteDataFunction)
+        writer.callConnectAndWrite(myWriteDataFunction)
 
         assertThat(systemErr.log, containsString("Failed to write the database: SQL error message"))
         systemErr.clearCapturedLog()
 
         every { initialiser.beforeConnect(any()) } throws MissingTableConfigException("tables error message")
-        writer.connectAndWrite(myWriteDataFunction)
+        writer.callConnectAndWrite(myWriteDataFunction)
 
         assertThat(systemErr.log, containsString("Failed to write the database: tables error message"))
         systemErr.clearCapturedLog()
 
         every { initialiser.beforeConnect(any()) } throws Exception("unhandled error message")
-        ExpectException.expect { writer.connectAndWrite(myWriteDataFunction) }
+        ExpectException.expect { writer.callConnectAndWrite(myWriteDataFunction) }
             .toThrow<Exception>()
             .withMessage("unhandled error message")
     }
 
-    private fun createWriter(): BaseDatabaseWriter<BaseDatabaseTables> {
-        return object : BaseDatabaseWriter<BaseDatabaseTables>() {
+    private fun createWriter() =
+        object : BaseDatabaseWriter<BaseDatabaseTables>() {
+            fun callConnectAndWrite(writeData: () -> Boolean): Boolean = connectAndWrite(writeData)
             override val databaseTables: BaseDatabaseTables
                 get() = tables
             override val databaseInitialiser: DatabaseInitialiser<BaseDatabaseTables>
                 get() = initialiser
         }
-    }
 
     private fun validateCalls(
         expectConnect: Boolean = true,
@@ -169,7 +169,7 @@ internal class BaseDatabaseWriterTest {
         expectedResult: Boolean = expectCommit
     ) {
         clearMocks(initialiser, connection, tables, statement, resultSet, versionTable, myWriteDataFunction, answers = false)
-        assertThat(writer.connectAndWrite(myWriteDataFunction), equalTo(expectedResult))
+        assertThat(writer.callConnectAndWrite(myWriteDataFunction), equalTo(expectedResult))
 
         verifySequence {
             initialiser.beforeConnect(any())

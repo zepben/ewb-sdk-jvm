@@ -36,7 +36,7 @@ abstract class BaseDatabaseWriter<TTables : BaseDatabaseTables> internal constru
      *
      * @return true if the database was successfully written, otherwise false.
      */
-    fun connectAndWrite(writeData: () -> Boolean): Boolean {
+    protected fun connectAndWrite(writeData: () -> Boolean): Boolean {
         try {
             if (!databaseInitialiser.beforeConnect(logger))
                 return false

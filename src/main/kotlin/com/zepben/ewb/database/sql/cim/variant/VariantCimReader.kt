@@ -19,11 +19,9 @@ import com.zepben.ewb.database.sql.cim.tables.extensions.iec61970.infpart303.net
 import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.infpart303.networkmodelprojects.TableAnnotatedProjectDependencies
 import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.infpart303.networkmodelprojects.TableNetworkModelProjectStageEquipmentContainers
 import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.infpart303.networkmodelprojects.TableNetworkModelProjectStages
-import com.zepben.ewb.database.sql.extensions.getInstant
 import com.zepben.ewb.database.sql.extensions.getNullableInt
 import com.zepben.ewb.database.sql.extensions.getNullableString
 import com.zepben.ewb.services.common.extensions.ensureGet
-import com.zepben.ewb.services.common.extensions.getOrThrow
 import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 import com.zepben.ewb.services.variant.VariantService
 import java.sql.ResultSet
@@ -47,7 +45,7 @@ internal class VariantCimReader : CimReader<VariantService>(), AutoCloseable{
         return service.addOrThrow(
             NetworkModelProject(nmpMRID).apply {
                 externalStatus = resultSet.getString(table.EXTERNAL_STATUS.queryIndex)
-                forecastCommissionDate = resultSet.getInstant(table.FORECAST_COMMISSION_DATE.queryIndex)
+                forecastCommissionDate = resultSet.getTimestamp(table.FORECAST_COMMISSION_DATE.queryIndex)?.toInstant()
                 externalDriver = resultSet.getString(table.EXTERNAL_DRIVER.queryIndex)
             }.also {
                 readNetworkModelProjectComponent(service, it, table, resultSet)
@@ -57,9 +55,9 @@ internal class VariantCimReader : CimReader<VariantService>(), AutoCloseable{
 
     private fun readNetworkModelProjectComponent(service: VariantService, networkModelProjectComponent: NetworkModelProjectComponent, table: TableNetworkModelProjectComponents, resultSet: ResultSet): Boolean {
         networkModelProjectComponent.apply {
-            created = resultSet.getInstant(table.CREATED.queryIndex)
-            updated = resultSet.getInstant(table.UPDATED.queryIndex)
-            closed = resultSet.getInstant(table.CLOSED.queryIndex)
+            created = resultSet.getTimestamp(table.CREATED.queryIndex)?.toInstant()
+            updated = resultSet.getTimestamp(table.UPDATED.queryIndex)?.toInstant()
+            closed = resultSet.getTimestamp(table.CLOSED.queryIndex)?.toInstant()
         }.also { nmpc ->
             resultSet.getString(table.PARENT_MRID.queryIndex)?.let {
                 service.ensureGet<NetworkModelProject>(it, nmpc.typeNameAndMRID())?.apply {
@@ -95,11 +93,11 @@ internal class VariantCimReader : CimReader<VariantService>(), AutoCloseable{
         val nmpsMRID = setIdentifier(resultSet.getString(table.MRID.queryIndex))
         return service.addOrThrow(
             NetworkModelProjectStage(nmpsMRID).apply {
-                plannedCommissionedDate = resultSet.getInstant(table.PLANNED_COMMISSION_DATE.queryIndex)
-                commissionedDate = resultSet.getInstant(table.COMMISSIONED_DATE.queryIndex)
+                plannedCommissionedDate = resultSet.getTimestamp(table.PLANNED_COMMISSION_DATE.queryIndex)?.toInstant()
+                commissionedDate = resultSet.getTimestamp(table.COMMISSIONED_DATE.queryIndex)?.toInstant()
                 confidenceLevel = resultSet.getNullableInt(table.CONFIDENCE_LEVEL.queryIndex)
                 baseModelVersion = resultSet.getNullableString(table.BASE_MODEL_VERSION.queryIndex)
-                lastConflictCheckedAt = resultSet.getInstant(table.LAST_CONFLICT_CHECKED_AT.queryIndex)
+                lastConflictCheckedAt = resultSet.getTimestamp(table.LAST_CONFLICT_CHECKED_AT.queryIndex)?.toInstant()
                 userComments = resultSet.getNullableString(table.USER_COMMENTS.queryIndex)
                 resultSet.getNullableString(table.CHANGE_SET_MRID.queryIndex)?.let {
                     setChangeSetMRID(it)

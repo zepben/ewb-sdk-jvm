@@ -53,8 +53,6 @@ import com.zepben.ewb.cim.iec61970.base.wires.*
 import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.AnnotatedProjectDependency
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStage
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSetMember
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.DataSet
 import kotlin.reflect.KClass
 
@@ -567,10 +565,6 @@ internal object NetworkModelProjectToNetworkModelProjectComponentResolver : Refe
 
 internal object NetworkModelProjectComponentToNetworkModelProjectResolver : ReferenceResolver<NetworkModelProjectComponent, NetworkModelProject> by KReferenceResolver(
     NetworkModelProjectComponent::class, NetworkModelProject::class, NetworkModelProjectComponent::setParent
-)
-
-internal object NetworkModelProjectStageToChangeSet : ReferenceResolver<NetworkModelProjectStage, ChangeSet> by KReferenceResolverIO2DS(
-    NetworkModelProjectStage::class, ChangeSet::class, NetworkModelProjectStage::setChangeSet
 )
 
 internal object AnnotatedProjectDependencyToDependentNetworkModelProjectStageResolver : ReferenceResolver<AnnotatedProjectDependency, NetworkModelProjectStage> by KReferenceResolver(

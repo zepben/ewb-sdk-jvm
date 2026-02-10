@@ -74,9 +74,9 @@ fun NetworkModelProjectStage.fillFields(service: VariantService, includeRuntime:
     baseModelVersion = "2025-10-12"
     lastConflictCheckedAt = Instant.now().minusSeconds(20000)
     userComments = "Dodgy network, probably dont use this in production..."
+    setChangeSetMRID("${mRID}-changeset-1")
 
     if (includeRuntime) {
-        setChangeSet(ChangeSet("${mRID}-changeset-1").fillFields(service, includeRuntime))
         addDependingStage(AnnotatedProjectDependency("$mRID-apd").fillFields(service, includeRuntime))
         addDependentOnStage(AnnotatedProjectDependency("$mRID-apd").fillFields(service, includeRuntime))
 

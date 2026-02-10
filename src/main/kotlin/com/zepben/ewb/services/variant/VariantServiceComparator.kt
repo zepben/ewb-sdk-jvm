@@ -61,6 +61,7 @@ class VariantServiceComparator : BaseServiceComparator() {
                 NetworkModelProjectStage::baseModelVersion,
                 NetworkModelProjectStage::lastConflictCheckedAt,
                 NetworkModelProjectStage::userComments,
+                NetworkModelProjectStage::changeSetMRID
             )
             compareIdReferenceCollections(
                 NetworkModelProjectStage::dependentOnStage,
@@ -68,11 +69,6 @@ class VariantServiceComparator : BaseServiceComparator() {
                 //NetworkModelProjectStage::equipmentContainers, // FIXME: not resolving via addFromPb
             )
 
-            source.changeSet?.let { sourceCS ->
-                target.changeSet?.let { targetCS ->
-                    compareChangeSets(sourceCS, targetCS)
-                }
-            }
         }
 
     private fun compareAnnotatedProjectDependencies(source: AnnotatedProjectDependency, target: AnnotatedProjectDependency): ObjectDifference<AnnotatedProjectDependency> =

@@ -29,7 +29,6 @@ import com.zepben.ewb.services.variant.whenVariantIdentifiedObject
 import com.zepben.protobuf.vc.VariantChangeSetMember
 import com.zepben.protobuf.vc.VariantDataSet
 import com.zepben.protobuf.vc.VariantIdentifiedObject
-import java.time.Instant
 import com.zepben.protobuf.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProject as PBNetworkModelProject
 import com.zepben.protobuf.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectComponent as PBNetworkModelProjectComponent
 import com.zepben.protobuf.cim.iec61970.infiec61970.infpart303.networkmodelprojects.AnnotatedProjectDependency as PBAnnotatedProjectDependency
@@ -166,10 +165,7 @@ fun toPb(cim: NetworkModelProjectStage, pb: PBNetworkModelProjectStage.Builder):
         cim.baseModelVersion?.also { baseModelVersionSet = it } ?: run { baseModelVersionNull = NullValue.NULL_VALUE }
         cim.lastConflictCheckedAt?.also { lastConflictCheckedAtSet = it.toTimestamp() } ?: run { lastConflictCheckedAtNull = NullValue.NULL_VALUE }
         cim.userComments?.also { userCommentsSet = it } ?: run { userCommentsNull = NullValue.NULL_VALUE }
-        cim.changeSetMRID?.also {
-            changeSetMRID = it
-        }
-        cim.changeSet?.also { changeSetSet = it.toPb() } ?: run { changeSetNull = NullValue.NULL_VALUE }
+        cim.changeSetMRID?.also { changeSetMRIDSet = it } ?: run { changeSetMRIDNull = NullValue.NULL_VALUE }
         cim.dependentOnStage.forEach {
             addDependentOnStage( it.toPb() )
         }

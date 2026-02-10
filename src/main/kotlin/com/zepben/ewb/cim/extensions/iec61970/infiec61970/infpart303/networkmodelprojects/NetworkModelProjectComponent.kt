@@ -30,7 +30,7 @@ abstract class NetworkModelProjectComponent(mRID: String) : IdentifiedObject(mRI
     @ZBEX val parent: NetworkModelProject? get() = _parent
 
     fun setParent(networkModelProject: NetworkModelProject): NetworkModelProjectComponent {
-        // TODO: Validation
+        require(_parent == null) { "Parent already set for this NetworkModelProjectComponent." }
         _parent = networkModelProject
         return this
     }

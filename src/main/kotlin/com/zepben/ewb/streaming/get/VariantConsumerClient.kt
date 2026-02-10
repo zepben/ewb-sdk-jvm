@@ -124,13 +124,16 @@ class VariantConsumerClient @JvmOverloads constructor(
         val request = stub.getNetworkModelProjects(streamObserver)
         val builder = GetNetworkModelProjectsRequest.newBuilder()
 
-        mRIDs?.let {
-            batchSend(it, builder::addMrids) {
+        if (mRIDs == null) {
+            request.onNext(builder.build())
+        } else {
+            batchSend(mRIDs, builder::addMrids) {
                 if (builder.mridsList.isNotEmpty())
                     request.onNext(builder.build())
                 builder.clearMrids()
             }
         }
+
         request.onCompleted()
         streamObserver.await()
 

@@ -53,7 +53,6 @@ import com.zepben.ewb.cim.iec61970.base.wires.*
 import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.AnnotatedProjectDependency
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStage
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
 
 /**
  * These should be used to access [ReferenceResolver] instances for use with [BaseService.resolveOrDeferReference] and
@@ -599,10 +598,6 @@ object Resolvers {
     @JvmStatic
     fun assets(powerSystemResource: PowerSystemResource): BoundReferenceResolver<PowerSystemResource, Asset> =
         BoundReferenceResolver(powerSystemResource, PowerSystemResourceToAssetResolver, AssetToPowerSystemResourceResolver)
-
-    @JvmStatic
-    fun changeSets(networkModelProjectStage: NetworkModelProjectStage): BoundReferenceResolver<NetworkModelProjectStage, ChangeSet> =
-        BoundReferenceResolver(networkModelProjectStage, NetworkModelProjectStageToChangeSet, null)
 
     @JvmStatic
     fun networkModelProjectComponents(networkModelProject: NetworkModelProject): BoundReferenceResolver<NetworkModelProject, NetworkModelProjectComponent> =

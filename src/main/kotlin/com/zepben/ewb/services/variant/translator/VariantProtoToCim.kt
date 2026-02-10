@@ -32,7 +32,6 @@ import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectCrea
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectDeletion
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectModification
 import com.zepben.ewb.services.common.Resolvers
-import com.zepben.ewb.services.common.extensions.getOrThrow
 import com.zepben.ewb.services.common.translator.AddFromPbResult
 import com.zepben.ewb.services.common.translator.BaseProtoToCim
 import com.zepben.ewb.services.common.translator.getOrAddFromPb
@@ -110,11 +109,10 @@ fun toCim(pb: PBNetworkModelProjectStage, networkService: VariantService): Netwo
         baseModelVersion = pb.baseModelVersionSet.takeUnless { pb.hasBaseModelVersionNull() }
         lastConflictCheckedAt = pb.lastConflictCheckedAtSet.takeUnless { pb.hasLastConflictCheckedAtNull() }?.toInstant()
         userComments = pb.userCommentsSet.takeUnless { pb.hasUserCommentsNull() }
-        setChangeSetMRID(pb.changeSetMRID)
-
-        if ( !pb.hasChangeSetNull() ) {
-            setChangeSet(toCim(pb.changeSetSet, networkService))
+        pb.changeSetMRIDSet.takeUnless {pb.hasChangeSetMRIDNull() }?.let {
+            setChangeSetMRID(it)
         }
+
         pb.dependingStageList.forEach {
             addDependingStage(toCim(it, networkService))
         }

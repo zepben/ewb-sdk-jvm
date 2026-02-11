@@ -17,14 +17,11 @@
 
 ## [1.5.0] - 2026-02-13
 ### Breaking Changes
-* `BaseDatabaseWriter` has the following breaking changes which prevent it being used to call the `write` method without using a descendant class type:
-  * No longer defines a generic type of data to be written due to an expanded set of descendant class requirements.
-  * The protected `writeData` function has been replaced with `connectAndWrite`, which now takes a callback to perform the data writing rather than the data.
-  * The abstract `write` function for the generic type has been removed. It is expected appropriate `write` methods, which call the new `connectAndWrite`, will
-    be added to descendant classes.
-* `BaseCollectionWriter` has the following breaking changes which prevent it being used to call the `write` method without using a descendant class type:
-  * No longer defines a generic type of data to be written due to an expanded set of descendant class requirements.
-  * The abstract `write` function for the generic type has been removed. It is expected appropriate `write` methods will be added to descendant classes.
+* A `ShuntCompensator.groundingTerminal` must belong to the `ShuntCompensator`. Assigning a `Terminal` to `ShuntCompensator.groundingTerminal` will now set the
+  terminals `conductingEquipment` to the `ShuntCompensator` if it isn't set, and throw an `IllegalArgumentException` if it is assigned to a different
+  `ConductingEquipment`.
+* `ShuntCompensator.groundingTerminal` must be in the `terminals` collection, and will be added automatically if it is missing on assignment, which in turn will
+  update the `sequenceNumber` of the `Terminal` if it is `0`.
 
 ### New Features
 * Added table `TableVariantMetrics` to the metrics database.
@@ -90,8 +87,7 @@
 * Added helper function `AcLineSegment.wireInfoForPhase()` for retrieving the `WireInfo` for a given phase of a conductor.
 * Added helper function `EquipmentContainer.edgeTerminals()` for retrieving all terminals on the edge of an `EquipmentContainer`.
 * Added support to filter NetworkHierarchy responses when calling `NetworkConsumerClient.getNetworkHierarchy()`. A client can now choose what hierarchy
-  containers should
-  be populated in the response.
+  containers should be populated in the response.
 * Added `EquipmentContainer.edgeTerminals()` to retrieve all terminals connecting outside of the `EquipmentContainer`.
 * Added `AcLineSegment.wireInfoForPhase(phase: SinglePhaseKind)` to retrieve the `WireInfo` associated with a given phase of a conductor.
 

@@ -44,5 +44,21 @@ abstract class ShuntCompensator(mRID: String) : RegulatingCondEq(mRID) {
 
     @ZBEX
     var groundingTerminal: Terminal? = null
+        set(value) {
+            if (value == null) {
+                field = null
+                return
+            }
+
+            if (value.conductingEquipment == null)
+                value.conductingEquipment = this
+
+            require(value.conductingEquipment == this) { "The grounding terminal must belong to this ShuntCompensator." }
+
+            if (value !in terminals)
+                addTerminal(value)
+
+            field = value
+        }
 
 }

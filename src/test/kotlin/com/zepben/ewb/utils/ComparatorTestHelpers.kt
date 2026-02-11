@@ -86,6 +86,7 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
         assertThat(diff.source, equalTo(expectModification.source))
         assertThat(diff.target, equalTo(expectModification.target))
         assertThat(diff.differences.filterKeys { it !in expectedDifferences }, equalTo(expectModification.differences))
+        assertThat(diff.differences.filterKeys { it in expectedDifferences }.size, equalTo(expectedDifferences.size))
 
         if (optionsStopCompare) {
             val noDiffExpected: ObjectDifference<T> = newComparator(options).compare(source, target)

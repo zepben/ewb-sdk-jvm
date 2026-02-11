@@ -1731,7 +1731,7 @@ fun ShuntCompensator.fillFields(service: NetworkService, includeRuntime: Boolean
     nomU = 1
     phaseConnection = PhaseShuntConnectionKind.I
     sections = 2.2
-    groundingTerminal = Terminal(generateId()).also { service.add(it) }
+    groundingTerminal = terminals.last()
 
     return this
 }

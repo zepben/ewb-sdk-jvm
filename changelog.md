@@ -1,7 +1,11 @@
 # Zepben EWB SDK changelog
 ## [1.6.0] - UNRELEASED
 ### Breaking Changes
-* None.
+* A `ShuntCompensator.groundingTerminal` must belong to the `ShuntCompensator`. Assigning a `Terminal` to `ShuntCompensator.groundingTerminal` will now set the
+  terminals `conductingEquipment` to the `ShuntCompensator` if it isn't set, and throw an `IllegalArgumentException` if it is assigned to a different
+  `ConductingEquipment`.
+* `ShuntCompensator.groundingTerminal` must be in the `terminals` collection, and will be added automatically if it is missing on assignment, which in turn will
+  update the `sequenceNumber` of the `Terminal` if it is `0`.
 
 ### New Features
 * None.
@@ -90,8 +94,7 @@
 * Added helper function `AcLineSegment.wireInfoForPhase()` for retrieving the `WireInfo` for a given phase of a conductor.
 * Added helper function `EquipmentContainer.edgeTerminals()` for retrieving all terminals on the edge of an `EquipmentContainer`.
 * Added support to filter NetworkHierarchy responses when calling `NetworkConsumerClient.getNetworkHierarchy()`. A client can now choose what hierarchy
-  containers should
-  be populated in the response.
+  containers should be populated in the response.
 * Added `EquipmentContainer.edgeTerminals()` to retrieve all terminals connecting outside of the `EquipmentContainer`.
 * Added `AcLineSegment.wireInfoForPhase(phase: SinglePhaseKind)` to retrieve the `WireInfo` associated with a given phase of a conductor.
 

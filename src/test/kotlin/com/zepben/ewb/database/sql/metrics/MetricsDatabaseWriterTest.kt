@@ -56,7 +56,7 @@ internal class MetricsDatabaseWriterTest {
 
     private val uuid = UUID.randomUUID()
     private val ingestionJob = IngestionJob(uuid, mockk())
-    private val variantMetrics = VariantMetrics("projectId", "networkStageId", "1234", emptyList())
+    private val variantMetrics = VariantMetrics("projectId", "networkStageId", "1234", "changeSetId1", emptyList())
 
     private val writer = mockk<MetricsWriter> {
         every { write(any<IngestionJob>()) } returns true

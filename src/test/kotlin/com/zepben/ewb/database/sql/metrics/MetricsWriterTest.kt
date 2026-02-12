@@ -40,7 +40,7 @@ internal class MetricsWriterTest {
         every { write(any(), any<IngestionMetadata>()) } returns true
         every { writeSource(any(), any<JobSource>()) } returns true
         every { writeMetric(any(), any<NetworkMetric>()) } returns true
-        every { writeVariantMetricEntry(any(), any(), any(), any<VariantMetricEntry>()) } returns true
+        every { writeVariantMetricEntry(any(), any(), any(), any(), any<VariantMetricEntry>()) } returns true
     }
     private val metricsWriter = MetricsWriter(mockk(), metricsEntryWriter)
 
@@ -116,7 +116,7 @@ internal class MetricsWriterTest {
     @Test
     internal fun `passes variant metrics through to the metrics entry writer`() {
         val variantMetrics = VariantMetrics(
-            "projectId", "networkStageId", "1234",
+            "projectId", "networkStageId", "1234", "changeSetId1",
             listOf(
                 VariantMetricEntry(VariantMetricKind.CONFLICT, "test", 7, listOf("mrid1", "mrid2")),
                 VariantMetricEntry(VariantMetricKind.ASSET, "test2", 8, emptyList())
@@ -130,12 +130,14 @@ internal class MetricsWriterTest {
                 variantMetrics.networkModelProjectId,
                 variantMetrics.networkModelProjectStageId,
                 variantMetrics.baseModelVersion,
+                variantMetrics.changeSetId,
                 variantMetrics.metrics[0]
             )
             metricsEntryWriter.writeVariantMetricEntry(
                 variantMetrics.networkModelProjectId,
                 variantMetrics.networkModelProjectStageId,
                 variantMetrics.baseModelVersion,
+                variantMetrics.changeSetId,
                 variantMetrics.metrics[1]
             )
         }

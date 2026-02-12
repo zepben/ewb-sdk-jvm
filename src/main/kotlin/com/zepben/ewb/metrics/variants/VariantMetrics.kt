@@ -19,5 +19,6 @@ data class VariantMetrics(
     val networkModelProjectId: String,
     val networkModelProjectStageId: String,
     val baseModelVersion: String,
+    val changeSetId: String,
     val metrics: List<VariantMetricEntry>
 )

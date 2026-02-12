@@ -33,7 +33,13 @@ internal class MetricsWriter(
             }
 
     fun write(data: VariantMetrics): Boolean =
-        writeEach(data.metrics, { writer.writeVariantMetricEntry(data.networkModelProjectId, data.networkModelProjectStageId, data.baseModelVersion, it) } ) { metricEntry, e ->
+        writeEach(data.metrics, { writer.writeVariantMetricEntry(
+            networkModelProjectId = data.networkModelProjectId,
+            networkModelProjectStageId = data.networkModelProjectStageId,
+            baseModelVersion = data.baseModelVersion,
+            changeSetId = data.changeSetId,
+            variantMetricEntry = it
+        ) } ) { metricEntry, e ->
             logger.error("Failed to write metric entry $metricEntry: ${e.message}")
         }
 }

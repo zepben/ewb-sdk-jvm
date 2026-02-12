@@ -119,6 +119,7 @@ internal class MetricsEntryWriter(
      * @param networkModelProjectId The network model project ID of the variant metric to be written.
      * @param networkModelProjectStageId The network model project stage ID of the variant metric to be written.
      * @param baseModelVersion The base model version of the variant metric to be written.
+     * @param baseModelVersion The change set of the variant metric to be written.
      * @param variantMetricEntry The [VariantMetricEntry] to write.
      * @return true if the [VariantMetricEntry] was written successfully.
      */
@@ -126,6 +127,7 @@ internal class MetricsEntryWriter(
         networkModelProjectId: String,
         networkModelProjectStageId: String,
         baseModelVersion: String,
+        changeSetId: String,
         variantMetricEntry: VariantMetricEntry
     ): Boolean {
         val table = databaseTables.getTable<TableVariantMetrics>()
@@ -135,6 +137,7 @@ internal class MetricsEntryWriter(
         insert.setString(table.NETWORK_MODEL_PROJECT_ID.queryIndex, networkModelProjectId)
         insert.setString(table.NETWORK_MODEL_PROJECT_STAGE_ID.queryIndex, networkModelProjectStageId)
         insert.setString(table.BASE_MODEL_VERSION.queryIndex, baseModelVersion)
+        insert.setString(table.CHANGE_SET_ID.queryIndex, changeSetId)
         insert.setString(table.TYPE.queryIndex, variantMetricEntry.type.name)
         insert.setString(table.NAME.queryIndex, variantMetricEntry.name)
         insert.setInt(table.METRIC_VALUE.queryIndex, variantMetricEntry.value)

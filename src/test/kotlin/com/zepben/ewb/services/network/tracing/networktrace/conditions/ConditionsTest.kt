@@ -100,4 +100,11 @@ class ConditionsTest {
         assertThat(condition.limit, equalTo(1))
         assertThat(condition.equipmentType, equalTo(PowerTransformer::class))
     }
+
+    @Test
+    fun `test stopOnShuntCompensatorGround condition`() {
+        val condition = Conditions.stopOnShuntCompensatorGround<Unit>()
+        assertThat(condition, instanceOf(ShuntCompensatorCondition.StopOnGround::class.java))
+    }
+
 }

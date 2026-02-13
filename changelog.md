@@ -8,7 +8,7 @@
   update the `sequenceNumber` of the `Terminal` if it is `0`.
 
 ### New Features
-* None.
+* Added `Conditions.stopOnShuntCompensatorGround`, a new condition to prevent tracing through a `ShuntCompensator` using its grounding terminal.
 
 ### Enhancements
 * None.

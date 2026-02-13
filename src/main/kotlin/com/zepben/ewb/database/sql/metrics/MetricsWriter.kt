@@ -10,6 +10,7 @@ package com.zepben.ewb.database.sql.metrics
 
 import com.zepben.ewb.database.sql.common.BaseCollectionWriter
 import com.zepben.ewb.metrics.IngestionJob
+import com.zepben.ewb.metrics.variants.VariantMetrics
 
 /**
  * Class for writing an ingestion job (and associated metadata, metrics, and sources) to the tables in a metrics database.
@@ -20,9 +21,9 @@ import com.zepben.ewb.metrics.IngestionJob
 internal class MetricsWriter(
     databaseTables: MetricsDatabaseTables,
     private val writer: MetricsEntryWriter = MetricsEntryWriter(databaseTables)
-) : BaseCollectionWriter<IngestionJob>() {
+) : BaseCollectionWriter() {
 
-    override fun write(data: IngestionJob): Boolean =
+    fun write(data: IngestionJob): Boolean =
         writer.write(data.id, data.metadata) and
             writeEach(data.sources.entries, { writer.writeSource(data.id, it) }) { jobSource, e ->
                 logger.error("Failed to write job source $jobSource: ${e.message}")
@@ -31,4 +32,14 @@ internal class MetricsWriter(
                 logger.error("Failed to write metric $metric: ${e.message}")
             }
 
+    fun write(data: VariantMetrics): Boolean =
+        writeEach(data.metrics, { writer.writeVariantMetricEntry(
+            networkModelProjectId = data.networkModelProjectId,
+            networkModelProjectStageId = data.networkModelProjectStageId,
+            baseModelVersion = data.baseModelVersion,
+            changeSetId = data.changeSetId,
+            variantMetricEntry = it
+        ) } ) { metricEntry, e ->
+            logger.error("Failed to write metric entry $metricEntry: ${e.message}")
+        }
 }

@@ -11,6 +11,7 @@ package com.zepben.ewb.database.sql.metrics
 import com.zepben.ewb.database.sql.common.tables.TableVersion
 import com.zepben.ewb.database.sql.initialisers.NoOpDatabaseInitialiser
 import com.zepben.ewb.metrics.IngestionJob
+import com.zepben.ewb.metrics.variants.VariantMetrics
 import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.every
 import io.mockk.justRun
@@ -54,25 +55,27 @@ internal class MetricsDatabaseWriterTest {
     }
 
     private val uuid = UUID.randomUUID()
-    private val job = IngestionJob(uuid, mockk())
+    private val ingestionJob = IngestionJob(uuid, mockk())
+    private val variantMetrics = VariantMetrics("projectId", "networkStageId", "1234", "changeSetId1", emptyList())
 
     private val writer = mockk<MetricsWriter> {
-        every { write(any()) } returns true
+        every { write(any<IngestionJob>()) } returns true
+        every { write(any<VariantMetrics>()) } returns true
     }
 
     @Test
-    internal fun callsWriter() {
+    internal fun `callsWriter for IngestionJob`() {
         val result = MetricsDatabaseWriter(
             tables,
             connectionyStuff,
             modelPath = null,
             createMetricsWriter = { writer }
-        ).write(job)
+        ).write(ingestionJob)
 
         assertThat("Should have written successfully", result)
         assertThat("Job ID file shouldn't exist with no path", modelPath.resolve("$uuid.${JOB_ID_FILE_EXTENSION}").notExists())
 
-        verify { writer.write(job) }
+        verify { writer.write(ingestionJob) }
     }
 
     @Test
@@ -82,11 +85,11 @@ internal class MetricsDatabaseWriterTest {
             connectionyStuff,
             modelPath = modelPath,
             createMetricsWriter = { writer }
-        ).write(job)
+        ).write(ingestionJob)
 
         assertThat("Job ID file should exist", modelPath.resolve("$uuid.${JOB_ID_FILE_EXTENSION}").exists())
 
-        verify { writer.write(job) }
+        verify { writer.write(ingestionJob) }
     }
 
     @Test
@@ -102,13 +105,13 @@ internal class MetricsDatabaseWriterTest {
             connectionyStuff,
             modelPath = modelPath,
             createMetricsWriter = { writer }
-        ).write(job)
+        ).write(ingestionJob)
 
         assertThat("Old job ID file should be deleted", modelPath.resolve("$uuid2.${JOB_ID_FILE_EXTENSION}").notExists())
         assertThat("Old job ID file should be deleted", modelPath.resolve("$uuid3.${JOB_ID_FILE_EXTENSION}").notExists())
         assertThat("New job ID file should exist", modelPath.resolve("$uuid.${JOB_ID_FILE_EXTENSION}").exists())
 
-        verify { writer.write(job) }
+        verify { writer.write(ingestionJob) }
     }
 
     @Test
@@ -120,12 +123,12 @@ internal class MetricsDatabaseWriterTest {
             NoOpDatabaseInitialiser { connection },
             modelPath = innerPath,
             createMetricsWriter = { writer }
-        ).write(job)
+        ).write(ingestionJob)
 
         assertThat("write should be successful", success)
         assertThat("Job ID file should exist", innerPath.resolve("$uuid.$JOB_ID_FILE_EXTENSION").exists())
 
-        verify { writer.write(job) }
+        verify { writer.write(ingestionJob) }
     }
 
     @Test
@@ -138,11 +141,25 @@ internal class MetricsDatabaseWriterTest {
             NoOpDatabaseInitialiser { connection },
             modelPath = innerPath,
             createMetricsWriter = { writer }
-        ).write(job)
+        ).write(ingestionJob)
 
         assertThat("write should be unsuccessful", !success)
 
-        verify { writer.write(job) }
+        verify { writer.write(ingestionJob) }
     }
 
+    @Test
+    internal fun `callsWriter for VariantMetrics`() {
+        val result = MetricsDatabaseWriter(
+            tables,
+            connectionyStuff,
+            modelPath = modelPath,
+            createMetricsWriter = { writer }
+        ).write(variantMetrics)
+
+        assertThat("Should have written successfully", result)
+        assertThat("Job ID file shouldn't exist after just writing variant metrics", modelPath.resolve("$uuid.${JOB_ID_FILE_EXTENSION}").notExists())
+
+        verify { writer.write(variantMetrics) }
+    }
 }

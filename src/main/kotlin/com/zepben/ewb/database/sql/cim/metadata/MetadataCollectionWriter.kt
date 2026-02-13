@@ -21,9 +21,9 @@ import com.zepben.ewb.services.common.meta.MetadataCollection
 internal class MetadataCollectionWriter(
     databaseTables: CimDatabaseTables,
     private val writer: MetadataEntryWriter = MetadataEntryWriter(databaseTables)
-) : BaseCollectionWriter<MetadataCollection>() {
+) : BaseCollectionWriter() {
 
-    override fun write(data: MetadataCollection): Boolean = data.run {
+    fun write(data: MetadataCollection): Boolean = data.run {
         @Suppress("Destructure")
         writeEach(dataSources, writer::write) { ds, e -> logger.error("Failed to write DataSource '${ds.source}': ${e.message}") }
     }

@@ -1,10 +1,24 @@
 # Zepben EWB SDK changelog
 ## [1.5.0] - UNRELEASED
 ### Breaking Changes
-* None.
+* `BaseDatabaseWriter` has the following breaking changes which prevent it being used to call the `write` method without using a descendant class type:
+  * No longer defines a generic type of data to be written due to an expanded set of descendant class requirements.
+  * The protected `writeData` function has been replaced with `connectAndWrite`, which now takes a callback to perform the data writing rather than the data.
+  * The abstract `write` function for the generic type has been removed. It is expected appropriate `write` methods, which call the new `connectAndWrite`, will
+    be added to descendant classes.
+* `BaseCollectionWriter` has the following breaking changes which prevent it being used to call the `write` method without using a descendant class type:
+  * No longer defines a generic type of data to be written due to an expanded set of descendant class requirements.
+  * The abstract `write` function for the generic type has been removed. It is expected appropriate `write` methods will be added to descendant classes.
 
 ### New Features
-* None.
+* Added table `TableVariantMetrics` to the metrics database.
+  * Using `MetricsDatabaseWriter`, a `VariantMetics` class containing a set of metrics related to a single `variant` may be saved to the database.
+
+* Added new classes:
+  * VariantMetrics
+
+* Added new enums:
+  * VariantMetricKind
 
 ### Enhancements
 * None.
@@ -37,8 +51,8 @@
 
 ## [1.3.0] - 2025-12-23
 ### Breaking Changes
-* You must now provide an `mRID` for all `IdentifiedObject` instances, the auto-generated default `mRID` has been removed. The helper function 
-  `generateId()` has been added which can be used to auto-generate a UUID. Note this is discouraged for production use, and reproducible mRIDs 
+* You must now provide an `mRID` for all `IdentifiedObject` instances, the auto-generated default `mRID` has been removed. The helper function
+  `generateId()` has been added which can be used to auto-generate a UUID. Note this is discouraged for production use, and reproducible mRIDs
   are preferred.
 
 ### New Features
@@ -59,7 +73,8 @@
 * Added new enum `WireInsulationKind` with extensions.
 * Added helper function `AcLineSegment.wireInfoForPhase()` for retrieving the `WireInfo` for a given phase of a conductor.
 * Added helper function `EquipmentContainer.edgeTerminals()` for retrieving all terminals on the edge of an `EquipmentContainer`.
-* Added support to filter NetworkHierarchy responses when calling `NetworkConsumerClient.getNetworkHierarchy()`. A client can now choose what hierarchy containers should
+* Added support to filter NetworkHierarchy responses when calling `NetworkConsumerClient.getNetworkHierarchy()`. A client can now choose what hierarchy
+  containers should
   be populated in the response.
 * Added `EquipmentContainer.edgeTerminals()` to retrieve all terminals connecting outside of the `EquipmentContainer`.
 * Added `AcLineSegment.wireInfoForPhase(phase: SinglePhaseKind)` to retrieve the `WireInfo` associated with a given phase of a conductor.

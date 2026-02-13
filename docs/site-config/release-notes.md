@@ -2,6 +2,7 @@
 
 | Version                  | Released              |
 | ------------------------ | --------------------- |
+|[1.5.0](#150)| `13 February 2026` |
 |[1.4.0](#140)| `23 January 2026` |
 |[1.3.0](#130)| `23 December 2025` |
 |[1.2.0](#120)| `05 December 2025` |
@@ -44,6 +45,39 @@
 ---
 
 NOTE: This library is not yet stable, and breaking changes should be expected until a 1.0.0 release.
+
+---
+
+## [1.5.0]
+
+### Breaking Changes
+* `BaseDatabaseWriter` has the following breaking changes which prevent it being used to call the `write` method without using a descendant class type:
+  * No longer defines a generic type of data to be written due to an expanded set of descendant class requirements.
+  * The protected `writeData` function has been replaced with `connectAndWrite`, which now takes a callback to perform the data writing rather than the data.
+  * The abstract `write` function for the generic type has been removed. It is expected appropriate `write` methods, which call the new `connectAndWrite`, will
+    be added to descendant classes.
+* `BaseCollectionWriter` has the following breaking changes which prevent it being used to call the `write` method without using a descendant class type:
+  * No longer defines a generic type of data to be written due to an expanded set of descendant class requirements.
+  * The abstract `write` function for the generic type has been removed. It is expected appropriate `write` methods will be added to descendant classes.
+
+### New Features
+* Added table `TableVariantMetrics` to the metrics database.
+  * Using `MetricsDatabaseWriter`, a `VariantMetics` class containing a set of metrics related to a single `variant` may be saved to the database.
+
+* Added new classes:
+  * VariantMetrics
+
+* Added new enums:
+  * VariantMetricKind
+
+### Enhancements
+* None.
+
+### Fixes
+* Reordered the feeder equipment and direction assignment on database read to prevent parallel feeders from tracing back into the zone substation.
+
+### Notes
+* Update super-pom to 0.46.1 to fix test containers.
 
 ---
 

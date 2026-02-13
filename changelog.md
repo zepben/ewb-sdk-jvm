@@ -27,7 +27,7 @@
 * Reordered the feeder equipment and direction assignment on database read to prevent parallel feeders from tracing back into the zone substation.
 
 ### Notes
-* None.
+* Update super-pom to 0.46.1 to fix test containers.
 
 ## [1.4.0] - 2026-01-23
 ### Breaking Changes

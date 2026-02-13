@@ -1,5 +1,5 @@
 # Zepben EWB SDK changelog
-## [1.5.0] - UNRELEASED
+## [1.5.0] - 2026-02-13
 ### Breaking Changes
 * `BaseDatabaseWriter` has the following breaking changes which prevent it being used to call the `write` method without using a descendant class type:
   * No longer defines a generic type of data to be written due to an expanded set of descendant class requirements.

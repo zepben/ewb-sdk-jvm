@@ -22,18 +22,24 @@ import java.time.Instant
  */
 @ZBEX
 abstract class NetworkModelProjectComponent(mRID: String) : IdentifiedObject(mRID) {
-    private var _parent: NetworkModelProject? = null
 
     @ZBEX var created: Instant? = null
+        set(it) {
+            updated = Instant.now()
+            field = it
+        }
     @ZBEX var updated: Instant? = null
     @ZBEX var closed: Instant? = null
-    @ZBEX val parent: NetworkModelProject? get() = _parent
-
-    fun setParent(networkModelProject: NetworkModelProject): NetworkModelProjectComponent {
-        require(_parent == null) { "Parent already set for this NetworkModelProjectComponent." }
-        _parent = networkModelProject
-        return this
-    }
+        set(it) {
+            updated = Instant.now()
+            field = it
+        }
+    @ZBEX var parent: NetworkModelProject? = null
+        set(it) {
+            require(parent == null) { "Parent already set for NetworkModelProjectComponent $mRID." }
+            updated = Instant.now()
+            field = it
+        }
 
     /**
      * Delete this [NetworkModelProject]
@@ -47,8 +53,8 @@ abstract class NetworkModelProjectComponent(mRID: String) : IdentifiedObject(mRI
         }
 
         closed = Instant.now()
+        updated = Instant.now()
         return true
     }
 
-    // TODO: function to update `_updated` whenever an applicable attribute is modified, should this propogate from attributes of attributes?
 }

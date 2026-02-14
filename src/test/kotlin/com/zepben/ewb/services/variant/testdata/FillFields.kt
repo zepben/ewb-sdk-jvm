@@ -80,7 +80,7 @@ fun NetworkModelProjectStage.fillFields(service: VariantService, includeRuntime:
         addDependingStage(AnnotatedProjectDependency("$mRID-apd").fillFields(service, includeRuntime))
         addDependentOnStage(AnnotatedProjectDependency("$mRID-apd").fillFields(service, includeRuntime))
 
-        addEquipmentContainer(
+        addContainer(
             Feeder("${mRID}-equipment-container")
         )
     }
@@ -96,18 +96,18 @@ fun NetworkModelProjectStage.fillFields(service: VariantService, includeRuntime:
 fun ChangeSet.fillFields(service: VariantService, includeRuntime: Boolean = true): ChangeSet {
     (this as DataSet).fillFieldsCommon(service, includeRuntime)
 
-    addChangeSetMember(ObjectCreation().fillFields(service, includeRuntime))
-    addChangeSetMember(ObjectDeletion().fillFields(service, includeRuntime))
-    addChangeSetMember(
+    addMember(ObjectCreation().fillFields(service, includeRuntime))
+    addMember(ObjectDeletion().fillFields(service, includeRuntime))
+    addMember(
         ObjectCreation().also {
             it.targetObjectMRID = "${mRID}-creation-target"
         })
-    addChangeSetMember(
+    addMember(
         ObjectDeletion().also {
             it.targetObjectMRID = "$mRID-deletion-target"
         }
     )
-    addChangeSetMember(ObjectModification.createObjectModification(
+    addMember(ObjectModification.createObjectModification(
         changeSet = this,
         modifiedObjectMRID = "${mRID}-modified",
         originalObjectMRID = "${mRID}-original"

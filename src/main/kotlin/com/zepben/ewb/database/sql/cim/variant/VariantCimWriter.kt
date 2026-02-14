@@ -21,11 +21,9 @@ import com.zepben.ewb.database.sql.extensions.setNullableString
 import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.infpart303.networkmodelprojects.TableAnnotatedProjectDependencies
 import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.infpart303.networkmodelprojects.TableNetworkModelProjectStageEquipmentContainers
 import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.infpart303.networkmodelprojects.TableNetworkModelProjectStages
-import com.zepben.ewb.database.sql.extensions.setInstant
 import com.zepben.ewb.database.sql.extensions.setNullableInt
 import com.zepben.ewb.services.variant.VariantService
 import java.sql.PreparedStatement
-import java.sql.Time
 import java.sql.Timestamp
 
 /**
@@ -102,10 +100,10 @@ class VariantCimWriter(
         insert.setNullableString(table.BASE_MODEL_VERSION.queryIndex, networkModelProjectStage.baseModelVersion)
         insert.setTimestamp(table.LAST_CONFLICT_CHECKED_AT.queryIndex, networkModelProjectStage.lastConflictCheckedAt?.let { Timestamp.from(it) })
         insert.setNullableString(table.USER_COMMENTS.queryIndex, networkModelProjectStage.userComments)
-        insert.setNullableString(table.CHANGE_SET_MRID.queryIndex, networkModelProjectStage.changeSetMRID)
+        insert.setNullableString(table.CHANGE_SET_MRID.queryIndex, networkModelProjectStage.changeSet)
 
         var status = true
-        networkModelProjectStage.equipmentContainers.forEach {
+        networkModelProjectStage.equipmentContainerMRIDs.forEach {
             status = status and writeAssociation(networkModelProjectStage, it)
         }
 

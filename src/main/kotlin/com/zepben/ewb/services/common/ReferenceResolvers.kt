@@ -559,21 +559,36 @@ internal object PowerSystemResourceToAssetResolver : ReferenceResolver<PowerSyst
     PowerSystemResource::class, Asset::class, PowerSystemResource::addAsset
 )
 
-internal object NetworkModelProjectToNetworkModelProjectComponentResolver : ReferenceResolver<NetworkModelProject, NetworkModelProjectComponent> by KReferenceResolver(
-    NetworkModelProject::class, NetworkModelProjectComponent::class, NetworkModelProject::addChild
-)
+internal object NetworkModelProjectToNetworkModelProjectComponentResolver :
+    ReferenceResolver<NetworkModelProject, NetworkModelProjectComponent> by KReferenceResolver(
+        NetworkModelProject::class, NetworkModelProjectComponent::class, NetworkModelProject::addChild
+    )
 
-internal object NetworkModelProjectComponentToNetworkModelProjectResolver : ReferenceResolver<NetworkModelProjectComponent, NetworkModelProject> by KReferenceResolver(
-    NetworkModelProjectComponent::class, NetworkModelProject::class, NetworkModelProjectComponent::setParent
-)
+internal object NetworkModelProjectComponentToNetworkModelProjectResolver :
+    ReferenceResolver<NetworkModelProjectComponent, NetworkModelProject> by KReferenceResolver(
+        NetworkModelProjectComponent::class, NetworkModelProject::class, NetworkModelProjectComponent::setParent
+    )
 
-internal object AnnotatedProjectDependencyToDependentNetworkModelProjectStageResolver : ReferenceResolver<AnnotatedProjectDependency, NetworkModelProjectStage> by KReferenceResolver(
-    AnnotatedProjectDependency::class, NetworkModelProjectStage::class, AnnotatedProjectDependency::addDependencyDependingStage
-)
+internal object AnnotatedProjectDependencyToDependentNetworkModelProjectStageResolver :
+    ReferenceResolver<AnnotatedProjectDependency, NetworkModelProjectStage> by KReferenceResolver(
+        AnnotatedProjectDependency::class, NetworkModelProjectStage::class, AnnotatedProjectDependency::addDependencyDependingStage
+    )
 
-internal object AnnotatedProjectDependencyToDependingNetworkModelProjectStageResolver : ReferenceResolver<AnnotatedProjectDependency, NetworkModelProjectStage> by KReferenceResolver(
-    AnnotatedProjectDependency::class, NetworkModelProjectStage::class, AnnotatedProjectDependency::addDependencyDependingStage
-)
+internal object AnnotatedProjectDependencyToDependingNetworkModelProjectStageResolver :
+    ReferenceResolver<AnnotatedProjectDependency, NetworkModelProjectStage> by KReferenceResolver(
+        AnnotatedProjectDependency::class, NetworkModelProjectStage::class, AnnotatedProjectDependency::addDependencyDependingStage
+    )
+
+internal object DependentNetworkModelProjectStageToAnnotatedProjectDependencyResolver :
+    ReferenceResolver<NetworkModelProjectStage, AnnotatedProjectDependency> by KReferenceResolver(
+        NetworkModelProjectStage::class, AnnotatedProjectDependency::class, NetworkModelProjectStage::addDependentOnStage
+    )
+
+
+internal object DependingNetworkModelProjectStageToAnnotatedProjectDependencyResolver :
+    ReferenceResolver<NetworkModelProjectStage, AnnotatedProjectDependency> by KReferenceResolver(
+        NetworkModelProjectStage::class, AnnotatedProjectDependency::class, NetworkModelProjectStage::addDependingStage
+    )
 
 //-------------------------------------------//
 

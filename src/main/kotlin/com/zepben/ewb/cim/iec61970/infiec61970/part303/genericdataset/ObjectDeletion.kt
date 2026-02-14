@@ -11,4 +11,4 @@ package com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset
 /**
  * An object is to be deleted in the context.
  */
-class ObjectDeletion : ChangeSetMember()
+class ObjectDeletion(changeSet: ChangeSet, targetObjectMRID: String) : ChangeSetMember(changeSet, targetObjectMRID)

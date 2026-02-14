@@ -14,8 +14,8 @@ import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
  * Represents the relationship between two network model project stages.
  *
  * @param dependencyType Describes the dependency relationship between the two classes.
- * @param dependencyDependentOnStage NetworkModelProjectStage representing the "to" stage.
- * @param dependencyDependingStage NetworkModelProjectStage representing the "from" stage.
+ * @param dependencyDependentOnStage NetworkModelProjectStage required by this stage.
+ * @param dependencyDependingStage NetworkModelProjectStages that cannot be applied alongside this stage.
  */
 class AnnotatedProjectDependency(mRID: String) : IdentifiedObject(mRID) {
 
@@ -24,13 +24,4 @@ class AnnotatedProjectDependency(mRID: String) : IdentifiedObject(mRID) {
     var dependencyDependentOnStage: NetworkModelProjectStage? = null
     var dependencyDependingStage: NetworkModelProjectStage? = null
 
-    fun addDependencyDependentOnStage(stage: NetworkModelProjectStage) {
-        dependencyDependingStage = stage
-        stage.addDependingStage(this)
-    }
-
-    fun addDependencyDependingStage(stage: NetworkModelProjectStage) {
-        dependencyDependingStage = stage
-        stage.addDependingStage(this)
-    }
 }

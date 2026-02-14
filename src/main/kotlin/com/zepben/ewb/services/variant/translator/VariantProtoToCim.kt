@@ -88,8 +88,8 @@ fun toCim(pb: PBNetworkModelProject, networkService: VariantService): NetworkMod
         externalStatus = pb.externalStatusSet.takeUnless { pb.hasExternalStatusNull() }
         forecastCommissionDate = pb.forecastCommissionDateSet.takeUnless { pb.hasForecastCommissionDateNull() }?.toInstant()
         externalDriver = pb.externalDriverSet.takeUnless { pb.hasExternalDriverNull() }
-        pb.childrenList.forEach { child ->
-            networkService.resolveOrDeferReference(Resolvers.networkModelProjectComponents(this), child.mRID())
+        pb.childrenMRIDsList.forEach { child ->
+            networkService.resolveOrDeferReference(Resolvers.networkModelProjectComponents(this), child)
         }
         toCim(pb.nmpc, this, networkService)
     }
@@ -113,15 +113,15 @@ fun toCim(pb: PBNetworkModelProjectStage, networkService: VariantService): Netwo
             setChangeSetMRID(it)
         }
 
-        pb.dependingStageList.forEach {
-            addDependingStage(toCim(it, networkService))
+        pb.dependingStageMRIDList.forEach {
+            networkService.resolveOrDeferReference(Resolvers.dependingStage(this), it)
         }
-        pb.dependentOnStageList.forEach {
-            addDependentOnStage(toCim(it, networkService))
+        pb.dependentOnStageMRIDList.forEach {
+            networkService.resolveOrDeferReference(Resolvers.dependentOnStage(this), it)
         }
-        pb.equipmentContainersList.forEach { ec ->
+        pb.equipmentContainerMRIDsList.forEach { ec ->
             networkService.addFromPb(ec).identifiedObject?.let {
-                addEquipmentContainer(it as EquipmentContainer)
+                addContainer(it as EquipmentContainer)
             }
         }
     }.also {
@@ -156,8 +156,8 @@ fun toCim(pb: PBAnnotatedProjectDependency, networkService: VariantService): Ann
         pb.mRID(),
     ).apply { //FIXME: DIS HAX
         dependencyType = mapDependencyKind.toCim(pb.dependencyType)
-        networkService.resolveOrDeferReference(Resolvers.dependentnetworkModelProjectStage(this), pb.dependencyDependentOnStageMRID)
-        networkService.resolveOrDeferReference(Resolvers.dependingnetworkModelProjectStage(this), pb.dependencyDependingStageMRID)
+        networkService.resolveOrDeferReference(Resolvers.dependentStage(this), pb.dependencyDependentOnStageMRID)
+        networkService.resolveOrDeferReference(Resolvers.dependingStage(this), pb.dependencyDependingStageMRID)
     }.also {
         toCim(pb.io, it, networkService)
     }
@@ -205,7 +205,7 @@ fun toCim(pb: PBChangeSet, networkService: VariantService): ChangeSet =
                     "changeSetMember object type ${it.changeSetMemberCase} is not supported by the variant service"
                 )
             }.also { csm ->
-                addChangeSetMember( csm )
+                addMember( csm )
             }
         }
     }.also {

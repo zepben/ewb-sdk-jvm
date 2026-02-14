@@ -170,7 +170,6 @@ abstract class Equipment(mRID: String) : PowerSystemResource(mRID) {
 
     /**
      * @param usagePoint the usage point that connects to the electrical grid through this equipment.
-     * @return true if the usage point is associated.
      * @return A reference to this [Equipment] to allow fluent use.
      */
     fun addUsagePoint(usagePoint: UsagePoint): Equipment {
@@ -185,7 +184,7 @@ abstract class Equipment(mRID: String) : PowerSystemResource(mRID) {
 
     /**
      * @param usagePoint the usage point to disconnect from this equipment.
-     * @return this [Equipment]
+     * @return true if [usagePoint] was removed from this equipment.
      */
     fun removeUsagePoint(usagePoint: UsagePoint): Boolean {
         val ret = _usagePoints?.remove(usagePoint) == true

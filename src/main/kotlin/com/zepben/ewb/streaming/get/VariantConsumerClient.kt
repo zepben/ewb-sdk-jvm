@@ -18,12 +18,16 @@ import com.zepben.ewb.streaming.grpc.GrpcChannel
 import com.zepben.ewb.streaming.grpc.GrpcResult
 import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProject
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.DataSet
+import com.zepben.ewb.services.network.translator.mRID
+import com.zepben.ewb.streaming.get.hierarchy.NetworkHierarchy
 import com.zepben.protobuf.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProject as PBNetworkModelProject
 import com.zepben.protobuf.metadata.GetMetadataRequest
 import com.zepben.protobuf.metadata.GetMetadataResponse
+import com.zepben.protobuf.nc.GetNetworkHierarchyResponse
 import com.zepben.protobuf.vc.*
 import io.grpc.CallCredentials
 import io.grpc.Channel
+import java.io.IOException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -74,31 +78,22 @@ class VariantConsumerClient @JvmOverloads constructor(
     override fun processIdentifiedObjects(mRIDs: Sequence<String>): Sequence<ExtractResult> =
         throw NotImplementedError()
 
-    // TODO: docs
-    fun getChangeSet(id: String): GrpcResult<DataSet> = tryRpc {
-        // FIXME: This feels like a hack. extractResults didnt wanna play good scope friendly games
-        val extractResults: MutableList<DSExtractResult> = mutableListOf()
-        val streamObserver = AwaitableStreamObserver<GetChangeSetsResponse> { response ->
-            response.changeSetsList.forEach {
-                extractChangeSet(it).let { dsExtractResult ->
-                    extractResults.add(dsExtractResult)
-                }
-            }
+    /**
+     * Retrieve a ChangeSet from the server. Note this does not receive the contents of the ChangeSet, only the metadata.
+     * To retrieve the contents you must use getChangeSet against each respective service (network, diagram, customer).
+     *
+     * @param mRID The mRID of the ChangeSet to retrieve.
+     * @return A [GrpcResult] capturing the result of the request for the ChangeSet.
+     */
+    fun getChangeSet(mRID: String): GrpcResult<ChangeSet> = tryRpc {
+        var changeSet: ChangeSet? = null
+        val streamObserver = AwaitableStreamObserver<GetChangeSetResponse> { response ->
+            changeSet = service.addFromPb(response.changeSet)
         }
+        stub.getChangeSet(GetChangeSetRequest.newBuilder().setMrid(mRID).build(), streamObserver)
 
-        val request = stub.getChangeSets(streamObserver)
-        val builder = GetChangeSetsRequest.newBuilder()
-
-        builder.setMrid(id)
-        request.onNext(builder.build())
-        builder.clear()
-
-        request.onCompleted()
         streamObserver.await()
-
-        extractResults.firstOrNull()?.dataSet
-        ?: throw NoSuchElementException("No object with mRID $id could be found.")
-
+        changeSet ?: throw IOException("No change set was received before GRPC channel was closed.")
     }
 
     // TODO: docs
@@ -111,7 +106,7 @@ class VariantConsumerClient @JvmOverloads constructor(
             ?: throw NoSuchElementException("No object with mRID $mRID could be found.")
     }
 
-    fun processNetworkModelProjects(mRIDs: Sequence<String>? = null): Sequence<ExtractResult> {
+    private fun processNetworkModelProjects(mRIDs: Sequence<String>? = null): Sequence<ExtractResult> {
         val extractResults = mutableListOf<ExtractResult>()
         val streamObserver = AwaitableStreamObserver<GetNetworkModelProjectsResponse> { response ->
             response.networkModelProjectsList.forEach {

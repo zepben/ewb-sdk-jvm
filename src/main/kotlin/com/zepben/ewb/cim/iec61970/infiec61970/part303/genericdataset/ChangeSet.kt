@@ -20,27 +20,52 @@ import com.zepben.ewb.services.common.extensions.asUnmodifiable
  */
 class ChangeSet(mRID: String) : DataSet(mRID) {
 
-    private var _changeSetMembers: MutableSet<ChangeSetMember> = mutableSetOf()
+    private var _changeSetMembers: MutableList<ChangeSetMember>? = null
 
-    val changeSetMembers: List<ChangeSetMember> get() = _changeSetMembers.toList().asUnmodifiable()
+    val changeSetMembers: List<ChangeSetMember> get() = _changeSetMembers.asUnmodifiable()
     var networkModelProjectStage: NetworkModelProjectStage? = null
 
+    /**
+     * Get the number of entries in the [ChangeSetMember] collection.
+     */
+    fun numMembers(): Int = _changeSetMembers?.size ?: 0
 
-    fun addChangeSetMember(member: ChangeSetMember): Boolean {
-        if (member.changeSet == null) {
-            member.setChangeSet(this) // TODO: handle false being returned from setChangeSet
-        } else {
-            require(member.changeSet !== this) {
-                "${member.javaClass.simpleName} `changeSet` property references ${member.changeSet?.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
-                return false
-            }
-        }
-        require(!_changeSetMembers.contains(member)) {
-            "${member.javaClass.simpleName} `changeSet` already exists in changeSetMembers."
-            return false
-        }
-        _changeSetMembers.add(member)
-        return true
+    /**
+     * Retrieve the [ChangeSetMember] for the specified [mRID]
+     *
+     * @param mRID the [ChangeSetMember.targetObjectMRID] to retrieve.
+     * @return The [ChangeSetMember] with the specified [ChangeSetMember.targetObjectMRID] if it exists, otherwise null
+     */
+    fun getMember(mRID: String): ChangeSetMember? = _changeSetMembers?.firstOrNull { it.targetObjectMRID == mRID }
+
+
+    /**
+     * Add a [ChangeSetMember] to this [ChangeSet].
+     * A [ChangeSetMember.targetObjectMRID] may only be referenced by one member in this [ChangeSet].
+     *
+     * @param member The [ChangeSetMember] to add.
+     * @return this [ChangeSet] for fluent use.
+     */
+    fun addMember(member: ChangeSetMember): ChangeSet {
+        require(member.changeSet == this) { "${member.javaClass.simpleName} `changeSet` property references ${member.changeSet.typeNameAndMRID()}, expected ${typeNameAndMRID()}." }
+        require(changeSetMembers.none { it.targetObjectMRID == member.targetObjectMRID }) { "A ChangeSetMember already exists in ${typeNameAndMRID()} with targetObjectMRID ${member.targetObjectMRID}." }
+
+        _changeSetMembers = _changeSetMembers ?: mutableListOf()
+        _changeSetMembers!!.add(member)
+
+        return this
+    }
+
+    /**
+     * Remove a [ChangeSetMember] from this [ChangeSet].
+     *
+     * @param member the [ChangeSetMember] to disconnect from this [ChangeSet].
+     * @return true if [member] was removed from this [ChangeSet].
+     */
+    fun removeMember(member: ChangeSetMember): Boolean {
+        val ret = _changeSetMembers?.remove(member) == true
+        if (_changeSetMembers.isNullOrEmpty()) _changeSetMembers = null
+        return ret
     }
 
 }

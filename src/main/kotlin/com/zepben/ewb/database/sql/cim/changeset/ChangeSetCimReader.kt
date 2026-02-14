@@ -8,25 +8,11 @@
 
 package com.zepben.ewb.database.sql.cim.changeset
 
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSetMember
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.DataSet
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectCreation
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectDeletion
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectModification
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.*
 import com.zepben.ewb.database.sql.cim.CimReader
-import com.zepben.ewb.database.sql.extensions.getNullableString
-import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.genericdataset.TableChangeSetMembers
-import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.genericdataset.TableChangeSets
-import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.genericdataset.TableDataSets
-import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.genericdataset.TableObjectCreations
-import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.genericdataset.TableObjectDeletions
-import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.genericdataset.TableObjectModifications
-import com.zepben.ewb.database.sql.common.MRIDLookupException
-import com.zepben.ewb.services.common.extensions.getOrThrow
+import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.genericdataset.*
 import com.zepben.ewb.services.variant.VariantService
 import java.sql.ResultSet
-import kotlin.collections.get
 
 /**
  * A class for reading the [VariantService] tables from the database.
@@ -48,21 +34,6 @@ internal class ChangeSetCimReader : CimReader<VariantService>(), AutoCloseable{
 
     }
 
-    private fun readChangeSetMember(
-        service: VariantService,
-        changeSetMember: ChangeSetMember,
-        table: TableChangeSetMembers,
-        resultSet: ResultSet,
-        setIdentifier: (String) -> String
-    ): Boolean {
-        changeSetMember.apply {
-            val changeSetMRID = setIdentifier(resultSet.getString(table.CHANGE_SET_MRID.queryIndex))
-            setChangeSet(service.getOrThrow(changeSetMRID,setIdentifier("$changeSetMRID ObjectCreation")) as ChangeSet)
-            targetObjectMRID = resultSet.getString(table.TARGET_OBJECT_MRID.queryIndex)
-        }
-        return true
-    }
-
     private fun readDataSet(
         dataSet: DataSet,
         table: TableDataSets,
@@ -77,26 +48,37 @@ internal class ChangeSetCimReader : CimReader<VariantService>(), AutoCloseable{
     }
 
     fun read(service: VariantService, table: TableObjectCreations, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
-        ObjectCreation().also {
-            readChangeSetMember(service, it, table, resultSet, setIdentifier)
-        }
+        val changeSetMRID = resultSet.getString(table.CHANGE_SET_MRID.queryIndex)
+        val targetObj = resultSet.getString(table.TARGET_OBJECT_MRID.queryIndex)
+        setIdentifier("$changeSetMRID-$targetObj")
+        val changeSet = service.getOrThrow<ChangeSet>(mRID = changeSetMRID, typeNameAndMRID = "ObjectCreation $targetObj")
+        val obj = ObjectCreation(changeSet, targetObj)
+        changeSet.addMember(obj)
+
         return true
     }
 
     fun read(service: VariantService, table: TableObjectDeletions, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
-        ObjectDeletion().also {
-            readChangeSetMember(service, it, table, resultSet, setIdentifier)
-        }
+        val changeSetMRID = resultSet.getString(table.CHANGE_SET_MRID.queryIndex)
+        val targetObj = resultSet.getString(table.TARGET_OBJECT_MRID.queryIndex)
+        setIdentifier("$changeSetMRID-$targetObj")
+        val changeSet = service.getOrThrow<ChangeSet>(mRID = changeSetMRID, typeNameAndMRID = "ObjectDeletion $targetObj")
+        val obj = ObjectDeletion(changeSet, targetObj)
+        changeSet.addMember(obj)
+
         return true
     }
 
     fun read(service: VariantService, table: TableObjectModifications, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
-        ObjectModification().also {
-            readChangeSetMember(service, it, table, resultSet, setIdentifier)
-            resultSet.getNullableString(table.OBJECT_REVERSE_MODIFICATION_TARGET_OBJECT_MRID.queryIndex)?.let { ormMRID ->
-                it.setObjectReverseModification(service.getOrThrow(ormMRID, "ObjectModification reverseObjectModification targetObject $ormMRID association"))
-            }
-        }
+        val changeSetMRID = resultSet.getString(table.CHANGE_SET_MRID.queryIndex)
+        val targetObj = resultSet.getString(table.TARGET_OBJECT_MRID.queryIndex)
+        val originalObj = resultSet.getString(table.OBJECT_REVERSE_MODIFICATION_TARGET_OBJECT_MRID.queryIndex)
+        setIdentifier("$changeSetMRID-$targetObj")
+        val changeSet = service.getOrThrow<ChangeSet>(mRID = changeSetMRID, typeNameAndMRID = "ObjectModification $targetObj")
+        val obj = ObjectModification(changeSet, targetObj, originalObj)
+        changeSet.addMember(obj)
+        changeSet.addMember(obj.objectReverseModification)
+
         return true
     }
 

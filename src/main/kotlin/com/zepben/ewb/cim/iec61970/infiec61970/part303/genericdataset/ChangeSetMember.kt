@@ -11,20 +11,7 @@ package com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset
 /**
  * A CRUD-style data object.
  *
- * @property changeSet [ChangeSet] this [ChangeSetMember] belongs to.
- * @property targetObjectMRID The registered CIM object.
+ * @property changeSet The [ChangeSet] this [ChangeSetMember] belongs to.
+ * @property targetObjectMRID The CIM object [changeSet] applies to.
  */
-abstract class ChangeSetMember {
-
-    private var _changeSet: ChangeSet? = null
-
-    val changeSet: ChangeSet? get() = _changeSet
-    var targetObjectMRID: String? = null
-
-    internal fun setChangeSet(changeSet: ChangeSet): Boolean{
-        require(this._changeSet == null) { "changeSet already exists" }
-        this._changeSet = changeSet
-        return true
-    }
-
-}
+abstract class ChangeSetMember(val changeSet: ChangeSet, val targetObjectMRID: String)

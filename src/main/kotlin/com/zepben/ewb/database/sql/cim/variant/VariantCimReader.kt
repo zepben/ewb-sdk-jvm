@@ -80,8 +80,8 @@ internal class VariantCimReader : CimReader<VariantService>(), AutoCloseable{
                 apdMRID,
             ).apply {
                 dependencyType = DependencyKind.valueOf(resultSet.getString(table.DEPENDENCY_TYPE.queryIndex))
-                addDependencyDependentOnStage(service.getOrThrow(resultSet.getString(table.DEPENDENCY_DEPENDENT_ON_STAGE_MRID.queryIndex), "annotated project dependency $apdMRID dependency dependent on stage"))
-                addDependencyDependingStage(service.getOrThrow(resultSet.getString(table.DEPENDENCY_DEPENDING_STAGE_MRID.queryIndex),"annotated project dependency $apdMRID dependency depending stage"))
+                dependencyDependentOnStage = service.getOrThrow(resultSet.getString(table.DEPENDENCY_DEPENDENT_ON_STAGE_MRID.queryIndex), "annotated project dependency $apdMRID dependency dependent on stage"))
+                dependencyDependingStage = (service.getOrThrow(resultSet.getString(table.DEPENDENCY_DEPENDING_STAGE_MRID.queryIndex),"annotated project dependency $apdMRID dependency depending stage"))
             }.also {
                 readIdentifiedObject(it, table, resultSet)
             }
@@ -110,7 +110,7 @@ internal class VariantCimReader : CimReader<VariantService>(), AutoCloseable{
     fun read(service: VariantService, table: TableNetworkModelProjectStageEquipmentContainers, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val nmpsMRID = setIdentifier(resultSet.getString(table.NETWORK_MODEL_PROJECT_MRID.queryIndex))
         service.ensureGet<NetworkModelProjectStage>(nmpsMRID, "$nmpsMRID equipment container")?.apply {
-            addEquipmentContainer(service.getOrThrow(resultSet.getString(table.EQUIPMENT_CONTAINER_MRID.queryIndex), "equipment container"))
+            addContainer(service.getOrThrow(resultSet.getString(table.EQUIPMENT_CONTAINER_MRID.queryIndex), "equipment container"))
         }
 
         return true

@@ -15,6 +15,7 @@ import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.DataSet
 import com.zepben.ewb.database.sql.common.DuplicateMRIDException
 import com.zepben.ewb.database.sql.common.MRIDLookupException
+import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.common.exceptions.UnsupportedIdentifiedObjectException
 import com.zepben.ewb.services.common.meta.MetadataCollection
 import com.zepben.ewb.services.network.NetworkService
@@ -24,7 +25,7 @@ import kotlin.reflect.full.isSuperclassOf
 /**
  * Maintains an in-memory model of NetworkModelProjects.
  */
-class VariantService (name: String = "networkmodelproject", metadata: MetadataCollection = MetadataCollection()) : NetworkService(name, metadata) {
+class VariantService (name: String = "networkmodelproject", metadata: MetadataCollection = MetadataCollection()) : BaseService(name, metadata) {
 
     val dataSetsByMRID: MutableMap<String, DataSet> = mutableMapOf()
 

@@ -601,17 +601,50 @@ object Resolvers {
 
     @JvmStatic
     fun networkModelProjectComponents(networkModelProject: NetworkModelProject): BoundReferenceResolver<NetworkModelProject, NetworkModelProjectComponent> =
-        BoundReferenceResolver(networkModelProject, NetworkModelProjectToNetworkModelProjectComponentResolver, null)
+        BoundReferenceResolver(
+            networkModelProject,
+            NetworkModelProjectToNetworkModelProjectComponentResolver,
+            NetworkModelProjectComponentToNetworkModelProjectResolver
+        )
 
     @JvmStatic
     fun networkModelProjects(networkModelProjectComponent: NetworkModelProjectComponent): BoundReferenceResolver<NetworkModelProjectComponent, NetworkModelProject> =
-        BoundReferenceResolver(networkModelProjectComponent, NetworkModelProjectComponentToNetworkModelProjectResolver, null)
+        BoundReferenceResolver(
+            networkModelProjectComponent,
+            NetworkModelProjectComponentToNetworkModelProjectResolver,
+            NetworkModelProjectToNetworkModelProjectComponentResolver
+        )
 
     @JvmStatic
-    fun dependentnetworkModelProjectStage(annotatedProjectDependency: AnnotatedProjectDependency): BoundReferenceResolver<AnnotatedProjectDependency, NetworkModelProjectStage> =
-        BoundReferenceResolver(annotatedProjectDependency, AnnotatedProjectDependencyToDependentNetworkModelProjectStageResolver, null)
+    fun dependentStage(annotatedProjectDependency: AnnotatedProjectDependency): BoundReferenceResolver<AnnotatedProjectDependency, NetworkModelProjectStage> =
+        BoundReferenceResolver(
+            annotatedProjectDependency,
+            AnnotatedProjectDependencyToDependentNetworkModelProjectStageResolver,
+            DependentNetworkModelProjectStageToAnnotatedProjectDependencyResolver
+        )
 
     @JvmStatic
-    fun dependingnetworkModelProjectStage(annotatedProjectDependency: AnnotatedProjectDependency): BoundReferenceResolver<AnnotatedProjectDependency, NetworkModelProjectStage> =
-        BoundReferenceResolver(annotatedProjectDependency, AnnotatedProjectDependencyToDependingNetworkModelProjectStageResolver, null)
+    fun dependingStage(annotatedProjectDependency: AnnotatedProjectDependency): BoundReferenceResolver<AnnotatedProjectDependency, NetworkModelProjectStage> =
+        BoundReferenceResolver(
+            annotatedProjectDependency,
+            AnnotatedProjectDependencyToDependingNetworkModelProjectStageResolver,
+            DependingNetworkModelProjectStageToAnnotatedProjectDependencyResolver
+        )
+
+
+    @JvmStatic
+    fun dependentOnStage(networkModelProjectStage: NetworkModelProjectStage): BoundReferenceResolver<NetworkModelProjectStage, AnnotatedProjectDependency> =
+        BoundReferenceResolver(
+            networkModelProjectStage,
+            DependentNetworkModelProjectStageToAnnotatedProjectDependencyResolver,
+            AnnotatedProjectDependencyToDependentNetworkModelProjectStageResolver
+        )
+
+    @JvmStatic
+    fun dependingStage(networkModelProjectStage: NetworkModelProjectStage): BoundReferenceResolver<NetworkModelProjectStage, AnnotatedProjectDependency> =
+        BoundReferenceResolver(
+            networkModelProjectStage,
+            DependingNetworkModelProjectStageToAnnotatedProjectDependencyResolver,
+            AnnotatedProjectDependencyToDependingNetworkModelProjectStageResolver
+        )
 }

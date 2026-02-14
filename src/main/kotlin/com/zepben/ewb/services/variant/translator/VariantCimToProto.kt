@@ -22,7 +22,6 @@ import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectDele
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectModification
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectReverseModification
 import com.zepben.ewb.services.common.translator.*
-import com.zepben.ewb.services.network.translator.networkIdentifiedObject
 import com.zepben.ewb.services.variant.whenVariantChangeSetMember
 import com.zepben.ewb.services.variant.whenVariantDataSet
 import com.zepben.ewb.services.variant.whenVariantIdentifiedObject
@@ -92,7 +91,7 @@ fun toPb(cim: NetworkModelProject, pb: PBNetworkModelProject.Builder): PBNetwork
         cim.forecastCommissionDate?.also { forecastCommissionDateSet = it.toTimestamp() } ?: run { forecastCommissionDateNull = NullValue.NULL_VALUE }
         cim.externalDriver?.also { externalDriverSet = it } ?: run { externalDriverNull = NullValue.NULL_VALUE }
         cim.children.forEach {
-            addChildren(it.toPb())
+            addChildrenMRIDs(it.mRID)
         }
     }.also {
         toPb(cim, pb.nmpcBuilder)
@@ -165,15 +164,15 @@ fun toPb(cim: NetworkModelProjectStage, pb: PBNetworkModelProjectStage.Builder):
         cim.baseModelVersion?.also { baseModelVersionSet = it } ?: run { baseModelVersionNull = NullValue.NULL_VALUE }
         cim.lastConflictCheckedAt?.also { lastConflictCheckedAtSet = it.toTimestamp() } ?: run { lastConflictCheckedAtNull = NullValue.NULL_VALUE }
         cim.userComments?.also { userCommentsSet = it } ?: run { userCommentsNull = NullValue.NULL_VALUE }
-        cim.changeSetMRID?.also { changeSetMRIDSet = it } ?: run { changeSetMRIDNull = NullValue.NULL_VALUE }
+        cim.changeSet?.also { changeSetMRIDSet = it } ?: run { changeSetMRIDNull = NullValue.NULL_VALUE }
         cim.dependentOnStage.forEach {
-            addDependentOnStage( it.toPb() )
+            addDependentOnStageMRID(it.mRID)
         }
         cim.dependingStage.forEach {
-            addDependingStage( it.toPb() )
+            addDependingStageMRID(it.mRID)
         }
-        cim.equipmentContainers.forEach {
-            addEquipmentContainers( networkIdentifiedObject(it) ) // TODO: this seems both right, and nasty.
+        cim.equipmentContainerMRIDs.forEach {
+            addEquipmentContainerMRIDs(it.mRID)
         }
         toPb(cim, pb.nmpcBuilder)
     }

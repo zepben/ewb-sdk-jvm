@@ -13,34 +13,12 @@ package com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset
  *
  * @property objectReverseModification ObjectReverseModification specifying precondition properties for a preconditioned update.
  */
-class ObjectModification : ChangeSetMember() {
+class ObjectModification(changeSet: ChangeSet, modifiedObjectMRID: String, originalObjectMRID: String) : ChangeSetMember(changeSet, modifiedObjectMRID) {
 
-    var objectReverseModification: ObjectReverseModification? = null
-
-    fun setObjectReverseModification(targetObjectMRID: String): ObjectModification {
-        require(objectReverseModification == null) { "objectReverseModification already set" }
-        require(changeSet != null) { "set changeset before calling this helper." }
-        objectReverseModification = ObjectReverseModification().also {
-            changeSet!!.addChangeSetMember(it)
-            it.targetObjectMRID = targetObjectMRID
-            require(it.objectModification == null) { "objectModification already set" }
-            it.objectModification = this
-        }
-        return this
+    init {
+        changeSet.addMember(this)
     }
 
-    companion object {
-        fun createObjectModification(changeSet: ChangeSet, modifiedObjectMRID: String, originalObjectMRID: String? = null): ObjectModification {
-            return ObjectModification().also {
-                changeSet.addChangeSetMember(it)
-                it.targetObjectMRID = modifiedObjectMRID
-                originalObjectMRID?.let { _ ->
-                    it.objectReverseModification = ObjectReverseModification().also { orm ->
-                        orm.targetObjectMRID = originalObjectMRID
-                        orm.objectModification = it
-                    }
-                }
-            }
-        }
-    }
+    val objectReverseModification: ObjectReverseModification = ObjectReverseModification(changeSet, originalObjectMRID, this)
+
 }

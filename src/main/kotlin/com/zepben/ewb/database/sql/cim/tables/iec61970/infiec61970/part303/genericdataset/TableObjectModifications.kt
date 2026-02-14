@@ -9,6 +9,8 @@
 package com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.genericdataset
 
 import com.zepben.ewb.database.sql.common.tables.Column
+import com.zepben.ewb.database.sql.common.tables.Column.Nullable.NOT_NULL
+import com.zepben.ewb.database.sql.common.tables.Column.Type.STRING
 
 /**
  * A class representing the ObjectModification columns required for the database table.
@@ -18,7 +20,7 @@ import com.zepben.ewb.database.sql.common.tables.Column
 @Suppress("PropertyName")
 class TableObjectModifications : TableChangeSetMembers() {
 
-    val OBJECT_REVERSE_MODIFICATION_TARGET_OBJECT_MRID: Column = Column(++columnIndex, "object_reverse_modification_mrid", Column.Type.STRING, Column.Nullable.NULL)
+    val OBJECT_REVERSE_MODIFICATION_TARGET_OBJECT_MRID: Column = Column(++columnIndex, "object_reverse_modification_mrid", STRING, NOT_NULL)
 
     override val name: String = "object_modifications"
 

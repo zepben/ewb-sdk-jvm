@@ -9,9 +9,12 @@
 package com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects
 
 import com.zepben.ewb.cim.extensions.ZBEX
+import com.zepben.ewb.cim.iec61968.operations.OperationalRestriction
+import com.zepben.ewb.cim.iec61970.base.core.Equipment
 import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import com.zepben.ewb.services.common.extensions.getByMRID
 import com.zepben.ewb.services.common.extensions.typeNameAndMRID
+import com.zepben.ewb.services.common.extensions.validateReference
 import java.time.Instant
 
 /**
@@ -27,25 +30,68 @@ class NetworkModelProject(mRID: String) : NetworkModelProjectComponent(mRID) {
     private var _children: MutableList<NetworkModelProjectComponent>? = null
 
     @ZBEX var externalStatus: String? = null
+        set(it) {
+            updated = Instant.now()
+            field = it
+        }
     @ZBEX var forecastCommissionDate: Instant? = null
+        set(it) {
+            updated = Instant.now()
+            field = it
+        }
     @ZBEX var externalDriver: String? = null
+        set(it) {
+            updated = Instant.now()
+            field = it
+        }
     @ZBEX val children: Collection<NetworkModelProjectComponent> get() = _children.asUnmodifiable()
 
-    fun addChild(child: NetworkModelProjectComponent): NetworkModelProject {
-        if (_children == null)
-            _children = mutableListOf()
 
-        if (_children.getByMRID(child.mRID) == null) {
-            if (child.parent == null || child.parent === this) {
-                _children!!.add(child)
-                child.setParent(this)
-            }
-        }
+    /**
+     * Get the number of entries in the [children] collection.
+     */
+    fun numChildren(): Int = _children?.size ?: 0
 
-        require(child.parent === this && _children.getByMRID(child.mRID) === child) {
-            "Failed to add child [${child.typeNameAndMRID()} to ${javaClass.simpleName}."
-        }
+    /**
+     * Get the child [NetworkModelProjectComponent] identified by [mRID]
+     *
+     * @param mRID the mRID of the required [NetworkModelProjectComponent]
+     * @return The [NetworkModelProjectComponent] with the specified [mRID] if it exists, otherwise null
+     */
+    fun getChild(mRID: String): NetworkModelProjectComponent? = _children?.firstOrNull { it.mRID == mRID }
 
+    /**
+     * Add equipment to which this restriction applies.
+     *
+     * @param equipment the equipment to add.
+     * @return A reference to this [OperationalRestriction] to allow fluent use.
+     */
+    fun addChild(equipment: NetworkModelProjectComponent): NetworkModelProject {
+        if (validateReference(equipment, ::getChild, "A NetworkModelProjectComponent"))
+            return this
+
+        _children = _children ?: mutableListOf()
+        _children!!.add(equipment)
+
+        updated = Instant.now()
+        return this
+    }
+
+    fun removeChild(child: NetworkModelProjectComponent): Boolean {
+        val ret = _children?.remove(child) == true
+        if (_children.isNullOrEmpty()) _children = null
+        updated = Instant.now()
+        return ret
+    }
+
+    /**
+     * Clear the collection of [NetworkModelProjectComponent]s.
+     *
+     * @return A reference to this [NetworkModelProject] to allow fluent use.
+     */
+    fun clearChildren(): NetworkModelProject {
+        _children = null
+        updated = Instant.now()
         return this
     }
 

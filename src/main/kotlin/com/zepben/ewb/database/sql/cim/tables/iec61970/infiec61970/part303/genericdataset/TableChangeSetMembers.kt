@@ -9,6 +9,8 @@
 package com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.genericdataset
 
 import com.zepben.ewb.database.sql.common.tables.Column
+import com.zepben.ewb.database.sql.common.tables.Column.Nullable.NOT_NULL
+import com.zepben.ewb.database.sql.common.tables.Column.Type.STRING
 import com.zepben.ewb.database.sql.common.tables.SqlTable
 
 /**
@@ -20,8 +22,8 @@ import com.zepben.ewb.database.sql.common.tables.SqlTable
 @Suppress("PropertyName")
 abstract class TableChangeSetMembers : SqlTable() {
 
-    val CHANGE_SET_MRID: Column = Column(++columnIndex, "change_set_mrid", Column.Type.STRING, Column.Nullable.NOT_NULL)
-    val TARGET_OBJECT_MRID: Column = Column(++columnIndex, "target_object_mrid", Column.Type.STRING, Column.Nullable.NOT_NULL)
+    val CHANGE_SET_MRID: Column = Column(++columnIndex, "change_set_mrid", STRING, NOT_NULL)
+    val TARGET_OBJECT_MRID: Column = Column(++columnIndex, "target_object_mrid", STRING, NOT_NULL)
 
     init {
         addUniqueIndexes(listOf(CHANGE_SET_MRID, TARGET_OBJECT_MRID))

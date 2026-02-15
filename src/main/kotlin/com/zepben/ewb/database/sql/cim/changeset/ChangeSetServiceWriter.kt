@@ -8,9 +8,10 @@
 
 package com.zepben.ewb.database.sql.cim.changeset
 
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.DataSet
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.*
 import com.zepben.ewb.database.sql.cim.BaseServiceWriter
+import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.variant.VariantService
 
 /**
@@ -24,22 +25,5 @@ internal class ChangeSetServiceWriter(
 ) : BaseServiceWriter<VariantService>(writer) {
 
     override fun VariantService.writeService(): Boolean =
-        writeEachDataSet<ChangeSet>(writer::write)
-
-    private inline fun <reified T : DataSet> VariantService.writeEachDataSet(noinline writer: (T) -> Boolean): Boolean {
-        var status = true
-        logger.error("${this.dataSetsByMRID.keys}")
-        sequenceOfDataSet(T::class).forEach {
-            status = status && validateWrite(it, writer)
-        }
-
-        return status
-    }
-
-    private inline fun <reified T : DataSet> validateWrite(it: T, noinline writer: (T) -> Boolean): Boolean {
-        return validateWrite(it, writer) { e ->
-            logger.error("Failed to write ${it.typeNameAndMRID()}: ${e.message}")
-        }
-    }
-
+        writeEach<ChangeSet>(writer::write)
 }

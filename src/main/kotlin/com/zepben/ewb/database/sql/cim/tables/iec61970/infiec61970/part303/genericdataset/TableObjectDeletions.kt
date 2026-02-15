@@ -11,15 +11,8 @@ package com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.gene
 /**
  * A class representing the ObjectDeletion columns required for the database table.
  */
-@Suppress("PropertyName")
 class TableObjectDeletions : TableChangeSetMembers() {
 
     override val name: String = "object_deletions"
 
-    init {
-        addNonUniqueIndexes(
-            listOf(TARGET_OBJECT_MRID),
-            listOf(CHANGE_SET_MRID)
-        )
-    }
 }

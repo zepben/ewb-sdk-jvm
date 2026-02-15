@@ -17,6 +17,7 @@ import com.zepben.ewb.services.variant.translator.addFromPb
 import com.zepben.ewb.streaming.grpc.GrpcChannel
 import com.zepben.ewb.streaming.grpc.GrpcResult
 import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProject
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.DataSet
 import com.zepben.ewb.services.network.translator.mRID
 import com.zepben.ewb.streaming.get.hierarchy.NetworkHierarchy
@@ -50,7 +51,7 @@ class VariantConsumerClient @JvmOverloads constructor(
 ) : CimConsumerClient<VariantService, VariantProtoToCim>(executor) {
 
     init {
-        executor?.also { stub.withExecutor { it } }
+        executor?.also { exe -> stub.withExecutor { exe } }  // TODO: this seems important...
     }
 
     /**
@@ -101,7 +102,7 @@ class VariantConsumerClient @JvmOverloads constructor(
         handleMultiObjectRPC { processNetworkModelProjects() }
 
     // TODO: docs
-    fun getNetworkModelProject(mRID: String): GrpcResult<IdentifiedObject> = tryRpc {
+    fun getNetworkModelProject(mRID: String): GrpcResult<Identifiable> = tryRpc {
         processNetworkModelProjects(sequenceOf(mRID)).firstOrNull()?.identifiedObject
             ?: throw NoSuchElementException("No object with mRID $mRID could be found.")
     }
@@ -147,9 +148,9 @@ class VariantConsumerClient @JvmOverloads constructor(
             ExtractResult(it, it.mRID)
         }
 
-    private fun extractChangeSet(cs: PBChangeSet): DSExtractResult =
+    private fun extractChangeSet(cs: PBChangeSet): ExtractResult =
         protoToCim.networkService.addFromPb(cs).let {
-            DSExtractResult(it, it.mRID)
+            ExtractResult(getOrAdd(it), it.mRID)
         }
 
 }

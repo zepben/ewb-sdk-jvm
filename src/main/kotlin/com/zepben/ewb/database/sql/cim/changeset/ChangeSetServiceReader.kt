@@ -10,6 +10,9 @@ package com.zepben.ewb.database.sql.cim.changeset
 
 import com.zepben.ewb.database.sql.cim.BaseServiceReader
 import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.genericdataset.TableChangeSets
+import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.genericdataset.TableObjectCreations
+import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.genericdataset.TableObjectDeletions
+import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.genericdataset.TableObjectModifications
 import com.zepben.ewb.services.variant.VariantService
 import java.sql.Connection
 
@@ -26,6 +29,9 @@ internal class ChangeSetServiceReader(
     ) : BaseServiceReader<VariantService>(databaseTables, connection, reader) {
 
     override fun readService(service: VariantService): Boolean =
-        readEach<TableChangeSets>(service, reader::read)
+        readEach<TableChangeSets>(service, reader::read) and
+            readEach<TableObjectCreations>(service, reader::read) and
+            readEach<TableObjectDeletions>(service, reader::read) and
+            readEach<TableObjectModifications>(service, reader::read)
 
 }

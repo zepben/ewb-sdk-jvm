@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.streaming.get
 
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.DataSet
@@ -27,15 +28,15 @@ import java.util.concurrent.ExecutorService
  * @property objects A Map of mRID to its IdentifiedObject that were processed.
  * @property failed The set of mRIDs that failed to be processed.
  */
-data class MultiObjectResult(val objects: MutableMap<String, IdentifiedObject> = mutableMapOf(), val failed: MutableSet<String> = mutableSetOf())
+data class MultiObjectResult(val objects: MutableMap<String, Identifiable> = mutableMapOf(), val failed: MutableSet<String> = mutableSetOf())
 
 /**
  * Represents the result of deserialising a protobuf message and adding it to a service.
  * @property identifiedObject The [IdentifiedObject] that was deserialised, or null if it couldn't be added to the service
  * @property mRID The corresponding mRID of [identifiedObject]. Typically only used if [identifiedObject] is null.
  */
-data class ExtractResult(val identifiedObject: IdentifiedObject?, val mRID: String)
-data class DSExtractResult(val dataSet: DataSet?, val mRID: String)
+data class ExtractResult(val identifiedObject: Identifiable?, val mRID: String)
+
 /**
  * Base class that defines some helpful functions when producer clients are sending to the server.
  *
@@ -71,7 +72,7 @@ abstract class CimConsumerClient<T : BaseService, U : BaseProtoToCim>(executor: 
      *    - [NoSuchElementException] if the object could not be found.
      *    - The gRPC error that occurred while retrieving the object
      */
-    fun getIdentifiedObject(mRID: String): GrpcResult<IdentifiedObject> = tryRpc {
+    fun getIdentifiedObject(mRID: String): GrpcResult<Identifiable> = tryRpc {
         processIdentifiedObjects(sequenceOf(mRID)).firstOrNull()?.identifiedObject
             ?: throw NoSuchElementException("No object with mRID $mRID could be found.")
     }
@@ -141,7 +142,7 @@ abstract class CimConsumerClient<T : BaseService, U : BaseProtoToCim>(executor: 
      * @param addFromPb A callback to convert and add the protobuf object, scoped to the [protoToCim] object.
      * @return A result object containing either an existing object with the same mRID, or the result of the [addFromPb] call.
      */
-    protected inline fun <reified CIM : IdentifiedObject> extractResult(mRID: String, addFromPb: U.() -> CIM?): ExtractResult =
+    protected inline fun <reified CIM : Identifiable> extractResult(mRID: String, addFromPb: U.() -> CIM?): ExtractResult =
         ExtractResult(getOrAdd(mRID, addFromPb), mRID)
 
     /**
@@ -152,7 +153,7 @@ abstract class CimConsumerClient<T : BaseService, U : BaseProtoToCim>(executor: 
      * @param addFromPb A callback to convert and add the protobuf object, scoped to the [protoToCim] object.
      * @return Either an existing object with the same mRID, or the result of the [addFromPb] call.
      */
-    protected inline fun <reified CIM : IdentifiedObject> getOrAdd(mRID: String, addFromPb: U.() -> CIM?): CIM? =
+    protected inline fun <reified CIM : Identifiable> getOrAdd(mRID: String, addFromPb: U.() -> CIM?): CIM? =
         service.get(CIM::class, mRID) ?: protoToCim.addFromPb()
 
     /**
@@ -161,7 +162,7 @@ abstract class CimConsumerClient<T : BaseService, U : BaseProtoToCim>(executor: 
      */
     protected fun handleMultiObjectRPC(mRIDs: Sequence<String>? = null, processor: () -> Sequence<ExtractResult>): GrpcResult<MultiObjectResult> =
         tryRpc {
-            val results = mutableMapOf<String, IdentifiedObject>()
+            val results = mutableMapOf<String, Identifiable>()
             val failed = mRIDs?.toMutableSet() ?: mutableSetOf()
             processor().forEach { (identifiedObject, mRID): ExtractResult ->
                 identifiedObject?.let {

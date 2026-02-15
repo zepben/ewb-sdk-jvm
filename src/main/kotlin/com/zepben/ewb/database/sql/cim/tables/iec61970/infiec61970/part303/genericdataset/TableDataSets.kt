@@ -9,14 +9,17 @@
 package com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.genericdataset
 
 import com.zepben.ewb.database.sql.common.tables.Column
+import com.zepben.ewb.database.sql.common.tables.Column.Nullable.NOT_NULL
+import com.zepben.ewb.database.sql.common.tables.Column.Nullable.NULL
+import com.zepben.ewb.database.sql.common.tables.Column.Type.STRING
 import com.zepben.ewb.database.sql.common.tables.SqlTable
 
 @Suppress("PropertyName")
 abstract class TableDataSets : SqlTable() {
 
-    val MRID: Column = Column(++columnIndex, "mrid", Column.Type.STRING, Column.Nullable.NOT_NULL)
-    val NAME: Column = Column(++columnIndex, "name", Column.Type.STRING, Column.Nullable.NULL)
-    val DESCRIPTION: Column = Column(++columnIndex, "description", Column.Type.STRING, Column.Nullable.NULL)
+    val MRID: Column = Column(++columnIndex, "mrid", STRING, NOT_NULL)
+    val NAME: Column = Column(++columnIndex, "name", STRING, NULL)
+    val DESCRIPTION: Column = Column(++columnIndex, "description", STRING, NULL)
 
     init {
         addUniqueIndexes(

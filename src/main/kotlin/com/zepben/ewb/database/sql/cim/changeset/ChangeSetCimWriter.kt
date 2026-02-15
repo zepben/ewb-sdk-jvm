@@ -8,23 +8,12 @@
 
 package com.zepben.ewb.database.sql.cim.changeset
 
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSetMember
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.DataSet
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectCreation
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectDeletion
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectModification
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectReverseModification
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.*
 import com.zepben.ewb.database.sql.cim.CimWriter
+import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.genericdataset.*
 import com.zepben.ewb.database.sql.extensions.setNullableString
-import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.genericdataset.TableChangeSetChangeSetMembers
-import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.genericdataset.TableChangeSetMembers
-import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.genericdataset.TableChangeSets
-import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.genericdataset.TableDataSets
-import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.genericdataset.TableObjectCreations
-import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.genericdataset.TableObjectDeletions
-import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.genericdataset.TableObjectModifications
 import com.zepben.ewb.services.variant.VariantService
+import com.zepben.ewb.services.variant.whenVariantChangeSetMember
 import java.sql.PreparedStatement
 import java.sql.SQLException
 
@@ -55,29 +44,34 @@ class ChangeSetCimWriter(
 
     }
 
-    // TODO: docs
+    /**
+     * Write the [ChangeSet] fields to [TableChangeSets].
+     *
+     * @param changeSet The [ChangeSet] instance to write to the database.
+     *
+     * @return true if the [ChangeSet] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
     fun write(changeSet: ChangeSet): Boolean {
         val table = databaseTables.getTable<TableChangeSets>()
         val insert = databaseTables.getInsert<TableChangeSets>()
 
-        changeSet.networkModelProjectStage?.let {
-            insert.setNullableString(table.NETWORK_MODEL_PROJECT_STAGE_MRID.queryIndex, it.mRID)
-        }
+        insert.setNullableString(table.NETWORK_MODEL_PROJECT_STAGE_MRID.queryIndex, changeSet.networkModelProjectStage?.mRID)
+
+        var status = true
         changeSet.changeSetMembers.forEach {
-            when (it) {
-                is ObjectCreation -> write(it)
-                is ObjectDeletion -> write(it)
-                is ObjectModification -> write(it)
-                is ObjectReverseModification -> { } // this is a no-op as ObjectModification handles the logic that
-                                                    // would be here, but we also don't want to error when we have
-                                                    // ObjectReverseModifications in the ChangeSet
-                else -> throw NotImplementedError()
-            }
+            status = status && whenVariantChangeSetMember(
+                it,
+                isObjectCreation = ::write,
+                isObjectDeletion = ::write,
+                isObjectModification = ::write,
+            )
         }
 
-        return writeDataSet(table, insert, changeSet, "change set")
+        return status and writeDataSet(table, insert, changeSet, "change set")
     }
 
+    @Suppress("SameParameterValue")  // description - suppressed as maybe we'll need it in the future.
     private fun writeDataSet(
         table: TableDataSets,
         insert: PreparedStatement,
@@ -92,7 +86,14 @@ class ChangeSetCimWriter(
 
     }
 
-    // TODO: docs
+    /**
+     * Write the [ObjectCreation] fields to [TableObjectCreations].
+     *
+     * @param objectCreation The [ObjectCreation] instance to write to the database.
+     *
+     * @return true if the [ObjectCreation] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
     fun write(objectCreation: ObjectCreation): Boolean {
         val table = databaseTables.getTable<TableObjectCreations>()
         val insert = databaseTables.getInsert<TableObjectCreations>()
@@ -100,7 +101,14 @@ class ChangeSetCimWriter(
         return writeChangeSetMember(table, insert, objectCreation, "object creation")
     }
 
-    // TODO: docs
+    /**
+     * Write the [ObjectDeletion] fields to [TableObjectDeletions].
+     *
+     * @param objectDeletion The [ObjectDeletion] instance to write to the database.
+     *
+     * @return true if the [ObjectDeletion] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
     fun write(objectDeletion: ObjectDeletion): Boolean {
         val table = databaseTables.getTable<TableObjectDeletions>()
         val insert = databaseTables.getInsert<TableObjectDeletions>()
@@ -108,25 +116,21 @@ class ChangeSetCimWriter(
         return writeChangeSetMember(table, insert, objectDeletion, "object deletion")
     }
 
-    // TODO: docs
+    /**
+     * Write the [ObjectModification] fields to [TableObjectModifications].
+     *
+     * @param objectModification The [ObjectModification] instance to write to the database.
+     *
+     * @return true if the [ObjectModification] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
     fun write(objectModification: ObjectModification): Boolean {
         val table = databaseTables.getTable<TableObjectModifications>()
         val insert = databaseTables.getInsert<TableObjectModifications>()
 
-        objectModification.objectReverseModification?.let {
-            insert.setNullableString(table.OBJECT_REVERSE_MODIFICATION_TARGET_OBJECT_MRID.queryIndex, it.targetObjectMRID)
-        }
+        insert.setNullableString(table.OBJECT_REVERSE_MODIFICATION_TARGET_OBJECT_MRID.queryIndex, objectModification.objectReverseModification.targetObjectMRID)
 
         return writeChangeSetMember(table, insert, objectModification, "object modification")
     }
 
-    private fun writeAssociation(changeSet: ChangeSet, changeSetMember: ChangeSetMember): Boolean {
-        val table = databaseTables.getTable<TableChangeSetChangeSetMembers>()
-        val insert = databaseTables.getInsert<TableChangeSetChangeSetMembers>()
-
-        insert.setString(table.CHANGE_SET_MRID.queryIndex, changeSet.mRID)
-        //insert.setString(table.CHANGE_SET_MEMBER_MRID.queryIndex, changeSetMember.mRID) TODO: no id?!
-
-        return insert.tryExecuteSingleUpdate("change set to change set member association")
-    }
 }

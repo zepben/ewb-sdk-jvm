@@ -26,8 +26,12 @@ import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.variant.VariantService
 import com.zepben.protobuf.vc.VariantChangeSetMember
 import com.zepben.protobuf.vc.VariantChangeSetMember.ChangeSetMemberCase.*
-import com.zepben.protobuf.vc.VariantIdentifiedObject
-import com.zepben.protobuf.vc.VariantIdentifiedObject.IdentifiedObjectCase.*
+import com.zepben.protobuf.vc.VariantObject
+import com.zepben.protobuf.vc.VariantObject.ObjectCase.*
+import com.zepben.protobuf.vc.VariantObject.ObjectCase.OBJECTCREATION
+import com.zepben.protobuf.vc.VariantObject.ObjectCase.OBJECTDELETION
+import com.zepben.protobuf.vc.VariantObject.ObjectCase.OBJECTMODIFICATION
+import com.zepben.protobuf.vc.VariantObject.ObjectCase.OTHER
 import com.zepben.protobuf.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProject as PBNetworkModelProject
 import com.zepben.protobuf.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectComponent as PBNetworkModelProjectComponent
 import com.zepben.protobuf.cim.iec61970.base.core.NameType as PBNameType
@@ -40,32 +44,19 @@ import com.zepben.protobuf.cim.iec61970.infiec61970.part303.genericdataset.Objec
 import com.zepben.protobuf.cim.iec61970.infiec61970.part303.genericdataset.ObjectDeletion as PBObjectDeletion
 import com.zepben.protobuf.cim.iec61970.infiec61970.part303.genericdataset.ObjectModification as PBObjectModification
 
-fun VariantService.addFromPb(pb: VariantIdentifiedObject): AddFromPbResult =
-    when (pb.identifiedObjectCase) {
+fun VariantService.addFromPb(pb: VariantObject): AddFromPbResult =
+    when (pb.objectCase) {
         NETWORKMODELPROJECT -> getOrAddFromPb(pb.networkModelProject.mRID()) { addFromPb(pb.networkModelProject )}
         NETWORKMODELPROJECTSTAGE -> getOrAddFromPb(pb.networkModelProjectStage.mRID()) { addFromPb(pb.networkModelProjectStage )}
-        ANNOTATEDPROJECTDEPENDENCY -> getOrAddFromPb(pb.annotatedProjectDependency.mRID()) { addFromPb(pb.annotatedProjectDependency) } // FIXME: move
-        OTHER, IDENTIFIEDOBJECT_NOT_SET, null -> throw UnsupportedOperationException(
-            "Identified object type ${pb.identifiedObjectCase} is not supported by the variant service"
+        ANNOTATEDPROJECTDEPENDENCY -> getOrAddFromPb(pb.annotatedProjectDependency.mRID()) { addFromPb(pb.annotatedProjectDependency) }
+        CHANGESET -> getOrAddFromPb(pb.changeSet.mRID()) { addFromPb(pb.changeSet) }
+        OBJECTCREATION -> addFromPb(pb.objectCreation)
+        OBJECTDELETION -> addFromPb(pb.objectDeletion)
+        OBJECTMODIFICATION -> addFromPb(pb.objectModification)
+        OTHER, OBJECT_NOT_SET, null -> throw UnsupportedOperationException(
+            "Object type ${pb.objectCase} is not supported by the variant service"
         )
-    }
 
-//fun NetworkModelProjectService.addFromPb(pb: VariantDataSet): AddFromPbResult =
-//    when (pb.dataSetCase) {
-//        CHANGESET -> getOrAddFromPb<ChangeSet>(pb.changeSet.mRID()) { addFromPb(pb.changeSet) }
-//        VariantDataSet.DataSetCase.OTHER, DATASET_NOT_SET, null -> throw UnsupportedOperationException(
-//            "dataset object type ${pb.dataSetCase} is not supported by the variant service"
-//        )
-//    }
-
-fun VariantService.addFromPb(pb: VariantChangeSetMember): ChangeSetMember =
-    when (pb.changeSetMemberCase) {
-        OBJECTCREATION -> toCim(pb.objectCreation, this)
-        OBJECTDELETION -> toCim(pb.objectDeletion, this)
-        OBJECTMODIFICATION -> toCim(pb.objectModification, this)
-        VariantChangeSetMember.ChangeSetMemberCase.OTHER, CHANGESETMEMBER_NOT_SET, null -> throw UnsupportedOperationException(
-            "changeSetMember object type ${pb.changeSetMemberCase} is not supported by the variant service"
-        )
     }
 
 /**
@@ -164,7 +155,7 @@ fun VariantService.addFromPb(pb: PBAnnotatedProjectDependency): AnnotatedProject
  * @param networkService The [VariantService] the converted CIM object will be added too.
  * @return The converted [pb] as a CIM [DataSet].
  */
-fun toCim(pb: PBDataSet, cim: DataSet, networkService: VariantService): DataSet =
+fun toCim(pb: PBDataSet, cim: DataSet): DataSet =
     cim.apply {
         description = pb.descriptionSet.takeUnless { pb.hasDescriptionNull() }
         name = pb.nameSet.takeUnless { pb.hasNameNull() }
@@ -173,7 +164,7 @@ fun toCim(pb: PBDataSet, cim: DataSet, networkService: VariantService): DataSet 
 /**
  * An extension to add a converted copy of the protobuf [PBNameType] to the [NetworkService].
  */
-fun NetworkService.addFromPb(pb: PBNameType): NameType = toCim(pb, this) // Special case
+fun VariantService.addFromPb(pb: PBNameType): NameType = toCim(pb, this) // Special case
 
 /**
  * Convert the protobuf [PBChangeSet] into its CIM counterpart.
@@ -183,23 +174,11 @@ fun NetworkService.addFromPb(pb: PBNameType): NameType = toCim(pb, this) // Spec
  * @return The converted [pb] as a CIM [ChangeSet].
  */
 fun toCim(pb: PBChangeSet, networkService: VariantService): ChangeSet =
-    ChangeSet(pb.mRID()).also {
-        networkService.dataSetsByMRID[it.mRID] = it
-    }.apply {
-        pb.changeSetMembersList.forEach {
-            when (it.changeSetMemberCase) {
-                OBJECTCREATION -> toCim(it.objectCreation, networkService)
-                OBJECTDELETION -> toCim(it.objectDeletion, networkService)
-                OBJECTMODIFICATION -> toCim(it.objectModification, networkService)
-                VariantChangeSetMember.ChangeSetMemberCase.OTHER, CHANGESETMEMBER_NOT_SET, null -> throw UnsupportedOperationException(
-                    "changeSetMember object type ${it.changeSetMemberCase} is not supported by the variant service"
-                )
-            }.also { csm ->
-                addMember( csm )
-            }
-        }
-    }.also {
-        toCim(pb.dataset, it, networkService)
+    ChangeSet(pb.mRID()).apply {
+        // Note: changeSetMembers are always resolved in the reverse direction, and thus the ChangeSet must be sent before any ChangeSetMember
+        networkService.resolveOrDeferReference(Resolvers.stage(this), pb.networkModelProjectStageMRID)
+
+        toCim(pb.dataset, this)
     }
 
 /**
@@ -209,10 +188,9 @@ fun toCim(pb: PBChangeSet, networkService: VariantService): ChangeSet =
  * @param service The [VariantService] the converted CIM object will be added too.
  * @return The converted [pb] as a CIM [ChangeSetMember].
  */
-fun toCim(pb: PBChangeSetMember, cim: ChangeSetMember, service: VariantService): ChangeSetMember =
-    cim.apply {
-        changeSet = service.getOrThrow(pb.changeSetMRID, "${pb::class} ${pb.changeSetMRID}")
-        targetObjectMRID = pb.targetObjectMRID
+inline fun <reified T : ChangeSetMember> toCim(pb: PBChangeSetMember, service: VariantService, creator: (ChangeSet, String) -> T): T =
+    creator(service.getOrThrow(pb.changeSetMRID, "${pb::class} ${pb.changeSetMRID}"), pb.targetObjectMRID).apply {
+        changeSet.addMember(this)
     }
 
 /**
@@ -223,8 +201,8 @@ fun toCim(pb: PBChangeSetMember, cim: ChangeSetMember, service: VariantService):
  * @return The converted [pb] as a CIM [ObjectCreation].
  */
 fun toCim(pb: PBObjectCreation, networkService: VariantService): ObjectCreation =
-    ObjectCreation().also {
-        toCim(pb.csm, it, networkService)
+    toCim(pb.csm, networkService) { cs, target ->
+        ObjectCreation(cs, target)
     }
 
 /**
@@ -235,8 +213,8 @@ fun toCim(pb: PBObjectCreation, networkService: VariantService): ObjectCreation 
  * @return The converted [pb] as a CIM [ObjectDeletion].
  */
 fun toCim(pb: PBObjectDeletion, networkService: VariantService): ObjectDeletion =
-    ObjectDeletion().also {
-        toCim(pb.csm, it, networkService)
+    toCim(pb.csm, networkService) { cs, target ->
+        ObjectDeletion(cs, target)
     }
 
 /**
@@ -247,12 +225,9 @@ fun toCim(pb: PBObjectDeletion, networkService: VariantService): ObjectDeletion 
  * @return The converted [pb] as a CIM [ObjectModification].
  */
 fun toCim(pb: PBObjectModification, networkService: VariantService): ObjectModification =
-    ObjectModification().also {
-        toCim(pb.csm, it, networkService)
-        pb.objectReverseModification?.let { orm ->
-            orm.csm.targetObjectMRID?.let { objectReverseModificationTargetObjectMRID ->
-                it.setObjectReverseModification(objectReverseModificationTargetObjectMRID)
-            }
+    toCim(pb.csm, networkService) { cs, target ->
+        ObjectModification(cs, target, pb.objectReverseModification.csm.targetObjectMRID).also {
+            cs.addMember(it.objectReverseModification)
         }
     }
 
@@ -269,7 +244,27 @@ fun VariantService.addFromPb(pb: PBNetworkModelProjectStage): NetworkModelProjec
 /**
  * An extension to add a converted copy of the protobuf [PBChangeSet] to the [VariantService].
  */
-fun VariantService.addFromPb(pb: PBChangeSet): ChangeSet = toCim(pb, this)
+fun VariantService.addFromPb(pb: PBChangeSet): ChangeSet? = tryAddOrNull(toCim(pb, this))
+
+
+/**
+ * An extension to add a converted copy of the protobuf [PBObjectCreation] to the [VariantService].
+ */
+fun VariantService.addFromPb(pb: PBObjectCreation): AddFromPbResult =
+    toCim(pb, this).let { AddFromPbResult("${it.changeSet.mRID}-${it.targetObjectMRID}", null, false) }
+
+
+/**
+ * An extension to add a converted copy of the protobuf [PBObjectDeletion] to the [VariantService].
+ */
+fun VariantService.addFromPb(pb: PBObjectDeletion): AddFromPbResult =
+    toCim(pb, this).let { AddFromPbResult("${it.changeSet.mRID}-${it.targetObjectMRID}", null, false) }
+
+/**
+ * An extension to add a converted copy of the protobuf [PBObjectModification] to the [VariantService].
+ */
+fun VariantService.addFromPb(pb: PBObjectModification): AddFromPbResult =
+    toCim(pb, this).let { AddFromPbResult("${it.changeSet.mRID}-${it.targetObjectMRID}", null, false) }
 
 // #################################
 // # Class for Java friendly usage #

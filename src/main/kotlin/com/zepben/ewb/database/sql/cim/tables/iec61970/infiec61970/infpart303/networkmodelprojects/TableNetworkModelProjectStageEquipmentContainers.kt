@@ -9,6 +9,8 @@
 package com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.infpart303.networkmodelprojects
 
 import com.zepben.ewb.database.sql.common.tables.Column
+import com.zepben.ewb.database.sql.common.tables.Column.Nullable.NOT_NULL
+import com.zepben.ewb.database.sql.common.tables.Column.Type.STRING
 import com.zepben.ewb.database.sql.common.tables.SqlTable
 
 /**
@@ -20,8 +22,8 @@ import com.zepben.ewb.database.sql.common.tables.SqlTable
 @Suppress("PropertyName")
 class TableNetworkModelProjectStageEquipmentContainers : SqlTable() {
 
-    val NETWORK_MODEL_PROJECT_STAGE_MRID: Column = Column(++columnIndex, "network_model_project_stage_mrid", Column.Type.STRING, Column.Nullable.NOT_NULL)
-    val EQUIPMENT_CONTAINER_MRID: Column = Column(++columnIndex, "equipment_container_mrid", Column.Type.STRING, Column.Nullable.NOT_NULL)
+    val NETWORK_MODEL_PROJECT_STAGE_MRID: Column = Column(++columnIndex, "network_model_project_stage_mrid", STRING, NOT_NULL)
+    val EQUIPMENT_CONTAINER_MRID: Column = Column(++columnIndex, "equipment_container_mrid", STRING, NOT_NULL)
 
     override val name: String = "network_model_project_stage_equipment_containers"
 

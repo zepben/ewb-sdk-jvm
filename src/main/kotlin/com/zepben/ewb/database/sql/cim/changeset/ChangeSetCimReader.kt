@@ -49,7 +49,7 @@ internal class ChangeSetCimReader : CimReader<VariantService>(), AutoCloseable{
         return true
     }
 
-    fun readChangeSetMember(service: VariantService, table: TableChangeSetMembers, resultSet: ResultSet, setIdentifier: (String) -> String, typeNameAndMRID: String, creator: (ChangeSet, String) -> ChangeSetMember): Boolean {
+    private fun readChangeSetMember(service: VariantService, table: TableChangeSetMembers, resultSet: ResultSet, setIdentifier: (String) -> String, typeNameAndMRID: String, creator: (ChangeSet, String) -> ChangeSetMember): Boolean {
         val changeSetMRID = resultSet.getString(table.CHANGE_SET_MRID.queryIndex)
         setIdentifier("$changeSetMRID-to-UNKNOWN")
         val targetObj = resultSet.getString(table.TARGET_OBJECT_MRID.queryIndex)

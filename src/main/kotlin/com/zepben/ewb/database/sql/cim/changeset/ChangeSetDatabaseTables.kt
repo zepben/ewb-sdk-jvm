@@ -9,7 +9,6 @@
 package com.zepben.ewb.database.sql.cim.changeset
 
 import com.zepben.ewb.database.sql.cim.CimDatabaseTables
-import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.genericdataset.TableChangeSetChangeSetMembers
 import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.genericdataset.TableChangeSets
 import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.genericdataset.TableObjectCreations
 import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.genericdataset.TableObjectDeletions
@@ -27,7 +26,6 @@ class ChangeSetDatabaseTables(
 
     override val includedTables: Sequence<SqlTable> =
         super.includedTables + sequenceOf(
-            TableChangeSetChangeSetMembers(),
             TableChangeSets(),
             TableObjectCreations(),
             TableObjectDeletions(),

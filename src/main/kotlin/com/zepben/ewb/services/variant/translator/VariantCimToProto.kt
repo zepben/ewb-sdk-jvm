@@ -11,7 +11,7 @@ package com.zepben.ewb.services.variant.translator
 import com.google.protobuf.NullValue
 import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProject
 import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectComponent
-import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.AnnotatedProjectDependency
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStage
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
@@ -23,11 +23,9 @@ import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectModi
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectReverseModification
 import com.zepben.ewb.services.common.translator.*
 import com.zepben.ewb.services.variant.whenVariantChangeSetMember
-import com.zepben.ewb.services.variant.whenVariantDataSet
 import com.zepben.ewb.services.variant.whenVariantIdentifiedObject
 import com.zepben.protobuf.vc.VariantChangeSetMember
-import com.zepben.protobuf.vc.VariantDataSet
-import com.zepben.protobuf.vc.VariantIdentifiedObject
+import com.zepben.protobuf.vc.VariantObject
 import com.zepben.protobuf.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProject as PBNetworkModelProject
 import com.zepben.protobuf.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectComponent as PBNetworkModelProjectComponent
 import com.zepben.protobuf.cim.iec61970.infiec61970.infpart303.networkmodelprojects.AnnotatedProjectDependency as PBAnnotatedProjectDependency
@@ -41,29 +39,22 @@ import com.zepben.protobuf.cim.iec61970.infiec61970.part303.genericdataset.Objec
 import com.zepben.protobuf.cim.iec61970.infiec61970.part303.genericdataset.ObjectReverseModification as PBObjectReverseModification
 
 /**
- * Convert the [DataSet] to a [VariantDataSet] representation.
+ * Convert the [variantObject] to a [VariantObject] representation.
  */
-/**
- * Convert the [DataSet] to a [VariantDataSet] representation.
- */
-fun variantIdentifiedObject(identifiedObject: IdentifiedObject): VariantIdentifiedObject =
-    VariantIdentifiedObject.newBuilder().apply {
+fun variantObject(identified: Identifiable): VariantObject =
+    VariantObject.newBuilder().apply {
         whenVariantIdentifiedObject(
-            identifiedObject,
+            identified,
             isNetworkModelProject = { networkModelProject = it.toPb() },
             isNetworkModelProjectStage = { networkModelProjectStage = it.toPb() },
-            isAnnotatedProjectDependency = { annotatedProjectDependency = it.toPb() }
+            isAnnotatedProjectDependency = { annotatedProjectDependency = it.toPb() },
+            isChangeSet = { changeSet = it.toPb() },
         )
     }.build()
 
-fun variantDataSet(dataSet: DataSet): VariantDataSet =
-    VariantDataSet.newBuilder().apply {
-        whenVariantDataSet(
-            dataSet,
-            isChangeSet = { changeSet = it.toPb() }
-        )
-    }.build()
-
+/**
+ * Convert the [changeSetMember] to a [VariantChangeSetMember] representation.
+ */
 fun variantChangeSetMember(changeSetMember: ChangeSetMember): VariantChangeSetMember =
     VariantChangeSetMember.newBuilder().apply {
         whenVariantChangeSetMember(
@@ -109,9 +100,7 @@ fun toPb(cim: NetworkModelProjectComponent, pb: PBNetworkModelProjectComponent.B
         cim.created?.also { createdSet = it.toTimestamp() } ?: run { createdNull = NullValue.NULL_VALUE }
         cim.updated?.also { updatedSet = it.toTimestamp() } ?: run { updatedNull = NullValue.NULL_VALUE }
         cim.closed?.also { closedSet = it.toTimestamp() } ?: run { closedNull = NullValue.NULL_VALUE }
-        cim.parent?.let {
-            parentMRID = it.mRID
-        }
+        cim.parent?.also { parentMRID = it.mRID } ?: clearParentMRID()
 
     }.also {
         toPb(cim, pb.ioBuilder)
@@ -120,12 +109,7 @@ fun toPb(cim: NetworkModelProjectComponent, pb: PBNetworkModelProjectComponent.B
 /**
  * An extension for converting any [NetworkModelProject] into its protobuf counterpart.
  */
-fun NetworkModelProject.toPb(): PBNetworkModelProject = toPb(this, PBNetworkModelProject.newBuilder()).build() // FIXME: move.
-
-/**
- * An extension for converting any [NetworkModelProjectComponent] into its protobuf counterpart.
- */
-fun NetworkModelProjectComponent.toPb(): PBNetworkModelProjectComponent = toPb(this, PBNetworkModelProjectComponent.newBuilder()).build() // FIXME: move.
+fun NetworkModelProject.toPb(): PBNetworkModelProject = toPb(this, PBNetworkModelProject.newBuilder()).build()
 
 
 // ########################################################
@@ -142,8 +126,8 @@ fun NetworkModelProjectComponent.toPb(): PBNetworkModelProjectComponent = toPb(t
 fun toPb(cim: AnnotatedProjectDependency, pb: PBAnnotatedProjectDependency.Builder): PBAnnotatedProjectDependency.Builder =
     pb.apply {
         cim.dependencyType.also { dependencyType = mapDependencyKind.toPb(it) }
-        cim.dependencyDependingStage?.also { dependencyDependingStageMRID = it.mRID }
-        cim.dependencyDependentOnStage?.also { dependencyDependentOnStageMRID = it.mRID }
+        cim.dependencyDependingStage?.also { dependencyDependingStageMRID = it.mRID } ?: clearDependencyDependingStageMRID()
+        cim.dependencyDependentOnStage?.also { dependencyDependentOnStageMRID = it.mRID } ?: clearDependencyDependentOnStageMRID()
 
         toPb(cim, ioBuilder)
     }
@@ -174,18 +158,19 @@ fun toPb(cim: NetworkModelProjectStage, pb: PBNetworkModelProjectStage.Builder):
         cim.equipmentContainerMRIDs.forEach {
             addEquipmentContainerMRIDs(it)
         }
+
         toPb(cim, pb.nmpcBuilder)
     }
 
 /**
  * An extension for converting any [AnnotatedProjectDependency] into its protobuf counterpart.
  */
-fun AnnotatedProjectDependency.toPb(): PBAnnotatedProjectDependency = toPb(this, PBAnnotatedProjectDependency.newBuilder()).build() // FIXME: move.
+fun AnnotatedProjectDependency.toPb(): PBAnnotatedProjectDependency = toPb(this, PBAnnotatedProjectDependency.newBuilder()).build()
 
 /**
  * An extension for converting any [NetworkModelProjectStage] into its protobuf counterpart.
  */
-fun NetworkModelProjectStage.toPb(): PBNetworkModelProjectStage = toPb(this, PBNetworkModelProjectStage.newBuilder()).build() // FIXME: move.
+fun NetworkModelProjectStage.toPb(): PBNetworkModelProjectStage = toPb(this, PBNetworkModelProjectStage.newBuilder()).build()
 
 // ###############################################
 // # IEC61970 InfIEC61970 Part303 GenericDataSet #
@@ -214,9 +199,8 @@ fun toPb(cim: DataSet, pb: PBDataSet.Builder): PBDataSet.Builder =
  */
 fun toPb(cim: ChangeSet, pb: PBChangeSet.Builder): PBChangeSet.Builder =
     pb.apply {
-        cim.changeSetMembers.forEach {
-            addChangeSetMembers( variantChangeSetMember(it) )
-        }
+        // NOTE: changeSetMembers are sent separately
+        cim.networkModelProjectStage?.also { networkModelProjectStageMRID = it.mRID } ?: clearNetworkModelProjectStageMRID()
         toPb(cim, datasetBuilder)
     }
 
@@ -229,8 +213,8 @@ fun toPb(cim: ChangeSet, pb: PBChangeSet.Builder): PBChangeSet.Builder =
  */
 fun toPb(cim: ChangeSetMember, pb: PBChangeSetMember.Builder): PBChangeSetMember.Builder =
     pb.apply {
-        cim.changeSet?.let { changeSetMRID = it.mRID }
-        cim.targetObjectMRID?.let { targetObjectMRID = it }
+        changeSetMRID = cim.changeSet.mRID
+        targetObjectMRID = cim.targetObjectMRID
     }
 
 /**
@@ -266,12 +250,8 @@ fun toPb(cim: ObjectDeletion, pb: PBObjectDeletion.Builder): PBObjectDeletion.Bu
  */
 fun toPb(cim: ObjectModification, pb: PBObjectModification.Builder): PBObjectModification.Builder =
     pb.apply {
-        cim.objectReverseModification?.let {
-            pb.objectReverseModification = toPb(
-                it, objectReverseModificationBuilder
-            ).build()
+        pb.objectReverseModification = toPb(cim.objectReverseModification, objectReverseModificationBuilder).build()
 
-        }
         toPb(cim, csmBuilder)
     }
 
@@ -286,11 +266,6 @@ fun toPb(cim: ObjectReverseModification, pb: PBObjectReverseModification.Builder
     pb.apply {
         toPb(cim, csmBuilder)
     }
-
-/**
- * An extension for converting any [ChangeSetMember] into its protobuf counterpart.
- */
-fun ChangeSetMember.toPb(): PBChangeSetMember = toPb(this, PBChangeSetMember.newBuilder()).build()
 
 /**
  * An extension for converting any [ChangeSet] into its protobuf counterpart.
@@ -312,10 +287,6 @@ fun ObjectDeletion.toPb(): PBObjectDeletion = toPb(this, PBObjectDeletion.newBui
  */
 fun ObjectModification.toPb(): PBObjectModification = toPb(this, PBObjectModification.newBuilder()).build()
 
-/**
- * An extension for converting any [ObjectReverseModification] into its protobuf counterpart.
- */
-fun ObjectReverseModification.toPb(): PBObjectReverseModification = toPb(this, PBObjectReverseModification.newBuilder()).build()
 
 // #################################
 // # Class for Java friendly usage #
@@ -333,14 +304,6 @@ class NetworkModelProjectCimToProto : BaseCimToProto() {
      * @return the protobuf form of [cim]
      */
     fun toPb(cim: NetworkModelProject): PBNetworkModelProject = cim.toPb()
-
-    /**
-     * Convert the [NetworkModelProjectComponent] into its protobuf counterpart.
-     *
-     * @param cim The [NetworkModelProjectComponent] to convert.
-     * @return the protobuf form of [cim]
-     */
-    fun toPb(cim: NetworkModelProjectComponent): PBNetworkModelProjectComponent = cim.toPb()
 
     /**
      * Convert the [AnnotatedProjectDependency] into its protobuf counterpart.
@@ -367,14 +330,6 @@ class NetworkModelProjectCimToProto : BaseCimToProto() {
     fun toPb(cim: ChangeSet): PBChangeSet = cim.toPb()
 
     /**
-     * Convert the [ChangeSetMember] into its protobuf counterpart.
-     *
-     * @param cim The [ChangeSetMember] to convert.
-     * @return the protobuf form of [cim]
-     */
-    fun toPb(cim: ChangeSetMember): PBChangeSetMember = cim.toPb()
-
-    /**
      * Convert the [ObjectCreation] into its protobuf counterpart.
      *
      * @param cim The [ObjectCreation] to convert.
@@ -398,11 +353,4 @@ class NetworkModelProjectCimToProto : BaseCimToProto() {
      */
     fun toPb(cim: ObjectModification): PBObjectModification = cim.toPb()
 
-    /**
-     * Convert the [ObjectReverseModification] into its protobuf counterpart.
-     *
-     * @param cim The [ObjectReverseModification] to convert.
-     * @return the protobuf form of [cim]
-     */
-    fun toPb(cim: ObjectReverseModification): PBObjectReverseModification = cim.toPb()
 }

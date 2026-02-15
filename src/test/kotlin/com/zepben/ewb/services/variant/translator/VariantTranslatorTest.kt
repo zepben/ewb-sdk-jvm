@@ -26,7 +26,7 @@ internal class VariantTranslatorTest : TranslatorTestBase<VariantService>(
     VariantServiceComparator(),
     VariantDatabaseTables(),
     VariantService::addFromPb,
-    ::variantIdentifiedObject
+    ::variantObject
 
 ){
     private val vsToPb = NetworkModelProjectCimToProto()

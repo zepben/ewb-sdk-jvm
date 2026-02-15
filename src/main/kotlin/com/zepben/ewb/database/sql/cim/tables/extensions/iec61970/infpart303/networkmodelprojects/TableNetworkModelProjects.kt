@@ -9,6 +9,9 @@
 package com.zepben.ewb.database.sql.cim.tables.extensions.iec61970.infpart303.networkmodelprojects
 
 import com.zepben.ewb.database.sql.common.tables.Column
+import com.zepben.ewb.database.sql.common.tables.Column.Nullable.NULL
+import com.zepben.ewb.database.sql.common.tables.Column.Type.STRING
+import com.zepben.ewb.database.sql.common.tables.Column.Type.TIMESTAMP
 
 /**
  * A class representing the NetworkModelProject columns required for the database table.
@@ -20,9 +23,9 @@ import com.zepben.ewb.database.sql.common.tables.Column
 @Suppress("PropertyName")
 class TableNetworkModelProjects : TableNetworkModelProjectComponents() {
 
-    val EXTERNAL_STATUS: Column = Column(++columnIndex, "external_status", Column.Type.STRING, Column.Nullable.NULL)
-    val FORECAST_COMMISSION_DATE: Column = Column(++columnIndex, "forecast_commission_date", Column.Type.TIMESTAMP, Column.Nullable.NULL)
-    val EXTERNAL_DRIVER: Column = Column(++columnIndex, "external_driver", Column.Type.STRING, Column.Nullable.NULL)
+    val EXTERNAL_STATUS: Column = Column(++columnIndex, "external_status", STRING, NULL)
+    val FORECAST_COMMISSION_DATE: Column = Column(++columnIndex, "forecast_commission_date", TIMESTAMP, NULL)
+    val EXTERNAL_DRIVER: Column = Column(++columnIndex, "external_driver", STRING, NULL)
 
     override val name: String = "network_model_projects"
 

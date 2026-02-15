@@ -52,8 +52,7 @@ import kotlin.reflect.KClass
 /**
  * Maintains an in-memory model of the network.
  */
-// TODO: i needed open to extend the class, i dont know if this is right..?
-open class NetworkService(name: String = "network", metadata: MetadataCollection = MetadataCollection()) : BaseService(name, metadata) {
+class NetworkService(metadata: MetadataCollection = MetadataCollection()) : BaseService("network", metadata) {
 
     private enum class ProcessStatus {
         PROCESSED, SKIPPED, INVALID

@@ -11,15 +11,8 @@ package com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.gene
 /**
  * A class representing the ObjectCreation columns required for the database table.
  */
-@Suppress("PropertyName")
 class TableObjectCreations : TableChangeSetMembers() {
 
     override val name: String = "object_creations"
 
-    init {
-        addNonUniqueIndexes(
-            listOf(TARGET_OBJECT_MRID),
-            listOf(CHANGE_SET_MRID)
-        )
-    }
 }

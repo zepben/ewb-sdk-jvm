@@ -10,6 +10,8 @@ package com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.infpart303.n
 
 import com.zepben.ewb.database.sql.cim.tables.iec61970.base.core.TableIdentifiedObjects
 import com.zepben.ewb.database.sql.common.tables.Column
+import com.zepben.ewb.database.sql.common.tables.Column.Nullable.NOT_NULL
+import com.zepben.ewb.database.sql.common.tables.Column.Type.STRING
 
 /**
  * A class representing the AnnotatedProjectDependency columns required for the database table.
@@ -21,9 +23,9 @@ import com.zepben.ewb.database.sql.common.tables.Column
 @Suppress("PropertyName")
 class TableAnnotatedProjectDependencies : TableIdentifiedObjects() {
 
-    val DEPENDENCY_TYPE: Column = Column(++columnIndex, "dependency_type", Column.Type.STRING, Column.Nullable.NOT_NULL)
-    val DEPENDENCY_DEPENDENT_ON_STAGE_MRID: Column = Column(++columnIndex, "dependency_dependent_on_stage_mrid", Column.Type.STRING, Column.Nullable.NOT_NULL)
-    val DEPENDENCY_DEPENDING_STAGE_MRID: Column = Column(++columnIndex, "dependency_depending_on_stage_mrid", Column.Type.STRING, Column.Nullable.NOT_NULL)
+    val DEPENDENCY_TYPE: Column = Column(++columnIndex, "dependency_type", STRING, NOT_NULL)
+    val DEPENDENCY_DEPENDENT_ON_STAGE_MRID: Column = Column(++columnIndex, "dependency_dependent_on_stage_mrid", STRING, NOT_NULL)
+    val DEPENDENCY_DEPENDING_STAGE_MRID: Column = Column(++columnIndex, "dependency_depending_on_stage_mrid", STRING, NOT_NULL)
 
     override val name: String = "annotated_project_dependencies"
 
@@ -34,6 +36,11 @@ class TableAnnotatedProjectDependencies : TableIdentifiedObjects() {
                 DEPENDENCY_DEPENDING_STAGE_MRID,
                 DEPENDENCY_TYPE
             )
+        )
+
+        addNonUniqueIndexes(
+            listOf(DEPENDENCY_DEPENDING_STAGE_MRID),
+            listOf(DEPENDENCY_DEPENDENT_ON_STAGE_MRID)
         )
     }
 

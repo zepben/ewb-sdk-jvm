@@ -9,7 +9,6 @@
 package com.zepben.ewb.cim.iec61970.base.wires
 
 import com.zepben.ewb.services.common.extensions.asUnmodifiable
-import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 
 /**
  * Impedance and admittance parameters per unit length for n-wire unbalanced lines, in matrix form.

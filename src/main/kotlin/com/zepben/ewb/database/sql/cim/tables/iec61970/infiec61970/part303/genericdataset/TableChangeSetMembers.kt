@@ -23,4 +23,12 @@ abstract class TableChangeSetMembers : SqlTable() {
     val CHANGE_SET_MRID: Column = Column(++columnIndex, "change_set_mrid", Column.Type.STRING, Column.Nullable.NOT_NULL)
     val TARGET_OBJECT_MRID: Column = Column(++columnIndex, "target_object_mrid", Column.Type.STRING, Column.Nullable.NOT_NULL)
 
+    init {
+        addUniqueIndexes(listOf(CHANGE_SET_MRID, TARGET_OBJECT_MRID))
+
+        addNonUniqueIndexes(
+            listOf(TARGET_OBJECT_MRID),
+            listOf(CHANGE_SET_MRID)
+        )
+    }
 }

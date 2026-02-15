@@ -11,6 +11,9 @@ package com.zepben.ewb.database.sql.cim.variant
 import com.zepben.ewb.database.sql.cim.BaseServiceReader
 import com.zepben.ewb.database.sql.cim.tables.extensions.iec61970.infpart303.networkmodelprojects.TableNetworkModelProjects
 import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.infpart303.networkmodelprojects.TableAnnotatedProjectDependencies
+import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.infpart303.networkmodelprojects.TableNetworkModelProjectStageEquipmentContainers
+import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.infpart303.networkmodelprojects.TableNetworkModelProjectStages
+import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.genericdataset.TableChangeSets
 import com.zepben.ewb.services.variant.VariantService
 import java.sql.Connection
 
@@ -28,6 +31,8 @@ internal class VariantServiceReader(
 
     override fun readService(service: VariantService): Boolean =
         readEach<TableNetworkModelProjects>(service, reader::read) and
-            readEach<TableAnnotatedProjectDependencies>(service, reader::read)
+            readEach<TableNetworkModelProjectStages>(service, reader::read) and
+            readEach<TableAnnotatedProjectDependencies>(service, reader::read) and
+            readEach<TableNetworkModelProjectStageEquipmentContainers>(service, reader::read)
 
 }

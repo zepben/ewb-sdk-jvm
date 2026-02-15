@@ -9,7 +9,6 @@
 package com.zepben.ewb.cim.iec61970.base.wires
 
 import com.zepben.ewb.cim.iec61970.base.core.Terminal
-import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.testdata.fillFields

@@ -12,7 +12,6 @@ import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.iec61968.operations.OperationalRestriction
 import com.zepben.ewb.cim.iec61970.base.core.*
 import com.zepben.ewb.services.common.BaseService
-import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 import com.zepben.ewb.services.common.translator.EnumMapper
 import com.zepben.ewb.services.common.translator.mRID
 import com.zepben.ewb.services.network.NetworkService

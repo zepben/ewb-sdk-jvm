@@ -14,24 +14,24 @@ import com.zepben.ewb.database.sql.common.tables.SqlTable
 /**
  * A class representing the association between Equipment and EquipmentContainers.
  *
- * @property NETWORK_MODEL_PROJECT_MRID A column storing the mRID of NetworkModelProject.
+ * @property NETWORK_MODEL_PROJECT_STAGE_MRID A column storing the mRID of NetworkModelProject.
  * @property EQUIPMENT_CONTAINER_MRID A column storing the mRID of EquipmentContainers.
  */
 @Suppress("PropertyName")
 class TableNetworkModelProjectStageEquipmentContainers : SqlTable() {
 
-    val NETWORK_MODEL_PROJECT_MRID: Column = Column(++columnIndex, "network_model_project_mrid", Column.Type.STRING, Column.Nullable.NOT_NULL)
+    val NETWORK_MODEL_PROJECT_STAGE_MRID: Column = Column(++columnIndex, "network_model_project_stage_mrid", Column.Type.STRING, Column.Nullable.NOT_NULL)
     val EQUIPMENT_CONTAINER_MRID: Column = Column(++columnIndex, "equipment_container_mrid", Column.Type.STRING, Column.Nullable.NOT_NULL)
 
-    override val name: String = "equipment_equipment_containers"
+    override val name: String = "network_model_project_stage_equipment_containers"
 
     init {
         addUniqueIndexes(
-            listOf(NETWORK_MODEL_PROJECT_MRID, EQUIPMENT_CONTAINER_MRID)
+            listOf(NETWORK_MODEL_PROJECT_STAGE_MRID, EQUIPMENT_CONTAINER_MRID)
         )
 
         addNonUniqueIndexes(
-            listOf(NETWORK_MODEL_PROJECT_MRID),
+            listOf(NETWORK_MODEL_PROJECT_STAGE_MRID),
             listOf(EQUIPMENT_CONTAINER_MRID)
         )
     }

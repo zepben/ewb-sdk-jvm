@@ -11,7 +11,6 @@ package com.zepben.ewb.cim.extensions.iec61968.assetinfo
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.iec61968.assets.AssetInfo
 import com.zepben.ewb.services.common.extensions.asUnmodifiable
-import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 import java.util.function.BiConsumer
 
 /**

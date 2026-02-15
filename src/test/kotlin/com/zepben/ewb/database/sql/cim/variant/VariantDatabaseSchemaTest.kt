@@ -16,7 +16,6 @@ import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.N
 import com.zepben.ewb.database.sql.cim.variant.tables.tableVariantsVersion
 import com.zepben.ewb.database.sql.initialisers.NoOpDatabaseInitialiser
 import com.zepben.ewb.services.common.BaseService
-import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 import com.zepben.ewb.services.common.testdata.SchemaServices
 import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.variant.VariantService

@@ -8,8 +8,11 @@
 
 package com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.infpart303.networkmodelprojects
 
+import com.zepben.ewb.database.sql.cim.tables.extensions.iec61970.infpart303.networkmodelprojects.TableNetworkModelProjectComponents
 import com.zepben.ewb.database.sql.cim.tables.iec61970.base.core.TableIdentifiedObjects
 import com.zepben.ewb.database.sql.common.tables.Column
+import com.zepben.ewb.database.sql.common.tables.Column.Nullable.NULL
+import com.zepben.ewb.database.sql.common.tables.Column.Type.*
 
 /**
  * A class representing the NetworkModelProjectStage columns required for the database table.
@@ -23,15 +26,15 @@ import com.zepben.ewb.database.sql.common.tables.Column
  * @property CHANGE_SET_MRID A column storing the mRID of the ChangeSet for this NetworkModelProjectStage.
  */
 @Suppress("PropertyName")
-class TableNetworkModelProjectStages : TableIdentifiedObjects() {
+class TableNetworkModelProjectStages : TableNetworkModelProjectComponents() {
 
-    val PLANNED_COMMISSION_DATE: Column = Column(++columnIndex, "planned_commission_date", Column.Type.TIMESTAMP, Column.Nullable.NULL)
-    val COMMISSIONED_DATE: Column = Column(++columnIndex, "commissioned_date", Column.Type.TIMESTAMP, Column.Nullable.NULL)
-    val CONFIDENCE_LEVEL: Column = Column(++columnIndex, "confidence_level", Column.Type.INTEGER, Column.Nullable.NULL)
-    val BASE_MODEL_VERSION: Column = Column(++columnIndex, "base_model_version", Column.Type.STRING, Column.Nullable.NULL)
-    val LAST_CONFLICT_CHECKED_AT: Column = Column(++columnIndex, "last_conflict_checked_at", Column.Type.TIMESTAMP, Column.Nullable.NULL)
-    val USER_COMMENTS: Column = Column(++columnIndex, "user_comments", Column.Type.STRING, Column.Nullable.NULL)
-    val CHANGE_SET_MRID: Column = Column(++columnIndex, "change_set_mrid", Column.Type.STRING, Column.Nullable.NULL)
+    val PLANNED_COMMISSION_DATE: Column = Column(++columnIndex, "planned_commission_date", TIMESTAMP, NULL)
+    val COMMISSIONED_DATE: Column = Column(++columnIndex, "commissioned_date", TIMESTAMP, NULL)
+    val CONFIDENCE_LEVEL: Column = Column(++columnIndex, "confidence_level", INTEGER, NULL)
+    val BASE_MODEL_VERSION: Column = Column(++columnIndex, "base_model_version", STRING, NULL)
+    val LAST_CONFLICT_CHECKED_AT: Column = Column(++columnIndex, "last_conflict_checked_at", TIMESTAMP, NULL)
+    val USER_COMMENTS: Column = Column(++columnIndex, "user_comments", STRING, NULL)
+    val CHANGE_SET_MRID: Column = Column(++columnIndex, "change_set_mrid", STRING, NULL)
 
     override val name: String = "network_model_project_stages"
 

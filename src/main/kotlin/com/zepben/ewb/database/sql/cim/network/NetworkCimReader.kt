@@ -93,7 +93,6 @@ import com.zepben.ewb.database.sql.extensions.*
 import com.zepben.ewb.services.common.Resolvers
 import com.zepben.ewb.services.common.extensions.ensureGet
 import com.zepben.ewb.services.common.extensions.getOrThrow
-import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 import com.zepben.ewb.services.network.NetworkService
 import java.sql.ResultSet
 import java.sql.SQLException

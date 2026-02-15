@@ -8,6 +8,8 @@
 
 package com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset
 
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
+
 /**
  * A generic container of a version of instance data. The mRID can be used in an audit trail, not
  * in reusable script intended to work with new versions of data. A dataset could be serialized
@@ -21,11 +23,20 @@ package com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset
  * @property name is any free human-readable and possibly non-unique text naming the object.
  * @property description a free human-readable text describing or naming the object. It may be non-unique and may not correlate to a naming hierarchy.
  */
-abstract class DataSet(val mRID: String) {
+abstract class DataSet(override val mRID: String): Identifiable {
 
     var name: String? = null
     var description: String? = null
 
-    fun typeNameAndMRID(): String = if (name.isNullOrBlank()) "${javaClass.simpleName} $mRID" else "${javaClass.simpleName} $name [$mRID]"
+    /**
+     * Printable version of the object including the type, name and mRID.
+     */
+    override fun typeNameAndMRID(): String = if (name.isNullOrBlank()) "${javaClass.simpleName} $mRID" else "${javaClass.simpleName} $name [$mRID]"
+
+
+    /**
+     * Printable version of the object including its name and mRID.
+     */
+    override fun nameAndMRID(): String = if (name.isNullOrBlank()) mRID else "'$name' [$mRID]"
 
 }

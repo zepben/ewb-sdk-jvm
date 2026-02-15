@@ -15,10 +15,6 @@ package com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset
  */
 class ObjectModification(changeSet: ChangeSet, modifiedObjectMRID: String, originalObjectMRID: String) : ChangeSetMember(changeSet, modifiedObjectMRID) {
 
-    init {
-        changeSet.addMember(this)
-    }
-
     val objectReverseModification: ObjectReverseModification = ObjectReverseModification(changeSet, originalObjectMRID, this)
 
 }

@@ -9,7 +9,6 @@
 package com.zepben.ewb.services.network.tracing.phases
 
 import com.zepben.ewb.cim.iec61970.base.core.ConductingEquipment
-import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 import com.zepben.ewb.services.network.tracing.networktrace.NetworkTraceStep
 import com.zepben.ewb.services.network.tracing.networktrace.Tracing
 import com.zepben.ewb.services.network.tracing.networktrace.run

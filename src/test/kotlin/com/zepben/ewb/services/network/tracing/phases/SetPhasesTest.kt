@@ -16,7 +16,6 @@ import com.zepben.ewb.cim.iec61970.base.core.PhaseCode
 import com.zepben.ewb.cim.iec61970.base.core.Terminal
 import com.zepben.ewb.cim.iec61970.base.wires.AcLineSegment
 import com.zepben.ewb.cim.iec61970.base.wires.EnergySource
-import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.testdata.PhaseSwapLoopNetwork
 import com.zepben.ewb.services.network.tracing.networktrace.operators.NetworkStateOperators

@@ -25,10 +25,7 @@ class TableObjectModifications : TableChangeSetMembers() {
     override val name: String = "object_modifications"
 
     init {
-        addNonUniqueIndexes(
-            listOf(TARGET_OBJECT_MRID),
-            listOf(CHANGE_SET_MRID)
-        )
+        addNonUniqueIndexes(listOf(OBJECT_REVERSE_MODIFICATION_TARGET_OBJECT_MRID))
     }
 
 }

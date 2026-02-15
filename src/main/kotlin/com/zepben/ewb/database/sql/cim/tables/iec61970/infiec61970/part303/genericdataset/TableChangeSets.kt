@@ -9,11 +9,13 @@
 package com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.genericdataset
 
 import com.zepben.ewb.database.sql.common.tables.Column
+import com.zepben.ewb.database.sql.common.tables.Column.Nullable.NULL
+import com.zepben.ewb.database.sql.common.tables.Column.Type.STRING
 
 @Suppress("PropertyName")
 class TableChangeSets : TableDataSets() {
 
-    val NETWORK_MODEL_PROJECT_STAGE_MRID: Column = Column(++columnIndex, "network_model_project_stage_mrid", Column.Type.STRING, Column.Nullable.NULL)
+    val NETWORK_MODEL_PROJECT_STAGE_MRID: Column = Column(++columnIndex, "network_model_project_stage_mrid", STRING, NULL)
 
     override val name: String = "change_sets"
 

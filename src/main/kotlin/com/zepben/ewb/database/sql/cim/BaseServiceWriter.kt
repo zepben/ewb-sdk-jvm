@@ -13,7 +13,6 @@ import com.zepben.ewb.cim.iec61970.base.core.Name
 import com.zepben.ewb.cim.iec61970.base.core.NameType
 import com.zepben.ewb.database.sql.common.BaseCollectionWriter
 import com.zepben.ewb.services.common.BaseService
-import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 
 /**
  * A base class for writing object from a [BaseService] into the database.

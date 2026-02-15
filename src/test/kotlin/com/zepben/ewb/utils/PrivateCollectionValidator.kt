@@ -9,7 +9,6 @@
 package com.zepben.ewb.utils
 
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
-import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 import com.zepben.testutils.exception.ExpectException.Companion.expect
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*

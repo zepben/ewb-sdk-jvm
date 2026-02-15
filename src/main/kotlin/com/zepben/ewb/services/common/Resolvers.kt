@@ -53,6 +53,7 @@ import com.zepben.ewb.cim.iec61970.base.wires.*
 import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.AnnotatedProjectDependency
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStage
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
 
 /**
  * These should be used to access [ReferenceResolver] instances for use with [BaseService.resolveOrDeferReference] and
@@ -600,6 +601,14 @@ object Resolvers {
         BoundReferenceResolver(powerSystemResource, PowerSystemResourceToAssetResolver, AssetToPowerSystemResourceResolver)
 
     @JvmStatic
+    fun stage(changeSet: ChangeSet): BoundReferenceResolver<ChangeSet, NetworkModelProjectStage> =
+        BoundReferenceResolver(changeSet, ChangeSetToNetworkModelProjectStageResolver, NetworkModelProjectStageToChangeSetResolver)
+
+    @JvmStatic
+    fun changeSet(stage: NetworkModelProjectStage): BoundReferenceResolver<NetworkModelProjectStage, ChangeSet> =
+        BoundReferenceResolver(stage, NetworkModelProjectStageToChangeSetResolver, ChangeSetToNetworkModelProjectStageResolver)
+
+    @JvmStatic
     fun networkModelProjectComponents(networkModelProject: NetworkModelProject): BoundReferenceResolver<NetworkModelProject, NetworkModelProjectComponent> =
         BoundReferenceResolver(
             networkModelProject,
@@ -616,7 +625,7 @@ object Resolvers {
         )
 
     @JvmStatic
-    fun dependentStage(annotatedProjectDependency: AnnotatedProjectDependency): BoundReferenceResolver<AnnotatedProjectDependency, NetworkModelProjectStage> =
+    fun dependentOnStage(annotatedProjectDependency: AnnotatedProjectDependency): BoundReferenceResolver<AnnotatedProjectDependency, NetworkModelProjectStage> =
         BoundReferenceResolver(
             annotatedProjectDependency,
             AnnotatedProjectDependencyToDependentNetworkModelProjectStageResolver,

@@ -11,7 +11,6 @@ package com.zepben.ewb.database.sql.cim
 import com.zepben.ewb.database.sql.cim.metadata.MetadataCollectionReader
 import com.zepben.ewb.database.sql.common.tables.TableVersion
 import com.zepben.ewb.services.common.BaseService
-import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 import com.zepben.ewb.services.common.meta.MetadataCollection
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

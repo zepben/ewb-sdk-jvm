@@ -11,6 +11,7 @@ package com.zepben.ewb.database.sql.cim
 import com.zepben.ewb.cim.iec61968.common.Document
 import com.zepben.ewb.cim.iec61968.common.Organisation
 import com.zepben.ewb.cim.iec61968.common.OrganisationRole
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.core.Name
 import com.zepben.ewb.cim.iec61970.base.core.NameType
@@ -30,7 +31,6 @@ import com.zepben.ewb.services.common.exceptions.UnsupportedIdentifiedObjectExce
 import com.zepben.ewb.services.common.extensions.ensureGet
 import com.zepben.ewb.services.common.extensions.getNameTypeOrThrow
 import com.zepben.ewb.services.common.extensions.getOrThrow
-import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.sql.ResultSet
@@ -199,7 +199,7 @@ internal abstract class CimReader<TService : BaseService> {
      *   issue, rather than a problem with the data being read, and in a correctly configured system will never occur.
      */
     @Throws(DuplicateMRIDException::class, UnsupportedIdentifiedObjectException::class)
-    protected fun BaseService.addOrThrow(identifiedObject: IdentifiedObject): Boolean {
+    protected fun BaseService.addOrThrow(identifiedObject: Identifiable): Boolean {
         return if (tryAdd(identifiedObject)) {
             true
         } else {

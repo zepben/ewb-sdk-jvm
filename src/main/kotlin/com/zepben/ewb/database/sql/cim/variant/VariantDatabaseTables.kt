@@ -9,7 +9,6 @@
 package com.zepben.ewb.database.sql.cim.variant
 
 import com.zepben.ewb.database.sql.cim.CimDatabaseTables
-import com.zepben.ewb.database.sql.cim.tables.extensions.iec61970.infpart303.networkmodelprojects.TableNetworkModelProjectNetworkModelProjectComponents
 import com.zepben.ewb.database.sql.cim.tables.extensions.iec61970.infpart303.networkmodelprojects.TableNetworkModelProjects
 import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.infpart303.networkmodelprojects.TableAnnotatedProjectDependencies
 import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.infpart303.networkmodelprojects.TableNetworkModelProjectStageEquipmentContainers
@@ -28,7 +27,6 @@ class VariantDatabaseTables(
 
     override val includedTables: Sequence<SqlTable> =
         super.includedTables + sequenceOf(
-            TableNetworkModelProjectNetworkModelProjectComponents(),
             TableNetworkModelProjects(),
             TableAnnotatedProjectDependencies(),
             TableNetworkModelProjectStageEquipmentContainers(),

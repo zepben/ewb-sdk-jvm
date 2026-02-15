@@ -14,4 +14,4 @@ package com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset
  * @property changeSet The [ChangeSet] this [ChangeSetMember] belongs to.
  * @property targetObjectMRID The CIM object [changeSet] applies to.
  */
-abstract class ChangeSetMember(val changeSet: ChangeSet, val targetObjectMRID: String)
+abstract class ChangeSetMember(var changeSet: ChangeSet, var targetObjectMRID: String)

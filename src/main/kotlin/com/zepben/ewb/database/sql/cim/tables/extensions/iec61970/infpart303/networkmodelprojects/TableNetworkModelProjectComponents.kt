@@ -10,6 +10,9 @@ package com.zepben.ewb.database.sql.cim.tables.extensions.iec61970.infpart303.ne
 
 import com.zepben.ewb.database.sql.cim.tables.iec61970.base.core.TableIdentifiedObjects
 import com.zepben.ewb.database.sql.common.tables.Column
+import com.zepben.ewb.database.sql.common.tables.Column.Nullable.NULL
+import com.zepben.ewb.database.sql.common.tables.Column.Type.STRING
+import com.zepben.ewb.database.sql.common.tables.Column.Type.TIMESTAMP
 
 /**
  * A class representing the NetworkModelProjectComponent columns required for the database table.
@@ -21,8 +24,12 @@ import com.zepben.ewb.database.sql.common.tables.Column
  */
 @Suppress("PropertyName")
 abstract class TableNetworkModelProjectComponents : TableIdentifiedObjects() {
-    val CREATED: Column = Column(++columnIndex, "created", Column.Type.TIMESTAMP, Column.Nullable.NULL)
-    val UPDATED: Column = Column(++columnIndex, "updated", Column.Type.TIMESTAMP, Column.Nullable.NULL)
-    val CLOSED: Column = Column(++columnIndex, "closed", Column.Type.TIMESTAMP, Column.Nullable.NULL)
-    val PARENT_MRID: Column = Column(++columnIndex, "parent_mrid", Column.Type.STRING, Column.Nullable.NULL)
+    val CREATED: Column = Column(++columnIndex, "created", TIMESTAMP, NULL)
+    val UPDATED: Column = Column(++columnIndex, "updated", TIMESTAMP, NULL)
+    val CLOSED: Column = Column(++columnIndex, "closed", TIMESTAMP, NULL)
+    val PARENT_MRID: Column = Column(++columnIndex, "parent_mrid", STRING, NULL)
+
+    init {
+        addNonUniqueIndexes(listOf(PARENT_MRID))
+    }
 }

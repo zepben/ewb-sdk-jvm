@@ -53,7 +53,7 @@ import com.zepben.ewb.cim.iec61970.base.wires.*
 import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.AnnotatedProjectDependency
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStage
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.DataSet
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
 import kotlin.reflect.KClass
 
 
@@ -566,17 +566,17 @@ internal object NetworkModelProjectToNetworkModelProjectComponentResolver :
 
 internal object NetworkModelProjectComponentToNetworkModelProjectResolver :
     ReferenceResolver<NetworkModelProjectComponent, NetworkModelProject> by KReferenceResolver(
-        NetworkModelProjectComponent::class, NetworkModelProject::class, NetworkModelProjectComponent::setParent
+        NetworkModelProjectComponent::class, NetworkModelProject::class, NetworkModelProjectComponent::parent.setter
     )
 
 internal object AnnotatedProjectDependencyToDependentNetworkModelProjectStageResolver :
     ReferenceResolver<AnnotatedProjectDependency, NetworkModelProjectStage> by KReferenceResolver(
-        AnnotatedProjectDependency::class, NetworkModelProjectStage::class, AnnotatedProjectDependency::addDependencyDependingStage
+        AnnotatedProjectDependency::class, NetworkModelProjectStage::class, AnnotatedProjectDependency::dependencyDependentOnStage.setter
     )
 
 internal object AnnotatedProjectDependencyToDependingNetworkModelProjectStageResolver :
     ReferenceResolver<AnnotatedProjectDependency, NetworkModelProjectStage> by KReferenceResolver(
-        AnnotatedProjectDependency::class, NetworkModelProjectStage::class, AnnotatedProjectDependency::addDependencyDependingStage
+        AnnotatedProjectDependency::class, NetworkModelProjectStage::class, AnnotatedProjectDependency::dependencyDependingStage.setter
     )
 
 internal object DependentNetworkModelProjectStageToAnnotatedProjectDependencyResolver :
@@ -590,23 +590,20 @@ internal object DependingNetworkModelProjectStageToAnnotatedProjectDependencyRes
         NetworkModelProjectStage::class, AnnotatedProjectDependency::class, NetworkModelProjectStage::addDependingStage
     )
 
+internal object ChangeSetToNetworkModelProjectStageResolver :
+    ReferenceResolver<ChangeSet, NetworkModelProjectStage> by KReferenceResolver(
+        ChangeSet::class, NetworkModelProjectStage::class, ChangeSet::networkModelProjectStage.setter
+    )
+
+internal object NetworkModelProjectStageToChangeSetResolver :
+    ReferenceResolver<NetworkModelProjectStage, ChangeSet> by KReferenceResolver(
+        NetworkModelProjectStage::class, ChangeSet::class, NetworkModelProjectStage::changeSet.setter
+    )
+
+
 //-------------------------------------------//
 
-class KReferenceResolver<T : IdentifiedObject, R : IdentifiedObject>(
-    private val fromKClass: KClass<T>,
-    private val toKClass: KClass<R>,
-    private val resolveFun: (T, R) -> Unit
-) : ReferenceResolver<T, R> {
-
-    override val fromClass: Class<T> get() = fromKClass.java
-    override val toClass: Class<R> get() = toKClass.java
-
-    override fun resolve(from: T, to: R) {
-        resolveFun(from, to)
-    }
-}
-
-class KReferenceResolverIO2DS<T : IdentifiedObject, R : DataSet>(
+class KReferenceResolver<T : Identifiable, R : Identifiable>(
     private val fromKClass: KClass<T>,
     private val toKClass: KClass<R>,
     private val resolveFun: (T, R) -> Unit

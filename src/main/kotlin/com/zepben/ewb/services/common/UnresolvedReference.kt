@@ -8,9 +8,9 @@
 
 package com.zepben.ewb.services.common
 
-import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 
-data class UnresolvedReference<T : IdentifiedObject, R : IdentifiedObject>(
+data class UnresolvedReference<T : Identifiable, R : Identifiable>(
     val from: T,
     val toMrid: String,
     val resolver: ReferenceResolver<T, R>,

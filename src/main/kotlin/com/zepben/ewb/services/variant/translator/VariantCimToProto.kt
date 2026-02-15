@@ -164,7 +164,7 @@ fun toPb(cim: NetworkModelProjectStage, pb: PBNetworkModelProjectStage.Builder):
         cim.baseModelVersion?.also { baseModelVersionSet = it } ?: run { baseModelVersionNull = NullValue.NULL_VALUE }
         cim.lastConflictCheckedAt?.also { lastConflictCheckedAtSet = it.toTimestamp() } ?: run { lastConflictCheckedAtNull = NullValue.NULL_VALUE }
         cim.userComments?.also { userCommentsSet = it } ?: run { userCommentsNull = NullValue.NULL_VALUE }
-        cim.changeSet?.also { changeSetMRIDSet = it } ?: run { changeSetMRIDNull = NullValue.NULL_VALUE }
+        cim.changeSet?.also { changeSetMRIDSet = it.mRID } ?: run { changeSetMRIDNull = NullValue.NULL_VALUE }
         cim.dependentOnStage.forEach {
             addDependentOnStageMRID(it.mRID)
         }
@@ -172,7 +172,7 @@ fun toPb(cim: NetworkModelProjectStage, pb: PBNetworkModelProjectStage.Builder):
             addDependingStageMRID(it.mRID)
         }
         cim.equipmentContainerMRIDs.forEach {
-            addEquipmentContainerMRIDs(it.mRID)
+            addEquipmentContainerMRIDs(it)
         }
         toPb(cim, pb.nmpcBuilder)
     }

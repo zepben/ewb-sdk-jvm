@@ -15,7 +15,6 @@ import com.zepben.ewb.cim.iec61968.infiec61968.infassetinfo.TransformerFunctionK
 import com.zepben.ewb.cim.iec61970.base.core.BaseVoltage
 import com.zepben.ewb.cim.iec61970.base.core.ConnectivityNode
 import com.zepben.ewb.cim.iec61970.base.core.Terminal
-import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.utils.PrivateCollectionValidator
 import com.zepben.testutils.exception.ExpectException.Companion.expect

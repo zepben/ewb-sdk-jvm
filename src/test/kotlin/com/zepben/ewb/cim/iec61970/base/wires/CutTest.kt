@@ -9,7 +9,6 @@
 package com.zepben.ewb.cim.iec61970.base.wires
 
 import com.zepben.ewb.cim.iec61970.base.core.Terminal
-import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension

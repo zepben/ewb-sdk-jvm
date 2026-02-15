@@ -8,12 +8,10 @@
 
 package com.zepben.ewb.services.common
 
-import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.base.core.NameType
 import com.zepben.ewb.services.common.exceptions.UnsupportedIdentifiedObjectException
 import com.zepben.ewb.services.common.extensions.asUnmodifiable
-import com.zepben.ewb.services.common.extensions.nameAndMRID
-import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 import com.zepben.ewb.services.common.meta.MetadataCollection
 import java.util.*
 import java.util.function.Predicate
@@ -28,7 +26,7 @@ import kotlin.reflect.full.isSuperclassOf
 import kotlin.streams.asStream
 
 /**
- * Base class for services that work with [IdentifiedObject]s. This allows multiple services to be implemented that work
+ * Base class for services that work with [Identifiable]s. This allows multiple services to be implemented that work
  * with different subsets of the CIM to allow separation of concerns.
  *
  * This class provides a common set of functionality that all services will need.
@@ -44,7 +42,7 @@ abstract class BaseService(
     /**
      * A collection of objects store by this service, indexed by its class type and mRID.
      */
-    protected val objectsByType: MutableMap<KClass<*>, MutableMap<String, IdentifiedObject>> = mutableMapOf()
+    protected val objectsByType: MutableMap<KClass<*>, MutableMap<String, Identifiable>> = mutableMapOf()
 
     /**
      * A map of references between mRID's that as yet have not been resolved - typically when transferring services between systems.
@@ -62,10 +60,10 @@ abstract class BaseService(
      * }
      * ```
      *
-     * [resolve] in [ReferenceResolver] will be the function used to populate the relationship between the [IdentifiedObject]s either when
+     * [resolve] in [ReferenceResolver] will be the function used to populate the relationship between the [Identifiable]s either when
      * [resolveOrDeferReference] is called if the other side of the reference exists in the service, or otherwise when the second object is added to the service.
      */
-    private val unresolvedReferencesTo = mutableMapOf<String, MutableSet<UnresolvedReference<IdentifiedObject, IdentifiedObject>>>()
+    private val unresolvedReferencesTo = mutableMapOf<String, MutableSet<UnresolvedReference<Identifiable, Identifiable>>>()
 
     /**
      * An index of the unresolved references by their [UnresolvedReference.from] mRID. For the above example this will be a dictionary of the form:
@@ -78,20 +76,20 @@ abstract class BaseService(
      * }
      * ```
      */
-    private val unresolvedReferencesFrom = mutableMapOf<String, MutableSet<UnresolvedReference<IdentifiedObject, IdentifiedObject>>>()
+    private val unresolvedReferencesFrom = mutableMapOf<String, MutableSet<UnresolvedReference<Identifiable, Identifiable>>>()
 
-    private val addFunctions: Map<KClass<out IdentifiedObject>, KFunction<*>> = findFunctionsForDispatch("add")
-    private val removeFunctions: Map<KClass<out IdentifiedObject>, KFunction<*>> = findFunctionsForDispatch("remove")
+    private val addFunctions: Map<KClass<out Identifiable>, KFunction<*>> = findFunctionsForDispatch("add")
+    private val removeFunctions: Map<KClass<out Identifiable>, KFunction<*>> = findFunctionsForDispatch("remove")
 
     /**
      * A list of Java classes supported by this service.
      */
-    val supportedClasses: Set<Class<out IdentifiedObject>> = Collections.unmodifiableSet(addFunctions.keys.map { it.java }.toSet())
+    val supportedClasses: Set<Class<out Identifiable>> = Collections.unmodifiableSet(addFunctions.keys.map { it.java }.toSet())
 
     /**
      * A list of Kotlin classes supported by this service.
      */
-    val supportedKClasses: Set<KClass<out IdentifiedObject>> get() = addFunctions.keys
+    val supportedKClasses: Set<KClass<out Identifiable>> get() = addFunctions.keys
 
     private var _nameTypes: MutableMap<String, NameType> = mutableMapOf()
 
@@ -111,7 +109,7 @@ abstract class BaseService(
      *
      * @return The object identified by [mRID] as [T] if it was found, otherwise null.
      */
-    inline operator fun <reified T : IdentifiedObject> get(mRID: String?): T? = get(T::class, mRID)
+    inline operator fun <reified T : Identifiable> get(mRID: String?): T? = get(T::class, mRID)
 
     /**
      * A Java interop version of [get]. Get an object associated with this service.
@@ -122,7 +120,7 @@ abstract class BaseService(
      *
      * @return The object identified by [mRID] as [T] if it was found, otherwise null.
      */
-    fun <T : IdentifiedObject> get(clazz: Class<T>, mRID: String?): T? = get(clazz.kotlin, mRID)
+    fun <T : Identifiable> get(clazz: Class<T>, mRID: String?): T? = get(clazz.kotlin, mRID)
 
     /**
      * The name types associated with this service. The returned collection is read only.
@@ -163,10 +161,10 @@ abstract class BaseService(
      * @return The object identified by [mRID] as [T] if it was found, otherwise null.
      */
     @Suppress("UNCHECKED_CAST")
-    fun <T : IdentifiedObject> get(clazz: KClass<T>, mRID: String?): T? {
+    fun <T : Identifiable> get(clazz: KClass<T>, mRID: String?): T? {
         mRID ?: return null
 
-        if (clazz != IdentifiedObject::class)
+        if (clazz != Identifiable::class)
             objectsByType[clazz]?.let { return it[mRID] as T? }
 
         return clazz.java.cast(
@@ -189,11 +187,11 @@ abstract class BaseService(
     /**
      * Check if [obj] is in the service.
      *
-     * @param obj The [IdentifiedObject] to search for.
+     * @param obj The [Identifiable] to search for.
      *
      * @return true if [obj] was found in the service, otherwise false.
      */
-    operator fun contains(obj: IdentifiedObject): Boolean = objectsByType.values.any { it[obj.mRID] == obj }
+    operator fun contains(obj: Identifiable): Boolean = objectsByType.values.any { it[obj.mRID] == obj }
 
     /**
      * Get the number of objects associated with this service.
@@ -202,7 +200,7 @@ abstract class BaseService(
      *
      * @return The number of objects of the specified type.
      */
-    inline fun <reified T : IdentifiedObject> num(): Int = num(T::class)
+    inline fun <reified T : Identifiable> num(): Int = num(T::class)
 
     /**
      * A Java interop version of [num]. Get the number of objects associated with this service.
@@ -212,7 +210,7 @@ abstract class BaseService(
      *
      * @return The number of objects of the specified type.
      */
-    fun <T : IdentifiedObject> num(clazz: Class<T>): Int = num(clazz.kotlin)
+    fun <T : Identifiable> num(clazz: Class<T>): Int = num(clazz.kotlin)
 
     /**
      * Get the number of objects associated with this service.
@@ -222,32 +220,32 @@ abstract class BaseService(
      *
      * @return The number of objects of the specified type.
      */
-    fun <T : IdentifiedObject> num(clazz: KClass<T>): Int = sequenceOf(clazz).count()
+    fun <T : Identifiable> num(clazz: KClass<T>): Int = sequenceOf(clazz).count()
 
     /**
-     * Attempts to add the [identifiedObject] to the service, if this service instance supports the type of [IdentifiedObject]
+     * Attempts to add the [identified] to the service, if this service instance supports the type of [Identifiable]
      * that is provided.
      *
-     * If the service does support the [identifiedObject], it will be added as if you are calling the add function
+     * If the service does support the [identified], it will be added as if you are calling the add function
      * directly on the instance where the corresponding "add" function is defined for this type of identified object.
      *
-     * @throws [UnsupportedIdentifiedObjectException] if the service does not support the [identifiedObject].
+     * @throws [UnsupportedIdentifiedObjectException] if the service does not support the [identified].
      * @return the return value of the underlying add function.
      */
-    fun tryAdd(identifiedObject: IdentifiedObject): Boolean {
-        val func = addFunctions[identifiedObject::class]
-            ?: throw UnsupportedIdentifiedObjectException("$name service does not support adding ${identifiedObject::class}")
+    fun tryAdd(identified: Identifiable): Boolean {
+        val func = addFunctions[identified::class]
+            ?: throw UnsupportedIdentifiedObjectException("$name service does not support adding ${identified::class}")
 
-        return func.call(this, identifiedObject) as Boolean
+        return func.call(this, identified) as Boolean
     }
 
     /**
      * Add to the service and return [cim] if successful or null if the add failed (typically due to mRID already existing)
-     * @param cim The [IdentifiedObject] to add.
+     * @param cim The [Identifiable] to add.
      *
      * @return [cim] if successfully added else null.
      */
-    fun <T : IdentifiedObject> tryAddOrNull(cim: T): T? =
+    fun <T : Identifiable> tryAddOrNull(cim: T): T? =
         try {
             if (tryAdd(cim))
                 cim
@@ -259,60 +257,60 @@ abstract class BaseService(
 
 
     /**
-     * Attempts to remove the [identifiedObject] to the service, if this service instance supports the type of [IdentifiedObject]
+     * Attempts to remove the [identified] to the service, if this service instance supports the type of [Identifiable]
      * that is provided.
      *
-     * If the service does support the [identifiedObject], it will be removed as if you are calling the remove function
+     * If the service does support the [identified], it will be removed as if you are calling the remove function
      * directly on the instance where the corresponding remove function is defined for this type of identified object.
      *
-     * @throws [UnsupportedIdentifiedObjectException] if the service does not support the [identifiedObject].
+     * @throws [UnsupportedIdentifiedObjectException] if the service does not support the [identified].
      * @return the return value of the underlying remove function.
      */
-    fun tryRemove(identifiedObject: IdentifiedObject): Boolean {
-        val func = removeFunctions[identifiedObject::class]
-            ?: throw UnsupportedIdentifiedObjectException("$name service does not support removing ${identifiedObject::class}")
+    fun tryRemove(identified: Identifiable): Boolean {
+        val func = removeFunctions[identified::class]
+            ?: throw UnsupportedIdentifiedObjectException("$name service does not support removing ${identified::class}")
 
-        return func.call(this, identifiedObject) as Boolean
+        return func.call(this, identified) as Boolean
     }
 
     /**
-     * Associates the provided [identifiedObject] with this service. This should be called by derived classes within their
+     * Associates the provided [identified] with this service. This should be called by derived classes within their
      * add functions for specific supported identified object types.
      *
-     * The [identifiedObject] must have a unique MRID, otherwise false will be returned and the object will not be added.
+     * The [identified] must have a unique MRID, otherwise false will be returned and the object will not be added.
      *
-     * If there are any unresolved references to the [identifiedObject] at this point they will be resolved
-     * as part of the addition. If the [identifiedObject] class type does not match the [ReferenceResolver.toClass] of
+     * If there are any unresolved references to the [identified] at this point they will be resolved
+     * as part of the addition. If the [identified] class type does not match the [ReferenceResolver.toClass] of
      * any unresolved references an [IllegalStateException] will be thrown.
      *
-     * @param [identifiedObject] the object to add to this service
-     * @throws [UnsupportedIdentifiedObjectException] if the [IdentifiedObject] is not supported by this service.
+     * @param [identified] the object to add to this service
+     * @throws [UnsupportedIdentifiedObjectException] if the [Identifiable] is not supported by this service.
      * @throws [IllegalStateException] if any unresolved references have an incorrect class type.
-     * @throws [IllegalArgumentException] if [identifiedObject] did not have a valid mRID.
+     * @throws [IllegalArgumentException] if [identified] did not have a valid mRID.
      * @return true if the object is associated with this service, false if an object already exists in the service with
      * the same mRID.
      */
-    protected fun add(identifiedObject: IdentifiedObject): Boolean {
-        if (identifiedObject.mRID.isEmpty())
-            throw IllegalArgumentException("Object [${identifiedObject.typeNameAndMRID()}] must have an mRID set to be added to the service.")
+    protected fun add(identified: Identifiable): Boolean {
+        if (identified.mRID.isEmpty())
+            throw IllegalArgumentException("Object [${identified.typeNameAndMRID()}] must have an mRID set to be added to the service.")
 
-        if (!supportedKClasses.contains(identifiedObject::class)) {
-            throw UnsupportedIdentifiedObjectException("Unsupported IdentifiedObject type: ${identifiedObject::class}")
+        if (!supportedKClasses.contains(identified::class)) {
+            throw UnsupportedIdentifiedObjectException("Unsupported Identifiable type: ${identified::class}")
         }
 
-        val map = objectsByType.computeIfAbsent(identifiedObject::class) { mutableMapOf() }
-        if (map.containsKey(identifiedObject.mRID)) return map[identifiedObject.mRID] === identifiedObject
+        val map = objectsByType.computeIfAbsent(identified::class) { mutableMapOf() }
+        if (map.containsKey(identified.mRID)) return map[identified.mRID] === identified
 
         // Check all the other types to make sure this MRID is actually unique
-        if (objectsByType.any { (_, v) -> v.containsKey(identifiedObject.mRID) })
+        if (objectsByType.any { (_, v) -> v.containsKey(identified.mRID) })
             return false
 
-        unresolvedReferencesTo.remove(identifiedObject.mRID)?.forEach {
+        unresolvedReferencesTo.remove(identified.mRID)?.forEach {
             try {
-                val castedIdentifiedObject = it.resolver.toClass.cast(identifiedObject)
+                val castedIdentifiable = it.resolver.toClass.cast(identified)
 
-                it.resolver.resolve(it.from, castedIdentifiedObject)
-                it.reverseResolver?.resolve(castedIdentifiedObject, it.from)
+                it.resolver.resolve(it.from, castedIdentifiable)
+                it.reverseResolver?.resolve(castedIdentifiable, it.from)
 
                 unresolvedReferencesFrom[it.from.mRID]?.let { urs ->
                     urs.remove(it)
@@ -321,13 +319,13 @@ abstract class BaseService(
                 }
             } catch (ex: ClassCastException) {
                 throw IllegalStateException(
-                    "Expected a ${it.resolver.toClass.simpleName} when resolving ${identifiedObject.nameAndMRID()} references but got a ${identifiedObject::class.simpleName}. Make sure you sent the correct types in every reference.",
+                    "Expected a ${it.resolver.toClass.simpleName} when resolving ${identified.nameAndMRID()} references but got a ${identified::class.simpleName}. Make sure you sent the correct types in every reference.",
                     ex
                 )
             }
         }
 
-        map[identifiedObject.mRID] = identifiedObject
+        map[identified.mRID] = identified
         return true
     }
 
@@ -346,7 +344,7 @@ abstract class BaseService(
      * @return true if the reference was resolved, otherwise false if it has been deferred.
      */
     @Suppress("UNCHECKED_CAST")
-    fun <T : IdentifiedObject, R : IdentifiedObject> resolveOrDeferReference(
+    fun <T : Identifiable, R : Identifiable> resolveOrDeferReference(
         boundResolver: BoundReferenceResolver<T, R>,
         toMrid: String?
     ): Boolean {
@@ -376,7 +374,7 @@ abstract class BaseService(
                 }
                 true
             } else {
-                val ur = UnresolvedReference(from, toMrid, resolver, reverseResolver) as UnresolvedReference<IdentifiedObject, IdentifiedObject>
+                val ur = UnresolvedReference(from, toMrid, resolver, reverseResolver) as UnresolvedReference<Identifiable, Identifiable>
                 unresolvedReferencesTo.getOrPut(toMrid) { mutableSetOf() }.add(ur)
                 unresolvedReferencesFrom.getOrPut(from.mRID) { mutableSetOf() }.add(ur)
                 false
@@ -413,7 +411,7 @@ abstract class BaseService(
      *
      * Gets a set of MRIDs that are unresolved references via the [referenceResolver].
      */
-    fun <T : IdentifiedObject, R : IdentifiedObject> getUnresolvedReferenceMrids(referenceResolver: ReferenceResolver<T, R>): Set<String> =
+    fun <T : Identifiable, R : Identifiable> getUnresolvedReferenceMrids(referenceResolver: ReferenceResolver<T, R>): Set<String> =
         unresolvedReferencesTo.values.asSequence()
             .flatMap { it.asSequence() }
             .filter { it.resolver == referenceResolver }
@@ -423,7 +421,7 @@ abstract class BaseService(
     /**
      * Gets a set of MRIDs that are referenced by the [T] held by [boundResolver] that are unresolved.
      */
-    fun <T : IdentifiedObject, R : IdentifiedObject> getUnresolvedReferenceMrids(boundResolver: BoundReferenceResolver<T, R>): Set<String> =
+    fun <T : Identifiable, R : Identifiable> getUnresolvedReferenceMrids(boundResolver: BoundReferenceResolver<T, R>): Set<String> =
         unresolvedReferencesTo.values.asSequence()
             .flatMap { it.asSequence() }
             .filter { it.from == boundResolver.from && it.resolver == boundResolver.resolver }
@@ -453,12 +451,12 @@ abstract class BaseService(
     /**
      * Disassociate an object from this service.
      *
-     * @param identifiedObject The object to disassociate from this service.
+     * @param identifiedThe object to disassociate from this service.
      *
      * @return true if the object is disassociated from this service.
      */
-    protected fun remove(identifiedObject: IdentifiedObject): Boolean =
-        objectsByType[identifiedObject::class]?.removeIf(identifiedObject.mRID, identifiedObject) ?: false
+    protected fun remove(identified: Identifiable): Boolean =
+        objectsByType[identified::class]?.removeIf(identified.mRID, identified) ?: false
 
     /**
      * Create a sequence of all instances of the specified type.
@@ -467,7 +465,7 @@ abstract class BaseService(
      *
      * @return a [Sequence] containing all instances of type [T].
      */
-    inline fun <reified T : IdentifiedObject> sequenceOf(): Sequence<T> = sequenceOf(T::class)
+    inline fun <reified T : Identifiable> sequenceOf(): Sequence<T> = sequenceOf(T::class)
 
     /**
      * Create a sequence of all instances of the specified type.
@@ -478,7 +476,7 @@ abstract class BaseService(
      * @return a [Sequence] containing all instances of type [T].
      */
     @Suppress("UNCHECKED_CAST")
-    fun <T : IdentifiedObject> sequenceOf(clazz: KClass<T>): Sequence<T> =
+    fun <T : Identifiable> sequenceOf(clazz: KClass<T>): Sequence<T> =
         objectsByType[clazz]?.values?.asSequence()?.map { it as T }
             ?: objectsByType
                 .asSequence()
@@ -494,7 +492,7 @@ abstract class BaseService(
      *
      * @return a [Stream] containing all instances of type [T].
      */
-    fun <T : IdentifiedObject> streamOf(clazz: Class<T>): Stream<T> = sequenceOf(clazz.kotlin).asStream()
+    fun <T : Identifiable> streamOf(clazz: Class<T>): Stream<T> = sequenceOf(clazz.kotlin).asStream()
 
     /**
      * Collect all instances of the specified type that match a [filter] into a [List].
@@ -504,7 +502,7 @@ abstract class BaseService(
      *
      * @return a [List] containing all instances of type [T] that match [filter] stored in this service.
      */
-    inline fun <reified T : IdentifiedObject> listOf(noinline filter: ((T) -> Boolean)? = null): List<T> = listOf(T::class, filter)
+    inline fun <reified T : Identifiable> listOf(noinline filter: ((T) -> Boolean)? = null): List<T> = listOf(T::class, filter)
 
     /**
      * A Java interop version of [listOf]. Collect all instances of the specified type that match a [filter] into a [List].
@@ -516,7 +514,7 @@ abstract class BaseService(
      * @return a [List] containing all instances of type [T] that match [filter] stored in this service.
      */
     @JvmOverloads
-    fun <T : IdentifiedObject> listOf(clazz: Class<T>, filter: Predicate<T>? = null): List<T> = listOf(clazz.kotlin, filter?.let { it::test })
+    fun <T : Identifiable> listOf(clazz: Class<T>, filter: Predicate<T>? = null): List<T> = listOf(clazz.kotlin, filter?.let { it::test })
 
     /**
      * Collect all instances of the specified type that match a [filter] into a [List].
@@ -527,7 +525,7 @@ abstract class BaseService(
      *
      * @return a [List] containing all instances of type [T] that match [filter] stored in this service.
      */
-    fun <T : IdentifiedObject> listOf(clazz: KClass<T>, filter: ((T) -> Boolean)? = null): List<T> {
+    fun <T : Identifiable> listOf(clazz: KClass<T>, filter: ((T) -> Boolean)? = null): List<T> {
         val sequence = sequenceOf(clazz)
         return if (filter != null)
             sequence.filter(filter).toList()
@@ -543,7 +541,7 @@ abstract class BaseService(
      *
      * @return a [Set] containing all instances of type [T] that match [filter] stored in this service.
      */
-    inline fun <reified T : IdentifiedObject> setOf(noinline filter: ((T) -> Boolean)? = null): Set<T> = setOf(T::class, filter)
+    inline fun <reified T : Identifiable> setOf(noinline filter: ((T) -> Boolean)? = null): Set<T> = setOf(T::class, filter)
 
     /**
      * A Java interop version of [setOf]. Collect all instances of the specified type that match a [filter] into a [Set].
@@ -555,7 +553,7 @@ abstract class BaseService(
      * @return a [Set] containing all instances of type [T] that match [filter] stored in this service.
      */
     @JvmOverloads
-    fun <T : IdentifiedObject> setOf(clazz: Class<T>, filter: Predicate<T>? = null): Set<T> = setOf(clazz.kotlin, filter?.let { it::test })
+    fun <T : Identifiable> setOf(clazz: Class<T>, filter: Predicate<T>? = null): Set<T> = setOf(clazz.kotlin, filter?.let { it::test })
 
     /**
      * Collect all instances of the specified type that match a [filter] into a [Set].
@@ -566,7 +564,7 @@ abstract class BaseService(
      *
      * @return a [Set] containing all instances of type [T] that match [filter] stored in this service.
      */
-    fun <T : IdentifiedObject> setOf(clazz: KClass<T>, filter: ((T) -> Boolean)? = null): Set<T> {
+    fun <T : Identifiable> setOf(clazz: KClass<T>, filter: ((T) -> Boolean)? = null): Set<T> {
         val sequence = sequenceOf(clazz)
         return if (filter != null)
             sequence.filter(filter).toSet()
@@ -575,17 +573,17 @@ abstract class BaseService(
     }
 
     /**
-     * Collect all instances of the specified type that match a [filter] into a [Map], indexed by [IdentifiedObject.mRID]..
+     * Collect all instances of the specified type that match a [filter] into a [Map], indexed by [Identifiable.mRID]..
      *
      * @param T The type of object to collect. If this is a base class it will collect all subclasses.
      * @param filter The filter used to include items in the [Map].
      *
      * @return a [Map] containing all instances of type [T] that match [filter] stored in this service.
      */
-    inline fun <reified T : IdentifiedObject> mapOf(noinline filter: ((T) -> Boolean)? = null): Map<String, T> = mapOf(T::class, filter)
+    inline fun <reified T : Identifiable> mapOf(noinline filter: ((T) -> Boolean)? = null): Map<String, T> = mapOf(T::class, filter)
 
     /**
-     * A Java interop version of [mapOf]. Collect all instances of the specified type that match a [filter] into a [Map], indexed by [IdentifiedObject.mRID]..
+     * A Java interop version of [mapOf]. Collect all instances of the specified type that match a [filter] into a [Map], indexed by [Identifiable.mRID]..
      *
      * @param T The type of object to collect. If this is a base class it will collect all subclasses.
      * @param clazz The class representing [T].
@@ -594,10 +592,10 @@ abstract class BaseService(
      * @return a [Map] containing all instances of type [T] that match [filter] stored in this service.
      */
     @JvmOverloads
-    fun <T : IdentifiedObject> mapOf(clazz: Class<T>, filter: Predicate<T>? = null): Map<String, T> = mapOf(clazz.kotlin, filter?.let { it::test })
+    fun <T : Identifiable> mapOf(clazz: Class<T>, filter: Predicate<T>? = null): Map<String, T> = mapOf(clazz.kotlin, filter?.let { it::test })
 
     /**
-     * Collect all instances of the specified type that match a [filter] into a [Map], indexed by [IdentifiedObject.mRID]..
+     * Collect all instances of the specified type that match a [filter] into a [Map], indexed by [Identifiable.mRID]..
      *
      * @param T The type of object to collect. If this is a base class it will collect all subclasses.
      * @param clazz The class representing [T].
@@ -605,7 +603,7 @@ abstract class BaseService(
      *
      * @return a [Map] containing all instances of type [T] that match [filter] stored in this service.
      */
-    fun <T : IdentifiedObject> mapOf(clazz: KClass<T>, filter: ((T) -> Boolean)? = null): Map<String, T> {
+    fun <T : Identifiable> mapOf(clazz: KClass<T>, filter: ((T) -> Boolean)? = null): Map<String, T> {
         val sequence = sequenceOf(clazz)
         return if (filter != null)
             sequence.filter(filter).associateBy { it.mRID }
@@ -614,14 +612,14 @@ abstract class BaseService(
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun findFunctionsForDispatch(name: String): Map<KClass<out IdentifiedObject>, KFunction<*>> {
-        val idObjType = IdentifiedObject::class.createType()
+    private fun findFunctionsForDispatch(name: String): Map<KClass<out Identifiable>, KFunction<*>> {
+        val idObjType = Identifiable::class.createType()
         return this::class.declaredMemberFunctions.asSequence()
             .filter { it.name == name }
             .filter { it.parameters.size == 2 }
             .filter { it.visibility == KVisibility.PUBLIC }
             .filter { it.parameters[1].type.isSubtypeOf(idObjType) }
-            .map { (it.parameters[1].type.classifier as KClass<out IdentifiedObject>) to it }
+            .map { (it.parameters[1].type.classifier as KClass<out Identifiable>) to it }
             .onEach {
                 require(it.second.returnType.classifier == Boolean::class) {
                     "return type for '${it.second}' needs to be Boolean"

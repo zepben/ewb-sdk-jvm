@@ -23,7 +23,6 @@ import com.zepben.ewb.database.sql.extensions.getInstant
 import com.zepben.ewb.database.sql.extensions.getNullableInt
 import com.zepben.ewb.database.sql.extensions.getNullableString
 import com.zepben.ewb.services.common.extensions.ensureGet
-import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 import com.zepben.ewb.services.customer.CustomerService
 import java.sql.ResultSet
 import java.sql.SQLException

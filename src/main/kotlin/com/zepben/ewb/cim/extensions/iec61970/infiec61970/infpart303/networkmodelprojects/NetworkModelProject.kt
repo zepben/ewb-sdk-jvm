@@ -13,7 +13,6 @@ import com.zepben.ewb.cim.iec61968.operations.OperationalRestriction
 import com.zepben.ewb.cim.iec61970.base.core.Equipment
 import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import com.zepben.ewb.services.common.extensions.getByMRID
-import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 import com.zepben.ewb.services.common.extensions.validateReference
 import java.time.Instant
 

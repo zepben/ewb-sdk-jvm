@@ -13,8 +13,13 @@ package com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset
  *
  * @property objectReverseModification ObjectReverseModification specifying precondition properties for a preconditioned update.
  */
-class ObjectModification(changeSet: ChangeSet, modifiedObjectMRID: String, originalObjectMRID: String) : ChangeSetMember(changeSet, modifiedObjectMRID) {
+class ObjectModification(changeSet: ChangeSet, targetObjectMRID: String) : ChangeSetMember(changeSet, targetObjectMRID) {
 
-    val objectReverseModification: ObjectReverseModification = ObjectReverseModification(changeSet, originalObjectMRID, this)
+    val objectReverseModification: ObjectReverseModification = ObjectReverseModification(changeSet, targetObjectMRID.asObjectReverseModificationId, this)
 
 }
+
+// TODO: move me somewhere if it gets used elsewhere.
+internal val String.asObjectReverseModificationId: String get() = "-$this"
+
+internal val String.asTargetObjectMRID: String get() = this.removePrefix("-")

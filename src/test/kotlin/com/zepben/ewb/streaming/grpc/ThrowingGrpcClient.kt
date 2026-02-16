@@ -8,7 +8,10 @@
 
 package com.zepben.ewb.streaming.grpc
 
-class ThrowingGrpcClient(val ex: Throwable = RuntimeException()) : GrpcClient(null) {
+import com.zepben.protobuf.nc.NetworkConsumerGrpc
+
+class ThrowingGrpcClient(val ex: Throwable = RuntimeException(), override val stub: NetworkConsumerGrpc.NetworkConsumerStub) :
+    GrpcClient<NetworkConsumerGrpc.NetworkConsumerStub>() {
 
     fun throwViaSafeTryRpc(): GrpcResult<Unit> = tryRpc { throw ex }
 

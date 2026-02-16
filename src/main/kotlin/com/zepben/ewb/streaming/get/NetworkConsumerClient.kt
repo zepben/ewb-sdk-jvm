@@ -28,7 +28,6 @@ import com.zepben.protobuf.nc.*
 import io.grpc.CallCredentials
 import io.grpc.Channel
 import java.io.IOException
-import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import com.zepben.protobuf.nc.IncludedEnergizedContainers as PBIncludedEnergizedContainers
 import com.zepben.protobuf.nc.IncludedEnergizingContainers as PBIncludedEnergizingContainers
@@ -44,14 +43,12 @@ import com.zepben.protobuf.nc.NetworkState as PBNetworkState
  *
  * @property stub The gRPC stub to be used to communicate with the server
  * @property service The [NetworkService] to store fetched objects in.
- * @param executor An optional [ExecutorService] to use with the stub. If provided, it will be cleaned up when this client is closed.
  */
 class NetworkConsumerClient(
-    private val stub: NetworkConsumerGrpc.NetworkConsumerStub,
+    override val stub: NetworkConsumerGrpc.NetworkConsumerStub,
     override val service: NetworkService = NetworkService(),
     override val protoToCim: NetworkProtoToCim = NetworkProtoToCim(service),
-    executor: ExecutorService? = null
-) : CimConsumerClient<NetworkService, NetworkProtoToCim>(executor) {
+) : CimConsumerClient<NetworkService, NetworkProtoToCim, NetworkConsumerGrpc.NetworkConsumerStub>() {
 
     private var networkHierarchy: NetworkHierarchy? = null
 
@@ -68,8 +65,7 @@ class NetworkConsumerClient(
     @JvmOverloads
     constructor(channel: Channel, callCredentials: CallCredentials? = null) :
         this(
-            NetworkConsumerGrpc.newStub(channel).apply { callCredentials?.let { withCallCredentials(it) } },
-            executor = Executors.newSingleThreadExecutor()
+            NetworkConsumerGrpc.newStub(channel).withExecutor(Executors.newSingleThreadExecutor()).apply { callCredentials?.let { withCallCredentials(it) } }
         )
 
     /**

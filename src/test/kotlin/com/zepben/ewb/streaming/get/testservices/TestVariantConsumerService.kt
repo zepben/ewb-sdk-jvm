@@ -11,8 +11,8 @@ package com.zepben.ewb.streaming.get.testservices
 import com.zepben.protobuf.dc.*
 import com.zepben.protobuf.metadata.GetMetadataRequest
 import com.zepben.protobuf.metadata.GetMetadataResponse
-import com.zepben.protobuf.vc.GetChangeSetsRequest
-import com.zepben.protobuf.vc.GetChangeSetsResponse
+import com.zepben.protobuf.vc.GetChangeSetRequest
+import com.zepben.protobuf.vc.GetChangeSetResponse
 import com.zepben.protobuf.vc.GetNetworkModelProjectsRequest
 import com.zepben.protobuf.vc.GetNetworkModelProjectsResponse
 import com.zepben.protobuf.vc.VariantConsumerGrpc
@@ -22,14 +22,15 @@ import io.grpc.stub.StreamObserver
 internal class TestVariantConsumerService : VariantConsumerGrpc.VariantConsumerImplBase() {
 
     lateinit var onGetNetworkModelProjects: (request: GetNetworkModelProjectsRequest, response: StreamObserver<GetNetworkModelProjectsResponse>) -> Unit
-    lateinit var onGetChangeSets: (request: GetChangeSetsRequest, response: StreamObserver<GetChangeSetsResponse>) -> Unit
+    lateinit var onGetChangeSets: (request: GetChangeSetRequest, response: StreamObserver<GetChangeSetResponse>) -> Unit
     lateinit var onGetMetadataRequest: (request: GetMetadataRequest, response: StreamObserver<GetMetadataResponse>) -> Unit
 
     override fun getNetworkModelProjects(response: StreamObserver<GetNetworkModelProjectsResponse>): StreamObserver<GetNetworkModelProjectsRequest> =
         TestStreamObserver(response, onGetNetworkModelProjects)
 
-    override fun getChangeSets(response: StreamObserver<GetChangeSetsResponse>): StreamObserver<GetChangeSetsRequest> =
-        TestStreamObserver(response, onGetChangeSets)
+    // TODO: ??? where is this...
+//    override fun getChangeSet(response: StreamObserver<GetChangeSetResponse>): StreamObserver<GetChangeSetRequest> =
+//        TestStreamObserver(response, onGetChangeSets)
 
     override fun getMetadata(request: GetMetadataRequest, responseObserver: StreamObserver<GetMetadataResponse>) =
         runGrpc(request, responseObserver, onGetMetadataRequest)

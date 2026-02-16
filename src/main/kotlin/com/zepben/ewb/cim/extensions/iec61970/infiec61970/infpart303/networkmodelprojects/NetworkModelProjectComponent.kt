@@ -47,8 +47,8 @@ abstract class NetworkModelProjectComponent(mRID: String) : IdentifiedObject(mRI
      * @return true if the [NetworkModelProjectComponent] was deleted, false otherwise.
      */
     fun delete(): Boolean {
-        require(closed == null) {
-            "${javaClass.simpleName} already marked as deleted."
+        if (closed != null) {
+            "${typeNameAndMRID()} already marked as deleted."
             return false
         }
 

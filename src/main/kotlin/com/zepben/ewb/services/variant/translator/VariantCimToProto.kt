@@ -22,9 +22,7 @@ import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectDele
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectModification
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectReverseModification
 import com.zepben.ewb.services.common.translator.*
-import com.zepben.ewb.services.variant.whenVariantChangeSetMember
 import com.zepben.ewb.services.variant.whenVariantIdentifiedObject
-import com.zepben.protobuf.vc.VariantChangeSetMember
 import com.zepben.protobuf.vc.VariantObject
 import com.zepben.protobuf.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProject as PBNetworkModelProject
 import com.zepben.protobuf.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectComponent as PBNetworkModelProjectComponent
@@ -49,16 +47,6 @@ fun variantObject(identified: Identifiable): VariantObject =
             isNetworkModelProjectStage = { networkModelProjectStage = it.toPb() },
             isAnnotatedProjectDependency = { annotatedProjectDependency = it.toPb() },
             isChangeSet = { changeSet = it.toPb() },
-        )
-    }.build()
-
-/**
- * Convert the [changeSetMember] to a [VariantChangeSetMember] representation.
- */
-fun variantChangeSetMember(changeSetMember: ChangeSetMember): VariantChangeSetMember =
-    VariantChangeSetMember.newBuilder().apply {
-        whenVariantChangeSetMember(
-            changeSetMember,
             isObjectCreation = { objectCreation = it.toPb() },
             isObjectDeletion = { objectDeletion = it.toPb() },
             isObjectModification = { objectModification = it.toPb() },

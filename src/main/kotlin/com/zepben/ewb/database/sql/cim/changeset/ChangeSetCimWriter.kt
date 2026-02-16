@@ -13,7 +13,6 @@ import com.zepben.ewb.database.sql.cim.CimWriter
 import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.genericdataset.*
 import com.zepben.ewb.database.sql.extensions.setNullableString
 import com.zepben.ewb.services.variant.VariantService
-import com.zepben.ewb.services.variant.whenVariantChangeSetMember
 import java.sql.PreparedStatement
 import java.sql.SQLException
 
@@ -30,20 +29,6 @@ class ChangeSetCimWriter(
     // # IEC61970 Part303 GenericDataSet #
     // ###################################
 
-    @Throws(SQLException::class)
-    private fun writeChangeSetMember(
-        table: TableChangeSetMembers,
-        insert: PreparedStatement,
-        changeSetMember: ChangeSetMember,
-        description: String
-    ): Boolean {
-        insert.setNullableString(table.CHANGE_SET_MRID.queryIndex, changeSetMember.changeSet?.mRID)
-        insert.setNullableString(table.TARGET_OBJECT_MRID.queryIndex, changeSetMember.targetObjectMRID)
-
-        return insert.tryExecuteSingleUpdate(description)
-
-    }
-
     /**
      * Write the [ChangeSet] fields to [TableChangeSets].
      *
@@ -58,17 +43,16 @@ class ChangeSetCimWriter(
 
         insert.setNullableString(table.NETWORK_MODEL_PROJECT_STAGE_MRID.queryIndex, changeSet.networkModelProjectStage?.mRID)
 
-        var status = true
-        changeSet.changeSetMembers.forEach {
-            status = status && whenVariantChangeSetMember(
-                it,
-                isObjectCreation = ::write,
-                isObjectDeletion = ::write,
-                isObjectModification = ::write,
-            )
-        }
+        return writeDataSet(table, insert, changeSet, "change set")
+    }
 
-        return status and writeDataSet(table, insert, changeSet, "change set")
+    @Throws(SQLException::class)
+    private fun writeChangeSetMember(table: TableChangeSetMembers, insert: PreparedStatement, changeSetMember: ChangeSetMember, description: String): Boolean {
+        insert.setNullableString(table.CHANGE_SET_MRID.queryIndex, changeSetMember.changeSet.mRID)
+        insert.setNullableString(table.TARGET_OBJECT_MRID.queryIndex, changeSetMember.targetObjectMRID)
+
+        return insert.tryExecuteSingleUpdate(description)
+
     }
 
     @Suppress("SameParameterValue")  // description - suppressed as maybe we'll need it in the future.

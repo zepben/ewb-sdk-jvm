@@ -13,9 +13,10 @@ import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmode
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.AnnotatedProjectDependency
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStage
-import com.zepben.ewb.database.sql.cim.variant.VariantDatabaseTables
-import com.zepben.ewb.database.sql.cim.tables.extensions.iec61970.infpart303.networkmodelprojects.TableNetworkModelProjectNetworkModelProjectComponents
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectCreation
 import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.infpart303.networkmodelprojects.TableNetworkModelProjectStageEquipmentContainers
+import com.zepben.ewb.database.sql.cim.variant.VariantDatabaseTables
 import com.zepben.ewb.services.common.translator.TranslatorTestBase
 import com.zepben.ewb.services.variant.VariantService
 import com.zepben.ewb.services.variant.VariantServiceComparator
@@ -46,7 +47,9 @@ internal class VariantTranslatorTest : TranslatorTestBase<VariantService>(
         ValidationInfo(::AnnotatedProjectDependency, { fillFields(it) }, { addFromPb(vsToPb.toPb(it)) }),
         ValidationInfo(::NetworkModelProjectStage, { fillFields(it) }, { addFromPb(vsToPb.toPb(it)) }),
 
-        //ValidationInfo(::ChangeSet, { fillFields(it) }, { addFromPb(vsToPb.toPb(it)) }),  // TODO: datasets not being IO's bites me in the ass again.
+        ValidationInfo(::ChangeSet, { fillFields(it) }, { addFromPb(vsToPb.toPb(it)) }),
+        // TODO: new validator for these...
+//        ValidationInfo({ ObjectCreation(ChangeSet(), it) }, { fillFields(it) }, { addFromPb(vsToPb.toPb(it)) }),
 
     )
 
@@ -56,7 +59,6 @@ internal class VariantTranslatorTest : TranslatorTestBase<VariantService>(
 
     override val excludedTables =
         super.excludedTables + setOf(
-            TableNetworkModelProjectNetworkModelProjectComponents::class,
             TableNetworkModelProjectStageEquipmentContainers::class,
         )
 }

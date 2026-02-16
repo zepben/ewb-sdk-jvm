@@ -33,18 +33,12 @@ import java.util.concurrent.Executors
  * were retrieved but not added to service. This should not be the case unless you are processing things concurrently.
  *
  * @property stub The gRPC stub to be used to communicate with the server
- * @param executor An optional [ExecutorService] to use with the stub. If provided, it will be cleaned up when this client is closed.
  */
 class CustomerConsumerClient @JvmOverloads constructor(
-    private val stub: CustomerConsumerGrpc.CustomerConsumerStub,
+    override val stub: CustomerConsumerGrpc.CustomerConsumerStub,
     override val service: CustomerService = CustomerService(),
     override val protoToCim: CustomerProtoToCim = CustomerProtoToCim(service),
-    executor: ExecutorService? = null
-) : CimConsumerClient<CustomerService, CustomerProtoToCim>(executor) {
-
-    init {
-        executor?.also { stub.withExecutor(it) }
-    }
+) : CimConsumerClient<CustomerService, CustomerProtoToCim, CustomerConsumerGrpc.CustomerConsumerStub>() {
 
     /**
      * Create a [CustomerConsumerClient]
@@ -55,8 +49,7 @@ class CustomerConsumerClient @JvmOverloads constructor(
     @JvmOverloads
     constructor(channel: Channel, callCredentials: CallCredentials? = null) :
         this(
-            CustomerConsumerGrpc.newStub(channel).apply { callCredentials?.let { withCallCredentials(it) } },
-            executor = Executors.newSingleThreadExecutor()
+            CustomerConsumerGrpc.newStub(channel).withExecutor(Executors.newSingleThreadExecutor()).apply { callCredentials?.let { withCallCredentials(it) } },
         )
 
     /**

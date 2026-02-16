@@ -8,10 +8,19 @@
 
 package com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset
 
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
+
 /**
  * A CRUD-style data object.
  *
  * @property changeSet The [ChangeSet] this [ChangeSetMember] belongs to.
  * @property targetObjectMRID The CIM object [changeSet] applies to.
  */
-abstract class ChangeSetMember(var changeSet: ChangeSet, var targetObjectMRID: String)
+abstract class ChangeSetMember(val changeSet: ChangeSet, val targetObjectMRID: String): Identifiable {
+    override val mRID: String
+        get() = "${changeSet.mRID}_$targetObjectMRID"
+
+    override fun nameAndMRID(): String = mRID
+
+    override fun typeNameAndMRID(): String = "${javaClass.simpleName} $mRID"
+}

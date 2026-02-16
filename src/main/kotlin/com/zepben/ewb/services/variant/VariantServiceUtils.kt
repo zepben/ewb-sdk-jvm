@@ -15,7 +15,10 @@ import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.AnnotatedProjectDependency
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStage
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.*
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectCreation
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectDeletion
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectModification
 import com.zepben.ewb.services.network.NetworkService
 
 /**
@@ -39,6 +42,9 @@ inline fun <R> whenVariantIdentifiedObject(
     isNetworkModelProjectStage: (NetworkModelProjectStage) -> R,
     isAnnotatedProjectDependency: (AnnotatedProjectDependency) -> R,
     isChangeSet: (ChangeSet) -> R,
+    isObjectCreation: (ObjectCreation) -> R,
+    isObjectDeletion: (ObjectDeletion) -> R,
+    isObjectModification: (ObjectModification) -> R,
     isOther: (Any) -> R = { obj: Any ->
         throw IllegalArgumentException("Identified object type ${obj::class} is not supported by the network model project service")
     }
@@ -47,31 +53,8 @@ inline fun <R> whenVariantIdentifiedObject(
     is NetworkModelProjectStage -> isNetworkModelProjectStage(identifiedObject)
     is AnnotatedProjectDependency -> isAnnotatedProjectDependency(identifiedObject)
     is ChangeSet -> isChangeSet(identifiedObject)
+    is ObjectCreation -> isObjectCreation(identifiedObject)
+    is ObjectDeletion -> isObjectDeletion(identifiedObject)
+    is ObjectModification -> isObjectModification(identifiedObject)
     else -> isOther(identifiedObject)
-}
-
-inline fun <R> whenVariantDataSet(
-    obj: DataSet,  // FIXME: seems filthy, but DataSet and ChangeSetMember dont inherit from a common base
-    isChangeSet: (ChangeSet) -> R,
-    isOther: (Any) -> R = {obj: Any ->
-        throw IllegalArgumentException("DataSet object type ${obj::class} is not supported by the network model project service")
-    }
-): R = when (obj) {
-    is ChangeSet -> isChangeSet(obj)
-    else -> isOther(obj)
-}
-
-inline fun <R> whenVariantChangeSetMember(
-    obj: ChangeSetMember,  // FIXME: seems filthy, but DataSet and ChangeSetMember dont inherit from a common base
-    isObjectCreation: (ObjectCreation) -> R,
-    isObjectDeletion: (ObjectDeletion) -> R,
-    isObjectModification: (ObjectModification) -> R,
-    isOther: (Any) -> R = { o: Any ->
-        throw IllegalArgumentException("ChangeSetMember object type ${o::class} is not supported by the network model project service")
-    }
-): R = when (obj) {
-    is ObjectCreation -> isObjectCreation(obj)
-    is ObjectDeletion -> isObjectDeletion(obj)
-    is ObjectModification -> isObjectModification(obj)
-    else -> isOther(obj)
 }

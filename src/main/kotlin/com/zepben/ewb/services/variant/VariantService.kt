@@ -9,21 +9,14 @@
 package com.zepben.ewb.services.variant
 
 import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProject
-import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.AnnotatedProjectDependency
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStage
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.DataSet
-import com.zepben.ewb.database.sql.common.DuplicateMRIDException
-import com.zepben.ewb.database.sql.common.MRIDLookupException
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectCreation
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectDeletion
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectModification
 import com.zepben.ewb.services.common.BaseService
-import com.zepben.ewb.services.common.BoundReferenceResolver
-import com.zepben.ewb.services.common.UnresolvedReference
-import com.zepben.ewb.services.common.exceptions.UnsupportedIdentifiedObjectException
 import com.zepben.ewb.services.common.meta.MetadataCollection
-import com.zepben.ewb.services.network.NetworkService
-import kotlin.reflect.KClass
-import kotlin.reflect.full.isSuperclassOf
 
 /**
  * Maintains an in-memory model of variants for the network.
@@ -107,5 +100,51 @@ class VariantService(name: String = "variants", metadata: MetadataCollection = M
      */
     fun remove(changeSet: ChangeSet): Boolean = super.remove(changeSet)
 
+    /**
+     * Add the [objectCreation] to this service.
+     *
+     * @param objectCreation The [ChangeSet] to add.
+     * @return `true` if the item was added to the service, otherwise false.
+     */
+    fun add(objectCreation: ObjectCreation): Boolean = super.add(objectCreation)
 
+    /**
+     * Remove the [objectCreation] from this service.
+     *
+     * @param objectCreation The [ChangeSet] to remove.
+     * @return `true` if the item was removed from the service, otherwise false.
+     */
+    fun remove(objectCreation: ObjectCreation): Boolean = super.remove(objectCreation)
+
+    /**
+     * Add the [objectDeletion] to this service.
+     *
+     * @param objectDeletion The [ChangeSet] to add.
+     * @return `true` if the item was added to the service, otherwise false.
+     */
+    fun add(objectDeletion: ObjectDeletion): Boolean = super.add(objectDeletion)
+
+    /**
+     * Remove the [objectDeletion] from this service.
+     *
+     * @param objectDeletion The [ChangeSet] to remove.
+     * @return `true` if the item was removed from the service, otherwise false.
+     */
+    fun remove(objectDeletion: ObjectDeletion): Boolean = super.remove(objectDeletion)
+
+    /**
+     * Add the [objectModification] to this service.
+     *
+     * @param objectModification The [ChangeSet] to add.
+     * @return `true` if the item was added to the service, otherwise false.
+     */
+    fun add(objectModification: ObjectModification): Boolean = super.add(objectModification)
+
+    /**
+     * Remove the [objectModification] from this service.
+     *
+     * @param objectModification The [ChangeSet] to remove.
+     * @return `true` if the item was removed from the service, otherwise false.
+     */
+    fun remove(objectModification: ObjectModification): Boolean = super.remove(objectModification)
 }

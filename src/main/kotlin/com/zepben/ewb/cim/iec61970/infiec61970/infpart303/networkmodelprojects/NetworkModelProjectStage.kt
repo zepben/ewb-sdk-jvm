@@ -36,7 +36,7 @@ class NetworkModelProjectStage(mRID: String) : NetworkModelProjectComponent(mRID
 
     private var _dependentOnStage: MutableList<AnnotatedProjectDependency>? = null
     private var _dependingStage: MutableList<AnnotatedProjectDependency>? = null
-    private var _equipmentContainerMRIDs: MutableSet<String>? = null
+    private var _equipmentContainerMRIDs: MutableList<String>? = null
 
     var plannedCommissionedDate: Instant? = null
         set(it) {
@@ -69,8 +69,8 @@ class NetworkModelProjectStage(mRID: String) : NetworkModelProjectComponent(mRID
             field = it
         }
 
-    val dependentOnStage: Collection<AnnotatedProjectDependency> get() = _dependentOnStage.asUnmodifiable()
-    val dependingStage: Collection<AnnotatedProjectDependency> get() = _dependingStage.asUnmodifiable()
+    val dependentOnStage: List<AnnotatedProjectDependency> get() = _dependentOnStage.asUnmodifiable()
+    val dependingStage: List<AnnotatedProjectDependency> get() = _dependingStage.asUnmodifiable()
     var changeSet: ChangeSet? = null
         set(it) {
             updated = Instant.now()
@@ -78,7 +78,7 @@ class NetworkModelProjectStage(mRID: String) : NetworkModelProjectComponent(mRID
         }
 
     @ZBEX
-    val equipmentContainerMRIDs: Collection<String> get() = _equipmentContainerMRIDs.asUnmodifiable()
+    val equipmentContainerMRIDs: List<String> get() = _equipmentContainerMRIDs.asUnmodifiable()
 
 
     /**
@@ -205,7 +205,7 @@ class NetworkModelProjectStage(mRID: String) : NetworkModelProjectComponent(mRID
      * @return this [NetworkModelProjectStage] for fluent use.
      */
     fun addContainer(equipmentContainerMRID: String): NetworkModelProjectStage {
-        _equipmentContainerMRIDs = _equipmentContainerMRIDs ?: mutableSetOf()
+        _equipmentContainerMRIDs = _equipmentContainerMRIDs ?: mutableListOf()
         _equipmentContainerMRIDs!!.add(equipmentContainerMRID)
 
         updated = Instant.now()

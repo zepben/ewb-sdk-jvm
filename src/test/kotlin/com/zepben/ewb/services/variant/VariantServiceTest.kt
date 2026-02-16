@@ -24,10 +24,12 @@ internal class VariantServiceTest {
 
     private val service = VariantService()
 
+    // TODO: do this test for object creation/deletion/mod
     @Test
     internal fun `can add and remove supported types`() {
         service.supportedKClasses
             .asSequence()
+            .filter { it.primaryConstructor?.parameters?.size == 1 } // filters out object creation deletion modification
             .map { it.primaryConstructor!!.call("id-${it.simpleName}") }
             .forEach {
                 assertThat("Initial tryAdd should return true", service.tryAdd(it))

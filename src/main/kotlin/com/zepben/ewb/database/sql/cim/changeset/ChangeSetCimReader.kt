@@ -70,7 +70,7 @@ internal class ChangeSetCimReader : CimReader<VariantService>(), AutoCloseable{
 
     fun read(service: VariantService, table: TableObjectDeletions, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         return readChangeSetMember(service, table, resultSet, setIdentifier, "ObjectDeletion") { changeSet, targetObjMRID ->
-            ObjectCreation(changeSet, targetObjMRID)
+            ObjectDeletion(changeSet, targetObjMRID)
         }
     }
 
@@ -79,7 +79,7 @@ internal class ChangeSetCimReader : CimReader<VariantService>(), AutoCloseable{
         setIdentifier(originalObj)
 
         return readChangeSetMember(service, table, resultSet, setIdentifier, "ObjectModification") { changeSet, targetObjMRID ->
-            ObjectModification(changeSet, targetObjMRID, originalObj).also {
+            ObjectModification(changeSet, targetObjMRID).also {
                 changeSet.addMember(it.objectReverseModification)
             }
         }

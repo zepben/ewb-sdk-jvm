@@ -15,6 +15,8 @@ import com.zepben.ewb.services.common.translator.BaseProtoToCim
 import com.zepben.ewb.streaming.grpc.GrpcResult
 import com.zepben.protobuf.metadata.GetMetadataRequest
 import com.zepben.protobuf.metadata.GetMetadataResponse
+import com.zepben.protobuf.nc.NetworkConsumerGrpc.NetworkConsumerStub
+import io.grpc.stub.AbstractAsyncStub
 import io.mockk.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -23,7 +25,7 @@ import com.zepben.protobuf.metadata.ServiceInfo as PBServiceInfo
 
 internal class TestCimConsumerClient {
 
-    private val baseConsumerClient = mockk<CimConsumerClient<BaseService, BaseProtoToCim>>()
+    private val baseConsumerClient = mockk<CimConsumerClient<BaseService, BaseProtoToCim, NetworkConsumerStub>>()
 
     @Test
     internal fun `getMetadata returns non-cached response, and caches it`() {

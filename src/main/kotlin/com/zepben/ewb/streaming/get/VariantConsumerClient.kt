@@ -8,29 +8,22 @@
 
 package com.zepben.ewb.streaming.get
 
-import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
-import com.zepben.protobuf.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet as PBChangeSet
 import com.zepben.ewb.services.variant.VariantService
 import com.zepben.ewb.services.variant.translator.VariantProtoToCim
 import com.zepben.ewb.services.variant.translator.addFromPb
 import com.zepben.ewb.streaming.grpc.GrpcChannel
 import com.zepben.ewb.streaming.grpc.GrpcResult
-import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProject
-import com.zepben.ewb.cim.iec61970.base.core.Identifiable
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.DataSet
-import com.zepben.ewb.services.network.translator.mRID
-import com.zepben.ewb.streaming.get.hierarchy.NetworkHierarchy
-import com.zepben.protobuf.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProject as PBNetworkModelProject
 import com.zepben.protobuf.metadata.GetMetadataRequest
 import com.zepben.protobuf.metadata.GetMetadataResponse
-import com.zepben.protobuf.nc.GetNetworkHierarchyResponse
 import com.zepben.protobuf.vc.*
 import io.grpc.CallCredentials
 import io.grpc.Channel
 import java.io.IOException
-import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import com.zepben.protobuf.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProject as PBNetworkModelProject
+import com.zepben.protobuf.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet as PBChangeSet
 
 /**
  * Consumer client for a [VariantService].
@@ -41,18 +34,13 @@ import java.util.concurrent.Executors
  * were retrieved but not added to service. This should not be the case unless you are processing things concurrently.
  *
  * @property stub The gRPC stub to be used to communicate with the server
- * @param executor An optional [ExecutorService] to use with the stub. If provided, it will be cleaned up when this client is closed.
  */
 class VariantConsumerClient @JvmOverloads constructor(
-    private val stub: VariantConsumerGrpc.VariantConsumerStub,
+    override val stub: VariantConsumerGrpc.VariantConsumerStub,
     override val service: VariantService = VariantService(),
     override val protoToCim: VariantProtoToCim = VariantProtoToCim(service),
-    executor: ExecutorService? = null
-) : CimConsumerClient<VariantService, VariantProtoToCim>(executor) {
+) : CimConsumerClient<VariantService, VariantProtoToCim, VariantConsumerGrpc.VariantConsumerStub>() {
 
-    init {
-        executor?.also { exe -> stub.withExecutor { exe } }  // TODO: this seems important...
-    }
 
     /**
      * Create a [VariantConsumerClient]
@@ -63,8 +51,7 @@ class VariantConsumerClient @JvmOverloads constructor(
     @JvmOverloads
     constructor(channel: Channel, callCredentials: CallCredentials? = null) :
         this(
-            VariantConsumerGrpc.newStub(channel).apply { callCredentials?.let { withCallCredentials(it) } },
-            executor = Executors.newSingleThreadExecutor()
+            VariantConsumerGrpc.newStub(channel).withExecutor(Executors.newSingleThreadExecutor()).apply { callCredentials?.let { withCallCredentials(it) } },
         )
 
     /**
@@ -146,11 +133,6 @@ class VariantConsumerClient @JvmOverloads constructor(
     private fun extractNetworkModelProject(io: PBNetworkModelProject): ExtractResult? =
         protoToCim.networkService.addFromPb(io)?.let {
             ExtractResult(it, it.mRID)
-        }
-
-    private fun extractChangeSet(cs: PBChangeSet): ExtractResult =
-        protoToCim.networkService.addFromPb(cs).let {
-            ExtractResult(getOrAdd(it), it.mRID)
         }
 
 }

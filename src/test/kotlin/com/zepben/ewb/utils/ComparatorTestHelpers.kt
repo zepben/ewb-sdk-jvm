@@ -8,7 +8,7 @@
 
 package com.zepben.ewb.utils
 
-import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.base.core.NameType
 import com.zepben.ewb.services.common.*
 import com.zepben.ewb.services.network.NetworkServiceComparatorOptions
@@ -28,10 +28,10 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
     val newComparator: (NetworkServiceComparatorOptions) -> C
 ) {
 
-    fun <T : IdentifiedObject> validateServiceOf(
+    fun <T : Identifiable> validateServiceOf(
         source: T,
         target: T,
-        expectModification: ObjectDifference<out IdentifiedObject>? = null,
+        expectModification: ObjectDifference<out Identifiable>? = null,
         expectMissingFromTarget: T? = null,
         expectMissingFromSource: T? = null,
         options: NetworkServiceComparatorOptions = NetworkServiceComparatorOptions.all()
@@ -93,7 +93,7 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
         }
     }
 
-    fun <T : IdentifiedObject, R> validateProperty(
+    fun <T : Identifiable, R> validateProperty(
         property: KMutableProperty1<in T, R>,
         createIdObj: (String) -> T,
         createValue: (T) -> R,
@@ -113,7 +113,7 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
         }.validateExpected(options, optionsStopCompare, expectedDifferences)
     }
 
-    fun <T : IdentifiedObject, R> validateValProperty(
+    fun <T : Identifiable, R> validateValProperty(
         property: KProperty1<in T, R>,
         createIdObj: (id: String) -> T,
         changeState: (idObj: T, currentPropertyValue: R) -> Unit,
@@ -133,7 +133,7 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
         }.validateExpected(options, optionsStopCompare, expectedDifferences)
     }
 
-    fun <T : IdentifiedObject, R> validateCollection(
+    fun <T : Identifiable, R> validateCollection(
         property: KProperty1<in T, Collection<R>>,
         addToCollection: (T, R) -> Unit,
         createIdObj: (String) -> T,
@@ -180,9 +180,9 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
      *
      * This will validate if either of the [U] or [V] parameters are different, the resulting [R] is considered different.
      *
-     * Example usage of this function is for validating the names collection of an [IdentifiedObject].
+     * Example usage of this function is for validating the names collection of an [Identifiable].
      */
-    fun <T : IdentifiedObject, U, V, R> validateCollection(
+    fun <T : Identifiable, U, V, R> validateCollection(
         property: KProperty1<in T, Collection<R>>,
         addToCollection: (T, U, V) -> T,
         createIdObj: (String) -> T,
@@ -236,7 +236,7 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
         }.validateExpected(options, optionsStopCompare, expectedDifferences)
     }
 
-    fun <T : IdentifiedObject, R> validateIndexedCollection(
+    fun <T : Identifiable, R> validateIndexedCollection(
         property: KProperty1<in T, Collection<R>>,
         addToCollection: (T, R) -> Unit,
         createIdObj: (String) -> T,
@@ -286,7 +286,7 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
     /**
      * @param property The property we are checking.
      * @param addToCollection The function used to add the items to the object.
-     * @param createIdObj Create the [IdentifiedObject] under test.
+     * @param createIdObj Create the [Identifiable] under test.
      * @param createItem1 Create the first item to add to the collection.
      * @param createItem2 Create the second item to add to the collection.
      * @param createDiffItem1 Create an item with the same key as the first item, but with different data.
@@ -295,7 +295,7 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
      * @param expectedDifferences A set of differences expected between two items that should otherwise be equal. Only use if there are
      * expected runtime differences due to things outside your control. e.g. auto generated ID's etc.
      */
-    fun <T : IdentifiedObject, R> validateUnorderedCollection(
+    fun <T : Identifiable, R> validateUnorderedCollection(
         property: KProperty1<in T, Collection<R>>,
         addToCollection: (T, R) -> Unit,
         createIdObj: (String) -> T,
@@ -378,16 +378,16 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
     }
 
     private fun <T> getValueOrReferenceDifference(source: T?, target: T?): Difference {
-        return if (source is IdentifiedObject? && target is IdentifiedObject?)
+        return if (source is Identifiable? && target is Identifiable?)
             ReferenceDifference(source, target)
         else
             ValueDifference(source, target)
     }
 
-    private fun <T : IdentifiedObject> serviceOf(it: T) =
+    private fun <T : Identifiable> serviceOf(it: T) =
         newService().apply { tryAdd(it) }
 
-    private fun <T : IdentifiedObject> ObjectDifference<T>.validateExpected(
+    private fun <T : Identifiable> ObjectDifference<T>.validateExpected(
         options: NetworkServiceComparatorOptions,
         optionsStopCompare: Boolean = false,
         expectedDifferences: Set<String>

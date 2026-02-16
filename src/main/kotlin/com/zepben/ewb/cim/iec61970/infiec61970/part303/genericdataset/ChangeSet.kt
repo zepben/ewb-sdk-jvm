@@ -25,6 +25,11 @@ class ChangeSet(mRID: String) : DataSet(mRID) {
     val changeSetMembers: List<ChangeSetMember> get() = _changeSetMembers.asUnmodifiable()
     var networkModelProjectStage: NetworkModelProjectStage? = null
 
+    val creations: List<ObjectCreation> get() = _changeSetMembers.ofType()
+    val deletions: List<ObjectDeletion> get() = _changeSetMembers.ofType()
+    val modifications: List<ObjectModification> get() = _changeSetMembers.ofType()
+    val reverseModifications: List<ObjectReverseModification> get() = _changeSetMembers.ofType()
+
     /**
      * Get the number of entries in the [ChangeSetMember] collection.
      */
@@ -68,4 +73,5 @@ class ChangeSet(mRID: String) : DataSet(mRID) {
         return ret
     }
 
+    private inline fun <reified T : ChangeSetMember> List<*>?.ofType(): List<T> = this?.filterIsInstance(T::class.java) ?: emptyList()
 }

@@ -226,7 +226,7 @@ fun toCim(pb: PBObjectDeletion, networkService: VariantService): ObjectDeletion 
  */
 fun toCim(pb: PBObjectModification, networkService: VariantService): ObjectModification =
     toCim(pb.csm, networkService) { cs, target ->
-        ObjectModification(cs, target, pb.objectReverseModification.csm.targetObjectMRID).also {
+        ObjectModification(cs, target).also {
             cs.addMember(it.objectReverseModification)
         }
     }

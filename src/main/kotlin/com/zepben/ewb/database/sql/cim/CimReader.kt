@@ -203,7 +203,7 @@ internal abstract class CimReader<TService : BaseService> {
         return if (tryAdd(identifiedObject)) {
             true
         } else {
-            val duplicate = get<IdentifiedObject>(identifiedObject.mRID)
+            val duplicate = get<Identifiable>(identifiedObject.mRID)
             throw DuplicateMRIDException(
                 "Failed to read ${identifiedObject.typeNameAndMRID()}. Unable to add to service '$name': duplicate MRID (${duplicate?.typeNameAndMRID()})"
             )

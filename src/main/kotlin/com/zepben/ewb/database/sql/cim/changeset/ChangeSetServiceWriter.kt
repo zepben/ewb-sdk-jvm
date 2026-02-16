@@ -8,10 +8,11 @@
 
 package com.zepben.ewb.database.sql.cim.changeset
 
-import com.zepben.ewb.cim.iec61970.base.core.Identifiable
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.*
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectCreation
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectDeletion
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectModification
 import com.zepben.ewb.database.sql.cim.BaseServiceWriter
-import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.variant.VariantService
 
 /**
@@ -25,5 +26,8 @@ internal class ChangeSetServiceWriter(
 ) : BaseServiceWriter<VariantService>(writer) {
 
     override fun VariantService.writeService(): Boolean =
-        writeEach<ChangeSet>(writer::write)
+        writeEach<ChangeSet>(writer::write) and
+            writeEach<ObjectCreation>(writer::write) and
+            writeEach<ObjectDeletion>(writer::write) and
+            writeEach<ObjectModification>(writer::write)
 }

@@ -94,16 +94,16 @@ object SchemaServices {
 
     fun <T : IdentifiedObject> variantServicesOf(factory: (mRID: String) -> T, filler: (T, VariantService, Boolean) -> T): VariantService =
         VariantService().also { variantService ->
-            variantService.tryAdd(factory("empty").also { fillRequired(variantService, it) })
+            variantService.tryAdd(factory("empty"))
             variantService.tryAdd(filler(factory("filled"), variantService, false))
-            variantService.tryAdd(factory("emptyNotNull").also { fillRequired(variantService, it); fillEmptys(it)})
+            variantService.tryAdd(factory("emptyNotNull").also { fillEmptys(it)})
         }
 
     fun variantServicesOfChangeSets(factory: (mRID: String) -> ChangeSet, filler: (ChangeSet, VariantService, Boolean) -> ChangeSet): VariantService =
         VariantService().also { variantService ->
-            variantService.add(factory("empty").also { fillRequired(variantService, it) })
+            variantService.add(factory("empty"))
             variantService.add(filler(factory("filled"), variantService, false))
-            variantService.add(factory("emptyNotNull").also { fillRequired(variantService, it); fillEmptys(it) })
+            variantService.add(factory("emptyNotNull").also { fillEmptys(it) })
         }
 
     private fun fillRequired(service: NetworkService, io: Any) {

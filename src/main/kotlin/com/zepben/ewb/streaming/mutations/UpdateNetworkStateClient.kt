@@ -29,12 +29,10 @@ import com.zepben.protobuf.ns.SetCurrentStatesResponse as PBSetCurrentStatesResp
  * A client class that provides functionality to interact with the gRPC service for updating network states.
  *
  * @property stub The gRPC stub to be used to communicate with the server
- * @param executor An optional [ExecutorService] to use with the stub. If provided, it will be cleaned up when this client is closed.
  */
 class UpdateNetworkStateClient(
-    private val stub: UpdateNetworkStateServiceGrpc.UpdateNetworkStateServiceStub,
-    executor: ExecutorService?
-) : GrpcClient(executor) {
+    override val stub: UpdateNetworkStateServiceGrpc.UpdateNetworkStateServiceStub,
+) : GrpcClient<UpdateNetworkStateServiceGrpc.UpdateNetworkStateServiceStub>() {
 
     /**
      * Create a [UpdateNetworkStateClient]
@@ -45,8 +43,9 @@ class UpdateNetworkStateClient(
     @JvmOverloads
     constructor(channel: Channel, callCredentials: CallCredentials? = null) :
         this(
-            UpdateNetworkStateServiceGrpc.newStub(channel).apply { callCredentials?.let { withCallCredentials(it) } },
-            executor = Executors.newSingleThreadExecutor()
+            UpdateNetworkStateServiceGrpc.newStub(channel).withExecutor(Executors.newSingleThreadExecutor()).apply {
+                callCredentials?.let { withCallCredentials(it) }
+            },
         )
 
     /**
@@ -57,10 +56,7 @@ class UpdateNetworkStateClient(
      */
     @JvmOverloads
     constructor(channel: GrpcChannel, callCredentials: CallCredentials? = null) :
-        this(
-            UpdateNetworkStateServiceGrpc.newStub(channel.channel).apply { callCredentials?.let { withCallCredentials(it) } },
-            executor = Executors.newSingleThreadExecutor()
-        )
+        this(channel.channel, callCredentials)
 
     /**
      * Sends a single batch of current state events to the gRPC service for processing.

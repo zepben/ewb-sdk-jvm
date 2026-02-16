@@ -137,7 +137,7 @@ internal class GrpcChannelBuilderTest {
 
     @Test
     internal fun `testConnection returns on first successful call`() {
-        val responses = mapOf<KClass<out GrpcClient>, Exception?>(
+        val responses = mapOf<KClass<out GrpcClient<*>>, Exception?>(
             NetworkConsumerClient::class to StatusRuntimeException(Status.DATA_LOSS),
             CustomerConsumerClient::class to StatusRuntimeException(Status.INVALID_ARGUMENT),
             DiagramConsumerClient::class to null, //null returns GrpcResult mockk with wasSuccessful = true
@@ -150,7 +150,7 @@ internal class GrpcChannelBuilderTest {
 
     @Test
     internal fun `testConnection continues past grpc status UNAVAILABLE exceptions`() {
-        val responses = mapOf<KClass<out GrpcClient>, Exception?>(
+        val responses = mapOf<KClass<out GrpcClient<*>>, Exception?>(
             NetworkConsumerClient::class to StatusRuntimeException(Status.UNAVAILABLE),
             CustomerConsumerClient::class to null, //null returns GrpcResult mockk with wasSuccessful = true
             DiagramConsumerClient::class to StatusRuntimeException(Status.DATA_LOSS),
@@ -161,7 +161,7 @@ internal class GrpcChannelBuilderTest {
 
     @Test
     internal fun `testConnection continues past grpc status UNAUTHENTICATED exceptions`() {
-        val responses = mapOf<KClass<out GrpcClient>, Exception?>(
+        val responses = mapOf<KClass<out GrpcClient<*>>, Exception?>(
             NetworkConsumerClient::class to StatusRuntimeException(Status.DATA_LOSS),
             CustomerConsumerClient::class to StatusRuntimeException(Status.UNAUTHENTICATED),
             DiagramConsumerClient::class to null, //null returns GrpcResult mockk with wasSuccessful = true
@@ -172,7 +172,7 @@ internal class GrpcChannelBuilderTest {
 
     @Test
     internal fun `testConnection continues past grpc status UNKNOWN exceptions`() {
-        val responses = mapOf<KClass<out GrpcClient>, Exception?>(
+        val responses = mapOf<KClass<out GrpcClient<*>>, Exception?>(
             NetworkConsumerClient::class to StatusRuntimeException(Status.DATA_LOSS),
             CustomerConsumerClient::class to StatusRuntimeException(Status.UNKNOWN),
             DiagramConsumerClient::class to null, //null returns GrpcResult mockk with wasSuccessful = true
@@ -183,7 +183,7 @@ internal class GrpcChannelBuilderTest {
 
     @Test
     internal fun `testConnection rethrows unexpected exceptions`() {
-        val responses = mapOf<KClass<out GrpcClient>, Exception?>(
+        val responses = mapOf<KClass<out GrpcClient<*>>, Exception?>(
             NetworkConsumerClient::class to StatusRuntimeException(Status.DATA_LOSS),
             CustomerConsumerClient::class to Exception("Unexpected"),
             DiagramConsumerClient::class to StatusRuntimeException(Status.UNAVAILABLE),
@@ -196,7 +196,7 @@ internal class GrpcChannelBuilderTest {
 
     @Test
     internal fun `testConnection collects other exceptions for debug output`() {
-        val responses = mapOf<KClass<out GrpcClient>, Exception?>(
+        val responses = mapOf<KClass<out GrpcClient<*>>, Exception?>(
             NetworkConsumerClient::class to StatusRuntimeException(Status.DATA_LOSS.withDescription("Data loss message for testing")),
             CustomerConsumerClient::class to StatusRuntimeException(Status.INVALID_ARGUMENT.withDescription("Invalid argument message for testing")),
             DiagramConsumerClient::class to StatusRuntimeException(Status.UNIMPLEMENTED.withDescription("Method not found: zepben.protobuf.dc.DiagramConsumer/checkConnection")),
@@ -218,7 +218,7 @@ internal class GrpcChannelBuilderTest {
 
     @Test
     internal fun `testConnection throws GrpcConnectionException if no successful responses received`() {
-        val responses = mapOf<KClass<out GrpcClient>, Exception?>(
+        val responses = mapOf<KClass<out GrpcClient<*>>, Exception?>(
             NetworkConsumerClient::class to StatusRuntimeException(Status.DATA_LOSS.withDescription("Data loss message for testing")),
             CustomerConsumerClient::class to StatusRuntimeException(Status.INVALID_ARGUMENT.withDescription("Invalid argument message for testing")),
             DiagramConsumerClient::class to StatusRuntimeException(Status.UNIMPLEMENTED.withDescription("Method not found: zepben.protobuf.dc.DiagramConsumer/checkConnection")),
@@ -382,7 +382,7 @@ internal class GrpcChannelBuilderTest {
         }.toThrow<IllegalArgumentException>().withMessage("Call credential already set in connection builder.")
     }
 
-    private fun runTestConnection(responses: Map<KClass<out GrpcClient>, Exception?>, debug: Boolean = false, timeoutMs: Long = 5000) {
+    private fun runTestConnection(responses: Map<KClass<out GrpcClient<*>>, Exception?>, debug: Boolean = false, timeoutMs: Long = 5000) {
         val builder = GrpcChannelBuilder()
         val channel = mockk<Channel>()
         val grpcChannel = mockk<GrpcChannel> {

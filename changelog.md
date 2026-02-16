@@ -1,13 +1,13 @@
 # Zepben EWB SDK changelog
 ## [1.5.0] - UNRELEASED
 ### Breaking Changes
-* None.
+* `typeNameAndMRID()` and `nameAndMRID()` helpers have been moved directly onto `IdentifiedObject`. You will need to remove imports to these functions.
 
 ### New Features
 * None.
 
 ### Enhancements
-* None.
+* Introduced interface `Identifiable`, which implements `mRID`. `IdentifiedObject`, `Name`, `NameType`, and `DataSet` now implement this interface.
 
 ### Fixes
 * None.

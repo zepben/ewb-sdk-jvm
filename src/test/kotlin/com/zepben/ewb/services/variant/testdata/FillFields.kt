@@ -10,21 +10,15 @@ package com.zepben.ewb.services.variant.testdata
 
 import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProject
 import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectComponent
-import com.zepben.ewb.cim.iec61970.base.core.Feeder
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.AnnotatedProjectDependency
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.DependencyKind
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStage
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSetMember
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.DataSet
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectCreation
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectDeletion
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectModification
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.*
 import com.zepben.ewb.services.common.testdata.fillFieldsCommon
+import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.variant.VariantService
 import java.time.Instant
-import java.util.UUID
 
 // #######################################################
 // # Extensions IEC61970 InfPart303 NetworkModelProjects #
@@ -61,8 +55,8 @@ fun NetworkModelProjectComponent.fillFields(service: VariantService, includeRunt
 fun AnnotatedProjectDependency.fillFields(service: VariantService, includeRuntime: Boolean = true): AnnotatedProjectDependency {
     (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
     dependencyType = DependencyKind.mutuallyExclusive
-    addDependencyDependentOnStage(NetworkModelProjectStage("${mRID}-dependent-on-stage").also { service.add(it) })
-    addDependencyDependingStage(NetworkModelProjectStage("${mRID}-depending-on-stage").also { service.add(it) })
+    dependencyDependentOnStage = NetworkModelProjectStage(generateId()).also { service.add(it) }
+    dependencyDependingStage = NetworkModelProjectStage(generateId()).also { service.add(it) }
 
     return this
 }
@@ -74,16 +68,15 @@ fun NetworkModelProjectStage.fillFields(service: VariantService, includeRuntime:
     baseModelVersion = "2025-10-12"
     lastConflictCheckedAt = Instant.now().minusSeconds(20000)
     userComments = "Dodgy network, probably dont use this in production..."
-    setChangeSetMRID("${mRID}-changeset-1")
-
-    if (includeRuntime) {
-        addDependingStage(AnnotatedProjectDependency("$mRID-apd").fillFields(service, includeRuntime))
-        addDependentOnStage(AnnotatedProjectDependency("$mRID-apd").fillFields(service, includeRuntime))
-
-        addContainer(
-            Feeder("${mRID}-equipment-container")
-        )
+    changeSet = ChangeSet(generateId()).also {
+        service.add(it)
+        it.networkModelProjectStage = this
     }
+
+    addDependingStage(AnnotatedProjectDependency(generateId()).also { it.dependencyDependingStage = this })
+    addDependentOnStage(AnnotatedProjectDependency(generateId()).also { it.dependencyDependentOnStage = this })
+
+    addContainer(generateId())
     service.add(this)
 
     return this
@@ -96,22 +89,11 @@ fun NetworkModelProjectStage.fillFields(service: VariantService, includeRuntime:
 fun ChangeSet.fillFields(service: VariantService, includeRuntime: Boolean = true): ChangeSet {
     (this as DataSet).fillFieldsCommon(service, includeRuntime)
 
-    addMember(ObjectCreation().fillFields(service, includeRuntime))
-    addMember(ObjectDeletion().fillFields(service, includeRuntime))
-    addMember(
-        ObjectCreation().also {
-            it.targetObjectMRID = "${mRID}-creation-target"
-        })
-    addMember(
-        ObjectDeletion().also {
-            it.targetObjectMRID = "$mRID-deletion-target"
-        }
-    )
-    addMember(ObjectModification.createObjectModification(
-        changeSet = this,
-        modifiedObjectMRID = "${mRID}-modified",
-        originalObjectMRID = "${mRID}-original"
-    ))
+    networkModelProjectStage = NetworkModelProjectStage(generateId()).also { it.changeSet = this; service.add(it) }
+
+    addMember(ObjectCreation(this, generateId()).also { service.add(it) })
+    addMember(ObjectDeletion(this, generateId()).also { service.add(it) })
+    addMember(ObjectModification(this, generateId()).also { service.add(it) })
 
     return this
 }
@@ -122,33 +104,20 @@ fun DataSet.fillFieldsCommon(service: VariantService, @Suppress("UNUSED_PARAMETE
 
     return this
 }
-fun ChangeSetMember.generateMRID(suffix: String): String = "${UUID.randomUUID()}-${suffix}"
 
-fun ChangeSetMember.fillFields(csm: ChangeSetMember, changeSet: ChangeSet? = null): Boolean {
-    val changeSet = changeSet ?: ChangeSet(generateMRID("change-set"))
-    csm.apply {
-        targetObjectMRID = "${changeSet.mRID}-target"
-    }
-    return true
-}
+inline fun <reified T : ChangeSetMember> ChangeSetMember.fillFields(service: VariantService, includeRuntime: Boolean, creator: (ChangeSet, String) -> T): T =
+    creator(ChangeSet(generateId()).also { service.add(it) }, "${T::class.java.simpleName} ${generateId()}").fillFieldsCommon(service, includeRuntime) as T
 
+
+//fun ObjectCreation.fillFields(service: VariantService, includeRuntime: Boolean = true): ObjectCreation =
+//    fillFields(service, includeRuntime, ::ObjectCreation)
 
 fun ObjectCreation.fillFields(service: VariantService, includeRuntime: Boolean = true): ObjectCreation =
-    ObjectCreation().also {
-        fillFields(it as ChangeSetMember)
-    }
+    fillFields(service, includeRuntime, ::ObjectCreation)
+
 
 fun ObjectDeletion.fillFields(service: VariantService, includeRuntime: Boolean = true): ObjectDeletion =
-    ObjectDeletion().also {
-        fillFields(it as ChangeSetMember)
-    }
+    fillFields(service, includeRuntime, ::ObjectDeletion)
 
-fun ObjectModification.fillFields(service: VariantService, includeRuntime: Boolean = true): ObjectModification {
-    val baseUUID = UUID.randomUUID().toString()
-
-    return ObjectModification.createObjectModification(
-        changeSet = ChangeSet("${baseUUID}-change-set").also{ service.add(it) },
-        modifiedObjectMRID = "${baseUUID}-modified",
-        originalObjectMRID = "${baseUUID}-original"
-    )
-}
+fun ObjectModification.fillFields(service: VariantService, includeRuntime: Boolean = true): ObjectModification =
+    fillFields(service, includeRuntime, ::ObjectModification)

@@ -17,7 +17,7 @@
 
 ## [1.8.0] - 2026-03-26
 ### Breaking Changes
-* None.
+* Minimum required JVM version for compilation is 17
 
 ### New Features
 * None.

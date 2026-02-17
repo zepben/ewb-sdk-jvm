@@ -15,10 +15,12 @@ import com.zepben.ewb.services.network.NetworkService
 
 
 class ChangeSetServices(
-    val changeSet: ChangeSet,
-    val networkService: NetworkService,
-    val diagramService: DiagramService,
-    val customerService: CustomerService
+    val changeSet: ChangeSet? = null,
+    var variantService: VariantService? = null,
+    var networkService: NetworkService? = null,
+    var diagramService: DiagramService? = null,
+    var customerService: CustomerService? = null,
 )
 {
 }
+

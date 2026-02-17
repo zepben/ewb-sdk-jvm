@@ -24,3 +24,4 @@ abstract class ChangeSetMember(val changeSet: ChangeSet, val targetObjectMRID: S
 
     override fun typeNameAndMRID(): String = "${javaClass.simpleName} $mRID"
 }
+

@@ -11,6 +11,7 @@ package com.zepben.ewb.streaming.get
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.iec61968.operations.OperationalRestriction
 import com.zepben.ewb.cim.iec61970.base.core.*
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
 import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.common.translator.EnumMapper
 import com.zepben.ewb.services.common.translator.mRID
@@ -476,6 +477,26 @@ class NetworkConsumerClient(
         return GrpcResult(mor)
     }
 
+    /**
+     * Retrieve the network contents of a [ChangeSet] from the server.
+     * This will return a new [NetworkService] with just the network related contents of the [ChangeSet].
+     * Note this function does not populate [service] as merging a [ChangeSet] with a [NetworkService] should use XXXX TODO fill this in.
+     *
+     * @param mRID The mRID of the [ChangeSet] to retrieve contents for.
+     * @return A [GrpcResult] of a [NetworkService].
+     */
+    fun getChangeSetObjects(mRID: String): GrpcResult<NetworkService> = tryRpc {
+        val networkService = NetworkService()
+        val streamObserver = AwaitableStreamObserver<GetChangeSetObjectsResponse> { response ->
+            networkService.addFromPb(response.identifiableObject)
+        }
+        stub.getChangeSetObjects(GetChangeSetObjectsRequest.newBuilder().setChangeSetMRID(mRID).build(), streamObserver)
+
+        streamObserver.await()
+
+        networkService
+    }
+
     override fun processIdentifiedObjects(mRIDs: Sequence<String>): Sequence<ExtractResult> {
         val extractResults = mutableListOf<ExtractResult>()
         val streamObserver = AwaitableStreamObserver<GetIdentifiedObjectsResponse> { response ->
@@ -562,7 +583,7 @@ class NetworkConsumerClient(
             ExtractResult(it.identifiedObject, it.mRID)
         }
 
-    private fun <T, U : IdentifiedObject> toMap(objects: Iterable<T>, mapper: (T) -> U?): Map<String, U> =
+    private fun <T, U : Identifiable> toMap(objects: Iterable<T>, mapper: (T) -> U?): Map<String, U> =
         objects
             .mapNotNull(mapper)
             .associateBy { it.mRID }
@@ -585,7 +606,7 @@ class NetworkConsumerClient(
 
         val toFetch = mutableListOf<String>()
         mRIDs.forEach { mRID ->  // Only process mRIDs not already present in service
-            service.get<IdentifiedObject>(mRID)?.let { mor.objects[it.mRID] = it } ?: toFetch.add(mRID)
+            service.get<Identifiable>(mRID)?.let { mor.objects[it.mRID] = it } ?: toFetch.add(mRID)
         }
 
         val response = getIdentifiedObjects(toFetch.asSequence())

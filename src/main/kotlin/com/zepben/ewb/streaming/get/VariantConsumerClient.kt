@@ -17,13 +17,13 @@ import com.zepben.ewb.streaming.grpc.GrpcChannel
 import com.zepben.ewb.streaming.grpc.GrpcResult
 import com.zepben.protobuf.metadata.GetMetadataRequest
 import com.zepben.protobuf.metadata.GetMetadataResponse
+import com.zepben.protobuf.vc.GetIdentifiedObjectsRequest
+import com.zepben.protobuf.vc.GetIdentifiedObjectsResponse
 import com.zepben.protobuf.vc.*
 import io.grpc.CallCredentials
 import io.grpc.Channel
-import java.io.IOException
 import java.util.concurrent.Executors
 import com.zepben.protobuf.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProject as PBNetworkModelProject
-import com.zepben.protobuf.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet as PBChangeSet
 
 /**
  * Consumer client for a [VariantService].
@@ -63,26 +63,44 @@ class VariantConsumerClient @JvmOverloads constructor(
     @JvmOverloads
     constructor(channel: GrpcChannel, callCredentials: CallCredentials? = null) : this(channel.channel, callCredentials)
 
-    override fun processIdentifiedObjects(mRIDs: Sequence<String>): Sequence<ExtractResult> =
-        throw NotImplementedError()
+    override fun processIdentifiedObjects(mRIDs: Sequence<String>): Sequence<ExtractResult> {
+        val extractResults = mutableListOf<ExtractResult>()
+        val streamObserver = AwaitableStreamObserver<GetIdentifiedObjectsResponse> { response ->
+            response.identifiableObjectsList.forEach {
+                extractResults.add(extractIdentifiedObject(it))
+            }
+        }
+
+        val request = stub.getIdentifiedObjects(streamObserver)
+        val builder = GetIdentifiedObjectsRequest.newBuilder()
+
+        batchSend(mRIDs, builder::addMrids) {
+            if (builder.mridsList.isNotEmpty())
+                request.onNext(builder.build())
+            builder.clearMrids()
+        }
+
+        request.onCompleted()
+        streamObserver.await()
+
+        return extractResults.asSequence()
+    }
 
     /**
-     * Retrieve a ChangeSet from the server. Note this does not receive the contents of the ChangeSet, only the metadata.
-     * To retrieve the contents you must use getChangeSet against each respective service (network, diagram, customer).
-     *
-     * @param mRID The mRID of the ChangeSet to retrieve.
-     * @return A [GrpcResult] capturing the result of the request for the ChangeSet.
+     * Retrieve a ChangeSet and all its associations from the server. See [getChangeSets] documentation.
      */
-    fun getChangeSet(mRID: String): GrpcResult<ChangeSet> = tryRpc {
-        var changeSet: ChangeSet? = null
-        val streamObserver = AwaitableStreamObserver<GetChangeSetResponse> { response ->
-            changeSet = service.addFromPb(response.changeSet)
-        }
-        stub.getChangeSet(GetChangeSetRequest.newBuilder().setMrid(mRID).build(), streamObserver)
+    fun getChangeSet(mRID: String): GrpcResult<MultiObjectResult> = getChangeSets(listOf(mRID))
 
-        streamObserver.await()
-        changeSet ?: throw IOException("No change set was received before GRPC channel was closed.")
-    }
+    /**
+     * Retrieve a ChangeSet and all its associations from the server. This does not receive the contents of the ChangeSet, only the metadata.
+     * To retrieve the contents you should use [ChangeSetConsumerClient.getChangeSet], which will call this function for you.
+     *
+     * @param mRIDs The mRIDs of the [ChangeSet]s to retrieve.
+     * @return A [GrpcResult] of a [MultiObjectResult]. If successful, containing a map keyed by mRID of all the objects retrieved. If an item was not found, or
+     * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed]
+     */
+    fun getChangeSets(mRIDs: Iterable<String>): GrpcResult<MultiObjectResult> =
+        getWithReferences(mRIDs.asSequence(), ChangeSet::class.java)
 
     // TODO: docs
     fun getNetworkModelProjects(): GrpcResult<MultiObjectResult> =
@@ -131,8 +149,61 @@ class VariantConsumerClient @JvmOverloads constructor(
     }
 
     private fun extractNetworkModelProject(io: PBNetworkModelProject): ExtractResult? =
-        protoToCim.networkService.addFromPb(io)?.let {
+        protoToCim.variantService.addFromPb(io)?.let {
             ExtractResult(it, it.mRID)
+        }
+
+    private inline fun <reified T> getWithReferences(
+        mRIDs: Sequence<String>,
+        expectedClass: Class<out T>,
+    ): GrpcResult<MultiObjectResult> {
+        val mor = MultiObjectResult()
+
+        val toFetch = mutableListOf<String>()
+        mRIDs.forEach { mRID ->  // Only process mRIDs not already present in service
+            service.get<Identifiable>(mRID)?.let { mor.objects[it.mRID] = it } ?: toFetch.add(mRID)
+        }
+
+        val response = getIdentifiedObjects(toFetch.asSequence())
+        val result = response.onError { thrown, wasHandled -> return@getWithReferences GrpcResult.ofError(thrown, wasHandled) }.value
+
+        val invalid = result.objects.values.filter { !expectedClass.isInstance(it) }.toMutableSet()
+        if (invalid.isNotEmpty()) {
+            val e = ClassCastException("Unable to extract ${expectedClass.simpleName} networks from ${invalid.map { it.typeNameAndMRID() }}.")
+            return GrpcResult.ofError(e, tryHandleError(e))
+        }
+
+        mor.objects.putAll(result.objects)
+        mor.failed.addAll(result.failed)
+
+        resolveReferences(mor)?.let { return@getWithReferences it }
+
+        return GrpcResult(mor)
+    }
+
+    internal fun resolveReferences(mor: MultiObjectResult): GrpcResult<MultiObjectResult>? {
+        var res = mor
+        do {
+            // Skip any reference trying to resolve from an EquipmentContainer on subsequent passes - e.g a PowerTransformer trying to pull in its LvFeeder.
+            // EquipmentContainers should be retrieved explicitly or via a hierarchy call.
+            val toResolve = res.objects.keys
+                .flatMap { service.getUnresolvedReferencesFrom(it) }
+                .map { it.toMrid }
+                .distinct()
+                .toList()
+
+            res = getIdentifiedObjects(toResolve).onError { thrown, wasHandled ->
+                return GrpcResult.ofError(thrown, wasHandled)
+            }.value
+            mor.objects.putAll(res.objects)
+
+        } while (res.objects.isNotEmpty())
+        return null
+    }
+
+    private fun extractIdentifiedObject(io: VariantObject): ExtractResult =
+        protoToCim.variantService.addFromPb(io).let {
+            ExtractResult(it.identifiedObject, it.mRID)
         }
 
 }

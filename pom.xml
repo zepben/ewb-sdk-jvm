@@ -69,6 +69,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jacoco.coverage>0.5</jacoco.coverage>
     </properties>
 
     <dependencies>

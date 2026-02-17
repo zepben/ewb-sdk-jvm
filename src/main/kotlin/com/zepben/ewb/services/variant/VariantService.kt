@@ -9,6 +9,7 @@
 package com.zepben.ewb.services.variant
 
 import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProject
+import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectComponent
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.AnnotatedProjectDependency
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStage
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
@@ -17,6 +18,7 @@ import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectDele
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectModification
 import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.common.meta.MetadataCollection
+import java.time.Instant
 
 /**
  * Maintains an in-memory model of variants for the network.
@@ -147,4 +149,11 @@ class VariantService(name: String = "variants", metadata: MetadataCollection = M
      * @return `true` if the item was removed from the service, otherwise false.
      */
     fun remove(objectModification: ObjectModification): Boolean = super.remove(objectModification)
+
+    inline fun <reified TComp : NetworkModelProjectComponent> getComponentsBetween(start: Instant, end: Instant): Sequence<TComp> =
+        sequenceOf<TComp>().filter { it.created?.let { created -> created in start..end } == true }
+
+    fun getProjectsByDriver(driver: String?): Sequence<NetworkModelProject> =
+        sequenceOf<NetworkModelProject>().filter { it.externalDriver == driver }
+
 }

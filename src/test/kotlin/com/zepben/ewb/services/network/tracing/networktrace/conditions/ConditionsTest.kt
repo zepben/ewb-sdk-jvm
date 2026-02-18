@@ -14,6 +14,7 @@ import com.zepben.ewb.cim.iec61970.base.wires.Switch
 import com.zepben.ewb.services.network.tracing.feeder.FeederDirection
 import com.zepben.ewb.services.network.tracing.networktrace.conditions.Conditions.downstream
 import com.zepben.ewb.services.network.tracing.networktrace.conditions.Conditions.stopAtOpen
+import com.zepben.ewb.services.network.tracing.networktrace.conditions.Conditions.stopOnShuntCompensatorGround
 import com.zepben.ewb.services.network.tracing.networktrace.conditions.Conditions.upstream
 import com.zepben.ewb.services.network.tracing.networktrace.conditions.Conditions.withDirection
 import com.zepben.ewb.services.network.tracing.networktrace.operators.NetworkStateOperators
@@ -103,7 +104,13 @@ class ConditionsTest {
 
     @Test
     fun `test stopOnShuntCompensatorGround condition`() {
-        val condition = Conditions.stopOnShuntCompensatorGround<Unit>()
+        val condition = stopOnShuntCompensatorGround<Unit>()
+        assertThat(condition, instanceOf(ShuntCompensatorCondition.StopOnGround::class.java))
+    }
+
+    @Test
+    fun `test stopOnShuntCompensatorGround condition DSL`() {
+        val condition = NetworkStateOperators.NORMAL.stopOnShuntCompensatorGround<Unit>()
         assertThat(condition, instanceOf(ShuntCompensatorCondition.StopOnGround::class.java))
     }
 

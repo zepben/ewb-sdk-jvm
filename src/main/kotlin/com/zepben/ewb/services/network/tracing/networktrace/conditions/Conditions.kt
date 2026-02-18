@@ -143,4 +143,20 @@ object Conditions {
     fun <T> stopOnShuntCompensatorGround(): QueueCondition<NetworkTraceStep<T>> =
         ShuntCompensatorCondition.StopOnGround()
 
+    /**
+     * Creates a [NetworkTrace] condition that stops tracing a path if it attempts to traverse a [ShuntCompensator] using its grounding terminal.
+     *
+     * This variant is used to enable a DSL style syntax when setting up a [NetworkTrace].
+     * ```
+     * trace.addCondition { stopOnShuntCompensatorGround() }
+     * ```
+     *
+     * @receiver An unused [NetworkStateOperators], which is simply available to enable discovery when using the DSL style.
+     * @return A [NetworkTraceQueueCondition] that results in not queueing when a path attempts to traverse a [ShuntCompensator] using its grounding terminal.
+     */
+    @JvmStatic
+    @Suppress("UnusedReceiverParameter")
+    fun <T> NetworkStateOperators.stopOnShuntCompensatorGround(): QueueCondition<NetworkTraceStep<T>> =
+        ShuntCompensatorCondition.StopOnGround()
+
 }

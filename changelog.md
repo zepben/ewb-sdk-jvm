@@ -14,7 +14,7 @@
 * None.
 
 ### Fixes
-* None.
+* Fixed an error in `PhaseCode` when adding `NONE` which previously resulted in `NONE` instead of the existing `PhaseCode`.
 
 ### Notes
 * None.

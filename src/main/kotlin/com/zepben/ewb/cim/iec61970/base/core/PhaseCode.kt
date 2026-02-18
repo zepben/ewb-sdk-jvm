@@ -22,6 +22,8 @@ import java.util.function.Consumer
  * phases 1 and 2 refer to hot wires that are 180 degrees out of phase, while N refers to the neutral wire. Through single-phase
  * transformer connections, these secondary circuits may be served from one or two of the primary phases A, B, and C. For three-phase
  * loads, use the A, B, C phase codes instead of s12N.
+ *
+ * @param singlePhases The [SinglePhaseKind] that make up this [PhaseCode].
  */
 @Suppress("EnumEntryName")
 enum class PhaseCode(vararg singlePhases: SinglePhaseKind) {
@@ -169,8 +171,14 @@ enum class PhaseCode(vararg singlePhases: SinglePhaseKind) {
      */
     s2N(SinglePhaseKind.s2, SinglePhaseKind.N);
 
+    /**
+     * A list of the [SinglePhaseKind] that make up this [PhaseCode].
+     */
     val singlePhases: List<SinglePhaseKind> = singlePhases.asList().asUnmodifiable()
 
+    /**
+     * The number of phases that make up this [PhaseCode].
+     */
     fun numPhases(): Int {
         return when (this) {
             NONE -> 0
@@ -178,6 +186,9 @@ enum class PhaseCode(vararg singlePhases: SinglePhaseKind) {
         }
     }
 
+    /**
+     * Get a copy of this [PhaseCode] without the neutral phase if it has one.
+     */
     fun withoutNeutral(): PhaseCode {
         return if (!singlePhases.contains(SinglePhaseKind.N))
             this
@@ -185,22 +196,83 @@ enum class PhaseCode(vararg singlePhases: SinglePhaseKind) {
             fromSinglePhases(singlePhases.filter { it != SinglePhaseKind.N })
     }
 
+    /**
+     * Check to see if the [phase] is contained in this [PhaseCode]'s [singlePhases].
+     *
+     * @param phase The [SinglePhaseKind] to check.
+     * @return true if the [phase] is found in the [singlePhases], otherwise false.
+     */
     operator fun contains(phase: SinglePhaseKind): Boolean = singlePhases.contains(phase)
+
+    /**
+     * Add a [SinglePhaseKind] to this [PhaseCode].
+     *
+     * @param phase The [SinglePhaseKind] to add.
+     * @return A [PhaseCode] containing the [singlePhases] of this [PhaseCode] and [phase], or [NONE] if this produces an invalid combination.
+     */
     operator fun plus(phase: SinglePhaseKind): PhaseCode = fromSinglePhases(singlePhases + phase)
+
+    /**
+     * Add a [PhaseCode] to this [PhaseCode] by combining their [singlePhases].
+     *
+     * @param phaseCode The [PhaseCode] to add.
+     * @return A [PhaseCode] containing the [singlePhases] of this [PhaseCode] and [phaseCode], or [NONE] if this produces an invalid combination.
+     */
     operator fun plus(phaseCode: PhaseCode): PhaseCode = fromSinglePhases(singlePhases + phaseCode.singlePhases)
+
+    /**
+     * Remove a [SinglePhaseKind] from this [PhaseCode].
+     *
+     * @param phase The [SinglePhaseKind] to remove.
+     * @return A [PhaseCode] containing the [singlePhases] of this [PhaseCode] without [phase], which will be [NONE] if no phases remain.
+     */
     operator fun minus(phase: SinglePhaseKind): PhaseCode = fromSinglePhases(singlePhases - phase)
+
+    /**
+     * Remove a [SinglePhaseKind] from this [PhaseCode].
+     *
+     * @param phaseCode The [SinglePhaseKind] to remove.
+     * @return A [PhaseCode] containing the [singlePhases] of this [PhaseCode] without the [singlePhases] of [phaseCode], which will be [NONE] if no phases remain.
+     */
     operator fun minus(phaseCode: PhaseCode): PhaseCode = fromSinglePhases(singlePhases - phaseCode.singlePhases.toSet())
 
+    /**
+     * Returns a list containing the results of applying the given transform function to each element in the [singlePhases].
+     *
+     * @param transform The transformation function to apply to each phase.
+     * @return A list of transformer elements.
+     */
     fun <R> map(transform: (SinglePhaseKind) -> R): List<R> = singlePhases.map(transform)
+
+    /**
+     * Check if there are any matches with the [predicate] in the [singlePhases].
+     *
+     * @param predicate The check to perform to each phase.
+     * @return true if there are any matches with the [predicate], otherwise false.
+     */
     fun any(predicate: (SinglePhaseKind) -> Boolean): Boolean = singlePhases.any(predicate)
+
+    /**
+     * Check if all elements in the [singlePhases] match the [predicate].
+     *
+     * @param predicate The check to perform to each phase.
+     * @return true if all elements match the [predicate], otherwise false.
+     */
     fun all(predicate: (SinglePhaseKind) -> Boolean): Boolean = singlePhases.all(predicate)
 
+    /**
+     * Applies an actin to each element in the [singlePhases].
+     *
+     * @param action The function to perform to each phase.
+     */
     fun forEach(action: (SinglePhaseKind) -> Unit) {
         for (element in singlePhases) action(element)
     }
 
     /**
-     * Java interop version to prevent a `return null` or `return Unit.INSTANCE`
+     * Java interop version to prevent a `return null` or `return Unit.INSTANCE`.
+     *
+     * @param action The function to perform to each phase.
      */
     fun forEach(action: Consumer<SinglePhaseKind>) {
         for (element in singlePhases) action.accept(element)
@@ -208,10 +280,17 @@ enum class PhaseCode(vararg singlePhases: SinglePhaseKind) {
 
     init {
         byPhases[singlePhases.toSet()] = this
+        byPhases[singlePhases.toSet() + SinglePhaseKind.NONE] = this
     }
 
     companion object {
 
+        /**
+         * Lookup the [PhaseCode] that contains the [singlePhases].
+         *
+         * @param singlePhases The single phases for the target [PhaseCode].
+         * @return The matching [PhaseCode] if the [singlePhases] are a valid collection, otherwise [NONE]
+         */
         fun fromSinglePhases(singlePhases: Collection<SinglePhaseKind>): PhaseCode {
             return if (singlePhases is Set)
                 byPhases[singlePhases] ?: NONE

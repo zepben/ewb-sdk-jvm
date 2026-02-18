@@ -15,6 +15,7 @@ import java.security.PrivilegedActionException
 import java.security.PrivilegedExceptionAction
 import java.sql.PreparedStatement
 import java.sql.SQLException
+import java.sql.Timestamp
 import java.sql.Types.*
 import java.time.Instant
 import kotlin.reflect.full.memberProperties
@@ -149,6 +150,18 @@ internal fun PreparedStatement.setInstant(queryIndex: Int, value: Instant?) {
     when (value) {
         null -> setNull(queryIndex, VARCHAR)
         else -> setString(queryIndex, value.toString())
+    }
+}
+
+/**
+ * Set a column to a nullable `Timestamp` from an Instant.
+ * @param queryIndex The index of the column to set.
+ * @param value The value to assign to the columns.
+ */
+internal fun PreparedStatement.setTimestamp(queryIndex: Int, value: Instant?) {
+    when (value) {
+        null -> setNull(queryIndex, VARCHAR)
+        else -> setTimestamp(queryIndex, Timestamp.from(value))
     }
 }
 

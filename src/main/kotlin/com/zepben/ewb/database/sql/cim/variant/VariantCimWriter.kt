@@ -21,6 +21,7 @@ import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.infpart303.ne
 import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.infpart303.networkmodelprojects.TableNetworkModelProjectStages
 import com.zepben.ewb.database.sql.extensions.setInstant
 import com.zepben.ewb.database.sql.extensions.setNullableInt
+import com.zepben.ewb.database.sql.extensions.setTimestamp
 import com.zepben.ewb.services.variant.VariantService
 import java.sql.PreparedStatement
 
@@ -43,7 +44,7 @@ class VariantCimWriter(
         val insert = databaseTables.getInsert<TableNetworkModelProjects>()
 
         insert.setNullableString(table.EXTERNAL_STATUS.queryIndex, networkModelProject.externalStatus)
-        insert.setInstant(table.FORECAST_COMMISSION_DATE.queryIndex, networkModelProject.forecastCommissionDate)
+        insert.setTimestamp(table.FORECAST_COMMISSION_DATE.queryIndex, networkModelProject.forecastCommissionDate)
         insert.setNullableString(table.EXTERNAL_DRIVER.queryIndex, networkModelProject.externalDriver)
 
 
@@ -57,9 +58,9 @@ class VariantCimWriter(
         networkModelProjectComponent: NetworkModelProjectComponent,
         description: String
     ): Boolean {
-        insert.setInstant(table.CREATED.queryIndex, networkModelProjectComponent.created)
-        insert.setInstant(table.UPDATED.queryIndex, networkModelProjectComponent.updated)
-        insert.setInstant(table.CLOSED.queryIndex, networkModelProjectComponent.closed)
+        insert.setTimestamp(table.CREATED.queryIndex, networkModelProjectComponent.created)
+        insert.setTimestamp(table.UPDATED.queryIndex, networkModelProjectComponent.updated)
+        insert.setTimestamp(table.CLOSED.queryIndex, networkModelProjectComponent.closed)
         insert.setNullableString(table.PARENT_MRID.queryIndex, networkModelProjectComponent.parent?.mRID)
 
         return writeIdentifiedObject(table, insert, networkModelProjectComponent, description)
@@ -87,11 +88,11 @@ class VariantCimWriter(
         val table = databaseTables.getTable<TableNetworkModelProjectStages>()
         val insert = databaseTables.getInsert<TableNetworkModelProjectStages>()
 
-        insert.setInstant(table.PLANNED_COMMISSION_DATE.queryIndex, networkModelProjectStage.plannedCommissionedDate)
-        insert.setInstant(table.COMMISSIONED_DATE.queryIndex, networkModelProjectStage.commissionedDate)
+        insert.setTimestamp(table.PLANNED_COMMISSION_DATE.queryIndex, networkModelProjectStage.plannedCommissionedDate)
+        insert.setTimestamp(table.COMMISSIONED_DATE.queryIndex, networkModelProjectStage.commissionedDate)
         insert.setNullableInt(table.CONFIDENCE_LEVEL.queryIndex, networkModelProjectStage.confidenceLevel)
         insert.setNullableString(table.BASE_MODEL_VERSION.queryIndex, networkModelProjectStage.baseModelVersion)
-        insert.setInstant(table.LAST_CONFLICT_CHECKED_AT.queryIndex, networkModelProjectStage.lastConflictCheckedAt)
+        insert.setTimestamp(table.LAST_CONFLICT_CHECKED_AT.queryIndex, networkModelProjectStage.lastConflictCheckedAt)
         insert.setNullableString(table.USER_COMMENTS.queryIndex, networkModelProjectStage.userComments)
         insert.setNullableString(table.CHANGE_SET_MRID.queryIndex, networkModelProjectStage.changeSet?.mRID)
 

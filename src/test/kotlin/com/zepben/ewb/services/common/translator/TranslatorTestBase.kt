@@ -203,9 +203,14 @@ internal abstract class TranslatorTestBase<S : BaseService>(
             fun resolve(unresolvedReference: UnresolvedReference<*, *>) {
                 val (_, toMrid, resolver, _) = unresolvedReference
                 try {
-                    val io = abstractCreators[resolver.toClass]?.invoke(toMrid) ?: resolver.toClass.getDeclaredConstructor(String::class.java)
-                        .newInstance(toMrid)
-                    io.also { service.tryAdd(it) }
+                    val io = abstractCreators[resolver.toClass]?.invoke(toMrid)
+                        ?: resolver.toClass.getDeclaredConstructor(String::class.java).newInstance(toMrid)
+
+                    // Special case for the shunt compensator grounding terminal which must have phase N.
+                    if (resolver is ShuntCompensatorToTerminalResolver)
+                        (io as Terminal).phases = PhaseCode.N
+
+                    service.tryAdd(io)
                 } catch (e: Exception) {
                     // If this fails you need to add a concrete type mapping to the abstractCreators map at the top of this class.
                     fail("Failed to create unresolved reference for ${resolver.toClass}.", e)

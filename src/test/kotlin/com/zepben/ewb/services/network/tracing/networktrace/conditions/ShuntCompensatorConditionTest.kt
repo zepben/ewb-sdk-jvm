@@ -9,6 +9,7 @@
 package com.zepben.ewb.services.network.tracing.networktrace.conditions
 
 import com.zepben.ewb.cim.iec61970.base.core.ConductingEquipment
+import com.zepben.ewb.cim.iec61970.base.core.PhaseCode
 import com.zepben.ewb.cim.iec61970.base.core.Terminal
 import com.zepben.ewb.cim.iec61970.base.wires.LinearShuntCompensator
 import com.zepben.ewb.services.common.testdata.generateId
@@ -24,7 +25,7 @@ class ShuntCompensatorConditionTest {
     private val shuntCompensator = LinearShuntCompensator("sc")
     private val fromTerm = Terminal(mRID = generateId()).also { shuntCompensator.addTerminal(it) }
     private val toTerm = Terminal(mRID = generateId()).also { shuntCompensator.addTerminal(it) }
-    private val groundTerm = Terminal(mRID = generateId()).also { shuntCompensator.groundingTerminal = it }
+    private val groundTerm = Terminal(mRID = generateId()).apply { phases = PhaseCode.N }.also { shuntCompensator.groundingTerminal = it }
 
     @Test
     fun `always queues external steps`() {

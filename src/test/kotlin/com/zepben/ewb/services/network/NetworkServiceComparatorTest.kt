@@ -1788,8 +1788,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         comparatorValidator.validateProperty(
             ShuntCompensator::groundingTerminal,
             createShuntCompensator,
-            { Terminal("t1") },
-            { Terminal("t2") },
+            { Terminal("t1").apply { phases = PhaseCode.N } },
+            { Terminal("t2").apply { phases = PhaseCode.N } },
             expectedDifferences = setOf("terminals"), // The terminals should be different as setting the groundingTerminal also adds the terminal.
         )
     }

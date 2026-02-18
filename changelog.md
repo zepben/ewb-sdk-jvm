@@ -1,11 +1,12 @@
 # Zepben EWB SDK changelog
 ## [1.6.0] - UNRELEASED
 ### Breaking Changes
-* A `ShuntCompensator.groundingTerminal` must belong to the `ShuntCompensator`. Assigning a `Terminal` to `ShuntCompensator.groundingTerminal` will now set the
-  terminals `conductingEquipment` to the `ShuntCompensator` if it isn't set, and throw an `IllegalArgumentException` if it is assigned to a different
-  `ConductingEquipment`.
-* `ShuntCompensator.groundingTerminal` must be in the `terminals` collection, and will be added automatically if it is missing on assignment, which in turn will
-  update the `sequenceNumber` of the `Terminal` if it is `0`.
+* The `ShuntCompensator.groundingTerminal` must now:
+  * Belong to the `ShuntCompensator`. Assigning a `Terminal` to `ShuntCompensator.groundingTerminal` will now set the terminals `conductingEquipment` to the
+    `ShuntCompensator` if it isn't set, and throw an `IllegalArgumentException` if it is assigned to a different `ConductingEquipment`.
+  * Be in the `ShuntCompensator.terminals` collection, and will be added automatically if it is missing on assignment, which in turn will update the
+    `sequenceNumber` of the `Terminal` if it is `0`.
+  * Have phases `N`.
 
 ### New Features
 * Added `Conditions.stopOnShuntCompensatorGround`, a new condition to prevent tracing through a `ShuntCompensator` using its grounding terminal.

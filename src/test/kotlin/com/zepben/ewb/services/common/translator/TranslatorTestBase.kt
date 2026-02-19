@@ -20,6 +20,8 @@ import com.zepben.ewb.database.sql.common.tables.SqlTable
 import com.zepben.ewb.database.sql.common.tables.TableVersion
 import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.common.BaseServiceComparator
+import com.zepben.ewb.services.common.ShuntCompensatorToTerminalResolver
+import com.zepben.ewb.services.common.UnresolvedReference
 import com.zepben.ewb.services.common.testdata.SchemaServices
 import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.testutils.junit.SystemLogExtension
@@ -197,16 +199,38 @@ internal abstract class TranslatorTestBase<S : BaseService>(
             // We need to convert the populated item before we check the differences, so we can complete the unresolved references.
             val service = createService()
             val convertedCim = translate(service, cim)!!
-            service.unresolvedReferences().toList().forEach { (_, toMrid, resolver, _) ->
+
+            fun resolve(unresolvedReference: UnresolvedReference<*, *>) {
+                val (_, toMrid, resolver, _) = unresolvedReference
                 try {
-                    val io = abstractCreators[resolver.toClass]?.invoke(toMrid) ?: resolver.toClass.getDeclaredConstructor(String::class.java)
-                        .newInstance(toMrid)
-                    io.also { service.tryAdd(it) }
+                    val io = abstractCreators[resolver.toClass]?.invoke(toMrid)
+                        ?: resolver.toClass.getDeclaredConstructor(String::class.java).newInstance(toMrid)
+
+                    // Special case for the shunt compensator grounding terminal which must have phase N.
+                    if (resolver is ShuntCompensatorToTerminalResolver)
+                        (io as Terminal).phases = PhaseCode.N
+
+                    service.tryAdd(io)
                 } catch (e: Exception) {
                     // If this fails you need to add a concrete type mapping to the abstractCreators map at the top of this class.
                     fail("Failed to create unresolved reference for ${resolver.toClass}.", e)
                 }
             }
+
+            fun Sequence<UnresolvedReference<*, *>>.resolveAll(predicate: (UnresolvedReference<*, *>) -> Boolean) =
+                filter(predicate).toList().forEach { resolve(it) }
+
+            //
+            // NOTE: We need a special case to exclude any `ShuntCompensator.groundingTerminal` resolvers to ensure it is added after any other
+            //       terminals, to prevent assigning incorrect sequence numbers when we create unresolved terminals. This is complicated by
+            //       having a matching resolver being added in the `ConductingEquipment.terminals` that also needs to be delayed.
+            //
+            val delayIds = service.unresolvedReferences().filter { it.resolver is ShuntCompensatorToTerminalResolver }.map { it.toMrid }.toSet()
+            if (delayIds.isNotEmpty())
+                service.unresolvedReferences().resolveAll { it.toMrid !in delayIds }
+
+            service.unresolvedReferences().resolveAll { true }
+
             return convertedCim
         }
 

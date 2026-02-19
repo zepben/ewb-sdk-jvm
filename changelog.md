@@ -1,16 +1,24 @@
 # Zepben EWB SDK changelog
 ## [1.6.0] - UNRELEASED
 ### Breaking Changes
-* None.
+* The `ShuntCompensator.groundingTerminal` must now:
+  * Belong to the `ShuntCompensator`. Assigning a `Terminal` to `ShuntCompensator.groundingTerminal` will now set the terminals `conductingEquipment` to the
+    `ShuntCompensator` if it isn't set, and throw an `IllegalArgumentException` if it is assigned to a different `ConductingEquipment`.
+  * Be in the `ShuntCompensator.terminals` collection, and will be added automatically if it is missing on assignment, which in turn will update the
+    `sequenceNumber` of the `Terminal` if it is `0`.
+  * Have phases `N`.
+* Phase paths through a `ShuntCompensator` now add paths for mismatched phases between the grounding and normal terminals. This works in the same way as the
+  `PowerTransformer`. This will only impact traces that are tracking the included phase paths, and will allow traces that previously stopped at the
+  `ShuntCompensator` to continue. You should use the new `stopOnShuntCompensatorGround` condition to maintain current behaviour.
 
 ### New Features
-* None.
+* Added `Conditions.stopOnShuntCompensatorGround`, a new condition to prevent tracing through a `ShuntCompensator` using its grounding terminal.
 
 ### Enhancements
 * None.
 
 ### Fixes
-* None.
+* Fixed an error in `PhaseCode` when adding `NONE` which previously resulted in `NONE` instead of the existing `PhaseCode`.
 
 ### Notes
 * None.
@@ -90,8 +98,7 @@
 * Added helper function `AcLineSegment.wireInfoForPhase()` for retrieving the `WireInfo` for a given phase of a conductor.
 * Added helper function `EquipmentContainer.edgeTerminals()` for retrieving all terminals on the edge of an `EquipmentContainer`.
 * Added support to filter NetworkHierarchy responses when calling `NetworkConsumerClient.getNetworkHierarchy()`. A client can now choose what hierarchy
-  containers should
-  be populated in the response.
+  containers should be populated in the response.
 * Added `EquipmentContainer.edgeTerminals()` to retrieve all terminals connecting outside of the `EquipmentContainer`.
 * Added `AcLineSegment.wireInfoForPhase(phase: SinglePhaseKind)` to retrieve the `WireInfo` associated with a given phase of a conductor.
 

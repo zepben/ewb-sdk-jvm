@@ -553,11 +553,12 @@ fun Asset.fillFields(service: NetworkService, includeRuntime: Boolean = true): A
     (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
 
     addOrganisationRole(AssetOwner(generateId()).also { service.add(it) })
-    for (i in 0..1)
+    repeat(2) {
         addPowerSystemResource(Junction(generateId()).also {
             it.addAsset(this)
             service.add(it)
         })
+    }
 
     location = Location(generateId()).also { service.add(it) }
 
@@ -979,11 +980,12 @@ fun PowerSystemResource.fillFields(service: NetworkService, includeRuntime: Bool
     location = Location(generateId()).apply { addPoint(PositionPoint(3.3, 4.4)) }.also { service.add(it) }
     numControls = 5
 
-    for (i in 0..1)
+    repeat(2) {
         addAsset(Pole(generateId()).also {
             it.addPowerSystemResource(this)
             service.add(it)
         })
+    }
 
     return this
 }
@@ -1731,7 +1733,10 @@ fun ShuntCompensator.fillFields(service: NetworkService, includeRuntime: Boolean
     nomU = 1
     phaseConnection = PhaseShuntConnectionKind.I
     sections = 2.2
-    groundingTerminal = Terminal(generateId()).also { service.add(it) }
+
+    // Grounding terminal must have phase N.
+    terminals.last().phases = PhaseCode.N
+    groundingTerminal = terminals.last()
 
     return this
 }

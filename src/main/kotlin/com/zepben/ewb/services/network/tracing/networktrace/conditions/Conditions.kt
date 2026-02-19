@@ -9,6 +9,7 @@
 package com.zepben.ewb.services.network.tracing.networktrace.conditions
 
 import com.zepben.ewb.cim.iec61970.base.core.ConductingEquipment
+import com.zepben.ewb.cim.iec61970.base.wires.ShuntCompensator
 import com.zepben.ewb.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.ewb.cim.iec61970.base.wires.Switch
 import com.zepben.ewb.services.network.tracing.feeder.FeederDirection
@@ -66,7 +67,8 @@ object Conditions {
      * trace.addCondition { withDirection(FeederDirection.BOTH) }
      * ```
      *
-     * @return A [NetworkTraceQueueCondition] that results in upstream tracing.
+     * @param direction The feeder direction to trace.
+     * @return A [NetworkTraceQueueCondition] that results in directional tracing.
      */
     @JvmStatic
     fun <T> NetworkStateOperators.withDirection(direction: FeederDirection): QueueCondition<NetworkTraceStep<T>> =
@@ -123,7 +125,7 @@ object Conditions {
 
     /**
      * Overload of [limitEquipmentSteps] for Java interop.
-     *s
+     *
      * @param limit The maximum number of steps allowed on the specified equipment type before stopping.
      * @param equipmentType The class of the equipment type to track against the limit.
      * @return A [NetworkTraceStopCondition] that stops the trace when the step limit is reached for the specified equipment type.
@@ -131,5 +133,30 @@ object Conditions {
     @JvmStatic
     fun <T> limitEquipmentSteps(limit: Int, equipmentType: Class<out ConductingEquipment>): StopCondition<NetworkTraceStep<T>> =
         limitEquipmentSteps(limit, equipmentType.kotlin)
+
+    /**
+     * Creates a [NetworkTrace] condition that stops tracing a path if it attempts to traverse a [ShuntCompensator] using its grounding terminal.
+     *
+     * @return A [NetworkTraceQueueCondition] that results in not queueing when a path attempts to traverse a [ShuntCompensator] using its grounding terminal.
+     */
+    @JvmStatic
+    fun <T> stopOnShuntCompensatorGround(): QueueCondition<NetworkTraceStep<T>> =
+        ShuntCompensatorCondition.StopOnGround()
+
+    /**
+     * Creates a [NetworkTrace] condition that stops tracing a path if it attempts to traverse a [ShuntCompensator] using its grounding terminal.
+     *
+     * This variant is used to enable a DSL style syntax when setting up a [NetworkTrace].
+     * ```
+     * trace.addCondition { stopOnShuntCompensatorGround() }
+     * ```
+     *
+     * @receiver An unused [NetworkStateOperators], which is simply available to enable discovery when using the DSL style.
+     * @return A [NetworkTraceQueueCondition] that results in not queueing when a path attempts to traverse a [ShuntCompensator] using its grounding terminal.
+     */
+    @JvmStatic
+    @Suppress("UnusedReceiverParameter")
+    fun <T> NetworkStateOperators.stopOnShuntCompensatorGround(): QueueCondition<NetworkTraceStep<T>> =
+        ShuntCompensatorCondition.StopOnGround()
 
 }

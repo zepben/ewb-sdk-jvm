@@ -17,6 +17,7 @@ import com.zepben.ewb.services.network.tracing.networktrace.Tracing
 import com.zepben.ewb.services.network.tracing.networktrace.conditions.Conditions.downstream
 import com.zepben.ewb.services.network.tracing.networktrace.run
 import com.zepben.ewb.services.network.tracing.traversal.StepContext
+import com.zepben.ewb.testing.TestNetworkBuilder
 import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.every
 import io.mockk.justRun
@@ -243,6 +244,29 @@ internal class EquipmentTreeBuilderTest {
         assertThat(findNodeDepths(root, "acLineSegment14"), equalTo(listOf(9, 11, 11)))
         assertThat(findNodeDepths(root, "acLineSegment15"), equalTo(listOf(7, 10, 12, 13)))
         assertThat(findNodeDepths(root, "acLineSegment16"), equalTo(listOf(8, 9, 11, 14)))
+    }
+
+    @Test
+    fun `builds tree for empty feeder`() {
+        val n = TestNetworkBuilder()
+            .fromBreaker() // b0
+            .addFeeder("b0")
+            .build()
+
+        n.get<ConductingEquipment>("b0")!!.also { DirectionLogger.trace(it) }
+
+        val start: ConductingEquipment = n["b0"]!!
+        assertThat(start, notNullValue())
+        val treeBuilder = EquipmentTreeBuilder()
+        Tracing.networkTraceBranching()
+            .addCondition { downstream() }
+            .addStepAction(treeBuilder)
+            .run(start)
+
+        val root = treeBuilder.roots.first()
+
+        assertThat(root, notNullValue())
+        assertTreeAsset(root, n["b0"], null, arrayOf())
     }
 
     private fun assertTreeAsset(

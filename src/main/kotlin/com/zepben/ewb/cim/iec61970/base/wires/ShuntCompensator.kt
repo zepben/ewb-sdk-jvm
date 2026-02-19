@@ -10,6 +10,7 @@ package com.zepben.ewb.cim.iec61970.base.wires
 
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.iec61968.assetinfo.ShuntCompensatorInfo
+import com.zepben.ewb.cim.iec61970.base.core.PhaseCode
 import com.zepben.ewb.cim.iec61970.base.core.Terminal
 
 /**
@@ -44,5 +45,22 @@ abstract class ShuntCompensator(mRID: String) : RegulatingCondEq(mRID) {
 
     @ZBEX
     var groundingTerminal: Terminal? = null
+        set(value) {
+            if (value == null) {
+                field = null
+                return
+            }
+
+            if (value.conductingEquipment == null)
+                value.conductingEquipment = this
+
+            require(value.conductingEquipment == this) { "The grounding terminal must belong to this ShuntCompensator." }
+            require(value.phases == PhaseCode.N) { "The grounding terminal must used nominal phases `N`." }
+
+            if (value !in terminals)
+                addTerminal(value)
+
+            field = value
+        }
 
 }

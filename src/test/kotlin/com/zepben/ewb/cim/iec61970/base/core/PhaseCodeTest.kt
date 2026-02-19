@@ -112,6 +112,10 @@ internal class PhaseCodeTest {
         // Returns NONE for invalid additions.
         assertThat(PhaseCode.ABCN + SinglePhaseKind.X, equalTo(PhaseCode.NONE))
         assertThat(PhaseCode.ABCN + PhaseCode.X, equalTo(PhaseCode.NONE))
+
+        // Can add with NONE.
+        assertThat(PhaseCode.NONE + SinglePhaseKind.A, equalTo(PhaseCode.A))
+        assertThat(PhaseCode.B + SinglePhaseKind.NONE, equalTo(PhaseCode.B))
     }
 
     @Test
@@ -125,6 +129,9 @@ internal class PhaseCodeTest {
         assertThat(PhaseCode.AB - PhaseCode.C, equalTo(PhaseCode.AB))
 
         assertThat(PhaseCode.ABCN - PhaseCode.ABCN, equalTo(PhaseCode.NONE))
+
+        assertThat(PhaseCode.NONE - SinglePhaseKind.A, equalTo(PhaseCode.NONE))
+        assertThat(PhaseCode.B - SinglePhaseKind.NONE, equalTo(PhaseCode.B))
     }
 
     @Test

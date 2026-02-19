@@ -10,6 +10,7 @@ package com.zepben.ewb.services.network.tracing.connectivity
 
 import com.zepben.ewb.cim.iec61970.base.core.Terminal
 import com.zepben.ewb.cim.iec61970.base.wires.PowerTransformer
+import com.zepben.ewb.cim.iec61970.base.wires.ShuntCompensator
 import com.zepben.ewb.cim.iec61970.base.wires.SinglePhaseKind as SPK
 
 /**
@@ -33,35 +34,43 @@ object TerminalConnectivityInternal {
         otherTerminal: Terminal,
         includePhases: Set<SPK> = terminal.phases.singlePhases.toSet()
     ): ConnectivityResult =
-        if (terminal.conductingEquipment is PowerTransformer)
-            transformerTerminalConnectivity(terminal, otherTerminal, includePhases)
-        else
-            straightTerminalConnectivity(terminal, otherTerminal, includePhases)
+        ConnectivityResult.between(
+            fromTerminal = terminal,
+            toTerminal = otherTerminal,
+            nominalPhasePaths = when (terminal.conductingEquipment) {
+                is PowerTransformer -> findTransformerPhasePaths(terminal, otherTerminal, includePhases)
+                is ShuntCompensator -> findShuntCompensatorPhasePaths(terminal, otherTerminal, includePhases)
+                else -> findStraightPhasePaths(terminal, otherTerminal, includePhases)
+            },
+        )
 
-    private fun transformerTerminalConnectivity(
+    private fun findTransformerPhasePaths(
         terminal: Terminal,
         otherTerminal: Terminal,
         includePhases: Set<SPK>
-    ): ConnectivityResult =
-        ConnectivityResult.between(
-            terminal,
-            otherTerminal,
-            (TransformerPhasePaths.lookup[terminal.phases]?.let { it[otherTerminal.phases] } ?: emptyList())
-                .filter { (it.from in includePhases) || (it.from == SPK.NONE) }
-        )
+    ): Collection<NominalPhasePath> =
+        (TransformerPhasePaths.lookup[terminal.phases]?.let { it[otherTerminal.phases] }.orEmpty())
+            .filter { (it.from in includePhases) || (it.from == SPK.NONE) }
 
-    private fun straightTerminalConnectivity(
+    private fun findShuntCompensatorPhasePaths(
         terminal: Terminal,
         otherTerminal: Terminal,
         includePhases: Set<SPK>
-    ): ConnectivityResult =
-        ConnectivityResult.between(
-            terminal,
-            otherTerminal,
-            terminal.phases.singlePhases.toSet()
-                .intersect(otherTerminal.phases.singlePhases.toSet())
-                .filter { it in includePhases }
-                .map { NominalPhasePath(it, it) }
-        )
+    ): Collection<NominalPhasePath> =
+        when ((terminal.conductingEquipment as ShuntCompensator).groundingTerminal) {
+            terminal -> otherTerminal.phases.singlePhases.map { NominalPhasePath(SPK.NONE, it) }
+            otherTerminal -> setOf(NominalPhasePath(SPK.NONE, SPK.N))
+            else -> findStraightPhasePaths(terminal, otherTerminal, includePhases)
+        }
+
+    private fun findStraightPhasePaths(
+        terminal: Terminal,
+        otherTerminal: Terminal,
+        includePhases: Set<SPK>
+    ): List<NominalPhasePath> =
+        terminal.phases.singlePhases.toSet()
+            .intersect(otherTerminal.phases.singlePhases.toSet())
+            .filter { it in includePhases }
+            .map { NominalPhasePath(it, it) }
 
 }

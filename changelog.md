@@ -7,6 +7,9 @@
   * Be in the `ShuntCompensator.terminals` collection, and will be added automatically if it is missing on assignment, which in turn will update the
     `sequenceNumber` of the `Terminal` if it is `0`.
   * Have phases `N`.
+* Phase paths through a `ShuntCompensator` now add paths for mismatched phases between the grounding and normal terminals. This works in the same way as the
+  `PowerTransformer`. This will only impact traces that are tracking the included phase paths, and will allow traces that previously stopped at the
+  `ShuntCompensator` to continue. You should use the new `stopOnShuntCompensatorGround` condition to maintain current behaviour.
 
 ### New Features
 * Added `Conditions.stopOnShuntCompensatorGround`, a new condition to prevent tracing through a `ShuntCompensator` using its grounding terminal.

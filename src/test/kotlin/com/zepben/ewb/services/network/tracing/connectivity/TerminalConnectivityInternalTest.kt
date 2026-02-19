@@ -8,8 +8,11 @@
 
 package com.zepben.ewb.services.network.tracing.connectivity
 
+import com.zepben.ewb.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.ewb.cim.iec61970.base.core.PhaseCode
 import com.zepben.ewb.cim.iec61970.base.core.Terminal
+import com.zepben.ewb.cim.iec61970.base.wires.AcLineSegment
+import com.zepben.ewb.cim.iec61970.base.wires.LinearShuntCompensator
 import com.zepben.ewb.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.testutils.junit.SystemLogExtension
@@ -18,6 +21,7 @@ import org.hamcrest.Matchers.containsInAnyOrder
 import org.hamcrest.Matchers.empty
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import kotlin.reflect.full.primaryConstructor
 
 internal class TerminalConnectivityInternalTest {
 
@@ -27,288 +31,399 @@ internal class TerminalConnectivityInternalTest {
 
     @Test
     internal fun pathsThroughHv3Tx() {
-        validateTxPaths(PhaseCode.ABC, PhaseCode.ABC)
-        validateTxPaths(PhaseCode.ABC, PhaseCode.ABCN)
-        validateTxPaths(PhaseCode.ABCN, PhaseCode.ABC)
+        validatePathsThrough<PowerTransformer>(
+            PhaseCode.ABC to PhaseCode.ABC returns PhaseCode.ABC,
+            PhaseCode.ABC to PhaseCode.ABCN returns PhaseCode.ABCN,
+            PhaseCode.ABCN to PhaseCode.ABC returns PhaseCode.ABC,
+        )
     }
 
     @Test
     internal fun pathsThroughHv1Hv1Tx() {
-        validateTxPaths(PhaseCode.AB, PhaseCode.AB)
-        validateTxPaths(PhaseCode.BC, PhaseCode.BC)
-        validateTxPaths(PhaseCode.AC, PhaseCode.AC)
+        validatePathsThrough<PowerTransformer>(
+            PhaseCode.AB to PhaseCode.AB returns PhaseCode.AB,
+            PhaseCode.BC to PhaseCode.BC returns PhaseCode.BC,
+            PhaseCode.AC to PhaseCode.AC returns PhaseCode.AC,
 
-        validateTxPaths(PhaseCode.AB, PhaseCode.XY)
-        validateTxPaths(PhaseCode.BC, PhaseCode.XY)
-        validateTxPaths(PhaseCode.AC, PhaseCode.XY)
+            PhaseCode.AB to PhaseCode.XY returns PhaseCode.XY,
+            PhaseCode.BC to PhaseCode.XY returns PhaseCode.XY,
+            PhaseCode.AC to PhaseCode.XY returns PhaseCode.XY,
 
-        validateTxPaths(PhaseCode.XY, PhaseCode.AB)
-        validateTxPaths(PhaseCode.XY, PhaseCode.BC)
-        validateTxPaths(PhaseCode.XY, PhaseCode.AC)
-        validateTxPaths(PhaseCode.XY, PhaseCode.XY)
+            PhaseCode.XY to PhaseCode.AB returns PhaseCode.AB,
+            PhaseCode.XY to PhaseCode.BC returns PhaseCode.BC,
+            PhaseCode.XY to PhaseCode.AC returns PhaseCode.AC,
+            PhaseCode.XY to PhaseCode.XY returns PhaseCode.XY,
+        )
     }
 
     @Test
     internal fun pathsThroughHv1Lv2Tx() {
-        validateTxPaths(PhaseCode.AB, PhaseCode.ABN)
-        validateTxPaths(PhaseCode.AB, PhaseCode.BCN, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.AB, PhaseCode.ACN, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.AB, PhaseCode.XYN)
+        validatePathsThrough<PowerTransformer>(
+            PhaseCode.AB to PhaseCode.ABN returns PhaseCode.ABN,
+            PhaseCode.AB to PhaseCode.BCN returns PhaseCode.NONE,
+            PhaseCode.AB to PhaseCode.ACN returns PhaseCode.NONE,
+            PhaseCode.AB to PhaseCode.XYN returns PhaseCode.XYN,
 
-        validateTxPaths(PhaseCode.BC, PhaseCode.ABN, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.BC, PhaseCode.BCN)
-        validateTxPaths(PhaseCode.BC, PhaseCode.ACN, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.BC, PhaseCode.XYN)
+            PhaseCode.BC to PhaseCode.ABN returns PhaseCode.NONE,
+            PhaseCode.BC to PhaseCode.BCN returns PhaseCode.BCN,
+            PhaseCode.BC to PhaseCode.ACN returns PhaseCode.NONE,
+            PhaseCode.BC to PhaseCode.XYN returns PhaseCode.XYN,
 
-        validateTxPaths(PhaseCode.AC, PhaseCode.ABN, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.AC, PhaseCode.BCN, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.AC, PhaseCode.ACN)
-        validateTxPaths(PhaseCode.AC, PhaseCode.XYN)
+            PhaseCode.AC to PhaseCode.ABN returns PhaseCode.NONE,
+            PhaseCode.AC to PhaseCode.BCN returns PhaseCode.NONE,
+            PhaseCode.AC to PhaseCode.ACN returns PhaseCode.ACN,
+            PhaseCode.AC to PhaseCode.XYN returns PhaseCode.XYN,
 
-        validateTxPaths(PhaseCode.XY, PhaseCode.ABN)
-        validateTxPaths(PhaseCode.XY, PhaseCode.ACN)
-        validateTxPaths(PhaseCode.XY, PhaseCode.BCN)
-        validateTxPaths(PhaseCode.XY, PhaseCode.XYN)
+            PhaseCode.XY to PhaseCode.ABN returns PhaseCode.ABN,
+            PhaseCode.XY to PhaseCode.ACN returns PhaseCode.ACN,
+            PhaseCode.XY to PhaseCode.BCN returns PhaseCode.BCN,
+            PhaseCode.XY to PhaseCode.XYN returns PhaseCode.XYN,
+        )
     }
 
     @Test
     internal fun pathsThroughHv1Lv1Tx() {
-        validateTxPaths(PhaseCode.AB, PhaseCode.AN)
-        validateTxPaths(PhaseCode.AB, PhaseCode.BN, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.AB, PhaseCode.CN, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.AB, PhaseCode.XN)
+        validatePathsThrough<PowerTransformer>(
+            PhaseCode.AB to PhaseCode.AN returns PhaseCode.AN,
+            PhaseCode.AB to PhaseCode.BN returns PhaseCode.NONE,
+            PhaseCode.AB to PhaseCode.CN returns PhaseCode.NONE,
+            PhaseCode.AB to PhaseCode.XN returns PhaseCode.XN,
 
-        validateTxPaths(PhaseCode.BC, PhaseCode.AN, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.BC, PhaseCode.BN)
-        validateTxPaths(PhaseCode.BC, PhaseCode.CN, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.BC, PhaseCode.XN)
+            PhaseCode.BC to PhaseCode.AN returns PhaseCode.NONE,
+            PhaseCode.BC to PhaseCode.BN returns PhaseCode.BN,
+            PhaseCode.BC to PhaseCode.CN returns PhaseCode.NONE,
+            PhaseCode.BC to PhaseCode.XN returns PhaseCode.XN,
 
-        validateTxPaths(PhaseCode.AC, PhaseCode.AN, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.AC, PhaseCode.BN, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.AC, PhaseCode.CN)
-        validateTxPaths(PhaseCode.AC, PhaseCode.XN)
+            PhaseCode.AC to PhaseCode.AN returns PhaseCode.NONE,
+            PhaseCode.AC to PhaseCode.BN returns PhaseCode.NONE,
+            PhaseCode.AC to PhaseCode.CN returns PhaseCode.CN,
+            PhaseCode.AC to PhaseCode.XN returns PhaseCode.XN,
 
-        validateTxPaths(PhaseCode.XY, PhaseCode.AN)
-        validateTxPaths(PhaseCode.XY, PhaseCode.BN)
-        validateTxPaths(PhaseCode.XY, PhaseCode.CN)
-        validateTxPaths(PhaseCode.XY, PhaseCode.XN)
+            PhaseCode.XY to PhaseCode.AN returns PhaseCode.AN,
+            PhaseCode.XY to PhaseCode.BN returns PhaseCode.BN,
+            PhaseCode.XY to PhaseCode.CN returns PhaseCode.CN,
+            PhaseCode.XY to PhaseCode.XN returns PhaseCode.XN,
+        )
     }
 
     @Test
     internal fun pathsThroughLv2Lv2Tx() {
-        validateTxPaths(PhaseCode.ABN, PhaseCode.ABN)
-        validateTxPaths(PhaseCode.BCN, PhaseCode.BCN)
-        validateTxPaths(PhaseCode.ACN, PhaseCode.ACN)
+        validatePathsThrough<PowerTransformer>(
+            PhaseCode.ABN to PhaseCode.ABN returns PhaseCode.ABN,
+            PhaseCode.BCN to PhaseCode.BCN returns PhaseCode.BCN,
+            PhaseCode.ACN to PhaseCode.ACN returns PhaseCode.ACN,
 
-        validateTxPaths(PhaseCode.ABN, PhaseCode.XYN)
-        validateTxPaths(PhaseCode.BCN, PhaseCode.XYN)
-        validateTxPaths(PhaseCode.ACN, PhaseCode.XYN)
+            PhaseCode.ABN to PhaseCode.XYN returns PhaseCode.XYN,
+            PhaseCode.BCN to PhaseCode.XYN returns PhaseCode.XYN,
+            PhaseCode.ACN to PhaseCode.XYN returns PhaseCode.XYN,
 
-        validateTxPaths(PhaseCode.XYN, PhaseCode.ABN)
-        validateTxPaths(PhaseCode.XYN, PhaseCode.BCN)
-        validateTxPaths(PhaseCode.XYN, PhaseCode.ACN)
-        validateTxPaths(PhaseCode.XYN, PhaseCode.XYN)
+            PhaseCode.XYN to PhaseCode.ABN returns PhaseCode.ABN,
+            PhaseCode.XYN to PhaseCode.BCN returns PhaseCode.BCN,
+            PhaseCode.XYN to PhaseCode.ACN returns PhaseCode.ACN,
+            PhaseCode.XYN to PhaseCode.XYN returns PhaseCode.XYN,
+        )
     }
 
     @Test
     internal fun pathsThroughLv2Hv1Tx() {
-        validateTxPaths(PhaseCode.ABN, PhaseCode.AB)
-        validateTxPaths(PhaseCode.ABN, PhaseCode.BC, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.ABN, PhaseCode.AC, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.ABN, PhaseCode.XY)
+        validatePathsThrough<PowerTransformer>(
+            PhaseCode.ABN to PhaseCode.AB returns PhaseCode.AB,
+            PhaseCode.ABN to PhaseCode.BC returns PhaseCode.NONE,
+            PhaseCode.ABN to PhaseCode.AC returns PhaseCode.NONE,
+            PhaseCode.ABN to PhaseCode.XY returns PhaseCode.XY,
 
-        validateTxPaths(PhaseCode.BCN, PhaseCode.AB, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.BCN, PhaseCode.BC)
-        validateTxPaths(PhaseCode.BCN, PhaseCode.AC, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.BCN, PhaseCode.XY)
+            PhaseCode.BCN to PhaseCode.AB returns PhaseCode.NONE,
+            PhaseCode.BCN to PhaseCode.BC returns PhaseCode.BC,
+            PhaseCode.BCN to PhaseCode.AC returns PhaseCode.NONE,
+            PhaseCode.BCN to PhaseCode.XY returns PhaseCode.XY,
 
-        validateTxPaths(PhaseCode.ACN, PhaseCode.AB, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.ACN, PhaseCode.BC, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.ACN, PhaseCode.AC)
-        validateTxPaths(PhaseCode.ACN, PhaseCode.XY)
+            PhaseCode.ACN to PhaseCode.AB returns PhaseCode.NONE,
+            PhaseCode.ACN to PhaseCode.BC returns PhaseCode.NONE,
+            PhaseCode.ACN to PhaseCode.AC returns PhaseCode.AC,
+            PhaseCode.ACN to PhaseCode.XY returns PhaseCode.XY,
 
-        validateTxPaths(PhaseCode.XYN, PhaseCode.AB)
-        validateTxPaths(PhaseCode.XYN, PhaseCode.BC)
-        validateTxPaths(PhaseCode.XYN, PhaseCode.AC)
-        validateTxPaths(PhaseCode.XYN, PhaseCode.XY)
+            PhaseCode.XYN to PhaseCode.AB returns PhaseCode.AB,
+            PhaseCode.XYN to PhaseCode.BC returns PhaseCode.BC,
+            PhaseCode.XYN to PhaseCode.AC returns PhaseCode.AC,
+            PhaseCode.XYN to PhaseCode.XY returns PhaseCode.XY,
+        )
     }
 
     @Test
     internal fun pathsThroughLv1Hv1Tx() {
-        validateTxPaths(PhaseCode.AN, PhaseCode.AB)
-        validateTxPaths(PhaseCode.AN, PhaseCode.BC, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.AN, PhaseCode.AC, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.AN, PhaseCode.XY)
+        validatePathsThrough<PowerTransformer>(
+            PhaseCode.AN to PhaseCode.AB returns PhaseCode.AB,
+            PhaseCode.AN to PhaseCode.BC returns PhaseCode.NONE,
+            PhaseCode.AN to PhaseCode.AC returns PhaseCode.NONE,
+            PhaseCode.AN to PhaseCode.XY returns PhaseCode.XY,
 
-        validateTxPaths(PhaseCode.BN, PhaseCode.AB, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.BN, PhaseCode.BC)
-        validateTxPaths(PhaseCode.BN, PhaseCode.AC, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.BN, PhaseCode.XY)
+            PhaseCode.BN to PhaseCode.AB returns PhaseCode.NONE,
+            PhaseCode.BN to PhaseCode.BC returns PhaseCode.BC,
+            PhaseCode.BN to PhaseCode.AC returns PhaseCode.NONE,
+            PhaseCode.BN to PhaseCode.XY returns PhaseCode.XY,
 
-        validateTxPaths(PhaseCode.CN, PhaseCode.AB, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.CN, PhaseCode.BC, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.CN, PhaseCode.AC)
-        validateTxPaths(PhaseCode.CN, PhaseCode.XY)
+            PhaseCode.CN to PhaseCode.AB returns PhaseCode.NONE,
+            PhaseCode.CN to PhaseCode.BC returns PhaseCode.NONE,
+            PhaseCode.CN to PhaseCode.AC returns PhaseCode.AC,
+            PhaseCode.CN to PhaseCode.XY returns PhaseCode.XY,
 
-        validateTxPaths(PhaseCode.XN, PhaseCode.AB)
-        validateTxPaths(PhaseCode.XN, PhaseCode.BC)
-        validateTxPaths(PhaseCode.XN, PhaseCode.AC)
-        validateTxPaths(PhaseCode.XN, PhaseCode.XY)
+            PhaseCode.XN to PhaseCode.AB returns PhaseCode.AB,
+            PhaseCode.XN to PhaseCode.BC returns PhaseCode.BC,
+            PhaseCode.XN to PhaseCode.AC returns PhaseCode.AC,
+            PhaseCode.XN to PhaseCode.XY returns PhaseCode.XY,
+        )
     }
 
     @Test
     internal fun pathsThroughHv1SwerTx() {
-        validateTxPaths(PhaseCode.AB, PhaseCode.A)
-        validateTxPaths(PhaseCode.AB, PhaseCode.B, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.AB, PhaseCode.C, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.AB, PhaseCode.X)
+        validatePathsThrough<PowerTransformer>(
+            PhaseCode.AB to PhaseCode.A returns PhaseCode.A,
+            PhaseCode.AB to PhaseCode.B returns PhaseCode.NONE,
+            PhaseCode.AB to PhaseCode.C returns PhaseCode.NONE,
+            PhaseCode.AB to PhaseCode.X returns PhaseCode.X,
 
-        validateTxPaths(PhaseCode.BC, PhaseCode.A, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.BC, PhaseCode.B)
-        validateTxPaths(PhaseCode.BC, PhaseCode.C, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.BC, PhaseCode.X)
+            PhaseCode.BC to PhaseCode.A returns PhaseCode.NONE,
+            PhaseCode.BC to PhaseCode.B returns PhaseCode.B,
+            PhaseCode.BC to PhaseCode.C returns PhaseCode.NONE,
+            PhaseCode.BC to PhaseCode.X returns PhaseCode.X,
 
-        validateTxPaths(PhaseCode.AC, PhaseCode.A, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.AC, PhaseCode.B, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.AC, PhaseCode.C)
-        validateTxPaths(PhaseCode.AC, PhaseCode.X)
+            PhaseCode.AC to PhaseCode.A returns PhaseCode.NONE,
+            PhaseCode.AC to PhaseCode.B returns PhaseCode.NONE,
+            PhaseCode.AC to PhaseCode.C returns PhaseCode.C,
+            PhaseCode.AC to PhaseCode.X returns PhaseCode.X,
 
-        validateTxPaths(PhaseCode.XY, PhaseCode.A)
-        validateTxPaths(PhaseCode.XY, PhaseCode.B)
-        validateTxPaths(PhaseCode.XY, PhaseCode.C)
-        validateTxPaths(PhaseCode.XY, PhaseCode.X)
+            PhaseCode.XY to PhaseCode.A returns PhaseCode.A,
+            PhaseCode.XY to PhaseCode.B returns PhaseCode.B,
+            PhaseCode.XY to PhaseCode.C returns PhaseCode.C,
+            PhaseCode.XY to PhaseCode.X returns PhaseCode.X,
+        )
     }
 
     @Test
     internal fun pathsThroughSwerHv1Tx() {
-        validateTxPaths(PhaseCode.A, PhaseCode.AB)
-        validateTxPaths(PhaseCode.A, PhaseCode.BC, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.A, PhaseCode.AC, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.A, PhaseCode.XY)
+        validatePathsThrough<PowerTransformer>(
+            PhaseCode.A to PhaseCode.AB returns PhaseCode.AB,
+            PhaseCode.A to PhaseCode.BC returns PhaseCode.NONE,
+            PhaseCode.A to PhaseCode.AC returns PhaseCode.NONE,
+            PhaseCode.A to PhaseCode.XY returns PhaseCode.XY,
 
-        validateTxPaths(PhaseCode.B, PhaseCode.AB, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.B, PhaseCode.BC)
-        validateTxPaths(PhaseCode.B, PhaseCode.AC, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.B, PhaseCode.XY)
+            PhaseCode.B to PhaseCode.AB returns PhaseCode.NONE,
+            PhaseCode.B to PhaseCode.BC returns PhaseCode.BC,
+            PhaseCode.B to PhaseCode.AC returns PhaseCode.NONE,
+            PhaseCode.B to PhaseCode.XY returns PhaseCode.XY,
 
-        validateTxPaths(PhaseCode.C, PhaseCode.AB, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.C, PhaseCode.BC, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.C, PhaseCode.AC)
-        validateTxPaths(PhaseCode.C, PhaseCode.XY)
+            PhaseCode.C to PhaseCode.AB returns PhaseCode.NONE,
+            PhaseCode.C to PhaseCode.BC returns PhaseCode.NONE,
+            PhaseCode.C to PhaseCode.AC returns PhaseCode.AC,
+            PhaseCode.C to PhaseCode.XY returns PhaseCode.XY,
 
-        validateTxPaths(PhaseCode.X, PhaseCode.AB)
-        validateTxPaths(PhaseCode.X, PhaseCode.BC)
-        validateTxPaths(PhaseCode.X, PhaseCode.AC)
-        validateTxPaths(PhaseCode.X, PhaseCode.XY)
+            PhaseCode.X to PhaseCode.AB returns PhaseCode.AB,
+            PhaseCode.X to PhaseCode.BC returns PhaseCode.BC,
+            PhaseCode.X to PhaseCode.AC returns PhaseCode.AC,
+            PhaseCode.X to PhaseCode.XY returns PhaseCode.XY,
+        )
     }
 
     @Test
     internal fun pathsThroughSwerLv1Tx() {
-        validateTxPaths(PhaseCode.A, PhaseCode.AN)
-        validateTxPaths(PhaseCode.A, PhaseCode.BN, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.A, PhaseCode.CN, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.A, PhaseCode.XN)
+        validatePathsThrough<PowerTransformer>(
+            PhaseCode.A to PhaseCode.AN returns PhaseCode.AN,
+            PhaseCode.A to PhaseCode.BN returns PhaseCode.NONE,
+            PhaseCode.A to PhaseCode.CN returns PhaseCode.NONE,
+            PhaseCode.A to PhaseCode.XN returns PhaseCode.XN,
 
-        validateTxPaths(PhaseCode.B, PhaseCode.AN, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.B, PhaseCode.BN)
-        validateTxPaths(PhaseCode.B, PhaseCode.CN, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.B, PhaseCode.XN)
+            PhaseCode.B to PhaseCode.AN returns PhaseCode.NONE,
+            PhaseCode.B to PhaseCode.BN returns PhaseCode.BN,
+            PhaseCode.B to PhaseCode.CN returns PhaseCode.NONE,
+            PhaseCode.B to PhaseCode.XN returns PhaseCode.XN,
 
-        validateTxPaths(PhaseCode.C, PhaseCode.AN, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.C, PhaseCode.BN, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.C, PhaseCode.CN)
-        validateTxPaths(PhaseCode.C, PhaseCode.XN)
+            PhaseCode.C to PhaseCode.AN returns PhaseCode.NONE,
+            PhaseCode.C to PhaseCode.BN returns PhaseCode.NONE,
+            PhaseCode.C to PhaseCode.CN returns PhaseCode.CN,
+            PhaseCode.C to PhaseCode.XN returns PhaseCode.XN,
 
-        validateTxPaths(PhaseCode.X, PhaseCode.AN)
-        validateTxPaths(PhaseCode.X, PhaseCode.BN)
-        validateTxPaths(PhaseCode.X, PhaseCode.CN)
-        validateTxPaths(PhaseCode.X, PhaseCode.XN)
+            PhaseCode.X to PhaseCode.AN returns PhaseCode.AN,
+            PhaseCode.X to PhaseCode.BN returns PhaseCode.BN,
+            PhaseCode.X to PhaseCode.CN returns PhaseCode.CN,
+            PhaseCode.X to PhaseCode.XN returns PhaseCode.XN,
+        )
     }
 
     @Test
     internal fun pathsThroughLv1SwerTx() {
-        validateTxPaths(PhaseCode.AN, PhaseCode.A)
-        validateTxPaths(PhaseCode.AN, PhaseCode.B, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.AN, PhaseCode.C, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.AN, PhaseCode.X)
+        validatePathsThrough<PowerTransformer>(
+            PhaseCode.AN to PhaseCode.A returns PhaseCode.A,
+            PhaseCode.AN to PhaseCode.B returns PhaseCode.NONE,
+            PhaseCode.AN to PhaseCode.C returns PhaseCode.NONE,
+            PhaseCode.AN to PhaseCode.X returns PhaseCode.X,
 
-        validateTxPaths(PhaseCode.BN, PhaseCode.A, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.BN, PhaseCode.B)
-        validateTxPaths(PhaseCode.BN, PhaseCode.C, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.BN, PhaseCode.X)
+            PhaseCode.BN to PhaseCode.A returns PhaseCode.NONE,
+            PhaseCode.BN to PhaseCode.B returns PhaseCode.B,
+            PhaseCode.BN to PhaseCode.C returns PhaseCode.NONE,
+            PhaseCode.BN to PhaseCode.X returns PhaseCode.X,
 
-        validateTxPaths(PhaseCode.CN, PhaseCode.A, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.CN, PhaseCode.B, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.CN, PhaseCode.C)
-        validateTxPaths(PhaseCode.CN, PhaseCode.X)
+            PhaseCode.CN to PhaseCode.A returns PhaseCode.NONE,
+            PhaseCode.CN to PhaseCode.B returns PhaseCode.NONE,
+            PhaseCode.CN to PhaseCode.C returns PhaseCode.C,
+            PhaseCode.CN to PhaseCode.X returns PhaseCode.X,
 
-        validateTxPaths(PhaseCode.XN, PhaseCode.A)
-        validateTxPaths(PhaseCode.XN, PhaseCode.B)
-        validateTxPaths(PhaseCode.XN, PhaseCode.C)
-        validateTxPaths(PhaseCode.XN, PhaseCode.X)
+            PhaseCode.XN to PhaseCode.A returns PhaseCode.A,
+            PhaseCode.XN to PhaseCode.B returns PhaseCode.B,
+            PhaseCode.XN to PhaseCode.C returns PhaseCode.C,
+            PhaseCode.XN to PhaseCode.X returns PhaseCode.X,
+        )
     }
 
     @Test
     internal fun pathsThroughSwerLv2Tx() {
-        validateTxPaths(PhaseCode.A, PhaseCode.ABN)
-        validateTxPaths(PhaseCode.A, PhaseCode.BCN, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.A, PhaseCode.ACN, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.A, PhaseCode.XYN)
+        validatePathsThrough<PowerTransformer>(
+            PhaseCode.A to PhaseCode.ABN returns PhaseCode.ABN,
+            PhaseCode.A to PhaseCode.BCN returns PhaseCode.NONE,
+            PhaseCode.A to PhaseCode.ACN returns PhaseCode.NONE,
+            PhaseCode.A to PhaseCode.XYN returns PhaseCode.XYN,
 
-        validateTxPaths(PhaseCode.B, PhaseCode.ABN, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.B, PhaseCode.BCN)
-        validateTxPaths(PhaseCode.B, PhaseCode.ACN, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.B, PhaseCode.XYN)
+            PhaseCode.B to PhaseCode.ABN returns PhaseCode.NONE,
+            PhaseCode.B to PhaseCode.BCN returns PhaseCode.BCN,
+            PhaseCode.B to PhaseCode.ACN returns PhaseCode.NONE,
+            PhaseCode.B to PhaseCode.XYN returns PhaseCode.XYN,
 
-        validateTxPaths(PhaseCode.C, PhaseCode.ABN, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.C, PhaseCode.BCN, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.C, PhaseCode.ACN)
-        validateTxPaths(PhaseCode.C, PhaseCode.XYN)
+            PhaseCode.C to PhaseCode.ABN returns PhaseCode.NONE,
+            PhaseCode.C to PhaseCode.BCN returns PhaseCode.NONE,
+            PhaseCode.C to PhaseCode.ACN returns PhaseCode.ACN,
+            PhaseCode.C to PhaseCode.XYN returns PhaseCode.XYN,
 
-        validateTxPaths(PhaseCode.X, PhaseCode.ABN)
-        validateTxPaths(PhaseCode.X, PhaseCode.BCN)
-        validateTxPaths(PhaseCode.X, PhaseCode.ACN)
-        validateTxPaths(PhaseCode.X, PhaseCode.XYN)
+            PhaseCode.X to PhaseCode.ABN returns PhaseCode.ABN,
+            PhaseCode.X to PhaseCode.BCN returns PhaseCode.BCN,
+            PhaseCode.X to PhaseCode.ACN returns PhaseCode.ACN,
+            PhaseCode.X to PhaseCode.XYN returns PhaseCode.XYN,
+        )
     }
 
     @Test
     internal fun pathsThroughLv2SwerTx() {
-        validateTxPaths(PhaseCode.ABN, PhaseCode.A)
-        validateTxPaths(PhaseCode.ABN, PhaseCode.B, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.ABN, PhaseCode.C, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.ABN, PhaseCode.X)
+        validatePathsThrough<PowerTransformer>(
+            PhaseCode.ABN to PhaseCode.A returns PhaseCode.A,
+            PhaseCode.ABN to PhaseCode.B returns PhaseCode.NONE,
+            PhaseCode.ABN to PhaseCode.C returns PhaseCode.NONE,
+            PhaseCode.ABN to PhaseCode.X returns PhaseCode.X,
 
-        validateTxPaths(PhaseCode.BCN, PhaseCode.A, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.BCN, PhaseCode.B)
-        validateTxPaths(PhaseCode.BCN, PhaseCode.C, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.BCN, PhaseCode.X)
+            PhaseCode.BCN to PhaseCode.A returns PhaseCode.NONE,
+            PhaseCode.BCN to PhaseCode.B returns PhaseCode.B,
+            PhaseCode.BCN to PhaseCode.C returns PhaseCode.NONE,
+            PhaseCode.BCN to PhaseCode.X returns PhaseCode.X,
 
-        validateTxPaths(PhaseCode.ACN, PhaseCode.A, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.ACN, PhaseCode.B, PhaseCode.NONE)
-        validateTxPaths(PhaseCode.ACN, PhaseCode.C)
-        validateTxPaths(PhaseCode.ACN, PhaseCode.X)
+            PhaseCode.ACN to PhaseCode.A returns PhaseCode.NONE,
+            PhaseCode.ACN to PhaseCode.B returns PhaseCode.NONE,
+            PhaseCode.ACN to PhaseCode.C returns PhaseCode.C,
+            PhaseCode.ACN to PhaseCode.X returns PhaseCode.X,
 
-        validateTxPaths(PhaseCode.XYN, PhaseCode.A)
-        validateTxPaths(PhaseCode.XYN, PhaseCode.B)
-        validateTxPaths(PhaseCode.XYN, PhaseCode.C)
-        validateTxPaths(PhaseCode.XYN, PhaseCode.X)
+            PhaseCode.XYN to PhaseCode.A returns PhaseCode.A,
+            PhaseCode.XYN to PhaseCode.B returns PhaseCode.B,
+            PhaseCode.XYN to PhaseCode.C returns PhaseCode.C,
+            PhaseCode.XYN to PhaseCode.X returns PhaseCode.X,
+        )
     }
 
-    private fun validateTxPaths(primary: PhaseCode, secondary: PhaseCode, traced: PhaseCode = secondary) {
-        val tx = PowerTransformer(generateId())
-        val primaryTerminal = Terminal(generateId()).apply { phases = primary }.also { tx.addTerminal(it) }
-        val secondaryTerminal = Terminal(generateId()).apply { phases = secondary }.also { tx.addTerminal(it) }
+    @Test
+    internal fun pathsThroughLv2SwerTx2() {
+        validatePathsThrough<PowerTransformer>(
+            PhaseCode.ABN to PhaseCode.A returns PhaseCode.A,
+            PhaseCode.ABN to PhaseCode.B returns PhaseCode.NONE,
+            PhaseCode.ABN to PhaseCode.C returns PhaseCode.NONE,
+            PhaseCode.ABN to PhaseCode.X returns PhaseCode.X,
 
-        if (traced != PhaseCode.NONE) {
+            PhaseCode.BCN to PhaseCode.A returns PhaseCode.NONE,
+            PhaseCode.BCN to PhaseCode.B returns PhaseCode.B,
+            PhaseCode.BCN to PhaseCode.C returns PhaseCode.NONE,
+            PhaseCode.BCN to PhaseCode.X returns PhaseCode.X,
+
+            PhaseCode.ACN to PhaseCode.A returns PhaseCode.NONE,
+            PhaseCode.ACN to PhaseCode.B returns PhaseCode.NONE,
+            PhaseCode.ACN to PhaseCode.C returns PhaseCode.C,
+            PhaseCode.ACN to PhaseCode.X returns PhaseCode.X,
+
+            PhaseCode.XYN to PhaseCode.A returns PhaseCode.A,
+            PhaseCode.XYN to PhaseCode.B returns PhaseCode.B,
+            PhaseCode.XYN to PhaseCode.C returns PhaseCode.C,
+            PhaseCode.XYN to PhaseCode.X returns PhaseCode.X,
+        )
+    }
+
+    @Test
+    internal fun `can filter transformer paths`() {
+        validatePathsThrough<PowerTransformer>(
+            PhaseCode.ABC to PhaseCode.ABC using PhaseCode.AB returns PhaseCode.AB,
+            PhaseCode.ABCN to PhaseCode.ABC using PhaseCode.AC returns PhaseCode.AC,
+
+            // Neutral is picked up as it is added by the transformer, so not filtered out by the included phases.
+            PhaseCode.ABC to PhaseCode.ABCN using PhaseCode.BC returns PhaseCode.BCN,
+        )
+    }
+
+    @Test
+    internal fun `check shunt compensator paths`() {
+        validatePathsThrough<LinearShuntCompensator>(
+            PhaseCode.ABC to PhaseCode.ABC returns PhaseCode.ABC,
+            PhaseCode.ABC to PhaseCode.N returns PhaseCode.N,
+            PhaseCode.N to PhaseCode.ABC returns PhaseCode.ABC,
+
+            //
+            // NOTE: When moving to/from the grounding terminal, all phases are added by the shunt compensator, so
+            //       will not be impacted by the included phases.
+            //
+            PhaseCode.ABC to PhaseCode.ABC using PhaseCode.AB returns PhaseCode.AB,
+            PhaseCode.ABC to PhaseCode.N using PhaseCode.AB returns PhaseCode.N,
+            PhaseCode.N to PhaseCode.ABC using PhaseCode.N returns PhaseCode.ABC,
+        ) {
+            groundingTerminal = terminals.firstOrNull { it.phases == PhaseCode.N }
+        }
+    }
+
+    @Test
+    internal fun `check straight paths`() {
+        validatePathsThrough<AcLineSegment>(
+            PhaseCode.ABC to PhaseCode.ABC returns PhaseCode.ABC,
+            PhaseCode.ABC to PhaseCode.ABC using PhaseCode.AB returns PhaseCode.AB,
+        )
+    }
+
+    private inline fun <reified T : ConductingEquipment> validatePathsThrough(vararg paths: ExpectedPaths, additionalSetup: T.() -> Unit = {}) {
+        val ce = T::class.primaryConstructor!!.call(generateId())
+        val terminal = Terminal(generateId()).also { ce.addTerminal(it) }
+        val otherTerminal = Terminal(generateId()).also { ce.addTerminal(it) }
+
+        paths.forEach { (from, to, expected, included) ->
+            terminal.phases = from
+            otherTerminal.phases = to
+
+            ce.additionalSetup()
+
             assertThat(
-                TerminalConnectivityInternal.between(primaryTerminal, secondaryTerminal).nominalPhasePaths.map { it.to },
-                containsInAnyOrder(*traced.singlePhases.toTypedArray())
+                "${T::class.simpleName} from $from to $to using $included should return $expected",
+                findPathsBetween(terminal, otherTerminal, included).nominalPhasePaths.map { it.to },
+                when (expected) {
+                    PhaseCode.NONE -> empty()
+                    else -> containsInAnyOrder(*expected.singlePhases.toTypedArray())
+                }
             )
-        } else {
-            assertThat(
-                TerminalConnectivityInternal.between(primaryTerminal, secondaryTerminal).nominalPhasePaths,
-                empty()
-            )
+        }
+    }
+
+    private fun findPathsBetween(terminal: Terminal, otherTerminal: Terminal, included: PhaseCode): ConnectivityResult =
+        TerminalConnectivityInternal.between(terminal, otherTerminal, included.singlePhases.toSet())
+
+    private infix fun PhaseCode.to(to: PhaseCode): ExpectedPaths = ExpectedPaths(this, to)
+    private infix fun ExpectedPaths.using(included: PhaseCode): ExpectedPaths = ExpectedPaths(from, to, expected, included)
+    private infix fun ExpectedPaths.returns(expected: PhaseCode): ExpectedPaths = ExpectedPaths(from, to, expected, included)
+
+    private data class ExpectedPaths(
+        val from: PhaseCode,
+        val to: PhaseCode,
+        val expected: PhaseCode = to,
+        val included: PhaseCode = from
+    ) {
+        init {
+            require(from.singlePhases.containsAll(included.singlePhases)) { "`included` must only contain phases in `from`" }
         }
     }
 

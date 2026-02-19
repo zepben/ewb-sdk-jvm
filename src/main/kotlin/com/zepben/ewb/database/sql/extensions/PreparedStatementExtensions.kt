@@ -160,7 +160,7 @@ internal fun PreparedStatement.setInstant(queryIndex: Int, value: Instant?) {
  */
 internal fun PreparedStatement.setTimestamp(queryIndex: Int, value: Instant?) {
     when (value) {
-        null -> setNull(queryIndex, VARCHAR)
+        null -> setNull(queryIndex, TIMESTAMP)
         else -> setTimestamp(queryIndex, Timestamp.from(value))
     }
 }

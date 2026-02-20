@@ -52,8 +52,8 @@ class LocalEwbDataFilePaths @JvmOverloads constructor(
             createDirectories(datePath)
     }
 
-    override fun enumerateDescendants(): Iterator<Path> =
-        listFiles(baseDir)
+    override fun enumerateDescendants(prefix: String?): Iterator<Path> =
+        listFiles(prefix?.let { baseDir.resolve(it) } ?: baseDir)
 
     override fun resolveDatabase(path: Path): Path =
         baseDir.resolve(path)

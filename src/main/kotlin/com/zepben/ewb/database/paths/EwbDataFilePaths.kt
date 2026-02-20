@@ -144,7 +144,7 @@ interface EwbDataFilePaths {
      *
      * @return collection of child items.
      */
-    fun enumerateDescendants(): Iterator<Path>
+    fun enumerateDescendants(prefix: String? = null): Iterator<Path>
 
     /**
      * Resolves the database in the specified source [Path].

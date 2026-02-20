@@ -130,11 +130,9 @@ interface EwbDataFilePaths {
      * @return list of variant names that exist in the data path for the specified [date].
      */
     fun getAvailableVariantsFor(date: LocalDate = LocalDate.now()): List<String> {
-        return enumerateDescendants()
+        return enumerateDescendants("$date/$VARIANTS_PATH")
             .asSequence()
-            .filter { it.parent?.fileName.toString().lowercase() == VARIANTS_PATH }
-            .filter { it.parent?.parent?.fileName.toString() == date.toString() }
-            .map { it.fileName.toString() }
+            .map { it.parent?.fileName.toString() }
             .sorted()
             .toList()
     }

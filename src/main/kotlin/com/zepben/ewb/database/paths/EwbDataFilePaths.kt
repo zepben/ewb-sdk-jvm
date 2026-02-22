@@ -133,7 +133,7 @@ interface EwbDataFilePaths {
     fun getAvailableVariantsFor(date: LocalDate = LocalDate.now()): List<String> {
         return enumerateDescendants("$date/$VARIANTS_PATH")
             .asSequence()
-            .filter { it.isRegularFile() }
+            .filter { it.parent?.parent?.fileName.toString() == VARIANTS_PATH }
             .map { it.parent?.fileName.toString() }
             .sorted()
             .toList()

@@ -10,11 +10,10 @@ package com.zepben.ewb.services.variant.translator
 
 import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProject
 import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectComponent
-import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.AnnotatedProjectDependency
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStage
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectCreation
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.*
 import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.infpart303.networkmodelprojects.TableNetworkModelProjectStageEquipmentContainers
 import com.zepben.ewb.database.sql.cim.variant.VariantDatabaseTables
 import com.zepben.ewb.services.common.translator.TranslatorTestBase
@@ -30,7 +29,7 @@ internal class VariantTranslatorTest : TranslatorTestBase<VariantService>(
     ::variantObject
 
 ){
-    private val vsToPb = NetworkModelProjectCimToProto()
+    private val vsToPb = VariantServiceCimToProto()
 
     override val validationInfo = listOf(
 
@@ -48,14 +47,40 @@ internal class VariantTranslatorTest : TranslatorTestBase<VariantService>(
         ValidationInfo(::NetworkModelProjectStage, { fillFields(it) }, { addFromPb(vsToPb.toPb(it)) }),
 
         ValidationInfo(::ChangeSet, { fillFields(it) }, { addFromPb(vsToPb.toPb(it)) }),
-        // TODO: new validator for these...
-//        ValidationInfo({ ObjectCreation(ChangeSet(), it) }, { fillFields(it) }, { addFromPb(vsToPb.toPb(it)) }),
+
+        // Note the below have more complex translation logic due to having a calculated mRID.
+        ValidationInfo({ ObjectCreation() }, { fillFields(it) }, {
+            val convertedCim = vsToPb.toPb(it)
+            add(ChangeSet(it.changeSet.mRID))   // Resolve unresolved reference before adding from PB as changeSet must be present to compute an mRID.
+            addFromPb(convertedCim)
+        }),
+        ValidationInfo({ ObjectDeletion() }, { fillFields(it) }, {
+            val convertedCim = vsToPb.toPb(it)
+            add(ChangeSet(it.changeSet.mRID))   // Resolve unresolved reference before adding from PB as changeSet must be present to compute an mRID.
+            addFromPb(convertedCim)
+        }),
+        ValidationInfo({ ObjectModification() }, { fillFields(it) }, {
+            it.populateReverseModification(this)
+            val convertedCim = vsToPb.toPb(it)
+
+            add(ChangeSet(it.changeSet.mRID))   // Resolve unresolved reference before adding from PB as changeSet must be present to compute an mRID.
+            add(ObjectReverseModification().also { orm ->    // Resolve the reverse modification as it must also have changeSet present before the conversion.
+                orm.changeSet = it.changeSet; orm.targetObjectMRID = it.targetObjectMRID.asObjectReverseModificationId
+            })
+            addFromPb(convertedCim)
+        }),
 
     )
 
-    override val abstractCreators = mapOf<Class<*>, (String) -> IdentifiedObject>(
-        NetworkModelProjectComponent::class.java to { NetworkModelProjectStage(it) }
+    override val abstractCreators = mapOf<Class<*>, (String) -> Identifiable>(
+        NetworkModelProjectComponent::class.java to { NetworkModelProjectStage(it) },
     )
+    override val abstractCreatorsIdentifiable = mapOf<Class<*>, (Identifiable) -> Identifiable>(
+        ChangeSetMember::class.java to {
+            ObjectCreation().apply { it as ChangeSet; changeSet = it; targetObjectMRID = "creation" }
+        }
+    )
+
 
     override val excludedTables =
         super.excludedTables + setOf(

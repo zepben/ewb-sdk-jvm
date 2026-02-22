@@ -8,18 +8,37 @@
 
 package com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset
 
+import com.zepben.ewb.services.variant.VariantService
+
 /**
  * An object already exists and is to be modified.
  *
  * @property objectReverseModification ObjectReverseModification specifying precondition properties for a preconditioned update.
  */
-class ObjectModification(changeSet: ChangeSet, targetObjectMRID: String) : ChangeSetMember(changeSet, targetObjectMRID) {
+class ObjectModification : ChangeSetMember() {
 
-    val objectReverseModification: ObjectReverseModification = ObjectReverseModification(changeSet, targetObjectMRID.asObjectReverseModificationId, this)
+    lateinit var objectReverseModification: ObjectReverseModification
+
+    private var _initialised: Boolean = false
+    /**
+     * Helper function to populate the reverse modification. Should only be called after [changeSet] and [targetObjectMRID] have been set.
+     * @param service The [VariantService] to add the reverse modification to. Should be the same service that contains this [ObjectModification].
+     */
+    fun populateReverseModification(service: VariantService) {
+        if (!_initialised) {
+            objectReverseModification = ObjectReverseModification().also {
+                it.changeSet = changeSet
+                it.targetObjectMRID = targetObjectMRID.asObjectReverseModificationId
+                it.objectModification = this
+                changeSet.addMember(it)
+            }
+            service.add(objectReverseModification)
+        }
+        _initialised = true
+    }
 
 }
 
-// TODO: move me somewhere if it gets used elsewhere.
-internal val String.asObjectReverseModificationId: String get() = "-$this"
+val String.asObjectReverseModificationId: String get() = "-$this"
 
-internal val String.asTargetObjectMRID: String get() = this.removePrefix("-")
+val String.asTargetObjectMRID: String get() = this.removePrefix("-")

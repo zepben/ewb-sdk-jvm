@@ -10,14 +10,11 @@ package com.zepben.ewb.services.variant
 
 import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProject
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
-import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.AnnotatedProjectDependency
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStage
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.*
-
 import com.zepben.ewb.services.common.verifyWhenServiceFunctionSupportsAllServiceTypes
 import com.zepben.testutils.junit.SystemLogExtension
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
 internal class VariantServiceUtilsTest {
@@ -41,6 +38,7 @@ internal class VariantServiceUtilsTest {
         isObjectCreation: (ObjectCreation) -> String,
         isObjectDeletion: (ObjectDeletion) -> String,
         isObjectModification: (ObjectModification) -> String,
+        isObjectReverseModification: (ObjectReverseModification) -> String,
         isOther: (Any) -> String,
     ): String = whenVariantIdentifiedObject(
         identifiedObject,
@@ -51,6 +49,7 @@ internal class VariantServiceUtilsTest {
         isObjectCreation = isObjectCreation,
         isObjectDeletion = isObjectDeletion,
         isObjectModification = isObjectModification,
+        isObjectReverseModification = isObjectReverseModification,
         isOther = isOther
     )
 

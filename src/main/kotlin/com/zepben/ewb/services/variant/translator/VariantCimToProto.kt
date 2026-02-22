@@ -50,6 +50,7 @@ fun variantObject(identified: Identifiable): VariantObject =
             isObjectCreation = { objectCreation = it.toPb() },
             isObjectDeletion = { objectDeletion = it.toPb() },
             isObjectModification = { objectModification = it.toPb() },
+            isObjectReverseModification = { objectReverseModification = it.toPb() },
         )
     }.build()
 
@@ -187,8 +188,10 @@ fun toPb(cim: DataSet, pb: PBDataSet.Builder): PBDataSet.Builder =
  */
 fun toPb(cim: ChangeSet, pb: PBChangeSet.Builder): PBChangeSet.Builder =
     pb.apply {
-        // NOTE: changeSetMembers are sent separately
         cim.networkModelProjectStage?.also { networkModelProjectStageMRID = it.mRID } ?: clearNetworkModelProjectStageMRID()
+        cim.members.forEach {
+            pb.addChangeSetMemberMRIDs(it.mRID)
+        }
         toPb(cim, datasetBuilder)
     }
 
@@ -238,7 +241,7 @@ fun toPb(cim: ObjectDeletion, pb: PBObjectDeletion.Builder): PBObjectDeletion.Bu
  */
 fun toPb(cim: ObjectModification, pb: PBObjectModification.Builder): PBObjectModification.Builder =
     pb.apply {
-        pb.objectReverseModification = toPb(cim.objectReverseModification, objectReverseModificationBuilder).build()
+        pb.objectReverseModificationMRID = cim.objectReverseModification.mRID
 
         toPb(cim, csmBuilder)
     }
@@ -252,6 +255,8 @@ fun toPb(cim: ObjectModification, pb: PBObjectModification.Builder): PBObjectMod
  */
 fun toPb(cim: ObjectReverseModification, pb: PBObjectReverseModification.Builder): PBObjectReverseModification.Builder =
     pb.apply {
+        objectModificationMRID = cim.objectModification.mRID
+
         toPb(cim, csmBuilder)
     }
 
@@ -275,6 +280,10 @@ fun ObjectDeletion.toPb(): PBObjectDeletion = toPb(this, PBObjectDeletion.newBui
  */
 fun ObjectModification.toPb(): PBObjectModification = toPb(this, PBObjectModification.newBuilder()).build()
 
+/**
+ * An extension for converting any [ObjectReverseModification] into its protobuf counterpart.
+ */
+fun ObjectReverseModification.toPb(): PBObjectReverseModification = toPb(this, PBObjectReverseModification.newBuilder()).build()
 
 // #################################
 // # Class for Java friendly usage #
@@ -283,7 +292,7 @@ fun ObjectModification.toPb(): PBObjectModification = toPb(this, PBObjectModific
 /**
  * A helper class for Java friendly convertion from CIM objects to their protobuf counterparts.
  */
-class NetworkModelProjectCimToProto : BaseCimToProto() {
+class VariantServiceCimToProto: BaseCimToProto() {
 
     /**
      * Convert the [NetworkModelProject] into its protobuf counterpart.

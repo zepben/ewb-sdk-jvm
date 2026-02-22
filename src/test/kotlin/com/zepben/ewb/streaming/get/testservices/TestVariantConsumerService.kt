@@ -8,9 +8,10 @@
 
 package com.zepben.ewb.streaming.get.testservices
 
-import com.zepben.protobuf.dc.*
 import com.zepben.protobuf.metadata.GetMetadataRequest
 import com.zepben.protobuf.metadata.GetMetadataResponse
+import com.zepben.protobuf.vc.GetIdentifiedObjectsRequest
+import com.zepben.protobuf.vc.GetIdentifiedObjectsResponse
 import com.zepben.protobuf.vc.GetChangeSetRequest
 import com.zepben.protobuf.vc.GetChangeSetResponse
 import com.zepben.protobuf.vc.GetNetworkModelProjectsRequest
@@ -21,16 +22,20 @@ import io.grpc.stub.StreamObserver
 
 internal class TestVariantConsumerService : VariantConsumerGrpc.VariantConsumerImplBase() {
 
+    lateinit var onGetIdentifiedObjects: (request: GetIdentifiedObjectsRequest, response: StreamObserver<GetIdentifiedObjectsResponse>) -> Unit
     lateinit var onGetNetworkModelProjects: (request: GetNetworkModelProjectsRequest, response: StreamObserver<GetNetworkModelProjectsResponse>) -> Unit
     lateinit var onGetChangeSets: (request: GetChangeSetRequest, response: StreamObserver<GetChangeSetResponse>) -> Unit
     lateinit var onGetMetadataRequest: (request: GetMetadataRequest, response: StreamObserver<GetMetadataResponse>) -> Unit
 
+    override fun getIdentifiedObjects(response: StreamObserver<GetIdentifiedObjectsResponse>): StreamObserver<GetIdentifiedObjectsRequest> =
+        TestStreamObserver(response, onGetIdentifiedObjects)
+
     override fun getNetworkModelProjects(response: StreamObserver<GetNetworkModelProjectsResponse>): StreamObserver<GetNetworkModelProjectsRequest> =
         TestStreamObserver(response, onGetNetworkModelProjects)
 
-    // TODO: ??? where is this...
-//    override fun getChangeSet(response: StreamObserver<GetChangeSetResponse>): StreamObserver<GetChangeSetRequest> =
-//        TestStreamObserver(response, onGetChangeSets)
+    override fun getChangeSet(request: GetChangeSetRequest, response: StreamObserver<GetChangeSetResponse>) {
+        TestStreamObserver(response, onGetChangeSets)
+    }
 
     override fun getMetadata(request: GetMetadataRequest, responseObserver: StreamObserver<GetMetadataResponse>) =
         runGrpc(request, responseObserver, onGetMetadataRequest)

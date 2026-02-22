@@ -54,6 +54,9 @@ import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.AnnotatedProjectDependency
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStage
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSetMember
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectModification
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectReverseModification
 import kotlin.reflect.KClass
 
 
@@ -600,6 +603,25 @@ internal object NetworkModelProjectStageToChangeSetResolver :
         NetworkModelProjectStage::class, ChangeSet::class, NetworkModelProjectStage::changeSet.setter
     )
 
+internal object ChangeSetToChangeSetMemberResolver :
+    ReferenceResolver<ChangeSet, ChangeSetMember> by KReferenceResolver(
+        ChangeSet::class, ChangeSetMember::class, ChangeSet::addMember
+    )
+
+internal object ChangeSetMemberToChangeSetResolver :
+    ReferenceResolver<ChangeSetMember, ChangeSet> by KReferenceResolver(
+        ChangeSetMember::class, ChangeSet::class, ChangeSetMember::changeSet.setter
+    )
+
+internal object ObjectReverseModificationToObjectModificationResolver :
+    ReferenceResolver<ObjectReverseModification, ObjectModification> by KReferenceResolver(
+        ObjectReverseModification::class, ObjectModification::class, ObjectReverseModification::objectModification.setter
+    )
+
+internal object ObjectModificationToObjectReverseModificationResolver :
+    ReferenceResolver<ObjectModification, ObjectReverseModification> by KReferenceResolver(
+        ObjectModification::class, ObjectReverseModification::class, ObjectModification::objectReverseModification.setter
+    )
 
 //-------------------------------------------//
 

@@ -13,10 +13,16 @@ import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 /**
  * A CRUD-style data object.
  *
+ * [changeSet] and [targetObjectMRID] must be set prior to
+ *
  * @property changeSet The [ChangeSet] this [ChangeSetMember] belongs to.
  * @property targetObjectMRID The CIM object [changeSet] applies to.
  */
-abstract class ChangeSetMember(val changeSet: ChangeSet, val targetObjectMRID: String): Identifiable {
+abstract class ChangeSetMember: Identifiable {
+
+    lateinit var changeSet: ChangeSet
+    lateinit var targetObjectMRID: String
+
     override val mRID: String
         get() = "${changeSet.mRID}_$targetObjectMRID"
 

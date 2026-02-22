@@ -112,9 +112,26 @@ class ChangeSetCimWriter(
         val table = databaseTables.getTable<TableObjectModifications>()
         val insert = databaseTables.getInsert<TableObjectModifications>()
 
-        insert.setNullableString(table.OBJECT_REVERSE_MODIFICATION_TARGET_OBJECT_MRID.queryIndex, objectModification.objectReverseModification.targetObjectMRID)
+        insert.setNullableString(table.OBJECT_REVERSE_MODIFICATION_TARGET_OBJECT_MRID.queryIndex, objectModification.objectReverseModification.mRID)
 
         return writeChangeSetMember(table, insert, objectModification, "object modification")
+    }
+
+    /**
+     * Write the [ObjectReverseModification] fields to [TableObjectReverseModifications].
+     *
+     * @param objectModification The [ObjectReverseModification] instance to write to the database.
+     *
+     * @return true if the [ObjectReverseModification] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    fun write(objectReverseModification: ObjectReverseModification): Boolean {
+        val table = databaseTables.getTable<TableObjectReverseModifications>()
+        val insert = databaseTables.getInsert<TableObjectReverseModifications>()
+
+        insert.setNullableString(table.OBJECT_MODIFICATION_MRID.queryIndex, objectReverseModification.objectModification.mRID)
+
+        return writeChangeSetMember(table, insert, objectReverseModification, "object reverse modification")
     }
 
 }

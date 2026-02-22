@@ -8,18 +8,17 @@
 
 package com.zepben.ewb.services.common.testdata
 
-import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectComponent
 import com.zepben.ewb.cim.iec61968.common.StreetAddress
 import com.zepben.ewb.cim.iec61968.common.StreetDetail
 import com.zepben.ewb.cim.iec61968.common.TownDetail
 import com.zepben.ewb.cim.iec61968.infiec61968.infcommon.Ratio
 import com.zepben.ewb.cim.iec61968.metering.ControlledAppliance
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.core.NameType
 import com.zepben.ewb.cim.iec61970.base.domain.DateTimeInterval
 import com.zepben.ewb.cim.iec61970.base.wires.*
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.DataSet
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.*
 import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.common.meta.DataSource
 import com.zepben.ewb.services.common.meta.MetadataCollection
@@ -28,7 +27,6 @@ import com.zepben.ewb.services.diagram.DiagramService
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.variant.VariantService
 import java.time.Instant
-import javax.annotation.Nullable
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KVisibility
 import kotlin.reflect.full.*
@@ -124,6 +122,21 @@ object SchemaServices {
         }
     }
 
+    fun fillRequired(io: Identifiable) {
+
+        if (io is ChangeSetMember) {
+            io.changeSet = ChangeSet(generateId()); io.targetObjectMRID = "member"
+        }
+        if (io is ObjectModification) {
+            io.objectReverseModification = ObjectReverseModification().also {
+                it.changeSet = io.changeSet
+                it.targetObjectMRID = io.mRID.asObjectReverseModificationId
+                it.objectModification = io
+                io.changeSet.addMember(it)
+            }
+        }
+    }
+
     /**
      * This functionality was created because there were a few strings that weren't nullable, and we were treating "" as null.
      * We then converted them to nullable and wanted to ensure that nothing got broken by writing/reading these from the DB/protos.
@@ -150,7 +163,7 @@ object SchemaServices {
                     prop.isNullableOf<Float>() -> 0.0f
                     prop.isNullableOf<Double>() -> 0.0
                     // We don't need to worry about references to other objects, they are covered by `filled`.
-                    prop.isNullableOf<IdentifiedObject>() -> null
+                    prop.isNullableOf<Identifiable>() -> null
                     prop.isNullableOf<ControlledAppliance>() -> ControlledAppliance(0)
                     prop.isNullableOf<DateTimeInterval>() -> DateTimeInterval(Instant.ofEpochSecond(0), Instant.ofEpochSecond(1))
                     prop.isNullableOf<Instant>() -> Instant.ofEpochSecond(0)

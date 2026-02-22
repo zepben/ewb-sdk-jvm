@@ -15,15 +15,12 @@ import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.AnnotatedProjectDependency
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStage
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectCreation
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectDeletion
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectModification
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.*
 import com.zepben.ewb.services.network.NetworkService
 
 /**
- * A function that provides an exhaustive `when` style statement for all [IdentifiedObject] leaf types supported by
- * the [NetworkService]. If the provided [identifiedObject] is not supported by the service the [isOther] handler
+ * A function that provides an exhaustive `when` style statement for all [Identifiable] leaf types supported by
+ * the [VariantService]. If the provided [identifiable] is not supported by the service the [isOther] handler
  * is invoked which by default will throw an [IllegalArgumentException]
  *
  * By using this function, you acknowledge that if any new types are added to the customer service, and thus this
@@ -34,10 +31,10 @@ import com.zepben.ewb.services.network.NetworkService
  * If it is not critical that all types within the service are always handled, it is recommended to use a typical
  * `when` statement (Kotlin) or if-else branch (Java) and update new cases as required without breaking your code.
  *
- * @param identifiedObject The identified object to handle.
+ * @param identifiable The identified object to handle.
  */
 inline fun <R> whenVariantIdentifiedObject(
-    identifiedObject: Identifiable,
+    identifiable: Identifiable,
     isNetworkModelProject: (NetworkModelProject) -> R,
     isNetworkModelProjectStage: (NetworkModelProjectStage) -> R,
     isAnnotatedProjectDependency: (AnnotatedProjectDependency) -> R,
@@ -45,16 +42,18 @@ inline fun <R> whenVariantIdentifiedObject(
     isObjectCreation: (ObjectCreation) -> R,
     isObjectDeletion: (ObjectDeletion) -> R,
     isObjectModification: (ObjectModification) -> R,
+    isObjectReverseModification: (ObjectReverseModification) -> R,
     isOther: (Any) -> R = { obj: Any ->
         throw IllegalArgumentException("Identified object type ${obj::class} is not supported by the network model project service")
     }
-): R = when (identifiedObject) {
-    is NetworkModelProject -> isNetworkModelProject(identifiedObject)
-    is NetworkModelProjectStage -> isNetworkModelProjectStage(identifiedObject)
-    is AnnotatedProjectDependency -> isAnnotatedProjectDependency(identifiedObject)
-    is ChangeSet -> isChangeSet(identifiedObject)
-    is ObjectCreation -> isObjectCreation(identifiedObject)
-    is ObjectDeletion -> isObjectDeletion(identifiedObject)
-    is ObjectModification -> isObjectModification(identifiedObject)
-    else -> isOther(identifiedObject)
+): R = when (identifiable) {
+    is NetworkModelProject -> isNetworkModelProject(identifiable)
+    is NetworkModelProjectStage -> isNetworkModelProjectStage(identifiable)
+    is AnnotatedProjectDependency -> isAnnotatedProjectDependency(identifiable)
+    is ChangeSet -> isChangeSet(identifiable)
+    is ObjectCreation -> isObjectCreation(identifiable)
+    is ObjectDeletion -> isObjectDeletion(identifiable)
+    is ObjectModification -> isObjectModification(identifiable)
+    is ObjectReverseModification -> isObjectReverseModification(identifiable)
+    else -> isOther(identifiable)
 }

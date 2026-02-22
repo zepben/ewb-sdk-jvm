@@ -12,10 +12,7 @@ import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmode
 import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectComponent
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.AnnotatedProjectDependency
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStage
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectCreation
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectDeletion
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectModification
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.*
 import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.common.meta.MetadataCollection
 import java.time.Instant
@@ -149,6 +146,22 @@ class VariantService(name: String = "variants", metadata: MetadataCollection = M
      * @return `true` if the item was removed from the service, otherwise false.
      */
     fun remove(objectModification: ObjectModification): Boolean = super.remove(objectModification)
+
+    /**
+     * Add the [objectReverseModification] to this service.
+     *
+     * @param objectReverseModification The [ChangeSet] to add.
+     * @return `true` if the item was added to the service, otherwise false.
+     */
+    fun add(objectReverseModification: ObjectReverseModification): Boolean = super.add(objectReverseModification)
+
+    /**
+     * Remove the [objectReverseModification] from this service.
+     *
+     * @param objectReverseModification The [ChangeSet] to remove.
+     * @return `true` if the item was removed from the service, otherwise false.
+     */
+    fun remove(objectReverseModification: ObjectReverseModification): Boolean = super.remove(objectReverseModification)
 
     inline fun <reified TComp : NetworkModelProjectComponent> getComponentsBetween(start: Instant, end: Instant): Sequence<TComp> =
         sequenceOf<TComp>().filter { it.created?.let { created -> created in start..end } == true }

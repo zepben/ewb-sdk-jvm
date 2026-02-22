@@ -10,6 +10,7 @@ package com.zepben.ewb.services.variant.testdata
 
 import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProject
 import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectComponent
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.AnnotatedProjectDependency
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.DependencyKind
@@ -45,6 +46,12 @@ fun NetworkModelProject.fillFields(service: VariantService, includeRuntime: Bool
 fun NetworkModelProjectComponent.fillFields(service: VariantService, includeRuntime: Boolean = true): NetworkModelProjectComponent {
     (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
 
+    created = Instant.now().minusSeconds(10)
+    closed = Instant.now()
+
+    parent = NetworkModelProject("parent-project").also { it.addChild(this); service.add(it) }
+
+    // TODO
     return this
 }
 
@@ -77,7 +84,6 @@ fun NetworkModelProjectStage.fillFields(service: VariantService, includeRuntime:
     addDependentOnStage(AnnotatedProjectDependency(generateId()).also { it.dependencyDependentOnStage = this })
 
     addContainer(generateId())
-    service.add(this)
 
     return this
 }
@@ -87,37 +93,55 @@ fun NetworkModelProjectStage.fillFields(service: VariantService, includeRuntime:
 // ###################################
 
 fun ChangeSet.fillFields(service: VariantService, includeRuntime: Boolean = true): ChangeSet {
-    (this as DataSet).fillFieldsCommon(service, includeRuntime)
+    (this as DataSet).fillFields(service, includeRuntime)
 
     networkModelProjectStage = NetworkModelProjectStage(generateId()).also { it.changeSet = this; service.add(it) }
 
-    addMember(ObjectCreation(this, generateId()).also { service.add(it) })
-    addMember(ObjectDeletion(this, generateId()).also { service.add(it) })
-    addMember(ObjectModification(this, generateId()).also { service.add(it) })
+    addMember(ObjectCreation().also { it.changeSet = this; it.targetObjectMRID = "creation"; service.add(it) })
 
     return this
 }
 
-fun DataSet.fillFieldsCommon(service: VariantService, @Suppress("UNUSED_PARAMETER") includeRuntime: Boolean = true): DataSet {
+@Suppress("UNUSED_PARAMETER")
+fun DataSet.fillFields(service: VariantService, includeRuntime: Boolean = true): DataSet {
     name = "1"
     description = "the description"
 
     return this
 }
 
-inline fun <reified T : ChangeSetMember> ChangeSetMember.fillFields(service: VariantService, includeRuntime: Boolean, creator: (ChangeSet, String) -> T): T =
-    creator(ChangeSet(generateId()).also { service.add(it) }, "${T::class.java.simpleName} ${generateId()}").fillFieldsCommon(service, includeRuntime) as T
+fun ChangeSetMember.fillFields(service: VariantService, includeRuntime: Boolean): ChangeSetMember {
+    (this as Identifiable).fillFieldsCommon(service, includeRuntime)
+    val cs = ChangeSet(generateId()).also { service.add(it) }
+    changeSet = cs
+    cs.addMember(this)
+    targetObjectMRID = generateId()
+
+    return this
+}
 
 
-//fun ObjectCreation.fillFields(service: VariantService, includeRuntime: Boolean = true): ObjectCreation =
-//    fillFields(service, includeRuntime, ::ObjectCreation)
+fun ObjectCreation.fillFields(service: VariantService, includeRuntime: Boolean = true): ObjectCreation {
+    (this as ChangeSetMember).fillFields(service, includeRuntime)
+    return this
+}
 
-fun ObjectCreation.fillFields(service: VariantService, includeRuntime: Boolean = true): ObjectCreation =
-    fillFields(service, includeRuntime, ::ObjectCreation)
 
+fun ObjectDeletion.fillFields(service: VariantService, includeRuntime: Boolean = true): ObjectDeletion {
+    (this as ChangeSetMember).fillFields(service, includeRuntime)
+    return this
+}
 
-fun ObjectDeletion.fillFields(service: VariantService, includeRuntime: Boolean = true): ObjectDeletion =
-    fillFields(service, includeRuntime, ::ObjectDeletion)
+fun ObjectModification.fillFields(service: VariantService, includeRuntime: Boolean = true): ObjectModification {
+    (this as ChangeSetMember).fillFields(service, includeRuntime)
 
-fun ObjectModification.fillFields(service: VariantService, includeRuntime: Boolean = true): ObjectModification =
-    fillFields(service, includeRuntime, ::ObjectModification)
+    populateReverseModification(service)
+    return this
+}
+
+fun ObjectReverseModification.fillFields(service: VariantService, includeRuntime: Boolean = true): ObjectReverseModification {
+    (this as ChangeSetMember).fillFields(service, includeRuntime)
+
+    objectModification = ObjectModification().also { it.targetObjectMRID = generateId(); it.changeSet = this.changeSet; service.add(it) }
+    return this
+}

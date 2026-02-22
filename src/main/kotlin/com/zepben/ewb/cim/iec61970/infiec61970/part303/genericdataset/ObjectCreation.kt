@@ -11,4 +11,4 @@ package com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset
 /**
  * An object is to be created in the context.
  */
-class ObjectCreation(changeSet: ChangeSet, targetObjectMRID: String) : ChangeSetMember(changeSet, targetObjectMRID)
+open class ObjectCreation : ChangeSetMember()

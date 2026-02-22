@@ -13,6 +13,7 @@ import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.*
 import com.zepben.ewb.database.sql.cim.CimReader
 import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.genericdataset.*
 import com.zepben.ewb.database.sql.extensions.getNullableString
+import com.zepben.ewb.services.common.Resolvers
 import com.zepben.ewb.services.common.extensions.ensureGet
 import com.zepben.ewb.services.common.extensions.getOrThrow
 import com.zepben.ewb.services.variant.VariantService
@@ -49,40 +50,49 @@ internal class ChangeSetCimReader : CimReader<VariantService>(), AutoCloseable{
         return true
     }
 
-    private fun readChangeSetMember(service: VariantService, table: TableChangeSetMembers, resultSet: ResultSet, setIdentifier: (String) -> String, typeNameAndMRID: String, creator: (ChangeSet, String) -> ChangeSetMember): Boolean {
+    private fun readChangeSetMember(
+        service: VariantService,
+        cim: ChangeSetMember,
+        table: TableChangeSetMembers,
+        resultSet: ResultSet,
+        setIdentifier: (String) -> String
+    ): Boolean {
         val changeSetMRID = resultSet.getString(table.CHANGE_SET_MRID.queryIndex)
         setIdentifier("$changeSetMRID-to-UNKNOWN")
-        val targetObj = resultSet.getString(table.TARGET_OBJECT_MRID.queryIndex)
-        val id = setIdentifier("$changeSetMRID-to-$targetObj")
+        cim.targetObjectMRID = resultSet.getString(table.TARGET_OBJECT_MRID.queryIndex)
+        val id = setIdentifier("$changeSetMRID-to-${cim.targetObjectMRID}")
 
-        val changeSet = service.getOrThrow<ChangeSet>(mRID = changeSetMRID, typeNameAndMRID = "$typeNameAndMRID $id")
-        val obj = creator(changeSet, targetObj)
-        changeSet.addMember(obj)
+        cim.changeSet = service.getOrThrow<ChangeSet>(mRID = changeSetMRID, typeNameAndMRID = id)
+        cim.changeSet.addMember(cim)
 
         return true
     }
 
     fun read(service: VariantService, table: TableObjectCreations, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
-        return readChangeSetMember(service, table, resultSet, setIdentifier, "ObjectCreation") { changeSet, targetObjMRID ->
-            ObjectCreation(changeSet, targetObjMRID)
-        }
+        val objectCreation = ObjectCreation()
+
+        return readChangeSetMember(service, objectCreation, table, resultSet, setIdentifier)
     }
 
     fun read(service: VariantService, table: TableObjectDeletions, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
-        return readChangeSetMember(service, table, resultSet, setIdentifier, "ObjectDeletion") { changeSet, targetObjMRID ->
-            ObjectDeletion(changeSet, targetObjMRID)
-        }
+        val objectDeletion = ObjectDeletion()
+
+        return readChangeSetMember(service, objectDeletion, table, resultSet, setIdentifier)
     }
 
     fun read(service: VariantService, table: TableObjectModifications, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
-        val originalObj = resultSet.getString(table.OBJECT_REVERSE_MODIFICATION_TARGET_OBJECT_MRID.queryIndex)
-        setIdentifier(originalObj)
-
-        return readChangeSetMember(service, table, resultSet, setIdentifier, "ObjectModification") { changeSet, targetObjMRID ->
-            ObjectModification(changeSet, targetObjMRID).also {
-                changeSet.addMember(it.objectReverseModification)
-            }
+        val objectModification = ObjectModification().apply {
+            service.resolveOrDeferReference(Resolvers.reverseModification(this), resultSet.getString(table.OBJECT_REVERSE_MODIFICATION_TARGET_OBJECT_MRID.queryIndex))
         }
+
+        return readChangeSetMember(service, objectModification, table, resultSet, setIdentifier)
     }
 
+    fun read(service: VariantService, table: TableObjectReverseModifications, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val objectReverseModification = ObjectReverseModification().apply {
+            service.resolveOrDeferReference(Resolvers.modification(this), resultSet.getString(table.OBJECT_MODIFICATION_MRID.queryIndex))
+        }
+
+        return readChangeSetMember(service, objectReverseModification, table, resultSet, setIdentifier)
+    }
 }

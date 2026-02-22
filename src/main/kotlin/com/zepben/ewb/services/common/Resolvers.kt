@@ -54,6 +54,9 @@ import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.AnnotatedProjectDependency
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStage
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSetMember
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectModification
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectReverseModification
 
 /**
  * These should be used to access [ReferenceResolver] instances for use with [BaseService.resolveOrDeferReference] and
@@ -655,5 +658,37 @@ object Resolvers {
             networkModelProjectStage,
             DependingNetworkModelProjectStageToAnnotatedProjectDependencyResolver,
             AnnotatedProjectDependencyToDependingNetworkModelProjectStageResolver
+        )
+
+    @JvmStatic
+    fun member(changeSet: ChangeSet): BoundReferenceResolver<ChangeSet, ChangeSetMember> =
+        BoundReferenceResolver(
+            changeSet,
+            ChangeSetToChangeSetMemberResolver,
+            ChangeSetMemberToChangeSetResolver
+        )
+
+    @JvmStatic
+    fun changeSet(changeSetMember: ChangeSetMember): BoundReferenceResolver<ChangeSetMember, ChangeSet> =
+        BoundReferenceResolver(
+            changeSetMember,
+            ChangeSetMemberToChangeSetResolver,
+            ChangeSetToChangeSetMemberResolver,
+        )
+
+    @JvmStatic
+    fun modification(reverseModification: ObjectReverseModification): BoundReferenceResolver<ObjectReverseModification, ObjectModification> =
+        BoundReferenceResolver(
+            reverseModification,
+            ObjectReverseModificationToObjectModificationResolver,
+            ObjectModificationToObjectReverseModificationResolver,
+        )
+
+    @JvmStatic
+    fun reverseModification(modification: ObjectModification): BoundReferenceResolver<ObjectModification, ObjectReverseModification> =
+        BoundReferenceResolver(
+            modification,
+            ObjectModificationToObjectReverseModificationResolver,
+            ObjectReverseModificationToObjectModificationResolver,
         )
 }

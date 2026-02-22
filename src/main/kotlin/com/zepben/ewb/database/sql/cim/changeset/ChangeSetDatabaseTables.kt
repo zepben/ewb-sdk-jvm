@@ -9,10 +9,7 @@
 package com.zepben.ewb.database.sql.cim.changeset
 
 import com.zepben.ewb.database.sql.cim.CimDatabaseTables
-import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.genericdataset.TableChangeSets
-import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.genericdataset.TableObjectCreations
-import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.genericdataset.TableObjectDeletions
-import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.genericdataset.TableObjectModifications
+import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.genericdataset.*
 import com.zepben.ewb.database.sql.common.tables.SqlTable
 import com.zepben.ewb.database.sql.generators.SqlGenerator
 import com.zepben.ewb.database.sql.generators.SqliteGenerator
@@ -30,5 +27,6 @@ class ChangeSetDatabaseTables(
             TableObjectCreations(),
             TableObjectDeletions(),
             TableObjectModifications(),
+            TableObjectReverseModifications(),
         )
 }

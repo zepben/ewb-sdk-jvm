@@ -106,11 +106,11 @@ class ChangeSetConsumerClient(
 
         return GrpcResult.of(
             ChangeSetServices(
-                variantConsumerClient.service.get<ChangeSet>(mRID),
-                variantService = variantConsumerClient.service,
-                networkService = nMor?.value,
-                diagramService = dMor?.value,
-                customerService = cMor?.value,
+                variantConsumerClient.service.get<ChangeSet>(mRID), // didn't work?
+                variantService = variantConsumerClient.service,  // Empty service
+                networkService = nMor?.value,// Empty service
+                diagramService = dMor?.value,// Empty service
+                customerService = cMor?.value,// Empty service
             )
         )
     }

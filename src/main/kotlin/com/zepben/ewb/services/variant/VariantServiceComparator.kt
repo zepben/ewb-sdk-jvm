@@ -33,8 +33,8 @@ class VariantServiceComparator : BaseServiceComparator() {
                 NetworkModelProjectComponent::created,
                 NetworkModelProjectComponent::updated,
                 NetworkModelProjectComponent::closed,
-                NetworkModelProjectComponent::parent
             )
+            compareIdReferences(NetworkModelProjectComponent::parent)
         }
 
     fun compareNetworkModelProject(source: NetworkModelProject, target: NetworkModelProject): ObjectDifference<NetworkModelProject> =
@@ -61,8 +61,8 @@ class VariantServiceComparator : BaseServiceComparator() {
                 NetworkModelProjectStage::baseModelVersion,
                 NetworkModelProjectStage::lastConflictCheckedAt,
                 NetworkModelProjectStage::userComments,
-                NetworkModelProjectStage::changeSet,
             )
+            compareIdReferences(NetworkModelProjectStage::changeSet)
             compareIndexedValueCollections(NetworkModelProjectStage::equipmentContainerMRIDs)
             compareIdReferenceCollections(
                 NetworkModelProjectStage::dependentOnStage,
@@ -93,7 +93,7 @@ class VariantServiceComparator : BaseServiceComparator() {
     fun compareChangeSets(source: ChangeSet, target: ChangeSet): ObjectDifference<ChangeSet> =
         ObjectDifference(source, target).apply {
             compareDataSet()
-            compareIdReferenceCollections(ChangeSet::changeSetMembers)
+            compareIdReferenceCollections(ChangeSet::members)
             compareIdReferences(ChangeSet::networkModelProjectStage)
         }
 
@@ -101,41 +101,28 @@ class VariantServiceComparator : BaseServiceComparator() {
         ObjectDifference(source, target).apply {
             compareIdentifiable()
             compareValues(ChangeSetMember::targetObjectMRID)
+            compareIdReferences(ChangeSetMember::changeSet)
         }
 
     fun compareObjectCreation(source: ObjectCreation, target: ObjectCreation): ObjectDifference<ObjectCreation> =
         ObjectDifference(source, target).apply {
             compareChangeSetMember()
-            compareValues(ObjectCreation::targetObjectMRID)
-
-            compareIdReferences(ObjectCreation::changeSet)
         }
 
     fun compareObjectDeletion(source: ObjectDeletion, target: ObjectDeletion): ObjectDifference<ObjectDeletion> =
         ObjectDifference(source, target).apply {
             compareChangeSetMember()
-            compareValues(ObjectDeletion::targetObjectMRID)
-
-            compareIdReferences(ObjectDeletion::changeSet)
         }
 
     fun compareObjectModification(source: ObjectModification, target: ObjectModification): ObjectDifference<ObjectModification> =
         ObjectDifference(source, target).apply {
             compareChangeSetMember()
-            compareValues(ObjectModification::targetObjectMRID)
-
-            // Reverse modifications are not part of the VariantService, so always compared from a modification.
-            compareObjectReverseModification(source.objectReverseModification, target.objectReverseModification)
-
-            compareIdReferences(ObjectModification::changeSet)
+            compareIdReferences(ObjectModification::objectReverseModification)
         }
 
     private fun compareObjectReverseModification(source: ObjectReverseModification, target: ObjectReverseModification): ObjectDifference<ObjectReverseModification> =
         ObjectDifference(source, target).apply {
             compareChangeSetMember()
-            compareValues(ObjectReverseModification::targetObjectMRID)
-
-            compareIdReferences(ObjectReverseModification::changeSet)
             compareIdReferences(ObjectReverseModification::objectModification)
         }
 

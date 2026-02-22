@@ -13,4 +13,6 @@ package com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset
  *
  * @property objectModification ObjectModification specifying modifications to an object already existing.
  */
-class ObjectReverseModification(changeSet: ChangeSet, targetObjectMRID: String, val objectModification: ObjectModification): ChangeSetMember(changeSet, targetObjectMRID)
+class ObjectReverseModification: ChangeSetMember() {
+    lateinit var objectModification: ObjectModification
+}

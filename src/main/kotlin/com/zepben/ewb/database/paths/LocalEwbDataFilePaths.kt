@@ -10,6 +10,7 @@ package com.zepben.ewb.database.paths
 
 import java.nio.file.FileVisitOption
 import java.nio.file.Files
+import java.nio.file.NoSuchFileException
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.LocalDate
@@ -52,8 +53,19 @@ class LocalEwbDataFilePaths @JvmOverloads constructor(
             createDirectories(datePath)
     }
 
+    /**
+     * Lists the child items of source location.
+     *
+     * @return collection of child items. Returns an empty iterator if the prefix doesn't exist.
+     * @throws See [Files.walk] - Note: NoSuchFileException for a prefix will be captured here, but other exceptions apply.
+     */
+    @Suppress("KDocUnresolvedReference")
     override fun enumerateDescendants(prefix: String?): Iterator<Path> =
-        listFiles(prefix?.let { baseDir.resolve(it) } ?: baseDir)
+        try {
+            listFiles(prefix?.let { baseDir.resolve(it) } ?: baseDir)
+        } catch (e: NoSuchFileException) {
+            emptyList<Path>().iterator()
+        }
 
     override fun resolveDatabase(path: Path): Path =
         baseDir.resolve(path)

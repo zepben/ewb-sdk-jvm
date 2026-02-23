@@ -8,7 +8,7 @@
 
 package com.zepben.ewb.services.common
 
-import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.base.core.Name
 import kotlin.reflect.KProperty1
 
@@ -72,7 +72,7 @@ fun <T, R, C> KProperty1<in T, R?>.compareValues(source: T?, target: T?, toCompa
  * @param target The second object to compare.
  * @return The [ReferenceDifference] if there were any differences, otherwise `null`.
  */
-fun <T, R : IdentifiedObject> KProperty1<in T, R?>.compareIdReference(source: T?, target: T?): ReferenceDifference? {
+fun <T, R : Identifiable> KProperty1<in T, R?>.compareIdReference(source: T?, target: T?): ReferenceDifference? {
     val sRef: R? = source?.let { this.get(source) }
     val tRef: R? = target?.let { this.get(target) }
 
@@ -91,7 +91,7 @@ fun <T, R : IdentifiedObject> KProperty1<in T, R?>.compareIdReference(source: T?
  * @param target The second object to compare.
  * @return The [ObjectCollectionDifference] if there were any differences, otherwise `null`.
  */
-fun <T, R : IdentifiedObject> KProperty1<in T, Collection<R>>.compareIdReferenceCollection(source: T, target: T): ObjectCollectionDifference? {
+fun <T, R : Identifiable> KProperty1<in T, Collection<R>>.compareIdReferenceCollection(source: T, target: T): ObjectCollectionDifference? {
     val differences = ObjectCollectionDifference()
     val sourceCollection = this.get(source)
     val targetCollection = this.get(target)
@@ -121,7 +121,7 @@ fun <T, R : IdentifiedObject> KProperty1<in T, Collection<R>>.compareIdReference
  * @param target The second object to compare.
  * @return The [ValueCollectionDifference] if there were any differences, otherwise `null`.
  */
-fun <T : IdentifiedObject> KProperty1<in T, Collection<Name>>.compareNames(source: T, target: T): ValueCollectionDifference? {
+fun <T : Identifiable> KProperty1<in T, Collection<Name>>.compareNames(source: T, target: T): ValueCollectionDifference? {
     data class NameTypeName(val nameType: String, val name: String)
 
     val differences = ValueCollectionDifference()
@@ -153,7 +153,7 @@ fun <T : IdentifiedObject> KProperty1<in T, Collection<Name>>.compareNames(sourc
  * @param target The second object to compare.
  * @return The [ObjectCollectionDifference] if there were any differences, otherwise `null`.
  */
-fun <T, R : IdentifiedObject> KProperty1<in T, List<R>>.compareIndexedIdReferenceCollection(
+fun <T, R : Identifiable> KProperty1<in T, List<R>>.compareIndexedIdReferenceCollection(
     source: T,
     target: T
 ): ObjectCollectionDifference? {

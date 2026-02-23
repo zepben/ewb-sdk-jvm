@@ -46,9 +46,9 @@ internal class FindSwerEquipmentTest {
         val findSwerEquipmentSpy = spy(findSwerEquipment)
         findSwerEquipmentSpy.find(ns, stateOperators)
 
-        verify(findSwerEquipmentSpy).find(ns["fdr2"]!!, stateOperators)
+        verify(findSwerEquipmentSpy).find(feeder = ns["fdr2"]!!, stateOperators)  // FIXME: as with the other feeder = ns[...] ... why?
         verify(stateOperators).getEquipment(ns["fdr2"]!!)
-        verify(findSwerEquipmentSpy).find(ns["fdr3"]!!, stateOperators)
+        verify(findSwerEquipmentSpy).find(feeder = ns["fdr3"]!!, stateOperators)
         verify(stateOperators).getEquipment(ns["fdr3"]!!)
     }
 
@@ -69,7 +69,7 @@ internal class FindSwerEquipmentTest {
             .addFeeder("b0") // fdr10
             .build()
 
-        assertThat(findSwerEquipment.find(ns["fdr10"]!!, stateOperators), ns.createContainsInAnyOrder("tx3", "c4", "c5", "tx6", "c7", "b8"))
+        assertThat(findSwerEquipment.find(feeder = ns["fdr10"]!!, stateOperators), ns.createContainsInAnyOrder("tx3", "c4", "c5", "tx6", "c7", "b8"))
     }
 
     @Test
@@ -81,7 +81,7 @@ internal class FindSwerEquipmentTest {
             .addFeeder("b0") // fdr3
             .build()
 
-        assertThat(findSwerEquipment.find(ns["fdr3"]!!, stateOperators), empty())
+        assertThat(findSwerEquipment.find(feeder = ns["fdr3"]!!, stateOperators), empty())
     }
 
     @Test
@@ -109,7 +109,7 @@ internal class FindSwerEquipmentTest {
             .addFeeder("tx0") // fdr3
             .build()
 
-        assertThat(findSwerEquipment.find(ns["fdr3"]!!, stateOperators), ns.createContainsInAnyOrder("tx0", "b1"))
+        assertThat(findSwerEquipment.find(feeder = ns["fdr3"]!!, stateOperators), ns.createContainsInAnyOrder("tx0", "b1"))
         verify(stateOperators).isOpen(ns["b1"]!!)
     }
 
@@ -123,7 +123,7 @@ internal class FindSwerEquipmentTest {
             .addFeeder("tx0") // fdr4
             .build()
 
-        assertThat(findSwerEquipment.find(ns["fdr4"]!!, stateOperators), ns.createContainsInAnyOrder("tx0", "c1", "b2"))
+        assertThat(findSwerEquipment.find(feeder = ns["fdr4"]!!, stateOperators), ns.createContainsInAnyOrder("tx0", "c1", "b2"))
         verify(stateOperators).isOpen(ns["b2"]!!)
     }
 
@@ -140,8 +140,7 @@ internal class FindSwerEquipmentTest {
             .toAcls(PhaseCode.AN) { baseVoltage = BaseVoltage(generateId()).apply { nominalVoltage = 415 } } // c4
             .addFeeder("tx0") // fdr5
             .build()
-
-        assertThat(findSwerEquipment.find(ns["fdr5"]!!, stateOperators), ns.createContainsInAnyOrder("tx0", "c1", "c2", "c3", "c4"))
+        assertThat(findSwerEquipment.find(feeder = ns["fdr5"]!!, stateOperators), ns.createContainsInAnyOrder("tx0", "c1", "c2", "c3", "c4"))
     }
 
     @Test

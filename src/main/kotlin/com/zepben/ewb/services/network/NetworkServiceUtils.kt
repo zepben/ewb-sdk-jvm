@@ -157,7 +157,7 @@ import com.zepben.ewb.services.customer.CustomerService
  */
 @JvmOverloads
 inline fun <R> whenNetworkServiceObject(
-    identifiedObject: IdentifiedObject,
+    identifiedObject: Identifiable,
     isBatteryUnit: (BatteryUnit) -> R,
     isPhotoVoltaicUnit: (PhotoVoltaicUnit) -> R,
     isPowerElectronicsWindUnit: (PowerElectronicsWindUnit) -> R,
@@ -248,7 +248,7 @@ inline fun <R> whenNetworkServiceObject(
     isLvSubstation: (LvSubstation) -> R,
     isHvCustomer: (HvCustomer) -> R,
     isAcLineSegmentPhase: (AcLineSegmentPhase) -> R,
-    isOther: (IdentifiedObject) -> R = { idObj: IdentifiedObject ->
+    isOther: (Identifiable) -> R = { idObj: Identifiable ->
         throw IllegalArgumentException("Identified object type ${idObj::class} is not supported by the network service")
     }
 ): R = when (identifiedObject) {

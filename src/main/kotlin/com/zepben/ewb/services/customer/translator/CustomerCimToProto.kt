@@ -14,6 +14,7 @@ import com.zepben.ewb.cim.iec61968.customers.Customer
 import com.zepben.ewb.cim.iec61968.customers.CustomerAgreement
 import com.zepben.ewb.cim.iec61968.customers.PricingStructure
 import com.zepben.ewb.cim.iec61968.customers.Tariff
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.domain.DateTimeInterval
 import com.zepben.ewb.services.common.translator.BaseCimToProto
@@ -31,7 +32,7 @@ import com.zepben.protobuf.cim.iec61970.base.domain.DateTimeInterval as PBDateTi
 /**
  * Convert the [IdentifiedObject] to a [CustomerIdentifiedObject] representation.
  */
-fun customerIdentifiedObject(identifiedObject: IdentifiedObject): CustomerIdentifiedObject =
+fun customerIdentifiedObject(identifiedObject: Identifiable): CustomerIdentifiedObject =
     CustomerIdentifiedObject.newBuilder().apply {
         whenCustomerServiceObject(
             identifiedObject,

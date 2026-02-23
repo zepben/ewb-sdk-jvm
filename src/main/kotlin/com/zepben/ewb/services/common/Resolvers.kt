@@ -16,6 +16,8 @@ import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelayFun
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelayScheme
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelaySystem
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.BatteryControl
+import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProject
+import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectComponent
 import com.zepben.ewb.cim.iec61968.assetinfo.*
 import com.zepben.ewb.cim.iec61968.assets.Asset
 import com.zepben.ewb.cim.iec61968.assets.AssetOrganisationRole
@@ -49,6 +51,12 @@ import com.zepben.ewb.cim.iec61970.base.scada.RemoteControl
 import com.zepben.ewb.cim.iec61970.base.scada.RemoteSource
 import com.zepben.ewb.cim.iec61970.base.wires.*
 import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
+import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.AnnotatedProjectDependency
+import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStage
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSetMember
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectModification
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectReverseModification
 
 /**
  * These should be used to access [ReferenceResolver] instances for use with [BaseService.resolveOrDeferReference] and
@@ -595,4 +603,92 @@ object Resolvers {
     fun assets(powerSystemResource: PowerSystemResource): BoundReferenceResolver<PowerSystemResource, Asset> =
         BoundReferenceResolver(powerSystemResource, PowerSystemResourceToAssetResolver, AssetToPowerSystemResourceResolver)
 
+    @JvmStatic
+    fun stage(changeSet: ChangeSet): BoundReferenceResolver<ChangeSet, NetworkModelProjectStage> =
+        BoundReferenceResolver(changeSet, ChangeSetToNetworkModelProjectStageResolver, NetworkModelProjectStageToChangeSetResolver)
+
+    @JvmStatic
+    fun changeSet(stage: NetworkModelProjectStage): BoundReferenceResolver<NetworkModelProjectStage, ChangeSet> =
+        BoundReferenceResolver(stage, NetworkModelProjectStageToChangeSetResolver, ChangeSetToNetworkModelProjectStageResolver)
+
+    @JvmStatic
+    fun networkModelProjectComponents(networkModelProject: NetworkModelProject): BoundReferenceResolver<NetworkModelProject, NetworkModelProjectComponent> =
+        BoundReferenceResolver(
+            networkModelProject,
+            NetworkModelProjectToNetworkModelProjectComponentResolver,
+            NetworkModelProjectComponentToNetworkModelProjectResolver
+        )
+
+    @JvmStatic
+    fun networkModelProjects(networkModelProjectComponent: NetworkModelProjectComponent): BoundReferenceResolver<NetworkModelProjectComponent, NetworkModelProject> =
+        BoundReferenceResolver(
+            networkModelProjectComponent,
+            NetworkModelProjectComponentToNetworkModelProjectResolver,
+            NetworkModelProjectToNetworkModelProjectComponentResolver
+        )
+
+    @JvmStatic
+    fun dependentOnStage(annotatedProjectDependency: AnnotatedProjectDependency): BoundReferenceResolver<AnnotatedProjectDependency, NetworkModelProjectStage> =
+        BoundReferenceResolver(
+            annotatedProjectDependency,
+            AnnotatedProjectDependencyToDependentNetworkModelProjectStageResolver,
+            DependentNetworkModelProjectStageToAnnotatedProjectDependencyResolver
+        )
+
+    @JvmStatic
+    fun dependingStage(annotatedProjectDependency: AnnotatedProjectDependency): BoundReferenceResolver<AnnotatedProjectDependency, NetworkModelProjectStage> =
+        BoundReferenceResolver(
+            annotatedProjectDependency,
+            AnnotatedProjectDependencyToDependingNetworkModelProjectStageResolver,
+            DependingNetworkModelProjectStageToAnnotatedProjectDependencyResolver
+        )
+
+
+    @JvmStatic
+    fun dependentOnStage(networkModelProjectStage: NetworkModelProjectStage): BoundReferenceResolver<NetworkModelProjectStage, AnnotatedProjectDependency> =
+        BoundReferenceResolver(
+            networkModelProjectStage,
+            DependentNetworkModelProjectStageToAnnotatedProjectDependencyResolver,
+            AnnotatedProjectDependencyToDependentNetworkModelProjectStageResolver
+        )
+
+    @JvmStatic
+    fun dependingStage(networkModelProjectStage: NetworkModelProjectStage): BoundReferenceResolver<NetworkModelProjectStage, AnnotatedProjectDependency> =
+        BoundReferenceResolver(
+            networkModelProjectStage,
+            DependingNetworkModelProjectStageToAnnotatedProjectDependencyResolver,
+            AnnotatedProjectDependencyToDependingNetworkModelProjectStageResolver
+        )
+
+    @JvmStatic
+    fun member(changeSet: ChangeSet): BoundReferenceResolver<ChangeSet, ChangeSetMember> =
+        BoundReferenceResolver(
+            changeSet,
+            ChangeSetToChangeSetMemberResolver,
+            ChangeSetMemberToChangeSetResolver
+        )
+
+    @JvmStatic
+    fun changeSet(changeSetMember: ChangeSetMember): BoundReferenceResolver<ChangeSetMember, ChangeSet> =
+        BoundReferenceResolver(
+            changeSetMember,
+            ChangeSetMemberToChangeSetResolver,
+            ChangeSetToChangeSetMemberResolver,
+        )
+
+    @JvmStatic
+    fun modification(reverseModification: ObjectReverseModification): BoundReferenceResolver<ObjectReverseModification, ObjectModification> =
+        BoundReferenceResolver(
+            reverseModification,
+            ObjectReverseModificationToObjectModificationResolver,
+            ObjectModificationToObjectReverseModificationResolver,
+        )
+
+    @JvmStatic
+    fun reverseModification(modification: ObjectModification): BoundReferenceResolver<ObjectModification, ObjectReverseModification> =
+        BoundReferenceResolver(
+            modification,
+            ObjectModificationToObjectReverseModificationResolver,
+            ObjectReverseModificationToObjectModificationResolver,
+        )
 }

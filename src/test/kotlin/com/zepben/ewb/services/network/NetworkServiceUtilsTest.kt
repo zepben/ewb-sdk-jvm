@@ -69,7 +69,7 @@ internal class NetworkServiceUtilsTest {
     // Function references to functions with generics are not yet supported, so we take a copy of the function that has a concrete type and pass through.
     // If you get failed tests about missing IdentifiedObject types, first update the proxied function, then update this one to match.
     internal fun whenNetworkServiceObjectProxy(
-        identifiedObject: IdentifiedObject,
+        identifiedObject: Identifiable,
         isBatteryUnit: (BatteryUnit) -> String,
         isPhotoVoltaicUnit: (PhotoVoltaicUnit) -> String,
         isPowerElectronicsWindUnit: (PowerElectronicsWindUnit) -> String,
@@ -160,7 +160,7 @@ internal class NetworkServiceUtilsTest {
         isHvCustomer: (HvCustomer) -> String,
         isLvSubstation: (LvSubstation) -> String,
         isAcLineSegmentPhase: (AcLineSegmentPhase) -> String,
-        isOther: (IdentifiedObject) -> String
+        isOther: (Identifiable) -> String
     ): String = whenNetworkServiceObject(
         identifiedObject,
         isBatteryUnit = isBatteryUnit,

@@ -8,7 +8,9 @@
 
 package com.zepben.ewb.services.common
 
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
 import com.zepben.ewb.services.common.testdata.generateId
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -24,7 +26,11 @@ internal fun verifyWhenServiceFunctionSupportsAllServiceTypes(
     supportedKClasses: Set<KClass<*>>,
     whenFunction: KFunction<*>,
     subjectField: String = "identifiedObject",
-    createUnknownClass: (String) -> Any = { object : IdentifiedObject(it) {} }
+    createUnknownClass: (String) -> Any = { object : Identifiable {
+        override val mRID: String = it
+        override fun typeNameAndMRID(): String = "test name and mrid"
+        override fun nameAndMRID(): String = "test name"
+    } }
 ) {
     // Find all the parameters that have arguments and get their first parameter.
     // These should all be IdentifiedObject leaf classes in the "when*ServiceObject" functions.
@@ -44,7 +50,7 @@ internal fun verifyWhenServiceFunctionSupportsAllServiceTypes(
     // NeverInvokedChecker for each other callback.
     val paramsByName = whenFunction.parameters.associateBy { it.name }
     val neverInvokedParams = supportedKClasses.map { NeverInvokedChecker(it) }.associateBy { paramsByName.ensureParam(it.expectedCallback) } +
-        mapOf(paramsByName.ensureParam("isOther") to neverInvokedChecker<IdentifiedObject>())
+        mapOf(paramsByName.ensureParam("isOther") to neverInvokedChecker<Identifiable>())
 
     supportedKClasses.forEach { check ->
         whenFunction.validateObjectCallback(

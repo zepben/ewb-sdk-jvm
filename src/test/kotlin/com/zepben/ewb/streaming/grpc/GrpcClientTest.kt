@@ -8,7 +8,10 @@
 
 package com.zepben.ewb.streaming.grpc
 
+import com.zepben.protobuf.nc.NetworkConsumerGrpc
+import com.zepben.protobuf.nc.NetworkConsumerGrpc.NetworkConsumerStub
 import com.zepben.testutils.junit.SystemLogExtension
+import io.grpc.CallOptions
 import io.mockk.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -24,7 +27,7 @@ internal class GrpcClientTest {
     @RegisterExtension
     val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
-    private val client = ThrowingGrpcClient()
+    private val client = ThrowingGrpcClient(stub = mockk())
 
     @Test
     internal fun `safeTryRpc calls all handlers`() {
@@ -83,7 +86,10 @@ internal class GrpcClientTest {
             every { it.awaitTermination(any(), any()) } returns true
         }
 
-        val client1 = object : GrpcClient(executor) {}
+        val client1 = object : GrpcClient<NetworkConsumerStub>() {
+            override val stub: NetworkConsumerStub
+                get() = NetworkConsumerGrpc.newStub(spyk()).withExecutor(executor)
+        }
 
         client1.close()
 
@@ -100,7 +106,10 @@ internal class GrpcClientTest {
             every { it.shutdownNow() } returns emptyList()
         }
 
-        val client1 = object : GrpcClient(executor) {}
+        val client1 = object : GrpcClient<NetworkConsumerStub>() {
+            override val stub: NetworkConsumerStub
+                get() = NetworkConsumerGrpc.newStub(spyk()).withExecutor(executor)
+        }
 
         client1.close()
 
@@ -112,7 +121,30 @@ internal class GrpcClientTest {
 
     @Test
     internal fun `supports null executor`() {
-        val client1 = object : GrpcClient(null) {}
+        val callOpts = mockk<CallOptions> {
+            every { executor } returns null
+        }
+        val stub = mockk<NetworkConsumerStub> {
+            every { callOptions } returns callOpts
+        }
+
+        val client1 = object : GrpcClient<NetworkConsumerStub>() {
+            override val stub: NetworkConsumerStub = stub
+        }
+
+        client1.close()
+    }
+
+    @Test
+    internal fun `supports null callOpts`() {
+        val stub = mockk<NetworkConsumerStub> {
+            every { callOptions } returns null
+        }
+
+        val client1 = object : GrpcClient<NetworkConsumerStub>() {
+            override val stub: NetworkConsumerStub = stub
+        }
+
         client1.close()
     }
 

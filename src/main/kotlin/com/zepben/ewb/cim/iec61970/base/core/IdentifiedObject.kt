@@ -19,9 +19,7 @@ package com.zepben.ewb.cim.iec61970.base.core
  * @property description a free human-readable text describing or naming the object. It may be non-unique and may not correlate to a naming hierarchy.
  * @property numDiagramObjects Number of DiagramObject's known to associate with this [IdentifiedObject]
  */
-abstract class IdentifiedObject(
-    val mRID: String
-) {
+abstract class IdentifiedObject(override val mRID: String) : Identifiable {
 
     // Changed to use mutableSet to prevent duplicated entries from addName function
     private var _names: MutableSet<Name>? = null
@@ -142,6 +140,16 @@ abstract class IdentifiedObject(
         _names = null
         return this
     }
+
+    /**
+     * Printable version of the object including the type, name and mRID.
+     */
+    override fun typeNameAndMRID(): String = if (name.isNullOrBlank()) "${javaClass.simpleName} $mRID" else "${javaClass.simpleName} $name [$mRID]"
+
+    /**
+     * Printable version of the object including its name and mRID.
+     */
+    override fun nameAndMRID(): String = if (name.isNullOrBlank()) mRID else "'$name' [$mRID]"
 
     private fun Iterable<Name>?.getByTypeAndName(type: String, name: String): Name? {
         return this?.firstOrNull { it.type.name == type && it.name == name }

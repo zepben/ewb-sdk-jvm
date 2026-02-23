@@ -14,8 +14,6 @@ import com.zepben.ewb.cim.iec61970.base.wires.EnergySource
 import com.zepben.ewb.database.sql.cim.BaseServiceReader
 import com.zepben.ewb.database.sql.cim.CimDatabaseReader
 import com.zepben.ewb.database.sql.cim.metadata.MetadataCollectionReader
-import com.zepben.ewb.services.common.extensions.nameAndMRID
-import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 import com.zepben.ewb.services.common.meta.MetadataCollection
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.tracing.feeder.AssignToFeeders

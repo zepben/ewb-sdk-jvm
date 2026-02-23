@@ -8,18 +8,21 @@
 
 package com.zepben.ewb.streaming.get
 
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
 import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.diagram.DiagramService
 import com.zepben.ewb.services.diagram.translator.DiagramProtoToCim
 import com.zepben.ewb.services.diagram.translator.addFromPb
+import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.streaming.grpc.GrpcChannel
 import com.zepben.ewb.streaming.grpc.GrpcResult
 import com.zepben.protobuf.dc.*
 import com.zepben.protobuf.metadata.GetMetadataRequest
 import com.zepben.protobuf.metadata.GetMetadataResponse
+import com.zepben.protobuf.dc.GetChangeSetObjectsRequest
+import com.zepben.protobuf.dc.GetChangeSetObjectsResponse
 import io.grpc.CallCredentials
 import io.grpc.Channel
-import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 /**
@@ -31,14 +34,12 @@ import java.util.concurrent.Executors
  * were retrieved but not added to service. This should not be the case unless you are processing things concurrently.
  *
  * @property stub The gRPC stub to be used to communicate with the server
- * @param executor An optional [ExecutorService] to use with the stub. If provided, it will be cleaned up when this client is closed.
  */
 class DiagramConsumerClient(
-    private val stub: DiagramConsumerGrpc.DiagramConsumerStub,
+    override val stub: DiagramConsumerGrpc.DiagramConsumerStub,
     override val service: DiagramService = DiagramService(),
     override val protoToCim: DiagramProtoToCim = DiagramProtoToCim(service),
-    executor: ExecutorService? = null
-) : CimConsumerClient<DiagramService, DiagramProtoToCim>(executor) {
+) : CimConsumerClient<DiagramService, DiagramProtoToCim, DiagramConsumerGrpc.DiagramConsumerStub>() {
 
     /**
      * Create a [DiagramConsumerClient]
@@ -49,8 +50,7 @@ class DiagramConsumerClient(
     @JvmOverloads
     constructor(channel: Channel, callCredentials: CallCredentials? = null) :
         this(
-            DiagramConsumerGrpc.newStub(channel).apply { callCredentials?.let { withCallCredentials(it) } },
-            executor = Executors.newSingleThreadExecutor()
+            DiagramConsumerGrpc.newStub(channel).withExecutor(Executors.newSingleThreadExecutor()).apply { callCredentials?.let { withCallCredentials(it) } },
         )
 
     /**
@@ -60,11 +60,7 @@ class DiagramConsumerClient(
      * @param callCredentials [CallCredentials] to be attached to the stub.
      */
     @JvmOverloads
-    constructor(channel: GrpcChannel, callCredentials: CallCredentials? = null) :
-        this(
-            DiagramConsumerGrpc.newStub(channel.channel).apply { callCredentials?.let { withCallCredentials(it) } },
-            executor = Executors.newSingleThreadExecutor()
-        )
+    constructor(channel: GrpcChannel, callCredentials: CallCredentials? = null) : this(channel.channel, callCredentials)
 
 
     /**
@@ -93,6 +89,27 @@ class DiagramConsumerClient(
      */
     fun getDiagramObjects(mRIDs: Set<String>): GrpcResult<MultiObjectResult> = handleMultiObjectRPC {
         processDiagramObjects(mRIDs.asSequence())
+    }
+
+    /**
+     * Retrieve the network contents of a [ChangeSet] from the server.
+     * This will return a new [DiagramService] with just the network related contents of the [ChangeSet].
+     * Note this function does not populate [service] as merging a [ChangeSet] with a [DiagramService] should use
+     * XXXX TODO fill this in with merge functionality???.
+     *
+     * @param mRID The mRID of the [ChangeSet] to retrieve contents for.
+     * @return A [GrpcResult] of a [DiagramService].
+     */
+    fun getChangeSetObjects(mRID: String): GrpcResult<DiagramService> = tryRpc {
+        val diagramService = DiagramService()
+        val streamObserver = AwaitableStreamObserver<GetChangeSetObjectsResponse> { response ->
+            diagramService.addFromPb(response.identifiableObject)
+        }
+        stub.getChangeSetObjects(GetChangeSetObjectsRequest.newBuilder().setChangeSetMRID(mRID).build(), streamObserver)
+
+        streamObserver.await()
+
+        diagramService
     }
 
     override fun processIdentifiedObjects(mRIDs: Sequence<String>): Sequence<ExtractResult> {

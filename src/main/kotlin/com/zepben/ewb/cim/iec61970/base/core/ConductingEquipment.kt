@@ -10,7 +10,6 @@ package com.zepben.ewb.cim.iec61970.base.core
 
 import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import com.zepben.ewb.services.common.extensions.getByMRID
-import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 import com.zepben.ewb.services.common.extensions.validateReference
 
 /**

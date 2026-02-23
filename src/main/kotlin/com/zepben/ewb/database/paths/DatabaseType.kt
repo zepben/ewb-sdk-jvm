@@ -17,6 +17,7 @@ enum class DatabaseType(
     DIAGRAM(perDate = true, fileDescriptor = "diagrams"),
     MEASUREMENT(perDate = true, fileDescriptor = "measurements"),
     NETWORK_MODEL(perDate = true, fileDescriptor = "network-model"),
+    VARIANT(perDate = true, fileDescriptor = "variants"),
     TILE_CACHE(perDate = true, fileDescriptor = "tile-cache"),
     ENERGY_READING(perDate = true, fileDescriptor = "load-readings"),
 

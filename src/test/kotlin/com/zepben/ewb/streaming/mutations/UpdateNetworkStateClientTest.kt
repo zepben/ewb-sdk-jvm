@@ -49,7 +49,7 @@ internal class UpdateNetworkStateClientTest {
     private val serverName = InProcessServerBuilder.generateName()
     private val channel = grpcCleanup.register(InProcessChannelBuilder.forName(serverName).directExecutor().build())
     private val stub = spy(UpdateNetworkStateServiceGrpc.newStub(channel))
-    private val client = UpdateNetworkStateClient(stub, null)
+    private val client = UpdateNetworkStateClient(stub)
     private val service = TestUpdateNetworkStateService()
 
     private val currentStateEvents = listOf<CurrentStateEvent>(

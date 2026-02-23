@@ -8,11 +8,13 @@
 
 package com.zepben.ewb.services.common.extensions
 
-import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.base.core.NameType
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.DataSet
 import com.zepben.ewb.database.sql.common.MRIDLookupException
 import com.zepben.ewb.database.sql.common.NameTypeLookupException
 import com.zepben.ewb.services.common.BaseService
+import com.zepben.ewb.services.variant.VariantService
 
 
 /**
@@ -26,7 +28,7 @@ import com.zepben.ewb.services.common.BaseService
  * @throws MRIDLookupException if no objects of type [T] are found with the specified [mRID]
  */
 @Throws(MRIDLookupException::class)
-inline fun <reified T : IdentifiedObject> BaseService.getOrThrow(mRID: String?, typeNameAndMRID: String): T {
+inline fun <reified T : Identifiable> BaseService.getOrThrow(mRID: String?, typeNameAndMRID: String): T {
     return get(mRID)
         ?: throw MRIDLookupException("Failed to find ${T::class.simpleName} with mRID $mRID for $typeNameAndMRID")
 }
@@ -56,7 +58,7 @@ fun BaseService.getNameTypeOrThrow(typeName: String): NameType {
  * @throws MRIDLookupException if no objects of type [T] are found with the specified [mRID]
  */
 @Throws(MRIDLookupException::class)
-inline fun <reified T : IdentifiedObject> BaseService.ensureGet(mRID: String?, typeNameAndMRID: String): T? {
+inline fun <reified T : Identifiable> BaseService.ensureGet(mRID: String?, typeNameAndMRID: String): T? {
     return if (mRID.isNullOrBlank())
         null
     else

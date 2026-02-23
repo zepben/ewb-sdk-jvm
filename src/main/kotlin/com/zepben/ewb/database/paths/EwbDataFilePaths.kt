@@ -12,6 +12,7 @@ import java.io.IOException
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.LocalDate
+import kotlin.io.path.isRegularFile
 import kotlin.io.path.name
 
 /**
@@ -130,11 +131,10 @@ interface EwbDataFilePaths {
      * @return list of variant names that exist in the data path for the specified [date].
      */
     fun getAvailableVariantsFor(date: LocalDate = LocalDate.now()): List<String> {
-        return enumerateDescendants()
+        return enumerateDescendants("$date/$VARIANTS_PATH")
             .asSequence()
-            .filter { it.parent?.fileName.toString().lowercase() == VARIANTS_PATH }
-            .filter { it.parent?.parent?.fileName.toString() == date.toString() }
-            .map { it.fileName.toString() }
+            .filter { it.parent?.parent?.fileName.toString() == VARIANTS_PATH }
+            .map { it.parent?.fileName.toString() }
             .sorted()
             .toList()
     }
@@ -144,7 +144,7 @@ interface EwbDataFilePaths {
      *
      * @return collection of child items.
      */
-    fun enumerateDescendants(): Iterator<Path>
+    fun enumerateDescendants(prefix: String? = null): Iterator<Path>
 
     /**
      * Resolves the database in the specified source [Path].

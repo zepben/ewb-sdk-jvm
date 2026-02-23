@@ -11,6 +11,7 @@ package com.zepben.ewb.services.common
 import com.zepben.ewb.cim.iec61968.common.Document
 import com.zepben.ewb.cim.iec61968.common.Organisation
 import com.zepben.ewb.cim.iec61968.common.OrganisationRole
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.core.NameType
 import com.zepben.ewb.cim.iec61970.base.wires.Junction
@@ -71,24 +72,33 @@ internal abstract class BaseServiceComparatorTest {
     }
 
     @Test
-    internal fun testValidateService() {
+    internal fun testValidateServiceMRID() {
         val iter = comparatorValidator.newService().supportedKClasses.iterator()
-        val clazz1: KClass<out IdentifiedObject> = iter.next()
-        val clazz2: KClass<out IdentifiedObject> = iter.next()
+        val clazz1: KClass<out Identifiable> = iter.next()
+        val clazz2: KClass<out Identifiable> = iter.next()
 
-        val subject = clazz1.primaryConstructor?.call("mRID")?.apply { name = "the name" }
+        val subject = clazz1.primaryConstructor?.call("mRID")
             ?: throw Error("expected primary constructor")
-        val match = clazz1.primaryConstructor?.call("mRID")?.apply { name = "the name" }
+        val match = clazz1.primaryConstructor?.call("mRID")
             ?: throw Error("expected primary constructor")
-        val diffMRID = clazz1.primaryConstructor?.call("diff mRID")?.apply { name = "the name" }
+        val diffMRID = clazz1.primaryConstructor?.call("diff mRID")
             ?: throw Error("expected primary constructor")
-        val diffClass = clazz2.primaryConstructor?.call("mRID")?.apply { name = "the name" }
-            ?: throw Error("expected primary constructor")
-        val diffName = clazz1.primaryConstructor?.call("mRID")?.apply { name = "diff name" }
+        val diffClass = clazz2.primaryConstructor?.call("mRID")
             ?: throw Error("expected primary constructor")
         comparatorValidator.validateServiceOf(subject, match)
         comparatorValidator.validateServiceOf(subject, diffMRID, expectMissingFromTarget = subject, expectMissingFromSource = diffMRID)
         comparatorValidator.validateServiceOf(subject, diffClass, expectMissingFromTarget = subject, expectMissingFromSource = diffClass)
+    }
+
+    @Test
+    internal fun testValidateServiceWithModification() {
+        val iter = comparatorValidator.newService().supportedKClasses.filterIsInstance<KClass<out IdentifiedObject>>().iterator()
+        val clazz1: KClass<out IdentifiedObject> = iter.next()
+
+        val subject = clazz1.primaryConstructor?.call("mRID")?.apply { name = "the name" }
+            ?: throw Error("expected primary constructor")
+        val diffName = clazz1.primaryConstructor?.call("mRID")?.apply { name = "diff name" }
+            ?: throw Error("expected primary constructor")
         comparatorValidator.validateServiceOf(
             subject, diffName,
             expectModification = ObjectDifference(subject, diffName).apply { differences["name"] = ValueDifference(subject.name, diffName.name) })

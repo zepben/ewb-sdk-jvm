@@ -26,9 +26,8 @@ internal class TestDiagramConsumerService : DiagramConsumerGrpc.DiagramConsumerI
     override fun getDiagramObjects(responseObserver: StreamObserver<GetDiagramObjectsResponse>?): StreamObserver<GetDiagramObjectsRequest> =
         TestStreamObserver(responseObserver!!, onGetDiagramObjects)
 
-    override fun getMetadata(request: GetMetadataRequest, responseObserver: StreamObserver<GetMetadataResponse>) {
+    override fun getMetadata(request: GetMetadataRequest, responseObserver: StreamObserver<GetMetadataResponse>) =
         runGrpc(request, responseObserver, onGetMetadataRequest)
-    }
 
     private fun <T, U : StreamObserver<*>> runGrpc(request: T, response: U, handler: (T, U) -> Unit) {
         try {

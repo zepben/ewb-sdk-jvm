@@ -16,7 +16,6 @@ import com.zepben.ewb.database.sql.cim.tables.iec61970.base.diagramlayout.TableD
 import com.zepben.ewb.database.sql.extensions.getNullableString
 import com.zepben.ewb.services.common.extensions.ensureGet
 import com.zepben.ewb.services.common.extensions.getOrThrow
-import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 import com.zepben.ewb.services.diagram.DiagramService
 import java.sql.ResultSet
 import java.sql.SQLException

@@ -26,24 +26,20 @@ internal class TestNetworkConsumerService : NetworkConsumerGrpc.NetworkConsumerI
     override fun getIdentifiedObjects(response: StreamObserver<GetIdentifiedObjectsResponse>): StreamObserver<GetIdentifiedObjectsRequest> =
         TestStreamObserver(response, onGetIdentifiedObjects)
 
-    override fun getNetworkHierarchy(request: GetNetworkHierarchyRequest, response: StreamObserver<GetNetworkHierarchyResponse>) {
+    override fun getNetworkHierarchy(request: GetNetworkHierarchyRequest, response: StreamObserver<GetNetworkHierarchyResponse>) =
         runGrpc(request, response, onGetNetworkHierarchy)
-    }
 
-    override fun getMetadata(request: GetMetadataRequest, response: StreamObserver<GetMetadataResponse>) {
+    override fun getMetadata(request: GetMetadataRequest, response: StreamObserver<GetMetadataResponse>) =
         runGrpc(request, response, onGetMetadataRequest)
-    }
 
     override fun getEquipmentForContainers(response: StreamObserver<GetEquipmentForContainersResponse>): StreamObserver<GetEquipmentForContainersRequest> =
         TestStreamObserver(response, onGetEquipmentForContainers)
 
-    override fun getEquipmentForRestriction(request: GetEquipmentForRestrictionRequest, response: StreamObserver<GetEquipmentForRestrictionResponse>) {
+    override fun getEquipmentForRestriction(request: GetEquipmentForRestrictionRequest, response: StreamObserver<GetEquipmentForRestrictionResponse>) =
         runGrpc(request, response, onGetEquipmentForRestriction)
-    }
 
-    override fun getTerminalsForNode(request: GetTerminalsForNodeRequest, response: StreamObserver<GetTerminalsForNodeResponse>) {
+    override fun getTerminalsForNode(request: GetTerminalsForNodeRequest, response: StreamObserver<GetTerminalsForNodeResponse>) =
         runGrpc(request, response, onGetTerminalsForNode)
-    }
 
     private fun <T, U : StreamObserver<*>> runGrpc(request: T, response: U, handler: (T, U) -> Unit) {
         try {

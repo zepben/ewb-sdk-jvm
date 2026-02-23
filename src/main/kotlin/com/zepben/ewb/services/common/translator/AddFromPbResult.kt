@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.services.common.translator
 
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 
 /**
@@ -22,6 +23,6 @@ import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
  */
 data class AddFromPbResult(
     val mRID: String,
-    val identifiedObject: IdentifiedObject?,
+    val identifiedObject: Identifiable?,
     val reusedExisting: Boolean,
 )

@@ -12,7 +12,6 @@ import com.zepben.ewb.cim.iec61968.assetinfo.PowerTransformerInfo
 import com.zepben.ewb.cim.iec61970.base.core.BaseVoltage
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.core.Terminal
-import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 import com.zepben.ewb.services.network.ResistanceReactance
 
 /**

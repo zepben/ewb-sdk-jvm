@@ -12,14 +12,10 @@ import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmode
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.AnnotatedProjectDependency
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStage
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectCreation
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectDeletion
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectModification
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.*
 import com.zepben.ewb.services.variant.VariantService
 import com.zepben.ewb.services.variant.VariantServiceComparator
 import com.zepben.ewb.services.variant.testdata.fillFields
-import com.zepben.ewb.services.variant.translator.toPb
 import com.zepben.ewb.services.variant.translator.variantObject
 import com.zepben.ewb.streaming.get.testservices.TestVariantConsumerService
 import com.zepben.ewb.streaming.grpc.CaptureLastRpcErrorHandler
@@ -70,10 +66,14 @@ internal class VariantConsumerClientTest {
         grpcCleanup.register(InProcessServerBuilder.forName(serverName).directExecutor().addService(consumerService).build().start())
     }
 
-    private fun responseOf(objects: List<Identifiable>): MutableIterator<GetIdentifiedObjectsResponse> {
-        val responses = mutableListOf<GetIdentifiedObjectsResponse>()
+    private fun responseOf(obj: Identifiable): GetIdentifiedObjectsResponse {
+        return GetIdentifiedObjectsResponse.newBuilder().apply { addIdentifiableObjects(variantObject(obj)) }.build()
+    }
+
+    private fun responseOfChangeSet(objects: Iterable<Identifiable>): MutableIterator<GetChangeSetResponse> {
+        val responses = mutableListOf<GetChangeSetResponse>()
         objects.forEach {
-            responses.add(GetIdentifiedObjectsResponse.newBuilder().apply { addIdentifiableObjects(variantObject(it)) }.build())
+            responses.add(GetChangeSetResponse.newBuilder().apply { identifiableObject = variantObject(it) }.build())
         }
         return responses.iterator()
     }
@@ -84,16 +84,21 @@ internal class VariantConsumerClientTest {
         val expectedService = VariantService()
         val changeSet = ChangeSet("test").fillFields(expectedService).also { expectedService.add(it) }
 
-        consumerService.onGetChangeSets =
-            spy { _, response -> response.onNext(GetChangeSetResponse.newBuilder().setChangeSet(changeSet.toPb()).build()) }
+        consumerService.onGetChangeSet =
+            spy { _, response ->
+                val changeSetObjects = (expectedService.sequenceOf<ChangeSet>() + expectedService.sequenceOf<ChangeSetMember>())
+                responseOfChangeSet(changeSetObjects.toList()).forEach { response.onNext(it) }
+            }
         consumerService.onGetIdentifiedObjects =
             spy { request, response ->
-                responseOf(request.mridsList.map { expectedService[it]!! }).forEach { response.onNext((it)) }
+                request.mridsList.forEach {
+                    responseOf(expectedService[it]!!).also { response.onNext(it) }
+                }
             }
 
         val result = consumerClient.getChangeSet("test").throwOnError()
 
-        verify(consumerService.onGetIdentifiedObjects, times(2)).invoke(isA<GetIdentifiedObjectsRequest>(), any())
+        verify(consumerService.onGetIdentifiedObjects, times(1)).invoke(isA<GetIdentifiedObjectsRequest>(), any())
         assertThat("getChangeSet should succeed", result.wasSuccessful)
         val differences = VariantServiceComparator().compare(expectedService, consumerClient.service)
         assertThat("unexpected objects found in read service: ${differences.missingFromTarget()}", differences.missingFromTarget(), empty())
@@ -117,11 +122,20 @@ internal class VariantConsumerClientTest {
         val changeSet2 = ChangeSet("changeSet2").also { expectedService.add(it); it.networkModelProjectStage = stage2; stage2.changeSet = it }
         val depending = AnnotatedProjectDependency("depending").also { expectedService.add(it); it.dependencyDependingStage= stage2; stage2.addDependingStage(it) }
 
-        consumerService.onGetChangeSets =
-            spy { _, response -> response.onNext(GetChangeSetResponse.newBuilder().setChangeSet(changeSet.toPb()).build()) }
+        consumerService.onGetChangeSet =
+            spy { _, response ->
+                // Note we mimic the server behaviour here of sending the whole contents of the variants database, but that requires us to
+                // explicitly filter these out of the getIdentifiedObjects responses below so that we don't accidentally retrieve them via the unresolved references.
+                val changeSetObjects = listOf(changeSet, creation, deletion, modification, modification.objectReverseModification)
+                responseOfChangeSet(changeSetObjects).forEach { response.onNext(it) }
+            }
         consumerService.onGetIdentifiedObjects =
             spy { request, response ->
-                responseOf(request.mridsList.map { expectedService[it]!! }).forEach { response.onNext((it)) }
+                request.mridsList.forEach {
+                    if (it !in setOf(creation.mRID, deletion.mRID, modification.mRID, modification.objectReverseModification.mRID)) {
+                        responseOf(expectedService[it]!!).also { response.onNext(it) }
+                    }
+                }
             }
 
         val result = consumerClient.getChangeSet("changeSet").throwOnError()
@@ -131,6 +145,12 @@ internal class VariantConsumerClientTest {
         assertThat("unexpected objects found in read service: ${differences.missingFromTarget()}", differences.missingFromTarget(), containsInAnyOrder(changeSet2.mRID, stage2.mRID, depending.mRID))
         assertThat("unexpected modifications ${differences.modifications()}", differences.modifications(), anEmptyMap())
         assertThat("objects missing from read service: ${differences.missingFromSource()}", differences.missingFromSource(), empty())
+
+        consumerService.onGetChangeSet =
+            spy { _, response ->
+                val changeSetObjects = listOf(changeSet2)
+                responseOfChangeSet(changeSetObjects).forEach { response.onNext(it) }
+            }
 
         val result2 = consumerClient.getChangeSet("changeSet2").throwOnError()
         assertThat("getChangeSet should succeed", result2.wasSuccessful)

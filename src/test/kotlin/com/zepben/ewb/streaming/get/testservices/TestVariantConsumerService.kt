@@ -24,7 +24,7 @@ internal class TestVariantConsumerService : VariantConsumerGrpc.VariantConsumerI
 
     lateinit var onGetIdentifiedObjects: (request: GetIdentifiedObjectsRequest, response: StreamObserver<GetIdentifiedObjectsResponse>) -> Unit
     lateinit var onGetNetworkModelProjects: (request: GetNetworkModelProjectsRequest, response: StreamObserver<GetNetworkModelProjectsResponse>) -> Unit
-    lateinit var onGetChangeSets: (request: GetChangeSetRequest, response: StreamObserver<GetChangeSetResponse>) -> Unit
+    lateinit var onGetChangeSet: (request: GetChangeSetRequest, response: StreamObserver<GetChangeSetResponse>) -> Unit
     lateinit var onGetMetadataRequest: (request: GetMetadataRequest, response: StreamObserver<GetMetadataResponse>) -> Unit
 
     override fun getIdentifiedObjects(response: StreamObserver<GetIdentifiedObjectsResponse>): StreamObserver<GetIdentifiedObjectsRequest> =
@@ -34,7 +34,7 @@ internal class TestVariantConsumerService : VariantConsumerGrpc.VariantConsumerI
         TestStreamObserver(response, onGetNetworkModelProjects)
 
     override fun getChangeSet(request: GetChangeSetRequest, response: StreamObserver<GetChangeSetResponse>) {
-        TestStreamObserver(response, onGetChangeSets)
+        runGrpc(request, response, onGetChangeSet)
     }
 
     override fun getMetadata(request: GetMetadataRequest, responseObserver: StreamObserver<GetMetadataResponse>) =

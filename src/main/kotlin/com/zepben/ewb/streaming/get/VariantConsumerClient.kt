@@ -17,8 +17,6 @@ import com.zepben.ewb.streaming.grpc.GrpcChannel
 import com.zepben.ewb.streaming.grpc.GrpcResult
 import com.zepben.protobuf.metadata.GetMetadataRequest
 import com.zepben.protobuf.metadata.GetMetadataResponse
-import com.zepben.protobuf.vc.GetIdentifiedObjectsRequest
-import com.zepben.protobuf.vc.GetIdentifiedObjectsResponse
 import com.zepben.protobuf.vc.*
 import io.grpc.CallCredentials
 import io.grpc.Channel
@@ -99,8 +97,22 @@ class VariantConsumerClient @JvmOverloads constructor(
      * @return A [GrpcResult] of a [MultiObjectResult]. If successful, containing a map keyed by mRID of all the objects retrieved. If an item was not found, or
      * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed]
      */
-    fun getChangeSets(mRIDs: Iterable<String>): GrpcResult<MultiObjectResult> =
-        getWithReferences(mRIDs.asSequence(), ChangeSet::class.java)
+    fun getChangeSets(mRIDs: Iterable<String>): GrpcResult<MultiObjectResult> {
+        val mor = MultiObjectResult()
+        mRIDs.forEach { mRID ->
+            val streamObserver = AwaitableStreamObserver<GetChangeSetResponse> { response ->
+                val result = service.addFromPb(response.identifiableObject)
+                result.identifiedObject?.let { mor.objects.put(result.mRID, it) } ?: mor.failed.add(result.mRID)
+            }
+            stub.getChangeSet(GetChangeSetRequest.newBuilder().setChangeSetMRID(mRID).build(), streamObserver)
+
+            streamObserver.await()
+
+        }
+
+        resolveReferences(mor)?.let { return it }
+        return GrpcResult(mor)
+    }
 
     // TODO: docs
     fun getNetworkModelProjects(): GrpcResult<MultiObjectResult> =
@@ -184,8 +196,6 @@ class VariantConsumerClient @JvmOverloads constructor(
     internal fun resolveReferences(mor: MultiObjectResult): GrpcResult<MultiObjectResult>? {
         var res = mor
         do {
-            // Skip any reference trying to resolve from an EquipmentContainer on subsequent passes - e.g a PowerTransformer trying to pull in its LvFeeder.
-            // EquipmentContainers should be retrieved explicitly or via a hierarchy call.
             val toResolve = res.objects.keys
                 .flatMap { service.getUnresolvedReferencesFrom(it) }
                 .map { it.toMrid }

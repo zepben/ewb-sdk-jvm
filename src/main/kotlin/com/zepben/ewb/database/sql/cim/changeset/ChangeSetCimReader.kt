@@ -91,8 +91,13 @@ internal class ChangeSetCimReader : CimReader<VariantService>(), AutoCloseable{
         val status = readChangeSetMember(service, objectReverseModification, table, resultSet, setIdentifier)
 
         // This is here so typeNameAndMRID won't throw due to changeSet not being populated and not being able to generate an mRID.
-        if (status)
-            objectReverseModification.objectModification = service.getOrThrow<ObjectModification>(resultSet.getString(table.OBJECT_MODIFICATION_MRID.queryIndex), objectReverseModification.typeNameAndMRID())
+        if (status) {
+            objectReverseModification.objectModification = service.getOrThrow<ObjectModification>(
+                resultSet.getString(table.OBJECT_MODIFICATION_MRID.queryIndex),
+                objectReverseModification.typeNameAndMRID()
+            )
+            objectReverseModification.objectModification.objectReverseModification = objectReverseModification
+        }
 
         return status && service.addOrThrow(objectReverseModification)
     }

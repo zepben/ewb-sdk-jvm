@@ -71,13 +71,13 @@ internal class ChangeSetCimReader : CimReader<VariantService>(), AutoCloseable{
     fun read(service: VariantService, table: TableObjectCreations, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val objectCreation = ObjectCreation()
 
-        return readChangeSetMember(service, objectCreation, table, resultSet, setIdentifier)
+        return readChangeSetMember(service, objectCreation, table, resultSet, setIdentifier) && service.addOrThrow(objectCreation)
     }
 
     fun read(service: VariantService, table: TableObjectDeletions, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val objectDeletion = ObjectDeletion()
 
-        return readChangeSetMember(service, objectDeletion, table, resultSet, setIdentifier)
+        return readChangeSetMember(service, objectDeletion, table, resultSet, setIdentifier) && service.addOrThrow(objectDeletion)
     }
 
     fun read(service: VariantService, table: TableObjectModifications, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
@@ -85,7 +85,7 @@ internal class ChangeSetCimReader : CimReader<VariantService>(), AutoCloseable{
             service.resolveOrDeferReference(Resolvers.reverseModification(this), resultSet.getString(table.OBJECT_REVERSE_MODIFICATION_TARGET_OBJECT_MRID.queryIndex))
         }
 
-        return readChangeSetMember(service, objectModification, table, resultSet, setIdentifier)
+        return readChangeSetMember(service, objectModification, table, resultSet, setIdentifier) && service.addOrThrow(objectModification)
     }
 
     fun read(service: VariantService, table: TableObjectReverseModifications, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
@@ -93,6 +93,6 @@ internal class ChangeSetCimReader : CimReader<VariantService>(), AutoCloseable{
             service.resolveOrDeferReference(Resolvers.modification(this), resultSet.getString(table.OBJECT_MODIFICATION_MRID.queryIndex))
         }
 
-        return readChangeSetMember(service, objectReverseModification, table, resultSet, setIdentifier)
+        return readChangeSetMember(service, objectReverseModification, table, resultSet, setIdentifier) && service.addOrThrow(objectReverseModification)
     }
 }

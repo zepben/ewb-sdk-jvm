@@ -18,7 +18,10 @@ import com.zepben.ewb.services.network.NetworkService
 
 
 /**
+ * Contains a set of network, diagram, and customer services representing the contents of all changesets contained
+ * within [variantService].
  *
+ * Note change sets represented by this service must only be populated against one base model of the network.
  *
  * @param newNetworkService Contains the ObjectCreation and ObjectModifications to the NetworkService.
  * @param originalNetworkService Contains the ObjectDeletion and ObjectReverseModifications to the NetworkService.
@@ -39,9 +42,14 @@ class ChangeSetServices(
 {
 
     /**
-     * The [ChangeSet] modelled within this [VariantService]
+     * Helper to get a change set from the variantService.
      */
-    val changeSet by lazy { variantService.listOf<ChangeSet>().first() }
+    fun getChangeSet(mRID: String): ChangeSet? = variantService.get<ChangeSet>(mRID)
+
+    /**
+     * Helper to get all change sets from the variantService.
+     */
+    fun changeSets(): Sequence<ChangeSet> = variantService.sequenceOf<ChangeSet>()
 
     fun get(changeSetMember: ChangeSetMember): Identifiable {
         require(variantService.get<ChangeSetMember>(changeSetMember.mRID) != null) { "${changeSetMember.typeNameAndMRID()} must be present in the VariantService" }
@@ -55,7 +63,7 @@ class ChangeSetServices(
     }
 
     /**
-     * Get the reverse modification object for [objectModification].
+     * Get the reverse modification object for [objectModification], which should be the object from the base model of the variant.
      */
     fun getReverseModification(objectModification: ObjectModification): Identifiable =
         getFromOriginal(objectModification.targetObjectMRID)
@@ -70,18 +78,24 @@ class ChangeSetServices(
 
 
     /**
+     * Helper function to add a changeset to [variantService]
+     */
+    fun addChangeSet(changeSet: ChangeSet): Boolean = variantService.add(changeSet)
+
+    /**
      * Create and add a new ObjectCreation for the provided [Identifiable]
      *
      * @param newObject The object that has been added.
      */
-    fun addCreation(newObject: Identifiable) {
+    fun addCreation(changeSet: ChangeSet, newObject: Identifiable): Boolean {
         ObjectCreation().also { creation ->
             creation.targetObjectMRID = newObject.mRID
             creation.changeSet = changeSet
             changeSet.addMember(creation)
             variantService.add(creation)
         }
-        addToNew(newObject)
+
+        return addToNew(newObject)
     }
 
     /**
@@ -90,8 +104,9 @@ class ChangeSetServices(
      *
      * @param newObject The object that has been changed.
      * @param originalObject The original object, before changes.
+     * @return
      */
-    fun addModification(newObject: Identifiable, originalObject: Identifiable) {
+    fun addModification(changeSet: ChangeSet, newObject: Identifiable, originalObject: Identifiable): Boolean {
         ObjectModification().also { modification ->
             modification.targetObjectMRID = newObject.mRID
             modification.changeSet = changeSet
@@ -99,8 +114,8 @@ class ChangeSetServices(
             variantService.add(modification)
         }
 
-        addToNew(newObject)
-        addToOriginal(originalObject) // ObjectReverseModification
+        addToOriginal(originalObject) // ObjectReverseModification - we don't care about whether this succeeded as it should have be false if the obj is already present.
+        return addToNew(newObject)
     }
 
     /**
@@ -108,7 +123,7 @@ class ChangeSetServices(
      *
      * @param originalObject The object to delete.
      */
-    fun addDeletion(originalObject: Identifiable) {
+    fun addDeletion(changeSet: ChangeSet, originalObject: Identifiable): Boolean {
         ObjectDeletion().also { deletion ->
             deletion.targetObjectMRID = originalObject.mRID
             deletion.changeSet = changeSet
@@ -116,17 +131,23 @@ class ChangeSetServices(
             variantService.add(deletion)
         }
 
-        addToOriginal(originalObject)
+        return addToOriginal(originalObject)
     }
 
     /**
      * Add a base object that has no changes to the original service.
      * This object may be needed as it is referenced by other objects
      * that have been changed.
+     *
+     * @param originalObject The object to add, should be an object from the base model.
      */
     fun addOriginal(originalObject: Identifiable): Boolean =
         addToOriginal(originalObject)
 
+    /**
+     * @return true if the object was added to any service, false if the object already existed in one of the services and couldn't be added.
+     * @throws UnsupportedIdentifiedObjectException if [identifiable] is not supported by any service.
+     */
     private fun addToOriginal(identifiable: Identifiable): Boolean =
         try {
             originalNetworkService.tryAdd(identifiable).let { added ->
@@ -148,7 +169,11 @@ class ChangeSetServices(
             }
         }
 
-    private fun addToNew(identifiable: Identifiable) {
+    /**
+     * @return true if the object was added to any service, false if the object already existed in one of the services and couldn't be added.
+     * @throws UnsupportedIdentifiedObjectException if [identifiable] is not supported by any service.
+     */
+    private fun addToNew(identifiable: Identifiable): Boolean =
         try {
             newNetworkService.tryAdd(identifiable).let { added ->
                 if (added) {
@@ -168,6 +193,5 @@ class ChangeSetServices(
                 newCustomerService.tryAdd(identifiable)
             }
         }
-    }
 
 }

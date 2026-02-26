@@ -135,13 +135,13 @@ fun ObjectDeletion.fillFields(service: VariantService, includeRuntime: Boolean =
 fun ObjectModification.fillFields(service: VariantService, includeRuntime: Boolean = true): ObjectModification {
     (this as ChangeSetMember).fillFields(service, includeRuntime)
 
-    populateReverseModification(service)
+//    populateReverseModification(service)
     return this
 }
 
-fun ObjectReverseModification.fillFields(service: VariantService, includeRuntime: Boolean = true): ObjectReverseModification {
-    (this as ChangeSetMember).fillFields(service, includeRuntime)
-
-    objectModification = ObjectModification().also { it.targetObjectMRID = generateId(); it.changeSet = this.changeSet; service.add(it) }
-    return this
-}
+//fun ObjectReverseModification.fillFields(service: VariantService, includeRuntime: Boolean = true): ObjectReverseModification {
+//    (this as ChangeSetMember).fillFields(service, includeRuntime)
+//
+//    objectModification = ObjectModification().also { it.targetObjectMRID = generateId(); it.changeSet = this.changeSet; service.add(it) }
+//    return this
+//}

@@ -28,7 +28,7 @@ class ChangeSet(mRID: String) : DataSet(mRID) {
     val creations: List<ObjectCreation> get() = _members.ofType()
     val deletions: List<ObjectDeletion> get() = _members.ofType()
     val modifications: List<ObjectModification> get() = _members.ofType()
-    val reverseModifications: List<ObjectReverseModification> get() = _members.ofType()
+//    val reverseModifications: List<ObjectReverseModification> get() = _members.ofType()
 
     /**
      * Get the number of entries in the [ChangeSetMember] collection.

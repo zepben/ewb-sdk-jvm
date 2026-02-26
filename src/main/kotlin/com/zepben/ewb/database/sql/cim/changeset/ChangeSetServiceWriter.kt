@@ -26,6 +26,6 @@ internal class ChangeSetServiceWriter(
         writeEach<ChangeSet>(writer::write) and
             writeEach<ObjectCreation>(writer::write) and
             writeEach<ObjectDeletion>(writer::write) and
-            writeEach<ObjectModification>(writer::write) and
-            writeEach<ObjectReverseModification>(writer::write)
+            writeEach<ObjectModification>(writer::write) //and
+//            writeEach<ObjectReverseModification>(writer::write)
 }

@@ -38,7 +38,7 @@ internal class VariantServiceUtilsTest {
         isObjectCreation: (ObjectCreation) -> String,
         isObjectDeletion: (ObjectDeletion) -> String,
         isObjectModification: (ObjectModification) -> String,
-        isObjectReverseModification: (ObjectReverseModification) -> String,
+//        isObjectReverseModification: (ObjectReverseModification) -> String,
         isOther: (Any) -> String,
     ): String = whenVariantIdentifiedObject(
         identifiedObject,
@@ -49,7 +49,7 @@ internal class VariantServiceUtilsTest {
         isObjectCreation = isObjectCreation,
         isObjectDeletion = isObjectDeletion,
         isObjectModification = isObjectModification,
-        isObjectReverseModification = isObjectReverseModification,
+//        isObjectReverseModification = isObjectReverseModification,
         isOther = isOther
     )
 

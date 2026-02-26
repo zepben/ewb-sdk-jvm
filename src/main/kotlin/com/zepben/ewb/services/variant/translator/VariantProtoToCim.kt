@@ -42,7 +42,7 @@ fun VariantService.addFromPb(pb: VariantObject): AddFromPbResult =
         OBJECTCREATION -> getOrAddFromPb(pb.objectCreation.csm.mRID()) { addFromPb(pb.objectCreation) }
         OBJECTDELETION -> getOrAddFromPb(pb.objectDeletion.csm.mRID()) { addFromPb(pb.objectDeletion) }
         OBJECTMODIFICATION -> getOrAddFromPb(pb.objectModification.csm.mRID()) { addFromPb(pb.objectModification) }
-        OBJECTREVERSEMODIFICATION -> getOrAddFromPb(pb.objectReverseModification.csm.mRID()) { addFromPb(pb.objectReverseModification) }
+        OBJECTREVERSEMODIFICATION, //-> getOrAddFromPb(pb.objectReverseModification.csm.mRID()) { addFromPb(pb.objectReverseModification) }
         OTHER, OBJECT_NOT_SET, null -> throw UnsupportedOperationException(
             "Object type ${pb.objectCase} is not supported by the variant service"
         )
@@ -218,7 +218,7 @@ fun toCim(pb: PBObjectDeletion, networkService: VariantService): ObjectDeletion 
  */
 fun toCim(pb: PBObjectModification, networkService: VariantService): ObjectModification =
     ObjectModification().apply {
-        networkService.resolveOrDeferReference(Resolvers.reverseModification(this), pb.objectReverseModificationMRID, "${pb.csm.changeSetMRID}_${pb.csm.targetObjectMRID}")
+//        networkService.resolveOrDeferReference(Resolvers.reverseModification(this), pb.objectReverseModificationMRID, "${pb.csm.changeSetMRID}_${pb.csm.targetObjectMRID}")
         toCim(pb.csm, this, networkService)
     }
 
@@ -229,11 +229,11 @@ fun toCim(pb: PBObjectModification, networkService: VariantService): ObjectModif
  * @param networkService The [VariantService] the converted CIM object will be added too.
  * @return The converted [pb] as a CIM [ObjectModification].
  */
-fun toCim(pb: PBObjectReverseModification, networkService: VariantService): ObjectReverseModification =
-    ObjectReverseModification().apply {
-        networkService.resolveOrDeferReference(Resolvers.modification(this), pb.objectModificationMRID, "${pb.csm.changeSetMRID}_${pb.csm.targetObjectMRID}")
-        toCim(pb.csm, this, networkService)
-    }
+//fun toCim(pb: PBObjectReverseModification, networkService: VariantService): ObjectReverseModification =
+//    ObjectReverseModification().apply {
+//        networkService.resolveOrDeferReference(Resolvers.modification(this), pb.objectModificationMRID, "${pb.csm.changeSetMRID}_${pb.csm.targetObjectMRID}")
+//        toCim(pb.csm, this, networkService)
+//    }
 
 /**
  * An extension to add a converted copy of the protobuf [PBNetworkModelProject] to the [VariantService].
@@ -270,7 +270,7 @@ fun VariantService.addFromPb(pb: PBObjectModification): ObjectModification? = tr
 /**
  * An extension to add a converted copy of the protobuf [PBObjectModification] to the [VariantService].
  */
-fun VariantService.addFromPb(pb: PBObjectReverseModification): ObjectReverseModification? = tryAddOrNull(toCim(pb, this))
+//fun VariantService.addFromPb(pb: PBObjectReverseModification): ObjectReverseModification? = tryAddOrNull(toCim(pb, this))
 
 // #################################
 // # Class for Java friendly usage #
@@ -346,7 +346,7 @@ class VariantProtoToCim(val variantService: VariantService) : BaseProtoToCim() {
      * @param pb The [PBObjectReverseModification] to convert.
      * @return The converted [ObjectReverseModification]
      */
-    fun addFromPb(pb: PBObjectReverseModification): ObjectReverseModification? = variantService.addFromPb(pb)
+//    fun addFromPb(pb: PBObjectReverseModification): ObjectReverseModification? = variantService.addFromPb(pb)
 
 
 }

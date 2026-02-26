@@ -153,7 +153,7 @@ class VariantService(name: String = "variants", metadata: MetadataCollection = M
      * @param objectReverseModification The [ChangeSet] to add.
      * @return `true` if the item was added to the service, otherwise false.
      */
-    fun add(objectReverseModification: ObjectReverseModification): Boolean = super.add(objectReverseModification)
+//    fun add(objectReverseModification: ObjectReverseModification): Boolean = super.add(objectReverseModification)
 
     /**
      * Remove the [objectReverseModification] from this service.
@@ -161,7 +161,7 @@ class VariantService(name: String = "variants", metadata: MetadataCollection = M
      * @param objectReverseModification The [ChangeSet] to remove.
      * @return `true` if the item was removed from the service, otherwise false.
      */
-    fun remove(objectReverseModification: ObjectReverseModification): Boolean = super.remove(objectReverseModification)
+//    fun remove(objectReverseModification: ObjectReverseModification): Boolean = super.remove(objectReverseModification)
 
     inline fun <reified TComp : NetworkModelProjectComponent> getComponentsBetween(start: Instant, end: Instant): Sequence<TComp> =
         sequenceOf<TComp>().filter { it.created?.let { created -> created in start..end } == true }

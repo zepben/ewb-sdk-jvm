@@ -86,19 +86,19 @@ internal class ChangeSetCimReader : CimReader<VariantService>(), AutoCloseable{
         return readChangeSetMember(service, objectModification, table, resultSet, setIdentifier) && service.addOrThrow(objectModification)
     }
 
-    fun read(service: VariantService, table: TableObjectReverseModifications, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
-        val objectReverseModification = ObjectReverseModification()
-        val status = readChangeSetMember(service, objectReverseModification, table, resultSet, setIdentifier)
-
-        // This is here so typeNameAndMRID won't throw due to changeSet not being populated and not being able to generate an mRID.
-        if (status) {
-            objectReverseModification.objectModification = service.getOrThrow<ObjectModification>(
-                resultSet.getString(table.OBJECT_MODIFICATION_MRID.queryIndex),
-                objectReverseModification.typeNameAndMRID()
-            )
-            objectReverseModification.objectModification.objectReverseModification = objectReverseModification
-        }
-
-        return status && service.addOrThrow(objectReverseModification)
-    }
+//    fun read(service: VariantService, table: TableObjectReverseModifications, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+//        val objectReverseModification = ObjectReverseModification()
+//        val status = readChangeSetMember(service, objectReverseModification, table, resultSet, setIdentifier)
+//
+//        // This is here so typeNameAndMRID won't throw due to changeSet not being populated and not being able to generate an mRID.
+//        if (status) {
+//            objectReverseModification.objectModification = service.getOrThrow<ObjectModification>(
+//                resultSet.getString(table.OBJECT_MODIFICATION_MRID.queryIndex),
+//                objectReverseModification.typeNameAndMRID()
+//            )
+//            objectReverseModification.objectModification.objectReverseModification = objectReverseModification
+//        }
+//
+//        return status && service.addOrThrow(objectReverseModification)
+//    }
 }

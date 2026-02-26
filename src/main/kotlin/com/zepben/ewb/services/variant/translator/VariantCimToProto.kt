@@ -20,7 +20,6 @@ import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.DataSet
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectCreation
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectDeletion
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectModification
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectReverseModification
 import com.zepben.ewb.services.common.translator.*
 import com.zepben.ewb.services.variant.whenVariantIdentifiedObject
 import com.zepben.protobuf.vc.VariantObject
@@ -34,7 +33,6 @@ import com.zepben.protobuf.cim.iec61970.infiec61970.part303.genericdataset.DataS
 import com.zepben.protobuf.cim.iec61970.infiec61970.part303.genericdataset.ObjectCreation as PBObjectCreation
 import com.zepben.protobuf.cim.iec61970.infiec61970.part303.genericdataset.ObjectDeletion as PBObjectDeletion
 import com.zepben.protobuf.cim.iec61970.infiec61970.part303.genericdataset.ObjectModification as PBObjectModification
-import com.zepben.protobuf.cim.iec61970.infiec61970.part303.genericdataset.ObjectReverseModification as PBObjectReverseModification
 
 /**
  * Convert the [variantObject] to a [VariantObject] representation.
@@ -50,7 +48,7 @@ fun variantObject(identified: Identifiable): VariantObject =
             isObjectCreation = { objectCreation = it.toPb() },
             isObjectDeletion = { objectDeletion = it.toPb() },
             isObjectModification = { objectModification = it.toPb() },
-            isObjectReverseModification = { objectReverseModification = it.toPb() },
+//            isObjectReverseModification = { objectReverseModification = it.toPb() },
         )
     }.build()
 
@@ -241,7 +239,7 @@ fun toPb(cim: ObjectDeletion, pb: PBObjectDeletion.Builder): PBObjectDeletion.Bu
  */
 fun toPb(cim: ObjectModification, pb: PBObjectModification.Builder): PBObjectModification.Builder =
     pb.apply {
-        pb.objectReverseModificationMRID = cim.objectReverseModification.mRID
+//        pb.objectReverseModificationMRID = cim.objectReverseModification.mRID
 
         toPb(cim, csmBuilder)
     }
@@ -253,12 +251,12 @@ fun toPb(cim: ObjectModification, pb: PBObjectModification.Builder): PBObjectMod
  * @param pb The protobuf builder to populate.
  * @return [pb] for fluent use.
  */
-fun toPb(cim: ObjectReverseModification, pb: PBObjectReverseModification.Builder): PBObjectReverseModification.Builder =
-    pb.apply {
-        objectModificationMRID = cim.objectModification.mRID
-
-        toPb(cim, csmBuilder)
-    }
+//fun toPb(cim: ObjectReverseModification, pb: PBObjectReverseModification.Builder): PBObjectReverseModification.Builder =
+//    pb.apply {
+//        objectModificationMRID = cim.objectModification.mRID
+//
+//        toPb(cim, csmBuilder)
+//    }
 
 /**
  * An extension for converting any [ChangeSet] into its protobuf counterpart.
@@ -283,7 +281,7 @@ fun ObjectModification.toPb(): PBObjectModification = toPb(this, PBObjectModific
 /**
  * An extension for converting any [ObjectReverseModification] into its protobuf counterpart.
  */
-fun ObjectReverseModification.toPb(): PBObjectReverseModification = toPb(this, PBObjectReverseModification.newBuilder()).build()
+//fun ObjectReverseModification.toPb(): PBObjectReverseModification = toPb(this, PBObjectReverseModification.newBuilder()).build()
 
 // #################################
 // # Class for Java friendly usage #

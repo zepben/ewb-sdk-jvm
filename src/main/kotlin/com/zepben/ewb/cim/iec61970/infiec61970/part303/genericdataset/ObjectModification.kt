@@ -17,25 +17,25 @@ import com.zepben.ewb.services.variant.VariantService
  */
 class ObjectModification : ChangeSetMember() {
 
-    lateinit var objectReverseModification: ObjectReverseModification
+//    lateinit var objectReverseModification: ObjectReverseModification
 
-    private var _initialised: Boolean = false
+//    private var _initialised: Boolean = false
     /**
      * Helper function to populate the reverse modification. Should only be called after [changeSet] and [targetObjectMRID] have been set.
      * @param service The [VariantService] to add the reverse modification to. Should be the same service that contains this [ObjectModification].
      */
-    fun populateReverseModification(service: VariantService) {
-        if (!_initialised) {
-            objectReverseModification = ObjectReverseModification().also {
-                it.changeSet = changeSet
-                it.targetObjectMRID = targetObjectMRID.asObjectReverseModificationId
-                it.objectModification = this
-                changeSet.addMember(it)
-            }
-            service.add(objectReverseModification)
-        }
-        _initialised = true
-    }
+//    fun populateReverseModification(service: VariantService) {
+//        if (!_initialised) {
+//            objectReverseModification = ObjectReverseModification().also {
+//                it.changeSet = changeSet
+//                it.targetObjectMRID = targetObjectMRID.asObjectReverseModificationId
+//                it.objectModification = this
+//                changeSet.addMember(it)
+//            }
+//            service.add(objectReverseModification)
+//        }
+//        _initialised = true
+//    }
 
 }
 

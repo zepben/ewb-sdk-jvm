@@ -27,6 +27,6 @@ class ChangeSetDatabaseTables(
             TableObjectCreations(),
             TableObjectDeletions(),
             TableObjectModifications(),
-            TableObjectReverseModifications(),
+//            TableObjectReverseModifications(),
         )
 }

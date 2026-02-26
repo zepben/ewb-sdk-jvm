@@ -127,14 +127,14 @@ object SchemaServices {
         if (io is ChangeSetMember) {
             io.changeSet = ChangeSet(generateId()); io.targetObjectMRID = "member"
         }
-        if (io is ObjectModification) {
-            io.objectReverseModification = ObjectReverseModification().also {
-                it.changeSet = io.changeSet
-                it.targetObjectMRID = io.mRID.asObjectReverseModificationId
-                it.objectModification = io
-                io.changeSet.addMember(it)
-            }
-        }
+//        if (io is ObjectModification) {
+//            io.objectReverseModification = ObjectReverseModification().also {
+//                it.changeSet = io.changeSet
+//                it.targetObjectMRID = io.mRID.asObjectReverseModificationId
+//                it.objectModification = io
+//                io.changeSet.addMember(it)
+//            }
+//        }
     }
 
     /**

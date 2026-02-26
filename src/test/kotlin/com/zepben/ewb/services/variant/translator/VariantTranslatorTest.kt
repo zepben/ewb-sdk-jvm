@@ -60,13 +60,13 @@ internal class VariantTranslatorTest : TranslatorTestBase<VariantService>(
             addFromPb(convertedCim)
         }),
         ValidationInfo({ ObjectModification() }, { fillFields(it) }, {
-            it.populateReverseModification(this)
+//            it.populateReverseModification(this)
             val convertedCim = vsToPb.toPb(it)
 
             add(ChangeSet(it.changeSet.mRID))   // Resolve unresolved reference before adding from PB as changeSet must be present to compute an mRID.
-            add(ObjectReverseModification().also { orm ->    // Resolve the reverse modification as it must also have changeSet present before the conversion.
-                orm.changeSet = it.changeSet; orm.targetObjectMRID = it.targetObjectMRID.asObjectReverseModificationId
-            })
+//            add(ObjectReverseModification().also { orm ->    // Resolve the reverse modification as it must also have changeSet present before the conversion.
+//                orm.changeSet = it.changeSet; orm.targetObjectMRID = it.targetObjectMRID.asObjectReverseModificationId
+//            })
             addFromPb(convertedCim)
         }),
 

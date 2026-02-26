@@ -112,7 +112,7 @@ class ChangeSetCimWriter(
         val table = databaseTables.getTable<TableObjectModifications>()
         val insert = databaseTables.getInsert<TableObjectModifications>()
 
-        insert.setNullableString(table.OBJECT_REVERSE_MODIFICATION_TARGET_OBJECT_MRID.queryIndex, objectModification.objectReverseModification.mRID)
+//        insert.setNullableString(table.OBJECT_REVERSE_MODIFICATION_TARGET_OBJECT_MRID.queryIndex, objectModification.objectReverseModification.mRID)
 
         return writeChangeSetMember(table, insert, objectModification, "object modification")
     }
@@ -125,13 +125,13 @@ class ChangeSetCimWriter(
      * @return true if the [ObjectReverseModification] was successfully written to the database, otherwise false.
      * @throws SQLException For any errors encountered writing to the database.
      */
-    fun write(objectReverseModification: ObjectReverseModification): Boolean {
-        val table = databaseTables.getTable<TableObjectReverseModifications>()
-        val insert = databaseTables.getInsert<TableObjectReverseModifications>()
-
-        insert.setNullableString(table.OBJECT_MODIFICATION_MRID.queryIndex, objectReverseModification.objectModification.mRID)
-
-        return writeChangeSetMember(table, insert, objectReverseModification, "object reverse modification")
-    }
+//    fun write(objectReverseModification: ObjectReverseModification): Boolean {
+//        val table = databaseTables.getTable<TableObjectReverseModifications>()
+//        val insert = databaseTables.getInsert<TableObjectReverseModifications>()
+//
+//        insert.setNullableString(table.OBJECT_MODIFICATION_MRID.queryIndex, objectReverseModification.objectModification.mRID)
+//
+//        return writeChangeSetMember(table, insert, objectReverseModification, "object reverse modification")
+//    }
 
 }

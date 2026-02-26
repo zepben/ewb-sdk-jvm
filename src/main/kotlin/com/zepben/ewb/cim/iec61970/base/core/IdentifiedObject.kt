@@ -103,10 +103,11 @@ abstract class IdentifiedObject(override val mRID: String) : Identifiable {
      *
      * @param type the required [NameType]
      * @param name the name of the new [Name]
-     * @return this [IdentifiedObject] with a newly added [Name]
+     * @return this [IdentifiedObject] if the name was added, or already existed on this object.
      */
     fun addName(type: NameType, name: String): IdentifiedObject {
-
+        if (names.any { it.type == type && it.name == name})
+            return this
         _names = _names ?: mutableSetOf()
         _names!!.add(type.getOrAddName(name, this))
 

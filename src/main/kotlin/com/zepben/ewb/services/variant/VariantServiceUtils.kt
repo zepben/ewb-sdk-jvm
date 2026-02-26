@@ -42,7 +42,7 @@ inline fun <R> whenVariantIdentifiedObject(
     isObjectCreation: (ObjectCreation) -> R,
     isObjectDeletion: (ObjectDeletion) -> R,
     isObjectModification: (ObjectModification) -> R,
-    isObjectReverseModification: (ObjectReverseModification) -> R,
+//    isObjectReverseModification: (ObjectReverseModification) -> R,
     isOther: (Any) -> R = { obj: Any ->
         throw IllegalArgumentException("Identified object type ${obj::class} is not supported by the network model project service")
     }
@@ -54,6 +54,6 @@ inline fun <R> whenVariantIdentifiedObject(
     is ObjectCreation -> isObjectCreation(identifiable)
     is ObjectDeletion -> isObjectDeletion(identifiable)
     is ObjectModification -> isObjectModification(identifiable)
-    is ObjectReverseModification -> isObjectReverseModification(identifiable)
+//    is ObjectReverseModification -> isObjectReverseModification(identifiable)
     else -> isOther(identifiable)
 }

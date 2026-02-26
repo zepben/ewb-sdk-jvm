@@ -105,12 +105,12 @@ class ChangeSetConsumerClient(
         val cMor = customerConsumerClient?.getChangeSetObjects(mRID)?.throwOnError()
 
         return GrpcResult.of(
-            ChangeSetServices(
-                variantConsumerClient.service.get<ChangeSet>(mRID), // didn't work?
-                variantService = variantConsumerClient.service,  // Empty service
-                networkService = nMor?.value,// Empty service
-                diagramService = dMor?.value,// Empty service
-                customerService = cMor?.value,// Empty service
+            ChangeSetServices(  // TODO
+//                variantConsumerClient.service.get<ChangeSet>(mRID), // didn't work?
+//                variantService = variantConsumerClient.service,  // Empty service
+//                networkService = nMor?.value,// Empty service
+//                diagramService = dMor?.value,// Empty service
+//                customerService = cMor?.value,// Empty service
             )
         )
     }

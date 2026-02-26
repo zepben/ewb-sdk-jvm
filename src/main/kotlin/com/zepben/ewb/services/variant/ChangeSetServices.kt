@@ -63,6 +63,26 @@ class ChangeSetServices(
     }
 
     /**
+     * Fetch the created objects for a collection of [ObjectCreation]s
+     */
+    fun created(obj: Collection<ObjectCreation>): Sequence<Identifiable> = obj.map { getFromNew(it.targetObjectMRID) }.asSequence()
+
+    /**
+     * Fetch the modified objects for a collection of [ObjectModification]s
+     */
+    fun modified(obj: Collection<ObjectModification>): Sequence<Identifiable> = obj.map { getFromNew(it.targetObjectMRID) }.asSequence()
+
+    /**
+     * Fetch the deleted objects for a collection of [ObjectDeletion]s
+     */
+    fun deleted(obj: Collection<ObjectDeletion>): Sequence<Identifiable> = obj.map { getFromOriginal(it.targetObjectMRID) }.asSequence()
+
+    /**
+     * Fetch the reverse modification for a collection of [ObjectModification]s
+     */
+    fun original(obj: Collection<ObjectModification>): Sequence<Identifiable> = obj.map { getFromOriginal(it.targetObjectMRID) }.asSequence()
+
+    /**
      * Get the reverse modification object for [objectModification], which should be the object from the base model of the variant.
      */
     fun getReverseModification(objectModification: ObjectModification): Identifiable =

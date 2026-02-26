@@ -20,7 +20,7 @@ import com.zepben.ewb.services.common.BaseService
  *
  * @property writer The [BaseServiceWriter] used to actually write the objects to the database.
  */
-internal abstract class BaseServiceWriter<TService : BaseService>(
+abstract class BaseServiceWriter<TService : BaseService>(
     protected open val writer: CimWriter
 ) : BaseCollectionWriter() {
 

@@ -25,7 +25,7 @@ class TableAnnotatedProjectDependencies : TableIdentifiedObjects() {
 
     val DEPENDENCY_TYPE: Column = Column(++columnIndex, "dependency_type", STRING, NOT_NULL)
     val DEPENDENCY_DEPENDENT_ON_STAGE_MRID: Column = Column(++columnIndex, "dependency_dependent_on_stage_mrid", STRING, NOT_NULL)
-    val DEPENDENCY_DEPENDING_STAGE_MRID: Column = Column(++columnIndex, "dependency_depending_on_stage_mrid", STRING, NOT_NULL)
+    val DEPENDENCY_DEPENDING_STAGE_MRID: Column = Column(++columnIndex, "dependency_depending_stage_mrid", STRING, NOT_NULL)
 
     override val name: String = "annotated_project_dependencies"
 

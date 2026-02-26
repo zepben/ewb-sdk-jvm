@@ -19,7 +19,7 @@ import com.zepben.ewb.database.sql.common.tables.TableVersion
 /**
  * The base collection of tables for all our CIM databases.
  */
-abstract class CimDatabaseTables internal constructor(
+abstract class CimDatabaseTables(
     tableVersion: TableVersion = tableCimVersion,
 ) : BaseDatabaseTables() {
 

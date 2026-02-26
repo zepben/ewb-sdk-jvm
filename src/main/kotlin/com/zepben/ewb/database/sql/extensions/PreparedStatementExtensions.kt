@@ -28,7 +28,7 @@ import kotlin.reflect.jvm.isAccessible
  * @return true is a single record is updates, otherwise false.
  */
 @Throws(SQLException::class)
-internal fun PreparedStatement.tryExecuteSingleUpdate(onError: () -> Unit): Boolean {
+fun PreparedStatement.tryExecuteSingleUpdate(onError: () -> Unit): Boolean {
     if (executeSingleUpdate())
         return true
 
@@ -43,7 +43,7 @@ internal fun PreparedStatement.tryExecuteSingleUpdate(onError: () -> Unit): Bool
  * @param logger The logger to use for the failure message.
  * @param description The description of what was being written when the failure occurred.
  */
-internal fun PreparedStatement.logFailure(logger: Logger, description: String) {
+fun PreparedStatement.logFailure(logger: Logger, description: String) {
     logger.warn(
         "Failed to write $description.\n" +
             "SQL: ${sql()}\n" +
@@ -56,7 +56,7 @@ internal fun PreparedStatement.logFailure(logger: Logger, description: String) {
  * @param queryIndex The index of the column to set.
  * @param value The value to assign to the column.
  */
-internal fun PreparedStatement.setNullableBoolean(queryIndex: Int, value: Boolean?) {
+fun PreparedStatement.setNullableBoolean(queryIndex: Int, value: Boolean?) {
     if (value == null)
         setNull(queryIndex, BOOLEAN)
     else
@@ -68,7 +68,7 @@ internal fun PreparedStatement.setNullableBoolean(queryIndex: Int, value: Boolea
  * @param queryIndex The index of the column to set.
  * @param value The value to assign to the column.
  */
-internal fun PreparedStatement.setNullableString(queryIndex: Int, value: String?) {
+fun PreparedStatement.setNullableString(queryIndex: Int, value: String?) {
     when (value) {
         null -> setNull(queryIndex, VARCHAR)
         else -> setString(queryIndex, value)
@@ -80,7 +80,7 @@ internal fun PreparedStatement.setNullableString(queryIndex: Int, value: String?
  * @param queryIndex The index of the column to set.
  * @param value The value to assign to the column.
  */
-internal fun PreparedStatement.setNullableDouble(queryIndex: Int, value: Double?) {
+fun PreparedStatement.setNullableDouble(queryIndex: Int, value: Double?) {
     when {
         value == null -> this.setNull(queryIndex, DOUBLE)
         value.isNaN() -> this.setString(queryIndex, "NaN")
@@ -93,7 +93,7 @@ internal fun PreparedStatement.setNullableDouble(queryIndex: Int, value: Double?
  * @param queryIndex The index of the column to set.
  * @param value The value to assign to the column.
  */
-internal fun PreparedStatement.setNullableFloat(queryIndex: Int, value: Float?) {
+fun PreparedStatement.setNullableFloat(queryIndex: Int, value: Float?) {
     when {
         value == null -> this.setNull(queryIndex, FLOAT)
         value.isNaN() -> this.setString(queryIndex, "NaN")
@@ -106,7 +106,7 @@ internal fun PreparedStatement.setNullableFloat(queryIndex: Int, value: Float?) 
  * @param queryIndex The index of the column to set.
  * @param value The value to assign to the column.
  */
-internal fun PreparedStatement.setNullableInt(queryIndex: Int, value: Int?) {
+fun PreparedStatement.setNullableInt(queryIndex: Int, value: Int?) {
     if (value == null)
         this.setNull(queryIndex, INTEGER)
     else
@@ -118,7 +118,7 @@ internal fun PreparedStatement.setNullableInt(queryIndex: Int, value: Int?) {
  * @param queryIndex The index of the column to set.
  * @param value The value to assign to the column.
  */
-internal fun PreparedStatement.setNullableLong(queryIndex: Int, value: Long?) {
+fun PreparedStatement.setNullableLong(queryIndex: Int, value: Long?) {
     if (value == null)
         this.setNull(queryIndex, INTEGER)
     else
@@ -131,7 +131,7 @@ internal fun PreparedStatement.setNullableLong(queryIndex: Int, value: Long?) {
  * @param denominatorIndex The index of the column to set as the denominator.
  * @param value The value to assign to the columns.
  */
-internal fun PreparedStatement.setNullableRatio(numeratorIndex: Int, denominatorIndex: Int, value: Ratio?) {
+fun PreparedStatement.setNullableRatio(numeratorIndex: Int, denominatorIndex: Int, value: Ratio?) {
     if (value == null) {
         this.setNull(denominatorIndex, DOUBLE)
         this.setNull(numeratorIndex, DOUBLE)
@@ -146,7 +146,7 @@ internal fun PreparedStatement.setNullableRatio(numeratorIndex: Int, denominator
  * @param queryIndex The index of the column to set.
  * @param value The value to assign to the columns.
  */
-internal fun PreparedStatement.setInstant(queryIndex: Int, value: Instant?) {
+fun PreparedStatement.setInstant(queryIndex: Int, value: Instant?) {
     when (value) {
         null -> setNull(queryIndex, VARCHAR)
         else -> setString(queryIndex, value.toString())
@@ -158,18 +158,18 @@ internal fun PreparedStatement.setInstant(queryIndex: Int, value: Instant?) {
  * @param queryIndex The index of the column to set.
  * @param value The value to assign to the columns.
  */
-internal fun PreparedStatement.setTimestamp(queryIndex: Int, value: Instant?) {
+fun PreparedStatement.setTimestamp(queryIndex: Int, value: Instant?) {
     when (value) {
         null -> setNull(queryIndex, TIMESTAMP)
         else -> setTimestamp(queryIndex, Timestamp.from(value))
     }
 }
 
-internal fun PreparedStatement.executeSingleUpdate(): Boolean {
+fun PreparedStatement.executeSingleUpdate(): Boolean {
     return executeUpdate() == 1
 }
 
-internal fun PreparedStatement.sql(): String {
+fun PreparedStatement.sql(): String {
     return try {
         accessProtectedProperty<String>("sql")
     } catch (e: PrivilegedActionException) {
@@ -177,7 +177,7 @@ internal fun PreparedStatement.sql(): String {
     }
 }
 
-internal fun PreparedStatement.parameters(): String {
+fun PreparedStatement.parameters(): String {
     return try {
         accessProtectedProperty<Array<*>>("batch").contentToString()
     } catch (e: Exception) {

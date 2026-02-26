@@ -41,7 +41,7 @@ import java.sql.SQLException
  *
  * @property logger The [Logger] to use for this reader.
  */
-internal abstract class CimReader<TService : BaseService> {
+abstract class CimReader<TService : BaseService> {
 
     protected val logger: Logger = LoggerFactory.getLogger(javaClass)
 

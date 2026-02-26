@@ -9,7 +9,6 @@
 package com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.infpart303.networkmodelprojects
 
 import com.zepben.ewb.database.sql.cim.tables.extensions.iec61970.infpart303.networkmodelprojects.TableNetworkModelProjectComponents
-import com.zepben.ewb.database.sql.cim.tables.iec61970.base.core.TableIdentifiedObjects
 import com.zepben.ewb.database.sql.common.tables.Column
 import com.zepben.ewb.database.sql.common.tables.Column.Nullable.NULL
 import com.zepben.ewb.database.sql.common.tables.Column.Type.*

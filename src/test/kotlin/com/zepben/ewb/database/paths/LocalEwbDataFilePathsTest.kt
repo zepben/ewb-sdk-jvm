@@ -243,17 +243,25 @@ class LocalEwbDataFilePathsTest {
 
     @Test
     internal fun `resolves variant databases`() {
-        fun DatabaseType.toVariantPath(variant: String) =
-            baseDir.resolve(today.toString()).resolve(EwbDataFilePaths.VARIANTS_PATH).resolve(variant).resolve("$today-$fileDescriptor.sqlite")
+        fun DatabaseType.toVariantPath(variant: String, version: VariantContents) =
+            baseDir.resolve(today.toString()).resolve(EwbDataFilePaths.VARIANTS_PATH).resolve(variant).resolve(version.subDirectory).resolve("$today-$fileDescriptor.sqlite")
 
-        DatabaseType.entries.forEach { type ->
-            if (type.perDate) {
-                assertThat(ewbPaths.resolve(type, today, "my-variant1"), equalTo(type.toVariantPath("my-variant1")))
-                assertThat(ewbPaths.resolve(type, today, "my-variant2"), equalTo(type.toVariantPath("my-variant2")))
-            } else {
-                expect { ewbPaths.resolve(type, today, "my-variant") }
-                    .toThrow<IllegalArgumentException>()
-                    .withMessage("type must have its perDate set to true to use this method.")
+        VariantContents.entries.forEach { content ->
+            DatabaseType.entries.forEach { type ->
+                if (type.perDate) {
+                    if (content.types.contains(type)) {
+                        assertThat(ewbPaths.resolve(type, today, "my-variant1", content), equalTo(type.toVariantPath("my-variant1", content)))
+                        assertThat(ewbPaths.resolve(type, today, "my-variant2", content), equalTo(type.toVariantPath("my-variant2", content)))
+                    } else {
+                        expect { ewbPaths.resolve(type, today, "my-variant", content) }
+                            .toThrow<IllegalArgumentException>()
+                            .withMessage("type must be compatible with variantContents. Compatible options for ${content.name}: ${content.types.joinToString(",")}")
+                    }
+                } else {
+                    expect { ewbPaths.resolve(type, today, "my-variant", content) }
+                        .toThrow<IllegalArgumentException>()
+                        .withMessage("type must have its perDate set to true to use this method.")
+                }
             }
         }
     }

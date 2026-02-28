@@ -72,7 +72,6 @@ internal abstract class TranslatorTestBase<S : BaseService>(
         TableNames::class,
     )
 
-    // TODO:
     @Test
     internal fun `converts all types correctly`() {
         if (validationInfo.size != (databaseTables.tables.keys - excludedTables).size) {
@@ -95,6 +94,7 @@ internal abstract class TranslatorTestBase<S : BaseService>(
                 }
             }.toSet()
 
+            // TODO: Uncomment and fix
 //            fail(
 //                "The number of items being validated did not match the number of items written to the database. Did you forget to validate an item, " +
 //                    "or to exclude the table if it was an association or array data?" +
@@ -265,43 +265,5 @@ internal abstract class TranslatorTestBase<S : BaseService>(
         }
 
     }
-
-    /**
-     * Information required to validate the translation to/from cim/protobuf.
-     *
-     * @param T The class to test.
-     * @property cim The object of type [T] under test.
-     * @property filler The callback that is used to populate [cim].
-     * @property translate The callback that performs the translation from CIM to protobuf and back.
-     */
-//    protected inner class ValidationInfo2<T : Identifiable>(
-//        cimFactory: (ChangeSet, String) -> T,
-//        val filler: T.(S) -> Unit,
-//        val translate: S.(T) -> T?
-//    ): ValidationInfo<T>() {
-//
-//        val cim = cimFactory(generateId())
-//        private val cimEmptys = cimFactory(generateId())
-//
-//        override fun toString(): String = "ValidationInfo<${cim::class.simpleName}>"
-//
-//        fun validate() {
-//            val blankDifferences = comparator.compare(cim, translate(createService(), cim)!!).differences
-//            assertThat("Failed to convert blank ${cim::class.simpleName}:${blankDifferences}", blankDifferences, anEmptyMap())
-//
-//            // Replace nullable strings and booleans with "" and false and translate + compare
-//            SchemaServices.fillEmptys(cimEmptys)
-//            val emptyDifferences = comparator.compare(cimEmptys, translate(createService(), cimEmptys)!!).differences
-//            assertThat("Failed to convert empty ${cimEmptys::class.simpleName}:${emptyDifferences}", emptyDifferences, anEmptyMap())
-//
-//            cim.filler(createService())
-//            removeUnsentReferences()
-//
-//            val populatedDifferences = comparator.compare(cim, addWithUnresolvedReferences()).differences
-//            assertThat("Failed to convert populated ${cim::class.simpleName}:${populatedDifferences}", populatedDifferences, anEmptyMap())
-//
-//            assertThat(createServiceIdentifiedObject(cim), notNullValue())
-//        }
-//    }
 
 }

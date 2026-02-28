@@ -27,3 +27,12 @@ enum class DatabaseType(
     RESULTS_CACHE(perDate = false, fileDescriptor = "results-cache")
 
 }
+
+/**
+ * Defines the variant sub-directory for specific content types of databases.
+ */
+enum class VariantContents(val subDirectory: String, val types: Set<DatabaseType>) {
+    DELETIONS_REVERSEMODIFICATIONS("original", setOf(DatabaseType.NETWORK_MODEL, DatabaseType.CUSTOMER, DatabaseType.DIAGRAM, DatabaseType.MEASUREMENT)),
+    CREATIONS_MODIFICATIONS("new", setOf(DatabaseType.NETWORK_MODEL, DatabaseType.CUSTOMER, DatabaseType.DIAGRAM, DatabaseType.MEASUREMENT)),
+    CHANGESET("", setOf(DatabaseType.VARIANT))
+}

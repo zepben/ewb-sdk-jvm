@@ -183,10 +183,10 @@ object SchemaServices {
                             buildingNumber = ""
                         ),
                     )
-                    // FIXME: IDK how, also not much thought has gone in, but this just bit me with an accidental public var (NetworkModelProject._children), maybe we should check for that? ie: isPublic && name.startswith("_") ?
                     else -> throw IllegalStateException("INTERNAL ERROR: You forgot to add an empty value mapper for ${prop.returnType} - used by ${io::class.simpleName}.${prop.name}")
                 }
 
+                // TODO uncomment?
 //                try {
                 prop.setter.call(io, value)
 //                } catch (_: Exception) {

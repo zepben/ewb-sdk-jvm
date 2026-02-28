@@ -11,10 +11,15 @@ package com.zepben.ewb.services.variant
 import com.zepben.ewb.cim.iec61968.common.Organisation
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.*
+import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.common.exceptions.UnsupportedIdentifiedObjectException
 import com.zepben.ewb.services.customer.CustomerService
 import com.zepben.ewb.services.diagram.DiagramService
 import com.zepben.ewb.services.network.NetworkService
+import com.zepben.ewb.services.network.whenNetworkServiceObject
+import kotlin.reflect.KMutableProperty
+import kotlin.reflect.KVisibility
+import kotlin.reflect.full.*
 
 
 /**
@@ -134,6 +139,8 @@ class ChangeSetServices(
             variantService.add(modification)
         }
 
+        addModificationAssociations(originalObject, originalNetworkService) // TODO test this and logic may be bad...
+        addModificationAssociations(newObject, newNetworkService) // TODO test this
         addToOriginal(originalObject) // ObjectReverseModification - we don't care about whether this succeeded as it should have be false if the obj is already present.
         return addToNew(newObject)
     }
@@ -213,5 +220,28 @@ class ChangeSetServices(
                 newCustomerService.tryAdd(identifiable)
             }
         }
+
+    private fun addModificationAssociations(io: Identifiable, service: BaseService) {
+        io::class.memberProperties
+            .filter { it.visibility == KVisibility.PUBLIC }
+            .filterIsInstance<KMutableProperty<*>>()
+            .filter { it.getter.call(io) != null }
+            .forEach { prop ->
+                val returnType = prop.returnType
+                if (returnType.isSubtypeOf(Identifiable::class.createType())) {
+                    val associatedIdentifiable = prop.getter.call(io) as Identifiable?
+                    associatedIdentifiable?.let { service.tryAdd(it) }
+                } else if (returnType.isSubtypeOf(Iterable::class.starProjectedType)
+                    && returnType.arguments.isNotEmpty()
+                    && returnType.arguments[0].type?.isSubtypeOf(Identifiable::class.createType()) == true
+                ) {
+                    val associatedIdentifiables = prop.getter.call(io) as Iterable<Identifiable>?
+                    associatedIdentifiables?.forEach {
+                        service.tryAdd(it)
+                    }
+                }
+
+            }
+    }
 
 }

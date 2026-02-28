@@ -12,7 +12,6 @@ import java.io.IOException
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.LocalDate
-import kotlin.io.path.isRegularFile
 import kotlin.io.path.name
 
 /**
@@ -35,16 +34,23 @@ interface EwbDataFilePaths {
 
     /**
      * Resolves the [Path] to the database file for the specified [DatabaseType] that has
-     * [DatabaseType.perDate] set to true and the specified [LocalDate], within the [variant].
+     * [DatabaseType.perDate] set to true and the specified [LocalDate], within the [variant], for the specified [variantContents].
+     *
+     * ChangeSet content is split into two separate databases for each supported [DatabaseType], with targets of ObjectCreations and ObjectModifications going
+     * to one database, and targets of ObjectDeletions and ObjectReverseModifications going to another. This is to avoid conflicting IDs between the two
+     * databases.
+     * The ChangeSet and it's associated ObjectCreation, ObjectDeletion, and ObjectModifications will be contained in a single [DatabaseType.VARIANT] database.
      *
      * @param type The [DatabaseType] to use for the database [Path].
      * @param date The [LocalDate] to use for the database [Path].
      * @param variant The name of the variant containing the database.
+     * @param variantContents The relevant content for the desired [type].
      * @return The [Path] to the [DatabaseType] database file for the [variant].
      */
-    fun resolve(type: DatabaseType, date: LocalDate, variant: String): Path {
+    fun resolve(type: DatabaseType, date: LocalDate, variant: String, variantContents: VariantContents): Path {
         require(type.perDate) { "type must have its perDate set to true to use this method." }
-        return resolveDatabase(date.toDatedVariantPath(type, variant))
+        require(variantContents.types.contains(type)) { "type must be compatible with variantContents. Compatible options for ${variantContents.name}: ${variantContents.types.joinToString(",")}" }
+        return resolveDatabase(date.toDatedVariantPath(type, variant, variantContents))
     }
 
     /**
@@ -169,8 +175,8 @@ interface EwbDataFilePaths {
     private fun LocalDate.toDatedPath(type: DatabaseType): Path =
         toString().let { dateStr -> Paths.get(dateStr).resolve("$dateStr-${type.databaseName}") }
 
-    private fun LocalDate.toDatedVariantPath(type: DatabaseType, variant: String): Path =
-        toString().let { dateStr -> Paths.get(dateStr).resolve(VARIANTS_PATH).resolve(variant).resolve("$dateStr-${type.databaseName}") }
+    private fun LocalDate.toDatedVariantPath(type: DatabaseType, variant: String, variantContents: VariantContents): Path =
+        toString().let { dateStr -> Paths.get(dateStr).resolve(VARIANTS_PATH).resolve(variant).resolve(variantContents.subDirectory).resolve("$dateStr-${type.databaseName}") }
 
     private val DatabaseType.databaseName: String get() = "$fileDescriptor.sqlite"
 

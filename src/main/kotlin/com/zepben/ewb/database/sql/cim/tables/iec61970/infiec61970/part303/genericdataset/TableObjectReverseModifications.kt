@@ -17,15 +17,15 @@ import com.zepben.ewb.database.sql.common.tables.Column.Type.STRING
  *
  * @property OBJECT_MODIFICATION_MRID A column storing the mRID of the expected IdentifiedObject in the base network before modification.
  */
-@Suppress("PropertyName")
-class TableObjectReverseModifications : TableChangeSetMembers() {
-
-    val OBJECT_MODIFICATION_MRID: Column = Column(++columnIndex, "object_modification_mrid", STRING, NOT_NULL)
-
-    override val name: String = "object_reverse_modifications"
-
-    init {
-        addNonUniqueIndexes(listOf(OBJECT_MODIFICATION_MRID))
-    }
-
-}
+//@Suppress("PropertyName")
+//class TableObjectReverseModifications : TableChangeSetMembers() {
+//
+//    val OBJECT_MODIFICATION_MRID: Column = Column(++columnIndex, "object_modification_mrid", STRING, NOT_NULL)
+//
+//    override val name: String = "object_reverse_modifications"
+//
+//    init {
+//        addNonUniqueIndexes(listOf(OBJECT_MODIFICATION_MRID))
+//    }
+//
+//}

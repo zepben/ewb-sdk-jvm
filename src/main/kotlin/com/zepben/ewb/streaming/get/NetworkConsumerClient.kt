@@ -12,6 +12,7 @@ import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.iec61968.operations.OperationalRestriction
 import com.zepben.ewb.cim.iec61970.base.core.*
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
+import com.zepben.ewb.database.paths.VariantContents
 import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.common.translator.EnumMapper
 import com.zepben.ewb.services.common.translator.mRID
@@ -483,14 +484,16 @@ class NetworkConsumerClient(
      * Note this function does not populate [service] as merging a [ChangeSet] with a [NetworkService] should use XXXX TODO fill this in.
      *
      * @param mRID The mRID of the [ChangeSet] to retrieve contents for.
+     * @param variantContents The contents to retrieve from the server.
      * @return A [GrpcResult] of a [NetworkService].
      */
-    fun getChangeSetObjects(mRID: String): GrpcResult<NetworkService> = tryRpc {
+    fun getChangeSetObjects(mRID: String, variantContents: VariantContents): GrpcResult<NetworkService> = tryRpc {
         val networkService = NetworkService()
         val streamObserver = AwaitableStreamObserver<GetChangeSetObjectsResponse> { response ->
             networkService.addFromPb(response.identifiableObject)
         }
-        stub.getChangeSetObjects(GetChangeSetObjectsRequest.newBuilder().setChangeSetMRID(mRID).build(), streamObserver)
+        val request = GetChangeSetObjectsRequest.newBuilder().setChangeSetMRID(mRID).setVariantContents(mapVariantContents.toPb(variantContents)).build()
+        stub.getChangeSetObjects(request, streamObserver)
 
         streamObserver.await()
 

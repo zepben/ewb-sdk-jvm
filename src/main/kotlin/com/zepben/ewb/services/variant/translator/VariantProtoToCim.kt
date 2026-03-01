@@ -42,7 +42,6 @@ fun VariantService.addFromPb(pb: VariantObject): AddFromPbResult =
         OBJECTCREATION -> getOrAddFromPb(pb.objectCreation.csm.mRID()) { addFromPb(pb.objectCreation) }
         OBJECTDELETION -> getOrAddFromPb(pb.objectDeletion.csm.mRID()) { addFromPb(pb.objectDeletion) }
         OBJECTMODIFICATION -> getOrAddFromPb(pb.objectModification.csm.mRID()) { addFromPb(pb.objectModification) }
-        OBJECTREVERSEMODIFICATION, //-> getOrAddFromPb(pb.objectReverseModification.csm.mRID()) { addFromPb(pb.objectReverseModification) }
         OTHER, OBJECT_NOT_SET, null -> throw UnsupportedOperationException(
             "Object type ${pb.objectCase} is not supported by the variant service"
         )

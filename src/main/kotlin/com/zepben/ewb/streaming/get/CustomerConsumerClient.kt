@@ -11,6 +11,7 @@ package com.zepben.ewb.streaming.get
 import com.zepben.ewb.cim.iec61968.customers.Customer
 import com.zepben.ewb.cim.iec61970.base.core.EquipmentContainer
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
+import com.zepben.ewb.database.paths.VariantContents
 import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.customer.CustomerService
 import com.zepben.ewb.services.customer.translator.CustomerProtoToCim
@@ -97,12 +98,12 @@ class CustomerConsumerClient @JvmOverloads constructor(
      * @param mRID The mRID of the [ChangeSet] to retrieve contents for.
      * @return A [GrpcResult] of a [CustomerService].
      */
-    fun getChangeSetObjects(mRID: String): GrpcResult<CustomerService> = tryRpc {
+    fun getChangeSetObjects(mRID: String, variantContents: VariantContents): GrpcResult<CustomerService> = tryRpc {
         val customerService = CustomerService()
         val streamObserver = AwaitableStreamObserver<GetChangeSetObjectsResponse> { response ->
             customerService.addFromPb(response.identifiableObject)
         }
-        stub.getChangeSetObjects(GetChangeSetObjectsRequest.newBuilder().setChangeSetMRID(mRID).build(), streamObserver)
+        stub.getChangeSetObjects(GetChangeSetObjectsRequest.newBuilder().setChangeSetMRID(mRID).setVariantContents(mapVariantContents.toPb(variantContents)).build(), streamObserver)
 
         streamObserver.await()
 

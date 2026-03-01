@@ -9,6 +9,7 @@
 package com.zepben.ewb.streaming.get
 
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
+import com.zepben.ewb.database.paths.VariantContents
 import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.diagram.DiagramService
 import com.zepben.ewb.services.diagram.translator.DiagramProtoToCim
@@ -100,12 +101,12 @@ class DiagramConsumerClient(
      * @param mRID The mRID of the [ChangeSet] to retrieve contents for.
      * @return A [GrpcResult] of a [DiagramService].
      */
-    fun getChangeSetObjects(mRID: String): GrpcResult<DiagramService> = tryRpc {
+    fun getChangeSetObjects(mRID: String, variantContents: VariantContents): GrpcResult<DiagramService> = tryRpc {
         val diagramService = DiagramService()
         val streamObserver = AwaitableStreamObserver<GetChangeSetObjectsResponse> { response ->
             diagramService.addFromPb(response.identifiableObject)
         }
-        stub.getChangeSetObjects(GetChangeSetObjectsRequest.newBuilder().setChangeSetMRID(mRID).build(), streamObserver)
+        stub.getChangeSetObjects(GetChangeSetObjectsRequest.newBuilder().setChangeSetMRID(mRID).setVariantContents(mapVariantContents.toPb(variantContents)).build(), streamObserver)
 
         streamObserver.await()
 

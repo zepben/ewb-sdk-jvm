@@ -29,7 +29,12 @@ enum class DatabaseType(
 }
 
 /**
- * Defines the variant sub-directory for specific content types of databases.
+ * The contents contained within the variant.
+ * @property DELETIONS_REVERSEMODIFICATIONS Contains the target of [ObjectDeletion]s and [ObjectReverseModification]s. These are called 'original' because
+ *   the target will be the original object from the base model that the ChangeSet was derived from.
+ * @property CREATIONS_MODIFICATIONS Contains the target of [ObjectCreation]s and [ObjectModification]s. These are called 'new' as the targets contain
+ *   only updates or additions to the base model.
+ * @property CHANGESET Contains the ChangeSet and its ChangeSetMembers.
  */
 enum class VariantContents(val subDirectory: String, val types: Set<DatabaseType>) {
     DELETIONS_REVERSEMODIFICATIONS("original", setOf(DatabaseType.NETWORK_MODEL, DatabaseType.CUSTOMER, DatabaseType.DIAGRAM, DatabaseType.MEASUREMENT)),

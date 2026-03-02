@@ -11,7 +11,6 @@ package com.zepben.ewb.cim.iec61970.base.wires
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.TransformerCoolingType
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.TransformerEndRatedS
 import com.zepben.ewb.cim.iec61968.assetinfo.PowerTransformerInfo
-import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.ResistanceReactance

@@ -9,9 +9,11 @@
 package com.zepben.ewb.database.sql.cim
 
 import com.google.common.reflect.ClassPath
+import com.zepben.ewb.database.sql.cim.changeset.ChangeSetDatabaseTables
 import com.zepben.ewb.database.sql.cim.customer.CustomerDatabaseTables
 import com.zepben.ewb.database.sql.cim.diagram.DiagramDatabaseTables
 import com.zepben.ewb.database.sql.cim.network.NetworkDatabaseTables
+import com.zepben.ewb.database.sql.cim.variant.VariantDatabaseTables
 import com.zepben.ewb.database.sql.common.MissingTableConfigException
 import com.zepben.ewb.database.sql.common.tables.SqlTable
 import com.zepben.ewb.database.sql.common.tables.TableVersion
@@ -43,13 +45,36 @@ internal class CimDatabaseTablesTest {
             .map { it.simpleName }
             .toSet()
 
-        val usedTables = sequenceOf(CustomerDatabaseTables(), DiagramDatabaseTables(), NetworkDatabaseTables())
+        val usedTables = sequenceOf(
+            CustomerDatabaseTables(),
+            DiagramDatabaseTables(),
+            NetworkDatabaseTables(),
+            ChangeSetDatabaseTables(),
+            VariantDatabaseTables()
+        )
             .flatMap { it.tables.keys }
             .filter { !it.isSubclassOf(TableVersion::class) }
             .map { it.simpleName!! }
             .toSet()
 
-        assertThat(usedTables, equalTo(allFinalTables))
+        // Catch the AssertionError that dumps a relatively not useful list of tables
+        // and dump a categorised list of tables.
+        try {
+            assertThat(usedTables, equalTo(allFinalTables))
+        } catch (assertionError: AssertionError) {
+            // Tables declared in ${serviceName}DatabaseTables but not used.
+            val unusedTables = usedTables.filterNot {
+                allFinalTables.contains(it)
+            }.joinToString( ", " )
+
+            // Tables used, but not declared in ${serviceName}DatabaseTables.
+            val undeclaredTables = allFinalTables.filterNot {
+                usedTables.contains(it)
+            }.joinToString( ", " )
+
+            throw AssertionError("\n  Unused Tables: $unusedTables\n  Undeclared Tables: $undeclaredTables", assertionError)
+
+        }
     }
 
     @Test

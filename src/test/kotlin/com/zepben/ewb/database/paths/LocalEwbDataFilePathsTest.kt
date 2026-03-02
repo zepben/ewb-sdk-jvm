@@ -13,6 +13,8 @@ import io.mockk.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.io.TempDir
+import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.LocalDate
@@ -241,40 +243,27 @@ class LocalEwbDataFilePathsTest {
 
     @Test
     internal fun `resolves variant databases`() {
-        fun DatabaseType.toVariantPath(variant: String) =
-            baseDir.resolve(today.toString()).resolve(EwbDataFilePaths.VARIANTS_PATH).resolve(variant).resolve("$today-$fileDescriptor.sqlite")
+        fun DatabaseType.toVariantPath(variant: String, version: VariantContents) =
+            baseDir.resolve(today.toString()).resolve(EwbDataFilePaths.VARIANTS_PATH).resolve(variant).resolve(version.subDirectory).resolve("$today-$fileDescriptor.sqlite")
 
-        DatabaseType.entries.forEach { type ->
-            if (type.perDate) {
-                assertThat(ewbPaths.resolve(type, today, "my-variant1"), equalTo(type.toVariantPath("my-variant1")))
-                assertThat(ewbPaths.resolve(type, today, "my-variant2"), equalTo(type.toVariantPath("my-variant2")))
-            } else {
-                expect { ewbPaths.resolve(type, today, "my-variant") }
-                    .toThrow<IllegalArgumentException>()
-                    .withMessage("type must have its perDate set to true to use this method.")
+        VariantContents.entries.forEach { content ->
+            DatabaseType.entries.forEach { type ->
+                if (type.perDate) {
+                    if (content.types.contains(type)) {
+                        assertThat(ewbPaths.resolve(type, today, "my-variant1", content), equalTo(type.toVariantPath("my-variant1", content)))
+                        assertThat(ewbPaths.resolve(type, today, "my-variant2", content), equalTo(type.toVariantPath("my-variant2", content)))
+                    } else {
+                        expect { ewbPaths.resolve(type, today, "my-variant", content) }
+                            .toThrow<IllegalArgumentException>()
+                            .withMessage("type must be compatible with variantContents. Compatible options for ${content.name}: ${content.types.joinToString(",")}")
+                    }
+                } else {
+                    expect { ewbPaths.resolve(type, today, "my-variant", content) }
+                        .toThrow<IllegalArgumentException>()
+                        .withMessage("type must have its perDate set to true to use this method.")
+                }
             }
         }
-    }
-
-    @Test
-    internal fun `can request variants for a day`() {
-        val yesterday = today.minusDays(1)
-
-        descendants += listOf(
-            Path.of(yesterday.toString(), EwbDataFilePaths.VARIANTS_PATH, "my-variant-1"),
-            Path.of(yesterday.toString(), EwbDataFilePaths.VARIANTS_PATH, "my-variant-2"),
-
-            Path.of(today.toString(), EwbDataFilePaths.VARIANTS_PATH, "my-variant-2"),
-            Path.of(today.toString(), EwbDataFilePaths.VARIANTS_PATH, "my-variant-3"),
-        )
-
-        assertThat(ewbPaths.getAvailableVariantsFor(yesterday), contains("my-variant-1", "my-variant-2"))
-
-        // No date will default to today.
-        assertThat(ewbPaths.getAvailableVariantsFor(), contains("my-variant-2", "my-variant-3"))
-
-        // Should return an empty list if there are no variants for the specified date.
-        assertThat(ewbPaths.getAvailableVariantsFor(today.minusDays(2)), empty())
     }
 
     @Test
@@ -299,13 +288,52 @@ class LocalEwbDataFilePathsTest {
         }
     }
 
+    @TempDir
+    lateinit var basePath: Path
+
     @Test
-    internal fun `only folders under variants are included`() {
+    internal fun `getAvailableVariants and enumerateDescendants correctly apply prefix`() {
         val yesterday = today.minusDays(1)
+        val dateDir = basePath.resolve(yesterday.toString())
+        val previousDate = yesterday.minusDays(1)
+        val previousDateDir = basePath.resolve(previousDate.toString())
+        val previousDateVariantDir = previousDateDir.resolve("variants")
+        val variantsDir = dateDir.resolve("variants")
+        val variantDir = variantsDir.resolve("some-variant")
+        val emptyVariantDir = variantsDir.resolve("some-empty-variant")
+        val variantFile = variantDir.resolve("$yesterday-network-model.sqlite")
+        Files.createDirectories(previousDateVariantDir)
+        Files.createDirectories(variantDir)
+        Files.createDirectories(emptyVariantDir)
+        Files.createFile(variantFile)
 
-        descendants.add(Path.of(yesterday.toString(), "not-variant", "my-variant-1"))
+        val ewbPath = LocalEwbDataFilePaths(basePath, createPath = false)
+        var descendants = ewbPath.enumerateDescendants(yesterday.toString()).asSequence().toList()
 
-        assertThat(ewbPaths.getAvailableVariantsFor(yesterday), empty())
+        assertThat(descendants, contains(dateDir, variantsDir, variantDir, variantFile, emptyVariantDir))
+
+        descendants = ewbPath.enumerateDescendants(previousDateDir.toString()).asSequence().toList()
+        assertThat(descendants, contains(previousDateDir, previousDateVariantDir))
+
+        // Ensure getAvailableVariantsFor returns only variant names. Empty directories will not be included
+        var paths = ewbPath.getAvailableVariantsFor(yesterday)
+        assertThat(paths, contains("some-variant"))
+
+        // Today and previous date have no variants.
+        paths = ewbPath.getAvailableVariantsFor()
+        assertThat(paths, empty())
+
+        paths = ewbPath.getAvailableVariantsFor(previousDate)
+        assertThat(paths, empty())
+    }
+
+    @Test
+    internal fun `listFiles gets prefix appended from enumerateDescendants`() {
+        ewbPaths.enumerateDescendants("some-prefix")
+
+        verifySequence {
+            listFiles.invoke(Path.of(baseDir.toString(), "some-prefix"))
+        }
     }
 
     private fun validateClosest(expectedDate: LocalDate?, searchForwards: Boolean = false) {

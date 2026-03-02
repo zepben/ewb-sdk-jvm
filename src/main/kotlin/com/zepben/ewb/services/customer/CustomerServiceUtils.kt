@@ -16,6 +16,7 @@ import com.zepben.ewb.cim.iec61968.customers.Customer
 import com.zepben.ewb.cim.iec61968.customers.CustomerAgreement
 import com.zepben.ewb.cim.iec61968.customers.PricingStructure
 import com.zepben.ewb.cim.iec61968.customers.Tariff
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 
 /**
@@ -41,13 +42,13 @@ import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
  */
 @JvmOverloads
 inline fun <R> whenCustomerServiceObject(
-    identifiedObject: IdentifiedObject,
+    identifiedObject: Identifiable,
     isCustomer: (Customer) -> R,
     isCustomerAgreement: (CustomerAgreement) -> R,
     isOrganisation: (Organisation) -> R,
     isPricingStructure: (PricingStructure) -> R,
     isTariff: (Tariff) -> R,
-    isOther: (IdentifiedObject) -> R = { idObj: IdentifiedObject ->
+    isOther: (Identifiable) -> R = { idObj: Identifiable ->
         throw IllegalArgumentException("Identified object type ${idObj::class} is not supported by the customer service")
     }
 ): R = when (identifiedObject) {

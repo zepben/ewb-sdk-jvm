@@ -46,6 +46,7 @@ import com.zepben.ewb.cim.iec61970.base.scada.RemoteSource
 import com.zepben.ewb.cim.iec61970.base.wires.*
 import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.ewb.database.sql.cim.CimDatabaseSchemaTest
+import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.common.Resolvers
 import com.zepben.ewb.services.common.testdata.SchemaServices
 import com.zepben.ewb.services.common.testdata.fillFieldsCommon
@@ -66,7 +67,16 @@ import java.nio.file.Paths
 import java.sql.Connection
 import java.sql.DriverManager
 
-class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkDatabaseWriter, NetworkDatabaseReader, NetworkServiceComparator>() {
+class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<
+    NetworkService,
+    NetworkDatabaseWriter,
+    NetworkDatabaseReader,
+    NetworkServiceComparator,
+    IdentifiedObject
+>(
+    describeObject = IdentifiedObject::typeNameAndMRID,
+    addToService = BaseService::tryAdd
+){
 
     override fun createService(): NetworkService = NetworkService()
 

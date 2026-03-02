@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.streaming.grpc
 
+import io.grpc.stub.AbstractAsyncStub
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.TimeUnit
 
@@ -18,16 +19,20 @@ import java.util.concurrent.TimeUnit
  *
  * @param executor The [ExecutorService] created to monitor the gRPC stub if any. This executor will be shut down on disposal of the client.
  */
-abstract class GrpcClient(private val executor: ExecutorService?) : AutoCloseable {
+abstract class GrpcClient<T : AbstractAsyncStub<T>>: AutoCloseable {
+
+    protected abstract val stub: T
 
     /**
      * Cleanly shutdown the executor (if there was one).
      */
     override fun close() {
-        executor?.apply {
-            shutdown()
-            if (!awaitTermination(1000, TimeUnit.MILLISECONDS))
-                shutdownNow()
+        stub.callOptions?.executor?.also { it ->
+            if (it is ExecutorService) {
+                it.shutdown()
+                if (!it.awaitTermination(1000, TimeUnit.MILLISECONDS))
+                    it.shutdownNow()
+            }
         }
     }
 

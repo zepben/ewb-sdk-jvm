@@ -17,7 +17,7 @@ import java.sql.SQLException
  *
  * @property logger The logger to use for this collection reader.
  */
-internal abstract class BaseCollectionWriter {
+abstract class BaseCollectionWriter {
 
     protected val logger: Logger = LoggerFactory.getLogger(javaClass)
 

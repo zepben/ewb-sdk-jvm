@@ -19,7 +19,6 @@ import com.zepben.ewb.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.ewb.cim.validateEnum
 import com.zepben.ewb.services.common.Resolvers
-import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.NetworkServiceComparator

@@ -1,0 +1,33 @@
+/*
+ * Copyright 2025 Zeppelin Bend Pty Ltd
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+package com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset
+
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
+
+/**
+ * A CRUD-style data object.
+ *
+ * [changeSet] and [targetObjectMRID] must be set prior to
+ *
+ * @property changeSet The [ChangeSet] this [ChangeSetMember] belongs to.
+ * @property targetObjectMRID The CIM object [changeSet] applies to.
+ */
+abstract class ChangeSetMember: Identifiable {
+
+    lateinit var changeSet: ChangeSet
+    lateinit var targetObjectMRID: String
+
+    override val mRID: String
+        get() = "${changeSet.mRID}_$targetObjectMRID"
+
+    override fun nameAndMRID(): String = mRID
+
+    override fun typeNameAndMRID(): String = "${javaClass.simpleName} $mRID"
+}
+

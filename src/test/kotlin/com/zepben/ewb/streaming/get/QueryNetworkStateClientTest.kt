@@ -47,7 +47,7 @@ internal class QueryNetworkStateClientTest {
     private val channel = grpcCleanup.register(InProcessChannelBuilder.forName(serverName).directExecutor().build())
     private val stub = spyk(QueryNetworkStateServiceGrpc.newStub(channel))
     private val issues = NetworkStateIssues(LoggerFactory.getLogger("test"), NetworkMetrics())
-    private val client = QueryNetworkStateClient(stub, issues, null)
+    private val client = QueryNetworkStateClient(stub, issues)
     private val service = TestQueryNetworkStateService()
 
     init {

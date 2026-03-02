@@ -11,6 +11,7 @@ package com.zepben.ewb.services.common
 import com.zepben.ewb.cim.iec61968.common.Document
 import com.zepben.ewb.cim.iec61968.common.Organisation
 import com.zepben.ewb.cim.iec61968.common.OrganisationRole
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.core.Name
 import com.zepben.ewb.cim.iec61970.base.core.NameType
@@ -65,8 +66,8 @@ abstract class BaseServiceComparator {
     ): ServiceDifferences {
         val differences = ServiceDifferences({ source[it] }, { target[it] }, { source.getNameType(it) }, { target.getNameType(it) })
 
-        source.sequenceOf<IdentifiedObject>().forEach { s ->
-            val difference = target.get<IdentifiedObject>(s.mRID)?.let { t ->
+        source.sequenceOf<Identifiable>().forEach { s ->
+            val difference = target.get<Identifiable>(s.mRID)?.let { t ->
                 val sourceType = getComparableType(s::class)
                 if (sourceType != getComparableType(t::class)) {
                     differences.addToMissingFromSource(s.mRID)
@@ -84,7 +85,7 @@ abstract class BaseServiceComparator {
                 differences.addModifications(s.mRID, difference)
         }
 
-        target.sequenceOf<IdentifiedObject>()
+        target.sequenceOf<Identifiable>()
             .filter { !source.contains(it.mRID) }
             .forEach { differences.addToMissingFromSource(it.mRID) }
 
@@ -125,13 +126,24 @@ abstract class BaseServiceComparator {
     }
 
     /**
+     * Compare the [Identifiable] members.
+     *
+     * @receiver The [ObjectDifference] to populate with any differences.
+     * @return The [ObjectDifference] being populated for fluent use.
+     */
+    protected fun ObjectDifference<out Identifiable>.compareIdentifiable(): ObjectDifference<out Identifiable> = apply {
+        compareValues(Identifiable::mRID)
+    }
+
+    /**
      * Compare the [IdentifiedObject] members.
      *
      * @receiver The [ObjectDifference] to populate with any differences.
      * @return The [ObjectDifference] being populated for fluent use.
      */
     protected fun ObjectDifference<out IdentifiedObject>.compareIdentifiedObject(): ObjectDifference<out IdentifiedObject> = apply {
-        compareValues(IdentifiedObject::mRID, IdentifiedObject::name, IdentifiedObject::description, IdentifiedObject::numDiagramObjects)
+        compareIdentifiable()
+        compareValues(IdentifiedObject::name, IdentifiedObject::description, IdentifiedObject::numDiagramObjects)
         compareNames(IdentifiedObject::names)
     }
 
@@ -231,7 +243,7 @@ abstract class BaseServiceComparator {
      * @receiver The [ObjectDifference] to populate with any differences.
      * @return The [ObjectDifference] being populated for fluent use.
      */
-    fun <T : IdentifiedObject, R : IdentifiedObject> ObjectDifference<T>.compareIdReferences(
+    fun <T : Identifiable, R : Identifiable> ObjectDifference<T>.compareIdReferences(
         vararg properties: KProperty1<in T, R?>
     ): ObjectDifference<T> {
         properties.forEach { addIfDifferent(it.name, it.compareIdReference(source, target)) }
@@ -254,7 +266,7 @@ abstract class BaseServiceComparator {
      * @receiver The [ObjectDifference] to populate with any differences.
      * @return The [ObjectDifference] being populated for fluent use.
      */
-    fun <T : IdentifiedObject, R : IdentifiedObject> ObjectDifference<T>.compareIdReferenceCollections(
+    fun <T : Identifiable, R : Identifiable> ObjectDifference<T>.compareIdReferenceCollections(
         vararg properties: KProperty1<in T, Collection<R>>
     ): ObjectDifference<T> {
         properties.forEach { addIfDifferent(it.name, it.compareIdReferenceCollection(source, target)) }
@@ -270,7 +282,7 @@ abstract class BaseServiceComparator {
      * @receiver The [ObjectDifference] to populate with any differences.
      * @return The [ObjectDifference] being populated for fluent use.
      */
-    fun <T : IdentifiedObject, R : IdentifiedObject> ObjectDifference<T>.compareIndexedIdReferenceCollections(
+    fun <T : Identifiable, R : Identifiable> ObjectDifference<T>.compareIndexedIdReferenceCollections(
         vararg properties: KProperty1<in T, List<R>>
     ): ObjectDifference<T> {
         properties.forEach { addIfDifferent(it.name, it.compareIndexedIdReferenceCollection(source, target)) }

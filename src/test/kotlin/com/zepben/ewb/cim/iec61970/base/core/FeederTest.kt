@@ -111,13 +111,13 @@ internal class FeederTest {
     internal fun currentEnergizedLvSubstations() {
         PrivateCollectionValidator.validateUnordered(
             ::Feeder,
-            ::LvFeeder,
-            Feeder::currentEnergizedLvFeeders,
-            Feeder::numCurrentEnergizedLvFeeders,
-            Feeder::getCurrentEnergizedLvFeeder,
-            Feeder::addCurrentEnergizedLvFeeder,
-            Feeder::removeCurrentEnergizedLvFeeder,
-            Feeder::clearCurrentEnergizedLvFeeders
+            ::LvSubstation,
+            Feeder::currentEnergizedLvSubstations,
+            Feeder::numCurrentEnergizedLvSubstations,
+            Feeder::getCurrentEnergizedLvSubstation,
+            Feeder::addCurrentEnergizedLvSubstation,
+            Feeder::removeCurrentEnergizedLvSubstation,
+            Feeder::clearCurrentEnergizedLvSubstations
         )
     }
 

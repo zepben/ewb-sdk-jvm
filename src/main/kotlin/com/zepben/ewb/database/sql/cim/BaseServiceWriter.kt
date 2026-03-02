@@ -8,19 +8,19 @@
 
 package com.zepben.ewb.database.sql.cim
 
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.core.Name
 import com.zepben.ewb.cim.iec61970.base.core.NameType
 import com.zepben.ewb.database.sql.common.BaseCollectionWriter
 import com.zepben.ewb.services.common.BaseService
-import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 
 /**
  * A base class for writing object from a [BaseService] into the database.
  *
  * @property writer The [BaseServiceWriter] used to actually write the objects to the database.
  */
-internal abstract class BaseServiceWriter<TService : BaseService>(
+abstract class BaseServiceWriter<TService : BaseService>(
     protected open val writer: CimWriter
 ) : BaseCollectionWriter() {
 
@@ -46,7 +46,7 @@ internal abstract class BaseServiceWriter<TService : BaseService>(
      *
      * @return true if all objects are successfully written to the database, otherwise false.
      */
-    protected inline fun <reified T : IdentifiedObject> TService.writeEach(noinline writer: (T) -> Boolean): Boolean {
+    protected inline fun <reified T : Identifiable> TService.writeEach(noinline writer: (T) -> Boolean): Boolean {
         var status = true
         sequenceOf<T>().forEach { status = status && validateWrite(it, writer) }
         return status
@@ -61,7 +61,7 @@ internal abstract class BaseServiceWriter<TService : BaseService>(
      *
      * @return true if the object is successfully written to the database, otherwise false.
      */
-    protected inline fun <reified T : IdentifiedObject> validateWrite(it: T, noinline writer: (T) -> Boolean): Boolean {
+    protected inline fun <reified T : Identifiable> validateWrite(it: T, noinline writer: (T) -> Boolean): Boolean {
         return validateWrite(it, writer) { e ->
             logger.error("Failed to write ${it.typeNameAndMRID()}: ${e.message}")
         }

@@ -9,6 +9,7 @@
 package com.zepben.ewb.services.diagram.translator
 
 import com.google.protobuf.NullValue
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.ewb.cim.iec61970.base.diagramlayout.DiagramObject
@@ -21,7 +22,7 @@ import com.zepben.protobuf.cim.iec61970.base.diagramlayout.Diagram as PBDiagram
 import com.zepben.protobuf.cim.iec61970.base.diagramlayout.DiagramObject as PBDiagramObject
 import com.zepben.protobuf.cim.iec61970.base.diagramlayout.DiagramObjectPoint as PBDiagramObjectPoint
 
-fun diagramIdentifiedObject(identifiedObject: IdentifiedObject): DiagramIdentifiedObject =
+fun diagramIdentifiedObject(identifiedObject: Identifiable): DiagramIdentifiedObject =
     DiagramIdentifiedObject.newBuilder().apply {
         whenDiagramServiceObject(
             identifiedObject,

@@ -10,6 +10,8 @@ package com.zepben.ewb.streaming.get
 
 import com.zepben.ewb.cim.iec61968.customers.Customer
 import com.zepben.ewb.cim.iec61970.base.core.EquipmentContainer
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
+import com.zepben.ewb.database.paths.VariantContents
 import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.customer.CustomerService
 import com.zepben.ewb.services.customer.translator.CustomerProtoToCim
@@ -17,11 +19,12 @@ import com.zepben.ewb.services.customer.translator.addFromPb
 import com.zepben.ewb.streaming.grpc.GrpcChannel
 import com.zepben.ewb.streaming.grpc.GrpcResult
 import com.zepben.protobuf.cc.*
+import com.zepben.protobuf.cc.GetChangeSetObjectsRequest
+import com.zepben.protobuf.cc.GetChangeSetObjectsResponse
 import com.zepben.protobuf.metadata.GetMetadataRequest
 import com.zepben.protobuf.metadata.GetMetadataResponse
 import io.grpc.CallCredentials
 import io.grpc.Channel
-import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 /**
@@ -33,18 +36,12 @@ import java.util.concurrent.Executors
  * were retrieved but not added to service. This should not be the case unless you are processing things concurrently.
  *
  * @property stub The gRPC stub to be used to communicate with the server
- * @param executor An optional [ExecutorService] to use with the stub. If provided, it will be cleaned up when this client is closed.
  */
 class CustomerConsumerClient @JvmOverloads constructor(
-    private val stub: CustomerConsumerGrpc.CustomerConsumerStub,
+    override val stub: CustomerConsumerGrpc.CustomerConsumerStub,
     override val service: CustomerService = CustomerService(),
     override val protoToCim: CustomerProtoToCim = CustomerProtoToCim(service),
-    executor: ExecutorService? = null
-) : CimConsumerClient<CustomerService, CustomerProtoToCim>(executor) {
-
-    init {
-        executor?.also { stub.withExecutor(it) }
-    }
+) : CimConsumerClient<CustomerService, CustomerProtoToCim, CustomerConsumerGrpc.CustomerConsumerStub>() {
 
     /**
      * Create a [CustomerConsumerClient]
@@ -55,8 +52,7 @@ class CustomerConsumerClient @JvmOverloads constructor(
     @JvmOverloads
     constructor(channel: Channel, callCredentials: CallCredentials? = null) :
         this(
-            CustomerConsumerGrpc.newStub(channel).apply { callCredentials?.let { withCallCredentials(it) } },
-            executor = Executors.newSingleThreadExecutor()
+            CustomerConsumerGrpc.newStub(channel).withExecutor(Executors.newSingleThreadExecutor()).apply { callCredentials?.let { withCallCredentials(it) } },
         )
 
     /**
@@ -92,6 +88,26 @@ class CustomerConsumerClient @JvmOverloads constructor(
      */
     fun getCustomersForContainers(mRIDs: Set<String>): GrpcResult<MultiObjectResult> = handleMultiObjectRPC {
         processCustomersForContainers(mRIDs)
+    }
+
+    /**
+     * Retrieve the network contents of a [ChangeSet] from the server.
+     * This will return a new [CustomerService] with just the network related contents of the [ChangeSet].
+     * Note this function does not populate [service] as merging a [ChangeSet] with a [CustomerService] should use XXXX TODO fill this in.
+     *
+     * @param mRID The mRID of the [ChangeSet] to retrieve contents for.
+     * @return A [GrpcResult] of a [CustomerService].
+     */
+    fun getChangeSetObjects(mRID: String, variantContents: VariantContents): GrpcResult<CustomerService> = tryRpc {
+        val customerService = CustomerService()
+        val streamObserver = AwaitableStreamObserver<GetChangeSetObjectsResponse> { response ->
+            customerService.addFromPb(response.identifiableObject)
+        }
+        stub.getChangeSetObjects(GetChangeSetObjectsRequest.newBuilder().setChangeSetMRID(mRID).setVariantContents(mapVariantContents.toPb(variantContents)).build(), streamObserver)
+
+        streamObserver.await()
+
+        customerService
     }
 
     override fun processIdentifiedObjects(mRIDs: Sequence<String>): Sequence<ExtractResult> {

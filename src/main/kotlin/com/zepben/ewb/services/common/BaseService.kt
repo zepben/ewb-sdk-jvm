@@ -144,6 +144,14 @@ abstract class BaseService(
     }
 
     /**
+     * Disassociate the provided [nameType] from this service.
+     *
+     * @param [nameType] the [NameType] to remove from this service
+     * @return true if [nameType] was removed, false otherwise.
+     */
+    fun removeNameType(nameType: NameType): Boolean = _nameTypes.remove(nameType.name) != null
+
+    /**
      * Gets the [NameType] for the provided type name associated with this service.
      *
      * @param [type] the type name.

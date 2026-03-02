@@ -161,6 +161,16 @@ interface EwbDataFilePaths {
     fun resolveDatabase(path: Path): Path
 
     /**
+     * Generate a file path for a given date and type.
+     */
+    fun getDatedPath(type: DatabaseType, date: LocalDate): Path = date.toDatedPath(type)
+
+    /**
+     * Generate a file path for a given date, variant, and the contents of that variant.
+     */
+    fun getDatedVariantPath(type: DatabaseType, date: LocalDate, variant: String, variantContents: VariantContents): Path = date.toDatedVariantPath(type, variant, variantContents)
+
+    /**
      * Check if a database [Path] of the specified [DatabaseType] and [LocalDate] exists.
      *
      * @param descendants A list of [Path] representing the descendant paths.

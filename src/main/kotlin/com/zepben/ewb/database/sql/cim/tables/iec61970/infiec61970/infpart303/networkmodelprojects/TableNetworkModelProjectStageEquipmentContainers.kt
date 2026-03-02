@@ -18,12 +18,14 @@ import com.zepben.ewb.database.sql.common.tables.SqlTable
  *
  * @property NETWORK_MODEL_PROJECT_STAGE_MRID A column storing the mRID of NetworkModelProject.
  * @property EQUIPMENT_CONTAINER_MRID A column storing the mRID of EquipmentContainers.
+ * @property BASE_MODEL_VERSION A column storing the base version of the EWB model that the stage originated from.
  */
 @Suppress("PropertyName")
 class TableNetworkModelProjectStageEquipmentContainers : SqlTable() {
 
     val NETWORK_MODEL_PROJECT_STAGE_MRID: Column = Column(++columnIndex, "network_model_project_stage_mrid", STRING, NOT_NULL)
     val EQUIPMENT_CONTAINER_MRID: Column = Column(++columnIndex, "equipment_container_mrid", STRING, NOT_NULL)
+    val BASE_MODEL_VERSION: Column = Column(++columnIndex, "base_model_version", STRING, NOT_NULL)
 
     override val name: String = "network_model_project_stage_equipment_containers"
 

@@ -2,6 +2,7 @@
 
 | Version                  | Released              |
 | ------------------------ | --------------------- |
+|[1.6.0](#160)| `02 March 2026` |
 |[1.5.0](#150)| `13 February 2026` |
 |[1.4.0](#140)| `23 January 2026` |
 |[1.3.0](#130)| `23 December 2025` |
@@ -45,6 +46,33 @@
 ---
 
 NOTE: This library is not yet stable, and breaking changes should be expected until a 1.0.0 release.
+
+---
+
+## [1.6.0]
+
+### Breaking Changes
+* The `ShuntCompensator.groundingTerminal` must now:
+  * Belong to the `ShuntCompensator`. Assigning a `Terminal` to `ShuntCompensator.groundingTerminal` will now set the terminals `conductingEquipment` to the
+    `ShuntCompensator` if it isn't set, and throw an `IllegalArgumentException` if it is assigned to a different `ConductingEquipment`.
+  * Be in the `ShuntCompensator.terminals` collection, and will be added automatically if it is missing on assignment, which in turn will update the
+    `sequenceNumber` of the `Terminal` if it is `0`.
+  * Have phases `N`.
+* Phase paths through a `ShuntCompensator` now add paths for mismatched phases between the grounding and normal terminals. This works in the same way as the
+  `PowerTransformer`. This will only impact traces that are tracking the included phase paths, and will allow traces that previously stopped at the
+  `ShuntCompensator` to continue. You should use the new `stopOnShuntCompensatorGround` condition to maintain current behaviour.
+
+### New Features
+* Added `Conditions.stopOnShuntCompensatorGround`, a new condition to prevent tracing through a `ShuntCompensator` using its grounding terminal.
+
+### Enhancements
+* None.
+
+### Fixes
+* Fixed an error in `PhaseCode` when adding `NONE` which previously resulted in `NONE` instead of the existing `PhaseCode`.
+
+### Notes
+* None.
 
 ---
 

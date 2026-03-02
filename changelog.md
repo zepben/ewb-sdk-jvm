@@ -1,5 +1,5 @@
 # Zepben EWB SDK changelog
-## [1.6.0] - UNRELEASED
+## [1.6.0] - 2026-03-02
 ### Breaking Changes
 * The `ShuntCompensator.groundingTerminal` must now:
   * Belong to the `ShuntCompensator`. Assigning a `Terminal` to `ShuntCompensator.groundingTerminal` will now set the terminals `conductingEquipment` to the

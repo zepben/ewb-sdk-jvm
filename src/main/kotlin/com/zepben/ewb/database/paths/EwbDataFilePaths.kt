@@ -162,11 +162,20 @@ interface EwbDataFilePaths {
 
     /**
      * Generate a file path for a given date and type.
+     *
+     * @param type The [DatabaseType] to use for the database [Path].
+     * @param date The [LocalDate] to use for the database [Path].
      */
     fun getDatedPath(type: DatabaseType, date: LocalDate): Path = date.toDatedPath(type)
 
     /**
      * Generate a file path for a given date, variant, and the contents of that variant.
+     *
+     * @param type The [DatabaseType] to use for the database [Path].
+     * @param date The [LocalDate] to use for the database [Path].
+     * @param variant The name of the variant containing the database.
+     * @param variantContents The relevant content for the desired [type].
+     * @return The [Path] to the [DatabaseType] database file for the [variant].
      */
     fun getDatedVariantPath(type: DatabaseType, date: LocalDate, variant: String, variantContents: VariantContents): Path = date.toDatedVariantPath(type, variant, variantContents)
 

@@ -20,12 +20,6 @@ import com.zepben.ewb.database.sql.common.tables.Column.Type.STRING
 @Suppress("PropertyName")
 class TableObjectModifications : TableChangeSetMembers() {
 
-    val OBJECT_REVERSE_MODIFICATION_TARGET_OBJECT_MRID: Column = Column(++columnIndex, "object_reverse_modification_mrid", STRING, NOT_NULL)
-
     override val name: String = "object_modifications"
-
-    init {
-        addNonUniqueIndexes(listOf(OBJECT_REVERSE_MODIFICATION_TARGET_OBJECT_MRID))
-    }
 
 }

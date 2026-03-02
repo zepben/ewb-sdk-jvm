@@ -8,13 +8,11 @@
 
 package com.zepben.ewb.database.sql.cim.changeset
 
-import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStage
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.*
 import com.zepben.ewb.database.sql.cim.CimReader
 import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.genericdataset.*
 import com.zepben.ewb.database.sql.extensions.getNullableString
 import com.zepben.ewb.services.common.Resolvers
-import com.zepben.ewb.services.common.extensions.ensureGet
 import com.zepben.ewb.services.common.extensions.getOrThrow
 import com.zepben.ewb.services.variant.VariantService
 import java.sql.ResultSet
@@ -33,8 +31,11 @@ internal class ChangeSetCimReader : CimReader<VariantService>(), AutoCloseable{
 
     fun read(service: VariantService, table: TableChangeSets, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val changeSet = ChangeSet(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
-            networkModelProjectStage =
-                service.ensureGet<NetworkModelProjectStage>(resultSet.getNullableString(table.NETWORK_MODEL_PROJECT_STAGE_MRID.queryIndex), typeNameAndMRID())
+            service.resolveOrDeferReference(
+                Resolvers.stage(this),
+                resultSet.getNullableString(table.NETWORK_MODEL_PROJECT_STAGE_MRID.queryIndex),
+                typeNameAndMRID()
+            )
         }
 
         return readDataSet(changeSet, table, resultSet) && service.addOrThrow(changeSet)
@@ -85,21 +86,5 @@ internal class ChangeSetCimReader : CimReader<VariantService>(), AutoCloseable{
 
         return readChangeSetMember(service, objectModification, table, resultSet, setIdentifier) && service.addOrThrow(objectModification)
     }
-
-//    fun read(service: VariantService, table: TableObjectReverseModifications, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
-//        val objectReverseModification = ObjectReverseModification()
-//        val status = readChangeSetMember(service, objectReverseModification, table, resultSet, setIdentifier)
-//
-//        // This is here so typeNameAndMRID won't throw due to changeSet not being populated and not being able to generate an mRID.
-//        if (status) {
-//            objectReverseModification.objectModification = service.getOrThrow<ObjectModification>(
-//                resultSet.getString(table.OBJECT_MODIFICATION_MRID.queryIndex),
-//                objectReverseModification.typeNameAndMRID()
-//            )
-//            objectReverseModification.objectModification.objectReverseModification = objectReverseModification
-//        }
-//
-//        return status && service.addOrThrow(objectReverseModification)
-//    }
 
 }

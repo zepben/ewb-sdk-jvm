@@ -31,13 +31,11 @@ import kotlin.streams.asStream
  * A client class that provides functionality to interact with the gRPC service for querying network states.
  *
  * @property stub The gRPC stub to be used to communicate with the server
- * @param executor An optional [ExecutorService] to use with the stub. If provided, it will be cleaned up when this client is closed.
  */
 class QueryNetworkStateClient(
-    private val stub: QueryNetworkStateServiceGrpc.QueryNetworkStateServiceStub,
+    override val stub: QueryNetworkStateServiceGrpc.QueryNetworkStateServiceStub,
     private val networkStateIssues: NetworkStateIssues,
-    executor: ExecutorService?
-) : GrpcClient(executor) {
+) : GrpcClient<QueryNetworkStateServiceGrpc.QueryNetworkStateServiceStub>() {
 
     private val logger = LoggerFactory.getLogger("QueryNetworkStateClient")
     /**
@@ -49,9 +47,10 @@ class QueryNetworkStateClient(
     @JvmOverloads
     constructor(channel: Channel, networkStateIssues: NetworkStateIssues, callCredentials: CallCredentials? = null) :
         this(
-            QueryNetworkStateServiceGrpc.newStub(channel).apply { callCredentials?.let { withCallCredentials(it) } },
+            QueryNetworkStateServiceGrpc.newStub(channel).withExecutor(Executors.newSingleThreadExecutor()).apply {
+                callCredentials?.let { withCallCredentials(it) }
+            },
             networkStateIssues,
-            executor = Executors.newSingleThreadExecutor()
         )
 
     /**
@@ -62,11 +61,7 @@ class QueryNetworkStateClient(
      */
     @JvmOverloads
     constructor(channel: GrpcChannel, networkStateIssues: NetworkStateIssues, callCredentials: CallCredentials? = null) :
-        this(
-            QueryNetworkStateServiceGrpc.newStub(channel.channel).apply { callCredentials?.let { withCallCredentials(it) } },
-            networkStateIssues,
-            executor = Executors.newSingleThreadExecutor()
-        )
+        this(channel.channel, networkStateIssues, callCredentials)
 
     /**
      * Retrieves a sequence of lists containing [CurrentStateEvent] objects, representing the network states

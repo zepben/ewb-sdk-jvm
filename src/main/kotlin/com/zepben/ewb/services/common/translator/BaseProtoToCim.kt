@@ -11,6 +11,7 @@ package com.zepben.ewb.services.common.translator
 import com.zepben.ewb.cim.iec61968.common.Document
 import com.zepben.ewb.cim.iec61968.common.Organisation
 import com.zepben.ewb.cim.iec61968.common.OrganisationRole
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.core.NameType
 import com.zepben.ewb.services.common.BaseService
@@ -21,7 +22,7 @@ import com.zepben.protobuf.cim.iec61968.common.OrganisationRole as PBOrganisatio
 import com.zepben.protobuf.cim.iec61970.base.core.IdentifiedObject as PBIdentifiedObject
 import com.zepben.protobuf.cim.iec61970.base.core.NameType as PBNameType
 
-internal inline fun <reified CIM : IdentifiedObject> BaseService.getOrAddFromPb(mRID: String, addFromPb: () -> CIM?): AddFromPbResult =
+internal inline fun <reified CIM : Identifiable> BaseService.getOrAddFromPb(mRID: String, addFromPb: () -> CIM?): AddFromPbResult =
     get<CIM>(mRID)?.let {
         AddFromPbResult(mRID, it, reusedExisting = true)
     } ?: AddFromPbResult(mRID, addFromPb(), reusedExisting = false)

@@ -9,10 +9,6 @@
 package com.zepben.ewb.cim.iec61970.base.wires
 
 import com.zepben.ewb.cim.iec61968.assetinfo.OverheadWireInfo
-import com.zepben.ewb.cim.iec61968.common.Location
-import com.zepben.ewb.cim.iec61968.common.PositionPoint
-import com.zepben.ewb.cim.iec61968.common.forEachPoint
-import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.utils.PrivateCollectionValidator
 import com.zepben.testutils.exception.ExpectException.Companion.expect

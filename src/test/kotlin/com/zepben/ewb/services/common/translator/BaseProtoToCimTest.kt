@@ -35,7 +35,7 @@ class BaseProtoToCimTest {
     internal fun `getOrAddFromPb reuses existing items if possible`() {
         service.getOrAddFromPb("mRID1", addFromPb).apply {
             assertThat(mRID, equalTo("mRID1"))
-            assertThat(identifiedObject, sameInstance(junction))
+            assertThat(identifiable, sameInstance(junction))
             assertThat("Should have found the object in the service", reusedExisting)
         }
         confirmVerified(addFromPb)
@@ -48,7 +48,7 @@ class BaseProtoToCimTest {
 
         service.getOrAddFromPb("mRID2", addFromPb).apply {
             assertThat(mRID, equalTo("mRID2"))
-            assertThat(identifiedObject, sameInstance(newJunction))
+            assertThat(identifiable, sameInstance(newJunction))
             assertThat("Should have created a new object", !reusedExisting)
         }
 

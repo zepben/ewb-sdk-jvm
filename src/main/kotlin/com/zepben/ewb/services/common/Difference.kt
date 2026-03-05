@@ -8,7 +8,7 @@
 
 package com.zepben.ewb.services.common
 
-import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 
 /**
  * The base class of all differences detected when comparing objects or services.
@@ -77,7 +77,7 @@ data class ObjectDifference<T> @JvmOverloads constructor(
  * @property source The object being referenced in the source system.
  * @property targetValue The object being referenced in the target system.
  */
-data class ReferenceDifference(val source: IdentifiedObject?, val targetValue: IdentifiedObject?) : Difference()
+data class ReferenceDifference(val source: Identifiable?, val targetValue: Identifiable?) : Difference()
 
 /**
  * A difference in an indexed value.

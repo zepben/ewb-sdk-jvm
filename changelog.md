@@ -1,16 +1,20 @@
 # Zepben EWB SDK changelog
 ## [1.7.0] - UNRELEASED
 ### Breaking Changes
-* None.
+* `typeNameAndMRID` and `nameAndMRID` are no longer extension functions and imports for them will need to be removed.
+* `whenNetworkServiceObject`, `whenDiagramServiceObject`, `whenCustomerServiceObject` `identifiedObject` parameter is now `identifiable: Identifiable`
 
 ### New Features
-* None.
+* Added `Identifiable` interface which defines `mRID`, `typeNameAndMRID`, and `nameAndMRID`.
+* Anything implementing `Identifiable` can now be added to a `BaseService`.
+* `NameType` and `Name` now implement `Identifiable`. Their mRID will be set to `NameType.name` and `Name.name`.
 
 ### Enhancements
-* None.
+* `IdentifiedObject` now extends `Identifiable`.
 
 ### Fixes
-* None.
+* Adding a duplicate name to an `IdentifiedObject` will now be ignored.
+* `GrpcClient` implementations now correctly assign and close an executor for their stubs.
 
 ### Notes
 * None.

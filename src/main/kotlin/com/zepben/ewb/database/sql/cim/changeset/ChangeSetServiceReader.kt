@@ -30,6 +30,5 @@ internal class ChangeSetServiceReader(
             readEach<TableObjectCreations>(service, reader::read) and
             readEach<TableObjectDeletions>(service, reader::read) and
             readEach<TableObjectModifications>(service, reader::read) //and
-//            readEach<TableObjectReverseModifications>(service, reader::read)
 
 }

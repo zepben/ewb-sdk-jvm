@@ -34,7 +34,7 @@ internal class ChangeSetCimReader : CimReader<VariantService>(), AutoCloseable{
             service.resolveOrDeferReference(
                 Resolvers.stage(this),
                 resultSet.getNullableString(table.NETWORK_MODEL_PROJECT_STAGE_MRID.queryIndex),
-                typeNameAndMRID()
+                mRID
             )
         }
 

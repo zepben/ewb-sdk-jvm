@@ -38,6 +38,9 @@ class ChangeSetDatabaseReader internal constructor(
     createServiceReader,
 ){
 
+    override fun afterServiceRead(service: VariantService): Boolean {
+        return true
+    }
     /**
      * @param connection The connection to the database.
      * @param databaseDescription The description of the database for logging (e.g. filename).

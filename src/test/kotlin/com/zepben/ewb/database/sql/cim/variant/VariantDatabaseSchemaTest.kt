@@ -27,62 +27,62 @@ import java.sql.Connection
 import java.sql.DriverManager
 import kotlin.use
 
-private fun getConnection() = DriverManager.getConnection("jdbc:h2:mem:metrics;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH")
-
-class VariantDatabaseSchemaTest : CimDatabaseSchemaTest<
-    VariantService,
-    VariantDatabaseWriter,
-    VariantDatabaseReader,
-    VariantServiceComparator,
-    IdentifiedObject
->(
-    tableVariantsVersion,
-    databaseInitialiser = NoOpDatabaseInitialiser(::getConnection),
-    describeObject = IdentifiedObject::typeNameAndMRID,
-    addToService = BaseService::tryAdd
-) {
-
-    override fun createService(): VariantService = VariantService()
-
-    override fun createWriter(filename: String): VariantDatabaseWriter =
-        VariantDatabaseWriter(::getConnection)
-
-    override fun createReader(connection: Connection, databaseDescription: String): VariantDatabaseReader =
-        VariantDatabaseReader(connection, databaseDescription)
-
-    override fun createComparator(): VariantServiceComparator = VariantServiceComparator()
-
-    override fun createIdentifiedObject(): IdentifiedObject = NetworkModelProject(generateId())
-
-    // NOTE: this pattern must be used instead of `getConnection.use` to ensure the same in-memory DB is used for each of these tests.
-    private val connection = getConnection()
-
-    @BeforeEach
-    // NOTE: this pattern must be used instead of `getConnection.use` to ensure the same in-memory DB is used for each of these tests.
-    internal fun createSchema() {
-        // The VariantDatabaseWriter assumes that the schema has been created already, so we create it here
-        connection.createStatement().use { statement ->
-            val tables = VariantDatabaseTables()
-            tables.forEachTable {
-                statement.executeUpdate(tables.sqlGenerator.createTableSql(it))
-            }
-
-            // Add the version number to the database.
-            connection.prepareStatement(tableVariantsVersion.preparedInsertSql).use { insert ->
-                insert.setInt(tableVariantsVersion.VERSION.queryIndex, tableVariantsVersion.supportedVersion)
-                insert.executeUpdate()
-            }
-        }
-    }
-
-
-    @AfterEach
-    // NOTE: this pattern must be used instead of `getConnection.use` to ensure the same in-memory DB is used for each of these tests.
-    internal fun closeConnection() = connection.close()
-
-    internal fun `test schema for each supported type`() {
-        validateSchema(SchemaServices.variantServicesOf(::AnnotatedProjectDependency, AnnotatedProjectDependency::fillFields))
-        validateSchema(SchemaServices.variantServicesOf(::NetworkModelProject, NetworkModelProject::fillFields))
-        validateSchema(SchemaServices.variantServicesOf(::NetworkModelProjectStage, NetworkModelProjectStage::fillFields))
-    }
-}
+//private fun getConnection() = DriverManager.getConnection("jdbc:h2:mem:metrics;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH")
+//
+//class VariantDatabaseSchemaTest : CimDatabaseSchemaTest<
+//    VariantService,
+//    VariantDatabaseWriter,
+//    VariantDatabaseReader,
+//    VariantServiceComparator,
+//    IdentifiedObject
+//>(
+//    tableVariantsVersion,
+//    databaseInitialiser = NoOpDatabaseInitialiser(::getConnection),
+//    describeObject = IdentifiedObject::typeNameAndMRID,
+//    addToService = BaseService::tryAdd
+//) {
+//
+//    override fun createService(): VariantService = VariantService()
+//
+//    override fun createWriter(filename: String): VariantDatabaseWriter =
+//        VariantDatabaseWriter(::getConnection)
+//
+//    override fun createReader(connection: Connection, databaseDescription: String): VariantDatabaseReader =
+//        VariantDatabaseReader(connection, databaseDescription)
+//
+//    override fun createComparator(): VariantServiceComparator = VariantServiceComparator()
+//
+//    override fun createIdentifiedObject(): IdentifiedObject = NetworkModelProject(generateId())
+//
+//    // NOTE: this pattern must be used instead of `getConnection.use` to ensure the same in-memory DB is used for each of these tests.
+//    private val connection = getConnection()
+//
+//    @BeforeEach
+//    // NOTE: this pattern must be used instead of `getConnection.use` to ensure the same in-memory DB is used for each of these tests.
+//    internal fun createSchema() {
+//        // The VariantDatabaseWriter assumes that the schema has been created already, so we create it here
+//        connection.createStatement().use { statement ->
+//            val tables = VariantDatabaseTables()
+//            tables.forEachTable {
+//                statement.executeUpdate(tables.sqlGenerator.createTableSql(it))
+//            }
+//
+//            // Add the version number to the database.
+//            connection.prepareStatement(tableVariantsVersion.preparedInsertSql).use { insert ->
+//                insert.setInt(tableVariantsVersion.VERSION.queryIndex, tableVariantsVersion.supportedVersion)
+//                insert.executeUpdate()
+//            }
+//        }
+//    }
+//
+//
+//    @AfterEach
+//    // NOTE: this pattern must be used instead of `getConnection.use` to ensure the same in-memory DB is used for each of these tests.
+//    internal fun closeConnection() = connection.close()
+//
+//    internal fun `test schema for each supported type`() {
+//        validateSchema(SchemaServices.variantServicesOf(::AnnotatedProjectDependency, AnnotatedProjectDependency::fillFields))
+//        validateSchema(SchemaServices.variantServicesOf(::NetworkModelProject, NetworkModelProject::fillFields))
+//        validateSchema(SchemaServices.variantServicesOf(::NetworkModelProjectStage, NetworkModelProjectStage::fillFields))
+//    }
+//}

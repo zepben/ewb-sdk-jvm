@@ -113,10 +113,8 @@ fun NetworkModelProject.toPb(): PBNetworkModelProject = toPb(this, PBNetworkMode
 fun toPb(cim: AnnotatedProjectDependency, pb: PBAnnotatedProjectDependency.Builder): PBAnnotatedProjectDependency.Builder =
     pb.apply {
         cim.dependencyType.also { dependencyType = mapDependencyKind.toPb(it) }
-        cim.dependencyDependingStage?.also { dependencyDependingStageMRID = it.mRID } ?: clearDependencyDependingStageMRID()
-        cim.dependencyDependentOnStage?.also { dependencyDependentOnStageMRID = it.mRID } ?: clearDependencyDependentOnStageMRID()
-
-        toPb(cim, ioBuilder)
+        dependencyDependingStageMRID = cim.dependencyDependingStage.mRID
+        dependencyDependentOnStageMRID = cim.dependencyDependentOnStage.mRID
     }
 
 
@@ -136,10 +134,10 @@ fun toPb(cim: NetworkModelProjectStage, pb: PBNetworkModelProjectStage.Builder):
         cim.lastConflictCheckedAt?.also { lastConflictCheckedAtSet = it.toTimestamp() } ?: run { lastConflictCheckedAtNull = NullValue.NULL_VALUE }
         cim.userComments?.also { userCommentsSet = it } ?: run { userCommentsNull = NullValue.NULL_VALUE }
         cim.changeSet?.also { changeSetMRIDSet = it.mRID } ?: run { changeSetMRIDNull = NullValue.NULL_VALUE }
-        cim.dependentOnStage.forEach {
+        cim.dependentOnStages.forEach {
             addDependentOnStageMRID(it.mRID)
         }
-        cim.dependingStage.forEach {
+        cim.dependingStages.forEach {
             addDependingStageMRID(it.mRID)
         }
         cim.equipmentContainerMRIDs.forEach {

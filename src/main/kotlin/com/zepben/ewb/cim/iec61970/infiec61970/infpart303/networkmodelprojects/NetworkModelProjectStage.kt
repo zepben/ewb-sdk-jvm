@@ -27,8 +27,8 @@ import java.time.Instant
  * @property lastConflictCheckedAt [ZBEX] The time the last conflict check occurred.
  * @property userComments [ZBEX] User comments.
  * @property changeSet [ZBEX] The set of changes that this stage of the project will do.
- * @property dependentOnStage The stages that depend on this stage.
- * @property dependingStage The stages that this stage depends on.
+ * @property dependentOnStages The stages that depend on this stage.
+ * @property dependingStages The stages that this stage depends on.
  * @property equipmentContainerMRIDs [ZBEX] The equipment containers this stage is related to.
  */
 @ZBEX
@@ -69,8 +69,8 @@ class NetworkModelProjectStage(mRID: String) : NetworkModelProjectComponent(mRID
             field = it
         }
 
-    val dependentOnStage: List<AnnotatedProjectDependency> get() = _dependentOnStage.asUnmodifiable()
-    val dependingStage: List<AnnotatedProjectDependency> get() = _dependingStage.asUnmodifiable()
+    val dependentOnStages: List<AnnotatedProjectDependency> get() = _dependentOnStage.asUnmodifiable()
+    val dependingStages: List<AnnotatedProjectDependency> get() = _dependingStage.asUnmodifiable()
     var changeSet: ChangeSet? = null
         set(it) {
             updated = Instant.now()
@@ -82,7 +82,7 @@ class NetworkModelProjectStage(mRID: String) : NetworkModelProjectComponent(mRID
 
 
     /**
-     * Get the number of entries in the [dependentOnStage] collection.
+     * Get the number of entries in the [dependentOnStages] collection.
      */
     fun numDependentOnStages(): Int = _dependentOnStage?.size ?: 0
 
@@ -127,7 +127,7 @@ class NetworkModelProjectStage(mRID: String) : NetworkModelProjectComponent(mRID
     }
 
     /**
-     * Clear this [NetworkModelProjectStage]'s [dependentOnStage] collection.
+     * Clear this [NetworkModelProjectStage]'s [dependentOnStages] collection.
      * @return this [NetworkModelProjectStage]
      */
     fun clearDependentOnStages(): NetworkModelProjectStage {
@@ -137,7 +137,7 @@ class NetworkModelProjectStage(mRID: String) : NetworkModelProjectComponent(mRID
     }
 
     /**
-     * Get the number of entries in the [dependingStage] collection.
+     * Get the number of entries in the [dependingStages] collection.
      */
     fun numDependingStages(): Int = _dependingStage?.size ?: 0
 
@@ -182,7 +182,7 @@ class NetworkModelProjectStage(mRID: String) : NetworkModelProjectComponent(mRID
     }
 
     /**
-     * Clear this [NetworkModelProjectStage]'s [dependingStage] collection.
+     * Clear this [NetworkModelProjectStage]'s [dependingStages] collection.
      * @return this [NetworkModelProjectStage]
      */
     fun clearDependingStages(): NetworkModelProjectStage {

@@ -111,28 +111,30 @@ internal class VariantConsumerClientTest {
 
         val expectedService = VariantService()
         val stage = NetworkModelProjectStage("stage").also { expectedService.add(it) }
+        val dependingStage = NetworkModelProjectStage("dependingStage").also { expectedService.add(it) }
         val project = NetworkModelProject("project").also { expectedService.add(it); it.addChild(stage); stage.parent = it }
         val changeSet = ChangeSet("changeSet").also { expectedService.add(it); it.networkModelProjectStage = stage; stage.changeSet = it }
-        val dependentOn = AnnotatedProjectDependency("dependentOn").also { expectedService.add(it); it.dependencyDependentOnStage = stage; stage.addDependentOnStage(it) }
+        val dependentOn = AnnotatedProjectDependency().also { expectedService.add(it); it.dependencyDependentOnStage = stage; stage.addDependentOnStage(it); it.dependencyDependingStage = dependingStage; dependingStage.addDependingStage(it) }
         val creation = ObjectCreation().also { it.changeSet = changeSet; it.targetObjectMRID = "target1"; changeSet.addMember(it); expectedService.add(it)}
         val deletion = ObjectDeletion().also { it.changeSet = changeSet; it.targetObjectMRID = "target2"; changeSet.addMember(it); expectedService.add(it)}
-        val modification = ObjectModification().also { it.changeSet = changeSet; it.targetObjectMRID = "target3"; /* it.populateReverseModification(expectedService); */ changeSet.addMember(it); expectedService.add(it)}
+        val modification = ObjectModification().also { it.changeSet = changeSet; it.targetObjectMRID = "target3"; changeSet.addMember(it); expectedService.add(it)}
 
+        val dependentOnStage = NetworkModelProjectStage("otherStage").also { expectedService.add(it) }
         val stage2 = NetworkModelProjectStage("stage2").also { expectedService.add(it) }
         val changeSet2 = ChangeSet("changeSet2").also { expectedService.add(it); it.networkModelProjectStage = stage2; stage2.changeSet = it }
-        val depending = AnnotatedProjectDependency("depending").also { expectedService.add(it); it.dependencyDependingStage= stage2; stage2.addDependingStage(it) }
+        val depending = AnnotatedProjectDependency().also { expectedService.add(it); it.dependencyDependingStage = stage2; stage2.addDependingStage(it); it.dependencyDependentOnStage = dependentOnStage; dependentOnStage.addDependentOnStage(it) }
 
         consumerService.onGetChangeSet =
             spy { _, response ->
                 // Note we mimic the server behaviour here of sending the whole contents of the variants database, but that requires us to
                 // explicitly filter these out of the getIdentifiedObjects responses below so that we don't accidentally retrieve them via the unresolved references.
-                val changeSetObjects = listOf(changeSet, creation, deletion, modification, /* modification.objectReverseModification */)
+                val changeSetObjects = listOf(changeSet, creation, deletion, modification)
                 responseOfChangeSet(changeSetObjects).forEach { response.onNext(it) }
             }
         consumerService.onGetIdentifiedObjects =
             spy { request, response ->
                 request.mridsList.forEach {
-                    if (it !in setOf(creation.mRID, deletion.mRID, modification.mRID, /* modification.objectReverseModification.mRID */)) {
+                    if (it !in setOf(creation.mRID, deletion.mRID, modification.mRID)) {
                         responseOf(expectedService[it]!!).also { response.onNext(it) }
                     }
                 }

@@ -6,17 +6,13 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-@file:JvmName("NetworkModelProjectServiceUtils")
-
 package com.zepben.ewb.services.variant
 
 import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProject
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
-import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.AnnotatedProjectDependency
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStage
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.*
-import com.zepben.ewb.services.network.NetworkService
 
 /**
  * A function that provides an exhaustive `when` style statement for all [Identifiable] leaf types supported by
@@ -42,7 +38,6 @@ inline fun <R> whenVariantIdentifiedObject(
     isObjectCreation: (ObjectCreation) -> R,
     isObjectDeletion: (ObjectDeletion) -> R,
     isObjectModification: (ObjectModification) -> R,
-//    isObjectReverseModification: (ObjectReverseModification) -> R,
     isOther: (Any) -> R = { obj: Any ->
         throw IllegalArgumentException("Identified object type ${obj::class} is not supported by the network model project service")
     }
@@ -54,6 +49,5 @@ inline fun <R> whenVariantIdentifiedObject(
     is ObjectCreation -> isObjectCreation(identifiable)
     is ObjectDeletion -> isObjectDeletion(identifiable)
     is ObjectModification -> isObjectModification(identifiable)
-//    is ObjectReverseModification -> isObjectReverseModification(identifiable)
     else -> isOther(identifiable)
 }

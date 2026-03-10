@@ -122,12 +122,10 @@ fun toCim(pb: PBNetworkModelProjectComponent, cim: NetworkModelProjectComponent,
  * @return The converted [pb] as a CIM [AnnotatedProjectDependency].
  */
 fun toCim(pb: PBAnnotatedProjectDependency, networkService: VariantService): AnnotatedProjectDependency =
-    AnnotatedProjectDependency(pb.mRID()).apply {
+    AnnotatedProjectDependency().apply {
         dependencyType = mapDependencyKind.toCim(pb.dependencyType)
-        networkService.resolveOrDeferReference(Resolvers.dependentOnStage(this), pb.dependencyDependentOnStageMRID)
-        networkService.resolveOrDeferReference(Resolvers.dependingStage(this), pb.dependencyDependingStageMRID)
-
-        toCim(pb.io, this, networkService)
+        networkService.resolveOrDeferReference(Resolvers.dependentOnStage(this), pb.dependencyDependentOnStageMRID, pb.mRID())
+        networkService.resolveOrDeferReference(Resolvers.dependingStage(this), pb.dependencyDependingStageMRID, pb.mRID())
     }
 
 /**

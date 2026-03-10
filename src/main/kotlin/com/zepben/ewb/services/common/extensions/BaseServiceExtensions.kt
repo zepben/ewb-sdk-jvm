@@ -10,11 +10,9 @@ package com.zepben.ewb.services.common.extensions
 
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.base.core.NameType
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.DataSet
 import com.zepben.ewb.database.sql.common.MRIDLookupException
 import com.zepben.ewb.database.sql.common.NameTypeLookupException
 import com.zepben.ewb.services.common.BaseService
-import com.zepben.ewb.services.variant.VariantService
 
 
 /**

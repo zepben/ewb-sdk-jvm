@@ -65,15 +65,15 @@ class VariantServiceComparator : BaseServiceComparator() {
             compareIdReferences(NetworkModelProjectStage::changeSet)
             compareIndexedValueCollections(NetworkModelProjectStage::equipmentContainerMRIDs)
             compareIdReferenceCollections(
-                NetworkModelProjectStage::dependentOnStage,
-                NetworkModelProjectStage::dependingStage,
+                NetworkModelProjectStage::dependentOnStages,
+                NetworkModelProjectStage::dependingStages,
             )
 
         }
 
     fun compareAnnotatedProjectDependencies(source: AnnotatedProjectDependency, target: AnnotatedProjectDependency): ObjectDifference<AnnotatedProjectDependency> =
         ObjectDifference(source, target).apply {
-            compareIdentifiedObject()
+            compareIdentifiable()
             compareValues(
                 AnnotatedProjectDependency::dependencyType,
             )

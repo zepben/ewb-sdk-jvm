@@ -8,7 +8,7 @@
 
 package com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects
 
-import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 
 /**
  * Represents the relationship between two network model project stages.
@@ -17,11 +17,18 @@ import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
  * @param dependencyDependentOnStage NetworkModelProjectStage required by this stage.
  * @param dependencyDependingStage NetworkModelProjectStages that cannot be applied alongside this stage.
  */
-class AnnotatedProjectDependency(mRID: String) : IdentifiedObject(mRID) {
+class AnnotatedProjectDependency: Identifiable {
 
     var dependencyType: DependencyKind = DependencyKind.UNKNOWN
 
-    var dependencyDependentOnStage: NetworkModelProjectStage? = null
-    var dependencyDependingStage: NetworkModelProjectStage? = null
+    lateinit var dependencyDependentOnStage: NetworkModelProjectStage
+    lateinit var dependencyDependingStage: NetworkModelProjectStage
+
+    override val mRID: String
+        get() = "${dependencyDependentOnStage.mRID}_${dependencyDependingStage.mRID}"
+
+    override fun nameAndMRID(): String = mRID
+
+    override fun typeNameAndMRID(): String = "${javaClass.simpleName} $mRID"
 
 }

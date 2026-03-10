@@ -611,16 +611,6 @@ internal object ChangeSetMemberToChangeSetResolver :
         ChangeSetMember::class, ChangeSet::class, ChangeSetMember::changeSet.setter
     )
 
-//internal object ObjectReverseModificationToObjectModificationResolver :
-//    ReferenceResolver<ObjectReverseModification, ObjectModification> by KReferenceResolver(
-//        ObjectReverseModification::class, ObjectModification::class, ObjectReverseModification::objectModification.setter
-//    )
-//
-//internal object ObjectModificationToObjectReverseModificationResolver :
-//    ReferenceResolver<ObjectModification, ObjectReverseModification> by KReferenceResolver(
-//        ObjectModification::class, ObjectReverseModification::class, ObjectModification::objectReverseModification.setter
-//    )
-
 //-------------------------------------------//
 
 class KReferenceResolver<T : Identifiable, R : Identifiable>(

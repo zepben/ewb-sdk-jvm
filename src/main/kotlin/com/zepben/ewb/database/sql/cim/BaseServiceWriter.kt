@@ -9,7 +9,6 @@
 package com.zepben.ewb.database.sql.cim
 
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
-import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.core.Name
 import com.zepben.ewb.cim.iec61970.base.core.NameType
 import com.zepben.ewb.database.sql.common.BaseCollectionWriter

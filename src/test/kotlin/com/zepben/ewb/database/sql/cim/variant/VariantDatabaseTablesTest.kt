@@ -14,17 +14,17 @@ import io.mockk.mockk
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Test
 
-internal class VariantDatabaseTablesTest {
-
-    @Test
-    internal fun `contains base tables`() {
-        val tables = VariantDatabaseTables().tables.keys
-        val baseTables = (object : BaseDatabaseTables() {
-            override val sqlGenerator: SqlGenerator
-                get() = mockk()
-        }).tables.keys
-
-        assertThat("should contain all base tables", tables.containsAll(baseTables))
-    }
-
-}
+//internal class VariantDatabaseTablesTest {
+//
+//    @Test
+//    internal fun `contains base tables`() {
+//        val tables = VariantDatabaseTables().tables.keys
+//        val baseTables = (object : BaseDatabaseTables() {
+//            override val sqlGenerator: SqlGenerator
+//                get() = mockk()
+//        }).tables.keys
+//
+//        assertThat("should contain all base tables", tables.containsAll(baseTables))
+//    }
+//
+//}

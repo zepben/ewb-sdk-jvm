@@ -10,7 +10,6 @@ package com.zepben.ewb.services.diagram.translator
 
 import com.google.protobuf.NullValue
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
-import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.ewb.cim.iec61970.base.diagramlayout.DiagramObject
 import com.zepben.ewb.cim.iec61970.base.diagramlayout.DiagramObjectPoint

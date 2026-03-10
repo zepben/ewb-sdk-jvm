@@ -13,7 +13,6 @@ import com.zepben.ewb.database.sql.cim.changeset.ChangeSetDatabaseTables
 import com.zepben.ewb.database.sql.cim.customer.CustomerDatabaseTables
 import com.zepben.ewb.database.sql.cim.diagram.DiagramDatabaseTables
 import com.zepben.ewb.database.sql.cim.network.NetworkDatabaseTables
-import com.zepben.ewb.database.sql.cim.variant.VariantDatabaseTables
 import com.zepben.ewb.database.sql.common.MissingTableConfigException
 import com.zepben.ewb.database.sql.common.tables.SqlTable
 import com.zepben.ewb.database.sql.common.tables.TableVersion
@@ -50,7 +49,6 @@ internal class CimDatabaseTablesTest {
             DiagramDatabaseTables(),
             NetworkDatabaseTables(),
             ChangeSetDatabaseTables(),
-            VariantDatabaseTables()
         )
             .flatMap { it.tables.keys }
             .filter { !it.isSubclassOf(TableVersion::class) }

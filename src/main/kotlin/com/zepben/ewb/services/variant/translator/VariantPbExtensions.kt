@@ -19,7 +19,6 @@ import com.zepben.protobuf.cim.iec61970.infiec61970.part303.genericdataset.Chang
 fun NetworkModelProject.mRID(): String = nmpc.mRID()
 fun NetworkModelProjectStage.mRID(): String = nmpc.mRID()
 fun NetworkModelProjectComponent.mRID(): String = io.mrid
-fun AnnotatedProjectDependency.mRID(): String = io.mrid
 fun ChangeSetMember.mRID(): String = "${changeSetMRID}_$targetObjectMRID"
 
 fun ChangeSet.mRID(): String = dataset.mrid

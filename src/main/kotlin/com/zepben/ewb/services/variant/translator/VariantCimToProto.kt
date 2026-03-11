@@ -112,9 +112,11 @@ fun NetworkModelProject.toPb(): PBNetworkModelProject = toPb(this, PBNetworkMode
  */
 fun toPb(cim: AnnotatedProjectDependency, pb: PBAnnotatedProjectDependency.Builder): PBAnnotatedProjectDependency.Builder =
     pb.apply {
+        mrid = cim.mRID
         cim.dependencyType.also { dependencyType = mapDependencyKind.toPb(it) }
-        dependencyDependingStageMRID = cim.dependencyDependingStage.mRID
-        dependencyDependentOnStageMRID = cim.dependencyDependentOnStage.mRID
+        cim.dependencyDependingStage?.also { dependencyDependingStageMRID = it.mRID } ?: clearDependencyDependingStageMRID()
+        cim.dependencyDependentOnStage?.also { dependencyDependentOnStageMRID = it.mRID } ?: clearDependencyDependentOnStageMRID()
+
     }
 
 

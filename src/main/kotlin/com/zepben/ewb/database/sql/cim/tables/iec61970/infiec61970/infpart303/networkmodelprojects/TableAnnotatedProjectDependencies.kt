@@ -23,6 +23,7 @@ import com.zepben.ewb.database.sql.common.tables.SqlTable
 @Suppress("PropertyName")
 class TableAnnotatedProjectDependencies : SqlTable() {
 
+    val MRID: Column = Column(++columnIndex, "mrid", STRING, NOT_NULL)
     val DEPENDENCY_TYPE: Column = Column(++columnIndex, "dependency_type", STRING, NOT_NULL)
     val DEPENDENCY_DEPENDENT_ON_STAGE_MRID: Column = Column(++columnIndex, "dependency_dependent_on_stage_mrid", STRING, NOT_NULL)
     val DEPENDENCY_DEPENDING_STAGE_MRID: Column = Column(++columnIndex, "dependency_depending_stage_mrid", STRING, NOT_NULL)
@@ -32,6 +33,7 @@ class TableAnnotatedProjectDependencies : SqlTable() {
 
     init {
         addUniqueIndexes(
+            listOf(MRID),
             listOf(
                 DEPENDENCY_DEPENDENT_ON_STAGE_MRID,
                 DEPENDENCY_DEPENDING_STAGE_MRID,

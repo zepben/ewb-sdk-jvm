@@ -13,19 +13,16 @@ import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 /**
  * Represents the relationship between two network model project stages.
  *
- * @param dependencyType Describes the dependency relationship between the two classes.
- * @param dependencyDependentOnStage NetworkModelProjectStage required by this stage.
- * @param dependencyDependingStage NetworkModelProjectStages that cannot be applied alongside this stage.
+ * @property dependencyType Describes the dependency relationship between the two classes.
+ * @property dependencyDependentOnStage NetworkModelProjectStage required by this stage.
+ * @property dependencyDependingStage NetworkModelProjectStages that cannot be applied alongside this stage.
  */
-class AnnotatedProjectDependency: Identifiable {
+class AnnotatedProjectDependency(override val mRID: String): Identifiable {
 
     var dependencyType: DependencyKind = DependencyKind.UNKNOWN
 
-    lateinit var dependencyDependentOnStage: NetworkModelProjectStage
-    lateinit var dependencyDependingStage: NetworkModelProjectStage
-
-    override val mRID: String
-        get() = "${dependencyDependentOnStage.mRID}_${dependencyDependingStage.mRID}"
+    var dependencyDependentOnStage: NetworkModelProjectStage? = null
+    var dependencyDependingStage: NetworkModelProjectStage? = null
 
     override fun nameAndMRID(): String = mRID
 

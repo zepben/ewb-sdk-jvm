@@ -9,34 +9,36 @@
 package com.zepben.ewb.services.diagram.translator
 
 import com.zepben.ewb.cim.iec61970.base.core.NameType
-import com.zepben.ewb.cim.iec61970.base.diagramlayout.*
+import com.zepben.ewb.cim.iec61970.base.diagramlayout.Diagram
+import com.zepben.ewb.cim.iec61970.base.diagramlayout.DiagramObject
+import com.zepben.ewb.cim.iec61970.base.diagramlayout.DiagramObjectPoint
 import com.zepben.ewb.services.common.Resolvers
 import com.zepben.ewb.services.common.translator.AddFromPbResult
 import com.zepben.ewb.services.common.translator.BaseProtoToCim
 import com.zepben.ewb.services.common.translator.getOrAddFromPb
 import com.zepben.ewb.services.common.translator.toCim
 import com.zepben.ewb.services.diagram.DiagramService
-import com.zepben.protobuf.dc.DiagramIdentifiedObject
-import com.zepben.protobuf.dc.DiagramIdentifiedObject.IdentifiedObjectCase
-import com.zepben.protobuf.dc.DiagramIdentifiedObject.IdentifiedObjectCase.DIAGRAM
-import com.zepben.protobuf.dc.DiagramIdentifiedObject.IdentifiedObjectCase.DIAGRAMOBJECT
+import com.zepben.protobuf.dc.DiagramIdentifiable
+import com.zepben.protobuf.dc.DiagramIdentifiable.IdentifiableCase
+import com.zepben.protobuf.dc.DiagramIdentifiable.IdentifiableCase.DIAGRAM
+import com.zepben.protobuf.dc.DiagramIdentifiable.IdentifiableCase.DIAGRAMOBJECT
 import com.zepben.protobuf.cim.iec61970.base.core.NameType as PBNameType
 import com.zepben.protobuf.cim.iec61970.base.diagramlayout.Diagram as PBDiagram
 import com.zepben.protobuf.cim.iec61970.base.diagramlayout.DiagramObject as PBDiagramObject
 import com.zepben.protobuf.cim.iec61970.base.diagramlayout.DiagramObjectPoint as PBDiagramObjectPoint
 
 /**
- * An extension to add a converted copy of the protobuf [DiagramIdentifiedObject] to the [DiagramService].
+ * An extension to add a converted copy of the protobuf [DiagramIdentifiable] to the [DiagramService].
  *
  * @receiver The [DiagramService] to add the converted [pb] into.
- * @param pb The [DiagramIdentifiedObject] to add to the [DiagramService].
+ * @param pb The [DiagramIdentifiable] to add to the [DiagramService].
  * @return The result of trying to add the item to the service.
  */
-fun DiagramService.addFromPb(pb: DiagramIdentifiedObject): AddFromPbResult =
-    when (pb.identifiedObjectCase) {
+fun DiagramService.addFromPb(pb: DiagramIdentifiable): AddFromPbResult =
+    when (pb.identifiableCase) {
         DIAGRAM -> getOrAddFromPb(pb.diagram.mRID()) { addFromPb(pb.diagram) }
         DIAGRAMOBJECT -> getOrAddFromPb(pb.diagramObject.mRID()) { addFromPb(pb.diagramObject) }
-        IdentifiedObjectCase.OTHER, IdentifiedObjectCase.IDENTIFIEDOBJECT_NOT_SET, null -> throw UnsupportedOperationException("Identified object type ${pb.identifiedObjectCase} is not supported by the diagram service")
+        IdentifiableCase.OTHER, IdentifiableCase.IDENTIFIABLE_NOT_SET, null -> throw UnsupportedOperationException("Identified object type ${pb.identifiableCase} is not supported by the diagram service")
     }
 
 // ######################
@@ -118,12 +120,12 @@ fun DiagramService.addFromPb(pb: PBDiagramObject): DiagramObject? = tryAddOrNull
 class DiagramProtoToCim(val diagramService: DiagramService) : BaseProtoToCim() {
 
     /**
-     * Add a converted copy of the protobuf [DiagramIdentifiedObject] to the [DiagramService].
+     * Add a converted copy of the protobuf [DiagramIdentifiable] to the [DiagramService].
      *
-     * @param pb The [DiagramIdentifiedObject] to convert.
+     * @param pb The [DiagramIdentifiable] to convert.
      * @return The converted [AddFromPbResult] containing information on how the add was handled.
      */
-    fun addFromPb(pb: DiagramIdentifiedObject): AddFromPbResult =
+    fun addFromPb(pb: DiagramIdentifiable): AddFromPbResult =
         diagramService.addFromPb(pb)
 
     // ######################

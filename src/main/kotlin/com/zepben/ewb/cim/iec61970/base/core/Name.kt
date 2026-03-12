@@ -16,4 +16,12 @@ package com.zepben.ewb.cim.iec61970.base.core
  * @property type Type of this name.
  * @property identifiedObject Identified object that this name designates.
  */
-data class Name(val name: String, val type: NameType, val identifiedObject: IdentifiedObject)
+data class Name(val name: String, val type: NameType, val identifiedObject: IdentifiedObject) : Identifiable {
+
+    override val mRID: String get() = "$name-${type.name}-${identifiedObject.mRID}"
+
+    override fun typeNameAndMRID(): String = "${javaClass.simpleName} $mRID"
+
+    override fun nameAndMRID(): String = name
+
+}

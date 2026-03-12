@@ -42,15 +42,17 @@ import com.zepben.ewb.cim.iec61970.base.generation.production.PhotoVoltaicUnit
 import com.zepben.ewb.cim.iec61970.base.generation.production.PowerElectronicsUnit
 import com.zepben.ewb.cim.iec61970.base.generation.production.PowerElectronicsWindUnit
 import com.zepben.ewb.cim.iec61970.base.meas.*
-import com.zepben.ewb.cim.iec61970.base.protection.*
+import com.zepben.ewb.cim.iec61970.base.protection.CurrentRelay
 import com.zepben.ewb.cim.iec61970.base.scada.RemoteControl
 import com.zepben.ewb.cim.iec61970.base.scada.RemotePoint
 import com.zepben.ewb.cim.iec61970.base.scada.RemoteSource
 import com.zepben.ewb.cim.iec61970.base.wires.*
 import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
-import com.zepben.ewb.services.common.translator.*
+import com.zepben.ewb.services.common.translator.BaseCimToProto
+import com.zepben.ewb.services.common.translator.toPb
+import com.zepben.ewb.services.common.translator.toTimestamp
 import com.zepben.ewb.services.network.whenNetworkServiceObject
-import com.zepben.protobuf.nc.NetworkIdentifiedObject
+import com.zepben.protobuf.nc.NetworkIdentifiable
 import com.zepben.protobuf.cim.extensions.iec61968.assetinfo.RelayInfo as PBRelayInfo
 import com.zepben.protobuf.cim.extensions.iec61968.common.ContactDetails as PBContactDetails
 import com.zepben.protobuf.cim.extensions.iec61968.metering.PanDemandResponseFunction as PBPanDemandResponseFunction
@@ -194,12 +196,22 @@ import com.zepben.protobuf.cim.iec61970.base.wires.TransformerStarImpedance as P
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Circuit as PBCircuit
 
 /**
- * Convert the [IdentifiedObject] to a [NetworkIdentifiedObject] representation.
+ * Convert the [IdentifiedObject] to a [NetworkIdentifiable] representation.
+ *
+ * @param identifiedObject The [IdentifiedObject] to convert.
  */
-fun networkIdentifiedObject(identifiedObject: IdentifiedObject): NetworkIdentifiedObject =
-    NetworkIdentifiedObject.newBuilder().apply {
+@Deprecated("Use networkIdentifiable() instead", ReplaceWith("networkIdentifiable(identifiedObject)"))
+fun networkIdentifiedObject(identifiedObject: IdentifiedObject): NetworkIdentifiable = networkIdentifiable(identifiedObject)
+
+/**
+ * Convert the [Identifiable] to a [NetworkIdentifiable] representation.
+ *
+ * @param identifiable The [Identifiable] to convert.
+ */
+fun networkIdentifiable(identifiable: Identifiable): NetworkIdentifiable =
+    NetworkIdentifiable.newBuilder().apply {
         whenNetworkServiceObject(
-            identifiedObject,
+            identifiable,
             isAcLineSegment = { acLineSegment = it.toPb() },
             isAccumulator = { accumulator = it.toPb() },
             isAnalog = { analog = it.toPb() },
@@ -470,6 +482,7 @@ fun toPb(cim: LvSubstation, pb: PBLvSubstation.Builder): PBLvSubstation.Builder 
 
         toPb(cim, ecBuilder)
     }
+
 /**
  * An extension for converting any [Loop] into its protobuf counterpart.
  */

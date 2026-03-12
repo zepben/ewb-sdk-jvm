@@ -19,7 +19,6 @@ import com.zepben.ewb.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.ewb.cim.validateEnum
 import com.zepben.ewb.services.common.Resolvers
-import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.NetworkServiceComparator
@@ -53,8 +52,7 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.*
 import org.slf4j.LoggerFactory
 import java.util.concurrent.Executors
-import com.zepben.protobuf.nc.NetworkIdentifiedObject as NIO
-
+import com.zepben.protobuf.nc.NetworkIdentifiable as NIO
 
 internal class NetworkConsumerClientTest {
 
@@ -101,7 +99,7 @@ internal class NetworkConsumerClientTest {
         // This is a convoluted way of getting the requests to have a delay after sending to allow responses to be processed mid-batch.
         doAnswer { getIdentifiedObjectsInv ->
             @Suppress("UNCHECKED_CAST")
-            spy(getIdentifiedObjectsInv.callRealMethod() as StreamObserver<GetIdentifiedObjectsRequest>).also {
+            spy(getIdentifiedObjectsInv.callRealMethod() as StreamObserver<GetIdentifiablesRequest>).also {
                 doAnswer { onNextInv ->
                     onNextInv.callRealMethod()
                     // Go to sleep to delay the processing of the next batch. This is done to make sure that the previous responses are processed before the
@@ -109,10 +107,10 @@ internal class NetworkConsumerClientTest {
                     Thread.sleep(100)
                 }.`when`(it).onNext(any())
             }
-        }.`when`(stub).getIdentifiedObjects(any())
+        }.`when`(stub).getIdentifiables(any())
 
         // Send back the requested equipment, plus the terminals, in order to resolve more references than just those requested.
-        consumerService.onGetIdentifiedObjects = spy { request, resp ->
+        consumerService.onGetIdentifiables = spy { request, resp ->
             batchedResponseOf(request.mridsList.flatMap {
                 listOf(Breaker(it), Terminal("$it-t1"), Terminal("$it-t1"))
             }).forEach {
@@ -136,15 +134,20 @@ internal class NetworkConsumerClientTest {
             val mRID = "id" + ++counter
             val response = createResponse(builder, it, mRID)
 
-            consumerService.onGetIdentifiedObjects = spy { request, resp ->
+            consumerService.onGetIdentifiables = spy { request, resp ->
                 assertThat(request.mridsList, containsInAnyOrder(mRID))
                 resp.onNext(response)
             }
 
+            //
+            // NOTE: This class has been deliberately left accessing the deprecated versions to ensure it is tested. When the deprecated functions are removed, update this
+            //       class to use `getIdentifiable` and `getIdentifiables`. Don't forget the comments/strings.
+            //
+            @Suppress("DEPRECATION")
             val result = consumerClient.getIdentifiedObject(mRID)
 
-            response.identifiedObjectsList.forEach { nio ->
-                val type = nio.identifiedObjectCase
+            response.identifiablesList.forEach { nio ->
+                val type = nio.identifiableCase
                 if (isSupported(type)) {
                     if (result.wasFailure)
                     /**
@@ -162,7 +165,7 @@ internal class NetworkConsumerClientTest {
                 }
             }
 
-            verify(consumerService.onGetIdentifiedObjects).invoke(eq(GetIdentifiedObjectsRequest.newBuilder().addMrids(mRID).build()), any())
+            verify(consumerService.onGetIdentifiables).invoke(eq(GetIdentifiablesRequest.newBuilder().addMrids(mRID).build()), any())
         }
     }
 
@@ -225,11 +228,16 @@ internal class NetworkConsumerClientTest {
     @Test
     internal fun `returns error when object is not found`() {
         val mRID = "unknown"
-        consumerService.onGetIdentifiedObjects = spy { _, _ -> }
+        consumerService.onGetIdentifiables = spy { _, _ -> }
 
+        //
+        // NOTE: This class has been deliberately left accessing the deprecated versions to ensure it is tested. When the deprecated functions are removed, update this
+        //       class to use `getIdentifiable` and `getIdentifiables`. Don't forget the comments/strings.
+        //
+        @Suppress("DEPRECATION")
         val result = consumerClient.getIdentifiedObject(mRID)
 
-        verify(consumerService.onGetIdentifiedObjects).invoke(eq(GetIdentifiedObjectsRequest.newBuilder().addMrids(mRID).build()), any())
+        verify(consumerService.onGetIdentifiables).invoke(eq(GetIdentifiablesRequest.newBuilder().addMrids(mRID).build()), any())
         assertThat("getIdentifiedObject should fail for mRID '$mRID', which isn't in the network", result.wasFailure)
         expect { throw result.thrown }
             .toThrow<NoSuchElementException>()
@@ -239,11 +247,16 @@ internal class NetworkConsumerClientTest {
     @Test
     internal fun `calls error handler when getting an IdentifiedObject throws`() {
         val mRID = "1234"
-        consumerService.onGetIdentifiedObjects = spy { _, _ -> throw serverException }
+        consumerService.onGetIdentifiables = spy { _, _ -> throw serverException }
 
+        //
+        // NOTE: This class has been deliberately left accessing the deprecated versions to ensure it is tested. When the deprecated functions are removed, update this
+        //       class to use `getIdentifiable` and `getIdentifiables`. Don't forget the comments/strings.
+        //
+        @Suppress("DEPRECATION")
         val result = consumerClient.getIdentifiedObject(mRID)
 
-        verify(consumerService.onGetIdentifiedObjects).invoke(eq(GetIdentifiedObjectsRequest.newBuilder().addMrids(mRID).build()), any())
+        verify(consumerService.onGetIdentifiables).invoke(eq(GetIdentifiablesRequest.newBuilder().addMrids(mRID).build()), any())
         validateFailure(onErrorHandler, result, serverException)
     }
 
@@ -251,13 +264,18 @@ internal class NetworkConsumerClientTest {
     @Test
     internal fun `captures unhandled exceptions when getting an IdentifiedObject throws`() {
         val mRID = "1234"
-        consumerService.onGetIdentifiedObjects = spy { _, _ -> throw serverException }
+        consumerService.onGetIdentifiables = spy { _, _ -> throw serverException }
 
         consumerClient.removeErrorHandler(onErrorHandler)
 
+        //
+        // NOTE: This class has been deliberately left accessing the deprecated versions to ensure it is tested. When the deprecated functions are removed, update this
+        //       class to use `getIdentifiable` and `getIdentifiables`. Don't forget the comments/strings.
+        //
+        @Suppress("DEPRECATION")
         val result = consumerClient.getIdentifiedObject(mRID)
 
-        verify(consumerService.onGetIdentifiedObjects).invoke(eq(GetIdentifiedObjectsRequest.newBuilder().addMrids(mRID).build()), any())
+        verify(consumerService.onGetIdentifiables).invoke(eq(GetIdentifiablesRequest.newBuilder().addMrids(mRID).build()), any())
         validateFailure(onErrorHandler, result, serverException, expectHandled = false)
     }
 
@@ -265,12 +283,17 @@ internal class NetworkConsumerClientTest {
     internal fun `can get multiple identified objects in single call`() {
         val mRIDs = listOf("id1", "id2", "id3")
 
-        consumerService.onGetIdentifiedObjects = spy { _, response ->
+        consumerService.onGetIdentifiables = spy { _, response ->
             response.onNext(createResponse(NIO.newBuilder(), NIO.Builder::getAcLineSegmentBuilder, mRIDs[0]))
             response.onNext(createResponse(NIO.newBuilder(), NIO.Builder::getAcLineSegmentBuilder, mRIDs[1]))
             response.onNext(createResponse(NIO.newBuilder(), NIO.Builder::getBreakerBuilder, mRIDs[2]))
         }
 
+        //
+        // NOTE: This class has been deliberately left accessing the deprecated versions to ensure it is tested. When the deprecated functions are removed, update this
+        //       class to use `getIdentifiable` and `getIdentifiables`. Don't forget the comments/strings.
+        //
+        @Suppress("DEPRECATION")
         val result = consumerClient.getIdentifiedObjects(mRIDs.asSequence())
 
         assertThat("getIdentifiedObjects should succeed", result.wasSuccessful)
@@ -279,30 +302,40 @@ internal class NetworkConsumerClientTest {
         assertThat(result.value.objects[mRIDs[1]], instanceOf(AcLineSegment::class.java))
         assertThat(result.value.objects[mRIDs[2]], instanceOf(Breaker::class.java))
 
-        verify(consumerService.onGetIdentifiedObjects).invoke(eq(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(mRIDs).build()), any())
+        verify(consumerService.onGetIdentifiables).invoke(eq(GetIdentifiablesRequest.newBuilder().addAllMrids(mRIDs).build()), any())
     }
 
     @Test
     internal fun `calls error handler when getting multiple IdentifiedObject throws`() {
         val mRIDs = listOf("id1", "id2", "id3")
-        consumerService.onGetIdentifiedObjects = spy { _, _ -> throw serverException }
+        consumerService.onGetIdentifiables = spy { _, _ -> throw serverException }
 
+        //
+        // NOTE: This class has been deliberately left accessing the deprecated versions to ensure it is tested. When the deprecated functions are removed, update this
+        //       class to use `getIdentifiable` and `getIdentifiables`. Don't forget the comments/strings.
+        //
+        @Suppress("DEPRECATION")
         val result = consumerClient.getIdentifiedObjects(mRIDs.asSequence())
 
-        verify(consumerService.onGetIdentifiedObjects).invoke(eq(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(mRIDs).build()), any())
+        verify(consumerService.onGetIdentifiables).invoke(eq(GetIdentifiablesRequest.newBuilder().addAllMrids(mRIDs).build()), any())
         validateFailure(onErrorHandler, result, serverException)
     }
 
     @Test
     internal fun `captures unhandled exceptions when getting multiple IdentifiedObject throws`() {
         val mRIDs = listOf("id1", "id2", "id3")
-        consumerService.onGetIdentifiedObjects = spy { _, _ -> throw serverException }
+        consumerService.onGetIdentifiables = spy { _, _ -> throw serverException }
 
         consumerClient.removeErrorHandler(onErrorHandler)
 
+        //
+        // NOTE: This class has been deliberately left accessing the deprecated versions to ensure it is tested. When the deprecated functions are removed, update this
+        //       class to use `getIdentifiable` and `getIdentifiables`. Don't forget the comments/strings.
+        //
+        @Suppress("DEPRECATION")
         val result = consumerClient.getIdentifiedObjects(mRIDs)
 
-        verify(consumerService.onGetIdentifiedObjects).invoke(eq(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(mRIDs).build()), any())
+        verify(consumerService.onGetIdentifiables).invoke(eq(GetIdentifiablesRequest.newBuilder().addAllMrids(mRIDs).build()), any())
         validateFailure(onErrorHandler, result, serverException, expectHandled = false)
     }
 
@@ -319,7 +352,7 @@ internal class NetworkConsumerClientTest {
 
     internal fun buildHierarchyRequest(
         includeGeographicalRegions: Boolean = false,
-        includeSubgeographicalRegions: Boolean = false,
+        includeSubGeographicalRegions: Boolean = false,
         includeSubstations: Boolean = false,
         includeFeeders: Boolean = false,
         includeCircuits: Boolean = false,
@@ -328,7 +361,7 @@ internal class NetworkConsumerClientTest {
         includeLvFeeders: Boolean = false,
     ): GetNetworkHierarchyRequest = GetNetworkHierarchyRequest.newBuilder().also { req ->
         req.includeGeographicalRegions = includeGeographicalRegions
-        req.includeSubgeographicalRegions = includeSubgeographicalRegions
+        req.includeSubgeographicalRegions = includeSubGeographicalRegions
         req.includeSubstations = includeSubstations
         req.includeFeeders = includeFeeders
         req.includeCircuits = includeCircuits
@@ -340,7 +373,7 @@ internal class NetworkConsumerClientTest {
     internal fun callGetHierarchy(
         consumerClient: NetworkConsumerClient,
         includeGeographicalRegions: Boolean = false,
-        includeSubgeographicalRegions: Boolean = false,
+        includeSubGeographicalRegions: Boolean = false,
         includeSubstations: Boolean = false,
         includeFeeders: Boolean = false,
         includeCircuits: Boolean = false,
@@ -350,7 +383,7 @@ internal class NetworkConsumerClientTest {
     ): GrpcResult<NetworkHierarchy> =
         consumerClient.getNetworkHierarchy(
             includeGeographicalRegions = includeGeographicalRegions,
-            includeSubgeographicalRegions = includeSubgeographicalRegions,
+            includeSubgeographicalRegions = includeSubGeographicalRegions,
             includeSubstations = includeSubstations,
             includeFeeders = includeFeeders,
             includeCircuits = includeCircuits,
@@ -371,10 +404,10 @@ internal class NetworkConsumerClientTest {
     }
 
     @Test
-    internal fun `can optionally retrieve subgeographical regions`() {
+    internal fun `can optionally retrieve sub-geographical regions`() {
         consumerService.onGetNetworkHierarchy = spy { _, response -> response.onNext(NetworkHierarchyAllTypes.createResponse(includeSubgeographicalRegions = true)) }
-        val result = callGetHierarchy(consumerClient, includeSubgeographicalRegions = true)
-        val request = buildHierarchyRequest(includeSubgeographicalRegions = true)
+        val result = callGetHierarchy(consumerClient, includeSubGeographicalRegions = true)
+        val request = buildHierarchyRequest(includeSubGeographicalRegions = true)
         verify(consumerService.onGetNetworkHierarchy).invoke(eq(request), any())
         assertThat("getNetworkHierarchy should succeed", result.wasSuccessful)
         validateNetworkHierarchy(result.value, NetworkHierarchyAllTypes.createNetworkHierarchy(includeSubgeographicalRegions = true))
@@ -498,7 +531,7 @@ internal class NetworkConsumerClientTest {
 
         verify(consumerService.onGetNetworkHierarchy, times(1)).invoke(any(), any())
         verify(consumerService.onGetEquipmentForContainers, times(1)).invoke(any(), any())
-        verify(consumerService.onGetIdentifiedObjects, times(3)).invoke(any(), any())
+        verify(consumerService.onGetIdentifiables, times(3)).invoke(any(), any())
         verifyNoMoreInteractions(consumerService.onGetNetworkHierarchy)
 
         assertThat("getEquipmentContainer should succeed for in-network feeder $mRID", result.wasSuccessful)
@@ -528,7 +561,7 @@ internal class NetworkConsumerClientTest {
 
         val result = consumerClient.getEquipmentContainer<Feeder>("f002")
 
-        verify(consumerService.onGetIdentifiedObjects, times(1)).invoke(any(), any())
+        verify(consumerService.onGetIdentifiables, times(1)).invoke(any(), any())
 
         assertThat("getEquipmentContainer should fail for mRID f002, which isn't in the customer service", !result.wasSuccessful)
         expect { throw result.thrown }
@@ -543,7 +576,7 @@ internal class NetworkConsumerClientTest {
 
         val result = consumerClient.getEquipmentContainer<Feeder>("f001")
 
-        verify(consumerService.onGetIdentifiedObjects, times(1)).invoke(any(), any())
+        verify(consumerService.onGetIdentifiables, times(1)).invoke(any(), any())
         validateFailure(onErrorHandler, result, expectedException)
     }
 
@@ -556,7 +589,7 @@ internal class NetworkConsumerClientTest {
 
         val result = consumerClient.getEquipmentContainer<Feeder>("f001")
 
-        verify(consumerService.onGetIdentifiedObjects, times(1)).invoke(any(), any())
+        verify(consumerService.onGetIdentifiables, times(1)).invoke(any(), any())
         validateFailure(onErrorHandler, result, expectedException, expectHandled = false)
     }
 
@@ -568,7 +601,7 @@ internal class NetworkConsumerClientTest {
         val result = consumerClient.getEquipmentContainer<Feeder>("f001")
 
         verify(consumerService.onGetEquipmentForContainers, times(1)).invoke(any(), any())
-        verify(consumerService.onGetIdentifiedObjects, times(1)).invoke(any(), any())
+        verify(consumerService.onGetIdentifiables, times(1)).invoke(any(), any())
         validateFailure(onErrorHandler, result, expectedException)
     }
 
@@ -582,7 +615,7 @@ internal class NetworkConsumerClientTest {
         val result = consumerClient.getEquipmentContainer<Feeder>("f001")
 
         verify(consumerService.onGetEquipmentForContainers, times(1)).invoke(any(), any())
-        verify(consumerService.onGetIdentifiedObjects, times(1)).invoke(any(), any())
+        verify(consumerService.onGetIdentifiables, times(1)).invoke(any(), any())
         validateFailure(onErrorHandler, result, expectedException, expectHandled = false)
     }
 
@@ -594,7 +627,7 @@ internal class NetworkConsumerClientTest {
         val result = consumerClient.getEquipmentContainer<Feeder>("f001")
 
         verify(consumerService.onGetEquipmentForContainers, times(1)).invoke(any(), any())
-        verify(consumerService.onGetIdentifiedObjects, times(2)).invoke(any(), any())
+        verify(consumerService.onGetIdentifiables, times(2)).invoke(any(), any())
         validateFailure(onErrorHandler, result, expectedException)
     }
 
@@ -608,7 +641,7 @@ internal class NetworkConsumerClientTest {
         val result = consumerClient.getEquipmentContainer<Feeder>("f001")
 
         verify(consumerService.onGetEquipmentForContainers, times(1)).invoke(any(), any())
-        verify(consumerService.onGetIdentifiedObjects, times(2)).invoke(any(), any())
+        verify(consumerService.onGetIdentifiables, times(2)).invoke(any(), any())
         validateFailure(onErrorHandler, result, expectedException, expectHandled = false)
     }
 
@@ -619,7 +652,7 @@ internal class NetworkConsumerClientTest {
 
         val result = consumerClient.getEquipmentContainer<Feeder>("f001")
 
-        verify(consumerService.onGetIdentifiedObjects, times(3)).invoke(any(), any())
+        verify(consumerService.onGetIdentifiables, times(3)).invoke(any(), any())
         validateFailure(onErrorHandler, result, expectedException)
     }
 
@@ -632,7 +665,7 @@ internal class NetworkConsumerClientTest {
 
         val result = consumerClient.getEquipmentContainer<Feeder>("f001")
 
-        verify(consumerService.onGetIdentifiedObjects, times(3)).invoke(any(), any())
+        verify(consumerService.onGetIdentifiables, times(3)).invoke(any(), any())
         validateFailure(onErrorHandler, result, expectedException, expectHandled = false)
     }
 
@@ -650,10 +683,15 @@ internal class NetworkConsumerClientTest {
     internal fun `getIdentifiedObjects returns failed mRID when an mRID is not found`() {
         val mRIDs = listOf("id1", "id2")
 
-        consumerService.onGetIdentifiedObjects = spy { _, response ->
+        consumerService.onGetIdentifiables = spy { _, response ->
             response.onNext(createResponse(NIO.newBuilder(), NIO.Builder::getAcLineSegmentBuilder, mRIDs[0]))
         }
 
+        //
+        // NOTE: This class has been deliberately left accessing the deprecated versions to ensure it is tested. When the deprecated functions are removed, update this
+        //       class to use `getIdentifiable` and `getIdentifiables`. Don't forget the comments/strings.
+        //
+        @Suppress("DEPRECATION")
         val result = consumerClient.getIdentifiedObjects(mRIDs)
 
         assertThat("getIdentifiedObjects should succeed", result.wasSuccessful)
@@ -661,7 +699,7 @@ internal class NetworkConsumerClientTest {
         assertThat(result.value.objects["id1"], instanceOf(AcLineSegment::class.java))
         assertThat(result.value.failed, containsInAnyOrder(mRIDs[1]))
 
-        verify(consumerService.onGetIdentifiedObjects).invoke(eq(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(mRIDs).build()), any())
+        verify(consumerService.onGetIdentifiables).invoke(eq(GetIdentifiablesRequest.newBuilder().addAllMrids(mRIDs).build()), any())
     }
 
     @Test
@@ -670,12 +708,17 @@ internal class NetworkConsumerClientTest {
         val acls = AcLineSegment(mRIDs[0])
         service.add(acls)
 
-        consumerService.onGetIdentifiedObjects = spy { _, response ->
+        consumerService.onGetIdentifiables = spy { _, response ->
             response.onNext(createResponse(NIO.newBuilder(), NIO.Builder::getAcLineSegmentBuilder, mRIDs[0]))
             response.onNext(createResponse(NIO.newBuilder(), NIO.Builder::getAcLineSegmentBuilder, mRIDs[1]))
             response.onNext(createResponse(NIO.newBuilder(), NIO.Builder::getBreakerBuilder, mRIDs[2]))
         }
 
+        //
+        // NOTE: This class has been deliberately left accessing the deprecated versions to ensure it is tested. When the deprecated functions are removed, update this
+        //       class to use `getIdentifiable` and `getIdentifiables`. Don't forget the comments/strings.
+        //
+        @Suppress("DEPRECATION")
         val result = consumerClient.getIdentifiedObjects(mRIDs)
 
         assertThat(result.value.objects, hasEntry("id1", acls))
@@ -875,7 +918,7 @@ internal class NetworkConsumerClientTest {
 
         verify(consumerService.onGetNetworkHierarchy, times(1)).invoke(any(), any())
         verify(consumerService.onGetEquipmentForContainers, times(1)).invoke(any(), any())
-        verify(consumerService.onGetIdentifiedObjects, times(3)).invoke(any(), any())
+        verify(consumerService.onGetIdentifiables, times(3)).invoke(any(), any())
         verifyNoMoreInteractions(consumerService.onGetNetworkHierarchy)
 
         assertThat("getEquipmentContainer should succeed for in-network LV feeder $mRID", result.wasSuccessful)
@@ -908,26 +951,26 @@ internal class NetworkConsumerClientTest {
         identifiedObjectBuilder: NIO.Builder,
         subClassBuilder: (NIO.Builder) -> Any,
         mRID: String
-    ): GetIdentifiedObjectsResponse =
+    ): GetIdentifiablesResponse =
         createResponse(identifiedObjectBuilder, subClassBuilder(identifiedObjectBuilder), mRID)
 
     private fun createResponse(
         identifiedObjectBuilder: NIO.Builder,
         subClassBuilder: Any,
         mRID: String
-    ): GetIdentifiedObjectsResponse {
+    ): GetIdentifiablesResponse {
         buildFromBuilder(subClassBuilder, mRID)
         logger.info("$identifiedObjectBuilder")
 
-        val responseBuilder = GetIdentifiedObjectsResponse.newBuilder()
+        val responseBuilder = GetIdentifiablesResponse.newBuilder()
 
-        responseBuilder.addIdentifiedObjects(identifiedObjectBuilder.build())
+        responseBuilder.addIdentifiables(identifiedObjectBuilder.build())
 
         return responseBuilder.build()
     }
 
-    private fun isSupported(type: NIO.IdentifiedObjectCase): Boolean =
-        type != NIO.IdentifiedObjectCase.OTHER
+    private fun isSupported(type: NIO.IdentifiableCase): Boolean =
+        type != NIO.IdentifiableCase.OTHER
 
     private fun validateNetworkHierarchy(actual: NetworkHierarchy, expected: NetworkHierarchy) {
         validateMap(actual.geographicalRegions, expected.geographicalRegions)
@@ -952,9 +995,22 @@ internal class NetworkConsumerClientTest {
     private fun configureFeederResponses(expectedService: NetworkService, invalidObject: Class<out IdentifiedObject>? = null): Throwable? {
         val expectedException = createException(invalidObject)
 
-        consumerService.onGetNetworkHierarchy = spy { _, response -> response.onNext(NetworkHierarchyAllTypes.createResponse(true, true, true, true, true, true, true, true)) }
+        consumerService.onGetNetworkHierarchy = spy { _, response ->
+            response.onNext(
+                NetworkHierarchyAllTypes.createResponse(
+                    includeGeographicalRegions = true,
+                    includeSubgeographicalRegions = true,
+                    includeSubstations = true,
+                    includeFeeders = true,
+                    includeCircuits = true,
+                    includeLoops = true,
+                    includeLvSubstations = true,
+                    includeLvFeeders = true
+                )
+            )
+        }
 
-        consumerService.onGetIdentifiedObjects = spy { request, response ->
+        consumerService.onGetIdentifiables = spy { request, response ->
             val objects = mutableListOf<IdentifiedObject>()
             request.mridsList.forEach { mRID ->
                 expectedService.get<IdentifiedObject>(mRID)?.let { identifiedObject ->
@@ -992,7 +1048,7 @@ internal class NetworkConsumerClientTest {
             nodeTerminalResponseOf(expectedService.get<ConnectivityNode>(request.mrid)!!.terminals.toList()).forEach { response.onNext((it)) }
         }
 
-        consumerService.onGetIdentifiedObjects = spy { request, response ->
+        consumerService.onGetIdentifiables = spy { request, response ->
             responseOf(request.mridsList.map { expectedService[it]!! }).forEach { response.onNext((it)) }
         }
 
@@ -1018,26 +1074,36 @@ internal class NetworkConsumerClientTest {
     }
 
 
-    private fun responseOf(objects: List<IdentifiedObject>): MutableIterator<GetIdentifiedObjectsResponse> {
-        val responses = mutableListOf<GetIdentifiedObjectsResponse>()
+    private fun responseOf(objects: List<IdentifiedObject>): MutableIterator<GetIdentifiablesResponse> {
+        val responses = mutableListOf<GetIdentifiablesResponse>()
         objects.forEach {
-            responses.add(GetIdentifiedObjectsResponse.newBuilder().apply { addIdentifiedObjects(networkIdentifiedObject(it)) }.build())
+            //
+            // NOTE: This class has been deliberately left accessing the deprecated versions to ensure it is tested. When the deprecated functions are removed, update this
+            //       class to use `getIdentifiable` and `getIdentifiables`. Don't forget the comments/strings.
+            //
+            @Suppress("DEPRECATION")
+            responses.add(GetIdentifiablesResponse.newBuilder().apply { addIdentifiables(networkIdentifiedObject(it)) }.build())
         }
         return responses.iterator()
     }
 
-    private fun batchedResponseOf(objects: List<IdentifiedObject>): MutableIterator<GetIdentifiedObjectsResponse> {
+    private fun batchedResponseOf(objects: List<IdentifiedObject>): MutableIterator<GetIdentifiablesResponse> {
         assertThat(objects, not(empty()))
-        val responses = mutableListOf<GetIdentifiedObjectsResponse>()
+        val responses = mutableListOf<GetIdentifiablesResponse>()
 
-        var builder = GetIdentifiedObjectsResponse.newBuilder()
+        var builder = GetIdentifiablesResponse.newBuilder()
         objects.forEachIndexed { index, obj ->
-            if ((index % 1000 == 0) && (builder.identifiedObjectsCount > 0)) {
+            if ((index % 1000 == 0) && (builder.identifiablesCount > 0)) {
                 responses.add(builder.build())
-                builder = GetIdentifiedObjectsResponse.newBuilder()
+                builder = GetIdentifiablesResponse.newBuilder()
             }
 
-            builder.addIdentifiedObjects(networkIdentifiedObject(obj))
+            //
+            // NOTE: This class has been deliberately left accessing the deprecated versions to ensure it is tested. When the deprecated functions are removed, update this
+            //       class to use `getIdentifiable` and `getIdentifiables`. Don't forget the comments/strings.
+            //
+            @Suppress("DEPRECATION")
+            builder.addIdentifiables(networkIdentifiedObject(obj))
         }
         responses.add(builder.build())
 
@@ -1047,7 +1113,12 @@ internal class NetworkConsumerClientTest {
     private fun restrictionEquipmentResponseOf(objects: List<IdentifiedObject>): MutableIterator<GetEquipmentForRestrictionResponse> {
         val responses = mutableListOf<GetEquipmentForRestrictionResponse>()
         objects.forEach {
-            responses.add(GetEquipmentForRestrictionResponse.newBuilder().apply { addIdentifiedObjects(networkIdentifiedObject(it)) }.build())
+            //
+            // NOTE: This class has been deliberately left accessing the deprecated versions to ensure it is tested. When the deprecated functions are removed, update this
+            //       class to use `getIdentifiable` and `getIdentifiables`. Don't forget the comments/strings.
+            //
+            @Suppress("DEPRECATION")
+            responses.add(GetEquipmentForRestrictionResponse.newBuilder().apply { addIdentifiables(networkIdentifiedObject(it)) }.build())
         }
         return responses.iterator()
     }
@@ -1055,7 +1126,12 @@ internal class NetworkConsumerClientTest {
     private fun containerEquipmentResponseOf(objects: List<IdentifiedObject>): MutableIterator<GetEquipmentForContainersResponse> {
         val responses = mutableListOf<GetEquipmentForContainersResponse>()
         objects.forEach {
-            responses.add(GetEquipmentForContainersResponse.newBuilder().apply { addIdentifiedObjects(networkIdentifiedObject(it)) }.build())
+            //
+            // NOTE: This class has been deliberately left accessing the deprecated versions to ensure it is tested. When the deprecated functions are removed, update this
+            //       class to use `getIdentifiable` and `getIdentifiables`. Don't forget the comments/strings.
+            //
+            @Suppress("DEPRECATION")
+            responses.add(GetEquipmentForContainersResponse.newBuilder().apply { addIdentifiables(networkIdentifiedObject(it)) }.build())
         }
         return responses.iterator()
     }
@@ -1087,17 +1163,6 @@ internal class NetworkConsumerClientTest {
         .addAllLvSubstations(lvSubstations.map { it.toPb() })
         .addAllLvFeeders(lvFeeders.map { it.toPb() })
         .build()
-
-    private fun validateFeederNetwork(actual: NetworkService?, expectedService: NetworkService) {
-        assertThat(actual, notNullValue())
-        val differences = NetworkServiceComparator().compare(actual!!, expectedService)
-
-        logger.info("$differences")
-
-        assertThat("missing from source", differences.missingFromSource(), empty())
-        assertThat("missing from target", differences.missingFromTarget(), empty())
-        assertThat("has differences", differences.modifications().entries, empty())
-    }
 
     private fun configureGetEquipmentForContainersToValidateParameters(
         mRID: String,

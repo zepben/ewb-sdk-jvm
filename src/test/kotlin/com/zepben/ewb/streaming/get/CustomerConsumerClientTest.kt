@@ -12,7 +12,7 @@ import com.zepben.ewb.cim.iec61968.customers.Customer
 import com.zepben.ewb.cim.iec61968.customers.CustomerAgreement
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.services.customer.CustomerService
-import com.zepben.ewb.services.customer.translator.customerIdentifiedObject
+import com.zepben.ewb.services.customer.translator.customerIdentifiable
 import com.zepben.ewb.streaming.get.ConsumerUtils.buildFromBuilder
 import com.zepben.ewb.streaming.get.ConsumerUtils.forEachBuilder
 import com.zepben.ewb.streaming.get.ConsumerUtils.validateFailure
@@ -22,8 +22,8 @@ import com.zepben.ewb.streaming.grpc.CaptureLastRpcErrorHandler
 import com.zepben.ewb.streaming.grpc.GrpcChannel
 import com.zepben.protobuf.cc.CustomerConsumerGrpc
 import com.zepben.protobuf.cc.GetCustomersForContainerResponse
-import com.zepben.protobuf.cc.GetIdentifiedObjectsRequest
-import com.zepben.protobuf.cc.GetIdentifiedObjectsResponse
+import com.zepben.protobuf.cc.GetIdentifiablesRequest
+import com.zepben.protobuf.cc.GetIdentifiablesResponse
 import com.zepben.protobuf.metadata.GetMetadataRequest
 import com.zepben.protobuf.metadata.GetMetadataResponse
 import com.zepben.testutils.exception.ExpectException.Companion.expect
@@ -45,7 +45,7 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.*
 import org.slf4j.LoggerFactory
 import java.util.concurrent.Executors
-import com.zepben.protobuf.cc.CustomerIdentifiedObject as CIO
+import com.zepben.protobuf.cc.CustomerIdentifiable as CIO
 
 internal class CustomerConsumerClientTest {
 
@@ -85,38 +85,38 @@ internal class CustomerConsumerClientTest {
             val mRID = "id" + ++counter
             val response = createResponse(builder, it, mRID)
 
-            consumerService.onGetIdentifiedObjects = spy { request, resp ->
+            consumerService.onGetIdentifiables = spy { request, resp ->
                 assertThat(request.mridsList, containsInAnyOrder(mRID))
                 resp.onNext(response)
             }
 
-            val result = consumerClient.getIdentifiedObject(mRID)
+            val result = consumerClient.getIdentifiable(mRID)
 
-            val type = response.identifiedObjectsList[0].identifiedObjectCase
+            val type = response.identifiablesList[0].identifiableCase
             if (isSupported(type)) {
-                assertThat("getIdentifiedObject should succeed for supported type ${type.name}", result.wasSuccessful)
+                assertThat("getIdentifiable should succeed for supported type ${type.name}", result.wasSuccessful)
                 assertThat(result.value.mRID, equalTo(mRID))
             } else {
-                assertThat("getIdentifiedObject should fail for unsupported type ${type.name}", result.wasFailure)
+                assertThat("getIdentifiable should fail for unsupported type ${type.name}", result.wasFailure)
                 assertThat(result.thrown, instanceOf(StatusRuntimeException::class.java))
                 assertThat(result.thrown.cause, instanceOf(UnsupportedOperationException::class.java))
                 assertThat(result.thrown.cause?.message, equalTo("Identified object type $type is not supported by the customer service"))
                 assertThat(result.thrown, equalTo(onErrorHandler.lastError))
             }
 
-            verify(consumerService.onGetIdentifiedObjects).invoke(eq(GetIdentifiedObjectsRequest.newBuilder().addMrids(mRID).build()), any())
+            verify(consumerService.onGetIdentifiables).invoke(eq(GetIdentifiablesRequest.newBuilder().addMrids(mRID).build()), any())
         }
     }
 
     @Test
     internal fun `returns error when object is not found`() {
         val mRID = "unknown"
-        consumerService.onGetIdentifiedObjects = spy { _, _ -> }
+        consumerService.onGetIdentifiables = spy { _, _ -> }
 
-        val result = consumerClient.getIdentifiedObject(mRID)
+        val result = consumerClient.getIdentifiable(mRID)
 
-        verify(consumerService.onGetIdentifiedObjects).invoke(eq(GetIdentifiedObjectsRequest.newBuilder().addMrids(mRID).build()), any())
-        assertThat("getIdentifiedObject should fail for mRID '$mRID', which isn't in the customer service", result.wasFailure)
+        verify(consumerService.onGetIdentifiables).invoke(eq(GetIdentifiablesRequest.newBuilder().addMrids(mRID).build()), any())
+        assertThat("getIdentifiable should fail for mRID '$mRID', which isn't in the customer service", result.wasFailure)
         expect { throw result.thrown }
             .toThrow<NoSuchElementException>()
             .withMessage("No object with mRID $mRID could be found.")
@@ -125,24 +125,24 @@ internal class CustomerConsumerClientTest {
     @Test
     internal fun `calls error handler when getting an IdentifiedObject throws`() {
         val mRID = "1234"
-        consumerService.onGetIdentifiedObjects = spy { _, _ -> throw serverException }
+        consumerService.onGetIdentifiables = spy { _, _ -> throw serverException }
 
-        val result = consumerClient.getIdentifiedObject(mRID)
+        val result = consumerClient.getIdentifiable(mRID)
 
-        verify(consumerService.onGetIdentifiedObjects).invoke(eq(GetIdentifiedObjectsRequest.newBuilder().addMrids(mRID).build()), any())
+        verify(consumerService.onGetIdentifiables).invoke(eq(GetIdentifiablesRequest.newBuilder().addMrids(mRID).build()), any())
         validateFailure(onErrorHandler, result, serverException)
     }
 
     @Test
     internal fun `captures unhandled exceptions when getting an IdentifiedObject throws`() {
         val mRID = "1234"
-        consumerService.onGetIdentifiedObjects = spy { _, _ -> throw serverException }
+        consumerService.onGetIdentifiables = spy { _, _ -> throw serverException }
 
         consumerClient.removeErrorHandler(onErrorHandler)
 
-        val result = consumerClient.getIdentifiedObject(mRID)
+        val result = consumerClient.getIdentifiable(mRID)
 
-        verify(consumerService.onGetIdentifiedObjects).invoke(eq(GetIdentifiedObjectsRequest.newBuilder().addMrids(mRID).build()), any())
+        verify(consumerService.onGetIdentifiables).invoke(eq(GetIdentifiablesRequest.newBuilder().addMrids(mRID).build()), any())
         validateFailure(onErrorHandler, result, serverException, expectHandled = false)
     }
 
@@ -150,78 +150,78 @@ internal class CustomerConsumerClientTest {
     internal fun `can get multiple identified objects in single call`() {
         val mRIDs = listOf("id1", "id2", "id3")
 
-        consumerService.onGetIdentifiedObjects = spy { _, response ->
+        consumerService.onGetIdentifiables = spy { _, response ->
             response.onNext(createResponse(CIO.newBuilder(), CIO.Builder::getCustomerBuilder, mRIDs[0]))
             response.onNext(createResponse(CIO.newBuilder(), CIO.Builder::getCustomerBuilder, mRIDs[1]))
             response.onNext(createResponse(CIO.newBuilder(), CIO.Builder::getCustomerAgreementBuilder, mRIDs[2]))
         }
 
-        val result = consumerClient.getIdentifiedObjects(mRIDs.asSequence())
+        val result = consumerClient.getIdentifiables(mRIDs.asSequence())
 
-        assertThat("getIdentifiedObjects should succeed", result.wasSuccessful)
+        assertThat("getIdentifiables should succeed", result.wasSuccessful)
         assertThat(result.value.objects, aMapWithSize(3))
         assertThat(result.value.objects[mRIDs[0]], instanceOf(Customer::class.java))
         assertThat(result.value.objects[mRIDs[1]], instanceOf(Customer::class.java))
         assertThat(result.value.objects[mRIDs[2]], instanceOf(CustomerAgreement::class.java))
 
-        verify(consumerService.onGetIdentifiedObjects).invoke(eq(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(mRIDs).build()), any())
+        verify(consumerService.onGetIdentifiables).invoke(eq(GetIdentifiablesRequest.newBuilder().addAllMrids(mRIDs).build()), any())
     }
 
     @Test
     internal fun `calls error handler when getting multiple IdentifiedObject throws`() {
         val mRIDs = listOf("id1", "id2", "id3")
-        consumerService.onGetIdentifiedObjects = spy { _, _ -> throw serverException }
+        consumerService.onGetIdentifiables = spy { _, _ -> throw serverException }
 
-        val result = consumerClient.getIdentifiedObjects(mRIDs.asSequence())
+        val result = consumerClient.getIdentifiables(mRIDs.asSequence())
 
-        verify(consumerService.onGetIdentifiedObjects).invoke(eq(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(mRIDs).build()), any())
+        verify(consumerService.onGetIdentifiables).invoke(eq(GetIdentifiablesRequest.newBuilder().addAllMrids(mRIDs).build()), any())
         validateFailure(onErrorHandler, result, serverException)
     }
 
     @Test
     internal fun `captures unhandled exceptions when getting multiple IdentifiedObject throws`() {
         val mRIDs = listOf("id1", "id2", "id3")
-        consumerService.onGetIdentifiedObjects = spy { _, _ -> throw serverException }
+        consumerService.onGetIdentifiables = spy { _, _ -> throw serverException }
 
         consumerClient.removeErrorHandler(onErrorHandler)
 
-        val result = consumerClient.getIdentifiedObjects(mRIDs)
+        val result = consumerClient.getIdentifiables(mRIDs)
 
-        verify(consumerService.onGetIdentifiedObjects).invoke(eq(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(mRIDs).build()), any())
+        verify(consumerService.onGetIdentifiables).invoke(eq(GetIdentifiablesRequest.newBuilder().addAllMrids(mRIDs).build()), any())
         validateFailure(onErrorHandler, result, serverException, expectHandled = false)
     }
 
     @Test
-    internal fun `getIdentifiedObjects returns failed mRID when an mRID is not found`() {
+    internal fun `getIdentifiables returns failed mRID when an mRID is not found`() {
         val mRIDs = listOf("id1", "id2")
 
-        consumerService.onGetIdentifiedObjects = spy { _, response ->
+        consumerService.onGetIdentifiables = spy { _, response ->
             response.onNext(createResponse(CIO.newBuilder(), CIO.Builder::getCustomerBuilder, mRIDs[0]))
         }
 
-        val result = consumerClient.getIdentifiedObjects(mRIDs)
+        val result = consumerClient.getIdentifiables(mRIDs)
 
-        assertThat("getIdentifiedObjects should succeed", result.wasSuccessful)
+        assertThat("getIdentifiables should succeed", result.wasSuccessful)
         assertThat(result.value.objects, aMapWithSize(1))
         assertThat(result.value.objects["id1"], instanceOf(Customer::class.java))
         assertThat(result.value.failed, containsInAnyOrder(mRIDs[1]))
 
-        verify(consumerService.onGetIdentifiedObjects).invoke(eq(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(mRIDs).build()), any())
+        verify(consumerService.onGetIdentifiables).invoke(eq(GetIdentifiablesRequest.newBuilder().addAllMrids(mRIDs).build()), any())
     }
 
     @Test
-    internal fun `getIdentifiedObjects returns map containing existing entries in the service`() {
+    internal fun `getIdentifiables returns map containing existing entries in the service`() {
         val mRIDs = listOf("id1", "id2", "id3")
         val customer = Customer(mRIDs[0])
         service.add(customer)
 
-        consumerService.onGetIdentifiedObjects = spy { _, response ->
+        consumerService.onGetIdentifiables = spy { _, response ->
             response.onNext(createResponse(CIO.newBuilder(), CIO.Builder::getCustomerBuilder, mRIDs[0]))
             response.onNext(createResponse(CIO.newBuilder(), CIO.Builder::getCustomerBuilder, mRIDs[1]))
             response.onNext(createResponse(CIO.newBuilder(), CIO.Builder::getCustomerAgreementBuilder, mRIDs[2]))
         }
 
-        val result = consumerClient.getIdentifiedObjects(mRIDs)
+        val result = consumerClient.getIdentifiables(mRIDs)
 
         assertThat(result.value.objects, hasEntry("id1", customer))
         assertThat(result.value.objects, hasKey("id2"))
@@ -324,7 +324,7 @@ internal class CustomerConsumerClientTest {
     private fun responseOf(objects: List<Customer>): MutableIterator<GetCustomersForContainerResponse> {
         val responses = mutableListOf<GetCustomersForContainerResponse>()
         objects.forEach {
-            responses.add(GetCustomersForContainerResponse.newBuilder().apply { addIdentifiedObjects(customerIdentifiedObject(it)) }.build())
+            responses.add(GetCustomersForContainerResponse.newBuilder().apply { addIdentifiables(customerIdentifiable(it)) }.build())
         }
         return responses.iterator()
     }
@@ -333,7 +333,7 @@ internal class CustomerConsumerClientTest {
         identifiedObjectBuilder: CIO.Builder,
         subClassBuilder: (CIO.Builder) -> Any,
         mRID: String
-    ): GetIdentifiedObjectsResponse {
+    ): GetIdentifiablesResponse {
         return createResponse(identifiedObjectBuilder, subClassBuilder(identifiedObjectBuilder), mRID)
     }
 
@@ -341,17 +341,17 @@ internal class CustomerConsumerClientTest {
         identifiedObjectBuilder: CIO.Builder,
         subClassBuilder: Any,
         mRID: String
-    ): GetIdentifiedObjectsResponse {
+    ): GetIdentifiablesResponse {
         buildFromBuilder(subClassBuilder, mRID)
         logger.info("$identifiedObjectBuilder")
 
-        val responseBuilder = GetIdentifiedObjectsResponse.newBuilder()
-        responseBuilder.addIdentifiedObjects(identifiedObjectBuilder.build())
+        val responseBuilder = GetIdentifiablesResponse.newBuilder()
+        responseBuilder.addIdentifiables(identifiedObjectBuilder.build())
 
         return responseBuilder.build()
     }
 
-    private fun isSupported(type: CIO.IdentifiedObjectCase): Boolean =
-        type != CIO.IdentifiedObjectCase.OTHER
+    private fun isSupported(type: CIO.IdentifiableCase): Boolean =
+        type != CIO.IdentifiableCase.OTHER
 
 }

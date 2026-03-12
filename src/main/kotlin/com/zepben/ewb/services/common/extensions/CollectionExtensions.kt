@@ -8,7 +8,7 @@
 
 package com.zepben.ewb.services.common.extensions
 
-import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import java.util.*
 
 fun <T> Collection<T>?.asUnmodifiable(): Collection<T> {
@@ -27,6 +27,6 @@ fun <T> Set<T>?.asUnmodifiable(): Set<T> {
     return if (this == null) emptySet() else Collections.unmodifiableSet(this)
 }
 
-fun <T : IdentifiedObject> MutableCollection<T>?.safeRemove(it: T?): Boolean {
+fun <T : Identifiable> MutableCollection<T>?.safeRemove(it: T?): Boolean {
     return this?.remove(it) == true
 }

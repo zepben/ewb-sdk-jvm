@@ -8,7 +8,7 @@
 
 package com.zepben.ewb.services.diagram
 
-import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.ewb.cim.iec61970.base.diagramlayout.DiagramObject
 import com.zepben.ewb.services.common.verifyWhenServiceFunctionSupportsAllServiceTypes
@@ -30,12 +30,12 @@ internal class DiagramServiceUtilsTest {
     // Function references to functions with generics are not yet supported, so we take a copy of the function that has a concrete type and pass through.
     // If you get failed tests about missing IdentifiedObject types, first update the proxied function, then update this one to match.
     internal fun whenDiagramServiceObjectProxy(
-        identifiedObject: IdentifiedObject,
+        identifiable: Identifiable,
         isDiagram: (Diagram) -> String,
         isDiagramObject: (DiagramObject) -> String,
-        isOther: (IdentifiedObject) -> String
+        isOther: (Identifiable) -> String
     ): String = whenDiagramServiceObject(
-        identifiedObject,
+        identifiable,
         isDiagram = isDiagram,
         isDiagramObject = isDiagramObject,
         isOther = isOther

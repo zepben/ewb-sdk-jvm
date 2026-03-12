@@ -8,7 +8,7 @@
 
 package com.zepben.ewb.services.common
 
-import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.services.common.testdata.generateId
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -23,12 +23,16 @@ private val logger = LoggerFactory.getLogger("verifyWhenServiceFunctionSupportsA
 internal fun verifyWhenServiceFunctionSupportsAllServiceTypes(
     supportedKClasses: Set<KClass<*>>,
     whenFunction: KFunction<*>,
-    subjectField: String = "identifiedObject",
-    createUnknownClass: (String) -> Any = { object : IdentifiedObject(it) {} }
+    subjectField: String = "identifiable",
+    createUnknownClass: (String) -> Any = { object : Identifiable {
+        override val mRID: String = it
+        override fun typeNameAndMRID(): String = "test name and mrid"
+        override fun nameAndMRID(): String = "test name"
+    } }
 ) {
     // Find all the parameters that have arguments and get their first parameter.
-    // These should all be IdentifiedObject leaf classes in the "when*ServiceObject" functions.
-    val functionParamIdentifiedObjectTypes = whenFunction
+    // These should all be Identifiable leaf classes in the "when*ServiceObject" functions.
+    val functionParamIdentifiableTypes = whenFunction
         .parameters
         .asSequence()
         .filter { it.name != subjectField && it.name != "isOther" }
@@ -38,13 +42,13 @@ internal fun verifyWhenServiceFunctionSupportsAllServiceTypes(
         .map { it.type?.classifier as KClass<*> }
         .toSet()
 
-    assertThat(functionParamIdentifiedObjectTypes, equalTo(supportedKClasses))
+    assertThat(functionParamIdentifiableTypes, equalTo(supportedKClasses))
 
     // Make sure each object calls the correct callback by building a map containing an InvokedChecker for the expected callback, and a
     // NeverInvokedChecker for each other callback.
     val paramsByName = whenFunction.parameters.associateBy { it.name }
     val neverInvokedParams = supportedKClasses.map { NeverInvokedChecker(it) }.associateBy { paramsByName.ensureParam(it.expectedCallback) } +
-        mapOf(paramsByName.ensureParam("isOther") to neverInvokedChecker<IdentifiedObject>())
+        mapOf(paramsByName.ensureParam("isOther") to neverInvokedChecker<Identifiable>())
 
     supportedKClasses.forEach { check ->
         whenFunction.validateObjectCallback(

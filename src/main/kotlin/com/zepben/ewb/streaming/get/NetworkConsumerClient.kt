@@ -12,7 +12,6 @@ import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.iec61968.operations.OperationalRestriction
 import com.zepben.ewb.cim.iec61970.base.core.*
 import com.zepben.ewb.services.common.BaseService
-import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 import com.zepben.ewb.services.common.translator.EnumMapper
 import com.zepben.ewb.services.common.translator.mRID
 import com.zepben.ewb.services.network.NetworkService
@@ -29,7 +28,6 @@ import com.zepben.protobuf.nc.*
 import io.grpc.CallCredentials
 import io.grpc.Channel
 import java.io.IOException
-import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import com.zepben.protobuf.nc.IncludedEnergizedContainers as PBIncludedEnergizedContainers
 import com.zepben.protobuf.nc.IncludedEnergizingContainers as PBIncludedEnergizingContainers
@@ -45,14 +43,12 @@ import com.zepben.protobuf.nc.NetworkState as PBNetworkState
  *
  * @property stub The gRPC stub to be used to communicate with the server
  * @property service The [NetworkService] to store fetched objects in.
- * @param executor An optional [ExecutorService] to use with the stub. If provided, it will be cleaned up when this client is closed.
  */
 class NetworkConsumerClient(
-    private val stub: NetworkConsumerGrpc.NetworkConsumerStub,
+    override val stub: NetworkConsumerGrpc.NetworkConsumerStub,
     override val service: NetworkService = NetworkService(),
     override val protoToCim: NetworkProtoToCim = NetworkProtoToCim(service),
-    executor: ExecutorService? = null
-) : CimConsumerClient<NetworkService, NetworkProtoToCim>(executor) {
+) : CimConsumerClient<NetworkService, NetworkProtoToCim, NetworkConsumerGrpc.NetworkConsumerStub>() {
 
     private var networkHierarchy: NetworkHierarchy? = null
 
@@ -69,8 +65,7 @@ class NetworkConsumerClient(
     @JvmOverloads
     constructor(channel: Channel, callCredentials: CallCredentials? = null) :
         this(
-            NetworkConsumerGrpc.newStub(channel).apply { callCredentials?.let { withCallCredentials(it) } },
-            executor = Executors.newSingleThreadExecutor()
+            NetworkConsumerGrpc.newStub(channel).withExecutor(Executors.newSingleThreadExecutor()).apply { callCredentials?.let { withCallCredentials(it) } }
         )
 
     /**
@@ -481,16 +476,16 @@ class NetworkConsumerClient(
         return GrpcResult(mor)
     }
 
-    override fun processIdentifiedObjects(mRIDs: Sequence<String>): Sequence<ExtractResult> {
+    override fun processIdentifiables(mRIDs: Sequence<String>): Sequence<ExtractResult> {
         val extractResults = mutableListOf<ExtractResult>()
-        val streamObserver = AwaitableStreamObserver<GetIdentifiedObjectsResponse> { response ->
-            response.identifiedObjectsList.forEach {
-                extractResults.add(extractIdentifiedObject(it))
+        val streamObserver = AwaitableStreamObserver<GetIdentifiablesResponse> { response ->
+            response.identifiablesList.forEach {
+                extractResults.add(extractIdentifiable(it))
             }
         }
 
-        val request = stub.getIdentifiedObjects(streamObserver)
-        val builder = GetIdentifiedObjectsRequest.newBuilder()
+        val request = stub.getIdentifiables(streamObserver)
+        val builder = GetIdentifiablesRequest.newBuilder()
 
         batchSend(mRIDs, builder::addMrids) {
             if (builder.mridsList.isNotEmpty())
@@ -512,8 +507,8 @@ class NetworkConsumerClient(
     ): Sequence<ExtractResult> {
         val extractResults = mutableListOf<ExtractResult>()
         val streamObserver = AwaitableStreamObserver<GetEquipmentForContainersResponse> { response ->
-            response.identifiedObjectsList.forEach {
-                extractResults.add(extractIdentifiedObject(it))
+            response.identifiablesList.forEach {
+                extractResults.add(extractIdentifiable(it))
             }
         }
 
@@ -539,8 +534,8 @@ class NetworkConsumerClient(
     private fun processRestriction(mRID: String): Sequence<ExtractResult> {
         val extractResults = mutableListOf<ExtractResult>()
         val streamObserver = AwaitableStreamObserver<GetEquipmentForRestrictionResponse> { response ->
-            response.identifiedObjectsList.forEach {
-                extractResults.add(extractIdentifiedObject(it))
+            response.identifiablesList.forEach {
+                extractResults.add(extractIdentifiable(it))
             }
         }
 
@@ -562,12 +557,12 @@ class NetworkConsumerClient(
         return extractResults.asSequence()
     }
 
-    private fun extractIdentifiedObject(io: NetworkIdentifiedObject): ExtractResult =
+    private fun extractIdentifiable(io: NetworkIdentifiable): ExtractResult =
         protoToCim.networkService.addFromPb(io).let {
-            ExtractResult(it.identifiedObject, it.mRID)
+            ExtractResult(it.identifiable, it.mRID)
         }
 
-    private fun <T, U : IdentifiedObject> toMap(objects: Iterable<T>, mapper: (T) -> U?): Map<String, U> =
+    private fun <T, U : Identifiable> toMap(objects: Iterable<T>, mapper: (T) -> U?): Map<String, U> =
         objects
             .mapNotNull(mapper)
             .associateBy { it.mRID }
@@ -590,10 +585,10 @@ class NetworkConsumerClient(
 
         val toFetch = mutableListOf<String>()
         mRIDs.forEach { mRID ->  // Only process mRIDs not already present in service
-            service.get<IdentifiedObject>(mRID)?.let { mor.objects[it.mRID] = it } ?: toFetch.add(mRID)
+            service.get<Identifiable>(mRID)?.let { mor.objects[it.mRID] = it } ?: toFetch.add(mRID)
         }
 
-        val response = getIdentifiedObjects(toFetch.asSequence())
+        val response = getIdentifiables(toFetch.asSequence())
         val result = response.onError { thrown, wasHandled -> return@getWithReferences GrpcResult.ofError(thrown, wasHandled) }.value
 
         val invalid = result.objects.values.filter { !expectedClass.isInstance(it) }.toMutableSet()
@@ -624,7 +619,7 @@ class NetworkConsumerClient(
                 .distinct()
                 .toList()
 
-            res = getIdentifiedObjects(toResolve).onError { thrown, wasHandled ->
+            res = getIdentifiables(toResolve).onError { thrown, wasHandled ->
                 return GrpcResult.ofError(thrown, wasHandled)
             }.value
             mor.objects.putAll(res.objects)

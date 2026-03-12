@@ -556,7 +556,7 @@ internal object PowerSystemResourceToAssetResolver : ReferenceResolver<PowerSyst
 
 //-------------------------------------------//
 
-class KReferenceResolver<T : IdentifiedObject, R : IdentifiedObject>(
+class KReferenceResolver<T : Identifiable, R : Identifiable>(
     private val fromKClass: KClass<T>,
     private val toKClass: KClass<R>,
     private val resolveFun: (T, R) -> Unit

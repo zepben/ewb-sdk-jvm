@@ -8,26 +8,16 @@
 
 package com.zepben.ewb.services.common.extensions
 
-import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 
-/**
- * Printable version of the object including its name and mRID.
- */
-fun IdentifiedObject.nameAndMRID(): String = if (name.isNullOrBlank()) mRID else "'$name' [$mRID]"
-
-/**
- * Printable version of the object including the type, name and mRID.
- */
-fun IdentifiedObject.typeNameAndMRID(): String = if (name.isNullOrBlank()) "${javaClass.simpleName} $mRID" else "${javaClass.simpleName} $name [$mRID]"
-
-internal fun <T : IdentifiedObject> Iterable<T>?.getByMRID(mRID: String): T? {
+internal fun <T : Identifiable> Iterable<T>?.getByMRID(mRID: String): T? {
     return this?.firstOrNull { it.mRID == mRID }
 }
 
-internal fun IdentifiedObject.validateReference(other: IdentifiedObject, getter: (String) -> IdentifiedObject?, typeDescription: String): Boolean =
-    validateReference(other, IdentifiedObject::mRID, getter) { "$typeDescription with mRID ${other.mRID}" }
+internal fun Identifiable.validateReference(other: Identifiable, getter: (String) -> Identifiable?, typeDescription: String): Boolean =
+    validateReference(other, Identifiable::mRID, getter) { "$typeDescription with mRID ${other.mRID}" }
 
-internal fun <T> IdentifiedObject.validateReference(other: T, getIdentifier: T.() -> String, getter: (String) -> T?, describeOther: () -> String): Boolean {
+internal fun <T> Identifiable.validateReference(other: T, getIdentifier: T.() -> String, getter: (String) -> T?, describeOther: () -> String): Boolean {
     val getResult = getter(other.getIdentifier())
     if (getResult == other)
         return true

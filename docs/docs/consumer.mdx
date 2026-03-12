@@ -456,14 +456,14 @@ functions on the service provided when requesting identified objects.
 
 ```java
 void getWithBaseVoltage(NetworkService service, NetworkConsumerClient client, String mrid) {
-    IdentifiedObject equipment = client.getIdentifiedObject(service, mrid).getResult();
+    Identifiable equipment = client.getIdentifiable(service, mrid).getResult();
     if (equipment == null || !(equipment instanceof ConductingEquipment)) {
         return;
     }
     
     Set<String> mrids = service.getUnresolvedReferenceMrids(Resolvers.baseVoltage(equipment));
     if (!mrids.isEmpty()) {
-        client.getIdentifiedObject(service, mrids.iterator().next());
+        client.getIdentifiable(service, mrids.iterator().next());
     }
 }
 ```
@@ -473,13 +473,13 @@ void getWithBaseVoltage(NetworkService service, NetworkConsumerClient client, St
 
 ```kotlin
 fun getWithBaseVoltage(service: NetworkService, client: NetworkConsumerClient, mrid: String) {
-    val equipment = client.getIdentifiedObject(service, mrid).result
+    val equipment = client.getIdentifiable(service, mrid).result
     if (equipment == null || equipment !is ConductingEquipment) {
         return
     }
 
     service.getUnresolvedReferenceMrids(Resolvers.baseVoltage(equipment)).firstOrNull()
-        ?.let { client.getIdentifiedObject(service, it) }
+        ?.let { client.getIdentifiable(service, it) }
 }
 ```
 
@@ -505,14 +505,14 @@ String mrid = "feeder1";
 List<UnresolvedReferences> references = service.getUnresolvedReferencesFrom(mrid);
 
 for (UnresolvedReference ref: references) {
-    client.getIdentifiedObject(service, ref.toMrid)
+    client.getIdentifiable(service, ref.toMrid)
 }
 
 // To get unresolved references pointing to `equipment`
 references = service.getUnresolvedReferencesFrom(mrid);
 
 for (UnresolvedReference ref: references) {
-    client.getIdentifiedObject(service, ref.from.mRID)
+    client.getIdentifiable(service, ref.from.mRID)
 }
 ```
 
@@ -523,11 +523,11 @@ for (UnresolvedReference ref: references) {
 val mrid = "feeder1"
 
 service.getUnresolvedReferencesFrom(mrid).forEach {
-    client.getIdentifiedObject(service, ref.toMrid)
+    client.getIdentifiable(service, ref.toMrid)
 }
 
 service.getUnresolvedReferencesTo(mrid).forEach {
-    client.getIdentifiedObject(service, ref.from.mRID)
+    client.getIdentifiable(service, ref.from.mRID)
 }
 ```
 

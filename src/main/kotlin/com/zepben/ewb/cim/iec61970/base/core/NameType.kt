@@ -21,7 +21,9 @@ import com.zepben.ewb.services.common.extensions.asUnmodifiable
  * @property name Name of the name type.
  * @property description Description of the name type.
  */
-class NameType(val name: String) {
+class NameType(val name: String) : Identifiable {
+
+    override val mRID: String get() = name
 
     private var namesIndex: MutableMap<String, Name> = mutableMapOf()
     private var namesMultiIndex: MutableMap<String, MutableMap<IdentifiedObject, Name>> = mutableMapOf()
@@ -173,5 +175,8 @@ class NameType(val name: String) {
         return "NameType(name='$name', description='$description')"
     }
 
+    override fun typeNameAndMRID(): String = "${javaClass.simpleName} $mRID"
+
+    override fun nameAndMRID(): String = name
 
 }

@@ -11,6 +11,7 @@ package com.zepben.ewb.database.sql.cim
 import com.zepben.ewb.cim.iec61968.common.Document
 import com.zepben.ewb.cim.iec61968.common.Organisation
 import com.zepben.ewb.cim.iec61968.common.OrganisationRole
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.core.Name
 import com.zepben.ewb.cim.iec61970.base.core.NameType
@@ -26,11 +27,10 @@ import com.zepben.ewb.database.sql.extensions.getInstant
 import com.zepben.ewb.database.sql.extensions.getNullableInt
 import com.zepben.ewb.database.sql.extensions.getNullableString
 import com.zepben.ewb.services.common.BaseService
-import com.zepben.ewb.services.common.exceptions.UnsupportedIdentifiedObjectException
+import com.zepben.ewb.services.common.exceptions.UnsupportedIdentifiableException
 import com.zepben.ewb.services.common.extensions.ensureGet
 import com.zepben.ewb.services.common.extensions.getNameTypeOrThrow
 import com.zepben.ewb.services.common.extensions.getOrThrow
-import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.sql.ResultSet
@@ -41,7 +41,7 @@ import java.sql.SQLException
  *
  * @property logger The [Logger] to use for this reader.
  */
-internal abstract class CimReader<TService : BaseService> {
+abstract class CimReader<TService : BaseService> {
 
     protected val logger: Logger = LoggerFactory.getLogger(javaClass)
 
@@ -188,24 +188,24 @@ internal abstract class CimReader<TService : BaseService> {
     // #############
 
     /**
-     * Try and add the [identifiedObject] to the [BaseService], and throw an [Exception] if unsuccessful.
+     * Try and add the [identifiable] to the [BaseService], and throw an [Exception] if unsuccessful.
      *
      * @receiver The [BaseService] to search.
-     * @param identifiedObject The [IdentifiedObject] to add to the [BaseService].
+     * @param identifiable The [Identifiable] to add to the [BaseService].
      *
      * @return true in all instances, otherwise it throws.
-     * @throws DuplicateMRIDException If the [IdentifiedObject.mRID] has already been used.
-     * @throws UnsupportedIdentifiedObjectException If the [IdentifiedObject] is not supported by the [BaseService]. This is an indication of an internal coding
+     * @throws DuplicateMRIDException If the [Identifiable.mRID] has already been used.
+     * @throws UnsupportedIdentifiableException If the [Identifiable] is not supported by the [BaseService]. This is an indication of an internal coding
      *   issue, rather than a problem with the data being read, and in a correctly configured system will never occur.
      */
-    @Throws(DuplicateMRIDException::class, UnsupportedIdentifiedObjectException::class)
-    protected fun BaseService.addOrThrow(identifiedObject: IdentifiedObject): Boolean {
-        return if (tryAdd(identifiedObject)) {
+    @Throws(DuplicateMRIDException::class, UnsupportedIdentifiableException::class)
+    protected fun BaseService.addOrThrow(identifiable: Identifiable): Boolean {
+        return if (tryAdd(identifiable)) {
             true
         } else {
-            val duplicate = get<IdentifiedObject>(identifiedObject.mRID)
+            val duplicate = get<Identifiable>(identifiable.mRID)
             throw DuplicateMRIDException(
-                "Failed to read ${identifiedObject.typeNameAndMRID()}. Unable to add to service '$name': duplicate MRID (${duplicate?.typeNameAndMRID()})"
+                "Failed to read ${identifiable.typeNameAndMRID()}. Unable to add to service '$name': duplicate MRID (${duplicate?.typeNameAndMRID()})"
             )
         }
     }

@@ -8,8 +8,7 @@
 
 package com.zepben.ewb.utils
 
-import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
-import com.zepben.ewb.services.common.extensions.typeNameAndMRID
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.testutils.exception.ExpectException.Companion.expect
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -21,9 +20,9 @@ internal class PrivateCollectionValidator {
     companion object {
 
         /**
-         * Validate the internal collection for an associated [IdentifiedObject] that has no order significance.
+         * Validate the internal collection for an associated [Identifiable] that has no order significance.
          */
-        internal fun <T : IdentifiedObject, U : IdentifiedObject> validateUnordered(
+        internal fun <T : Identifiable, U : Identifiable> validateUnordered(
             createIt: (String) -> T,
             createOther: (String) -> U,
             getAll: (T) -> Collection<U>,
@@ -66,7 +65,7 @@ internal class PrivateCollectionValidator {
         }
 
         /**
-         * Validate the internal collection for an associated object that is not an [IdentifiedObject] that has no order significance.
+         * Validate the internal collection for an associated object that is not an [Identifiable] that has no order significance.
          */
         internal fun <T, U : Any, K : Any> validateUnordered(
             createIt: (String) -> T,
@@ -87,7 +86,7 @@ internal class PrivateCollectionValidator {
             val otherDuplicateKey = createOther(1)
             val others = listOf(other1, other2, other3)
 
-            require(other1 !is IdentifiedObject) { "do not use this function with identified 'other', use one of the other variants instead." }
+            require(other1 !is Identifiable) { "do not use this function with identified 'other', use one of the other variants instead." }
 
             // Just check that the duplicate key is in the error message.
             val expectedDuplicateErrors = mapOf(otherDuplicateKey to ".*${getKey(otherDuplicateKey)}.*")
@@ -119,12 +118,12 @@ internal class PrivateCollectionValidator {
         }
 
         /**
-         * Validate the internal collection for an associated [IdentifiedObject] that has order significance, baked into the object itself, not just
+         * Validate the internal collection for an associated [Identifiable] that has order significance, baked into the object itself, not just
          * the placement in the collection.
          *
          * NOTE: Baked in index is expected to be 1-based, not 0-based.
          */
-        internal fun <T : IdentifiedObject, U : IdentifiedObject> validateOrdered(
+        internal fun <T : Identifiable, U : Identifiable> validateOrdered(
             createIt: (String) -> T,
             createOther: (String, Int) -> U,
             getAll: (T) -> Collection<U>,
@@ -187,12 +186,12 @@ internal class PrivateCollectionValidator {
         }
 
         /**
-         * Validate the internal collection for an associated object that is not an [IdentifiedObject] that has order significance based on its index
+         * Validate the internal collection for an associated object that is not an [Identifiable] that has order significance based on its index
          * in the collection.
          *
          * NOTE: Positional index is expected to be 0-based, not 1-based.
          */
-        internal fun <T : IdentifiedObject, U : Any> validateOrdered(
+        internal fun <T : Identifiable, U : Any> validateOrdered(
             createIt: (String) -> T,
             createOther: (Int) -> U,
             getAll: (T) -> Collection<U>,
@@ -211,7 +210,7 @@ internal class PrivateCollectionValidator {
             val other3 = createOther(3)
             val others = listOf(other1, other2, other3)
 
-            require(other1 !is IdentifiedObject) { "do not use this function with identified 'other', use one of the other variants instead." }
+            require(other1 !is Identifiable) { "do not use this function with identified 'other', use one of the other variants instead." }
 
             validate(
                 it,

@@ -41,9 +41,7 @@ inline fun <R> whenMeasurementServiceObject(
     isAnalogValue: (AnalogValue) -> R,
     isAccumulatorValue: (AccumulatorValue) -> R,
     isDiscreteValue: (DiscreteValue) -> R,
-    isOther: (MeasurementValue) -> R = { idObj: MeasurementValue ->
-        throw IllegalArgumentException("MeasurementValue object type ${idObj::class} is not supported by the measurement service")
-    }
+    isOther: (MeasurementValue) -> R = { throw IllegalArgumentException("MeasurementValue type ${it::class} is not supported by the measurement service") }
 ): R = when (measurementValue) {
     is AnalogValue -> isAnalogValue(measurementValue)
     is AccumulatorValue -> isAccumulatorValue(measurementValue)

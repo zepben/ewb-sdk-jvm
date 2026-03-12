@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.services.common.translator
 
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 
 /**
@@ -17,11 +18,15 @@ import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
  *
  * @property mRID The mRID of the object, even if it wasn't added to the service.
  * @property identifiedObject The [IdentifiedObject] reference if it was either added to the service, or `null` if there was an error adding it. This
+ * @property identifiable The [Identifiable] reference if it was either added to the service, or `null` if there was an error adding it. This
  * may be a reference to an existing object if it already existed in the service.
- * @property reusedExisting `true` if the [identifiedObject] was found in the service, or `false` is a newly added item was created.
+ * @property reusedExisting `true` if the [identifiable] was found in the service, or `false` is a newly added item was created.
  */
 data class AddFromPbResult(
     val mRID: String,
-    val identifiedObject: IdentifiedObject?,
+    val identifiable: Identifiable?,
     val reusedExisting: Boolean,
-)
+) {
+    @Deprecated("Use identifiable instead", ReplaceWith("identifiable"))
+    val identifiedObject: IdentifiedObject? = identifiable as? IdentifiedObject
+}

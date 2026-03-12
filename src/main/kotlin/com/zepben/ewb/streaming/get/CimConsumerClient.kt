@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.streaming.get
 
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.common.meta.ServiceInfo
@@ -17,22 +18,22 @@ import com.zepben.ewb.streaming.grpc.GrpcClient
 import com.zepben.ewb.streaming.grpc.GrpcResult
 import com.zepben.protobuf.metadata.GetMetadataRequest
 import com.zepben.protobuf.metadata.GetMetadataResponse
+import io.grpc.stub.AbstractAsyncStub
 import java.io.IOException
-import java.util.concurrent.ExecutorService
 
 /**
  * A result to use when multiple objects are requested.
- * @property objects A Map of mRID to its IdentifiedObject that were processed.
+ * @property objects A Map of mRID to its [Identifiable] that were processed.
  * @property failed The set of mRIDs that failed to be processed.
  */
-data class MultiObjectResult(val objects: MutableMap<String, IdentifiedObject> = mutableMapOf(), val failed: MutableSet<String> = mutableSetOf())
+data class MultiObjectResult(val objects: MutableMap<String, Identifiable> = mutableMapOf(), val failed: MutableSet<String> = mutableSetOf())
 
 /**
  * Represents the result of deserialising a protobuf message and adding it to a service.
- * @property identifiedObject The [IdentifiedObject] that was deserialised, or null if it couldn't be added to the service
- * @property mRID The corresponding mRID of [identifiedObject]. Typically only used if [identifiedObject] is null.
+ * @property identifiable The [Identifiable] that was deserialised, or null if it couldn't be added to the service
+ * @property mRID The corresponding mRID of [identifiable]. Typically only used if [identifiable] is null.
  */
-data class ExtractResult(val identifiedObject: IdentifiedObject?, val mRID: String)
+data class ExtractResult(val identifiable: Identifiable?, val mRID: String)
 
 /**
  * Base class that defines some helpful functions when producer clients are sending to the server.
@@ -42,17 +43,17 @@ data class ExtractResult(val identifiedObject: IdentifiedObject?, val mRID: Stri
  * occur for an object if another object with the same mRID is already present in service. [MultiObjectResult.failed] can be used to check for mRIDs that
  * were not found or retrieved but not added to service (this should not be the case unless you are processing things concurrently).
  *
- * @param T The type of service used by this client.
- * @property service The service to store fetched objects in. Descendant of [BaseService] defined by [T]
+ * @param TService The type of service used by this client.
+ * @property service The service to store fetched objects in. Descendant of [BaseService] defined by [TService]
  */
-abstract class CimConsumerClient<T : BaseService, U : BaseProtoToCim>(executor: ExecutorService?) : GrpcClient(executor) {
+abstract class CimConsumerClient<TService : BaseService, TProtoToCim : BaseProtoToCim, TStub : AbstractAsyncStub<TStub>> : GrpcClient<TStub>() {
 
-    abstract val service: T
+    abstract val service: TService
 
     /**
      * The protobuf to cim converter.
      */
-    protected abstract val protoToCim: U
+    protected abstract val protoToCim: TProtoToCim
 
     internal var serviceInfo: ServiceInfo? = null
 
@@ -69,8 +70,27 @@ abstract class CimConsumerClient<T : BaseService, U : BaseProtoToCim>(executor: 
      *    - [NoSuchElementException] if the object could not be found.
      *    - The gRPC error that occurred while retrieving the object
      */
+    @Deprecated("Use getIdentifiable() instead", ReplaceWith("getIdentifiable(mRID)"))
     fun getIdentifiedObject(mRID: String): GrpcResult<IdentifiedObject> = tryRpc {
-        processIdentifiedObjects(sequenceOf(mRID)).firstOrNull()?.identifiedObject
+        processIdentifiables(sequenceOf(mRID)).firstOrNull()?.identifiable as? IdentifiedObject
+            ?: throw NoSuchElementException("No object with mRID $mRID could be found.")
+    }
+
+    /**
+     * Retrieve the object with the given [mRID] and store the result in the [service].
+     *
+     * Exceptions that occur during sending will be caught and passed to all error handlers that have been registered by [addErrorHandler].
+     *
+     * @param mRID The mRID to retrieve.
+     *
+     * @return A [GrpcResult] with a result of one of the following:
+     * - When [GrpcResult.wasSuccessful], the item found, accessible via [GrpcResult.value].
+     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the object, accessible via [GrpcResult.thrown]. One of:
+     *    - [NoSuchElementException] if the object could not be found.
+     *    - The gRPC error that occurred while retrieving the object
+     */
+    fun getIdentifiable(mRID: String): GrpcResult<Identifiable> = tryRpc {
+        processIdentifiables(sequenceOf(mRID)).firstOrNull()?.identifiable
             ?: throw NoSuchElementException("No object with mRID $mRID could be found.")
     }
 
@@ -87,7 +107,8 @@ abstract class CimConsumerClient<T : BaseService, U : BaseProtoToCim>(executor: 
      * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the object, accessible via [GrpcResult.thrown].
      * Note the [CimConsumerClient] warning in this case.
      */
-    fun getIdentifiedObjects(mRIDs: Iterable<String>): GrpcResult<MultiObjectResult> = getIdentifiedObjects(mRIDs.asSequence())
+    @Deprecated("Use getIdentifiables() instead", ReplaceWith("getIdentifiables(mRIDs)"))
+    fun getIdentifiedObjects(mRIDs: Iterable<String>): GrpcResult<MultiObjectResult> = getIdentifiables(mRIDs.asSequence())
 
     /**
      * Retrieve the objects with the given [mRIDs] and store the results in the [service].
@@ -102,8 +123,41 @@ abstract class CimConsumerClient<T : BaseService, U : BaseProtoToCim>(executor: 
      * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the object, accessible via [GrpcResult.thrown].
      * Note the [CimConsumerClient] warning in this case.
      */
+    fun getIdentifiables(mRIDs: Iterable<String>): GrpcResult<MultiObjectResult> = getIdentifiables(mRIDs.asSequence())
+
+    /**
+     * Retrieve the objects with the given [mRIDs] and store the results in the [service].
+     *
+     * Exceptions that occur during processing will be caught and passed to all error handlers that have been registered by [addErrorHandler].
+     *
+     * @param mRIDs The mRIDs to retrieve.
+     *
+     * @return A [GrpcResult] with a result of one of the following:
+     * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
+     * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
+     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the object, accessible via [GrpcResult.thrown].
+     * Note the [CimConsumerClient] warning in this case.
+     */
+    @Deprecated("Use getIdentifiables() instead", ReplaceWith("getIdentifiables(mRID)"))
     fun getIdentifiedObjects(mRIDs: Sequence<String>): GrpcResult<MultiObjectResult> = handleMultiObjectRPC(mRIDs) {
-        processIdentifiedObjects(mRIDs)
+        processIdentifiables(mRIDs)
+    }
+
+    /**
+     * Retrieve the objects with the given [mRIDs] and store the results in the [service].
+     *
+     * Exceptions that occur during processing will be caught and passed to all error handlers that have been registered by [addErrorHandler].
+     *
+     * @param mRIDs The mRIDs to retrieve.
+     *
+     * @return A [GrpcResult] with a result of one of the following:
+     * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
+     * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
+     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the object, accessible via [GrpcResult.thrown].
+     * Note the [CimConsumerClient] warning in this case.
+     */
+    fun getIdentifiables(mRIDs: Sequence<String>): GrpcResult<MultiObjectResult> = handleMultiObjectRPC(mRIDs) {
+        processIdentifiables(mRIDs)
     }
 
     /**
@@ -112,7 +166,7 @@ abstract class CimConsumerClient<T : BaseService, U : BaseProtoToCim>(executor: 
      * @param mRIDs The mRIDs of the requested identified objects.
      * @return A sequence of [ExtractResult] containing the identified objects if found, null otherwise.
      */
-    protected abstract fun processIdentifiedObjects(mRIDs: Sequence<String>): Sequence<ExtractResult>
+    protected abstract fun processIdentifiables(mRIDs: Sequence<String>): Sequence<ExtractResult>
 
     /**
      * A helper function to split responses into batches of 1000.
@@ -139,7 +193,7 @@ abstract class CimConsumerClient<T : BaseService, U : BaseProtoToCim>(executor: 
      * @param addFromPb A callback to convert and add the protobuf object, scoped to the [protoToCim] object.
      * @return A result object containing either an existing object with the same mRID, or the result of the [addFromPb] call.
      */
-    protected inline fun <reified CIM : IdentifiedObject> extractResult(mRID: String, addFromPb: U.() -> CIM?): ExtractResult =
+    protected inline fun <reified CIM : Identifiable> extractResult(mRID: String, addFromPb: TProtoToCim.() -> CIM?): ExtractResult =
         ExtractResult(getOrAdd(mRID, addFromPb), mRID)
 
     /**
@@ -150,7 +204,7 @@ abstract class CimConsumerClient<T : BaseService, U : BaseProtoToCim>(executor: 
      * @param addFromPb A callback to convert and add the protobuf object, scoped to the [protoToCim] object.
      * @return Either an existing object with the same mRID, or the result of the [addFromPb] call.
      */
-    protected inline fun <reified CIM : IdentifiedObject> getOrAdd(mRID: String, addFromPb: U.() -> CIM?): CIM? =
+    protected inline fun <reified CIM : Identifiable> getOrAdd(mRID: String, addFromPb: TProtoToCim.() -> CIM?): CIM? =
         service.get(CIM::class, mRID) ?: protoToCim.addFromPb()
 
     /**
@@ -159,10 +213,10 @@ abstract class CimConsumerClient<T : BaseService, U : BaseProtoToCim>(executor: 
      */
     protected fun handleMultiObjectRPC(mRIDs: Sequence<String>? = null, processor: () -> Sequence<ExtractResult>): GrpcResult<MultiObjectResult> =
         tryRpc {
-            val results = mutableMapOf<String, IdentifiedObject>()
+            val results = mutableMapOf<String, Identifiable>()
             val failed = mRIDs?.toMutableSet() ?: mutableSetOf()
-            processor().forEach { (identifiedObject, mRID) ->
-                identifiedObject?.let {
+            processor().forEach { (identifiable, mRID): ExtractResult ->
+                identifiable?.let {
                     results[it.mRID] = it
                     failed.remove(it.mRID)
                 } ?: failed.add(mRID)

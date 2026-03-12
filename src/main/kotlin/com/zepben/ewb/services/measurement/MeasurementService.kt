@@ -8,7 +8,6 @@
 
 package com.zepben.ewb.services.measurement
 
-import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.meas.AccumulatorValue
 import com.zepben.ewb.cim.iec61970.base.meas.AnalogValue
 import com.zepben.ewb.cim.iec61970.base.meas.DiscreteValue
@@ -21,7 +20,7 @@ import kotlin.reflect.full.declaredMemberFunctions
 import kotlin.reflect.full.isSubtypeOf
 import kotlin.reflect.full.isSuperclassOf
 
-/*
+/**
  * Maintains an in-memory model of measurements.
  */
 class MeasurementService {
@@ -50,18 +49,18 @@ class MeasurementService {
     //region Code copied from BaseService
     //
     // NOTE: This is a copy/paste from BaseService because this service doesn't inherit from it. There is no point making BaseService the base class as
-    //       the items stored in this service don't inherit from IdentifiedObject, which is what BaseService is designed for.
+    //       the items stored in this service don't inherit from Identifiable, which is what BaseService is designed for.
     //
     //       The only difference is the base class used for finding the add/remove functions. This copy uses MeasurementValue, while the copy in BaseService
-    //       uses IdentifiedObject. Someone at some stage can probably move this to a reusable utils class and make it take the base class as a parameter.
+    //       uses Identifiable. Someone at some stage can probably move this to a reusable utils class and make it take the base class as a parameter.
     //
-    private val addFunctions: Map<KClass<out IdentifiedObject>, KFunction<*>> = findFunctionsForDispatch("add")
-    private val removeFunctions: Map<KClass<out IdentifiedObject>, KFunction<*>> = findFunctionsForDispatch("remove")
+    private val addFunctions: Map<KClass<out MeasurementValue>, KFunction<*>> = findFunctionsForDispatch("add")
+    private val removeFunctions: Map<KClass<out MeasurementValue>, KFunction<*>> = findFunctionsForDispatch("remove")
 
     /**
      * A list of Kotlin classes supported by this service.
      */
-    val supportedKClasses: Set<KClass<out IdentifiedObject>> get() = addFunctions.keys
+    val supportedKClasses: Set<KClass<out MeasurementValue>> get() = addFunctions.keys
 
     init {
         check(addFunctions.keys == removeFunctions.keys) {
@@ -72,14 +71,14 @@ class MeasurementService {
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun findFunctionsForDispatch(name: String): Map<KClass<out IdentifiedObject>, KFunction<*>> {
+    private fun findFunctionsForDispatch(name: String): Map<KClass<out MeasurementValue>, KFunction<*>> {
         val idObjType = MeasurementValue::class.createType()
         return this::class.declaredMemberFunctions.asSequence()
             .filter { it.name == name }
             .filter { it.parameters.size == 2 }
             .filter { it.visibility == KVisibility.PUBLIC }
             .filter { it.parameters[1].type.isSubtypeOf(idObjType) }
-            .map { (it.parameters[1].type.classifier as KClass<out IdentifiedObject>) to it }
+            .map { (it.parameters[1].type.classifier as KClass<out MeasurementValue>) to it }
             .onEach {
                 require(it.second.returnType.classifier == Boolean::class) {
                     "return type for '${it.second}' needs to be Boolean"

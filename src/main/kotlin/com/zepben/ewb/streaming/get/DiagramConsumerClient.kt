@@ -19,7 +19,6 @@ import com.zepben.protobuf.metadata.GetMetadataRequest
 import com.zepben.protobuf.metadata.GetMetadataResponse
 import io.grpc.CallCredentials
 import io.grpc.Channel
-import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 /**
@@ -31,14 +30,12 @@ import java.util.concurrent.Executors
  * were retrieved but not added to service. This should not be the case unless you are processing things concurrently.
  *
  * @property stub The gRPC stub to be used to communicate with the server
- * @param executor An optional [ExecutorService] to use with the stub. If provided, it will be cleaned up when this client is closed.
  */
 class DiagramConsumerClient(
-    private val stub: DiagramConsumerGrpc.DiagramConsumerStub,
+    override val stub: DiagramConsumerGrpc.DiagramConsumerStub,
     override val service: DiagramService = DiagramService(),
     override val protoToCim: DiagramProtoToCim = DiagramProtoToCim(service),
-    executor: ExecutorService? = null
-) : CimConsumerClient<DiagramService, DiagramProtoToCim>(executor) {
+) : CimConsumerClient<DiagramService, DiagramProtoToCim, DiagramConsumerGrpc.DiagramConsumerStub>() {
 
     /**
      * Create a [DiagramConsumerClient]
@@ -49,8 +46,7 @@ class DiagramConsumerClient(
     @JvmOverloads
     constructor(channel: Channel, callCredentials: CallCredentials? = null) :
         this(
-            DiagramConsumerGrpc.newStub(channel).apply { callCredentials?.let { withCallCredentials(it) } },
-            executor = Executors.newSingleThreadExecutor()
+            DiagramConsumerGrpc.newStub(channel).withExecutor(Executors.newSingleThreadExecutor()).apply { callCredentials?.let { withCallCredentials(it) } },
         )
 
     /**
@@ -60,11 +56,7 @@ class DiagramConsumerClient(
      * @param callCredentials [CallCredentials] to be attached to the stub.
      */
     @JvmOverloads
-    constructor(channel: GrpcChannel, callCredentials: CallCredentials? = null) :
-        this(
-            DiagramConsumerGrpc.newStub(channel.channel).apply { callCredentials?.let { withCallCredentials(it) } },
-            executor = Executors.newSingleThreadExecutor()
-        )
+    constructor(channel: GrpcChannel, callCredentials: CallCredentials? = null) : this(channel.channel, callCredentials)
 
 
     /**
@@ -95,16 +87,16 @@ class DiagramConsumerClient(
         processDiagramObjects(mRIDs.asSequence())
     }
 
-    override fun processIdentifiedObjects(mRIDs: Sequence<String>): Sequence<ExtractResult> {
+    override fun processIdentifiables(mRIDs: Sequence<String>): Sequence<ExtractResult> {
         val extractResults = mutableListOf<ExtractResult>()
-        val streamObserver = AwaitableStreamObserver<GetIdentifiedObjectsResponse> { response ->
-            response.identifiedObjectsList.forEach {
-                extractResults.add(extractIdentifiedObject(it))
+        val streamObserver = AwaitableStreamObserver<GetIdentifiablesResponse> { response ->
+            response.identifiablesList.forEach {
+                extractResults.add(extractIdentifiable(it))
             }
         }
 
-        val request = stub.getIdentifiedObjects(streamObserver)
-        val builder = GetIdentifiedObjectsRequest.newBuilder()
+        val request = stub.getIdentifiables(streamObserver)
+        val builder = GetIdentifiablesRequest.newBuilder()
 
         batchSend(mRIDs, builder::addMrids) {
             if (builder.mridsList.isNotEmpty())
@@ -118,9 +110,9 @@ class DiagramConsumerClient(
         return extractResults.asSequence()
     }
 
-    private fun extractIdentifiedObject(io: DiagramIdentifiedObject): ExtractResult =
+    private fun extractIdentifiable(io: DiagramIdentifiable): ExtractResult =
         protoToCim.diagramService.addFromPb(io).let {
-            ExtractResult(it.identifiedObject, it.mRID)
+            ExtractResult(it.identifiable, it.mRID)
         }
 
     private fun processDiagramObjects(
@@ -128,8 +120,8 @@ class DiagramConsumerClient(
     ): Sequence<ExtractResult> {
         val extractResults = mutableListOf<ExtractResult>()
         val streamObserver = AwaitableStreamObserver<GetDiagramObjectsResponse> { response ->
-            response.identifiedObjectsList.forEach {
-                extractResults.add(extractIdentifiedObject(it))
+            response.identifiablesList.forEach {
+                extractResults.add(extractIdentifiable(it))
             }
         }
 

@@ -16,11 +16,7 @@ import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvSubstation
 import com.zepben.ewb.cim.extensions.iec61970.base.generation.production.EvChargingUnit
-import com.zepben.ewb.cim.extensions.iec61970.base.protection.DirectionalCurrentRelay
-import com.zepben.ewb.cim.extensions.iec61970.base.protection.DistanceRelay
-import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelayScheme
-import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelaySystem
-import com.zepben.ewb.cim.extensions.iec61970.base.protection.VoltageRelay
+import com.zepben.ewb.cim.extensions.iec61970.base.protection.*
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.BatteryControl
 import com.zepben.ewb.cim.iec61968.assetinfo.*
 import com.zepben.ewb.cim.iec61968.assets.AssetOwner
@@ -69,7 +65,7 @@ internal class NetworkServiceUtilsTest {
     // Function references to functions with generics are not yet supported, so we take a copy of the function that has a concrete type and pass through.
     // If you get failed tests about missing IdentifiedObject types, first update the proxied function, then update this one to match.
     internal fun whenNetworkServiceObjectProxy(
-        identifiedObject: IdentifiedObject,
+        identifiable: Identifiable,
         isBatteryUnit: (BatteryUnit) -> String,
         isPhotoVoltaicUnit: (PhotoVoltaicUnit) -> String,
         isPowerElectronicsWindUnit: (PowerElectronicsWindUnit) -> String,
@@ -160,9 +156,9 @@ internal class NetworkServiceUtilsTest {
         isHvCustomer: (HvCustomer) -> String,
         isLvSubstation: (LvSubstation) -> String,
         isAcLineSegmentPhase: (AcLineSegmentPhase) -> String,
-        isOther: (IdentifiedObject) -> String
+        isOther: (Identifiable) -> String
     ): String = whenNetworkServiceObject(
-        identifiedObject,
+        identifiable,
         isBatteryUnit = isBatteryUnit,
         isPhotoVoltaicUnit = isPhotoVoltaicUnit,
         isPowerElectronicsWindUnit = isPowerElectronicsWindUnit,

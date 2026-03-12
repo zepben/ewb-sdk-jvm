@@ -26,7 +26,7 @@ import java.sql.SQLException
 
  * @param connection The connection to the database to read.
  */
-internal abstract class BaseCollectionReader<T>(
+abstract class BaseCollectionReader<T>(
     val databaseTables: BaseDatabaseTables,
     protected val connection: Connection
 ) {

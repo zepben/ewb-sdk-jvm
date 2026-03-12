@@ -13,7 +13,6 @@ import com.zepben.ewb.cim.iec61970.base.core.Terminal
 import com.zepben.ewb.cim.iec61970.base.wires.EnergySource
 import com.zepben.ewb.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.ewb.cim.iec61970.base.wires.SinglePhaseKind
-import com.zepben.ewb.services.common.extensions.typeNameAndMRID
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.tracing.connectivity.NominalPhasePath
 import com.zepben.ewb.services.network.tracing.connectivity.TerminalConnectivityConnected

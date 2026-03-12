@@ -16,11 +16,11 @@ import com.zepben.ewb.cim.iec61968.customers.Customer
 import com.zepben.ewb.cim.iec61968.customers.CustomerAgreement
 import com.zepben.ewb.cim.iec61968.customers.PricingStructure
 import com.zepben.ewb.cim.iec61968.customers.Tariff
-import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 
 /**
- * A function that provides an exhaustive `when` style statement for all [IdentifiedObject] leaf types supported by
- * the [CustomerService]. If the provided [identifiedObject] is not supported by the service the [isOther] handler
+ * A function that provides an exhaustive `when` style statement for all [Identifiable] leaf types supported by
+ * the [CustomerService]. If the provided [identifiable] is not supported by the service the [isOther] handler
  * is invoked which by default will throw an [IllegalArgumentException]
  *
  * By using this function, you acknowledge that if any new types are added to the customer service, and thus this
@@ -31,30 +31,28 @@ import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
  * If it is not critical that all types within the service are always handled, it is recommended to use a typical
  * `when` statement (Kotlin) or if-else branch (Java) and update new cases as required without breaking your code.
  *
- * @param identifiedObject The identified object to handle.
- * @param isCustomer Handler when the [identifiedObject] is a [Customer]
- * @param isCustomerAgreement Handler when the [identifiedObject] is a [CustomerAgreement]
- * @param isOrganisation Handler when the [identifiedObject] is a [Organisation]
- * @param isPricingStructure Handler when the [identifiedObject] is a [PricingStructure]
- * @param isTariff Handler when the [identifiedObject] is a [Tariff]
- * @param isOther Handler when the [identifiedObject] is not supported by the [CustomerService].
+ * @param identifiable The identified object to handle.
+ * @param isCustomer Handler when the [identifiable] is a [Customer]
+ * @param isCustomerAgreement Handler when the [identifiable] is a [CustomerAgreement]
+ * @param isOrganisation Handler when the [identifiable] is a [Organisation]
+ * @param isPricingStructure Handler when the [identifiable] is a [PricingStructure]
+ * @param isTariff Handler when the [identifiable] is a [Tariff]
+ * @param isOther Handler when the [identifiable] is not supported by the [CustomerService].
  */
 @JvmOverloads
 inline fun <R> whenCustomerServiceObject(
-    identifiedObject: IdentifiedObject,
+    identifiable: Identifiable,
     isCustomer: (Customer) -> R,
     isCustomerAgreement: (CustomerAgreement) -> R,
     isOrganisation: (Organisation) -> R,
     isPricingStructure: (PricingStructure) -> R,
     isTariff: (Tariff) -> R,
-    isOther: (IdentifiedObject) -> R = { idObj: IdentifiedObject ->
-        throw IllegalArgumentException("Identified object type ${idObj::class} is not supported by the customer service")
-    }
-): R = when (identifiedObject) {
-    is Customer -> isCustomer(identifiedObject)
-    is CustomerAgreement -> isCustomerAgreement(identifiedObject)
-    is Organisation -> isOrganisation(identifiedObject)
-    is PricingStructure -> isPricingStructure(identifiedObject)
-    is Tariff -> isTariff(identifiedObject)
-    else -> isOther(identifiedObject)
+    isOther: (Identifiable) -> R = { throw IllegalArgumentException("Identifiable type ${it::class} is not supported by the customer service") }
+): R = when (identifiable) {
+    is Customer -> isCustomer(identifiable)
+    is CustomerAgreement -> isCustomerAgreement(identifiable)
+    is Organisation -> isOrganisation(identifiable)
+    is PricingStructure -> isPricingStructure(identifiable)
+    is Tariff -> isTariff(identifiable)
+    else -> isOther(identifiable)
 }

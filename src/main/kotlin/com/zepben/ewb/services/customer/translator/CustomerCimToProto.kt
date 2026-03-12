@@ -14,13 +14,14 @@ import com.zepben.ewb.cim.iec61968.customers.Customer
 import com.zepben.ewb.cim.iec61968.customers.CustomerAgreement
 import com.zepben.ewb.cim.iec61968.customers.PricingStructure
 import com.zepben.ewb.cim.iec61968.customers.Tariff
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.domain.DateTimeInterval
 import com.zepben.ewb.services.common.translator.BaseCimToProto
 import com.zepben.ewb.services.common.translator.toPb
 import com.zepben.ewb.services.common.translator.toTimestamp
 import com.zepben.ewb.services.customer.whenCustomerServiceObject
-import com.zepben.protobuf.cc.CustomerIdentifiedObject
+import com.zepben.protobuf.cc.CustomerIdentifiable
 import com.zepben.protobuf.cim.iec61968.common.Agreement as PBAgreement
 import com.zepben.protobuf.cim.iec61968.customers.Customer as PBCustomer
 import com.zepben.protobuf.cim.iec61968.customers.CustomerAgreement as PBCustomerAgreement
@@ -29,12 +30,22 @@ import com.zepben.protobuf.cim.iec61968.customers.Tariff as PBTariff
 import com.zepben.protobuf.cim.iec61970.base.domain.DateTimeInterval as PBDateTimeInterval
 
 /**
- * Convert the [IdentifiedObject] to a [CustomerIdentifiedObject] representation.
+ * Convert the [IdentifiedObject] to a [CustomerIdentifiable] representation.
+ *
+ * @param identifiedObject The [IdentifiedObject] to convert.
  */
-fun customerIdentifiedObject(identifiedObject: IdentifiedObject): CustomerIdentifiedObject =
-    CustomerIdentifiedObject.newBuilder().apply {
+@Deprecated("Use customerIdentifiable() instead", ReplaceWith("customerIdentifiable(identifiedObject)"))
+fun customerIdentifiedObject(identifiedObject: IdentifiedObject): CustomerIdentifiable = customerIdentifiable(identifiedObject)
+
+/**
+ * Convert the [Identifiable] to a [CustomerIdentifiable] representation.
+ *
+ * @param identifiable The [Identifiable] to convert.
+ */
+fun customerIdentifiable(identifiable: Identifiable): CustomerIdentifiable =
+    CustomerIdentifiable.newBuilder().apply {
         whenCustomerServiceObject(
-            identifiedObject,
+            identifiable,
             isCustomer = { customer = it.toPb() },
             isCustomerAgreement = { customerAgreement = it.toPb() },
             isOrganisation = { organisation = it.toPb() },

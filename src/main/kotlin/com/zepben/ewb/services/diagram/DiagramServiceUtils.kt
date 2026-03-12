@@ -11,14 +11,14 @@
 
 package com.zepben.ewb.services.diagram
 
-import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.ewb.cim.iec61970.base.diagramlayout.DiagramObject
 import com.zepben.ewb.services.customer.CustomerService
 
 /**
- * A function that provides an exhaustive `when` style statement for all [IdentifiedObject] leaf types supported by
- * the [DiagramService]. If the provided [identifiedObject] is not supported by the service the [isOther] handler
+ * A function that provides an exhaustive `when` style statement for all [Identifiable] leaf types supported by
+ * the [DiagramService]. If the provided [identifiable] is not supported by the service the [isOther] handler
  * is invoked which by default will throw an [IllegalArgumentException]
  *
  * By using this function, you acknowledge that if any new types are added to the customer service, and thus this
@@ -29,21 +29,19 @@ import com.zepben.ewb.services.customer.CustomerService
  * If it is not critical that all types within the service are always handled, it is recommended to use a typical
  * `when` statement (Kotlin) or if-else branch (Java) and update new cases as required without breaking your code.
  *
- * @param identifiedObject The identified object to handle.
- * @param isDiagram Handler when the [identifiedObject] is a [Diagram]
- * @param isDiagramObject Handler when the [identifiedObject] is a [DiagramObject]
- * @param isOther Handler when the [identifiedObject] is not supported by the [CustomerService].
+ * @param identifiable The identified object to handle.
+ * @param isDiagram Handler when the [identifiable] is a [Diagram]
+ * @param isDiagramObject Handler when the [identifiable] is a [DiagramObject]
+ * @param isOther Handler when the [identifiable] is not supported by the [CustomerService].
  */
 @JvmOverloads
 inline fun <R> whenDiagramServiceObject(
-    identifiedObject: IdentifiedObject,
+    identifiable: Identifiable,
     isDiagram: (Diagram) -> R,
     isDiagramObject: (DiagramObject) -> R,
-    isOther: (IdentifiedObject) -> R = { idObj: IdentifiedObject ->
-        throw IllegalArgumentException("Identified object type ${idObj::class} is not supported by the diagram service")
-    }
-): R = when (identifiedObject) {
-    is Diagram -> isDiagram(identifiedObject)
-    is DiagramObject -> isDiagramObject(identifiedObject)
-    else -> isOther(identifiedObject)
+    isOther: (Identifiable) -> R = { throw IllegalArgumentException("Identifiable type ${it::class} is not supported by the diagram service") }
+): R = when (identifiable) {
+    is Diagram -> isDiagram(identifiable)
+    is DiagramObject -> isDiagramObject(identifiable)
+    else -> isOther(identifiable)
 }

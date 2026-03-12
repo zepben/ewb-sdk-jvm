@@ -78,7 +78,7 @@ class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkD
 
     override fun createComparator(): NetworkServiceComparator = NetworkServiceComparator()
 
-    override fun createIdentifiedObject(): IdentifiedObject = Junction(generateId())
+    override fun createIdentifiable(): Identifiable = Junction(generateId())
 
     @Test
     @Disabled

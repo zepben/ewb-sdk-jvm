@@ -8,4 +8,11 @@
 
 package com.zepben.ewb.services.common.exceptions
 
-class UnsupportedIdentifiedObjectException(message: String) : RuntimeException(message)
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
+
+/**
+ * An exception thrown when the [Identifiable] isn't supported by an operation.
+ *
+ * @param message The message detailing the unsupported operation.
+ */
+class UnsupportedIdentifiableException(message: String) : RuntimeException(message)

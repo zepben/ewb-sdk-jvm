@@ -23,7 +23,7 @@ private val logger = LoggerFactory.getLogger("verifyWhenServiceFunctionSupportsA
 internal fun verifyWhenServiceFunctionSupportsAllServiceTypes(
     supportedKClasses: Set<KClass<*>>,
     whenFunction: KFunction<*>,
-    subjectField: String = "identifiedObject",
+    subjectField: String = "identifiable",
     createUnknownClass: (String) -> Any = { object : Identifiable {
         override val mRID: String = it
         override fun typeNameAndMRID(): String = "test name and mrid"
@@ -31,8 +31,8 @@ internal fun verifyWhenServiceFunctionSupportsAllServiceTypes(
     } }
 ) {
     // Find all the parameters that have arguments and get their first parameter.
-    // These should all be IdentifiedObject leaf classes in the "when*ServiceObject" functions.
-    val functionParamIdentifiedObjectTypes = whenFunction
+    // These should all be Identifiable leaf classes in the "when*ServiceObject" functions.
+    val functionParamIdentifiableTypes = whenFunction
         .parameters
         .asSequence()
         .filter { it.name != subjectField && it.name != "isOther" }
@@ -42,7 +42,7 @@ internal fun verifyWhenServiceFunctionSupportsAllServiceTypes(
         .map { it.type?.classifier as KClass<*> }
         .toSet()
 
-    assertThat(functionParamIdentifiedObjectTypes, equalTo(supportedKClasses))
+    assertThat(functionParamIdentifiableTypes, equalTo(supportedKClasses))
 
     // Make sure each object calls the correct callback by building a map containing an InvokedChecker for the expected callback, and a
     // NeverInvokedChecker for each other callback.

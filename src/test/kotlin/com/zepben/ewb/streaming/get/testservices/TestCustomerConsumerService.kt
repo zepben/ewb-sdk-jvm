@@ -16,12 +16,12 @@ import io.grpc.stub.StreamObserver
 
 internal class TestCustomerConsumerService : CustomerConsumerGrpc.CustomerConsumerImplBase() {
 
-    lateinit var onGetIdentifiedObjects: (request: GetIdentifiedObjectsRequest, response: StreamObserver<GetIdentifiedObjectsResponse>) -> Unit
+    lateinit var onGetIdentifiables: (request: GetIdentifiablesRequest, response: StreamObserver<GetIdentifiablesResponse>) -> Unit
     lateinit var onGetCustomersForContainer: (request: GetCustomersForContainerRequest, response: StreamObserver<GetCustomersForContainerResponse>) -> Unit
     lateinit var onGetMetadataRequest: (request: GetMetadataRequest, response: StreamObserver<GetMetadataResponse>) -> Unit
 
-    override fun getIdentifiedObjects(response: StreamObserver<GetIdentifiedObjectsResponse>): StreamObserver<GetIdentifiedObjectsRequest> =
-        TestStreamObserver(response, onGetIdentifiedObjects)
+    override fun getIdentifiables(response: StreamObserver<GetIdentifiablesResponse>): StreamObserver<GetIdentifiablesRequest> =
+        TestStreamObserver(response, onGetIdentifiables)
 
     override fun getCustomersForContainer(responseObserver: StreamObserver<GetCustomersForContainerResponse>?): StreamObserver<GetCustomersForContainerRequest> =
         TestStreamObserver(responseObserver!!, onGetCustomersForContainer)

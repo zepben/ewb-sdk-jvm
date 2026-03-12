@@ -12,7 +12,6 @@
 package com.zepben.ewb.services.diagram
 
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
-import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.ewb.cim.iec61970.base.diagramlayout.DiagramObject
 import com.zepben.ewb.services.customer.CustomerService
@@ -40,9 +39,7 @@ inline fun <R> whenDiagramServiceObject(
     identifiable: Identifiable,
     isDiagram: (Diagram) -> R,
     isDiagramObject: (DiagramObject) -> R,
-    isOther: (Identifiable) -> R = { idObj: Identifiable ->
-        throw IllegalArgumentException("Identified object type ${idObj::class} is not supported by the diagram service")
-    }
+    isOther: (Identifiable) -> R = { throw IllegalArgumentException("Identifiable type ${it::class} is not supported by the diagram service") }
 ): R = when (identifiable) {
     is Diagram -> isDiagram(identifiable)
     is DiagramObject -> isDiagramObject(identifiable)

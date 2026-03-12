@@ -29,6 +29,8 @@ internal class NameTest {
         assertThat(name.name, equalTo("name"))
         assertThat(name.type, equalTo(type))
         assertThat(name.identifiedObject, equalTo(idObj))
+
+        assertThat(name.mRID, equalTo("name-type-${idObj.mRID}"))
     }
 
 }

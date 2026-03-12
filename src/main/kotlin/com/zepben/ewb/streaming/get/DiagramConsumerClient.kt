@@ -87,16 +87,16 @@ class DiagramConsumerClient(
         processDiagramObjects(mRIDs.asSequence())
     }
 
-    override fun processIdentifiedObjects(mRIDs: Sequence<String>): Sequence<ExtractResult> {
+    override fun processIdentifiables(mRIDs: Sequence<String>): Sequence<ExtractResult> {
         val extractResults = mutableListOf<ExtractResult>()
-        val streamObserver = AwaitableStreamObserver<GetIdentifiedObjectsResponse> { response ->
-            response.identifiedObjectsList.forEach {
-                extractResults.add(extractIdentifiedObject(it))
+        val streamObserver = AwaitableStreamObserver<GetIdentifiablesResponse> { response ->
+            response.identifiablesList.forEach {
+                extractResults.add(extractIdentifiable(it))
             }
         }
 
-        val request = stub.getIdentifiedObjects(streamObserver)
-        val builder = GetIdentifiedObjectsRequest.newBuilder()
+        val request = stub.getIdentifiables(streamObserver)
+        val builder = GetIdentifiablesRequest.newBuilder()
 
         batchSend(mRIDs, builder::addMrids) {
             if (builder.mridsList.isNotEmpty())
@@ -110,7 +110,7 @@ class DiagramConsumerClient(
         return extractResults.asSequence()
     }
 
-    private fun extractIdentifiedObject(io: DiagramIdentifiedObject): ExtractResult =
+    private fun extractIdentifiable(io: DiagramIdentifiable): ExtractResult =
         protoToCim.diagramService.addFromPb(io).let {
             ExtractResult(it.identifiable, it.mRID)
         }
@@ -120,8 +120,8 @@ class DiagramConsumerClient(
     ): Sequence<ExtractResult> {
         val extractResults = mutableListOf<ExtractResult>()
         val streamObserver = AwaitableStreamObserver<GetDiagramObjectsResponse> { response ->
-            response.identifiedObjectsList.forEach {
-                extractResults.add(extractIdentifiedObject(it))
+            response.identifiablesList.forEach {
+                extractResults.add(extractIdentifiable(it))
             }
         }
 

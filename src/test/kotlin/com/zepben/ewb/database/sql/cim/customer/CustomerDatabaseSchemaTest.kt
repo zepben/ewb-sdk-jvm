@@ -13,7 +13,7 @@ import com.zepben.ewb.cim.iec61968.customers.Customer
 import com.zepben.ewb.cim.iec61968.customers.CustomerAgreement
 import com.zepben.ewb.cim.iec61968.customers.PricingStructure
 import com.zepben.ewb.cim.iec61968.customers.Tariff
-import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.database.sql.cim.CimDatabaseSchemaTest
 import com.zepben.ewb.services.common.Resolvers
 import com.zepben.ewb.services.common.testdata.SchemaServices
@@ -43,7 +43,7 @@ class CustomerDatabaseSchemaTest : CimDatabaseSchemaTest<CustomerService, Custom
 
     override fun createComparator(): CustomerServiceComparator = CustomerServiceComparator()
 
-    override fun createIdentifiedObject(): IdentifiedObject = Customer(generateId())
+    override fun createIdentifiable(): Identifiable = Customer(generateId())
 
     @Test
     @Disabled

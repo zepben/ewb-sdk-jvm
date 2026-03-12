@@ -17,7 +17,6 @@ import com.zepben.ewb.cim.iec61968.customers.CustomerAgreement
 import com.zepben.ewb.cim.iec61968.customers.PricingStructure
 import com.zepben.ewb.cim.iec61968.customers.Tariff
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
-import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 
 /**
  * A function that provides an exhaustive `when` style statement for all [Identifiable] leaf types supported by
@@ -48,9 +47,7 @@ inline fun <R> whenCustomerServiceObject(
     isOrganisation: (Organisation) -> R,
     isPricingStructure: (PricingStructure) -> R,
     isTariff: (Tariff) -> R,
-    isOther: (Identifiable) -> R = { idObj: Identifiable ->
-        throw IllegalArgumentException("Identified object type ${idObj::class} is not supported by the customer service")
-    }
+    isOther: (Identifiable) -> R = { throw IllegalArgumentException("Identifiable type ${it::class} is not supported by the customer service") }
 ): R = when (identifiable) {
     is Customer -> isCustomer(identifiable)
     is CustomerAgreement -> isCustomerAgreement(identifiable)

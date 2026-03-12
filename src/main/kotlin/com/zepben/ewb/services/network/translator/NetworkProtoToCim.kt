@@ -8,7 +8,6 @@
 
 package com.zepben.ewb.services.network.translator
 
-import com.google.protobuf.NullValue
 import com.zepben.ewb.cim.extensions.iec61968.assetinfo.RelayInfo
 import com.zepben.ewb.cim.extensions.iec61968.common.ContactDetails
 import com.zepben.ewb.cim.extensions.iec61968.metering.PanDemandResponseFunction
@@ -19,11 +18,13 @@ import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvSubstation
 import com.zepben.ewb.cim.extensions.iec61970.base.generation.production.EvChargingUnit
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.*
-import com.zepben.ewb.cim.extensions.iec61970.base.wires.*
+import com.zepben.ewb.cim.extensions.iec61970.base.wires.BatteryControl
+import com.zepben.ewb.cim.extensions.iec61970.base.wires.TransformerEndRatedS
 import com.zepben.ewb.cim.iec61968.assetinfo.*
 import com.zepben.ewb.cim.iec61968.assets.*
 import com.zepben.ewb.cim.iec61968.common.*
-import com.zepben.ewb.cim.iec61968.infiec61968.infassetinfo.*
+import com.zepben.ewb.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
+import com.zepben.ewb.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.ewb.cim.iec61968.infiec61968.infassets.Pole
 import com.zepben.ewb.cim.iec61968.infiec61968.infcommon.Ratio
 import com.zepben.ewb.cim.iec61968.metering.*
@@ -32,9 +33,12 @@ import com.zepben.ewb.cim.iec61970.base.auxiliaryequipment.*
 import com.zepben.ewb.cim.iec61970.base.core.*
 import com.zepben.ewb.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.ewb.cim.iec61970.base.equivalents.EquivalentEquipment
-import com.zepben.ewb.cim.iec61970.base.generation.production.*
+import com.zepben.ewb.cim.iec61970.base.generation.production.BatteryUnit
+import com.zepben.ewb.cim.iec61970.base.generation.production.PhotoVoltaicUnit
+import com.zepben.ewb.cim.iec61970.base.generation.production.PowerElectronicsUnit
+import com.zepben.ewb.cim.iec61970.base.generation.production.PowerElectronicsWindUnit
 import com.zepben.ewb.cim.iec61970.base.meas.*
-import com.zepben.ewb.cim.iec61970.base.protection.*
+import com.zepben.ewb.cim.iec61970.base.protection.CurrentRelay
 import com.zepben.ewb.cim.iec61970.base.scada.RemoteControl
 import com.zepben.ewb.cim.iec61970.base.scada.RemotePoint
 import com.zepben.ewb.cim.iec61970.base.scada.RemoteSource
@@ -43,8 +47,8 @@ import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.ewb.services.common.Resolvers
 import com.zepben.ewb.services.common.translator.*
 import com.zepben.ewb.services.network.NetworkService
-import com.zepben.protobuf.nc.NetworkIdentifiedObject
-import com.zepben.protobuf.nc.NetworkIdentifiedObject.IdentifiedObjectCase.*
+import com.zepben.protobuf.nc.NetworkIdentifiable
+import com.zepben.protobuf.nc.NetworkIdentifiable.IdentifiableCase.*
 import com.zepben.protobuf.cim.extensions.iec61968.assetinfo.RelayInfo as PBRelayInfo
 import com.zepben.protobuf.cim.extensions.iec61968.common.ContactDetails as PBContactDetails
 import com.zepben.protobuf.cim.extensions.iec61968.metering.PanDemandResponseFunction as PBPanDemandResponseFunction
@@ -190,14 +194,14 @@ import com.zepben.protobuf.cim.iec61970.base.wires.TransformerStarImpedance as P
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Circuit as PBCircuit
 
 /**
- * An extension to add a converted copy of the protobuf [NetworkIdentifiedObject] to the [NetworkService].
+ * An extension to add a converted copy of the protobuf [NetworkIdentifiable] to the [NetworkService].
  *
  * @receiver The [NetworkService] to add the converted [pb] into.
- * @param pb The [NetworkIdentifiedObject] to add to the [NetworkService].
+ * @param pb The [NetworkIdentifiable] to add to the [NetworkService].
  * @return The result of trying to add the item to the service.
  */
-fun NetworkService.addFromPb(pb: NetworkIdentifiedObject): AddFromPbResult =
-    when (pb.identifiedObjectCase) {
+fun NetworkService.addFromPb(pb: NetworkIdentifiable): AddFromPbResult =
+    when (pb.identifiableCase) {
         BATTERYUNIT -> getOrAddFromPb(pb.batteryUnit.mRID()) { addFromPb(pb.batteryUnit) }
         PHOTOVOLTAICUNIT -> getOrAddFromPb(pb.photoVoltaicUnit.mRID()) { addFromPb(pb.photoVoltaicUnit) }
         POWERELECTRONICSWINDUNIT -> getOrAddFromPb(pb.powerElectronicsWindUnit.mRID()) { addFromPb(pb.powerElectronicsWindUnit) }
@@ -288,8 +292,8 @@ fun NetworkService.addFromPb(pb: NetworkIdentifiedObject): AddFromPbResult =
         HVCUSTOMER -> getOrAddFromPb(pb.hvCustomer.mRID()) { addFromPb(pb.hvCustomer) }
         LVSUBSTATION -> getOrAddFromPb(pb.lvSubstation.mRID()) { addFromPb(pb.lvSubstation) }
         ACLINESEGMENTPHASE -> getOrAddFromPb(pb.acLineSegmentPhase.mRID()) { addFromPb(pb.acLineSegmentPhase) }
-        OTHER, IDENTIFIEDOBJECT_NOT_SET, null -> throw UnsupportedOperationException(
-            "Identified object type ${pb.identifiedObjectCase} is not supported by the network service"
+        OTHER, IDENTIFIABLE_NOT_SET, null -> throw UnsupportedOperationException(
+            "Identified object type ${pb.identifiableCase} is not supported by the network service"
         )
 
     }
@@ -3191,12 +3195,12 @@ fun NetworkService.addFromPb(pb: PBCircuit): Circuit? = tryAddOrNull(toCim(pb, t
 class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
 
     /**
-     * Add a converted copy of the protobuf [NetworkIdentifiedObject] to the [NetworkService].
+     * Add a converted copy of the protobuf [NetworkIdentifiable] to the [NetworkService].
      *
-     * @param pb The [NetworkIdentifiedObject] to convert.
+     * @param pb The [NetworkIdentifiable] to convert.
      * @return The converted [AddFromPbResult] containing information on how the add was handled.
      */
-    fun addFromPb(pb: NetworkIdentifiedObject): AddFromPbResult =
+    fun addFromPb(pb: NetworkIdentifiable): AddFromPbResult =
         networkService.addFromPb(pb)
 
     // ##################################

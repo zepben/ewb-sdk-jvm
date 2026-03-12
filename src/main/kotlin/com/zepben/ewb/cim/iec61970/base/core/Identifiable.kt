@@ -8,13 +8,18 @@
 
 package com.zepben.ewb.cim.iec61970.base.core
 
-
+/**
+ * An interface that marks an object as identifiable.
+ */
 interface Identifiable {
 
+    /**
+     * The identifier for this object.
+     */
     val mRID: String
 
     /**
-     * Printable version of the object including the type, name and mRID.
+     * Printable version of the object including its type, name and mRID.
      */
     fun typeNameAndMRID(): String
 

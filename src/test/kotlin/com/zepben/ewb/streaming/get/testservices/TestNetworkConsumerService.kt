@@ -16,15 +16,15 @@ import io.grpc.stub.StreamObserver
 
 internal class TestNetworkConsumerService : NetworkConsumerGrpc.NetworkConsumerImplBase() {
 
-    lateinit var onGetIdentifiedObjects: (request: GetIdentifiedObjectsRequest, response: StreamObserver<GetIdentifiedObjectsResponse>) -> Unit
+    lateinit var onGetIdentifiables: (request: GetIdentifiablesRequest, response: StreamObserver<GetIdentifiablesResponse>) -> Unit
     lateinit var onGetNetworkHierarchy: (request: GetNetworkHierarchyRequest, response: StreamObserver<GetNetworkHierarchyResponse>) -> Unit
     lateinit var onGetEquipmentForContainers: (request: GetEquipmentForContainersRequest, response: StreamObserver<GetEquipmentForContainersResponse>) -> Unit
     lateinit var onGetEquipmentForRestriction: (request: GetEquipmentForRestrictionRequest, response: StreamObserver<GetEquipmentForRestrictionResponse>) -> Unit
     lateinit var onGetTerminalsForNode: (request: GetTerminalsForNodeRequest, response: StreamObserver<GetTerminalsForNodeResponse>) -> Unit
     lateinit var onGetMetadataRequest: (request: GetMetadataRequest, response: StreamObserver<GetMetadataResponse>) -> Unit
 
-    override fun getIdentifiedObjects(response: StreamObserver<GetIdentifiedObjectsResponse>): StreamObserver<GetIdentifiedObjectsRequest> =
-        TestStreamObserver(response, onGetIdentifiedObjects)
+    override fun getIdentifiables(response: StreamObserver<GetIdentifiablesResponse>): StreamObserver<GetIdentifiablesRequest> =
+        TestStreamObserver(response, onGetIdentifiables)
 
     override fun getNetworkHierarchy(request: GetNetworkHierarchyRequest, response: StreamObserver<GetNetworkHierarchyResponse>) {
         runGrpc(request, response, onGetNetworkHierarchy)

@@ -53,7 +53,7 @@ import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.ewb.services.customer.CustomerService
 
 /**
- * A function that provides an exhaustive `when` style statement for all [IdentifiedObject] leaf types supported by
+ * A function that provides an exhaustive `when` style statement for all [Identifiable] leaf types supported by
  * the [NetworkService]. If the provided [identifiable] is not supported by the service the [isOther] handler
  * is invoked which by default will throw an [IllegalArgumentException]
  *
@@ -153,6 +153,9 @@ import com.zepben.ewb.services.customer.CustomerService
  * @param isCut Handler when the [identifiable] is a [Cut]
  * @param isClamp Handler when the [identifiable] is a [Clamp]
  * @param isDirectionalCurrentRelay Handler when the [identifiable] is a [DirectionalCurrentRelay]
+ * @param isLvSubstation Handler when the [identifiable] is a [LvSubstation]
+ * @param isHvCustomer Handler when the [identifiable] is a [HvCustomer]
+ * @param isAcLineSegmentPhase Handler when the [identifiable] is a [AcLineSegmentPhase]
  * @param isOther Handler when the [identifiable] is not supported by the [CustomerService].
  */
 @JvmOverloads
@@ -248,9 +251,7 @@ inline fun <R> whenNetworkServiceObject(
     isLvSubstation: (LvSubstation) -> R,
     isHvCustomer: (HvCustomer) -> R,
     isAcLineSegmentPhase: (AcLineSegmentPhase) -> R,
-    isOther: (Identifiable) -> R = { idObj: Identifiable ->
-        throw IllegalArgumentException("Identified object type ${idObj::class} is not supported by the network service")
-    }
+    isOther: (Identifiable) -> R = { throw IllegalArgumentException("Identifiable type ${it::class} is not supported by the network service") }
 ): R = when (identifiable) {
     is BatteryUnit -> isBatteryUnit(identifiable)
     is PhotoVoltaicUnit -> isPhotoVoltaicUnit(identifiable)

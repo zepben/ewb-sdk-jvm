@@ -8,7 +8,7 @@
 
 package com.zepben.ewb.database.sql.cim.diagram
 
-import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.ewb.cim.iec61970.base.diagramlayout.DiagramObject
 import com.zepben.ewb.database.sql.cim.CimDatabaseSchemaTest
@@ -39,7 +39,7 @@ class DiagramDatabaseSchemaTest : CimDatabaseSchemaTest<DiagramService, DiagramD
 
     override fun createComparator(): DiagramServiceComparator = DiagramServiceComparator()
 
-    override fun createIdentifiedObject(): IdentifiedObject = Diagram(generateId())
+    override fun createIdentifiable(): Identifiable = Diagram(generateId())
 
     @Test
     @Disabled

@@ -11,14 +11,11 @@ package com.zepben.ewb.services.common
 import com.zepben.ewb.cim.iec61968.assetinfo.CableInfo
 import com.zepben.ewb.cim.iec61968.common.Location
 import com.zepben.ewb.cim.iec61968.operations.OperationalRestriction
-import com.zepben.ewb.cim.iec61970.base.core.BaseVoltage
-import com.zepben.ewb.cim.iec61970.base.core.ConductingEquipment
-import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
-import com.zepben.ewb.cim.iec61970.base.core.Terminal
+import com.zepben.ewb.cim.iec61970.base.core.*
 import com.zepben.ewb.cim.iec61970.base.wires.AcLineSegment
 import com.zepben.ewb.cim.iec61970.base.wires.Breaker
 import com.zepben.ewb.cim.iec61970.base.wires.Junction
-import com.zepben.ewb.services.common.exceptions.UnsupportedIdentifiedObjectException
+import com.zepben.ewb.services.common.exceptions.UnsupportedIdentifiableException
 import com.zepben.ewb.services.common.meta.MetadataCollection
 import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
@@ -76,16 +73,16 @@ internal class BaseServiceTest {
         val junction = Junction(generateId())
         assertThat("Initial tryAdd should return true", service.tryAdd(junction))
         assertThat("tryRemove should return true for previously-added object", service.tryRemove(junction))
-        expect { service.tryAdd(CableInfo(generateId())) }.toThrow<UnsupportedIdentifiedObjectException>()
-        expect { service.tryRemove(CableInfo(generateId())) }.toThrow<UnsupportedIdentifiedObjectException>()
+        expect { service.tryAdd(CableInfo(generateId())) }.toThrow<UnsupportedIdentifiableException>()
+        expect { service.tryRemove(CableInfo(generateId())) }.toThrow<UnsupportedIdentifiableException>()
     }
 
     @Test
     internal fun getJavaInterop() {
-        assertThat(service.get<IdentifiedObject>(breaker1.mRID), equalTo(breaker1))
-        assertThat(service.get<IdentifiedObject>(breaker2.mRID), equalTo(breaker2))
-        assertThat(service.get<IdentifiedObject>(acLineSegment1.mRID), equalTo(acLineSegment1))
-        assertThat(service.get<IdentifiedObject>(acLineSegment2.mRID), equalTo(acLineSegment2))
+        assertThat(service.get<Identifiable>(breaker1.mRID), equalTo(breaker1))
+        assertThat(service.get<Identifiable>(breaker2.mRID), equalTo(breaker2))
+        assertThat(service.get<Identifiable>(acLineSegment1.mRID), equalTo(acLineSegment1))
+        assertThat(service.get<Identifiable>(acLineSegment2.mRID), equalTo(acLineSegment2))
 
         assertThat(service[breaker2.mRID], equalTo(breaker2))
         assertThat(service[breaker1.mRID], equalTo(breaker1))
@@ -100,14 +97,14 @@ internal class BaseServiceTest {
 
     @Test
     internal fun countJavaInterop() {
-        assertThat(service.num<IdentifiedObject>(), equalTo(4))
+        assertThat(service.num<Identifiable>(), equalTo(4))
         assertThat(service.num<Breaker>(), equalTo(2))
         assertThat(service.num<AcLineSegment>(), equalTo(2))
     }
 
     @Test
     internal fun forEachJavaInterop() {
-        validateForEach<IdentifiedObject>(listOf(breaker1, breaker2, acLineSegment1, acLineSegment2))
+        validateForEach<Identifiable>(listOf(breaker1, breaker2, acLineSegment1, acLineSegment2))
         validateForEach<Breaker>(listOf(breaker1, breaker2))
         validateForEach<AcLineSegment>(listOf(acLineSegment1, acLineSegment2))
 
@@ -121,14 +118,14 @@ internal class BaseServiceTest {
 
     @Test
     internal fun asStreamJavaInterop() {
-        assertThat(service.sequenceOf<IdentifiedObject>().toList(), containsInAnyOrder(breaker1, breaker2, acLineSegment1, acLineSegment2))
+        assertThat(service.sequenceOf<Identifiable>().toList(), containsInAnyOrder(breaker1, breaker2, acLineSegment1, acLineSegment2))
         assertThat(service.sequenceOf<Breaker>().toList(), containsInAnyOrder(breaker1, breaker2))
         assertThat(service.sequenceOf<AcLineSegment>().toList(), containsInAnyOrder(acLineSegment1, acLineSegment2))
     }
 
     @Test
     internal fun toListJavaInterop() {
-        assertThat(service.listOf(), containsInAnyOrder<IdentifiedObject>(breaker1, breaker2, acLineSegment1, acLineSegment2))
+        assertThat(service.listOf(), containsInAnyOrder<Identifiable>(breaker1, breaker2, acLineSegment1, acLineSegment2))
         assertThat(service.listOf(), containsInAnyOrder(breaker1, breaker2))
         assertThat(service.listOf(), containsInAnyOrder(acLineSegment1, acLineSegment2))
         assertThat(service.listOf { it.name.isNullOrEmpty() }, containsInAnyOrder<IdentifiedObject>(breaker1, acLineSegment2))
@@ -138,7 +135,7 @@ internal class BaseServiceTest {
 
     @Test
     internal fun toSetJavaInterop() {
-        assertThat(service.setOf(), containsInAnyOrder<IdentifiedObject>(breaker1, breaker2, acLineSegment1, acLineSegment2))
+        assertThat(service.setOf(), containsInAnyOrder<Identifiable>(breaker1, breaker2, acLineSegment1, acLineSegment2))
         assertThat(service.setOf(), containsInAnyOrder(breaker1, breaker2))
         assertThat(service.setOf(), containsInAnyOrder(acLineSegment1, acLineSegment2))
         assertThat(service.setOf { it.name.isNullOrEmpty() }, containsInAnyOrder<IdentifiedObject>(breaker1, acLineSegment2))
@@ -148,9 +145,9 @@ internal class BaseServiceTest {
 
     @Test
     internal fun toMapJavaInterop() {
-        assertThat(service.mapOf<IdentifiedObject>().keys, containsInAnyOrder(breaker1.mRID, breaker2.mRID, acLineSegment1.mRID, acLineSegment2.mRID))
+        assertThat(service.mapOf<Identifiable>().keys, containsInAnyOrder(breaker1.mRID, breaker2.mRID, acLineSegment1.mRID, acLineSegment2.mRID))
         assertThat(
-            service.mapOf<IdentifiedObject>().values,
+            service.mapOf<Identifiable>().values,
             containsInAnyOrder(breaker1, breaker2, acLineSegment1, acLineSegment2)
         )
 
@@ -304,14 +301,14 @@ internal class BaseServiceTest {
         assertThat("shouldn't contain unknown", Breaker(generateId()) !in service)
     }
 
-    private inline fun <reified T : IdentifiedObject> validateForEach(expected: List<ConductingEquipment>) {
-        val visited = mutableListOf<IdentifiedObject>()
+    private inline fun <reified T : Identifiable> validateForEach(expected: List<ConductingEquipment>) {
+        val visited = mutableListOf<Identifiable>()
         service.sequenceOf<T>().forEach { visited.add(it) }
         assertThat(visited, containsInAnyOrder<Any>(*expected.toTypedArray()))
     }
 
-    private inline fun <reified T : IdentifiedObject> validateForEachFiltered(noinline filter: (T) -> Boolean, expected: List<ConductingEquipment>) {
-        val visited = mutableListOf<IdentifiedObject>()
+    private inline fun <reified T : Identifiable> validateForEachFiltered(noinline filter: (T) -> Boolean, expected: List<ConductingEquipment>) {
+        val visited = mutableListOf<Identifiable>()
         service.sequenceOf<T>().filter(filter).forEach { visited.add(it) }
         assertThat(visited, containsInAnyOrder<Any>(*expected.toTypedArray()))
     }

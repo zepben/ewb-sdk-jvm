@@ -10,7 +10,7 @@ package com.zepben.ewb.services.common
 
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.base.core.NameType
-import com.zepben.ewb.services.common.exceptions.UnsupportedIdentifiedObjectException
+import com.zepben.ewb.services.common.exceptions.UnsupportedIdentifiableException
 import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import com.zepben.ewb.services.common.meta.MetadataCollection
 import java.util.*
@@ -193,13 +193,13 @@ abstract class BaseService(
     operator fun contains(mRID: String): Boolean = objectsByType.values.any { it.containsKey(mRID) }
 
     /**
-     * Check if [obj] is in the service.
+     * Check if [identifiable] is in the service.
      *
-     * @param obj The [Identifiable] to search for.
+     * @param identifiable The [Identifiable] to search for.
      *
-     * @return true if [obj] was found in the service, otherwise false.
+     * @return true if [identifiable] was found in the service, otherwise false.
      */
-    operator fun contains(obj: Identifiable): Boolean = objectsByType.values.any { it[obj.mRID] == obj }
+    operator fun contains(identifiable: Identifiable): Boolean = objectsByType.values.any { it[identifiable.mRID] == identifiable }
 
     /**
      * Get the number of objects associated with this service.
@@ -231,20 +231,21 @@ abstract class BaseService(
     fun <T : Identifiable> num(clazz: KClass<T>): Int = sequenceOf(clazz).count()
 
     /**
-     * Attempts to add the [identified] to the service, if this service instance supports the type of [Identifiable]
+     * Attempts to add the [identifiable] to the service, if this service instance supports the type of [Identifiable]
      * that is provided.
      *
-     * If the service does support the [identified], it will be added as if you are calling the add function
+     * If the service does support the [identifiable], it will be added as if you are calling the add function
      * directly on the instance where the corresponding "add" function is defined for this type of identified object.
      *
-     * @throws [UnsupportedIdentifiedObjectException] if the service does not support the [identified].
+     * @param identifiable
+     * @throws [UnsupportedIdentifiableException] if the service does not support the [identifiable].
      * @return the return value of the underlying add function.
      */
-    fun tryAdd(identified: Identifiable): Boolean {
-        val func = addFunctions[identified::class]
-            ?: throw UnsupportedIdentifiedObjectException("$name service does not support adding ${identified::class}")
+    fun tryAdd(identifiable: Identifiable): Boolean {
+        val func = addFunctions[identifiable::class]
+            ?: throw UnsupportedIdentifiableException("$name service does not support adding ${identifiable::class}")
 
-        return func.call(this, identified) as Boolean
+        return func.call(this, identifiable) as Boolean
     }
 
     /**
@@ -259,63 +260,64 @@ abstract class BaseService(
                 cim
             else
                 null
-        } catch (ex: UnsupportedIdentifiedObjectException) {
+        } catch (_: UnsupportedIdentifiableException) {
             null
         }
 
 
     /**
-     * Attempts to remove the [identified] to the service, if this service instance supports the type of [Identifiable]
+     * Attempts to remove the [identifiable] to the service, if this service instance supports the type of [Identifiable]
      * that is provided.
      *
-     * If the service does support the [identified], it will be removed as if you are calling the remove function
+     * If the service does support the [identifiable], it will be removed as if you are calling the remove function
      * directly on the instance where the corresponding remove function is defined for this type of identified object.
      *
-     * @throws [UnsupportedIdentifiedObjectException] if the service does not support the [identified].
+     * @param identifiable The [Identifiable] to remove.
+     * @throws [UnsupportedIdentifiableException] if the service does not support the [identifiable].
      * @return the return value of the underlying remove function.
      */
-    fun tryRemove(identified: Identifiable): Boolean {
-        val func = removeFunctions[identified::class]
-            ?: throw UnsupportedIdentifiedObjectException("$name service does not support removing ${identified::class}")
+    fun tryRemove(identifiable: Identifiable): Boolean {
+        val func = removeFunctions[identifiable::class]
+            ?: throw UnsupportedIdentifiableException("$name service does not support removing ${identifiable::class}")
 
-        return func.call(this, identified) as Boolean
+        return func.call(this, identifiable) as Boolean
     }
 
     /**
-     * Associates the provided [identified] with this service. This should be called by derived classes within their
+     * Associates the provided [identifiable] with this service. This should be called by derived classes within their
      * add functions for specific supported identified object types.
      *
-     * The [identified] must have a unique MRID, otherwise false will be returned and the object will not be added.
+     * The [identifiable] must have a unique MRID, otherwise false will be returned and the object will not be added.
      *
-     * If there are any unresolved references to the [identified] at this point they will be resolved
-     * as part of the addition. If the [identified] class type does not match the [ReferenceResolver.toClass] of
+     * If there are any unresolved references to the [identifiable] at this point they will be resolved
+     * as part of the addition. If the [identifiable] class type does not match the [ReferenceResolver.toClass] of
      * any unresolved references an [IllegalStateException] will be thrown.
      *
-     * @param [identified] the object to add to this service
-     * @throws [UnsupportedIdentifiedObjectException] if the [Identifiable] is not supported by this service.
+     * @param [identifiable] the object to add to this service
+     * @throws [UnsupportedIdentifiableException] if the [Identifiable] is not supported by this service.
      * @throws [IllegalStateException] if any unresolved references have an incorrect class type.
-     * @throws [IllegalArgumentException] if [identified] did not have a valid mRID.
+     * @throws [IllegalArgumentException] if [identifiable] did not have a valid mRID.
      * @return true if the object is associated with this service, false if an object already exists in the service with
      * the same mRID.
      */
-    protected fun add(identified: Identifiable): Boolean {
-        if (identified.mRID.isEmpty())
-            throw IllegalArgumentException("Object [${identified.typeNameAndMRID()}] must have an mRID set to be added to the service.")
+    protected fun add(identifiable: Identifiable): Boolean {
+        if (identifiable.mRID.isEmpty())
+            throw IllegalArgumentException("Object [${identifiable.typeNameAndMRID()}] must have an mRID set to be added to the service.")
 
-        if (!supportedKClasses.contains(identified::class)) {
-            throw UnsupportedIdentifiedObjectException("Unsupported Identifiable type: ${identified::class}")
+        if (!supportedKClasses.contains(identifiable::class)) {
+            throw UnsupportedIdentifiableException("Unsupported Identifiable type: ${identifiable::class}")
         }
 
-        val map = objectsByType.computeIfAbsent(identified::class) { mutableMapOf() }
-        if (map.containsKey(identified.mRID)) return map[identified.mRID] === identified
+        val map = objectsByType.computeIfAbsent(identifiable::class) { mutableMapOf() }
+        if (map.containsKey(identifiable.mRID)) return map[identifiable.mRID] === identifiable
 
         // Check all the other types to make sure this MRID is actually unique
-        if (objectsByType.any { (_, v) -> v.containsKey(identified.mRID) })
+        if (objectsByType.any { (_, v) -> v.containsKey(identifiable.mRID) })
             return false
 
-        unresolvedReferencesTo.remove(identified.mRID)?.forEach {
+        unresolvedReferencesTo.remove(identifiable.mRID)?.forEach {
             try {
-                val castedIdentifiable = it.resolver.toClass.cast(identified)
+                val castedIdentifiable = it.resolver.toClass.cast(identifiable)
 
                 it.resolver.resolve(it.from, castedIdentifiable)
                 it.reverseResolver?.resolve(castedIdentifiable, it.from)
@@ -327,13 +329,13 @@ abstract class BaseService(
                 }
             } catch (ex: ClassCastException) {
                 throw IllegalStateException(
-                    "Expected a ${it.resolver.toClass.simpleName} when resolving ${identified.nameAndMRID()} references but got a ${identified::class.simpleName}. Make sure you sent the correct types in every reference.",
+                    "Expected a ${it.resolver.toClass.simpleName} when resolving ${identifiable.nameAndMRID()} references but got a ${identifiable::class.simpleName}. Make sure you sent the correct types in every reference.",
                     ex
                 )
             }
         }
 
-        map[identified.mRID] = identified
+        map[identifiable.mRID] = identifiable
         return true
     }
 
@@ -349,16 +351,13 @@ abstract class BaseService(
      * is thrown either immediately if the reference can be resolved now, or it will be thrown when the deferred resolution
      * is applied when the object is added to the service.
      *
-     * @param fromMridOverride The desired mRID to use for the object adding the unresolved reference. This is only required for objects that compute their mRID
-     * from their properties and from.mRID may not be accessible until after resolution (see [ChangeSetMember]). If null, [BoundReferenceResolver.from] will be used.
-     * TODO: Test that providing an incorrect fromMridOverride fails? This happens in [VariantConsumerTest.can get change test] as a side effect... maybe it needs an explicit test?
+     * @param boundResolver The [BoundReferenceResolver] to use to resolve the reference.
+     * @param toMrid The mRID of the object being referenced.
      * @return true if the reference was resolved, otherwise false if it has been deferred.
      */
-    @Suppress("UNCHECKED_CAST")
     fun <T : Identifiable, R : Identifiable> resolveOrDeferReference(
         boundResolver: BoundReferenceResolver<T, R>,
-        toMrid: String?,
-        fromMridOverride: String? = null,
+        toMrid: String?
     ): Boolean {
         if (toMrid.isNullOrEmpty()) {
             return true
@@ -373,24 +372,23 @@ abstract class BaseService(
                     reverseResolver.resolve(to, from)
 
                     // Clean up any reverse unresolved references now that the reference has been resolved
-                    (fromMridOverride?: from.mRID).let { fromMrid ->
-                        unresolvedReferencesTo[fromMrid]?.apply {
-                            removeIf { it.toMrid == fromMrid && it.resolver == reverseResolver }
-                            if (isEmpty())
-                                unresolvedReferencesTo.remove(fromMrid )
-                        }
+                    unresolvedReferencesTo[from.mRID]?.apply {
+                        removeIf { it.toMrid == from.mRID && it.resolver == reverseResolver }
+                        if (isEmpty())
+                            unresolvedReferencesTo.remove(from.mRID)
+                    }
                     unresolvedReferencesFrom[to.mRID]?.apply {
-                        removeIf { it.toMrid == fromMrid && it.resolver == reverseResolver }
+                        removeIf { it.toMrid == from.mRID && it.resolver == reverseResolver }
                         if (isEmpty())
                             unresolvedReferencesFrom.remove(to.mRID)
-                    }
                     }
                 }
                 true
             } else {
+                @Suppress("UNCHECKED_CAST")
                 val ur = UnresolvedReference(from, toMrid, resolver, reverseResolver) as UnresolvedReference<Identifiable, Identifiable>
                 unresolvedReferencesTo.getOrPut(toMrid) { mutableSetOf() }.add(ur)
-                unresolvedReferencesFrom.getOrPut(fromMridOverride ?: from.mRID) { mutableSetOf() }.add(ur)
+                unresolvedReferencesFrom.getOrPut(from.mRID) { mutableSetOf() }.add(ur)
                 false
             }
         } catch (ex: ClassCastException) {
@@ -465,12 +463,12 @@ abstract class BaseService(
     /**
      * Disassociate an object from this service.
      *
-     * @param identifiedThe object to disassociate from this service.
+     * @param identifiable The object to disassociate from this service.
      *
      * @return true if the object is disassociated from this service.
      */
-    protected fun remove(identified: Identifiable): Boolean =
-        objectsByType[identified::class]?.removeIf(identified.mRID, identified) ?: false
+    protected fun remove(identifiable: Identifiable): Boolean =
+        objectsByType[identifiable::class]?.removeIf(identifiable.mRID, identifiable) ?: false
 
     /**
      * Create a sequence of all instances of the specified type.

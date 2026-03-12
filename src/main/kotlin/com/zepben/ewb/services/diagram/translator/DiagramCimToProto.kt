@@ -10,21 +10,35 @@ package com.zepben.ewb.services.diagram.translator
 
 import com.google.protobuf.NullValue
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
+import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.ewb.cim.iec61970.base.diagramlayout.DiagramObject
 import com.zepben.ewb.cim.iec61970.base.diagramlayout.DiagramObjectPoint
 import com.zepben.ewb.services.common.translator.BaseCimToProto
 import com.zepben.ewb.services.common.translator.toPb
 import com.zepben.ewb.services.diagram.whenDiagramServiceObject
-import com.zepben.protobuf.dc.DiagramIdentifiedObject
+import com.zepben.protobuf.dc.DiagramIdentifiable
 import com.zepben.protobuf.cim.iec61970.base.diagramlayout.Diagram as PBDiagram
 import com.zepben.protobuf.cim.iec61970.base.diagramlayout.DiagramObject as PBDiagramObject
 import com.zepben.protobuf.cim.iec61970.base.diagramlayout.DiagramObjectPoint as PBDiagramObjectPoint
 
-fun diagramIdentifiedObject(identifiedObject: Identifiable): DiagramIdentifiedObject =
-    DiagramIdentifiedObject.newBuilder().apply {
+/**
+ * Convert the [IdentifiedObject] to a [DiagramIdentifiable] representation.
+ *
+ * @param identifiedObject The [IdentifiedObject] to convert.
+ */
+@Deprecated("Use diagramIdentifiable() instead", ReplaceWith("diagramIdentifiable(identifiedObject)"))
+fun diagramIdentifiedObject(identifiedObject: IdentifiedObject): DiagramIdentifiable = diagramIdentifiable(identifiedObject)
+
+/**
+ * Convert the [Identifiable] to a [DiagramIdentifiable] representation.
+ *
+ * @param identifiable The [Identifiable] to convert.
+ */
+fun diagramIdentifiable(identifiable: Identifiable): DiagramIdentifiable =
+    DiagramIdentifiable.newBuilder().apply {
         whenDiagramServiceObject(
-            identifiedObject,
+            identifiable,
             isDiagram = { diagram = it.toPb() },
             isDiagramObject = { diagramObject = it.toPb() },
         )

@@ -10,7 +10,7 @@ package com.zepben.ewb.database.sql.cim.network
 
 import com.zepben.ewb.cim.iec61970.base.core.Equipment
 import com.zepben.ewb.cim.iec61970.base.core.Feeder
-import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.base.wires.EnergySource
 import com.zepben.ewb.cim.iec61970.base.wires.Junction
 import com.zepben.ewb.database.sql.cim.metadata.MetadataCollectionReader
@@ -163,11 +163,11 @@ internal class NetworkDatabaseReaderTest {
 
         reader(true).read(service)
 
-        fun correctMessage(idObj: IdentifiedObject) =
-            "*** Action Required *** Inferred missing phase for '${idObj.name}' [${idObj.mRID}] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system."
+        fun correctMessage(idObj: Identifiable) =
+            "*** Action Required *** Inferred missing phase for ${idObj.nameAndMRID()} which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system."
 
-        fun suspectMessage(idObj: IdentifiedObject) =
-            "*** Action Required *** Inferred missing phases for '${idObj.name}' [${idObj.mRID}] which may not be correct. The phases were inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system."
+        fun suspectMessage(idObj: Identifiable) =
+            "*** Action Required *** Inferred missing phases for ${idObj.nameAndMRID()} which may not be correct. The phases were inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system."
 
         assertThat(systemErr.log, containsString(correctMessage(j1)))
         assertThat(systemErr.log, containsString(suspectMessage(j2)))

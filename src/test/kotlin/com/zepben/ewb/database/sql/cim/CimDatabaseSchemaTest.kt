@@ -8,7 +8,7 @@
 
 package com.zepben.ewb.database.sql.cim
 
-import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.database.sql.cim.tables.tableCimVersion
 import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.common.BaseServiceComparator
@@ -44,7 +44,7 @@ abstract class CimDatabaseSchemaTest<TService : BaseService, TWriter : CimDataba
     abstract fun createWriter(filename: String): TWriter
     abstract fun createReader(connection: Connection, databaseDescription: String): TReader
     abstract fun createComparator(): TComparator
-    abstract fun createIdentifiedObject(): IdentifiedObject
+    abstract fun createIdentifiable(): Identifiable
 
     @BeforeEach
     internal fun beforeEach() {
@@ -71,15 +71,15 @@ abstract class CimDatabaseSchemaTest<TService : BaseService, TWriter : CimDataba
         val writeService = createService()
         val readService = createService()
 
-        val identifiedObject = createIdentifiedObject()
-        assertThat("Should have added", writeService.tryAdd(identifiedObject))
-        assertThat("Should have added", readService.tryAdd(identifiedObject))
+        val identifiable = createIdentifiable()
+        assertThat("Should have added", writeService.tryAdd(identifiable))
+        assertThat("Should have added", readService.tryAdd(identifiable))
 
         validateWriteRead(writeService, readService = readService)
 
         assertThat(
             systemErr.log,
-            containsString("Failed to read ${identifiedObject.typeNameAndMRID()}. Unable to add to service '${readService.name}': duplicate MRID")
+            containsString("Failed to read ${identifiable.typeNameAndMRID()}. Unable to add to service '${readService.name}': duplicate MRID")
         )
     }
 

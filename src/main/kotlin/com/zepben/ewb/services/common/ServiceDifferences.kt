@@ -8,13 +8,13 @@
 
 package com.zepben.ewb.services.common
 
-import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.base.core.NameType
 import com.zepben.ewb.services.common.extensions.asUnmodifiable
 
 class ServiceDifferences internal constructor(
-    private val sourceObjLookup: (mRID: String) -> IdentifiedObject?,
-    private val targetObjLookup: (mRID: String) -> IdentifiedObject?,
+    private val sourceObjLookup: (mRID: String) -> Identifiable?,
+    private val targetObjLookup: (mRID: String) -> Identifiable?,
     private val sourceNameTypeLookup: (mRID: String) -> NameType?,
     private val targetNameTypeLookup: (mRID: String) -> NameType?
 ) {

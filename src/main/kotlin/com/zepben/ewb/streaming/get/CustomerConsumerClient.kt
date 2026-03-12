@@ -86,16 +86,16 @@ class CustomerConsumerClient @JvmOverloads constructor(
         processCustomersForContainers(mRIDs)
     }
 
-    override fun processIdentifiedObjects(mRIDs: Sequence<String>): Sequence<ExtractResult> {
+    override fun processIdentifiables(mRIDs: Sequence<String>): Sequence<ExtractResult> {
         val extractResults = mutableListOf<ExtractResult>()
-        val streamObserver = AwaitableStreamObserver<GetIdentifiedObjectsResponse> { response ->
-            response.identifiedObjectsList.forEach {
-                extractResults.add(extractIdentifiedObject(it))
+        val streamObserver = AwaitableStreamObserver<GetIdentifiablesResponse> { response ->
+            response.identifiablesList.forEach {
+                extractResults.add(extractIdentifiable(it))
             }
         }
 
-        val request = stub.getIdentifiedObjects(streamObserver)
-        val builder = GetIdentifiedObjectsRequest.newBuilder()
+        val request = stub.getIdentifiables(streamObserver)
+        val builder = GetIdentifiablesRequest.newBuilder()
 
         batchSend(mRIDs, builder::addMrids) {
             if (builder.mridsList.isNotEmpty())
@@ -114,8 +114,8 @@ class CustomerConsumerClient @JvmOverloads constructor(
     ): Sequence<ExtractResult> {
         val extractResults = mutableListOf<ExtractResult>()
         val streamObserver = AwaitableStreamObserver<GetCustomersForContainerResponse> { response ->
-            response.identifiedObjectsList.forEach {
-                extractResults.add(extractIdentifiedObject(it))
+            response.identifiablesList.forEach {
+                extractResults.add(extractIdentifiable(it))
             }
         }
 
@@ -134,7 +134,7 @@ class CustomerConsumerClient @JvmOverloads constructor(
         return extractResults.asSequence()
     }
 
-    private fun extractIdentifiedObject(io: CustomerIdentifiedObject): ExtractResult =
+    private fun extractIdentifiable(io: CustomerIdentifiable): ExtractResult =
         protoToCim.customerService.addFromPb(io).let {
             ExtractResult(it.identifiable, it.mRID)
         }

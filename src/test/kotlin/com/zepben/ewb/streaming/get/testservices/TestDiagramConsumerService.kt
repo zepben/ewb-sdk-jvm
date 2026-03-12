@@ -16,12 +16,12 @@ import io.grpc.stub.StreamObserver
 
 internal class TestDiagramConsumerService : DiagramConsumerGrpc.DiagramConsumerImplBase() {
 
-    lateinit var onGetIdentifiedObjects: (request: GetIdentifiedObjectsRequest, response: StreamObserver<GetIdentifiedObjectsResponse>) -> Unit
+    lateinit var onGetIdentifiables: (request: GetIdentifiablesRequest, response: StreamObserver<GetIdentifiablesResponse>) -> Unit
     lateinit var onGetDiagramObjects: (request: GetDiagramObjectsRequest, response: StreamObserver<GetDiagramObjectsResponse>) -> Unit
     lateinit var onGetMetadataRequest: (request: GetMetadataRequest, response: StreamObserver<GetMetadataResponse>) -> Unit
 
-    override fun getIdentifiedObjects(response: StreamObserver<GetIdentifiedObjectsResponse>): StreamObserver<GetIdentifiedObjectsRequest> =
-        TestStreamObserver(response, onGetIdentifiedObjects)
+    override fun getIdentifiables(response: StreamObserver<GetIdentifiablesResponse>): StreamObserver<GetIdentifiablesRequest> =
+        TestStreamObserver(response, onGetIdentifiables)
 
     override fun getDiagramObjects(responseObserver: StreamObserver<GetDiagramObjectsResponse>?): StreamObserver<GetDiagramObjectsRequest> =
         TestStreamObserver(responseObserver!!, onGetDiagramObjects)

@@ -19,7 +19,9 @@ package com.zepben.ewb.cim.iec61970.base.core
  * @property description a free human-readable text describing or naming the object. It may be non-unique and may not correlate to a naming hierarchy.
  * @property numDiagramObjects Number of DiagramObject's known to associate with this [IdentifiedObject]
  */
-abstract class IdentifiedObject(override val mRID: String) : Identifiable {
+abstract class IdentifiedObject(
+    override val mRID: String
+) : Identifiable {
 
     // Changed to use mutableSet to prevent duplicated entries from addName function
     private var _names: MutableSet<Name>? = null
@@ -103,10 +105,10 @@ abstract class IdentifiedObject(override val mRID: String) : Identifiable {
      *
      * @param type the required [NameType]
      * @param name the name of the new [Name]
-     * @return this [IdentifiedObject] if the name was added, or already existed on this object.
+     * @return this [IdentifiedObject] with a newly added [Name], if it didn't already exist.
      */
     fun addName(type: NameType, name: String): IdentifiedObject {
-        if (names.any { it.type == type && it.name == name})
+        if (names.any { (it.type == type) && (it.name == name) })
             return this
         _names = _names ?: mutableSetOf()
         _names!!.add(type.getOrAddName(name, this))

@@ -14,7 +14,6 @@ import com.zepben.ewb.cim.iec61968.customers.CustomerAgreement
 import com.zepben.ewb.cim.iec61968.customers.PricingStructure
 import com.zepben.ewb.cim.iec61968.customers.Tariff
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
-import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.services.common.verifyWhenServiceFunctionSupportsAllServiceTypes
 import com.zepben.testutils.junit.SystemLogExtension
 import org.junit.jupiter.api.Test
@@ -34,7 +33,7 @@ internal class CustomerServiceUtilsTest {
     // Function references to functions with generics are not yet supported, so we take a copy of the function that has a concrete type and pass through.
     // If you get failed tests about missing IdentifiedObject types, first update the proxied function, then update this one to match.
     internal fun whenCustomerServiceObjectProxy(
-        identifiedObject: Identifiable,
+        identifiable: Identifiable,
         isCustomer: (Customer) -> String,
         isCustomerAgreement: (CustomerAgreement) -> String,
         isOrganisation: (Organisation) -> String,
@@ -42,7 +41,7 @@ internal class CustomerServiceUtilsTest {
         isTariff: (Tariff) -> String,
         isOther: (Identifiable) -> String
     ): String = whenCustomerServiceObject(
-        identifiedObject,
+        identifiable,
         isCustomer = isCustomer,
         isCustomerAgreement = isCustomerAgreement,
         isOrganisation = isOrganisation,

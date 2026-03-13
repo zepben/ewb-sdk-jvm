@@ -1,5 +1,5 @@
 # Zepben EWB SDK changelog
-## [1.7.0] - UNRELEASED
+## [1.7.0] - 2026-03-13
 ### Breaking Changes
 * The `GrpcClient` constructor and class parameters have been updated. You must now provide an `AbstractAsyncStub` type, and no longer an `executor`. All
   descendant classes no longer accept the `executor` as a constructor argument, which is now expected to be bound to the `stub`.

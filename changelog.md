@@ -1,4 +1,20 @@
 # Zepben EWB SDK changelog
+## [1.8.0] - UNRELEASED
+### Breaking Changes
+* None.
+
+### New Features
+* None.
+
+### Enhancements
+* None.
+
+### Fixes
+* None.
+
+### Notes
+* None.
+
 ## [1.7.0] - 2026-03-13
 ### Breaking Changes
 * The `GrpcClient` constructor and class parameters have been updated. You must now provide an `AbstractAsyncStub` type, and no longer an `executor`. All

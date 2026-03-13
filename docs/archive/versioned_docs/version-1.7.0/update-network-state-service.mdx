@@ -1,0 +1,154 @@
+---
+id: update-network-state-service
+title: Update Network State Service
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+An implementation of the `UpdateNetworkStateService` will provide an object-oriented wrapper for the gRPC library, with the ability to update information about
+the state of the network. This is done with the following 3 steps:
+
+1. Create callbacks which will be called when gRPC messages are received from a client.
+2. Register the callbacks with an instance of the `UpdateNetworkStateService`.
+3. Add your `UpdateNetworkStateService` instance as a gRPC service.
+
+:::info
+The below examples make use of a helper library provided by Zepben, which is included as a transitive dependency of the SDK, or can be [added directly from Maven Central](https://central.sonatype.com/artifact/com.zepben.evolve/evolve-conn).
+
+You do _**NOT**_ have to do this, you can register the services directly with a Netty gRPC (or other) server instead.
+:::
+
+The classes you need for performing these actions can be imported from the SDK:
+
+```kotlin
+import com.zepben.ewb.conn.grpc.GrpcServer
+import com.zepben.ewb.streaming.data.CurrentStateEvent
+import com.zepben.ewb.streaming.data.SetCurrentStatesStatus
+import com.zepben.ewb.streaming.mutations.UpdateNetworkStateService
+```
+
+## Creating callbacks
+
+Each supported message in `UpdateNetworkStateService` requires a callback, which will be triggered when any client messages are received. Implementation of these
+callbacks can be done as either lambdas, or full method/function implementations that can be passed as method references.
+
+### onSetCurrentStates
+
+The `onSetCurrentStates` callback is triggered for each request passing in a batch of current state events, and should return a
+`CompletableFuture` of [batch result response](update-network-state-client.mdx#batch-result-responses) to reflect the success or failure of the update process.
+
+```kotlin
+// Using a lambda expression
+var updateCurrentStatesLambda = { batchId: Long, events: List<CurrentStateEvent> ->
+    // process updating of events here and return a CompletableFuture of batch result response
+}
+
+// Using a method
+class UpdateNetworkStateServiceImpl {
+
+    fun updateCurrentStates(batchId: Long, events: List<CurrentStateEvent>): CompletableFuture<SetCurrentStatesStatus> {
+        // process updating of events here and return a CompletableFuture of batch result response
+    }
+
+}
+```
+
+## Registering callbacks
+
+Registering the callbacks with the service is as simple as passing them into the `UpdateNetworkStateService` constructor.
+
+```kotlin
+// Using lambda expressions
+val service = UpdateNetworkStateService(updateCurrentStatesLambda)
+
+// Using method references
+class UpdateNetworkStateServiceImpl {
+
+    val service = UpdateNetworkStateService(::updateCurrentStates);
+
+}
+```
+
+## Registering the service
+
+For the above code to have any effect, you need to register the service with a gRPC server. Once this has been done, you should start to receive callbacks for
+each request sent from a gRPC client.
+
+```kotlin
+fun main() {
+    val grpcServer = object : GrpcServer(9001) {
+        init {
+            serverBuilder.addService(service)
+        }
+    }
+    grpcServer.start()
+}
+```
+
+## Putting it all together
+
+Putting each of the steps above together, you can build the scaffold of a working application
+
+<Tabs
+    groupId="code-example"
+    defaultValue="kotlin-lambda"
+    values={[
+        { label: "Kotlin Lambdas", value: "kotlin-lambda", },
+        { label: "Kotlin Methods", value: "kotlin-method", },
+    ]
+}>
+
+<TabItem  value="kotlin-lambda">
+
+```kotlin
+import com.zepben.ewb.conn.grpc.GrpcServer
+import com.zepben.ewb.streaming.data.CurrentStateEvent
+import com.zepben.ewb.streaming.mutations.UpdateNetworkStateService
+
+fun main() {
+    val service = UpdateNetworkStateService(onSetCurrentStates = { batchId: Long, events: List<CurrentStateEvent> ->
+       // process updating of events here and return a CompletableFuture of batch result response
+    })
+
+    val grpcServer = object : GrpcServer(9001) {
+        init {
+            serverBuilder.addService(service)
+        }
+    }
+    grpcServer.start()
+}
+```
+
+</TabItem>
+<TabItem  value="kotlin-method">
+
+```kotlin
+import com.zepben.ewb.conn.grpc.GrpcServer
+import com.zepben.ewb.streaming.data.CurrentStateEvent
+import com.zepben.ewb.streaming.data.SetCurrentStatesStatus
+import com.zepben.ewb.streaming.mutations.UpdateNetworkStateService
+
+class UpdateNetworkStateServiceImpl {
+
+    val service = UpdateNetworkStateService(::updateCurrentStates)
+
+    fun updateCurrentStates(batchId: Long, events: List<CurrentStateEvent>): CompletableFuture<SetCurrentStatesStatus> {
+        // process updating of events here and return a CompletableFuture of batch result response
+    }
+
+}
+
+fun main() {
+    val service = UpdateNetworkStateServiceImpl().service
+    val grpcServer = object : GrpcServer(9001) {
+        init {
+            serverBuilder.addService(service)
+        }
+    }
+    grpcServer.start()
+}
+```
+
+</TabItem>
+</Tabs>

@@ -2,6 +2,7 @@
 
 | Version                  | Released              |
 | ------------------------ | --------------------- |
+|[1.7.0](#170)| `13 March 2026` |
 |[1.6.0](#160)| `02 March 2026` |
 |[1.5.0](#150)| `13 February 2026` |
 |[1.4.0](#140)| `23 January 2026` |
@@ -46,6 +47,82 @@
 ---
 
 NOTE: This library is not yet stable, and breaking changes should be expected until a 1.0.0 release.
+
+---
+
+## [1.7.0]
+
+### Breaking Changes
+* The `GrpcClient` constructor and class parameters have been updated. You must now provide an `AbstractAsyncStub` type, and no longer an `executor`. All
+  descendant classes no longer accept the `executor` as a constructor argument, which is now expected to be bound to the `stub`.
+* `typeNameAndMRID` and `nameAndMRID` are no longer extension functions and imports for them will need to be removed.
+* In `whenNetworkServiceObject`, `whenDiagramServiceObject`, `whenCustomerServiceObject`, `networkIdentifiedObject`, `diagramIdentifiedObject` and
+  `customerIdentifiedObject` the `identifiedObject` parameter is now `identifiable: Identifiable`
+* Renamed `UnsupportedIdentifiedObjectException` to `UnsupportedIdentifiableException`.
+* `BaseService` functions `contains`, `tryAdd`, `tryRemove`, `add`, `remove` and `addOrThrow` have replaced their `identifiedObject` parameters with
+  `identifiable: Identifiable`.
+* `BaseService` members and functions that used to reference `IdentifiedObject` now use `Identifiable` instead.
+* `MultiObjectResult.objects` is now a `MutableMap<String, Identifiable>`. This will cause problems if you are explicitly expecting an `IdentifiedObject` to be
+  returned via a consumer client call without any further type narrowing.
+* `ExtractResult.identifiedObject` has been replaced with `identifiable: Identifiable`.
+* Protected function `CimConsumerClient.processIdentifiedObjects` has been renamed to `processIdentifiables`.
+* `ReferenceDifference` members `source` and `targetValue` now reference `Identifiable`.
+* Renamed the following gRPC messages and attributes to support identifiable objects that don't descend from `IdentifiedObject` (such as `DataSet`):
+  * In the `cc` protos:
+    * `CustomerConsumer.getIdentifiedObjects` -> `CustomerConsumer.getIdentifiables`
+    * `GetIdentifiedObjectsRequest` -> `GetIdentifiablesRequest`
+    * `GetIdentifiedObjectsResponse` -> `GetIdentifiablesResponse`
+    * `GetIdentifiablesResponse.identifiedObjects` -> `GetIdentifiablesResponse.identifiables`
+    * `CustomerIdentifiedObject` -> `CustomerIdentifiable`
+    * `CustomerIdentifiable.identifiedObject` -> `CustomerIdentifiable.identifiable`
+    * `GetCustomersForContainerResponse.identifiedObject` -> `GetCustomersForContainerResponse.identifiable`
+  * In the `dc` protos:
+    * `DiagramConsumer.getIdentifiedObjects` -> `DiagramConsumer.getIdentifiables`
+    * `GetIdentifiedObjectsRequest` -> `GetIdentifiablesRequest`
+    * `GetIdentifiedObjectsResponse` -> `GetIdentifiablesResponse`
+    * `GetIdentifiablesResponse.identifiedObjects` -> `GetIdentifiablesResponse.identifiables`
+    * `DiagramIdentifiedObject` -> `DiagramIdentifiable`
+    * `DiagramIdentifiable.identifiedObject` -> `DiagramIdentifiable.identifiable`
+    * `GetDiagramObjectsResponse.identifiedObject` -> `GetDiagramObjectsResponse.identifiable`
+  * In the `nc` protos:
+    * `NetworkConsumer.getIdentifiedObjects` -> `NetworkConsumer.getIdentifiables`
+    * `GetIdentifiedObjectsRequest` -> `GetIdentifiablesRequest`
+    * `GetIdentifiedObjectsResponse` -> `GetIdentifiablesResponse`
+    * `GetIdentifiablesResponse.identifiedObjects` -> `GetIdentifiablesResponse.identifiables`
+    * `NetworkIdentifiedObject` -> `NetworkIdentifiable`
+    * `NetworkIdentifiable.identifiedObject` -> `NetworkIdentifiable.identifiable`
+    * `GetEquipmentForContainersResponse.identifiedObject` -> `GetEquipmentForContainersResponse.identifiable`
+    * `GetEquipmentForRestrictionResponse.identifiedObject` -> `GetEquipmentForRestrictionResponse.identifiable`
+
+### New Features
+* Added `Identifiable` interface which defines `mRID`, `typeNameAndMRID`, and `nameAndMRID`.
+* Anything implementing `Identifiable` can now be added to a `BaseService`.
+* `NameType` and `Name` now implement `Identifiable`. Their mRID will be set to `<name>` and `<name>-<type.name>-<identifiedObject.mRID>`.
+* Promoted `BaseServiceReader`, `BaseServiceWriter`, `CimReader`, `BaseCollectionReader`, `BaseCollectionWriter`, and `BaseServiceReader` to the public API.
+* Added `customerIdentifiable` to replace `customerIdentifiedObject` with support for `Identifiable` object types in the future.
+* Added `diagramIdentifiable` to replace `diagramIdentifiedObject` with support for `Identifiable` object types in the future.
+* Added `networkIdentifiable` to replace `networkIdentifiedObject` with support for `Identifiable` object types in the future.
+* Added the following functions to all `CimConsumerClient` descendants:
+  * `getIdentifiable` which replaces the now deprecated `getIdentifiedObject`.
+  * `getIdentifiables` which replaces the now deprecated `getIdentifiedObjects`.
+* Added `AddFromPbResult.identifiable` which replaces the now deprecated `identifiedObject`.
+
+### Enhancements
+* `IdentifiedObject`, `Name` and `NameType` now extends `Identifiable`.
+* `BaseServiceComparator` will now compare all `Identifiable` objects that have been added, not just `IdentifiedObject` objects.
+
+### Fixes
+* Adding a duplicate name to an `IdentifiedObject` will now be ignored.
+* `GrpcClient` implementations now correctly assign and close an executor for their stubs.
+
+### Notes
+* Deprecated the `customerIdentifiedObject` function, please use the replacement `customerIdentifiable`.
+* Deprecated the `diagramIdentifiedObject` function, please use the replacement `diagramIdentifiable`.
+* Deprecated the `networkIdentifiedObject` function, please use the replacement `networkIdentifiable`.
+* Deprecated the following functions on all `CimConsumerClient` descendants:
+  * `getIdentifiedObject` which has been replaced with `getIdentifiable`.
+  * `getIdentifiedObjects` which has been replaced with `getIdentifiables`.
+* Deprecated `AddFromPbResult.identifiedObject` which has been replaced with `identifiable`.
 
 ---
 

@@ -65,8 +65,7 @@ class VariantServiceComparator : BaseServiceComparator() {
             compareIdReferences(NetworkModelProjectStage::changeSet)
             compareIndexedValueCollections(NetworkModelProjectStage::equipmentContainerMRIDs)
             compareIdReferenceCollections(
-                NetworkModelProjectStage::dependentOnStages,
-                NetworkModelProjectStage::dependingStages,
+                NetworkModelProjectStage::dependencies,
             )
 
         }

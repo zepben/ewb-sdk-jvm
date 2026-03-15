@@ -55,7 +55,7 @@ import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.A
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStage
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSetMember
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectModification
+
 //import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectReverseModification
 
 /**
@@ -628,35 +628,19 @@ object Resolvers {
         )
 
     @JvmStatic
-    fun dependentOnStage(annotatedProjectDependency: AnnotatedProjectDependency): BoundReferenceResolver<AnnotatedProjectDependency, NetworkModelProjectStage> =
+    fun stage(annotatedProjectDependency: AnnotatedProjectDependency): BoundReferenceResolver<AnnotatedProjectDependency, NetworkModelProjectStage> =
         BoundReferenceResolver(
             annotatedProjectDependency,
             AnnotatedProjectDependencyToDependentNetworkModelProjectStageResolver,
-            DependentNetworkModelProjectStageToAnnotatedProjectDependencyResolver
-        )
-
-    @JvmStatic
-    fun dependingStage(annotatedProjectDependency: AnnotatedProjectDependency): BoundReferenceResolver<AnnotatedProjectDependency, NetworkModelProjectStage> =
-        BoundReferenceResolver(
-            annotatedProjectDependency,
-            AnnotatedProjectDependencyToDependingNetworkModelProjectStageResolver,
-            DependingNetworkModelProjectStageToAnnotatedProjectDependencyResolver
+            NetworkModelProjectStageToAnnotatedProjectDependencyResolver
         )
 
 
     @JvmStatic
-    fun dependentOnStage(networkModelProjectStage: NetworkModelProjectStage): BoundReferenceResolver<NetworkModelProjectStage, AnnotatedProjectDependency> =
+    fun dependency(networkModelProjectStage: NetworkModelProjectStage): BoundReferenceResolver<NetworkModelProjectStage, AnnotatedProjectDependency> =
         BoundReferenceResolver(
             networkModelProjectStage,
-            DependentNetworkModelProjectStageToAnnotatedProjectDependencyResolver,
-            AnnotatedProjectDependencyToDependentNetworkModelProjectStageResolver
-        )
-
-    @JvmStatic
-    fun dependingStage(networkModelProjectStage: NetworkModelProjectStage): BoundReferenceResolver<NetworkModelProjectStage, AnnotatedProjectDependency> =
-        BoundReferenceResolver(
-            networkModelProjectStage,
-            DependingNetworkModelProjectStageToAnnotatedProjectDependencyResolver,
+            NetworkModelProjectStageToAnnotatedProjectDependencyResolver,
             AnnotatedProjectDependencyToDependingNetworkModelProjectStageResolver
         )
 

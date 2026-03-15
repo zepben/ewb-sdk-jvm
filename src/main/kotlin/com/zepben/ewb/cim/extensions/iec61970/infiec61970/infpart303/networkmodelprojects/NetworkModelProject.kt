@@ -10,9 +10,7 @@ package com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmod
 
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.iec61968.operations.OperationalRestriction
-import com.zepben.ewb.cim.iec61970.base.core.Equipment
 import com.zepben.ewb.services.common.extensions.asUnmodifiable
-import com.zepben.ewb.services.common.extensions.getByMRID
 import com.zepben.ewb.services.common.extensions.validateReference
 import java.time.Instant
 
@@ -62,15 +60,15 @@ class NetworkModelProject(mRID: String) : NetworkModelProjectComponent(mRID) {
     /**
      * Add equipment to which this restriction applies.
      *
-     * @param equipment the equipment to add.
+     * @param child the equipment to add.
      * @return A reference to this [OperationalRestriction] to allow fluent use.
      */
-    fun addChild(equipment: NetworkModelProjectComponent): NetworkModelProject {
-        if (validateReference(equipment, ::getChild, "A NetworkModelProjectComponent"))
+    fun addChild(child: NetworkModelProjectComponent): NetworkModelProject {
+        if (validateReference(child, ::getChild, "A NetworkModelProjectComponent"))
             return this
 
         _children = _children ?: mutableListOf()
-        _children!!.add(equipment)
+        _children!!.add(child)
 
         updated = Instant.now()
         return this

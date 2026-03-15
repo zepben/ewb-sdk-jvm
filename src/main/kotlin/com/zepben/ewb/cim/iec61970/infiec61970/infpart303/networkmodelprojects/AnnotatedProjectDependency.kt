@@ -28,4 +28,17 @@ class AnnotatedProjectDependency(override val mRID: String): Identifiable {
 
     override fun typeNameAndMRID(): String = "${javaClass.simpleName} $mRID"
 
+    fun contentEquals(other: AnnotatedProjectDependency): Boolean {
+        if (dependencyType != other.dependencyType  ||
+            dependencyDependingStage != other.dependencyDependingStage ||
+            dependencyDependentOnStage != other.dependencyDependentOnStage)
+            return false
+        else
+            return true
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return super.equals(other)
+    }
+
 }

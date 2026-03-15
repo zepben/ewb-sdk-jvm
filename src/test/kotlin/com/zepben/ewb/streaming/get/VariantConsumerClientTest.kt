@@ -115,7 +115,7 @@ internal class VariantConsumerClientTest {
         val dependingStage = NetworkModelProjectStage("dependingStage").also { expectedService.add(it) }
         val project = NetworkModelProject("project").also { expectedService.add(it); it.addChild(stage); stage.parent = it }
         val changeSet = ChangeSet("changeSet").also { expectedService.add(it); it.networkModelProjectStage = stage; stage.changeSet = it }
-        val dependentOn = AnnotatedProjectDependency(generateId()).also { expectedService.add(it); it.dependencyDependentOnStage = stage; stage.addDependentOnStage(it); it.dependencyDependingStage = dependingStage; dependingStage.addDependingStage(it) }
+        val dependentOn = AnnotatedProjectDependency(generateId()).also { expectedService.add(it); it.dependencyDependentOnStage = stage; stage.addDependency(it); it.dependencyDependingStage = dependingStage; dependingStage.addDependency(it) }
         val creation = ObjectCreation().also { it.changeSet = changeSet; it.targetObjectMRID = "target1"; changeSet.addMember(it); expectedService.add(it)}
         val deletion = ObjectDeletion().also { it.changeSet = changeSet; it.targetObjectMRID = "target2"; changeSet.addMember(it); expectedService.add(it)}
         val modification = ObjectModification().also { it.changeSet = changeSet; it.targetObjectMRID = "target3"; changeSet.addMember(it); expectedService.add(it)}
@@ -123,7 +123,7 @@ internal class VariantConsumerClientTest {
         val dependentOnStage = NetworkModelProjectStage("otherStage").also { expectedService.add(it) }
         val stage2 = NetworkModelProjectStage("stage2").also { expectedService.add(it) }
         val changeSet2 = ChangeSet("changeSet2").also { expectedService.add(it); it.networkModelProjectStage = stage2; stage2.changeSet = it }
-        val depending = AnnotatedProjectDependency(generateId()).also { expectedService.add(it); it.dependencyDependingStage = stage2; stage2.addDependingStage(it); it.dependencyDependentOnStage = dependentOnStage; dependentOnStage.addDependentOnStage(it) }
+        val depending = AnnotatedProjectDependency(generateId()).also { expectedService.add(it); it.dependencyDependingStage = stage2; stage2.addDependency(it); it.dependencyDependentOnStage = dependentOnStage; dependentOnStage.addDependency(it) }
 
         consumerService.onGetChangeSet =
             spy { _, response ->

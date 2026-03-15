@@ -28,14 +28,13 @@ import java.time.Instant
  * @property userComments [ZBEX] User comments.
  * @property changeSet [ZBEX] The set of changes that this stage of the project will do.
  * @property dependentOnStages The stages that depend on this stage.
- * @property dependingStages The stages that this stage depends on.
+ * @property dependencies The stages that this stage depends on.
  * @property equipmentContainerMRIDs [ZBEX] The equipment containers this stage is related to.
  */
 @ZBEX
 class NetworkModelProjectStage(mRID: String) : NetworkModelProjectComponent(mRID) {
 
-    private var _dependentOnStage: MutableList<AnnotatedProjectDependency>? = null
-    private var _dependingStage: MutableList<AnnotatedProjectDependency>? = null
+    private var _dependencies: MutableList<AnnotatedProjectDependency>? = null
     private var _equipmentContainerMRIDs: MutableList<String>? = null
 
     var plannedCommissionedDate: Instant? = null
@@ -69,8 +68,7 @@ class NetworkModelProjectStage(mRID: String) : NetworkModelProjectComponent(mRID
             field = it
         }
 
-    val dependentOnStages: List<AnnotatedProjectDependency> get() = _dependentOnStage.asUnmodifiable()
-    val dependingStages: List<AnnotatedProjectDependency> get() = _dependingStage.asUnmodifiable()
+    val dependencies: List<AnnotatedProjectDependency> get() = _dependencies.asUnmodifiable()
     var changeSet: ChangeSet? = null
         set(it) {
             updated = Instant.now()
@@ -82,9 +80,14 @@ class NetworkModelProjectStage(mRID: String) : NetworkModelProjectComponent(mRID
 
 
     /**
-     * Get the number of entries in the [dependentOnStages] collection.
+     * Get the number of stages that are dependent on this stage.
      */
-    fun numDependentOnStages(): Int = _dependentOnStage?.size ?: 0
+    fun numDependentOnStages(): Int = _dependencies?.filter { it.dependencyDependentOnStage != this }?.size ?: 0
+
+    /**
+     * Get the number of stages that are depending on this stage.
+     */
+    fun numDependingStages(): Int = _dependencies?.filter { it.dependencyDependingStage != this }?.size ?: 0
 
     /**
      * Get a dependent [AnnotatedProjectDependency] for this stage.
@@ -92,62 +95,7 @@ class NetworkModelProjectStage(mRID: String) : NetworkModelProjectComponent(mRID
      * @param mRID the mRID of the required [AnnotatedProjectDependency]
      * @return The [AnnotatedProjectDependency] with the specified [mRID] if it exists, otherwise null
      */
-    fun getDependentOnStage(mRID: String): AnnotatedProjectDependency? = _dependentOnStage.getByMRID(mRID)
-
-    /**
-     * Create an [AnnotatedProjectDependency] where the other stage in [AnnotatedProjectDependency] depends on this stage.
-     *
-     * e.g:
-     *   to apply the [ChangeSet]s in the other stage we MUST resolve the dependency.
-     *   to apply the [ChangeSet]s in this stage we do not resolve the dependency.
-     *
-     * @param dependentOnStage the [AnnotatedProjectDependency] that depends on this stage.
-     * @return A reference to this [NetworkModelProjectStage] to allow fluent use.
-     */
-    fun addDependentOnStage(dependentOnStage: AnnotatedProjectDependency): NetworkModelProjectStage {
-        if (validateReference(dependentOnStage, ::getDependentOnStage, "An AnnotatedProjectDependency"))
-            return this
-
-        _dependentOnStage = _dependentOnStage ?: mutableListOf()
-        _dependentOnStage!!.add(dependentOnStage)
-
-        updated = Instant.now()
-        return this
-    }
-
-    /**
-     * @param dependentOnStage the [AnnotatedProjectDependency] to remove its dependency on this stage.
-     * @return true if [dependentOnStage] was removed as a dependency from this stage.
-     */
-    fun removeDependentOnStage(dependentOnStage: AnnotatedProjectDependency): Boolean {
-        val ret = _dependentOnStage?.remove(dependentOnStage) == true
-        if (_dependentOnStage.isNullOrEmpty()) _dependentOnStage = null
-        updated = Instant.now()
-        return ret
-    }
-
-    /**
-     * Clear this [NetworkModelProjectStage]'s [dependentOnStages] collection.
-     * @return this [NetworkModelProjectStage]
-     */
-    fun clearDependentOnStages(): NetworkModelProjectStage {
-        _dependentOnStage = null
-        updated = Instant.now()
-        return this
-    }
-
-    /**
-     * Get the number of entries in the [dependingStages] collection.
-     */
-    fun numDependingStages(): Int = _dependingStage?.size ?: 0
-
-    /**
-     * Get a dependent [AnnotatedProjectDependency] for this stage.
-     *
-     * @param mRID the mRID of the required [AnnotatedProjectDependency]
-     * @return The [AnnotatedProjectDependency] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getDependingStage(mRID: String): AnnotatedProjectDependency? = _dependingStage.getByMRID(mRID)
+    fun getDependency(mRID: String): AnnotatedProjectDependency? = _dependencies.getByMRID(mRID)
 
     /**
      * Create an [AnnotatedProjectDependency] where this stage depends on the other stage in [annotatedProjectDependency].
@@ -156,37 +104,37 @@ class NetworkModelProjectStage(mRID: String) : NetworkModelProjectComponent(mRID
      *   to apply the [ChangeSet]s in the other stage we do not resolve the dependency.
      *   to apply the [ChangeSet]s in this stage we MUST resolve the dependency.
      *
-     * @param dependingStage the [AnnotatedProjectDependency] that depends on this stage.
+     * @param dependency the [AnnotatedProjectDependency] that depends on this stage.
      * @return A reference to this [NetworkModelProjectStage] to allow fluent use.
      */
-    fun addDependingStage(dependingStage: AnnotatedProjectDependency): NetworkModelProjectStage {
-        if (validateReference(dependingStage, ::getDependingStage, "An AnnotatedProjectDependency"))
+    fun addDependency(dependency: AnnotatedProjectDependency): NetworkModelProjectStage {
+        if (validateReference(dependency, ::getDependency, "An AnnotatedProjectDependency"))
             return this
 
-        _dependingStage = _dependingStage ?: mutableListOf()
-        _dependingStage!!.add(dependingStage)
+        _dependencies = _dependencies ?: mutableListOf()
+        _dependencies!!.add(dependency)
 
         updated = Instant.now()
         return this
     }
 
     /**
-     * @param dependingStage the [AnnotatedProjectDependency] to remove its dependency on this stage.
-     * @return true if [dependingStage] was removed as a dependency from this stage.
+     * @param dependency the [AnnotatedProjectDependency] to remove its dependency on this stage.
+     * @return true if [dependency] was removed as a dependency from this stage.
      */
-    fun removeDependingStage(dependingStage: AnnotatedProjectDependency): Boolean {
-        val ret = _dependingStage?.remove(dependingStage) == true
-        if (_dependingStage.isNullOrEmpty()) _dependingStage = null
+    fun removeDependency(dependency: AnnotatedProjectDependency): Boolean {
+        val ret = _dependencies?.remove(dependency) == true
+        if (_dependencies.isNullOrEmpty()) _dependencies = null
         updated = Instant.now()
         return ret
     }
 
     /**
-     * Clear this [NetworkModelProjectStage]'s [dependingStages] collection.
+     * Clear this [NetworkModelProjectStage]'s [dependencies] collection.
      * @return this [NetworkModelProjectStage]
      */
-    fun clearDependingStages(): NetworkModelProjectStage {
-        _dependingStage = null
+    fun clearDependencies(): NetworkModelProjectStage {
+        _dependencies = null
         updated = Instant.now()
         return this
     }

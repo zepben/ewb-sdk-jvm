@@ -82,8 +82,8 @@ fun NetworkModelProjectStage.fillFields(service: VariantService, includeRuntime:
 
     val dependingStage = NetworkModelProjectStage(generateId()).also { service.add(it) }
     val dependentStage = NetworkModelProjectStage(generateId()).also { service.add(it) }
-    addDependingStage(AnnotatedProjectDependency(generateId()).also { it.dependencyDependingStage = this; it.dependencyDependentOnStage = dependentStage; dependentStage.addDependentOnStage(it) })
-    addDependentOnStage(AnnotatedProjectDependency(generateId()).also { it.dependencyDependentOnStage = this; it.dependencyDependingStage = dependingStage; dependingStage.addDependingStage(it) })
+    addDependency(AnnotatedProjectDependency(generateId()).also { it.dependencyDependingStage = this; it.dependencyDependentOnStage = dependentStage })
+    addDependency(AnnotatedProjectDependency(generateId()).also { it.dependencyDependentOnStage = this; it.dependencyDependingStage = dependingStage })
 
     addContainer(generateId())
 

@@ -86,10 +86,11 @@ fun toCim(pb: PBNetworkModelProjectStage, networkService: VariantService): Netwo
         }
 
         pb.dependingStageMRIDList.forEach {
-            networkService.resolveOrDeferReference(Resolvers.dependingStage(this), it)
+            networkService.resolveOrDeferReference(Resolvers.dependency(this), it)
         }
+        // TODO: need to remove this MRID list
         pb.dependentOnStageMRIDList.forEach {
-            networkService.resolveOrDeferReference(Resolvers.dependentOnStage(this), it)
+            networkService.resolveOrDeferReference(Resolvers.dependency(this), it)
         }
         pb.equipmentContainerMRIDsList.forEach { ec ->
             addContainer(ec)
@@ -124,8 +125,7 @@ fun toCim(pb: PBNetworkModelProjectComponent, cim: NetworkModelProjectComponent,
 fun toCim(pb: PBAnnotatedProjectDependency, networkService: VariantService): AnnotatedProjectDependency =
     AnnotatedProjectDependency(pb.mrid).apply {
         dependencyType = mapDependencyKind.toCim(pb.dependencyType)
-        networkService.resolveOrDeferReference(Resolvers.dependentOnStage(this), pb.dependencyDependentOnStageMRID)
-        networkService.resolveOrDeferReference(Resolvers.dependingStage(this), pb.dependencyDependingStageMRID)
+        networkService.resolveOrDeferReference(Resolvers.stage(this), pb.dependencyDependingStageMRID)
     }
 
 /**

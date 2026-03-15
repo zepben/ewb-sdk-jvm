@@ -580,15 +580,9 @@ internal object AnnotatedProjectDependencyToDependingNetworkModelProjectStageRes
         AnnotatedProjectDependency::class, NetworkModelProjectStage::class, AnnotatedProjectDependency::dependencyDependingStage.setter
     )
 
-internal object DependentNetworkModelProjectStageToAnnotatedProjectDependencyResolver :
+internal object NetworkModelProjectStageToAnnotatedProjectDependencyResolver :
     ReferenceResolver<NetworkModelProjectStage, AnnotatedProjectDependency> by KReferenceResolver(
-        NetworkModelProjectStage::class, AnnotatedProjectDependency::class, NetworkModelProjectStage::addDependentOnStage
-    )
-
-
-internal object DependingNetworkModelProjectStageToAnnotatedProjectDependencyResolver :
-    ReferenceResolver<NetworkModelProjectStage, AnnotatedProjectDependency> by KReferenceResolver(
-        NetworkModelProjectStage::class, AnnotatedProjectDependency::class, NetworkModelProjectStage::addDependingStage
+        NetworkModelProjectStage::class, AnnotatedProjectDependency::class, NetworkModelProjectStage::addDependency
     )
 
 internal object ChangeSetToNetworkModelProjectStageResolver :

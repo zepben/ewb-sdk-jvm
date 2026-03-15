@@ -136,10 +136,7 @@ fun toPb(cim: NetworkModelProjectStage, pb: PBNetworkModelProjectStage.Builder):
         cim.lastConflictCheckedAt?.also { lastConflictCheckedAtSet = it.toTimestamp() } ?: run { lastConflictCheckedAtNull = NullValue.NULL_VALUE }
         cim.userComments?.also { userCommentsSet = it } ?: run { userCommentsNull = NullValue.NULL_VALUE }
         cim.changeSet?.also { changeSetMRIDSet = it.mRID } ?: run { changeSetMRIDNull = NullValue.NULL_VALUE }
-        cim.dependentOnStages.forEach {
-            addDependentOnStageMRID(it.mRID)
-        }
-        cim.dependingStages.forEach {
+        cim.dependencies.forEach {
             addDependingStageMRID(it.mRID)
         }
         cim.equipmentContainerMRIDs.forEach {

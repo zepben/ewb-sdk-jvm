@@ -35,9 +35,11 @@ import java.time.LocalDateTime
 
 internal class QueryNetworkStateServiceTest {
 
-    @JvmField
-    @RegisterExtension
-    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     @JvmField
     @Rule
@@ -68,7 +70,8 @@ internal class QueryNetworkStateServiceTest {
     private val onProcessingErrorInterface = mockk<QueryNetworkStateService.ProcessingErrorHandler> { justRun { handle(any()) } }
 
     private val service = QueryNetworkStateService(onGetCurrentStates, onCurrentStatesStatus, LoggerFactory.getLogger(""), onProcessingError)
-    private val serviceJava = QueryNetworkStateService(onGetCurrentStatesInterface, onCurrentStatesStatusInterface, LoggerFactory.getLogger(""), onProcessingErrorInterface)
+    private val serviceJava =
+        QueryNetworkStateService(onGetCurrentStatesInterface, onCurrentStatesStatusInterface, LoggerFactory.getLogger(""), onProcessingErrorInterface)
 
     @Test
     internal fun getCurrentStates() {

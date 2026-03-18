@@ -18,9 +18,11 @@ import kotlin.reflect.full.primaryConstructor
 
 internal class CustomerServiceTest {
 
-    @JvmField
-    @RegisterExtension
-    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     private val service = CustomerService()
 

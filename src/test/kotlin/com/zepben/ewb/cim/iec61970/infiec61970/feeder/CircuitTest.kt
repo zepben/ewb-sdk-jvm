@@ -22,9 +22,11 @@ import org.junit.jupiter.api.extension.RegisterExtension
 
 internal class CircuitTest {
 
-    @JvmField
-    @RegisterExtension
-    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     @Test
     internal fun constructorCoverage() {

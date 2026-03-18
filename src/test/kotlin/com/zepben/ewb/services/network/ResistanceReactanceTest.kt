@@ -16,9 +16,11 @@ import org.junit.jupiter.api.extension.RegisterExtension
 
 internal class ResistanceReactanceTest {
 
-    @JvmField
-    @RegisterExtension
-    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     @Test
     internal fun isEmpty() {
@@ -38,13 +40,11 @@ internal class ResistanceReactanceTest {
         assertThat("ResistanceReactance with null x0 is not complete", !ResistanceReactance(r = 5.1, x = 5.2, r0 = 5.3).isComplete())
     }
 
-    companion object {
-        fun validateResistanceReactance(rr: ResistanceReactance, r: Double?, x: Double?, r0: Double?, x0: Double?) {
-            assertThat(rr.r, equalTo(r))
-            assertThat(rr.x, equalTo(x))
-            assertThat(rr.r0, equalTo(r0))
-            assertThat(rr.x0, equalTo(x0))
-        }
-    }
+}
 
+fun validateResistanceReactance(rr: ResistanceReactance, r: Double?, x: Double?, r0: Double?, x0: Double?) {
+    assertThat(rr.r, equalTo(r))
+    assertThat(rr.x, equalTo(x))
+    assertThat(rr.r0, equalTo(r0))
+    assertThat(rr.x0, equalTo(x0))
 }

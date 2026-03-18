@@ -27,9 +27,11 @@ import org.mockito.kotlin.verify
 
 internal class FindSwerEquipmentTest {
 
-    @JvmField
-    @RegisterExtension
-    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     private val stateOperators = spy(NetworkStateOperators.NORMAL)
     private val findSwerEquipment = FindSwerEquipment(debugLogger = null)

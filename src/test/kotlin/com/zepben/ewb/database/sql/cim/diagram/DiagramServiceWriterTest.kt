@@ -20,9 +20,11 @@ import org.junit.jupiter.api.extension.RegisterExtension
 
 internal class DiagramServiceWriterTest {
 
-    @JvmField
-    @RegisterExtension
-    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     private val diagramService = DiagramService()
     private val cimWriter = mockk<DiagramCimWriter> { every { write(any<Diagram>()) } returns true }

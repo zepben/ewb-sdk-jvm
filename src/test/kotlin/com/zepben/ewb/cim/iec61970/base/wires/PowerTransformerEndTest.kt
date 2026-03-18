@@ -14,8 +14,8 @@ import com.zepben.ewb.cim.iec61968.assetinfo.PowerTransformerInfo
 import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.ResistanceReactance
-import com.zepben.ewb.services.network.ResistanceReactanceTest.Companion.validateResistanceReactance
 import com.zepben.ewb.services.network.testdata.fillFields
+import com.zepben.ewb.services.network.validateResistanceReactance
 import com.zepben.ewb.utils.PrivateCollectionValidator
 import com.zepben.ewb.utils.PrivateCollectionValidator.DuplicateBehaviour
 import com.zepben.testutils.exception.ExpectException.Companion.expect
@@ -29,9 +29,11 @@ import org.mockito.kotlin.*
 
 internal class PowerTransformerEndTest {
 
-    @JvmField
-    @RegisterExtension
-    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     private val si = mock<TransformerStarImpedance>()
     private val info = mock<PowerTransformerInfo>()

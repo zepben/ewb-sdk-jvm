@@ -33,9 +33,11 @@ import java.sql.DriverManager
  */
 abstract class CimDatabaseSchemaTest<TService : BaseService, TWriter : CimDatabaseWriter<*, TService>, TReader : CimDatabaseReader<*, TService>, TComparator : BaseServiceComparator> {
 
-    @JvmField
-    @RegisterExtension
-    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     protected val logger: Logger = LoggerFactory.getLogger(javaClass)
     private val schemaTestFile = "src/test/data/schemaTest.sqlite"

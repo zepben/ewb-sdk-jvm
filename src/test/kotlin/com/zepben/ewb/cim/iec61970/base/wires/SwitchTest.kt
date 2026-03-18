@@ -25,9 +25,11 @@ import com.zepben.ewb.cim.iec61970.base.wires.SinglePhaseKind as SPK
 
 internal class SwitchTest {
 
-    @JvmField
-    @RegisterExtension
-    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     @Test
     internal fun constructorCoverage() {

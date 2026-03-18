@@ -8,8 +8,8 @@
 
 package com.zepben.ewb.cim.iec61970.base.core
 
-import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvSubstation
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
+import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvSubstation
 import com.zepben.ewb.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.utils.PrivateCollectionValidator
@@ -23,9 +23,11 @@ import org.junit.jupiter.api.extension.RegisterExtension
 
 internal class FeederTest {
 
-    @JvmField
-    @RegisterExtension
-    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     private val feeder = Feeder(generateId())
 

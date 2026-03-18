@@ -23,9 +23,11 @@ import com.zepben.ewb.cim.iec61970.base.wires.SinglePhaseKind as SPK
 
 internal class TerminalConnectivityConnectedTest {
 
-    @JvmField
-    @RegisterExtension
-    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     val networkService = NetworkService()
     val connectivity = TerminalConnectivityConnected

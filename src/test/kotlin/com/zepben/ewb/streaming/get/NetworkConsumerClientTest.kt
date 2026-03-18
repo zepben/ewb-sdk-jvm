@@ -56,9 +56,11 @@ import com.zepben.protobuf.nc.NetworkIdentifiable as NIO
 
 internal class NetworkConsumerClientTest {
 
-    @JvmField
-    @RegisterExtension
-    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -405,7 +407,8 @@ internal class NetworkConsumerClientTest {
 
     @Test
     internal fun `can optionally retrieve sub-geographical regions`() {
-        consumerService.onGetNetworkHierarchy = spy { _, response -> response.onNext(NetworkHierarchyAllTypes.createResponse(includeSubgeographicalRegions = true)) }
+        consumerService.onGetNetworkHierarchy =
+            spy { _, response -> response.onNext(NetworkHierarchyAllTypes.createResponse(includeSubgeographicalRegions = true)) }
         val result = callGetHierarchy(consumerClient, includeSubGeographicalRegions = true)
         val request = buildHierarchyRequest(includeSubGeographicalRegions = true)
         verify(consumerService.onGetNetworkHierarchy).invoke(eq(request), any())

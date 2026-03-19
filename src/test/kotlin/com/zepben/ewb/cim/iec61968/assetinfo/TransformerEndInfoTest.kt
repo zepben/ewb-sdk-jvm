@@ -13,8 +13,8 @@ import com.zepben.ewb.cim.iec61970.base.wires.WindingConnection
 import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.ResistanceReactance
-import com.zepben.ewb.services.network.ResistanceReactanceTest.Companion.validateResistanceReactance
 import com.zepben.ewb.services.network.testdata.fillFields
+import com.zepben.ewb.services.network.validateResistanceReactance
 import com.zepben.testutils.junit.SystemLogExtension
 import com.zepben.testutils.mockito.DefaultAnswer
 import org.hamcrest.MatcherAssert.assertThat
@@ -25,9 +25,11 @@ import org.mockito.kotlin.*
 
 internal class TransformerEndInfoTest {
 
-    @JvmField
-    @RegisterExtension
-    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     @Test
     internal fun constructorCoverage() {

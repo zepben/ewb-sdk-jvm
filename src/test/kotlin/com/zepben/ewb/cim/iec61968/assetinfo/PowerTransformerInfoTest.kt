@@ -10,7 +10,7 @@ package com.zepben.ewb.cim.iec61968.assetinfo
 
 import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.ResistanceReactance
-import com.zepben.ewb.services.network.ResistanceReactanceTest
+import com.zepben.ewb.services.network.validateResistanceReactance
 import com.zepben.ewb.utils.PrivateCollectionValidator
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -52,8 +52,8 @@ internal class PowerTransformerInfoTest {
         doReturn(ResistanceReactance(1.1, 1.2, 1.3, 1.4)).`when`(tank1).resistanceReactance(1)
         doReturn(ResistanceReactance(2.1, 2.2, 2.3, 2.4)).`when`(tank2).resistanceReactance(2)
 
-        ResistanceReactanceTest.validateResistanceReactance(txInfo.resistanceReactance(1)!!, 1.1, 1.2, 1.3, 1.4)
-        ResistanceReactanceTest.validateResistanceReactance(txInfo.resistanceReactance(2)!!, 2.1, 2.2, 2.3, 2.4)
+        validateResistanceReactance(txInfo.resistanceReactance(1)!!, 1.1, 1.2, 1.3, 1.4)
+        validateResistanceReactance(txInfo.resistanceReactance(2)!!, 2.1, 2.2, 2.3, 2.4)
         assertThat(txInfo.resistanceReactance(3), nullValue())
     }
 

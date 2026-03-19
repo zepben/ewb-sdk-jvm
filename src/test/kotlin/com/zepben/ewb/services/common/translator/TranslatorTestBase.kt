@@ -41,9 +41,11 @@ internal abstract class TranslatorTestBase<S : BaseService>(
     private val createServiceIdentifiedObject: (IdentifiedObject) -> Any
 ) {
 
-    @JvmField
-    @RegisterExtension
-    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     /**
      * The list of things to validate.

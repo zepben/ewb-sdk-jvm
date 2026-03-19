@@ -27,9 +27,11 @@ import com.zepben.ewb.cim.iec61970.base.wires.SinglePhaseKind as SPK
 @Suppress("SameParameterValue")
 internal class PhaseInferrerTest {
 
-    @JvmField
-    @RegisterExtension
-    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     private val phaseInferrer = PhaseInferrer(debugLogger = null)
 

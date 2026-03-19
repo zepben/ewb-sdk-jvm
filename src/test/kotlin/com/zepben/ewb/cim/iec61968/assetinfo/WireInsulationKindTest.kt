@@ -16,9 +16,11 @@ import com.zepben.protobuf.cim.iec61968.assetinfo.WireInsulationKind as PBWireIn
 
 internal class WireInsulationKindTest {
 
-    @JvmField
-    @RegisterExtension
-    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     @Test
     internal fun validateVsPb() {

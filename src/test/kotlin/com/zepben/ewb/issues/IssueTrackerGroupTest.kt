@@ -21,9 +21,11 @@ import org.junit.jupiter.api.extension.RegisterExtension
 
 internal class IssueTrackerGroupTest {
 
-    @JvmField
-    @RegisterExtension
-    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     private val trackerGroup = TrackerGroup()
     private val subTrackerGroup = SubTrackerGroup()

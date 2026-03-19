@@ -19,9 +19,11 @@ import org.junit.jupiter.api.extension.RegisterExtension
 
 class ServicesTest {
 
-    @JvmField
-    @RegisterExtension
-    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     private val expectedNs = NetworkService()
     private val expectedDs = DiagramService()

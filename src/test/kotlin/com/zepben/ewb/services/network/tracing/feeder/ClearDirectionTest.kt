@@ -25,9 +25,11 @@ import org.junit.jupiter.api.extension.RegisterExtension
 
 class ClearDirectionTest {
 
-    @JvmField
-    @RegisterExtension
-    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     private val clearDirection = ClearDirection(debugLogger = null)
     private val stateOperators = NetworkStateOperators.NORMAL

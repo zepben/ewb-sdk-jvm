@@ -39,9 +39,11 @@ import org.junit.jupiter.api.extension.RegisterExtension
 
 internal class AssignToLvFeedersTest {
 
-    @JvmField
-    @RegisterExtension
-    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     val hvBaseVoltage = BaseVoltage(generateId()).apply { nominalVoltage = 11000 }
     val lvBaseVoltage = BaseVoltage(generateId()).apply { nominalVoltage = 400 }

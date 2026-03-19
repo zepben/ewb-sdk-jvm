@@ -43,9 +43,11 @@ import com.zepben.protobuf.ns.data.SwitchStateEvent as PBSwitchStateEvent
 
 internal class UpdateNetworkStateServiceTest {
 
-    @JvmField
-    @RegisterExtension
-    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     @JvmField
     @Rule

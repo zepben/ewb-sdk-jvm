@@ -25,9 +25,11 @@ import java.util.*
 
 internal class MetricsSchemaTest {
 
-    @JvmField
-    @RegisterExtension
-    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     private val uuid = UUID.randomUUID()
     private val tables = MetricsDatabaseTables()

@@ -31,9 +31,11 @@ import org.junit.jupiter.api.extension.RegisterExtension
 
 internal class BaseServiceTest {
 
-    @JvmField
-    @RegisterExtension
-    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     internal class TestBaseService : BaseService("test", MetadataCollection()) {
         fun add(obj: Junction) = super.add(obj)

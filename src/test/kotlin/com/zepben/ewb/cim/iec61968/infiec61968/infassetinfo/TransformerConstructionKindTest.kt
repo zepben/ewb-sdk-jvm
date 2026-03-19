@@ -16,9 +16,11 @@ import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.TransformerCons
 
 internal class TransformerConstructionKindTest {
 
-    @JvmField
-    @RegisterExtension
-    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     @Test
     internal fun validateVsPb() {

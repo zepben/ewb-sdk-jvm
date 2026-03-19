@@ -25,9 +25,11 @@ import kotlin.reflect.full.primaryConstructor
 
 internal abstract class BaseServiceComparatorTest {
 
-    @JvmField
-    @RegisterExtension
-    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     protected abstract val comparatorValidator: ServiceComparatorValidator<out BaseService, out BaseServiceComparator>
 

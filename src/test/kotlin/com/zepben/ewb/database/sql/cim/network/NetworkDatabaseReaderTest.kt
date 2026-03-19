@@ -32,9 +32,11 @@ import java.sql.Connection
 
 internal class NetworkDatabaseReaderTest {
 
-    @JvmField
-    @RegisterExtension
-    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     private val databaseFile = "databaseFile"
     private val service = spyk(NetworkService())

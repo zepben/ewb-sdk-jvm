@@ -36,9 +36,11 @@ import kotlin.test.fail
 @Suppress("SqlResolve", "SameParameterValue")
 internal class ChangeSetTest {
 
-    @JvmField
-    @RegisterExtension
-    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     private val logger = LoggerFactory.getLogger(javaClass)
 

@@ -49,9 +49,11 @@ import com.zepben.protobuf.cc.CustomerIdentifiable as CIO
 
 internal class CustomerConsumerClientTest {
 
-    @JvmField
-    @RegisterExtension
-    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     private val logger = LoggerFactory.getLogger(javaClass)
 

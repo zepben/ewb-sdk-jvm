@@ -21,9 +21,11 @@ import org.mockito.kotlin.verifyNoMoreInteractions
 
 internal class AwaitableStreamObserverTest {
 
-    @JvmField
-    @RegisterExtension
-    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     private val processor = mock<(Int) -> Unit>()
     private val streamObserver = AwaitableStreamObserver(processor)

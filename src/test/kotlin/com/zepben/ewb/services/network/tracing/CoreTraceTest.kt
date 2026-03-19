@@ -31,9 +31,11 @@ import org.junit.jupiter.api.extension.RegisterExtension
 
 internal class CoreTraceTest {
 
-    @JvmField
-    @RegisterExtension
-    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     @Test
     internal fun traceCores() {
@@ -214,6 +216,7 @@ internal class CoreTraceTest {
         return runTrace(Tracing.networkTrace(NetworkStateOperators.NORMAL).addCondition { downstream() }, start, phases)
     }
 
+    @Suppress("SameParameterValue")
     private fun currentDownstreamTrace(start: ConductingEquipment, phases: PhaseCode): List<TrackedPhases> {
         return runTrace(Tracing.networkTrace(NetworkStateOperators.CURRENT).addCondition { downstream() }, start, phases)
     }

@@ -16,9 +16,11 @@ import com.zepben.protobuf.cim.iec61968.customers.CustomerKind as PBCustomerKind
 
 internal class CustomerKindTest {
 
-    @JvmField
-    @RegisterExtension
-    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     @Test
     internal fun validateVsPb() {

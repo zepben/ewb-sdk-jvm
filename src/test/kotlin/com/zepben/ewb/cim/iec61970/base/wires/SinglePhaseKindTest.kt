@@ -19,9 +19,11 @@ import com.zepben.protobuf.cim.iec61970.base.wires.SinglePhaseKind as PBSinglePh
 
 internal class SinglePhaseKindTest {
 
-    @JvmField
-    @RegisterExtension
-    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     @Test
     internal fun validateVsPb() {

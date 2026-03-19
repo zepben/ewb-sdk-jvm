@@ -22,9 +22,11 @@ import org.junit.jupiter.api.extension.RegisterExtension
 
 internal class ConnectivityResultTest {
 
-    @JvmField
-    @RegisterExtension
-    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     private val asset1: ConductingEquipment = Junction("asset1").apply {
         name = "asset 1"

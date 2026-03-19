@@ -29,9 +29,11 @@ import com.zepben.ewb.cim.iec61970.base.wires.SinglePhaseKind as SPK
 
 internal class SetPhasesTest {
 
-    @JvmField
-    @RegisterExtension
-    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     private val setPhases = SetPhases(debugLogger = null)
 

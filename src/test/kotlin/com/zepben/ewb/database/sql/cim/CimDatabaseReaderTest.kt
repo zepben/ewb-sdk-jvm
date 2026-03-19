@@ -23,9 +23,11 @@ import java.sql.Connection
 
 internal class CimDatabaseReaderTest {
 
-    @JvmField
-    @RegisterExtension
-    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     private val metadata = MetadataCollection()
     private val service = object : BaseService("service name", metadata) {}

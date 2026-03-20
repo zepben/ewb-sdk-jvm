@@ -81,7 +81,7 @@ fun toCim(pb: PBNetworkModelProjectStage, networkService: VariantService): Netwo
         baseModelVersion = pb.baseModelVersionSet.takeUnless { pb.hasBaseModelVersionNull() }
         lastConflictCheckedAt = pb.lastConflictCheckedAtSet.takeUnless { pb.hasLastConflictCheckedAtNull() }?.toInstant()
         userComments = pb.userCommentsSet.takeUnless { pb.hasUserCommentsNull() }
-        pb.changeSetMRIDSet.takeUnless {pb.hasChangeSetMRIDNull() }?.let {
+        pb.changeSetMRIDSet.takeUnless { pb.hasChangeSetMRIDNull() }?.let {
             networkService.resolveOrDeferReference(Resolvers.changeSet(this), it)
         }
 
@@ -125,7 +125,8 @@ fun toCim(pb: PBNetworkModelProjectComponent, cim: NetworkModelProjectComponent,
 fun toCim(pb: PBAnnotatedProjectDependency, networkService: VariantService): AnnotatedProjectDependency =
     AnnotatedProjectDependency(pb.mrid).apply {
         dependencyType = mapDependencyKind.toCim(pb.dependencyType)
-        networkService.resolveOrDeferReference(Resolvers.stage(this), pb.dependencyDependingStageMRID)
+        networkService.resolveOrDeferReference(Resolvers.dependentOnStage(this), pb.dependencyDependentOnStageMRID)
+        networkService.resolveOrDeferReference(Resolvers.dependingStage(this), pb.dependencyDependingStageMRID)
     }
 
 /**

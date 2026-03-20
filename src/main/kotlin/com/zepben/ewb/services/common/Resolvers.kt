@@ -628,10 +628,18 @@ object Resolvers {
         )
 
     @JvmStatic
-    fun stage(annotatedProjectDependency: AnnotatedProjectDependency): BoundReferenceResolver<AnnotatedProjectDependency, NetworkModelProjectStage> =
+    fun dependentOnStage(annotatedProjectDependency: AnnotatedProjectDependency): BoundReferenceResolver<AnnotatedProjectDependency, NetworkModelProjectStage> =
         BoundReferenceResolver(
             annotatedProjectDependency,
             AnnotatedProjectDependencyToDependentNetworkModelProjectStageResolver,
+            NetworkModelProjectStageToAnnotatedProjectDependencyResolver
+        )
+
+    @JvmStatic
+    fun dependingStage(annotatedProjectDependency: AnnotatedProjectDependency): BoundReferenceResolver<AnnotatedProjectDependency, NetworkModelProjectStage> =
+        BoundReferenceResolver(
+            annotatedProjectDependency,
+            AnnotatedProjectDependencyToDependingNetworkModelProjectStageResolver,
             NetworkModelProjectStageToAnnotatedProjectDependencyResolver
         )
 

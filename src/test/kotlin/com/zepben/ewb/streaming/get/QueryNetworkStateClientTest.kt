@@ -106,7 +106,7 @@ internal class QueryNetworkStateClientTest {
             CurrentStateEventBatch(4, listOf(SwitchStateEvent("event4", from.plusHours(1), "switch-2", SwitchAction.CLOSE)))
         )
 
-        service.onGetCurrentStates = spyk({ _, _ -> batches.asSequence() })
+        service.onGetCurrentStates = spyk(@JvmSerializableLambda { _, _ -> batches.asSequence() })
 
         val result = act(from, to)
 

@@ -149,10 +149,10 @@ internal class EquivalentNetworkCreatorTest {
             baseVoltage = BaseVoltage(generateId()).apply { nominalVoltage = 1 }
         }
 
-        val branchMrid = spyk<BranchMridSupplier>({ "branchMrid" })
-        val equipmentMrid = spyk<EquipmentMridSupplier>({ "equipmentMrid" })
-        val initBranch = spyk<BranchInitialisation>({ location = Location(generateId()) })
-        val initEquipment = spyk<EquipmentInitialisation<EnergySource>>({ baseVoltage = BaseVoltage(generateId()) })
+        val branchMrid = spyk<BranchMridSupplier>(@JvmSerializableLambda { "branchMrid" })
+        val equipmentMrid = spyk<EquipmentMridSupplier>(@JvmSerializableLambda { "equipmentMrid" })
+        val initBranch = spyk<BranchInitialisation>(@JvmSerializableLambda { location = Location(generateId()) })
+        val initEquipment = spyk<EquipmentInitialisation<EnergySource>>(@JvmSerializableLambda { baseVoltage = BaseVoltage(generateId()) })
 
         val results = network.addToEdgeBetween(lvFeeder, hvFeeder, branchMrid, equipmentMrid, null, initBranch, initEquipment)
 
@@ -191,7 +191,7 @@ internal class EquivalentNetworkCreatorTest {
             baseVoltage = BaseVoltage(generateId()).apply { nominalVoltage = 1 }
         }
 
-        val initBranch = spyk<BranchInitialisation>({ addTerminal(Terminal(generateId()).apply { phases = PhaseCode.AN }) })
+        val initBranch = spyk<BranchInitialisation>(@JvmSerializableLambda { addTerminal(Terminal(generateId()).apply { phases = PhaseCode.AN }) })
 
         val results = network.addToEdgeBetween<EnergySource>(lvFeeder, hvFeeder, initBranch = initBranch)
 
@@ -215,7 +215,7 @@ internal class EquivalentNetworkCreatorTest {
             baseVoltage = BaseVoltage(generateId()).apply { nominalVoltage = 1 }
         }
 
-        val initEquipment = spyk<EquipmentInitialisation<EnergySource>>({ addTerminal(Terminal(generateId()).apply { phases = PhaseCode.BN }) })
+        val initEquipment = spyk<EquipmentInitialisation<EnergySource>>(@JvmSerializableLambda { addTerminal(Terminal(generateId()).apply { phases = PhaseCode.BN }) })
 
         val results = network.addToEdgeBetween(lvFeeder, hvFeeder, initEquipment = initEquipment)
 
@@ -308,11 +308,11 @@ internal class EquivalentNetworkCreatorTest {
         val network = NetworkService()
         val (edgeEquipment, _, _, _) = network.createEdgeBetween<LvFeeder, Feeder>()
 
-        val equivalentBranchesCreator = spyk<EquivalentBranchesCreator>({
+        val equivalentBranchesCreator = spyk<EquivalentBranchesCreator>(@JvmSerializableLambda {
             sequenceOf(EquivalentBranch("${it.edgeEquipment.mRID}-b1"), EquivalentBranch("${it.edgeEquipment.mRID}-b2"))
         })
 
-        val equivalentEquipmentCreator = spyk<EquivalentEquipmentCreator>({
+        val equivalentEquipmentCreator = spyk<EquivalentEquipmentCreator>(@JvmSerializableLambda {
             sequenceOf(null to EnergyConsumer("${it.equivalentBranch.mRID}-e1"), null to EnergySource("${it.equivalentBranch.mRID}-e2"))
         })
 

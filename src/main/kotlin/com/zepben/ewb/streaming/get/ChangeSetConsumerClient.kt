@@ -15,6 +15,7 @@ import com.zepben.ewb.services.customer.CustomerService
 import com.zepben.ewb.services.diagram.DiagramService
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.variant.ChangeSetServices
+import com.zepben.ewb.services.variant.VariantService
 import com.zepben.ewb.streaming.grpc.GrpcChannel
 import com.zepben.ewb.streaming.grpc.GrpcResult
 import com.zepben.protobuf.nc.*
@@ -28,14 +29,19 @@ import io.grpc.Channel
  */
 class ChangeSetConsumerClient(
     val variantConsumerClient: VariantConsumerClient,
-    val newNetworkConsumerClient: NetworkConsumerClient?,
-    val originalNetworkConsumerClient: NetworkConsumerClient?,
-    val newDiagramConsumerClient: DiagramConsumerClient?,
-    val originalDiagramConsumerClient: DiagramConsumerClient?,
-    val newCustomerConsumerClient: CustomerConsumerClient?,
-    val originalCustomerConsumerClient: CustomerConsumerClient?,
+    val networkChannel: Channel?,
+    val diagramChannel: Channel?,
+    val customerChannel: Channel?,
+    val networkCallCredentials: CallCredentials?,
+    val diagramCallCredentials: CallCredentials?,
+    val customerCallCredentials: CallCredentials?,
 ) {
 
+    init {
+        require(networkChannel != null || diagramChannel != null || customerChannel != null) {
+            "At least one of networkChannel, diagramChannel, or customerChannel must be provided."
+        }
+    }
 
     /**
      * Create a [ChangeSetConsumerClient]
@@ -44,32 +50,36 @@ class ChangeSetConsumerClient(
      * @param callCredentials [CallCredentials] to be attached to the stubs.
      */
     @JvmOverloads
-    constructor(channel: Channel, callCredentials: CallCredentials? = null) :
+    constructor(channel: Channel, variantService: VariantService, callCredentials: CallCredentials? = null) :
         this(
-            VariantConsumerClient(channel, callCredentials),
-            NetworkConsumerClient(channel, callCredentials),
-            NetworkConsumerClient(channel, callCredentials),
-            DiagramConsumerClient(channel, callCredentials),
-            DiagramConsumerClient(channel, callCredentials),
-            CustomerConsumerClient(channel, callCredentials),
-            CustomerConsumerClient(channel, callCredentials),
+            VariantConsumerClient(channel, variantService, callCredentials),
+            channel,
+            channel,
+            channel,
+            callCredentials,
+            callCredentials,
+            callCredentials
         )
 
     constructor(
         variantChannel: Channel,
+        variantService: VariantService,
         networkChannel: Channel? = null,
         diagramChannel: Channel? = null,
         customerChannel: Channel? = null,
-        callCredentials: CallCredentials? = null
+        variantCallCredentials: CallCredentials? = null,
+        networkCallCredentials: CallCredentials? = null,
+        diagramCallCredentials: CallCredentials? = null,
+        customerCallCredentials: CallCredentials? = null,
     ) :
         this(
-            VariantConsumerClient(variantChannel, callCredentials),
-            networkChannel?.let { NetworkConsumerClient(it, callCredentials) },
-            networkChannel?.let { NetworkConsumerClient(it, callCredentials) },
-            diagramChannel?.let { DiagramConsumerClient(it, callCredentials) },
-            diagramChannel?.let { DiagramConsumerClient(it, callCredentials) },
-            customerChannel?.let { CustomerConsumerClient(it, callCredentials) },
-            customerChannel?.let { CustomerConsumerClient(it, callCredentials) },
+            VariantConsumerClient(variantChannel, variantService, variantCallCredentials),
+            networkChannel,
+            diagramChannel,
+            customerChannel,
+            networkCallCredentials,
+            diagramCallCredentials,
+            customerCallCredentials
         )
 
 
@@ -81,23 +91,31 @@ class ChangeSetConsumerClient(
      * @param callCredentials [CallCredentials] to be attached to the stub.
      */
     @JvmOverloads
-    constructor(channel: GrpcChannel, callCredentials: CallCredentials? = null) : this(channel.channel, callCredentials)
+    constructor(channel: GrpcChannel, variantService: VariantService, callCredentials: CallCredentials? = null) : this(
+        channel.channel,
+        variantService,
+        callCredentials
+    )
 
     constructor(
         variantChannel: GrpcChannel,
-        networkChannel: GrpcChannel? = null,
-        diagramChannel: GrpcChannel? = null,
-        customerChannel: GrpcChannel? = null,
-        callCredentials: CallCredentials? = null
+        variantService: VariantService,
+        networkChannel: GrpcChannel,
+        diagramChannel: GrpcChannel,
+        customerChannel: GrpcChannel,
+        variantCallCredentials: CallCredentials? = null,
+        networkCallCredentials: CallCredentials? = null,
+        diagramCallCredentials: CallCredentials? = null,
+        customerCallCredentials: CallCredentials? = null,
     ) :
         this(
-            VariantConsumerClient(variantChannel.channel, callCredentials),
-            networkChannel?.channel?.let { NetworkConsumerClient(it, callCredentials) },
-            networkChannel?.channel?.let { NetworkConsumerClient(it, callCredentials) },
-            diagramChannel?.channel?.let { DiagramConsumerClient(it, callCredentials) },
-            diagramChannel?.channel?.let { DiagramConsumerClient(it, callCredentials) },
-            customerChannel?.channel?.let { CustomerConsumerClient(it, callCredentials) },
-            customerChannel?.channel?.let { CustomerConsumerClient(it, callCredentials) },
+            VariantConsumerClient(variantChannel.channel, variantService, variantCallCredentials),
+            networkChannel.channel,
+            diagramChannel.channel,
+            customerChannel.channel,
+            networkCallCredentials,
+            diagramCallCredentials,
+            customerCallCredentials
         )
 
     /**
@@ -111,24 +129,40 @@ class ChangeSetConsumerClient(
      */
     fun getChangeSet(mRID: String): GrpcResult<ChangeSetServices> {
         variantConsumerClient.getChangeSet(mRID).throwOnError()
-        val nMor = newNetworkConsumerClient?.getChangeSetObjects(mRID, VariantContents.CREATIONS_MODIFICATIONS)?.throwOnError()
-        val dMor = newDiagramConsumerClient?.getChangeSetObjects(mRID, VariantContents.CREATIONS_MODIFICATIONS)?.throwOnError()
-        val cMor = newCustomerConsumerClient?.getChangeSetObjects(mRID, VariantContents.CREATIONS_MODIFICATIONS)?.throwOnError()
-        val nMorOriginal = originalNetworkConsumerClient?.getChangeSetObjects(mRID, VariantContents.DELETIONS_REVERSEMODIFICATIONS)?.throwOnError()
-        val dMorOriginal = originalDiagramConsumerClient?.getChangeSetObjects(mRID, VariantContents.DELETIONS_REVERSEMODIFICATIONS)?.throwOnError()
-        val cMorOriginal = originalCustomerConsumerClient?.getChangeSetObjects(mRID, VariantContents.DELETIONS_REVERSEMODIFICATIONS)?.throwOnError()
+        return variantConsumerClient.service.get<ChangeSet>(mRID)?.let { changeSet ->
+            val nMor = networkChannel?.let {
+                NetworkConsumerClient(it, networkCallCredentials).getChangeSetObjects(mRID, VariantContents.CREATIONS_MODIFICATIONS).throwOnError()
+            }
+            val nMorOriginal = networkChannel?.let {
+                NetworkConsumerClient(it, networkCallCredentials).getChangeSetObjects(mRID, VariantContents.DELETIONS_REVERSEMODIFICATIONS).throwOnError()
+            }
+            val dMor = diagramChannel?.let {
+                DiagramConsumerClient(it, diagramCallCredentials).getChangeSetObjects(mRID, VariantContents.CREATIONS_MODIFICATIONS).throwOnError()
+            }
+            val dMorOriginal = diagramChannel?.let {
+                DiagramConsumerClient(it, diagramCallCredentials).getChangeSetObjects(mRID, VariantContents.DELETIONS_REVERSEMODIFICATIONS).throwOnError()
+            }
+            val cMor = customerChannel?.let {
+                CustomerConsumerClient(it, customerCallCredentials).getChangeSetObjects(mRID, VariantContents.CREATIONS_MODIFICATIONS).throwOnError()
+            }
+            val cMorOriginal = customerChannel?.let {
+                CustomerConsumerClient(it, customerCallCredentials).getChangeSetObjects(mRID, VariantContents.DELETIONS_REVERSEMODIFICATIONS).throwOnError()
+            }
 
-        return GrpcResult.of(
-            ChangeSetServices(
-                variantConsumerClient.service,
-                newNetworkService = nMor?.value ?: NetworkService(),
-                originalNetworkService = nMorOriginal?.value ?: NetworkService(),
-                newDiagramService = dMor?.value ?: DiagramService(),
-                originalDiagramService = dMorOriginal?.value ?: DiagramService(),
-                newCustomerService = cMor?.value ?: CustomerService(),
-                originalCustomerService = cMorOriginal?.value ?: CustomerService(),
+            GrpcResult.of(
+                ChangeSetServices(
+                    changeSet,
+                    newNetworkService = nMor?.value ?: NetworkService(),
+                    originalNetworkService = nMorOriginal?.value ?: NetworkService(),
+                    newDiagramService = dMor?.value ?: DiagramService(),
+                    originalDiagramService = dMorOriginal?.value ?: DiagramService(),
+                    newCustomerService = cMor?.value ?: CustomerService(),
+                    originalCustomerService = cMorOriginal?.value ?: CustomerService(),
+                )
             )
-        )
+        }
+            ?: throw IllegalStateException("ChangeSet $mRID was missing from the service after retrieval - this shouldn't have occurred, contact Zepben for support.")
+
     }
 
 

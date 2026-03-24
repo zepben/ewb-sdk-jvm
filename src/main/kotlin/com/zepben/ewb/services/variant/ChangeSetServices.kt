@@ -16,7 +16,6 @@ import com.zepben.ewb.services.common.exceptions.UnsupportedIdentifiedObjectExce
 import com.zepben.ewb.services.customer.CustomerService
 import com.zepben.ewb.services.diagram.DiagramService
 import com.zepben.ewb.services.network.NetworkService
-import com.zepben.ewb.services.network.whenNetworkServiceObject
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KVisibility
 import kotlin.reflect.full.*
@@ -36,7 +35,7 @@ import kotlin.reflect.full.*
  * @param originalCustomerService Contains the ObjectDeletion and ObjectReverseModifications to the CustomerService.
  */
 class ChangeSetServices(
-    val variantService: VariantService = VariantService(),
+    val changeSet: ChangeSet,
     val newNetworkService: NetworkService = NetworkService(),
     val originalNetworkService: NetworkService = NetworkService(),
     val newDiagramService: DiagramService = DiagramService(),
@@ -46,18 +45,8 @@ class ChangeSetServices(
 )
 {
 
-    /**
-     * Helper to get a change set from the variantService.
-     */
-    fun getChangeSet(mRID: String): ChangeSet? = variantService.get<ChangeSet>(mRID)
-
-    /**
-     * Helper to get all change sets from the variantService.
-     */
-    fun changeSets(): Sequence<ChangeSet> = variantService.sequenceOf<ChangeSet>()
-
     fun get(changeSetMember: ChangeSetMember): Identifiable {
-        require(variantService.get<ChangeSetMember>(changeSetMember.mRID) != null) { "${changeSetMember.typeNameAndMRID()} must be present in the VariantService" }
+        require(changeSet.getMember(changeSetMember.targetObjectMRID) != null) { "${changeSetMember.typeNameAndMRID()} must be present in ${changeSet.typeNameAndMRID()}" }
         return when (changeSetMember) {
             is ObjectCreation,
             is ObjectModification -> getFromNew(changeSetMember.targetObjectMRID)
@@ -103,16 +92,11 @@ class ChangeSetServices(
 
 
     /**
-     * Helper function to add a changeset to [variantService]
-     */
-    fun addChangeSet(changeSet: ChangeSet): Boolean = variantService.add(changeSet)
-
-    /**
      * Create and add a new ObjectCreation for the provided [Identifiable]
      *
      * @param newObject The object that has been added.
      */
-    fun addCreation(changeSet: ChangeSet, newObject: Identifiable): Boolean {
+    fun addCreation(variantService: VariantService, changeSet: ChangeSet, newObject: Identifiable): Boolean {
         ObjectCreation().also { creation ->
             creation.targetObjectMRID = newObject.mRID
             creation.changeSet = changeSet
@@ -131,7 +115,9 @@ class ChangeSetServices(
      * @param originalObject The original object, before changes.
      * @return
      */
-    fun addModification(changeSet: ChangeSet, newObject: Identifiable, originalObject: Identifiable): Boolean {
+    fun addModification(variantService: VariantService, changeSet: ChangeSet, newObject: Identifiable, originalObject: Identifiable): Boolean {
+        require(newObject.mRID == originalObject.mRID) { "newObject (${newObject.mRID}) and originalObject (${originalObject.mRID}) must share the same mRID." }
+        require(newObject::class.java == originalObject::class.java) { "newObject (${newObject.typeNameAndMRID()}) and originalObject (${originalObject.typeNameAndMRID()}) must be of the same type." }
         ObjectModification().also { modification ->
             modification.targetObjectMRID = newObject.mRID
             modification.changeSet = changeSet
@@ -141,7 +127,7 @@ class ChangeSetServices(
 
         addModificationAssociations(originalObject, originalNetworkService) // TODO test this and logic may be bad...
         addModificationAssociations(newObject, newNetworkService) // TODO test this
-        addToOriginal(originalObject) // ObjectReverseModification - we don't care about whether this succeeded as it should have be false if the obj is already present.
+        addToOriginal(originalObject) // ObjectReverseModification - we don't care about whether this succeeded as it should be false if the obj is already present.
         return addToNew(newObject)
     }
 
@@ -150,7 +136,7 @@ class ChangeSetServices(
      *
      * @param originalObject The object to delete.
      */
-    fun addDeletion(changeSet: ChangeSet, originalObject: Identifiable): Boolean {
+    fun addDeletion(variantService: VariantService, changeSet: ChangeSet, originalObject: Identifiable): Boolean {
         ObjectDeletion().also { deletion ->
             deletion.targetObjectMRID = originalObject.mRID
             deletion.changeSet = changeSet

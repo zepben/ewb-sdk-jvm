@@ -113,6 +113,8 @@ fun toCim(pb: PBNetworkModelProjectComponent, cim: NetworkModelProjectComponent,
         closed = pb.closedSet.takeUnless { pb.hasClosedNull() }?.toInstant()
 
         networkService.resolveOrDeferReference(Resolvers.networkModelProjects(this), pb.parentMRID)
+
+        toCim(pb.io, this, networkService)
     }
 
 /**

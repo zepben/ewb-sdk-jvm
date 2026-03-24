@@ -57,7 +57,7 @@ internal class VariantConsumerClientTest {
     private val channel = grpcCleanup.register(InProcessChannelBuilder.forName(serverName).directExecutor().build())
     private val stub = spy(VariantConsumerGrpc.newStub(channel).withExecutor(Executors.newSingleThreadExecutor()))
     private val onErrorHandler = CaptureLastRpcErrorHandler()
-    private val consumerClient = spy(VariantConsumerClient(stub).apply { addErrorHandler(onErrorHandler) })
+    private val consumerClient = spy(VariantConsumerClient(stub, VariantService()).apply { addErrorHandler(onErrorHandler) })
     private val service = consumerClient.service
 
     private val serverException = IllegalStateException("custom message")

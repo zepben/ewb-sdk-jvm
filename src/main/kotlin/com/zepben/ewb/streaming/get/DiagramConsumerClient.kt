@@ -95,8 +95,7 @@ class DiagramConsumerClient(
     /**
      * Retrieve the network contents of a [ChangeSet] from the server.
      * This will return a new [DiagramService] with just the network related contents of the [ChangeSet].
-     * Note this function does not populate [service] as merging a [ChangeSet] with a [DiagramService] should use
-     * XXXX TODO fill this in with merge functionality???.
+     * Note this function does not populate [service] as merging a [ChangeSet] with a [DiagramService] should use XXXX TODO fill this in with merge functionality???.
      *
      * @param mRID The mRID of the [ChangeSet] to retrieve contents for.
      * @return A [GrpcResult] of a [DiagramService].

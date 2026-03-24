@@ -25,11 +25,12 @@ class ChangeSetServicesTest {
 
     @Test
     fun testAddCreation() {
-        val services = ChangeSetServices()
-        val cs = ChangeSet("cs").also { services.addChangeSet(it) }
+        val cs = ChangeSet("cs")
+        val services = ChangeSetServices(cs)
+        val variantService = VariantService()
         val io = AcLineSegment("test")
 
-        services.addCreation(cs, io)
+        services.addCreation(variantService, cs, io)
 
         val obj = cs.getMember("test")!!
         assertThat(obj, isA(ObjectCreation::class.java))
@@ -40,24 +41,25 @@ class ChangeSetServicesTest {
 
     @Test
     fun testAddModification() {
-        val services = ChangeSetServices()
-        val cs = ChangeSet("cs").also { services.addChangeSet(it) }
+        val cs = ChangeSet("cs")
+        val services = ChangeSetServices(cs)
+        val variantService = VariantService()
         val io = AcLineSegment("test")
         val ioOriginal = AcLineSegment("test")
         val ioThrowsMRID = AcLineSegment("test3")
         val ioThrowsType = Junction("test")
 
         expect {
-            services.addModification(cs, io, ioThrowsMRID)
+            services.addModification(variantService, cs, io, ioThrowsMRID)
         }.toThrow<IllegalArgumentException>()
             .withMessage("newObject (${io.mRID}) and originalObject (${ioThrowsMRID.mRID}) must share the same mRID.")
 
         expect {
-            services.addModification(cs, io, ioThrowsType)
+            services.addModification(variantService, cs, io, ioThrowsType)
         }.toThrow<IllegalArgumentException>()
             .withMessage("newObject (${io.typeNameAndMRID()}) and originalObject (${ioThrowsType.typeNameAndMRID()}) must be of the same type.")
 
-        services.addModification(cs, io, ioOriginal)
+        services.addModification(variantService, cs, io, ioOriginal)
 
         val obj = cs.getMember("test")!!
         assertThat(obj, isA(ObjectModification::class.java))
@@ -69,11 +71,12 @@ class ChangeSetServicesTest {
 
     @Test
     fun testAddDeletion() {
-        val services = ChangeSetServices()
-        val cs = ChangeSet("cs").also { services.addChangeSet(it) }
+        val cs = ChangeSet("cs")
+        val services = ChangeSetServices(cs)
+        val variantService = VariantService()
         val io = AcLineSegment("test")
 
-        services.addDeletion(cs, io)
+        services.addDeletion(variantService, cs, io)
 
         val obj = cs.getMember("test")!!
         assertThat(obj, isA(ObjectDeletion::class.java))

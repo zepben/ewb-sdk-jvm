@@ -40,7 +40,7 @@ import com.zepben.protobuf.cim.extensions.iec61970.infiec61970.infpart303.networ
  */
 class VariantConsumerClient @JvmOverloads constructor(
     override val stub: VariantConsumerGrpc.VariantConsumerStub,
-    override val service: VariantService = VariantService(),
+    override val service: VariantService,
     override val protoToCim: VariantProtoToCim = VariantProtoToCim(service),
 ) : CimConsumerClient<VariantService, VariantProtoToCim, VariantConsumerGrpc.VariantConsumerStub>() {
 
@@ -51,9 +51,10 @@ class VariantConsumerClient @JvmOverloads constructor(
      * @param callCredentials [CallCredentials] to be attached to the stub.
      */
     @JvmOverloads
-    constructor(channel: Channel, callCredentials: CallCredentials? = null) :
+    constructor(channel: Channel, variantService: VariantService = VariantService(), callCredentials: CallCredentials? = null) :
         this(
             VariantConsumerGrpc.newStub(channel).withExecutor(Executors.newSingleThreadExecutor()).apply { callCredentials?.let { withCallCredentials(it) } },
+            variantService
         )
 
     /**
@@ -63,7 +64,7 @@ class VariantConsumerClient @JvmOverloads constructor(
      * @param callCredentials [CallCredentials] to be attached to the stub.
      */
     @JvmOverloads
-    constructor(channel: GrpcChannel, callCredentials: CallCredentials? = null) : this(channel.channel, callCredentials)
+    constructor(channel: GrpcChannel, variantService: VariantService = VariantService(), callCredentials: CallCredentials? = null) : this(channel.channel, variantService, callCredentials)
 
     override fun processIdentifiedObjects(mRIDs: Sequence<String>): Sequence<ExtractResult> {
         val extractResults = mutableListOf<ExtractResult>()

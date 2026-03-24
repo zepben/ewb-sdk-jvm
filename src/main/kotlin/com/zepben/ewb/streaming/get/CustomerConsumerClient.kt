@@ -16,6 +16,7 @@ import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.customer.CustomerService
 import com.zepben.ewb.services.customer.translator.CustomerProtoToCim
 import com.zepben.ewb.services.customer.translator.addFromPb
+import com.zepben.ewb.services.diagram.DiagramService
 import com.zepben.ewb.streaming.grpc.GrpcChannel
 import com.zepben.ewb.streaming.grpc.GrpcResult
 import com.zepben.protobuf.cc.*
@@ -93,7 +94,7 @@ class CustomerConsumerClient @JvmOverloads constructor(
     /**
      * Retrieve the network contents of a [ChangeSet] from the server.
      * This will return a new [CustomerService] with just the network related contents of the [ChangeSet].
-     * Note this function does not populate [service] as merging a [ChangeSet] with a [CustomerService] should use XXXX TODO fill this in.
+     * Note this function does not populate [service] as merging a [ChangeSet] with a [DiagramService] should use XXXX TODO fill this in with merge functionality???.
      *
      * @param mRID The mRID of the [ChangeSet] to retrieve contents for.
      * @return A [GrpcResult] of a [CustomerService].

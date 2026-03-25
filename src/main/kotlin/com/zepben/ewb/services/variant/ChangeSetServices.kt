@@ -116,8 +116,8 @@ class ChangeSetServices(
      * @return
      */
     fun addModification(variantService: VariantService, changeSet: ChangeSet, newObject: Identifiable, originalObject: Identifiable): Boolean {
-        require(newObject.mRID == originalObject.mRID) { "newObject (${newObject.mRID}) and originalObject (${originalObject.mRID}) must share the same mRID." }
-        require(newObject::class.java == originalObject::class.java) { "newObject (${newObject.typeNameAndMRID()}) and originalObject (${originalObject.typeNameAndMRID()}) must be of the same type." }
+//        require(newObject.mRID == originalObject.mRID) { "newObject (${newObject.mRID}) and originalObject (${originalObject.mRID}) must share the same mRID." }
+//        require(newObject::class.java == originalObject::class.java) { "newObject (${newObject.typeNameAndMRID()}) and originalObject (${originalObject.typeNameAndMRID()}) must be of the same type." }
         ObjectModification().also { modification ->
             modification.targetObjectMRID = newObject.mRID
             modification.changeSet = changeSet

@@ -16,7 +16,6 @@ import com.zepben.ewb.streaming.grpc.GrpcResult
 import com.zepben.protobuf.metadata.GetMetadataRequest
 import com.zepben.protobuf.metadata.GetMetadataResponse
 import com.zepben.protobuf.nc.NetworkConsumerGrpc.NetworkConsumerStub
-import io.grpc.stub.AbstractAsyncStub
 import io.mockk.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo

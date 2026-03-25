@@ -23,9 +23,11 @@ import org.junit.jupiter.api.extension.RegisterExtension
 
 class BaseProtoToCimTest {
 
-    @JvmField
-    @RegisterExtension
-    val systemErr: SystemLogExtension = SystemLogExtension.Companion.SYSTEM_ERR.captureLog().muteOnSuccess()
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     private val service = NetworkService()
     private val junction = Junction("mRID1").also { service.add(it) }

@@ -7,8 +7,6 @@
  */
 
 
-@file:Suppress("PropertyName")
-
 package com.zepben.ewb.services.network.tracing.phases
 
 import com.zepben.ewb.cim.iec61970.base.core.ConductingEquipment

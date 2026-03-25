@@ -15,12 +15,12 @@ import org.junit.jupiter.api.Test
 class PhaseImpedanceDataTest {
     @Test
     internal fun constructorCoverage() {
-        assertThat(com.zepben.ewb.cim.iec61970.base.wires.PhaseImpedanceData(SinglePhaseKind.A, SinglePhaseKind.B, 0.0, 0.0, 0.0, 0.0), notNullValue())
+        assertThat(PhaseImpedanceData(SinglePhaseKind.A, SinglePhaseKind.B, 0.0, 0.0, 0.0, 0.0), notNullValue())
     }
 
     @Test
     internal fun accessorCoverage() {
-        var data = com.zepben.ewb.cim.iec61970.base.wires.PhaseImpedanceData(SinglePhaseKind.A, SinglePhaseKind.B)
+        var data = PhaseImpedanceData(SinglePhaseKind.A, SinglePhaseKind.B)
 
         assertThat(data.fromPhase, equalTo(SinglePhaseKind.A))
         assertThat(data.toPhase, equalTo(SinglePhaseKind.B))
@@ -29,7 +29,7 @@ class PhaseImpedanceDataTest {
         assertThat(data.r, nullValue())
         assertThat(data.x, nullValue())
 
-        data = com.zepben.ewb.cim.iec61970.base.wires.PhaseImpedanceData(SinglePhaseKind.NONE, SinglePhaseKind.NONE, 0.1, 0.2, 0.3, 0.4)
+        data = PhaseImpedanceData(SinglePhaseKind.NONE, SinglePhaseKind.NONE, 0.1, 0.2, 0.3, 0.4)
 
         assertThat(data.toPhase, equalTo(SinglePhaseKind.NONE))
         assertThat(data.fromPhase, equalTo(SinglePhaseKind.NONE))

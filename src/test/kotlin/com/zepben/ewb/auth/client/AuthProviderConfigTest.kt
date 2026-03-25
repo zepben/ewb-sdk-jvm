@@ -21,17 +21,17 @@ import java.net.http.HttpResponse.BodyHandler
 
 class AuthProviderConfigTest {
 
-    val handler = mockk<BodyHandler<String>>()
-    val response = mockk<HttpResponse<String>> {
+    val handler: BodyHandler<String> = mockk<BodyHandler<String>>()
+    val response: HttpResponse<String> = mockk<HttpResponse<String>> {
         every { statusCode() } returns StatusCode.OK.code
         every { body() } returns "{}"
     }
-    val client = mockk<HttpClient> {
+    val client: HttpClient = mockk<HttpClient> {
         every { send(any(), handler) } returns response
     }
 
-    val clientCreator = { client }
-    val verifyCertificates = true
+    val clientCreator: () -> HttpClient = { client }
+    val verifyCertificates: Boolean = true
 
     @Test
     fun `handles handles issuers with and without slashes`() {

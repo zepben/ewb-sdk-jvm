@@ -117,6 +117,7 @@ object SchemaServices {
      */
     fun fillEmptys(io: IdentifiedObject) {
         io::class.memberProperties
+            .asSequence()
             .filter { it.visibility == KVisibility.PUBLIC }
             .filter { it.returnType.isMarkedNullable }
             .filterNot { it.name.uppercase().endsWith("MRID") } // Ignore identifiedObjectMRID, customerMRID, etc
@@ -155,12 +156,7 @@ object SchemaServices {
                     else -> throw IllegalStateException("INTERNAL ERROR: You forgot to add an empty value mapper for ${prop.returnType} - used by ${io::class.simpleName}.${prop.name}")
                 }
 
-//                try {
                 prop.setter.call(io, value)
-//                } catch (_: Exception) {
-//                    // Any exception in setting the value to the empty value means there are constraints in place, and the old null
-//                    // replacements won't be an issue, so can safely be ignored.
-//                }
             }
     }
 

@@ -68,7 +68,7 @@ internal class UpdateNetworkStateServiceTest {
         )
     )
     private val onSetCurrentStates = mockk<(batchId: Long, events: List<CurrentStateEvent>) -> CompletableFuture<SetCurrentStatesStatus>>().also {
-        every { it(capture(batchIdSlot), capture(eventsSlot)) } returnsMany setCurrentStatesReturns.map { CompletableFuture.completedFuture(it) }
+        every { it(capture(batchIdSlot), capture(eventsSlot)) } returnsMany setCurrentStatesReturns.map { r -> CompletableFuture.completedFuture(r) }
     }
     private val error = Error("TEST ERROR!")
     private val onProcessingErrorSlot = slot<Throwable>()

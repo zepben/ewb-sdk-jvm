@@ -113,6 +113,7 @@ class JWKHolderTest {
     private fun validateKeyRequests(requests: List<KeyRequestCheck>) {
         excludeRecords {
             requests.forEach {
+                @Suppress("ReplaceCallWithBinaryOperator")
                 it.trustedIssuer.equals(any()) //this is from the answer selection... https://github.com/mockk/mockk/issues/577
             }
         }
@@ -129,6 +130,7 @@ class JWKHolderTest {
         }
     }
 
+    @Suppress("SameParameterValue")
     private fun validateKeyRequest(trustedIssuer: TrustedIssuer, jwkProvider: (TrustedIssuer) -> Map<String, Jwk>, expectCacheRefresh: Boolean) {
         validateKeyRequests(listOf(KeyRequestCheck(trustedIssuer, jwkProvider, expectCacheRefresh)))
     }

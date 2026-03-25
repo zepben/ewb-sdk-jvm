@@ -59,7 +59,6 @@ internal class PhaseLogger private constructor(asset: ConductingEquipment) : Ste
             trace(listOf(asset!!))
         }
 
-        @Suppress("MemberVisibilityCanBePrivate")
         fun trace(assets: Collection<ConductingEquipment?>) {
             assets.forEach { asset ->
                 val pl = PhaseLogger(asset!!)

@@ -39,7 +39,6 @@ internal class ZepbenTokenFetcherTest {
     private val client = mock<HttpClient>()
     private val response = mock<HttpResponse<String>>()
 
-    private val secureSSLContext = mock<SSLContext>()
     private val secureConfSSLContext = mock<SSLContext>()
     private val secureAuthSSLContext = mock<SSLContext>()
     private val insecureSSLContext = mock<SSLContext>()

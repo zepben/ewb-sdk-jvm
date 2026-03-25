@@ -287,6 +287,7 @@ class ClearDirectionTest {
 
     private fun Terminal.validateDirection(feederDirection: FeederDirection) = validateDirection(feederDirection, stateOperators)
 
+    @Suppress("SameParameterValue")
     private fun TestNetworkBuilder.buildAndLog(vararg logFrom: String) = build().apply {
         DirectionLogger.trace(logFrom.map { get(it) })
     }

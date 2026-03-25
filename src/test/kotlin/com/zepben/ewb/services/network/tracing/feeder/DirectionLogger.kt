@@ -57,7 +57,6 @@ internal class DirectionLogger private constructor(asset: ConductingEquipment) :
             trace(listOf(asset))
         }
 
-        @Suppress("MemberVisibilityCanBePrivate")
         fun trace(assets: Collection<ConductingEquipment?>) {
             assets.forEach { asset ->
                 val pl = DirectionLogger(asset!!)

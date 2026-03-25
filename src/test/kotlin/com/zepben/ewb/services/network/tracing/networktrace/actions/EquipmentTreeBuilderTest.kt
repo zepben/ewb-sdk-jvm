@@ -297,7 +297,7 @@ internal class EquipmentTreeBuilderTest {
         val processNodes = ArrayDeque<TreeNode<ConductingEquipment>>()
         processNodes.addLast(root)
 
-        while (processNodes.size > 0) {
+        while (processNodes.isNotEmpty()) {
             val node = Objects.requireNonNull(processNodes.pollFirst())
             if (node.identifiedObject.mRID == assetId)
                 matches.add(node)

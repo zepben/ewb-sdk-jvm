@@ -59,7 +59,7 @@ class ShuntCompensatorConditionTest {
         validateQueues(stepOf(NetworkTraceStep.Path(fromTerm, groundTerm)), shouldQueue = false)
     }
 
-    private fun stepOf(path: NetworkTraceStep.Path) = NetworkTraceStep<Unit>(path, 0, 0, Unit)
+    private fun stepOf(path: NetworkTraceStep.Path) = NetworkTraceStep(path, 0, 0, Unit)
 
     private fun validateQueues(nextStep: NetworkTraceStep<Unit>, shouldQueue: Boolean = true) {
         val result = ShuntCompensatorCondition.StopOnGround<Unit>().shouldQueue(nextStep, mockk(), mockk(), mockk())

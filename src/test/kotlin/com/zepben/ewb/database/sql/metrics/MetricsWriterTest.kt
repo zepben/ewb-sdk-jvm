@@ -91,6 +91,7 @@ internal class MetricsWriterTest {
         verify { insert.setTimestamp(3, null) }
     }
 
+    @Suppress("SameParameterValue")
     private fun jobSource(keyVal: String = "", timestampVal: Instant? = Instant.EPOCH, fileHashVal: ByteArray = ByteArray(0)): JobSource =
         mockk<JobSource>().apply {
             every { key } returns keyVal

@@ -21,7 +21,7 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 
-const val write_network_scope = "write:network"
+const val write_network_scope: String = "write:network"
 
 class AuthInterceptorTest {
 

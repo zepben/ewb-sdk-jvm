@@ -23,6 +23,7 @@ object ConnectivityNodeNetworks {
         return ns
     }
 
+    @Suppress("SameParameterValue")
     private fun createConnectivityNodeWithTerminals(ns: NetworkService, mRID: String, vararg terminalPhases: PhaseCode) =
         ConnectivityNode(mRID).apply {
             ns.add(this)

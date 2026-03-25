@@ -246,7 +246,7 @@ object NetworkHierarchyAllTypes {
         GeographicalRegion("gr2").apply { name = "gr 2" }.also { service.add(it) }
 
         val sgr1 = SubGeographicalRegion("sgr1").apply {
-            name = "sgr 1";
+            name = "sgr 1"
             if (includeGeographicalRegions)
                 geographicalRegion = gr1
         }.also {
@@ -256,7 +256,7 @@ object NetworkHierarchyAllTypes {
         }
 
         SubGeographicalRegion("sgr2").apply {
-            name = "sgr 2";
+            name = "sgr 2"
             if (includeGeographicalRegions)
                 geographicalRegion = gr1
         }.also {
@@ -266,7 +266,7 @@ object NetworkHierarchyAllTypes {
         }
 
         val sub1 = Substation("sub1").apply {
-            name = "sub 1";
+            name = "sub 1"
             if (includeSubgeographicalRegions) {
                 subGeographicalRegion = sgr1
                 sgr1.addSubstation(this)
@@ -283,7 +283,7 @@ object NetworkHierarchyAllTypes {
         }
 
         Substation("sub2").apply {
-            name = "sub 2";
+            name = "sub 2"
             if (includeSubgeographicalRegions) {
                 subGeographicalRegion = sgr1
                 sgr1.addSubstation(this)
@@ -308,11 +308,11 @@ object NetworkHierarchyAllTypes {
             service.add(this)
         }
 
-        val fdr2 = Feeder("fdr2").apply {
-            name = "fdr 2";
+        Feeder("fdr2").apply {
+            name = "fdr 2"
             if (includeSubstations) {
                 normalEnergizingSubstation = sub1
-                sub1.addFeeder(this);
+                sub1.addFeeder(this)
             }
             service.add(this)
         }
@@ -320,7 +320,7 @@ object NetworkHierarchyAllTypes {
         val lvf1 = LvFeeder("lvfdr1").apply {
             name = "lvfdr 1"
             if (includeFeeders) {
-                fdr1.addNormalEnergizedLvFeeder(this);
+                fdr1.addNormalEnergizedLvFeeder(this)
                 this.addNormalEnergizingFeeder(fdr1)
             }
             service.add(this)
@@ -328,7 +328,7 @@ object NetworkHierarchyAllTypes {
         LvFeeder("lvfdr2").apply {
             name = "lvfdr 2"
             if (includeFeeders) {
-                fdr1.addNormalEnergizedLvFeeder(this);
+                fdr1.addNormalEnergizedLvFeeder(this)
                 this.addNormalEnergizingFeeder(fdr1)
             }
             service.add(this)
@@ -337,7 +337,7 @@ object NetworkHierarchyAllTypes {
         LvSubstation("lvsub1").apply {
             name = "lvsub 1"
             if (includeFeeders) {
-                fdr1.addNormalEnergizedLvSubstation(this);
+                fdr1.addNormalEnergizedLvSubstation(this)
                 this.addNormalEnergizingFeeder(fdr1)
             }
             if (includeLvFeeders) {
@@ -350,7 +350,7 @@ object NetworkHierarchyAllTypes {
         LvSubstation("lvsub2").apply {
             name = "lvsub 2"
             if (includeFeeders) {
-                fdr1.addNormalEnergizedLvSubstation(this);
+                fdr1.addNormalEnergizedLvSubstation(this)
                 this.addNormalEnergizingFeeder(fdr1)
             }
             service.add(this)

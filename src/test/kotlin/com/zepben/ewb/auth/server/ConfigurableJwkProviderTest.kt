@@ -19,11 +19,11 @@ import java.net.http.HttpClient
 import java.net.http.HttpResponse
 
 class ConfigurableJwkProviderTest {
-    val clientCreator = { client }
-    val url = URL("http://fake-url.com")
+    val clientCreator: () -> HttpClient = { client }
+    val url: URL = URL("https://fake-url.com")
 
     // Sampled from Microsoft keys
-    val reponseBody = """
+    val reponseBody: String = """
         {
           "keys": [
             {
@@ -56,12 +56,12 @@ class ConfigurableJwkProviderTest {
         }
    """.trimIndent()
 
-    val response = mockk<HttpResponse<String>>() {
+    val response: HttpResponse<String> = mockk<HttpResponse<String>> {
         every { statusCode() } returns StatusCode.OK.code
         every { body() } returns reponseBody
     }
 
-    val client = mockk<HttpClient>() {
+    val client: HttpClient = mockk<HttpClient> {
         every { send(any(), HttpResponse.BodyHandlers.ofString()) } returns response
     }
 

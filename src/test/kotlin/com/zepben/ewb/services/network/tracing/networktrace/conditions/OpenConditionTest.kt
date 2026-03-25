@@ -39,7 +39,7 @@ class OpenConditionTest {
         val isOpen = mockk<(Switch, SinglePhaseKind?) -> Boolean>()
         val spk = mockk<SinglePhaseKind>()
 
-        val nextPath = mockk<NetworkTraceStep.Path>() { every { toEquipment } returns mockk<ConductingEquipment>() }
+        val nextPath = mockk<NetworkTraceStep.Path> { every { toEquipment } returns mockk<ConductingEquipment>() }
         val nextStep = mockk<NetworkTraceStep<Unit>> {
             every { type } returns NetworkTraceStep.Type.INTERNAL
             every { path } returns nextPath

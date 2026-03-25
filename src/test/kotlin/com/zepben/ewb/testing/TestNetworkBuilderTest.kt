@@ -441,6 +441,7 @@ internal class TestNetworkBuilderTest {
         assertThat(get<Feeder>(mRID)!!.normalHeadTerminal, equalTo(get(headTerminal)))
     }
 
+    @Suppress("SameParameterValue")
     private fun NetworkService.validateLvFeeder(mRID: String, headTerminal: String) {
         assertThat(get<LvFeeder>(mRID)!!.normalHeadTerminal, equalTo(get(headTerminal)))
     }

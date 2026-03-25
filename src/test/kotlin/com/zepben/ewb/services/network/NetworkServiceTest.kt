@@ -474,6 +474,7 @@ internal class NetworkServiceTest {
 
     private fun PhaseCode.toSet(): Set<SinglePhaseKind> = singlePhases.toSet()
 
+    @Suppress("SameParameterValue")
     private class PhasePathSet private constructor(private val fromPhases: PhaseCode) {
         fun to(toPhases: PhaseCode): Set<NominalPhasePath> {
             return IntStream.range(0, fromPhases.singlePhases.size)

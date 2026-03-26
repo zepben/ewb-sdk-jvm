@@ -6,3 +6,5 @@ jobs:
   release:
     uses: zepben/.github/.github/workflows/maven-lib-release.yml@main
     secrets: inherit
+    with:
+      java-major-version: "17"

@@ -2,6 +2,7 @@
 
 | Version                  | Released              |
 | ------------------------ | --------------------- |
+|[1.8.0](#180)| `26 March 2026` |
 |[1.7.0](#170)| `13 March 2026` |
 |[1.6.0](#160)| `02 March 2026` |
 |[1.5.0](#150)| `13 February 2026` |
@@ -47,6 +48,25 @@
 ---
 
 NOTE: This library is not yet stable, and breaking changes should be expected until a 1.0.0 release.
+
+---
+
+## [1.8.0]
+
+### Breaking Changes
+* None.
+
+### New Features
+* None.
+
+### Enhancements
+* None.
+
+### Fixes
+* None.
+
+### Notes
+* Updated Kotlin from `1.9.10` -> `1.9.24`.
 
 ---
 

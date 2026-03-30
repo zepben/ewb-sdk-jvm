@@ -12,3 +12,5 @@ jobs:
   snapshot:
     uses: zepben/.github/.github/workflows/maven-lib-snapshot.yml@main
     secrets: inherit
+    with:
+      java-major-version: "17"

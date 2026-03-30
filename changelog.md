@@ -1,7 +1,7 @@
 # Zepben EWB SDK changelog
 ## [1.9.0] - UNRELEASED
 ### Breaking Changes
-* None.
+* Minimum required JVM version for compilation is 17
 
 ### New Features
 * None.
@@ -13,7 +13,7 @@
 * None.
 
 ### Notes
-* None.
+* Updated Kotlin from `1.9.24` -> `2.3.20`.
 
 ## [1.8.0] - 2026-03-26
 ### Breaking Changes

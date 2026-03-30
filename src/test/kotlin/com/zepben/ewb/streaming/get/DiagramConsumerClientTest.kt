@@ -86,7 +86,7 @@ internal class DiagramConsumerClientTest {
             val mRID = "id" + ++counter
             val response = createResponse(builder, it, mRID)
 
-            consumerService.onGetIdentifiables = spy { request, resp ->
+            consumerService.onGetIdentifiables = spy @JvmSerializableLambda { request, resp ->
                 assertThat(request.mridsList, containsInAnyOrder(mRID))
                 resp.onNext(response)
             }
@@ -112,7 +112,7 @@ internal class DiagramConsumerClientTest {
     @Test
     internal fun `returns error when object is not found`() {
         val mRID = "unknown"
-        consumerService.onGetIdentifiables = spy { _, _ -> }
+        consumerService.onGetIdentifiables = spy @JvmSerializableLambda { _, _ -> }
 
         val result = consumerClient.getIdentifiable(mRID)
 
@@ -126,7 +126,7 @@ internal class DiagramConsumerClientTest {
     @Test
     internal fun `calls error handler when getting an IdentifiedObject throws`() {
         val mRID = "1234"
-        consumerService.onGetIdentifiables = spy { _, _ -> throw serverException }
+        consumerService.onGetIdentifiables = spy @JvmSerializableLambda { _, _ -> throw serverException }
 
         val result = consumerClient.getIdentifiable(mRID)
 
@@ -137,7 +137,7 @@ internal class DiagramConsumerClientTest {
     @Test
     internal fun `captures unhandled exceptions when getting an IdentifiedObject throws`() {
         val mRID = "1234"
-        consumerService.onGetIdentifiables = spy { _, _ -> throw serverException }
+        consumerService.onGetIdentifiables = spy @JvmSerializableLambda { _, _ -> throw serverException }
 
         consumerClient.removeErrorHandler(onErrorHandler)
 
@@ -151,7 +151,7 @@ internal class DiagramConsumerClientTest {
     internal fun `can get multiple identified objects in single call`() {
         val mRIDs = listOf("id1", "id2", "id3")
 
-        consumerService.onGetIdentifiables = spy { _, response ->
+        consumerService.onGetIdentifiables = spy @JvmSerializableLambda { _, response ->
             response.onNext(createResponse(DIO.newBuilder(), DIO.Builder::getDiagramBuilder, mRIDs[0]))
             response.onNext(createResponse(DIO.newBuilder(), DIO.Builder::getDiagramBuilder, mRIDs[1]))
             response.onNext(createResponse(DIO.newBuilder(), DIO.Builder::getDiagramObjectBuilder, mRIDs[2]))
@@ -171,7 +171,7 @@ internal class DiagramConsumerClientTest {
     @Test
     internal fun `calls error handler when getting multiple IdentifiedObject throws`() {
         val mRIDs = listOf("id1", "id2", "id3")
-        consumerService.onGetIdentifiables = spy { _, _ -> throw serverException }
+        consumerService.onGetIdentifiables = spy @JvmSerializableLambda { _, _ -> throw serverException }
 
         val result = consumerClient.getIdentifiables(mRIDs.asSequence())
 
@@ -182,7 +182,7 @@ internal class DiagramConsumerClientTest {
     @Test
     internal fun `captures unhandled exceptions when getting multiple IdentifiedObject throws`() {
         val mRIDs = listOf("id1", "id2", "id3")
-        consumerService.onGetIdentifiables = spy { _, _ -> throw serverException }
+        consumerService.onGetIdentifiables = spy @JvmSerializableLambda { _, _ -> throw serverException }
 
         consumerClient.removeErrorHandler(onErrorHandler)
 
@@ -196,7 +196,7 @@ internal class DiagramConsumerClientTest {
     internal fun `getIdentifiables returns failed mRID when an mRID is not found`() {
         val mRIDs = listOf("id1", "id2")
 
-        consumerService.onGetIdentifiables = spy { _, response ->
+        consumerService.onGetIdentifiables = spy @JvmSerializableLambda { _, response ->
             response.onNext(createResponse(DIO.newBuilder(), DIO.Builder::getDiagramBuilder, mRIDs[0]))
         }
 
@@ -216,7 +216,7 @@ internal class DiagramConsumerClientTest {
         val diagram = Diagram(mRIDs[0])
         service.add(diagram)
 
-        consumerService.onGetIdentifiables = spy { _, response ->
+        consumerService.onGetIdentifiables = spy @JvmSerializableLambda { _, response ->
             response.onNext(createResponse(DIO.newBuilder(), DIO.Builder::getDiagramBuilder, mRIDs[0]))
             response.onNext(createResponse(DIO.newBuilder(), DIO.Builder::getDiagramBuilder, mRIDs[1]))
             response.onNext(createResponse(DIO.newBuilder(), DIO.Builder::getDiagramObjectBuilder, mRIDs[2]))
@@ -260,7 +260,7 @@ internal class DiagramConsumerClientTest {
 
     @Test
     internal fun `calls error handler when getting the metadata throws`() {
-        consumerService.onGetMetadataRequest = spy { _, _ -> throw serverException }
+        consumerService.onGetMetadataRequest = spy @JvmSerializableLambda { _, _ -> throw serverException }
 
         val result = consumerClient.getMetadata()
 
@@ -308,7 +308,7 @@ internal class DiagramConsumerClientTest {
     }
 
     private fun configureResponses(expectedDiagramService: DiagramService) {
-        consumerService.onGetDiagramObjects = spy { request, response ->
+        consumerService.onGetDiagramObjects = spy @JvmSerializableLambda { request, response ->
             val objects = mutableListOf<DiagramObject>()
             request.mridsList.forEach { mRID ->
                 expectedDiagramService.getDiagramObjects(mRID).forEach { diagramObject ->

@@ -143,7 +143,7 @@ internal class UpdateNetworkStateClientTest {
         // We must have the same number of responses as batches to prevent errors about ArrayDeque having no elements.
         assertThat(responses, hasSize(batches.size))
 
-        service.onSetCurrentStates = spy { request, response ->
+        service.onSetCurrentStates = spy @JvmSerializableLambda { request, response ->
             response.onNext(responses.removeFirst()?.apply { messageId = request.messageId }?.build())
         }
 

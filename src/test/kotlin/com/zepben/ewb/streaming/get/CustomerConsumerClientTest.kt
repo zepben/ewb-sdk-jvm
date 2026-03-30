@@ -87,7 +87,7 @@ internal class CustomerConsumerClientTest {
             val mRID = "id" + ++counter
             val response = createResponse(builder, it, mRID)
 
-            consumerService.onGetIdentifiables = spy { request, resp ->
+            consumerService.onGetIdentifiables = spy @JvmSerializableLambda { request, resp ->
                 assertThat(request.mridsList, containsInAnyOrder(mRID))
                 resp.onNext(response)
             }
@@ -113,7 +113,7 @@ internal class CustomerConsumerClientTest {
     @Test
     internal fun `returns error when object is not found`() {
         val mRID = "unknown"
-        consumerService.onGetIdentifiables = spy { _, _ -> }
+        consumerService.onGetIdentifiables = spy @JvmSerializableLambda { _, _ -> }
 
         val result = consumerClient.getIdentifiable(mRID)
 
@@ -127,7 +127,7 @@ internal class CustomerConsumerClientTest {
     @Test
     internal fun `calls error handler when getting an IdentifiedObject throws`() {
         val mRID = "1234"
-        consumerService.onGetIdentifiables = spy { _, _ -> throw serverException }
+        consumerService.onGetIdentifiables = spy @JvmSerializableLambda { _, _ -> throw serverException }
 
         val result = consumerClient.getIdentifiable(mRID)
 
@@ -138,7 +138,7 @@ internal class CustomerConsumerClientTest {
     @Test
     internal fun `captures unhandled exceptions when getting an IdentifiedObject throws`() {
         val mRID = "1234"
-        consumerService.onGetIdentifiables = spy { _, _ -> throw serverException }
+        consumerService.onGetIdentifiables = spy @JvmSerializableLambda { _, _ -> throw serverException }
 
         consumerClient.removeErrorHandler(onErrorHandler)
 
@@ -152,7 +152,7 @@ internal class CustomerConsumerClientTest {
     internal fun `can get multiple identified objects in single call`() {
         val mRIDs = listOf("id1", "id2", "id3")
 
-        consumerService.onGetIdentifiables = spy { _, response ->
+        consumerService.onGetIdentifiables = spy @JvmSerializableLambda { _, response ->
             response.onNext(createResponse(CIO.newBuilder(), CIO.Builder::getCustomerBuilder, mRIDs[0]))
             response.onNext(createResponse(CIO.newBuilder(), CIO.Builder::getCustomerBuilder, mRIDs[1]))
             response.onNext(createResponse(CIO.newBuilder(), CIO.Builder::getCustomerAgreementBuilder, mRIDs[2]))
@@ -172,7 +172,7 @@ internal class CustomerConsumerClientTest {
     @Test
     internal fun `calls error handler when getting multiple IdentifiedObject throws`() {
         val mRIDs = listOf("id1", "id2", "id3")
-        consumerService.onGetIdentifiables = spy { _, _ -> throw serverException }
+        consumerService.onGetIdentifiables = spy @JvmSerializableLambda { _, _ -> throw serverException }
 
         val result = consumerClient.getIdentifiables(mRIDs.asSequence())
 
@@ -183,7 +183,7 @@ internal class CustomerConsumerClientTest {
     @Test
     internal fun `captures unhandled exceptions when getting multiple IdentifiedObject throws`() {
         val mRIDs = listOf("id1", "id2", "id3")
-        consumerService.onGetIdentifiables = spy { _, _ -> throw serverException }
+        consumerService.onGetIdentifiables = spy @JvmSerializableLambda { _, _ -> throw serverException }
 
         consumerClient.removeErrorHandler(onErrorHandler)
 
@@ -197,7 +197,7 @@ internal class CustomerConsumerClientTest {
     internal fun `getIdentifiables returns failed mRID when an mRID is not found`() {
         val mRIDs = listOf("id1", "id2")
 
-        consumerService.onGetIdentifiables = spy { _, response ->
+        consumerService.onGetIdentifiables = spy @JvmSerializableLambda { _, response ->
             response.onNext(createResponse(CIO.newBuilder(), CIO.Builder::getCustomerBuilder, mRIDs[0]))
         }
 
@@ -217,7 +217,7 @@ internal class CustomerConsumerClientTest {
         val customer = Customer(mRIDs[0])
         service.add(customer)
 
-        consumerService.onGetIdentifiables = spy { _, response ->
+        consumerService.onGetIdentifiables = spy @JvmSerializableLambda { _, response ->
             response.onNext(createResponse(CIO.newBuilder(), CIO.Builder::getCustomerBuilder, mRIDs[0]))
             response.onNext(createResponse(CIO.newBuilder(), CIO.Builder::getCustomerBuilder, mRIDs[1]))
             response.onNext(createResponse(CIO.newBuilder(), CIO.Builder::getCustomerAgreementBuilder, mRIDs[2]))
@@ -269,7 +269,7 @@ internal class CustomerConsumerClientTest {
 
     @Test
     internal fun `calls error handler when getting the metadata throws`() {
-        consumerService.onGetMetadataRequest = spy { _, _ -> throw serverException }
+        consumerService.onGetMetadataRequest = spy @JvmSerializableLambda { _, _ -> throw serverException }
 
         val result = consumerClient.getMetadata()
 
@@ -314,7 +314,7 @@ internal class CustomerConsumerClientTest {
 
     private fun configureFeederResponses(expectedCustomerService: CustomerService) {
 
-        consumerService.onGetCustomersForContainer = spy { request, response ->
+        consumerService.onGetCustomersForContainer = spy @JvmSerializableLambda { request, response ->
             val objects = mutableListOf<Customer>()
             expectedCustomerService.sequenceOf<Customer>().filter { it.mRID in request.mridsList }.forEach { customer ->
                 objects.add(customer)

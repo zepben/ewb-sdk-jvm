@@ -112,7 +112,7 @@ internal class NetworkConsumerClientTest {
         }.`when`(stub).getIdentifiables(any())
 
         // Send back the requested equipment, plus the terminals, in order to resolve more references than just those requested.
-        consumerService.onGetIdentifiables = spy { request, resp ->
+        consumerService.onGetIdentifiables = spy @JvmSerializableLambda { request, resp ->
             batchedResponseOf(request.mridsList.flatMap {
                 listOf(Breaker(it), Terminal("$it-t1"), Terminal("$it-t1"))
             }).forEach {
@@ -136,7 +136,7 @@ internal class NetworkConsumerClientTest {
             val mRID = "id" + ++counter
             val response = createResponse(builder, it, mRID)
 
-            consumerService.onGetIdentifiables = spy { request, resp ->
+            consumerService.onGetIdentifiables = spy @JvmSerializableLambda  { request, resp ->
                 assertThat(request.mridsList, containsInAnyOrder(mRID))
                 resp.onNext(response)
             }
@@ -230,7 +230,7 @@ internal class NetworkConsumerClientTest {
     @Test
     internal fun `returns error when object is not found`() {
         val mRID = "unknown"
-        consumerService.onGetIdentifiables = spy { _, _ -> }
+        consumerService.onGetIdentifiables = spy @JvmSerializableLambda  { _, _ -> }
 
         //
         // NOTE: This class has been deliberately left accessing the deprecated versions to ensure it is tested. When the deprecated functions are removed, update this
@@ -249,7 +249,7 @@ internal class NetworkConsumerClientTest {
     @Test
     internal fun `calls error handler when getting an IdentifiedObject throws`() {
         val mRID = "1234"
-        consumerService.onGetIdentifiables = spy { _, _ -> throw serverException }
+        consumerService.onGetIdentifiables = spy @JvmSerializableLambda  { _, _ -> throw serverException }
 
         //
         // NOTE: This class has been deliberately left accessing the deprecated versions to ensure it is tested. When the deprecated functions are removed, update this
@@ -266,7 +266,7 @@ internal class NetworkConsumerClientTest {
     @Test
     internal fun `captures unhandled exceptions when getting an IdentifiedObject throws`() {
         val mRID = "1234"
-        consumerService.onGetIdentifiables = spy { _, _ -> throw serverException }
+        consumerService.onGetIdentifiables = spy @JvmSerializableLambda  { _, _ -> throw serverException }
 
         consumerClient.removeErrorHandler(onErrorHandler)
 
@@ -285,7 +285,7 @@ internal class NetworkConsumerClientTest {
     internal fun `can get multiple identified objects in single call`() {
         val mRIDs = listOf("id1", "id2", "id3")
 
-        consumerService.onGetIdentifiables = spy { _, response ->
+        consumerService.onGetIdentifiables = spy @JvmSerializableLambda {_, response ->
             response.onNext(createResponse(NIO.newBuilder(), NIO.Builder::getAcLineSegmentBuilder, mRIDs[0]))
             response.onNext(createResponse(NIO.newBuilder(), NIO.Builder::getAcLineSegmentBuilder, mRIDs[1]))
             response.onNext(createResponse(NIO.newBuilder(), NIO.Builder::getBreakerBuilder, mRIDs[2]))
@@ -310,7 +310,7 @@ internal class NetworkConsumerClientTest {
     @Test
     internal fun `calls error handler when getting multiple IdentifiedObject throws`() {
         val mRIDs = listOf("id1", "id2", "id3")
-        consumerService.onGetIdentifiables = spy { _, _ -> throw serverException }
+        consumerService.onGetIdentifiables = spy @JvmSerializableLambda {_, _ -> throw serverException }
 
         //
         // NOTE: This class has been deliberately left accessing the deprecated versions to ensure it is tested. When the deprecated functions are removed, update this
@@ -326,7 +326,7 @@ internal class NetworkConsumerClientTest {
     @Test
     internal fun `captures unhandled exceptions when getting multiple IdentifiedObject throws`() {
         val mRIDs = listOf("id1", "id2", "id3")
-        consumerService.onGetIdentifiables = spy { _, _ -> throw serverException }
+        consumerService.onGetIdentifiables = spy @JvmSerializableLambda {_, _ -> throw serverException }
 
         consumerClient.removeErrorHandler(onErrorHandler)
 
@@ -343,7 +343,7 @@ internal class NetworkConsumerClientTest {
 
     @Test
     internal fun `can get network hierarchy`() {
-        consumerService.onGetNetworkHierarchy = spy { _, response -> response.onNext(NetworkHierarchyAllTypes.createResponse()) }
+        consumerService.onGetNetworkHierarchy = spy @JvmSerializableLambda {_, response -> response.onNext(NetworkHierarchyAllTypes.createResponse()) }
 
         val result = consumerClient.getNetworkHierarchy()
 
@@ -397,7 +397,7 @@ internal class NetworkConsumerClientTest {
     @Test
     internal fun `can optionally retrieve geographical regions`() {
         consumerService.onGetNetworkHierarchy =
-            spy { _, response -> response.onNext(NetworkHierarchyAllTypes.createResponse(includeGeographicalRegions = true)) }
+            spy @JvmSerializableLambda {_, response -> response.onNext(NetworkHierarchyAllTypes.createResponse(includeGeographicalRegions = true)) }
         val result = callGetHierarchy(consumerClient, includeGeographicalRegions = true)
         val request = buildHierarchyRequest(includeGeographicalRegions = true)
         verify(consumerService.onGetNetworkHierarchy).invoke(eq(request), any())
@@ -408,7 +408,7 @@ internal class NetworkConsumerClientTest {
     @Test
     internal fun `can optionally retrieve sub-geographical regions`() {
         consumerService.onGetNetworkHierarchy =
-            spy { _, response -> response.onNext(NetworkHierarchyAllTypes.createResponse(includeSubgeographicalRegions = true)) }
+            spy @JvmSerializableLambda {_, response -> response.onNext(NetworkHierarchyAllTypes.createResponse(includeSubgeographicalRegions = true)) }
         val result = callGetHierarchy(consumerClient, includeSubGeographicalRegions = true)
         val request = buildHierarchyRequest(includeSubGeographicalRegions = true)
         verify(consumerService.onGetNetworkHierarchy).invoke(eq(request), any())
@@ -419,7 +419,7 @@ internal class NetworkConsumerClientTest {
 
     @Test
     internal fun `can optionally retrieve substations`() {
-        consumerService.onGetNetworkHierarchy = spy { _, response -> response.onNext(NetworkHierarchyAllTypes.createResponse(includeSubstations = true)) }
+        consumerService.onGetNetworkHierarchy = spy @JvmSerializableLambda {_, response -> response.onNext(NetworkHierarchyAllTypes.createResponse(includeSubstations = true)) }
         val result = callGetHierarchy(consumerClient, includeSubstations = true)
         val request = buildHierarchyRequest(includeSubstations = true)
         verify(consumerService.onGetNetworkHierarchy).invoke(eq(request), any())
@@ -430,7 +430,7 @@ internal class NetworkConsumerClientTest {
 
     @Test
     internal fun `can optionally retrieve feeders`() {
-        consumerService.onGetNetworkHierarchy = spy { _, response -> response.onNext(NetworkHierarchyAllTypes.createResponse(includeFeeders = true)) }
+        consumerService.onGetNetworkHierarchy = spy @JvmSerializableLambda {_, response -> response.onNext(NetworkHierarchyAllTypes.createResponse(includeFeeders = true)) }
         val result = callGetHierarchy(consumerClient, includeFeeders = true)
         val request = buildHierarchyRequest(includeFeeders = true)
         verify(consumerService.onGetNetworkHierarchy).invoke(eq(request), any())
@@ -440,7 +440,7 @@ internal class NetworkConsumerClientTest {
 
     @Test
     internal fun `can optionally retrieve circuits`() {
-        consumerService.onGetNetworkHierarchy = spy { _, response -> response.onNext(NetworkHierarchyAllTypes.createResponse(includeCircuits = true)) }
+        consumerService.onGetNetworkHierarchy = spy @JvmSerializableLambda {_, response -> response.onNext(NetworkHierarchyAllTypes.createResponse(includeCircuits = true)) }
         val result = callGetHierarchy(consumerClient, includeCircuits = true)
         val request = buildHierarchyRequest(includeCircuits = true)
         verify(consumerService.onGetNetworkHierarchy).invoke(eq(request), any())
@@ -451,7 +451,7 @@ internal class NetworkConsumerClientTest {
 
     @Test
     internal fun `can optionally retrieve loops`() {
-        consumerService.onGetNetworkHierarchy = spy { _, response -> response.onNext(NetworkHierarchyAllTypes.createResponse(includeLoops = true)) }
+        consumerService.onGetNetworkHierarchy = spy @JvmSerializableLambda {_, response -> response.onNext(NetworkHierarchyAllTypes.createResponse(includeLoops = true)) }
         val result = callGetHierarchy(consumerClient, includeLoops = true)
         val request = buildHierarchyRequest(includeLoops = true)
         verify(consumerService.onGetNetworkHierarchy).invoke(eq(request), any())
@@ -462,7 +462,7 @@ internal class NetworkConsumerClientTest {
 
     @Test
     internal fun `can optionally retrieve lv substations`() {
-        consumerService.onGetNetworkHierarchy = spy { _, response -> response.onNext(NetworkHierarchyAllTypes.createResponse(includeLvSubstations = true)) }
+        consumerService.onGetNetworkHierarchy = spy @JvmSerializableLambda {_, response -> response.onNext(NetworkHierarchyAllTypes.createResponse(includeLvSubstations = true)) }
         val result = callGetHierarchy(consumerClient, includeLvSubstations = true)
         val request = buildHierarchyRequest(includeLvSubstations = true)
         verify(consumerService.onGetNetworkHierarchy).invoke(eq(request), any())
@@ -473,7 +473,7 @@ internal class NetworkConsumerClientTest {
 
     @Test
     internal fun `can optionally retrieve lv feeders`() {
-        consumerService.onGetNetworkHierarchy = spy { _, response -> response.onNext(NetworkHierarchyAllTypes.createResponse(includeLvFeeders = true)) }
+        consumerService.onGetNetworkHierarchy = spy @JvmSerializableLambda {_, response -> response.onNext(NetworkHierarchyAllTypes.createResponse(includeLvFeeders = true)) }
         val result = callGetHierarchy(consumerClient, includeLvFeeders = true)
         val request = buildHierarchyRequest(includeLvFeeders = true)
         verify(consumerService.onGetNetworkHierarchy).invoke(eq(request), any())
@@ -494,7 +494,7 @@ internal class NetworkConsumerClientTest {
 
     @Test
     internal fun `calls error handler when getting the metadata throws`() {
-        consumerService.onGetMetadataRequest = spy { _, _ -> throw serverException }
+        consumerService.onGetMetadataRequest = spy @JvmSerializableLambda {_, _ -> throw serverException }
 
         val result = consumerClient.getMetadata()
 
@@ -504,7 +504,7 @@ internal class NetworkConsumerClientTest {
 
     @Test
     internal fun `calls error handler when getting the network hierarchy throws`() {
-        consumerService.onGetNetworkHierarchy = spy { _, _ -> throw serverException }
+        consumerService.onGetNetworkHierarchy = spy @JvmSerializableLambda {_, _ -> throw serverException }
 
         val result = consumerClient.getNetworkHierarchy()
 
@@ -514,7 +514,7 @@ internal class NetworkConsumerClientTest {
 
     @Test
     internal fun `captures unhandled exceptions when getting the network hierarchy throws`() {
-        consumerService.onGetNetworkHierarchy = spy { _, _ -> throw serverException }
+        consumerService.onGetNetworkHierarchy = spy @JvmSerializableLambda {_, _ -> throw serverException }
 
         consumerClient.removeErrorHandler(onErrorHandler)
 
@@ -686,7 +686,7 @@ internal class NetworkConsumerClientTest {
     internal fun `getIdentifiedObjects returns failed mRID when an mRID is not found`() {
         val mRIDs = listOf("id1", "id2")
 
-        consumerService.onGetIdentifiables = spy { _, response ->
+        consumerService.onGetIdentifiables = spy @JvmSerializableLambda {_, response ->
             response.onNext(createResponse(NIO.newBuilder(), NIO.Builder::getAcLineSegmentBuilder, mRIDs[0]))
         }
 
@@ -711,7 +711,7 @@ internal class NetworkConsumerClientTest {
         val acls = AcLineSegment(mRIDs[0])
         service.add(acls)
 
-        consumerService.onGetIdentifiables = spy { _, response ->
+        consumerService.onGetIdentifiables = spy @JvmSerializableLambda {_, response ->
             response.onNext(createResponse(NIO.newBuilder(), NIO.Builder::getAcLineSegmentBuilder, mRIDs[0]))
             response.onNext(createResponse(NIO.newBuilder(), NIO.Builder::getAcLineSegmentBuilder, mRIDs[1]))
             response.onNext(createResponse(NIO.newBuilder(), NIO.Builder::getBreakerBuilder, mRIDs[2]))
@@ -998,7 +998,7 @@ internal class NetworkConsumerClientTest {
     private fun configureFeederResponses(expectedService: NetworkService, invalidObject: Class<out IdentifiedObject>? = null): Throwable? {
         val expectedException = createException(invalidObject)
 
-        consumerService.onGetNetworkHierarchy = spy { _, response ->
+        consumerService.onGetNetworkHierarchy = spy @JvmSerializableLambda {_, response ->
             response.onNext(
                 NetworkHierarchyAllTypes.createResponse(
                     includeGeographicalRegions = true,
@@ -1013,7 +1013,7 @@ internal class NetworkConsumerClientTest {
             )
         }
 
-        consumerService.onGetIdentifiables = spy { request, response ->
+        consumerService.onGetIdentifiables = spy @JvmSerializableLambda {request, response ->
             val objects = mutableListOf<IdentifiedObject>()
             request.mridsList.forEach { mRID ->
                 expectedService.get<IdentifiedObject>(mRID)?.let { identifiedObject ->
@@ -1026,7 +1026,7 @@ internal class NetworkConsumerClientTest {
             responseOf(objects).forEach { response.onNext(it) }
         }
 
-        consumerService.onGetEquipmentForContainers = spy { request, response ->
+        consumerService.onGetEquipmentForContainers = spy @JvmSerializableLambda {request, response ->
             if (invalidObject == Equipment::class.java)
                 throw expectedException!!
 
@@ -1043,24 +1043,24 @@ internal class NetworkConsumerClientTest {
     }
 
     private fun configureResponses(expectedService: NetworkService) {
-        consumerService.onGetEquipmentForRestriction = spy { request, response ->
+        consumerService.onGetEquipmentForRestriction = spy @JvmSerializableLambda {request, response ->
             restrictionEquipmentResponseOf(expectedService.get<OperationalRestriction>(request.mrid)!!.equipment.toList()).forEach { response.onNext(it) }
         }
 
-        consumerService.onGetTerminalsForNode = spy { request, response ->
+        consumerService.onGetTerminalsForNode = spy @JvmSerializableLambda {request, response ->
             nodeTerminalResponseOf(expectedService.get<ConnectivityNode>(request.mrid)!!.terminals.toList()).forEach { response.onNext((it)) }
         }
 
-        consumerService.onGetIdentifiables = spy { request, response ->
+        consumerService.onGetIdentifiables = spy @JvmSerializableLambda {request, response ->
             responseOf(request.mridsList.map { expectedService[it]!! }).forEach { response.onNext((it)) }
         }
 
-        consumerService.onGetEquipmentForContainers = spy { request, response ->
+        consumerService.onGetEquipmentForContainers = spy @JvmSerializableLambda {request, response ->
             containerEquipmentResponseOf(request.mridsList.flatMap { expectedService.get<EquipmentContainer>(it)!!.equipment }.distinct().toList())
                 .forEach { response.onNext((it)) }
         }
 
-        consumerService.onGetNetworkHierarchy = spy { _, response ->
+        consumerService.onGetNetworkHierarchy = spy @JvmSerializableLambda {_, response ->
             response.onNext(
                 networkHierarchyResponseOf(
                     expectedService.listOf(),
@@ -1173,7 +1173,7 @@ internal class NetworkConsumerClientTest {
         includeEnergizedContainers: IncludedEnergizedContainers,
         networkState: NetworkState
     ) {
-        consumerService.onGetEquipmentForContainers = spy { request, _ ->
+        consumerService.onGetEquipmentForContainers = spy @JvmSerializableLambda {request, _ ->
             assertThat(request.mridsList, containsInAnyOrder(mRID))
             assertThat(request.includeEnergizingContainers, equalTo(includeEnergizingContainers))
             assertThat(request.includeEnergizedContainers, equalTo(includeEnergizedContainers))

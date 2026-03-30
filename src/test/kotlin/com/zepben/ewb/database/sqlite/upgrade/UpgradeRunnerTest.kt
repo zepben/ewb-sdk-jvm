@@ -66,8 +66,8 @@ internal class UpgradeRunnerTest {
         //
         every { close() } answers { currentVersion = splitVersion }
     }
-    private val connectionProvider = spyk<(String) -> Connection>({ connection })
-    private val copyFile = spyk<(Path, Path, CopyOption) -> Unit>({ _, _, _ -> })
+    private val connectionProvider = spyk<(String) -> Connection>(@JvmSerializableLambda { connection })
+    private val copyFile = spyk<(Path, Path, CopyOption) -> Unit>(@JvmSerializableLambda { _, _, _ -> })
 
     // NOTE: Use these to avoid calling `.number` on a mockk ChangeSet.
     private val minSupportedVersion = 47

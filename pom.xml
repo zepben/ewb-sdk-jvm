@@ -12,7 +12,7 @@
     <parent>
         <groupId>com.zepben.maven</groupId>
         <artifactId>evolve-super-pom</artifactId>
-        <version>0.47.0</version>
+        <version>0.48.0</version>
     </parent>
 
     <groupId>com.zepben</groupId>
@@ -75,12 +75,12 @@
         <dependency>
             <groupId>com.zepben</groupId>
             <artifactId>protobuf</artifactId>
-            <version>1.5.0</version>
+            <version>1.6.0b1</version>
         </dependency>
         <dependency>
             <groupId>com.zepben</groupId>
             <artifactId>vertx-utils</artifactId>
-            <version>1.7.0</version>
+            <version>1.8.0b1</version>
         </dependency>
 
         <!-- Kotlin -->
@@ -168,7 +168,7 @@
         <dependency>
             <groupId>com.zepben</groupId>
             <artifactId>test-utils</artifactId>
-            <version>3.1.0</version>
+            <version>3.2.0b1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -183,7 +183,7 @@
         </dependency>
         <dependency>
             <groupId>io.mockk</groupId>
-            <artifactId>mockk</artifactId>
+            <artifactId>mockk-jvm</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -219,7 +219,7 @@
                 <groupId>org.jetbrains.kotlin</groupId>
                 <!--suppress MavenModelInspection -->
                 <artifactId>kotlin-maven-plugin</artifactId>
-                <configuration>
+		<configuration>
                     <apiVersion>${kotlin.language.version}</apiVersion>
                     <languageVersion>${kotlin.language.version}</languageVersion>
                     <compilerPlugins>

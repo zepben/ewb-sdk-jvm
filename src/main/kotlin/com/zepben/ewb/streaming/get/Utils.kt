@@ -10,6 +10,12 @@ package com.zepben.ewb.streaming.get
 
 import com.zepben.ewb.database.paths.VariantContents
 import com.zepben.ewb.services.common.translator.EnumMapper
+import com.zepben.ewb.services.common.translator.toTimestamp
+import java.time.LocalDate
+import java.time.ZoneOffset
 
 
 val mapVariantContents: EnumMapper<VariantContents, com.zepben.protobuf.vc.VariantContents> = EnumMapper(VariantContents.entries, com.zepben.protobuf.vc.VariantContents.entries)
+
+
+fun LocalDate?.toTimestamp(offset: ZoneOffset = ZoneOffset.UTC) = this?.atStartOfDay()?.toInstant(offset)?.toTimestamp()

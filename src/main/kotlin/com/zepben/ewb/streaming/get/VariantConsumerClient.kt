@@ -8,10 +8,12 @@
 
 package com.zepben.ewb.streaming.get
 
+import com.google.protobuf.Timestamp
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
 import com.zepben.ewb.database.paths.VariantContents
 import com.zepben.ewb.services.common.translator.EnumMapper
+import com.zepben.ewb.services.common.translator.toTimestamp
 import com.zepben.ewb.services.network.NetworkState
 import com.zepben.ewb.services.variant.VariantService
 import com.zepben.ewb.services.variant.translator.VariantProtoToCim
@@ -23,6 +25,9 @@ import com.zepben.protobuf.metadata.GetMetadataResponse
 import com.zepben.protobuf.vc.*
 import io.grpc.CallCredentials
 import io.grpc.Channel
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneOffset
 import java.util.concurrent.Executors
 import com.zepben.protobuf.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProject as PBNetworkModelProject
 
@@ -92,7 +97,7 @@ class VariantConsumerClient @JvmOverloads constructor(
     /**
      * Retrieve a ChangeSet and all its associations from the server. See [getChangeSets] documentation.
      */
-    fun getChangeSet(mRID: String): GrpcResult<MultiObjectResult> = getChangeSets(listOf(mRID))
+    fun getChangeSet(mRID: String, baseModelVersion: LocalDate? = null): GrpcResult<MultiObjectResult> = getChangeSets(listOf(mRID), baseModelVersion)
 
     /**
      * Retrieve a ChangeSet and all its associations from the server. This does not receive the contents of the ChangeSet, only the metadata.
@@ -102,14 +107,18 @@ class VariantConsumerClient @JvmOverloads constructor(
      * @return A [GrpcResult] of a [MultiObjectResult]. If successful, containing a map keyed by mRID of all the objects retrieved. If an item was not found, or
      * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed]
      */
-    fun getChangeSets(mRIDs: Iterable<String>): GrpcResult<MultiObjectResult> {
+    fun getChangeSets(mRIDs: Iterable<String>, baseModelVersion: LocalDate? = null): GrpcResult<MultiObjectResult> {
         val mor = MultiObjectResult()
         mRIDs.forEach { mRID ->
             val streamObserver = AwaitableStreamObserver<GetChangeSetResponse> { response ->
                 val result = service.addFromPb(response.identifiableObject)
-                result.identifiedObject?.let { mor.objects.put(result.mRID, it) } ?: mor.failed.add(result.mRID)
+                result.identifiedObject?.let { mor.objects[result.mRID] = it } ?: mor.failed.add(result.mRID)
             }
-            stub.getChangeSet(GetChangeSetRequest.newBuilder().setChangeSetMRID(mRID).build(), streamObserver)
+            val requestBuilder = GetChangeSetRequest.newBuilder().setChangeSetMRID(mRID)
+            baseModelVersion?.atStartOfDay()?.toInstant(ZoneOffset.UTC)?.toTimestamp()?.also {
+                requestBuilder.setModelVersion(it)
+            }
+            stub.getChangeSet(requestBuilder.build(), streamObserver)
 
             streamObserver.await()
 

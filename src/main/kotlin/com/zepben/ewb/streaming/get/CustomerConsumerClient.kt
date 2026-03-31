@@ -20,12 +20,11 @@ import com.zepben.ewb.services.diagram.DiagramService
 import com.zepben.ewb.streaming.grpc.GrpcChannel
 import com.zepben.ewb.streaming.grpc.GrpcResult
 import com.zepben.protobuf.cc.*
-import com.zepben.protobuf.cc.GetChangeSetObjectsRequest
-import com.zepben.protobuf.cc.GetChangeSetObjectsResponse
 import com.zepben.protobuf.metadata.GetMetadataRequest
 import com.zepben.protobuf.metadata.GetMetadataResponse
 import io.grpc.CallCredentials
 import io.grpc.Channel
+import java.time.LocalDate
 import java.util.concurrent.Executors
 
 /**
@@ -99,12 +98,20 @@ class CustomerConsumerClient @JvmOverloads constructor(
      * @param mRID The mRID of the [ChangeSet] to retrieve contents for.
      * @return A [GrpcResult] of a [CustomerService].
      */
-    fun getChangeSetObjects(mRID: String, variantContents: VariantContents): GrpcResult<CustomerService> = tryRpc {
+    fun getChangeSetObjects(mRID: String, variantContents: VariantContents, baseModelVersion: LocalDate? = null): GrpcResult<CustomerService> = tryRpc {
         val customerService = CustomerService()
         val streamObserver = AwaitableStreamObserver<GetChangeSetObjectsResponse> { response ->
             customerService.addFromPb(response.identifiableObject)
         }
-        stub.getChangeSetObjects(GetChangeSetObjectsRequest.newBuilder().setChangeSetMRID(mRID).setVariantContents(mapVariantContents.toPb(variantContents)).build(), streamObserver)
+
+        val request = GetChangeSetObjectsRequest.newBuilder().apply {
+            changeSetMRID = mRID
+            this.variantContents = mapVariantContents.toPb(variantContents)
+            if (baseModelVersion != null)
+                modelVersion = baseModelVersion.toTimestamp()
+        }.build()
+
+        stub.getChangeSetObjects(request, streamObserver)
 
         streamObserver.await()
 

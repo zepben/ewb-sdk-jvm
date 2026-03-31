@@ -14,16 +14,14 @@ import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.diagram.DiagramService
 import com.zepben.ewb.services.diagram.translator.DiagramProtoToCim
 import com.zepben.ewb.services.diagram.translator.addFromPb
-import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.streaming.grpc.GrpcChannel
 import com.zepben.ewb.streaming.grpc.GrpcResult
 import com.zepben.protobuf.dc.*
 import com.zepben.protobuf.metadata.GetMetadataRequest
 import com.zepben.protobuf.metadata.GetMetadataResponse
-import com.zepben.protobuf.dc.GetChangeSetObjectsRequest
-import com.zepben.protobuf.dc.GetChangeSetObjectsResponse
 import io.grpc.CallCredentials
 import io.grpc.Channel
+import java.time.LocalDate
 import java.util.concurrent.Executors
 
 /**
@@ -100,12 +98,20 @@ class DiagramConsumerClient(
      * @param mRID The mRID of the [ChangeSet] to retrieve contents for.
      * @return A [GrpcResult] of a [DiagramService].
      */
-    fun getChangeSetObjects(mRID: String, variantContents: VariantContents): GrpcResult<DiagramService> = tryRpc {
+    fun getChangeSetObjects(mRID: String, variantContents: VariantContents, baseModelVersion: LocalDate? = null): GrpcResult<DiagramService> = tryRpc {
         val diagramService = DiagramService()
         val streamObserver = AwaitableStreamObserver<GetChangeSetObjectsResponse> { response ->
             diagramService.addFromPb(response.identifiableObject)
         }
-        stub.getChangeSetObjects(GetChangeSetObjectsRequest.newBuilder().setChangeSetMRID(mRID).setVariantContents(mapVariantContents.toPb(variantContents)).build(), streamObserver)
+
+        val request = GetChangeSetObjectsRequest.newBuilder().apply {
+            changeSetMRID = mRID
+            this.variantContents = mapVariantContents.toPb(variantContents)
+            if (baseModelVersion != null)
+                modelVersion = baseModelVersion.toTimestamp()
+        }.build()
+
+        stub.getChangeSetObjects(request, streamObserver)
 
         streamObserver.await()
 

@@ -30,6 +30,7 @@ import com.zepben.protobuf.nc.*
 import io.grpc.CallCredentials
 import io.grpc.Channel
 import java.io.IOException
+import java.time.LocalDate
 import java.util.concurrent.Executors
 import com.zepben.protobuf.nc.IncludedEnergizedContainers as PBIncludedEnergizedContainers
 import com.zepben.protobuf.nc.IncludedEnergizingContainers as PBIncludedEnergizingContainers
@@ -487,12 +488,19 @@ class NetworkConsumerClient(
      * @param variantContents The contents to retrieve from the server.
      * @return A [GrpcResult] of a [NetworkService].
      */
-    fun getChangeSetObjects(mRID: String, variantContents: VariantContents): GrpcResult<NetworkService> = tryRpc {
+    fun getChangeSetObjects(mRID: String, variantContents: VariantContents, baseModelVersion: LocalDate? = null): GrpcResult<NetworkService> = tryRpc {
         val networkService = NetworkService()
         val streamObserver = AwaitableStreamObserver<GetChangeSetObjectsResponse> { response ->
             networkService.addFromPb(response.identifiableObject)
         }
-        val request = GetChangeSetObjectsRequest.newBuilder().setChangeSetMRID(mRID).setVariantContents(mapVariantContents.toPb(variantContents)).build()
+
+        val request = GetChangeSetObjectsRequest.newBuilder().apply {
+            changeSetMRID = mRID
+            this.variantContents = mapVariantContents.toPb(variantContents)
+            if (baseModelVersion != null)
+                modelVersion = baseModelVersion.toTimestamp()
+        }.build()
+
         stub.getChangeSetObjects(request, streamObserver)
 
         streamObserver.await()

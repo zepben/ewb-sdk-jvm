@@ -177,7 +177,49 @@ interface EwbDataFilePaths {
      * @param variantContents The relevant content for the desired [type].
      * @return The [Path] to the [DatabaseType] database file for the [variant].
      */
-    fun getDatedVariantPath(type: DatabaseType, date: LocalDate, variant: String, variantContents: VariantContents): Path = date.toDatedVariantPath(type, variant, variantContents)
+    fun getDatedVariantPath(type: DatabaseType, date: LocalDate, variant: String, variantContents: VariantContents): Path =
+        date.toDatedVariantPath(type, variant, variantContents)
+
+    /**
+     * Parses a dated variant [path] into its constituent components.
+     *
+     * This is the inverse of [getDatedVariantPath].
+     *
+     * Expected path formats:
+     * - `{date}/variants/{variant}/{subDirectory}/{date}-{databaseName}` (when [VariantContents.subDirectory] is non-empty)
+     * - `{date}/variants/{variant}/{date}-{databaseName}` (when [VariantContents.subDirectory] is empty)
+     *
+     * @param path The path to parse.
+     * @return A [DatedVariantPathComponents] containing the extracted [DatabaseType], [LocalDate], variant name, and [VariantContents].
+     * @throws IllegalArgumentException If the path does not match the expected format.
+     */
+    fun parseDatedVariantPath(path: Path): DatedVariantPathComponents {
+        val pathComponents = path.toList()
+
+        val (variant, variantContents, fileName) = when (pathComponents.size) {
+            4 -> Triple(pathComponents[2], VariantContents.CHANGESET, pathComponents[3].toString())
+            5 -> {
+                val subDir = pathComponents[3].toString()
+                Triple(
+                    pathComponents[2],
+                    VariantContents.entries.firstOrNull { it.subDirectory == subDir }
+                        ?: throw IllegalArgumentException("Invalid path. There is no `VariantContent` for the sub directory `$subDir`."),
+                    pathComponents[4].toString())
+            }
+
+            else -> throw IllegalArgumentException("Invalid path. Make sure the path is correct by using `getDatedVariantPath`.")
+        }
+        val dateStr = pathComponents[0].toString()
+        val type = variantContents.types.firstOrNull { fileName == "$dateStr-${it.databaseName}" }
+            ?: throw IllegalArgumentException("Invalid path. There is no `DatabaseType` for the file name `$fileName`.")
+
+        return DatedVariantPathComponents(
+            type = type,
+            date = LocalDate.parse(dateStr),
+            variant = variant.toString(),
+            variantContents = variantContents,
+        )
+    }
 
     /**
      * Check if a database [Path] of the specified [DatabaseType] and [LocalDate] exists.

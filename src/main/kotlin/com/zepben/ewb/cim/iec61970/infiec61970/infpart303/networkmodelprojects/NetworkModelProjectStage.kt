@@ -38,42 +38,14 @@ class NetworkModelProjectStage(mRID: String) : NetworkModelProjectComponent(mRID
     private var _equipmentContainerMRIDs: MutableList<String>? = null
 
     var plannedCommissionedDate: Instant? = null
-        set(it) {
-            updated = Instant.now()
-            field = it
-        }
     var commissionedDate: Instant? = null
-        set(it) {
-            updated = Instant.now()
-            field = it
-        }
     @ZBEX var confidenceLevel: Int? = null
-        set(it) {
-            updated = Instant.now()
-            field = it
-        }
     @ZBEX var baseModelVersion: String? = null
-        set(it) {
-            updated = Instant.now()
-            field = it
-        }
     @ZBEX var lastConflictCheckedAt: Instant? = null
-        set(it) {
-            updated = Instant.now()
-            field = it
-        }
     @ZBEX var userComments: String? = null
-        set(it) {
-            updated = Instant.now()
-            field = it
-        }
 
     val dependencies: List<AnnotatedProjectDependency> get() = _dependencies.asUnmodifiable()
     var changeSet: ChangeSet? = null
-        set(it) {
-            updated = Instant.now()
-            field = it
-        }
 
     @ZBEX
     val equipmentContainerMRIDs: List<String> get() = _equipmentContainerMRIDs.asUnmodifiable()
@@ -114,7 +86,6 @@ class NetworkModelProjectStage(mRID: String) : NetworkModelProjectComponent(mRID
         _dependencies = _dependencies ?: mutableListOf()
         _dependencies!!.add(dependency)
 
-        updated = Instant.now()
         return this
     }
 
@@ -125,7 +96,6 @@ class NetworkModelProjectStage(mRID: String) : NetworkModelProjectComponent(mRID
     fun removeDependency(dependency: AnnotatedProjectDependency): Boolean {
         val ret = _dependencies?.remove(dependency) == true
         if (_dependencies.isNullOrEmpty()) _dependencies = null
-        updated = Instant.now()
         return ret
     }
 
@@ -135,7 +105,6 @@ class NetworkModelProjectStage(mRID: String) : NetworkModelProjectComponent(mRID
      */
     fun clearDependencies(): NetworkModelProjectStage {
         _dependencies = null
-        updated = Instant.now()
         return this
     }
 
@@ -156,7 +125,6 @@ class NetworkModelProjectStage(mRID: String) : NetworkModelProjectComponent(mRID
         _equipmentContainerMRIDs = _equipmentContainerMRIDs ?: mutableListOf()
         _equipmentContainerMRIDs!!.add(equipmentContainerMRID)
 
-        updated = Instant.now()
         return this
     }
 
@@ -172,7 +140,6 @@ class NetworkModelProjectStage(mRID: String) : NetworkModelProjectComponent(mRID
     fun removeContainer(equipmentContainerMRID: String): Boolean {
         val ret = _equipmentContainerMRIDs?.remove(equipmentContainerMRID) == true
         if (_equipmentContainerMRIDs.isNullOrEmpty()) _equipmentContainerMRIDs = null
-        updated = Instant.now()
         return ret
     }
 
@@ -182,7 +149,6 @@ class NetworkModelProjectStage(mRID: String) : NetworkModelProjectComponent(mRID
      */
     fun clearContainers(): NetworkModelProjectStage {
         _equipmentContainerMRIDs = null
-        updated = Instant.now()
         return this
     }
 

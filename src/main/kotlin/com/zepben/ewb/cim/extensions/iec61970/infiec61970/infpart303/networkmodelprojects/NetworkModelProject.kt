@@ -27,20 +27,8 @@ class NetworkModelProject(mRID: String) : NetworkModelProjectComponent(mRID) {
     private var _children: MutableList<NetworkModelProjectComponent>? = null
 
     @ZBEX var externalStatus: String? = null
-        set(it) {
-            updated = Instant.now()
-            field = it
-        }
     @ZBEX var forecastCommissionDate: Instant? = null
-        set(it) {
-            updated = Instant.now()
-            field = it
-        }
     @ZBEX var externalDriver: String? = null
-        set(it) {
-            updated = Instant.now()
-            field = it
-        }
     @ZBEX val children: Collection<NetworkModelProjectComponent> get() = _children.asUnmodifiable()
 
 
@@ -70,14 +58,12 @@ class NetworkModelProject(mRID: String) : NetworkModelProjectComponent(mRID) {
         _children = _children ?: mutableListOf()
         _children!!.add(child)
 
-        updated = Instant.now()
         return this
     }
 
     fun removeChild(child: NetworkModelProjectComponent): Boolean {
         val ret = _children?.remove(child) == true
         if (_children.isNullOrEmpty()) _children = null
-        updated = Instant.now()
         return ret
     }
 
@@ -88,7 +74,6 @@ class NetworkModelProject(mRID: String) : NetworkModelProjectComponent(mRID) {
      */
     fun clearChildren(): NetworkModelProject {
         _children = null
-        updated = Instant.now()
         return this
     }
 

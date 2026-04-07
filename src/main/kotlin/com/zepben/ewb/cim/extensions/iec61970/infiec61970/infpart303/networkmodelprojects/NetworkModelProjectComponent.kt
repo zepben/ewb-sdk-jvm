@@ -24,20 +24,11 @@ import java.time.Instant
 abstract class NetworkModelProjectComponent(mRID: String) : IdentifiedObject(mRID) {
 
     @ZBEX var created: Instant? = null
-        set(it) {
-            updated = Instant.now()
-            field = it
-        }
     @ZBEX var updated: Instant? = null
     @ZBEX var closed: Instant? = null
-        set(it) {
-            updated = Instant.now()
-            field = it
-        }
     @ZBEX var parent: NetworkModelProject? = null
         set(it) {
             require(parent == null) { "Parent already set for NetworkModelProjectComponent $mRID." }
-            updated = Instant.now()
             field = it
         }
 
@@ -48,12 +39,10 @@ abstract class NetworkModelProjectComponent(mRID: String) : IdentifiedObject(mRI
      */
     fun delete(): Boolean {
         if (closed != null) {
-            "${typeNameAndMRID()} already marked as deleted."
             return false
         }
 
         closed = Instant.now()
-        updated = Instant.now()
         return true
     }
 

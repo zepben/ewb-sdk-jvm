@@ -417,13 +417,13 @@ class LocalEwbDataFilePathsTest {
         val date = LocalDate.now().toString()
         val path = ewbPaths.getDatedVariantPath(DatabaseType.NETWORK_MODEL, LocalDate.now(), "variant1", VariantContents.CREATIONS_MODIFICATIONS).let {
             val components = it.toList()
-            Path.of(components[0].toString(), components[1].toString(), components[2].toString(), components[3].toString(), "$date-network-model.db")
+            Path.of(components[0].toString(), components[1].toString(), components[2].toString(), components[3].toString(), "$date-network-model1.db")
         }
 
         val ex = assertThrows<IllegalArgumentException> {
             ewbPaths.parseDatedVariantPath(path)
         }
-        assertThat(ex.message, equalTo("Invalid path. There is no `DatabaseType` for the file name `$date-network-model.db`."))
+        assertThat(ex.message, equalTo("Invalid path. There is no `DatabaseType` for the file name `$date-network-model1`."))
     }
 
     private fun validateClosest(expectedDate: LocalDate?, searchForwards: Boolean = false) {

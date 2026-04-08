@@ -13,6 +13,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.LocalDate
 import kotlin.io.path.name
+import kotlin.io.path.nameWithoutExtension
 
 /**
  * Provides paths to all the various data files / folders used by EWB.
@@ -196,27 +197,25 @@ interface EwbDataFilePaths {
     fun parseDatedVariantPath(path: Path): DatedVariantPathComponents {
         val pathComponents = path.toList()
 
-        val (variant, variantContents, fileName) = when (pathComponents.size) {
-            4 -> Triple(pathComponents[2], VariantContents.CHANGESET, pathComponents[3].toString())
+        val variantContents = when (pathComponents.size) {
+            4 ->  VariantContents.CHANGESET
             5 -> {
                 val subDir = pathComponents[3].toString()
-                Triple(
-                    pathComponents[2],
-                    VariantContents.entries.firstOrNull { it.subDirectory == subDir }
-                        ?: throw IllegalArgumentException("Invalid path. There is no `VariantContent` for the sub directory `$subDir`."),
-                    pathComponents[4].toString())
+                VariantContents.entries.firstOrNull { it.subDirectory == subDir }
+                    ?: throw IllegalArgumentException("Invalid path. There is no `VariantContent` for the sub directory `$subDir`.")
             }
 
             else -> throw IllegalArgumentException("Invalid path. Make sure the path is correct by using `getDatedVariantPath`.")
         }
+        val fileName = path.nameWithoutExtension
         val dateStr = pathComponents[0].toString()
-        val type = variantContents.types.firstOrNull { fileName == "$dateStr-${it.databaseName}" }
+        val type = variantContents.types.firstOrNull { fileName == "$dateStr-${it.fileDescriptor}" }
             ?: throw IllegalArgumentException("Invalid path. There is no `DatabaseType` for the file name `$fileName`.")
 
         return DatedVariantPathComponents(
             type = type,
             date = LocalDate.parse(dateStr),
-            variant = variant.toString(),
+            variant = pathComponents[2].toString(),
             variantContents = variantContents,
         )
     }

@@ -1,4 +1,20 @@
 # Zepben EWB SDK changelog
+## [1.10.0] - UNRELEASED
+### Breaking Changes
+* None.
+
+### New Features
+* None.
+
+### Enhancements
+* None.
+
+### Fixes
+* None.
+
+### Notes
+* None.
+
 ## [1.9.0] - 2026-04-09
 ### Breaking Changes
 * Minimum required JVM version for compilation is 17

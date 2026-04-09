@@ -2,6 +2,7 @@
 
 | Version                  | Released              |
 | ------------------------ | --------------------- |
+|[1.9.0](#190)| `09 April 2026` |
 |[1.8.0](#180)| `26 March 2026` |
 |[1.7.0](#170)| `13 March 2026` |
 |[1.6.0](#160)| `02 March 2026` |
@@ -48,6 +49,25 @@
 ---
 
 NOTE: This library is not yet stable, and breaking changes should be expected until a 1.0.0 release.
+
+---
+
+## [1.9.0]
+
+### Breaking Changes
+* Minimum required JVM version for compilation is 17
+
+### New Features
+* None.
+
+### Enhancements
+* None.
+
+### Fixes
+* None.
+
+### Notes
+* Updated Kotlin from `1.9.24` -> `2.3.20`.
 
 ---
 

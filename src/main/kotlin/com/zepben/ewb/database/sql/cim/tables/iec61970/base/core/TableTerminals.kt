@@ -33,6 +33,7 @@ class TableTerminals : TableAcDcTerminals() {
     val SEQUENCE_NUMBER: Column = Column(++columnIndex, "sequence_number", Column.Type.INTEGER, NOT_NULL)
     val CONNECTIVITY_NODE_MRID: Column = Column(++columnIndex, "connectivity_node_mrid", Column.Type.STRING, NULL)
     val PHASES: Column = Column(++columnIndex, "phases", Column.Type.STRING, NOT_NULL)
+    val NORMAL_FEEDER_DIRECTION: Column = Column(++columnIndex, "normal_feeder_direction", Column.Type.STRING, NULL)
 
     override val name: String = "terminals"
 

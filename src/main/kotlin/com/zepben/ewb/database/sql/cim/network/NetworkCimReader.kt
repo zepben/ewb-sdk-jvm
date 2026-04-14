@@ -94,6 +94,7 @@ import com.zepben.ewb.services.common.Resolvers
 import com.zepben.ewb.services.common.extensions.ensureGet
 import com.zepben.ewb.services.common.extensions.getOrThrow
 import com.zepben.ewb.services.network.NetworkService
+import com.zepben.ewb.services.network.tracing.feeder.FeederDirection
 import java.sql.ResultSet
 import java.sql.SQLException
 
@@ -1676,6 +1677,7 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
             )
             conductingEquipment?.addTerminal(this)
             phases = PhaseCode.valueOf(resultSet.getString(table.PHASES.queryIndex))
+            resultSet.getNullableString(table.NORMAL_FEEDER_DIRECTION.queryIndex)?.also { normalFeederDirection = FeederDirection.valueOf(it) }
         }
 
         service.connect(terminal, resultSet.getNullableString(table.CONNECTIVITY_NODE_MRID.queryIndex))

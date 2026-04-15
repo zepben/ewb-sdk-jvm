@@ -12,7 +12,7 @@
     <parent>
         <groupId>com.zepben.maven</groupId>
         <artifactId>evolve-super-pom</artifactId>
-        <version>0.48.0</version>
+        <version>0.49.0</version>
     </parent>
 
     <groupId>com.zepben</groupId>
@@ -75,7 +75,7 @@
         <dependency>
             <groupId>com.zepben</groupId>
             <artifactId>protobuf</artifactId>
-            <version>1.6.0</version>
+            <version>1.7.0b1</version>
         </dependency>
         <dependency>
             <groupId>com.zepben</groupId>

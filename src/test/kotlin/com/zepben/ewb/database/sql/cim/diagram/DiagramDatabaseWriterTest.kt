@@ -8,10 +8,18 @@
 
 package com.zepben.ewb.database.sql.cim.diagram
 
+import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.mockk
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 
 class DiagramDatabaseWriterTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     @Test
     internal fun `constructor coverage`() {

@@ -9,11 +9,19 @@
 package com.zepben.ewb.auth.server
 
 import com.zepben.ewb.auth.client.ProviderDetails
+import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 
 class TrustedIssuerTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     @Test
     fun lazyFetchWorksAsExpected() {

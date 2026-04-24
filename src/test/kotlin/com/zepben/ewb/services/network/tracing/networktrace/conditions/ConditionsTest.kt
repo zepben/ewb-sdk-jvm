@@ -19,12 +19,20 @@ import com.zepben.ewb.services.network.tracing.networktrace.conditions.Condition
 import com.zepben.ewb.services.network.tracing.networktrace.conditions.Conditions.withDirection
 import com.zepben.ewb.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.ewb.services.network.tracing.networktrace.operators.OpenStateOperators
+import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.instanceOf
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 
 class ConditionsTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     @Test
     fun stateOperatorsWithDirection() {

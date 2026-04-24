@@ -11,13 +11,21 @@ package com.zepben.ewb.services.network.tracing.networktrace.operators
 import com.zepben.ewb.cim.iec61970.base.core.Terminal
 import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.tracing.feeder.FeederDirection
+import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 
 import kotlin.reflect.KMutableProperty1
 
 class FeederDirectionStateOperatorsTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     private val normal = FeederDirectionStateOperations.NORMAL
     private val current = FeederDirectionStateOperations.CURRENT

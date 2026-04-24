@@ -31,8 +31,7 @@ import static org.hamcrest.Matchers.*;
 
 class BaseServiceJavaTest {
 
-    @RegisterExtension
-    static SystemLogExtension systemErr = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess();
+    @RegisterExtension final static SystemLogExtension systemErr = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess();
 
     private final BaseService service = new BaseServiceTest.TestBaseService();
     private final Breaker breaker1 = create(service, Breaker::new);

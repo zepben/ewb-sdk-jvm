@@ -11,11 +11,20 @@ package com.zepben.ewb.auth.server
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.zepben.ewb.auth.common.StatusCode
+import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert
 import org.hamcrest.Matchers
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 
 class JWTAuthoriserTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
+
     @Test
     fun permissionsFieldTest() {
         checkPermissionsField("permissions", StatusCode.OK)

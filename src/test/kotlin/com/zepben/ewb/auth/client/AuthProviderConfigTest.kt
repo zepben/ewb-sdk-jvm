@@ -9,10 +9,12 @@
 package com.zepben.ewb.auth.client
 
 import com.zepben.ewb.auth.common.StatusCode
+import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
@@ -20,6 +22,12 @@ import java.net.http.HttpResponse
 import java.net.http.HttpResponse.BodyHandler
 
 class AuthProviderConfigTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     val handler: BodyHandler<String> = mockk<BodyHandler<String>>()
     val response: HttpResponse<String> = mockk<HttpResponse<String>> {

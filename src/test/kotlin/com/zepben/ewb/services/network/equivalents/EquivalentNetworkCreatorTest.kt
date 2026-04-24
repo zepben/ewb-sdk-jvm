@@ -21,15 +21,23 @@ import com.zepben.ewb.services.network.equivalents.EquivalentNetworkCreator.sing
 import com.zepben.ewb.services.network.equivalents.EquivalentNetworkCreator.singleEquivalentBranchCreator
 import com.zepben.ewb.services.network.testdata.createTerminal
 import com.zepben.ewb.services.network.testdata.createTerminals
+import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import kotlin.reflect.KClass
 import kotlin.reflect.full.primaryConstructor
 
 internal class EquivalentNetworkCreatorTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     @AfterEach
     internal fun afterEach() {

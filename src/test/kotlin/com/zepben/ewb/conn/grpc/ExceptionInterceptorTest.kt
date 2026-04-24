@@ -8,13 +8,21 @@
 
 package com.zepben.ewb.conn.grpc
 
+import com.zepben.testutils.junit.SystemLogExtension
 import io.grpc.Status
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers
 import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 
 class ExceptionInterceptorTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     @Test
     fun `test intercepts exceptions on close and propagates to status`() {

@@ -9,15 +9,23 @@
 package com.zepben.ewb.database.paths
 
 import com.zepben.testutils.exception.ExpectException.Companion.expect
+import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.LocalDate
 
 class LocalEwbDataFilePathsTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     private val today = LocalDate.now()
     private val baseDir = Paths.get("/some/path/to/ewb/data")

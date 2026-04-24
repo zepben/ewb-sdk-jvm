@@ -9,16 +9,24 @@
 package com.zepben.ewb.database.sql.initialisers
 
 import com.zepben.ewb.database.sql.common.BaseDatabaseTables
+import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.every
 import io.mockk.mockk
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.sameInstance
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import java.sql.Connection
 import java.sql.DriverManager
 
 class NoOpDatabaseInitialiserTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     @Test
     internal fun `calls passed in connection factory on connect`() {

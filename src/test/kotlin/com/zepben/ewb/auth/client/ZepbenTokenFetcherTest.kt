@@ -13,6 +13,7 @@ import com.zepben.ewb.auth.common.AuthMethod
 import com.zepben.ewb.auth.common.StatusCode
 import com.zepben.testutils.auth.TOKEN
 import com.zepben.testutils.exception.ExpectException.Companion.expect
+import com.zepben.testutils.junit.SystemLogExtension
 import com.zepben.vertxutils.testing.TestHttpServer
 import io.mockk.every
 import io.mockk.mockkObject
@@ -24,6 +25,7 @@ import org.hamcrest.core.IsEqual.equalTo
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.Mockito.*
 import org.mockito.kotlin.mock
 import java.net.http.HttpClient
@@ -32,6 +34,12 @@ import java.net.http.HttpResponse
 import javax.net.ssl.SSLContext
 
 internal class ZepbenTokenFetcherTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     private lateinit var server: TestHttpServer
     private var port = 8080

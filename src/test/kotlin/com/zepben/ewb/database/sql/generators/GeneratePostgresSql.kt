@@ -12,10 +12,22 @@ import com.zepben.ewb.database.sql.cim.customer.CustomerDatabaseTables
 import com.zepben.ewb.database.sql.cim.diagram.DiagramDatabaseTables
 import com.zepben.ewb.database.sql.cim.network.NetworkDatabaseTables
 import com.zepben.ewb.database.sql.common.tables.SqlTable
+import com.zepben.testutils.junit.SystemLogExtension
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 
 class GeneratePostgresSql {
+
+    companion object {
+        //
+        // NOTE: Deliberately left unmuted and not capturing because these are all disabled tests that can be used to print SQL statements. It
+        //       is only here to pass the `TestsTest`.
+        //
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR
+    }
 
     //
     // NOTE: These tests are deliberately disabled as they simply print the database SQL statements which

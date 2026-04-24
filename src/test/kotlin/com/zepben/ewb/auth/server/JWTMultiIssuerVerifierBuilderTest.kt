@@ -15,13 +15,21 @@ import com.auth0.jwt.exceptions.InvalidClaimException
 import com.auth0.jwt.interfaces.DecodedJWT
 import com.auth0.jwt.interfaces.Verification
 import com.zepben.testutils.exception.ExpectException.Companion.expect
+import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import java.security.interfaces.RSAPublicKey
 
 class JWTMultiIssuerVerifierBuilderTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     private val trustedIssuerOne = mockk<TrustedIssuer> {
         every { issuerDomain } returns "one"

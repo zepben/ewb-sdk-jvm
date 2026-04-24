@@ -19,14 +19,22 @@ import com.zepben.ewb.services.network.tracing.feeder.FeederDirection
 import com.zepben.ewb.services.network.tracing.feeder.FeederDirection.*
 import com.zepben.ewb.services.network.tracing.networktrace.NetworkTraceStep
 import com.zepben.ewb.services.network.tracing.networktrace.operators.NetworkStateOperators
+import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.every
 import io.mockk.mockk
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.extension.RegisterExtension
 
 class DirectionConditionTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     @Test
     fun `shouldQueue for non cut or clamp path`() {

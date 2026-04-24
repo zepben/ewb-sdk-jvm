@@ -16,19 +16,23 @@ import com.zepben.ewb.streaming.grpc.GrpcResult
 import com.zepben.protobuf.metadata.GetMetadataRequest
 import com.zepben.protobuf.metadata.GetMetadataResponse
 import com.zepben.protobuf.nc.NetworkConsumerGrpc.NetworkConsumerStub
+import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import com.zepben.protobuf.metadata.ServiceInfo as PBServiceInfo
 
 internal class TestCimConsumerClient {
 
-    private val baseConsumerClient = mockk<CimConsumerClient<BaseService, BaseProtoToCim, NetworkConsumerStub>>()
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
-    // @Test
-    // Test disabled as the mocking in this test no longer works with Mockk
-    // as it is confused between mocking a field and the getter
+    @Test
     internal fun `getMetadata returns non-cached response, and caches it`() {
         val metadataResponse = GetMetadataResponse.newBuilder().apply {
             serviceInfoBuilder.apply {
@@ -42,59 +46,34 @@ internal class TestCimConsumerClient {
                         nanos = 456
                     }.build()
                 }
-                addDataSourcesBuilder().apply {
-                    source = "source two"
-                    version = "source version two"
-                    timestamp = timestampBuilder.apply {
-                        seconds = 654L
-                        nanos = 321
-                    }.build()
-                }
             }.build()
         }.build()
 
         val returnedServiceInfo = metadataResponse.serviceInfo.fromPb()
-
-        every { baseConsumerClient.runGetMetadata(ofType(GetMetadataRequest::class), any()) } answers {
-            secondArg<AwaitableStreamObserver<GetMetadataResponse>>().onNext(metadataResponse)
-            secondArg<AwaitableStreamObserver<GetMetadataResponse>>().onCompleted()
-        }
-
-        every { baseConsumerClient.getMetadata() } answers { callOriginal() }
-        every { baseConsumerClient.tryRpc(any<() -> ServiceInfo>()) } answers {
-            GrpcResult.of(firstArg<() -> ServiceInfo>().invoke())
-        }
-
-        //Because serviceInfo was made internal for other testing, everyone else has to mockk it themselves...
-        every { baseConsumerClient.serviceInfo } returns null
-        every { baseConsumerClient.serviceInfo = any() } answers {
-            every { baseConsumerClient.serviceInfo } returns firstArg()
-        }
+        val baseConsumerClient = spyk(createClient(metadataResponse))
 
         mockkStatic(PBServiceInfo::fromPb) {
             every { any<PBServiceInfo>().fromPb() } returns returnedServiceInfo
             val result = baseConsumerClient.getMetadata()
 
+            //
+            // NOTE: Property (i.e. `serviceInfo`) calls inside classes are no longer captured by Mockk, so there are no
+            //       recorded interactions with `baseConsumerClient.serviceInfo`.
+            //
             verifySequence {
                 baseConsumerClient.getMetadata()
                 baseConsumerClient.tryRpc<GrpcResult<ServiceInfo>>(any())
-                baseConsumerClient.serviceInfo
                 baseConsumerClient.runGetMetadata(GetMetadataRequest.newBuilder().build(), any())
                 metadataResponse.serviceInfo.fromPb()
-                baseConsumerClient.serviceInfo = returnedServiceInfo //verify response cached
-                baseConsumerClient.serviceInfo
             }
+
             assertThat(result.value, equalTo(returnedServiceInfo))
             assertThat(baseConsumerClient.serviceInfo, equalTo(returnedServiceInfo))
         }
     }
 
-    // @Test
-    // Test disabled as the mocking in this test no longer works with Mockk
-    // as it is confused between mocking a field and the getter
+    @Test
     internal fun `getMetadata returns cached response`() {
-        val uncachedServiceInfo = mockk<ServiceInfo>()
-
         val cachedResponse = PBServiceInfo.newBuilder().apply {
             title = "cached title"
             version = "cached version"
@@ -108,27 +87,45 @@ internal class TestCimConsumerClient {
             }
         }.build().fromPb()
 
-        every { baseConsumerClient.serviceInfo } returns cachedResponse
+        // We create this with a mockk to prove it isn't used, as it should use the cached version.
+        val baseConsumerClient = spyk(createClient(mockk()).apply { serviceInfo = cachedResponse })
 
-        every { baseConsumerClient.getMetadata() } answers { callOriginal() }
-        every { baseConsumerClient.tryRpc(any<() -> ServiceInfo>()) } answers {
-            GrpcResult.of(firstArg<() -> ServiceInfo>().invoke())
-        }
         mockkStatic(PBServiceInfo::fromPb) {
-            every { any<PBServiceInfo>().fromPb() } returns uncachedServiceInfo
+            every { any<PBServiceInfo>().fromPb() } throws AssertionError("shouldn't have been called")
             val result = baseConsumerClient.getMetadata()
 
+            //
+            // NOTE: Property (i.e. `serviceInfo`) calls inside classes are no longer captured by Mockk, so there are no
+            //       recorded interactions with `baseConsumerClient.serviceInfo`.
+            //
             verifySequence {
                 baseConsumerClient.getMetadata()
                 baseConsumerClient.tryRpc<GrpcResult<ServiceInfo>>(any())
-                baseConsumerClient.serviceInfo
-                baseConsumerClient.serviceInfo
             }
-            verify {
-                any<PBServiceInfo>().fromPb() wasNot called
-                uncachedServiceInfo wasNot called
-            }
+
             assertThat(result.value, equalTo(cachedResponse))
         }
     }
+
+    private fun createClient(response: GetMetadataResponse) = object : CimConsumerClient<BaseService, BaseProtoToCim, NetworkConsumerStub>() {
+        override val service: BaseService get() = assertNotCalled()
+        override val protoToCim: BaseProtoToCim get() = assertNotCalled()
+
+        override fun processIdentifiables(mRIDs: Sequence<String>): Sequence<ExtractResult> = assertNotCalled()
+
+        override fun runGetMetadata(
+            getMetadataRequest: GetMetadataRequest,
+            streamObserver: AwaitableStreamObserver<GetMetadataResponse>
+        ) {
+            streamObserver.onNext(response)
+            streamObserver.onCompleted()
+        }
+
+        override val stub: NetworkConsumerStub get() = assertNotCalled()
+
+        private fun assertNotCalled(): Nothing =
+            throw AssertionError("shouldn't have been called")
+
+    }
+
 }

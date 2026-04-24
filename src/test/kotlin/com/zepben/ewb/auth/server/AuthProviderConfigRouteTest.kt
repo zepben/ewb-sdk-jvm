@@ -10,6 +10,7 @@
 package com.zepben.ewb.auth.server
 
 import com.zepben.ewb.auth.common.AuthMethod
+import com.zepben.testutils.junit.SystemLogExtension
 import com.zepben.vertxutils.routing.RouteVersionUtils
 import com.zepben.vertxutils.testing.TestHttpServer
 import io.netty.handler.codec.http.HttpResponseStatus
@@ -19,8 +20,15 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 
 class AuthProviderConfigRouteTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     private var server: TestHttpServer? = null
     private var port = 8080

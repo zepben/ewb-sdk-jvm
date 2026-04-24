@@ -1,20 +1,19 @@
 /*
- * Copyright 2025 Zeppelin Bend Pty Ltd
+ * Copyright 2026 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.ewb.cim.extensions.iec61970.base.protection
+package com.zepben.ewb
 
 import com.zepben.testutils.junit.SystemLogExtension
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
+import com.zepben.testutils.junit.TestClassValidator
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
-internal class VoltageRelayTest {
+class TestsTest {
 
     companion object {
         @JvmField
@@ -23,8 +22,8 @@ internal class VoltageRelayTest {
     }
 
     @Test
-    internal fun constructorCoverage() {
-        assertThat(VoltageRelay("id").mRID, equalTo("id"))
+    internal fun `validate test classes`() {
+        TestClassValidator.validate()
     }
 
 }

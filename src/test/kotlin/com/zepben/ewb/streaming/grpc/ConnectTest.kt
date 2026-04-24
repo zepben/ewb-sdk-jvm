@@ -15,6 +15,7 @@ import com.zepben.ewb.auth.client.createTokenFetcherManagedIdentity
 import com.zepben.ewb.auth.common.AuthException
 import com.zepben.ewb.auth.common.AuthMethod
 import com.zepben.testutils.exception.ExpectException
+import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.*
 import io.vertx.core.json.JsonObject
 import org.hamcrest.MatcherAssert.assertThat
@@ -22,10 +23,17 @@ import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import java.net.http.HttpClient
 import javax.net.ssl.SSLContext
 
 internal class ConnectTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     private val gcbWithAddress = mockk<GrpcChannelBuilder>()
     private val gcbWithTls = mockk<GrpcChannelBuilder>()

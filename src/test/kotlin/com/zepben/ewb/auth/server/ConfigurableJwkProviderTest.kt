@@ -9,16 +9,25 @@
 package com.zepben.ewb.auth.server
 
 import com.zepben.ewb.auth.common.StatusCode
+import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.every
 import io.mockk.mockk
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import java.net.URL
 import java.net.http.HttpClient
 import java.net.http.HttpResponse
 
 class ConfigurableJwkProviderTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
+
     val clientCreator: () -> HttpClient = { client }
     val url: URL = URL("https://fake-url.com")
 

@@ -14,13 +14,21 @@ import com.zepben.ewb.cim.iec61970.base.core.Terminal
 import com.zepben.ewb.cim.iec61970.base.wires.LinearShuntCompensator
 import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.tracing.networktrace.NetworkTraceStep
+import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.every
 import io.mockk.mockk
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 
 class ShuntCompensatorConditionTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     private val shuntCompensator = LinearShuntCompensator("sc")
     private val fromTerm = Terminal(mRID = generateId()).also { shuntCompensator.addTerminal(it) }

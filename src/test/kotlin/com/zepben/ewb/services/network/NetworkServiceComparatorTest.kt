@@ -49,11 +49,19 @@ import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.ewb.services.common.*
 import com.zepben.ewb.services.network.tracing.feeder.FeederDirection
 import com.zepben.ewb.utils.ServiceComparatorValidator
+import com.zepben.testutils.junit.SystemLogExtension
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import java.time.Instant
 
 @Suppress("SameParameterValue")
 internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     override val comparatorValidator: ServiceComparatorValidator<NetworkService, NetworkServiceComparator> = ServiceComparatorValidator(
         { NetworkService() },

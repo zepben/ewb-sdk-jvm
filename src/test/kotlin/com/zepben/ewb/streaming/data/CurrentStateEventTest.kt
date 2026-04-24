@@ -11,11 +11,13 @@ package com.zepben.ewb.streaming.data
 import com.google.protobuf.Timestamp
 import com.zepben.ewb.cim.iec61970.base.core.PhaseCode
 import com.zepben.ewb.services.common.translator.toLocalDateTime
+import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.extension.RegisterExtension
 import com.zepben.protobuf.cim.iec61970.base.core.PhaseCode as PBPhaseCode
 import com.zepben.protobuf.ns.data.AddCutEvent as PBAddCutEvent
 import com.zepben.protobuf.ns.data.AddJumperEvent as PBAddJumperEvent
@@ -26,6 +28,12 @@ import com.zepben.protobuf.ns.data.SwitchAction as PBSwitchAction
 import com.zepben.protobuf.ns.data.SwitchStateEvent as PBSwitchStateEvent
 
 internal class CurrentStateEventTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     @Test
     internal fun `CurrentStateEvent from protobuf`() {

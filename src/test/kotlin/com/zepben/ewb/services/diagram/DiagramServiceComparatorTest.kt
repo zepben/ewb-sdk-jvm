@@ -13,9 +13,17 @@ import com.zepben.ewb.services.common.BaseServiceComparatorTest
 import com.zepben.ewb.services.common.ObjectCollectionDifference
 import com.zepben.ewb.services.common.ValueCollectionDifference
 import com.zepben.ewb.utils.ServiceComparatorValidator
+import com.zepben.testutils.junit.SystemLogExtension
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 
 internal class DiagramServiceComparatorTest : BaseServiceComparatorTest() {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     override val comparatorValidator: ServiceComparatorValidator<DiagramService, DiagramServiceComparator> = ServiceComparatorValidator(
         { DiagramService() },

@@ -13,10 +13,18 @@ import com.zepben.ewb.cim.iec61968.customers.*
 import com.zepben.ewb.services.common.BaseServiceComparatorTest
 import com.zepben.ewb.services.common.ObjectCollectionDifference
 import com.zepben.ewb.utils.ServiceComparatorValidator
+import com.zepben.testutils.junit.SystemLogExtension
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 
 @Suppress("SameParameterValue")
 internal class CustomerServiceComparatorTest : BaseServiceComparatorTest() {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     override val comparatorValidator: ServiceComparatorValidator<CustomerService, CustomerServiceComparator> = ServiceComparatorValidator(
         { CustomerService() },

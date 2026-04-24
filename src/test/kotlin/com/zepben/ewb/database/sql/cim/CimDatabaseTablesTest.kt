@@ -17,14 +17,22 @@ import com.zepben.ewb.database.sql.common.tables.SqlTable
 import com.zepben.ewb.database.sql.common.tables.TableVersion
 import com.zepben.ewb.database.sql.generators.SqlGenerator
 import com.zepben.testutils.exception.ExpectException.Companion.expect
+import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.mockk
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import java.lang.reflect.Modifier
 import kotlin.reflect.full.isSubclassOf
 
 internal class CimDatabaseTablesTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     private val tables = object : CimDatabaseTables() {
         override val sqlGenerator: SqlGenerator

@@ -55,11 +55,13 @@ import com.zepben.ewb.services.network.NetworkServiceComparator
 import com.zepben.ewb.services.network.testdata.*
 import com.zepben.ewb.services.network.testdata.stupid.StupidlyLargeNetwork
 import com.zepben.ewb.testing.TestNetworkBuilder
+import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.containsString
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -67,6 +69,12 @@ import java.sql.Connection
 import java.sql.DriverManager
 
 class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkDatabaseWriter, NetworkDatabaseReader, NetworkServiceComparator>() {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     override fun createService(): NetworkService = NetworkService()
 

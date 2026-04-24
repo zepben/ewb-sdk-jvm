@@ -185,6 +185,8 @@ class AssignToFeeders(
             val sites = toEquipment.containers.filterIsInstance<Site>()
             val substations = toEquipment.containers.filterIsInstance<LvSubstation>()
             if (substations.isNotEmpty()) {
+                //todo no need to search. substations.findLvFeeders should be replaced with substations.normalEnergizedLvFeeders.
+                //todo update ewb-network-routes. Search for "`LvSubstation.normalEnergizedLvFeeders`"
                 energizes(substations.findLvFeeders(lvFeederStartPoints, stateOperators))
                 // Also energise any LvSubstations found on the transformer. LvSubstations should gradually replace Sites.
                 energizesLvSubstations(substations)

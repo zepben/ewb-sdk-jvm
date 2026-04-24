@@ -10,11 +10,19 @@ package com.zepben.ewb.database.sql.cim.network
 
 import com.zepben.ewb.database.sql.cim.CimDatabaseTables
 import com.zepben.ewb.database.sql.generators.SqlGenerator
+import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.mockk
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 
 internal class NetworkDatabaseTablesTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     @Test
     internal fun `contains base tables`() {

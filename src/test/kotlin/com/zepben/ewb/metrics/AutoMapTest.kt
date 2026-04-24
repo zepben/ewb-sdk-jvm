@@ -8,11 +8,19 @@
 
 package com.zepben.ewb.metrics
 
+import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 
 internal class AutoMapTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     private val autoMap = object : AutoMap<String, MutableList<Int>>() {
         override fun defaultValue(): MutableList<Int> = mutableListOf(5)

@@ -10,14 +10,22 @@ package com.zepben.ewb.services.network.tracing.networktrace.operators
 
 import com.zepben.ewb.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.ewb.cim.iec61970.base.wires.Switch
+import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 
 class OpenStateOperatorsTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     private val normal = OpenStateOperators.NORMAL
     private val current = OpenStateOperators.CURRENT

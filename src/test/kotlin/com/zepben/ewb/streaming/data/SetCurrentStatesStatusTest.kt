@@ -8,12 +8,20 @@
 
 package com.zepben.ewb.streaming.data
 
+import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import com.zepben.protobuf.ns.data.StateEventFailure as PBStateEventFailure
 
 internal class SetCurrentStatesStatusTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     //
     // NOTE: We don't bother to check that the correct thing was put into the protobuf variants directly because it is

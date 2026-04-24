@@ -66,9 +66,11 @@ import com.zepben.ewb.services.common.translator.TranslatorTestBase
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.NetworkServiceComparator
 import com.zepben.ewb.services.network.testdata.fillFields
+import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.anEmptyMap
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 
 internal class NetworkTranslatorTest : TranslatorTestBase<NetworkService>(
     ::NetworkService,
@@ -77,6 +79,12 @@ internal class NetworkTranslatorTest : TranslatorTestBase<NetworkService>(
     NetworkService::addFromPb,
     ::networkIdentifiedObject
 ) {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     private val nsToPb = NetworkCimToProto()
 

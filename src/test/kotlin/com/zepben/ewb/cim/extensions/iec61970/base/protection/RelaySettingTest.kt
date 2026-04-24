@@ -9,11 +9,19 @@
 package com.zepben.ewb.cim.extensions.iec61970.base.protection
 
 import com.zepben.ewb.cim.iec61970.base.domain.UnitSymbol
+import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 
 internal class RelaySettingTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     @Test
     internal fun constructorCoverage() {

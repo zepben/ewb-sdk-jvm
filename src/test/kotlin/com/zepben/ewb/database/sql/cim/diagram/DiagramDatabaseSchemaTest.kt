@@ -18,9 +18,11 @@ import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.diagram.DiagramService
 import com.zepben.ewb.services.diagram.DiagramServiceComparator
 import com.zepben.ewb.services.diagram.testdata.fillFields
+import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -28,6 +30,12 @@ import java.sql.Connection
 import java.sql.DriverManager
 
 class DiagramDatabaseSchemaTest : CimDatabaseSchemaTest<DiagramService, DiagramDatabaseWriter, DiagramDatabaseReader, DiagramServiceComparator>() {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     override fun createService(): DiagramService = DiagramService()
 

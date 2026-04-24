@@ -13,6 +13,7 @@ import com.auth0.jwk.JwkException
 import com.auth0.jwk.SigningKeyNotFoundException
 import com.zepben.ewb.auth.client.ProviderDetails
 import com.zepben.testutils.exception.ExpectException
+import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.every
 import io.mockk.excludeRecords
 import io.mockk.mockk
@@ -20,10 +21,17 @@ import io.mockk.verifySequence
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import java.net.URI
 import java.net.URL
 
 class JWKHolderTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     private val jwk33 = mockk<Jwk>()
     private val jwk5006 = mockk<Jwk>()

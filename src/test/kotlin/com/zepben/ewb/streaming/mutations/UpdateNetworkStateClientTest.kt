@@ -17,6 +17,7 @@ import com.zepben.ewb.streaming.mutations.testservices.TestUpdateNetworkStateSer
 import com.zepben.protobuf.ns.SetCurrentStatesRequest
 import com.zepben.protobuf.ns.SetCurrentStatesResponse
 import com.zepben.protobuf.ns.UpdateNetworkStateServiceGrpc
+import com.zepben.testutils.junit.SystemLogExtension
 import io.grpc.inprocess.InProcessChannelBuilder
 import io.grpc.inprocess.InProcessServerBuilder
 import io.grpc.testing.GrpcCleanupRule
@@ -24,12 +25,12 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.Rule
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.verify
 import java.time.LocalDateTime
-import kotlin.streams.toList
 import com.zepben.protobuf.ns.data.BatchFailure as PBBatchFailure
 import com.zepben.protobuf.ns.data.BatchNotProcessed as PBBatchNotProcessed
 import com.zepben.protobuf.ns.data.BatchSuccessful as PBBatchSuccessful
@@ -41,6 +42,12 @@ import com.zepben.protobuf.ns.data.StateEventUnsupportedPhasing as PBStateEventU
 import org.mockito.kotlin.any as mockitoAny
 
 internal class UpdateNetworkStateClientTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     @JvmField
     @Rule

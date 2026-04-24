@@ -8,12 +8,20 @@
 
 package com.zepben.ewb.conn.grpc
 
+import com.zepben.testutils.junit.SystemLogExtension
 import io.grpc.Status
 import org.hamcrest.MatcherAssert
 import org.hamcrest.Matchers
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 
 class CompressionInterceptorTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     @Test
     fun `test intercepts calls`() {

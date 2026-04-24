@@ -10,14 +10,22 @@ package com.zepben.ewb.database.sql.extensions
 
 import com.zepben.ewb.cim.iec61968.infiec61968.infcommon.Ratio
 import com.zepben.ewb.utils.createMockResultSet
+import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.every
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import java.time.Instant
 
 internal class ResultSetExtensionsTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     @Test
     internal fun `getNullableBoolean returns a bool`() {

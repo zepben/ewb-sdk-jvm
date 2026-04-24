@@ -10,11 +10,19 @@ package com.zepben.ewb.services.network.tracing.tree
 
 import com.zepben.ewb.cim.iec61970.base.wires.Junction
 import com.zepben.ewb.services.network.tracing.networktrace.actions.TreeNode
+import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 
 internal class TreeNodeTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     @Test
     internal fun accessors() {

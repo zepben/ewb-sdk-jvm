@@ -13,6 +13,7 @@ import com.zepben.ewb.auth.server.createAuthenticator
 import com.zepben.testutils.auth.MockServerCall
 import com.zepben.testutils.auth.MockServerCallHandler
 import com.zepben.testutils.auth.TOKEN
+import com.zepben.testutils.junit.SystemLogExtension
 import io.grpc.Metadata
 import io.grpc.Status
 import io.mockk.every
@@ -20,10 +21,17 @@ import io.mockk.mockk
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 
 const val write_network_scope: String = "write:network"
 
 class AuthInterceptorTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     @Test
     fun testIntercept() {

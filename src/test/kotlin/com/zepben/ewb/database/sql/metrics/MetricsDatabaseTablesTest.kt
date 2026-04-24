@@ -13,12 +13,20 @@ import com.zepben.ewb.database.sql.common.MissingTableConfigException
 import com.zepben.ewb.database.sql.common.tables.SqlTable
 import com.zepben.ewb.database.sql.common.tables.TableVersion
 import com.zepben.testutils.exception.ExpectException
+import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import java.lang.reflect.Modifier
 
 internal class MetricsDatabaseTablesTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     private val tables = MetricsDatabaseTables()
 

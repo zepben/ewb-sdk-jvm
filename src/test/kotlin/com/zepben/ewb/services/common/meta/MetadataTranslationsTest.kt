@@ -8,16 +8,24 @@
 
 package com.zepben.ewb.services.common.meta
 
+import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import java.time.Instant
 import com.google.protobuf.Timestamp as PBTimestamp
 import com.zepben.protobuf.metadata.DataSource as PBDataSource
 import com.zepben.protobuf.metadata.ServiceInfo as PBServiceInfo
 
 internal class MetadataTranslationsTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     @Test
     internal fun `DataSource from Protobuf`() {

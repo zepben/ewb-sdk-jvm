@@ -9,6 +9,7 @@
 package com.zepben.ewb.streaming.grpc
 
 import com.zepben.ewb.auth.common.AuthException
+import com.zepben.testutils.junit.SystemLogExtension
 import io.grpc.CallCredentials.MetadataApplier
 import io.grpc.CallCredentials.RequestInfo
 import io.grpc.Metadata
@@ -18,10 +19,17 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import java.io.IOException
 import java.util.concurrent.Executor
 
 internal class TokenCallCredentialsTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     @AfterEach
     fun teardownMockks() {

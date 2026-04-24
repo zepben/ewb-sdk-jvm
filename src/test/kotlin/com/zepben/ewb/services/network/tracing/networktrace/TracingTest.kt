@@ -17,11 +17,19 @@ import com.zepben.ewb.services.network.tracing.networktrace.conditions.Condition
 import com.zepben.ewb.services.network.tracing.networktrace.conditions.Conditions.upstream
 import com.zepben.ewb.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.ewb.testing.TestNetworkBuilder
+import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 
 class TracingTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     //
     //              1 b2 21--c3--21 ec4

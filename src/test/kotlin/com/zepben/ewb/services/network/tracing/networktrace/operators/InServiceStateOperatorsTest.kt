@@ -9,13 +9,21 @@
 package com.zepben.ewb.services.network.tracing.networktrace.operators
 
 import com.zepben.ewb.cim.iec61970.base.core.Equipment
+import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import kotlin.reflect.KMutableProperty1
 
 class InServiceStateOperatorsTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     private val normal = InServiceStateOperators.NORMAL
     private val current = InServiceStateOperators.CURRENT

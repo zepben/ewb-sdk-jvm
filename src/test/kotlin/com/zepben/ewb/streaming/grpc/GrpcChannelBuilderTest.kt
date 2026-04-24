@@ -19,6 +19,7 @@ import com.zepben.ewb.streaming.get.QueryNetworkStateClient
 import com.zepben.ewb.streaming.mutations.UpdateNetworkStateClient
 import com.zepben.protobuf.connection.CheckConnectionRequest
 import com.zepben.testutils.exception.ExpectException.Companion.expect
+import com.zepben.testutils.junit.SystemLogExtension
 import io.grpc.*
 import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder
 import io.grpc.stub.ClientCalls
@@ -27,11 +28,18 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import java.io.File
 import java.lang.reflect.Modifier
 import kotlin.reflect.KClass
 
 internal class GrpcChannelBuilderTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     @AfterEach
     internal fun teardownMockks() {

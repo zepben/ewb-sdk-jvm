@@ -12,14 +12,22 @@ import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.ResistanceReactance
 import com.zepben.ewb.services.network.validateResistanceReactance
 import com.zepben.ewb.utils.PrivateCollectionValidator
+import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.spy
 
 internal class PowerTransformerInfoTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     @Test
     internal fun constructorCoverage() {

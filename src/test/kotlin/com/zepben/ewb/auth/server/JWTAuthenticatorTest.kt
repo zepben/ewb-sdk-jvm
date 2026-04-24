@@ -19,6 +19,7 @@ import com.zepben.ewb.auth.common.StatusCode
 import com.zepben.ewb.auth.server.JWTAuthoriser.authorise
 import com.zepben.testutils.auth.*
 import com.zepben.testutils.exception.ExpectException.Companion.expect
+import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
@@ -26,6 +27,7 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.instanceOf
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 
 fun createAuthenticator(aud: String, issuer: String): JWTAuthenticator {
     return JWTAuthenticator(
@@ -39,6 +41,12 @@ fun createAuthenticator(aud: String, issuer: String): JWTAuthenticator {
 }
 
 class JWTAuthenticatorTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     @Test
     fun testAuth() {

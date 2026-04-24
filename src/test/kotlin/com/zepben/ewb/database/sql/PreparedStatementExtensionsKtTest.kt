@@ -10,12 +10,20 @@ package com.zepben.ewb.database.sql
 
 import com.zepben.ewb.database.sql.extensions.parameters
 import com.zepben.ewb.database.sql.extensions.sql
+import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import java.sql.DriverManager
 
 class PreparedStatementExtensionsKtTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     @Test
     internal fun `can print sql statements and bound values`() {

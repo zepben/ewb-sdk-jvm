@@ -22,9 +22,11 @@ import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.customer.CustomerService
 import com.zepben.ewb.services.customer.CustomerServiceComparator
 import com.zepben.ewb.services.customer.testdata.fillFields
+import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -32,6 +34,12 @@ import java.sql.Connection
 import java.sql.DriverManager
 
 class CustomerDatabaseSchemaTest : CimDatabaseSchemaTest<CustomerService, CustomerDatabaseWriter, CustomerDatabaseReader, CustomerServiceComparator>() {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     override fun createService(): CustomerService = CustomerService()
 

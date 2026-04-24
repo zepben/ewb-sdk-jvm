@@ -8,11 +8,20 @@
 
 package com.zepben.ewb.cim.iec61970.base.wires
 
+import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 
 class PhaseImpedanceDataTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
+
     @Test
     internal fun constructorCoverage() {
         assertThat(PhaseImpedanceData(SinglePhaseKind.A, SinglePhaseKind.B, 0.0, 0.0, 0.0, 0.0), notNullValue())

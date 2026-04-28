@@ -1,19 +1,18 @@
-[![codecov](https://codecov.io/gh/zepben/evolve-sdk-jvm/branch/main/graph/badge.svg?token=WJKHSV0GS4)](https://codecov.io/gh/zepben/evolve-sdk-jvm)
+[![codecov](https://codecov.io/gh/zepben/ewb-sdk-jvm/branch/main/graph/badge.svg?token=WJKHSV0GS4)](https://codecov.io/gh/zepben/ewb-sdk-jvm)
 
-# Evolve SDK #
+# EWB SDK JVM
 
-The Evolve SDK contains everything necessary to communicate with a [Zepben EWB Server](https://github.com/zepben/energy-workbench-server). See the
-complete [Evolve JVM SDK Documentation](https://zepben.github.io/evolve/docs/jvm-sdk/) for more details.
+The EWB SDK contains everything necessary to communicate with a Zepben Energy Workbench Server. See the complete [EWB JVM SDK Documentation](https://zepben.github.io/evolve/docs/ewb-sdk-jvm/) for more details.
 
-## Requirements ##
+## Requirements
 
 - Java 11
 
-## Building ##
+## Building
 
 Requirements to build
 
-- JDK11 (tested with Amazon Corretto)
+- JDK17 (tested with Amazon Corretto)
 - Maven
 
 To build:

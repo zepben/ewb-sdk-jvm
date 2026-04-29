@@ -20,6 +20,7 @@ import com.zepben.ewb.services.variant.testdata.fillFields
 import com.zepben.ewb.services.variant.translator.variantObject
 import com.zepben.ewb.streaming.get.testservices.TestVariantConsumerService
 import com.zepben.ewb.streaming.grpc.CaptureLastRpcErrorHandler
+import com.zepben.ewb.streaming.grpc.GrpcChannel
 import com.zepben.protobuf.vc.GetChangeSetResponse
 import com.zepben.protobuf.vc.GetIdentifiedObjectsRequest
 import com.zepben.protobuf.vc.GetIdentifiedObjectsResponse
@@ -28,6 +29,7 @@ import com.zepben.testutils.junit.SystemLogExtension
 import io.grpc.inprocess.InProcessChannelBuilder
 import io.grpc.inprocess.InProcessServerBuilder
 import io.grpc.testing.GrpcCleanupRule
+import io.mockk.mockk
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.Rule
@@ -80,6 +82,11 @@ internal class VariantConsumerClientTest {
     }
 
     @Test
+    fun `constructor coverage`() {
+        VariantConsumerClient(channel = mockk<GrpcChannel>(), variantService = mockk(), callCredentials = mockk())
+    }
+
+    @Test
     internal fun `can get change set`() {
 
         val expectedService = VariantService()
@@ -115,15 +122,22 @@ internal class VariantConsumerClientTest {
         val dependingStage = NetworkModelProjectStage("dependingStage").also { expectedService.add(it) }
         val project = NetworkModelProject("project").also { expectedService.add(it); it.addChild(stage); stage.parent = it }
         val changeSet = ChangeSet("changeSet").also { expectedService.add(it); it.networkModelProjectStage = stage; stage.changeSet = it }
-        val dependentOn = AnnotatedProjectDependency(generateId()).also { expectedService.add(it); it.dependencyDependentOnStage = stage; stage.addDependency(it); it.dependencyDependingStage = dependingStage; dependingStage.addDependency(it) }
-        val creation = ObjectCreation().also { it.changeSet = changeSet; it.targetObjectMRID = "target1"; changeSet.addMember(it); expectedService.add(it)}
-        val deletion = ObjectDeletion().also { it.changeSet = changeSet; it.targetObjectMRID = "target2"; changeSet.addMember(it); expectedService.add(it)}
-        val modification = ObjectModification().also { it.changeSet = changeSet; it.targetObjectMRID = "target3"; changeSet.addMember(it); expectedService.add(it)}
+        val dependentOn = AnnotatedProjectDependency(generateId()).also {
+            expectedService.add(it); it.dependencyDependentOnStage = stage; stage.addDependency(it); it.dependencyDependingStage =
+            dependingStage; dependingStage.addDependency(it)
+        }
+        val creation = ObjectCreation().also { it.changeSet = changeSet; it.targetObjectMRID = "target1"; changeSet.addMember(it); expectedService.add(it) }
+        val deletion = ObjectDeletion().also { it.changeSet = changeSet; it.targetObjectMRID = "target2"; changeSet.addMember(it); expectedService.add(it) }
+        val modification =
+            ObjectModification().also { it.changeSet = changeSet; it.targetObjectMRID = "target3"; changeSet.addMember(it); expectedService.add(it) }
 
         val dependentOnStage = NetworkModelProjectStage("otherStage").also { expectedService.add(it) }
         val stage2 = NetworkModelProjectStage("stage2").also { expectedService.add(it) }
         val changeSet2 = ChangeSet("changeSet2").also { expectedService.add(it); it.networkModelProjectStage = stage2; stage2.changeSet = it }
-        val depending = AnnotatedProjectDependency(generateId()).also { expectedService.add(it); it.dependencyDependingStage = stage2; stage2.addDependency(it); it.dependencyDependentOnStage = dependentOnStage; dependentOnStage.addDependency(it) }
+        val depending = AnnotatedProjectDependency(generateId()).also {
+            expectedService.add(it); it.dependencyDependingStage = stage2; stage2.addDependency(it); it.dependencyDependentOnStage =
+            dependentOnStage; dependentOnStage.addDependency(it)
+        }
 
         consumerService.onGetChangeSet =
             spy { _, response ->
@@ -145,7 +159,11 @@ internal class VariantConsumerClientTest {
 
         assertThat("getChangeSet should succeed", result.wasSuccessful)
         val differences = VariantServiceComparator().compare(expectedService, consumerClient.service)
-        assertThat("unexpected objects found in read service: ${differences.missingFromTarget()}", differences.missingFromTarget(), containsInAnyOrder(changeSet2.mRID, stage2.mRID, depending.mRID))
+        assertThat(
+            "unexpected objects found in read service: ${differences.missingFromTarget()}",
+            differences.missingFromTarget(),
+            containsInAnyOrder(changeSet2.mRID, stage2.mRID, depending.mRID)
+        )
         assertThat("unexpected modifications ${differences.modifications()}", differences.modifications(), anEmptyMap())
         assertThat("objects missing from read service: ${differences.missingFromSource()}", differences.missingFromSource(), empty())
 

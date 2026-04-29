@@ -8,13 +8,9 @@
 
 package com.zepben.ewb.streaming.get
 
-import com.google.protobuf.Timestamp
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
-import com.zepben.ewb.database.paths.VariantContents
-import com.zepben.ewb.services.common.translator.EnumMapper
 import com.zepben.ewb.services.common.translator.toTimestamp
-import com.zepben.ewb.services.network.NetworkState
 import com.zepben.ewb.services.variant.VariantService
 import com.zepben.ewb.services.variant.translator.VariantProtoToCim
 import com.zepben.ewb.services.variant.translator.addFromPb
@@ -25,12 +21,10 @@ import com.zepben.protobuf.metadata.GetMetadataResponse
 import com.zepben.protobuf.vc.*
 import io.grpc.CallCredentials
 import io.grpc.Channel
-import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
 import java.util.concurrent.Executors
 import com.zepben.protobuf.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProject as PBNetworkModelProject
-
 
 
 /**

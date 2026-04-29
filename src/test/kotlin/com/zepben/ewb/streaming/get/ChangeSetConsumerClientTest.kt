@@ -8,25 +8,63 @@
 
 package com.zepben.ewb.streaming.get
 
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
-import com.zepben.ewb.services.variant.ChangeSetServices
-import com.zepben.ewb.services.variant.VariantService
-import com.zepben.ewb.services.variant.VariantServiceComparator
-import com.zepben.ewb.services.variant.testdata.fillFields
-import com.zepben.ewb.services.variant.translator.toPb
-import com.zepben.ewb.streaming.get.testservices.TestVariantConsumerService
-import com.zepben.protobuf.vc.GetChangeSetRequest
-import com.zepben.protobuf.vc.GetChangeSetResponse
-import org.hamcrest.MatcherAssert.assertThat
+import com.zepben.ewb.streaming.grpc.GrpcChannel
+import io.grpc.Channel
+import io.mockk.mockk
+import io.mockk.verifySequence
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.isA
-import org.mockito.kotlin.spy
-import org.mockito.kotlin.verify
 
 
 class ChangeSetConsumerClientTest {
 
+    @Test
+    fun `constructor coverage`() {
+        ChangeSetConsumerClient(
+            variantChannel = mockk<GrpcChannel>(),
+            variantService = mockk(),
+            networkChannel = mockk(),
+            diagramChannel = mockk(),
+            customerChannel = mockk(),
+            variantCallCredentials = mockk(),
+            networkCallCredentials = mockk(),
+            diagramCallCredentials = mockk(),
+            customerCallCredentials = mockk(),
+        )
 
+        ChangeSetConsumerClient(
+            variantChannel = mockk<Channel>(),
+            variantService = mockk(),
+            networkChannel = mockk(),
+            diagramChannel = mockk(),
+            customerChannel = mockk(),
+            variantCallCredentials = mockk(),
+            networkCallCredentials = mockk(),
+            diagramCallCredentials = mockk(),
+            customerCallCredentials = mockk(),
+        )
+
+        ChangeSetConsumerClient(
+            channel = mockk<GrpcChannel>(),
+            variantService = mockk(),
+            callCredentials = mockk(),
+        )
+    }
+
+    @Test
+    fun `closes underlying client`() {
+        val underlying = mockk<VariantConsumerClient>(relaxed = true)
+        val client = ChangeSetConsumerClient(
+            underlying,
+            networkChannel = mockk(),
+            diagramChannel = mockk(),
+            customerChannel = mockk(),
+            networkCallCredentials = mockk(),
+            diagramCallCredentials = mockk(),
+            customerCallCredentials = mockk(),
+        )
+        client.close()
+
+        verifySequence { underlying.close() }
+    }
 
 }

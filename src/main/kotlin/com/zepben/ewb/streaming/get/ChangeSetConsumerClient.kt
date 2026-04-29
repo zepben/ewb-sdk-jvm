@@ -24,7 +24,13 @@ import java.time.LocalDate
 /**
  * Helper client for querying multiple gRPC services for a [ChangeSet] and its contents.
  *
- * @property services The [ChangeSetServices] to store fetched objects in.
+ * @property variantConsumerClient The [VariantConsumerClient] to retrieve [ChangeSet].
+ * @property networkChannel The [Channel] to pass to [NetworkConsumerClient] to retrieve newNetworkService and originalNetworkService.
+ * @property diagramChannel The [Channel] to pass to [DiagramConsumerClient] to retrieve newDiagramService and originalDiagramService.
+ * @property customerChannel The [Channel] to pass to [CustomerConsumerClient] to retrieve newCustomerService and originalCustomerService.
+ * @property networkCallCredentials The network callCredentials [CallCredentials] to be attached to the stub.
+ * @property diagramCallCredentials The diagram callCredentials [CallCredentials] to be attached to the stub.
+ * @property customerCallCredentials The customer callCredentials [CallCredentials] to be attached to the stub.
  */
 class ChangeSetConsumerClient(
     val variantConsumerClient: VariantConsumerClient,
@@ -34,7 +40,7 @@ class ChangeSetConsumerClient(
     val networkCallCredentials: CallCredentials?,
     val diagramCallCredentials: CallCredentials?,
     val customerCallCredentials: CallCredentials?,
-) {
+) : AutoCloseable {
 
     init {
         require(networkChannel != null || diagramChannel != null || customerChannel != null) {
@@ -130,28 +136,34 @@ class ChangeSetConsumerClient(
         variantConsumerClient.getChangeSet(mRID, baseModelVersion).throwOnError()
         return variantConsumerClient.service.get<ChangeSet>(mRID)?.let { changeSet ->
             val nMor = networkChannel?.let {
-                NetworkConsumerClient(it, networkCallCredentials).getChangeSetObjects(mRID, VariantContents.CREATIONS_MODIFICATIONS, baseModelVersion)
-                    .throwOnError()
+                NetworkConsumerClient(it, networkCallCredentials).use { client ->
+                    client.getChangeSetObjects(mRID, VariantContents.CREATIONS_MODIFICATIONS, baseModelVersion).throwOnError()
+                }
             }
             val nMorOriginal = networkChannel?.let {
-                NetworkConsumerClient(it, networkCallCredentials).getChangeSetObjects(mRID, VariantContents.DELETIONS_REVERSEMODIFICATIONS, baseModelVersion)
-                    .throwOnError()
+                NetworkConsumerClient(it, networkCallCredentials).use { client ->
+                    client.getChangeSetObjects(mRID, VariantContents.DELETIONS_REVERSEMODIFICATIONS, baseModelVersion).throwOnError()
+                }
             }
             val dMor = diagramChannel?.let {
-                DiagramConsumerClient(it, diagramCallCredentials).getChangeSetObjects(mRID, VariantContents.CREATIONS_MODIFICATIONS, baseModelVersion)
-                    .throwOnError()
+                DiagramConsumerClient(it, diagramCallCredentials).use { client ->
+                    client.getChangeSetObjects(mRID, VariantContents.CREATIONS_MODIFICATIONS, baseModelVersion).throwOnError()
+                }
             }
             val dMorOriginal = diagramChannel?.let {
-                DiagramConsumerClient(it, diagramCallCredentials).getChangeSetObjects(mRID, VariantContents.DELETIONS_REVERSEMODIFICATIONS, baseModelVersion)
-                    .throwOnError()
+                DiagramConsumerClient(it, diagramCallCredentials).use { client ->
+                    client.getChangeSetObjects(mRID, VariantContents.DELETIONS_REVERSEMODIFICATIONS, baseModelVersion).throwOnError()
+                }
             }
             val cMor = customerChannel?.let {
-                CustomerConsumerClient(it, customerCallCredentials).getChangeSetObjects(mRID, VariantContents.CREATIONS_MODIFICATIONS, baseModelVersion)
-                    .throwOnError()
+                CustomerConsumerClient(it, customerCallCredentials).use { client ->
+                    client.getChangeSetObjects(mRID, VariantContents.CREATIONS_MODIFICATIONS, baseModelVersion).throwOnError()
+                }
             }
             val cMorOriginal = customerChannel?.let {
-                CustomerConsumerClient(it, customerCallCredentials).getChangeSetObjects(mRID, VariantContents.DELETIONS_REVERSEMODIFICATIONS, baseModelVersion)
-                    .throwOnError()
+                CustomerConsumerClient(it, customerCallCredentials).use { client ->
+                    client.getChangeSetObjects(mRID, VariantContents.DELETIONS_REVERSEMODIFICATIONS, baseModelVersion).throwOnError()
+                }
             }
 
             GrpcResult.of(
@@ -170,5 +182,7 @@ class ChangeSetConsumerClient(
 
     }
 
-
+    override fun close() {
+        variantConsumerClient.close()
+    }
 }

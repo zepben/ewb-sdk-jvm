@@ -13,16 +13,19 @@ import com.zepben.ewb.cim.iec61968.common.StreetDetail
 import com.zepben.ewb.cim.iec61968.common.TownDetail
 import com.zepben.ewb.cim.iec61968.infiec61968.infcommon.Ratio
 import com.zepben.ewb.cim.iec61968.metering.ControlledAppliance
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.core.NameType
 import com.zepben.ewb.cim.iec61970.base.domain.DateTimeInterval
 import com.zepben.ewb.cim.iec61970.base.wires.*
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.*
 import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.common.meta.DataSource
 import com.zepben.ewb.services.common.meta.MetadataCollection
 import com.zepben.ewb.services.customer.CustomerService
 import com.zepben.ewb.services.diagram.DiagramService
 import com.zepben.ewb.services.network.NetworkService
+import com.zepben.ewb.services.variant.VariantService
 import java.time.Instant
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KVisibility
@@ -87,7 +90,21 @@ object SchemaServices {
             networkService.tryAdd(factory("emptyNotNull").also { fillRequired(networkService, it); fillEmptys(it) })
         }
 
-    private fun fillRequired(service: NetworkService, io: IdentifiedObject) {
+    fun <T : IdentifiedObject> variantServicesOf(factory: (mRID: String) -> T, filler: (T, VariantService, Boolean) -> T): VariantService =
+        VariantService().also { variantService ->
+            variantService.tryAdd(factory("empty"))
+            variantService.tryAdd(filler(factory("filled"), variantService, false))
+            variantService.tryAdd(factory("emptyNotNull").also { fillEmptys(it)})
+        }
+
+    fun variantServicesOfChangeSets(factory: (mRID: String) -> ChangeSet, filler: (ChangeSet, VariantService, Boolean) -> ChangeSet): VariantService =
+        VariantService().also { variantService ->
+            variantService.add(factory("empty"))
+            variantService.add(filler(factory("filled"), variantService, false))
+            variantService.add(factory("emptyNotNull").also { fillEmptys(it) })
+        }
+
+    private fun fillRequired(service: NetworkService, io: Any) {
         when (io) {
             is EnergyConsumerPhase -> {
                 io.energyConsumer = EnergyConsumer(generateId()).also {
@@ -105,6 +122,21 @@ object SchemaServices {
         }
     }
 
+    fun fillRequired(io: Identifiable) {
+
+        if (io is ChangeSetMember) {
+            io.changeSet = ChangeSet(generateId()); io.targetObjectMRID = "member"
+        }
+//        if (io is ObjectModification) {
+//            io.objectReverseModification = ObjectReverseModification().also {
+//                it.changeSet = io.changeSet
+//                it.targetObjectMRID = io.mRID.asObjectReverseModificationId
+//                it.objectModification = io
+//                io.changeSet.addMember(it)
+//            }
+//        }
+    }
+
     /**
      * This functionality was created because there were a few strings that weren't nullable, and we were treating "" as null.
      * We then converted them to nullable and wanted to ensure that nothing got broken by writing/reading these from the DB/protos.
@@ -115,7 +147,7 @@ object SchemaServices {
      * Any exception in setting the value to the empty value means there are constraints in place, and the old null
      * replacements won't be an issue, so can safely be ignored.
      */
-    fun fillEmptys(io: IdentifiedObject) {
+    fun fillEmptys(io: Any) {
         io::class.memberProperties
             .asSequence()
             .filter { it.visibility == KVisibility.PUBLIC }
@@ -132,7 +164,7 @@ object SchemaServices {
                     prop.isNullableOf<Float>() -> 0.0f
                     prop.isNullableOf<Double>() -> 0.0
                     // We don't need to worry about references to other objects, they are covered by `filled`.
-                    prop.isNullableOf<IdentifiedObject>() -> null
+                    prop.isNullableOf<Identifiable>() -> null
                     prop.isNullableOf<ControlledAppliance>() -> ControlledAppliance(0)
                     prop.isNullableOf<DateTimeInterval>() -> DateTimeInterval(Instant.ofEpochSecond(0), Instant.ofEpochSecond(1))
                     prop.isNullableOf<Instant>() -> Instant.ofEpochSecond(0)
@@ -152,7 +184,6 @@ object SchemaServices {
                             buildingNumber = ""
                         ),
                     )
-
                     else -> throw IllegalStateException("INTERNAL ERROR: You forgot to add an empty value mapper for ${prop.returnType} - used by ${io::class.simpleName}.${prop.name}")
                 }
 
@@ -163,11 +194,11 @@ object SchemaServices {
     private inline fun <reified T> KMutableProperty<*>.isNullableOf(): Boolean =
         returnType.withNullability(false).isSubtypeOf(T::class.createType())
 
-    private fun KMutableProperty<*>.findKnownNonEmpty(io: IdentifiedObject): Any? {
+    private fun KMutableProperty<*>.findKnownNonEmpty(io: Any): Any? {
         return tryPowerElectronicsConnectionNonEmpty(io)
     }
 
-    private fun KMutableProperty<*>.tryPowerElectronicsConnectionNonEmpty(io: IdentifiedObject): Any? =
+    private fun KMutableProperty<*>.tryPowerElectronicsConnectionNonEmpty(io: Any): Any? =
         when (io) {
             is PowerElectronicsConnection -> {
                 when (name) {

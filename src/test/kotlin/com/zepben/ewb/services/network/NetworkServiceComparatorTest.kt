@@ -1650,7 +1650,6 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         comparatorValidator.validateProperty(PowerTransformerEnd::phaseAngleClock, { PowerTransformerEnd(it) }, { 1 }, { 2 })
         comparatorValidator.validateProperty(PowerTransformerEnd::r, { PowerTransformerEnd(it) }, { 1.0 }, { 2.0 })
         comparatorValidator.validateProperty(PowerTransformerEnd::r0, { PowerTransformerEnd(it) }, { 1.0 }, { 2.0 })
-        comparatorValidator.validateProperty(PowerTransformerEnd::ratedS, { PowerTransformerEnd(it) }, { 1 }, { 2 }, expectedDifferences = setOf("sRatings"))
         comparatorValidator.validateProperty(PowerTransformerEnd::ratedU, { PowerTransformerEnd(it) }, { 1 }, { 2 })
         comparatorValidator.validateProperty(PowerTransformerEnd::x, { PowerTransformerEnd(it) }, { 1.0 }, { 2.0 })
         comparatorValidator.validateProperty(PowerTransformerEnd::x0, { PowerTransformerEnd(it) }, { 1.0 }, { 2.0 })

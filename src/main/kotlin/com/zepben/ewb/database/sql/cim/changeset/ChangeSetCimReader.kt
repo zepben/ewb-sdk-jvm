@@ -1,0 +1,90 @@
+/*
+ * Copyright 2025 Zeppelin Bend Pty Ltd
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+package com.zepben.ewb.database.sql.cim.changeset
+
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.*
+import com.zepben.ewb.database.sql.cim.CimReader
+import com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.genericdataset.*
+import com.zepben.ewb.database.sql.extensions.getNullableString
+import com.zepben.ewb.services.common.Resolvers
+import com.zepben.ewb.services.common.extensions.getOrThrow
+import com.zepben.ewb.services.variant.VariantService
+import java.sql.ResultSet
+
+/**
+ * A class for reading the [VariantService] tables from the database.
+ */
+internal class ChangeSetCimReader : CimReader<VariantService>(), AutoCloseable{
+
+    override fun close() {
+    }
+
+    // ###################################
+    // # IEC61970 Part303 GenericDataSet #
+    // ###################################
+
+    fun read(service: VariantService, table: TableChangeSets, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val changeSet = ChangeSet(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
+            service.resolveOrDeferReference(
+                Resolvers.stage(this),
+                resultSet.getNullableString(table.NETWORK_MODEL_PROJECT_STAGE_MRID.queryIndex),
+                mRID
+            )
+        }
+
+        return readDataSet(changeSet, table, resultSet) && service.addOrThrow(changeSet)
+
+    }
+
+    private fun readDataSet(dataSet: DataSet, table: TableDataSets, resultSet: ResultSet): Boolean {
+        dataSet.apply {
+            name = resultSet.getNullableString(table.NAME.queryIndex)
+            description = resultSet.getNullableString(table.DESCRIPTION.queryIndex)
+        }
+
+        return true
+    }
+
+    private fun readChangeSetMember(
+        service: VariantService,
+        cim: ChangeSetMember,
+        table: TableChangeSetMembers,
+        resultSet: ResultSet,
+        setIdentifier: (String) -> String
+    ): Boolean {
+        val changeSetMRID = resultSet.getString(table.CHANGE_SET_MRID.queryIndex)
+        setIdentifier("$changeSetMRID-to-UNKNOWN")
+        cim.targetObjectMRID = resultSet.getString(table.TARGET_OBJECT_MRID.queryIndex)
+        val id = setIdentifier("$changeSetMRID-to-${cim.targetObjectMRID}")
+
+        cim.changeSet = service.getOrThrow<ChangeSet>(mRID = changeSetMRID, typeNameAndMRID = id)
+        cim.changeSet.addMember(cim)
+
+        return true
+    }
+
+    fun read(service: VariantService, table: TableObjectCreations, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val objectCreation = ObjectCreation()
+
+        return readChangeSetMember(service, objectCreation, table, resultSet, setIdentifier) && service.addOrThrow(objectCreation)
+    }
+
+    fun read(service: VariantService, table: TableObjectDeletions, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val objectDeletion = ObjectDeletion()
+
+        return readChangeSetMember(service, objectDeletion, table, resultSet, setIdentifier) && service.addOrThrow(objectDeletion)
+    }
+
+    fun read(service: VariantService, table: TableObjectModifications, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val objectModification = ObjectModification()
+
+        return readChangeSetMember(service, objectModification, table, resultSet, setIdentifier) && service.addOrThrow(objectModification)
+    }
+
+}

@@ -8,6 +8,8 @@
 
 package com.zepben.ewb.streaming.get
 
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
+import com.zepben.ewb.database.paths.VariantContents
 import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.diagram.DiagramService
 import com.zepben.ewb.services.diagram.translator.DiagramProtoToCim
@@ -19,6 +21,7 @@ import com.zepben.protobuf.metadata.GetMetadataRequest
 import com.zepben.protobuf.metadata.GetMetadataResponse
 import io.grpc.CallCredentials
 import io.grpc.Channel
+import java.time.LocalDate
 import java.util.concurrent.Executors
 
 /**
@@ -85,6 +88,34 @@ class DiagramConsumerClient(
      */
     fun getDiagramObjects(mRIDs: Set<String>): GrpcResult<MultiObjectResult> = handleMultiObjectRPC {
         processDiagramObjects(mRIDs.asSequence())
+    }
+
+    /**
+     * Retrieve the network contents of a [ChangeSet] from the server.
+     * This will return a new [DiagramService] with just the network related contents of the [ChangeSet].
+     * Note this function does not populate [service] as merging a [ChangeSet] with a [DiagramService] should use XXXX TODO fill this in with merge functionality???.
+     *
+     * @param mRID The mRID of the [ChangeSet] to retrieve contents for.
+     * @return A [GrpcResult] of a [DiagramService].
+     */
+    fun getChangeSetObjects(mRID: String, variantContents: VariantContents, baseModelVersion: LocalDate? = null): GrpcResult<DiagramService> = tryRpc {
+        val diagramService = DiagramService()
+        val streamObserver = AwaitableStreamObserver<GetChangeSetObjectsResponse> { response ->
+            diagramService.addFromPb(response.identifiableObject)
+        }
+
+        val request = GetChangeSetObjectsRequest.newBuilder().apply {
+            changeSetMRID = mRID
+            this.variantContents = mapVariantContents.toPb(variantContents)
+            if (baseModelVersion != null)
+                modelVersion = baseModelVersion.toTimestamp()
+        }.build()
+
+        stub.getChangeSetObjects(request, streamObserver)
+
+        streamObserver.await()
+
+        diagramService
     }
 
     override fun processIdentifiables(mRIDs: Sequence<String>): Sequence<ExtractResult> {

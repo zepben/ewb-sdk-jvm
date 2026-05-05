@@ -77,7 +77,7 @@ internal class NetworkTranslatorTest : TranslatorTestBase<NetworkService>(
     NetworkServiceComparator(),
     NetworkDatabaseTables(),
     NetworkService::addFromPb,
-    ::networkIdentifiedObject
+    ::networkIdentifiable
 ) {
 
     companion object {

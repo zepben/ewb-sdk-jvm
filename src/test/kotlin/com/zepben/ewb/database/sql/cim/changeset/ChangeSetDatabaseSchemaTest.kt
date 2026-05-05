@@ -39,7 +39,7 @@ class ChangeSetDatabaseSchemaTest : CimDatabaseSchemaTest<
 
     override fun createComparator(): VariantServiceComparator = VariantServiceComparator()
 
-    override fun createIdentifiedObject(): ChangeSet = ChangeSet(generateId())
+    override fun createIdentifiable(): ChangeSet = ChangeSet(generateId())
 
 //    @Test
     internal fun `test schema for each supported type`() {

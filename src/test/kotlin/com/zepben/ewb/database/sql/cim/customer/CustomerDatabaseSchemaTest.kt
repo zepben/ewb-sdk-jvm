@@ -39,9 +39,9 @@ class CustomerDatabaseSchemaTest : CimDatabaseSchemaTest<
     CustomerDatabaseWriter,
     CustomerDatabaseReader,
     CustomerServiceComparator,
-    IdentifiedObject
+    Identifiable
 >(
-    describeObject = IdentifiedObject::typeNameAndMRID,
+    describeObject = Identifiable::typeNameAndMRID,
     addToService = BaseService::tryAdd
 ) {
 

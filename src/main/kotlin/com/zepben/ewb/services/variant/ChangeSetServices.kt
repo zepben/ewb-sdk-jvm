@@ -12,7 +12,7 @@ import com.zepben.ewb.cim.iec61968.common.Organisation
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.*
 import com.zepben.ewb.services.common.BaseService
-import com.zepben.ewb.services.common.exceptions.UnsupportedIdentifiedObjectException
+import com.zepben.ewb.services.common.exceptions.UnsupportedIdentifiableException
 import com.zepben.ewb.services.customer.CustomerService
 import com.zepben.ewb.services.diagram.DiagramService
 import com.zepben.ewb.services.network.NetworkService
@@ -174,17 +174,17 @@ class ChangeSetServices(
                     false
                 }
             }
-        } catch (e: UnsupportedIdentifiedObjectException) {
+        } catch (e: UnsupportedIdentifiableException) {
             try {
                 originalDiagramService.tryAdd(identifiable)
-            } catch (e: UnsupportedIdentifiedObjectException) {
+            } catch (e: UnsupportedIdentifiableException) {
                 originalCustomerService.tryAdd(identifiable)
             }
         }
 
     /**
      * @return true if the object was added to any service, false if the object already existed in one of the services and couldn't be added.
-     * @throws UnsupportedIdentifiedObjectException if [identifiable] is not supported by any service.
+     * @throws UnsupportedIdentifiableException if [identifiable] is not supported by any service.
      */
     private fun addToNew(identifiable: Identifiable): Boolean =
         try {
@@ -199,10 +199,10 @@ class ChangeSetServices(
                     false
                 }
             }
-        } catch (e: UnsupportedIdentifiedObjectException) {
+        } catch (e: UnsupportedIdentifiableException) {
             try {
                 newDiagramService.tryAdd(identifiable)
-            } catch (e: UnsupportedIdentifiedObjectException) {
+            } catch (e: UnsupportedIdentifiableException) {
                 newCustomerService.tryAdd(identifiable)
             }
         }

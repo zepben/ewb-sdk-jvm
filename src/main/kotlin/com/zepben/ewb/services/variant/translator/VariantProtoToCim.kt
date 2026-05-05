@@ -31,7 +31,6 @@ import com.zepben.protobuf.cim.iec61970.infiec61970.part303.genericdataset.DataS
 import com.zepben.protobuf.cim.iec61970.infiec61970.part303.genericdataset.ObjectCreation as PBObjectCreation
 import com.zepben.protobuf.cim.iec61970.infiec61970.part303.genericdataset.ObjectDeletion as PBObjectDeletion
 import com.zepben.protobuf.cim.iec61970.infiec61970.part303.genericdataset.ObjectModification as PBObjectModification
-import com.zepben.protobuf.cim.iec61970.infiec61970.part303.genericdataset.ObjectReverseModification as PBObjectReverseModification
 
 fun VariantService.addFromPb(pb: VariantObject): AddFromPbResult =
     when (pb.objectCase) {
@@ -218,22 +217,8 @@ fun toCim(pb: PBObjectDeletion, networkService: VariantService): ObjectDeletion 
  */
 fun toCim(pb: PBObjectModification, networkService: VariantService): ObjectModification =
     ObjectModification().apply {
-//        networkService.resolveOrDeferReference(Resolvers.reverseModification(this), pb.objectReverseModificationMRID, "${pb.csm.changeSetMRID}_${pb.csm.targetObjectMRID}")
         toCim(pb.csm, this, networkService)
     }
-
-/**
- * Convert the protobuf [PBObjectModification] into its CIM counterpart.
- *
- * @param pb The protobuf [PBObjectModification] to convert.
- * @param networkService The [VariantService] the converted CIM object will be added too.
- * @return The converted [pb] as a CIM [ObjectModification].
- */
-//fun toCim(pb: PBObjectReverseModification, networkService: VariantService): ObjectReverseModification =
-//    ObjectReverseModification().apply {
-//        networkService.resolveOrDeferReference(Resolvers.modification(this), pb.objectModificationMRID, "${pb.csm.changeSetMRID}_${pb.csm.targetObjectMRID}")
-//        toCim(pb.csm, this, networkService)
-//    }
 
 /**
  * An extension to add a converted copy of the protobuf [PBNetworkModelProject] to the [VariantService].
@@ -266,11 +251,6 @@ fun VariantService.addFromPb(pb: PBObjectDeletion): ObjectDeletion? = tryAddOrNu
  * An extension to add a converted copy of the protobuf [PBObjectModification] to the [VariantService].
  */
 fun VariantService.addFromPb(pb: PBObjectModification): ObjectModification? = tryAddOrNull(toCim(pb, this))
-
-/**
- * An extension to add a converted copy of the protobuf [PBObjectModification] to the [VariantService].
- */
-//fun VariantService.addFromPb(pb: PBObjectReverseModification): ObjectReverseModification? = tryAddOrNull(toCim(pb, this))
 
 // #################################
 // # Class for Java friendly usage #
@@ -339,14 +319,5 @@ class VariantProtoToCim(val variantService: VariantService) : BaseProtoToCim() {
      * @return The converted [ObjectModification]
      */
     fun addFromPb(pb: PBObjectModification): ObjectModification? = variantService.addFromPb(pb)
-
-    /**
-     * Add a converted copy of the protobuf [PBObjectReverseModification] to the [VariantService].
-     *
-     * @param pb The [PBObjectReverseModification] to convert.
-     * @return The converted [ObjectReverseModification]
-     */
-//    fun addFromPb(pb: PBObjectReverseModification): ObjectReverseModification? = variantService.addFromPb(pb)
-
 
 }

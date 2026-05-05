@@ -35,9 +35,9 @@ class DiagramDatabaseSchemaTest : CimDatabaseSchemaTest<
     DiagramDatabaseWriter,
     DiagramDatabaseReader,
     DiagramServiceComparator,
-    IdentifiedObject
+    Identifiable
 >(
-    describeObject = IdentifiedObject::typeNameAndMRID,
+    describeObject = Identifiable::typeNameAndMRID,
     addToService = BaseService::tryAdd
 ){
 

@@ -8,16 +8,9 @@
 
 package com.zepben.ewb.database.sql.cim.tables.iec61970.infiec61970.part303.genericdataset
 
-import com.zepben.ewb.database.sql.common.tables.Column
-import com.zepben.ewb.database.sql.common.tables.Column.Nullable.NOT_NULL
-import com.zepben.ewb.database.sql.common.tables.Column.Type.STRING
-
 /**
  * A class representing the ObjectModification columns required for the database table.
- *
- * @property OBJECT_REVERSE_MODIFICATION_TARGET_OBJECT_MRID A column storing the mRID of the expected IdentifiedObject in the base network before modification.
  */
-@Suppress("PropertyName")
 class TableObjectModifications : TableChangeSetMembers() {
 
     override val name: String = "object_modifications"

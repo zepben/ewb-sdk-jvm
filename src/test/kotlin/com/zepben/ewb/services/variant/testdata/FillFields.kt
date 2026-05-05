@@ -19,7 +19,11 @@ import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.*
 import com.zepben.ewb.services.common.testdata.fillFieldsCommon
 import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.variant.VariantService
-import java.time.Instant
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
+import kotlin.time.Clock
+import kotlin.time.toJavaInstant
 
 // #######################################################
 // # Extensions IEC61970 InfPart303 NetworkModelProjects #
@@ -28,7 +32,7 @@ import java.time.Instant
 fun NetworkModelProject.fillFields(service: VariantService, includeRuntime: Boolean = true): NetworkModelProject {
     (this as NetworkModelProjectComponent).fillFields(service, includeRuntime)
     externalStatus = "Probably Fine"
-    forecastCommissionDate = Instant.now().plusSeconds(600)
+    forecastCommissionDate = Clock.System.now().plus(600, DateTimeUnit.SECOND).toJavaInstant()
     externalDriver = "Capacity"
 
     @Suppress("unused")
@@ -46,8 +50,8 @@ fun NetworkModelProject.fillFields(service: VariantService, includeRuntime: Bool
 fun NetworkModelProjectComponent.fillFields(service: VariantService, includeRuntime: Boolean = true): NetworkModelProjectComponent {
     (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
 
-    created = Instant.now().minusSeconds(10)
-    closed = Instant.now()
+    created = Clock.System.now().minus(10, DateTimeUnit.SECOND).toJavaInstant()
+    closed = Clock.System.now().toJavaInstant()
 
     parent = NetworkModelProject("parent-project").also { it.addChild(this); service.add(it) }
 
@@ -60,7 +64,7 @@ fun NetworkModelProjectComponent.fillFields(service: VariantService, includeRunt
 // ############################################
 
 fun AnnotatedProjectDependency.fillFields(service: VariantService, includeRuntime: Boolean = true): AnnotatedProjectDependency {
-    (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
+    (this as Identifiable).fillFieldsCommon(service, includeRuntime)
     dependencyType = DependencyKind.mutuallyExclusive
     dependencyDependentOnStage = NetworkModelProjectStage(generateId()).also { service.add(it) }
     dependencyDependingStage = NetworkModelProjectStage(generateId()).also { service.add(it) }
@@ -70,10 +74,10 @@ fun AnnotatedProjectDependency.fillFields(service: VariantService, includeRuntim
 
 fun NetworkModelProjectStage.fillFields(service: VariantService, includeRuntime: Boolean = true): NetworkModelProjectStage {
     (this as NetworkModelProjectComponent).fillFields(service, includeRuntime)
-    plannedCommissionedDate = Instant.now().plusSeconds(3200)
+    plannedCommissionedDate = Clock.System.now().plus(3200, DateTimeUnit.SECOND).toJavaInstant()
     confidenceLevel = 10
     baseModelVersion = "2025-10-12"
-    lastConflictCheckedAt = Instant.now().minusSeconds(20000)
+    lastConflictCheckedAt = Clock.System.now().minus(20000, DateTimeUnit.SECOND).toJavaInstant()
     userComments = "Dodgy network, probably dont use this in production..."
     changeSet = ChangeSet(generateId()).also {
         service.add(it)

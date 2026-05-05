@@ -18,7 +18,8 @@ import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.core.NameType
 import com.zepben.ewb.cim.iec61970.base.domain.DateTimeInterval
 import com.zepben.ewb.cim.iec61970.base.wires.*
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.*
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSetMember
 import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.common.meta.DataSource
 import com.zepben.ewb.services.common.meta.MetadataCollection
@@ -123,18 +124,9 @@ object SchemaServices {
     }
 
     fun fillRequired(io: Identifiable) {
-
         if (io is ChangeSetMember) {
             io.changeSet = ChangeSet(generateId()); io.targetObjectMRID = "member"
         }
-//        if (io is ObjectModification) {
-//            io.objectReverseModification = ObjectReverseModification().also {
-//                it.changeSet = io.changeSet
-//                it.targetObjectMRID = io.mRID.asObjectReverseModificationId
-//                it.objectModification = io
-//                io.changeSet.addMember(it)
-//            }
-//        }
     }
 
     /**

@@ -65,7 +65,7 @@ class VariantConsumerClient @JvmOverloads constructor(
     @JvmOverloads
     constructor(channel: GrpcChannel, variantService: VariantService = VariantService(), callCredentials: CallCredentials? = null) : this(channel.channel, variantService, callCredentials)
 
-    override fun processIdentifiedObjects(mRIDs: Sequence<String>): Sequence<ExtractResult> {
+    override fun processIdentifiables(mRIDs: Sequence<String>): Sequence<ExtractResult> {
         val extractResults = mutableListOf<ExtractResult>()
         val streamObserver = AwaitableStreamObserver<GetIdentifiedObjectsResponse> { response ->
             response.identifiableObjectsList.forEach {
@@ -128,7 +128,7 @@ class VariantConsumerClient @JvmOverloads constructor(
 
     // TODO: docs
     fun getNetworkModelProject(mRID: String): GrpcResult<Identifiable> = tryRpc {
-        processNetworkModelProjects(sequenceOf(mRID)).firstOrNull()?.identifiedObject
+        processNetworkModelProjects(sequenceOf(mRID)).firstOrNull()?.identifiable
             ?: throw NoSuchElementException("No object with mRID $mRID could be found.")
     }
 

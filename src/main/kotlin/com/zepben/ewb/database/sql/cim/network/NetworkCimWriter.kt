@@ -1438,6 +1438,7 @@ class NetworkCimWriter(
         insert.setInt(table.SEQUENCE_NUMBER.queryIndex, terminal.sequenceNumber)
         insert.setNullableString(table.CONNECTIVITY_NODE_MRID.queryIndex, terminal.connectivityNodeId)
         insert.setNullableString(table.PHASES.queryIndex, terminal.phases.name)
+        // TODO: Probs needs test... point of this is to allow directions to be used in variants.
         insert.setNullableString(table.NORMAL_FEEDER_DIRECTION.queryIndex, terminal.normalFeederDirection.name)
 
         return writeAcDcTerminal(table, insert, terminal, "terminal")

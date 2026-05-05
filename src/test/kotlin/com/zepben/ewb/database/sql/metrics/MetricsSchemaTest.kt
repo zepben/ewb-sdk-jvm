@@ -37,6 +37,7 @@ internal class MetricsSchemaTest {
     private fun getConnection() = TestDatabaseContainer.getConnection()
 
     @BeforeEach
+    // NOTE: this pattern must be used instead of `getConnection.use` to ensure the same in-memory DB is used for each of these tests.
     internal fun createSchema() {
         // The MetricsDatabaseWriter assumes that the schema has been created already, so we create it here
         TestDatabaseContainer.getConnection().use { conn ->

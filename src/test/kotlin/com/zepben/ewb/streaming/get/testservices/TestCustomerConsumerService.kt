@@ -26,9 +26,8 @@ internal class TestCustomerConsumerService : CustomerConsumerGrpc.CustomerConsum
     override fun getCustomersForContainer(responseObserver: StreamObserver<GetCustomersForContainerResponse>?): StreamObserver<GetCustomersForContainerRequest> =
         TestStreamObserver(responseObserver!!, onGetCustomersForContainer)
 
-    override fun getMetadata(request: GetMetadataRequest, responseObserver: StreamObserver<GetMetadataResponse>) {
+    override fun getMetadata(request: GetMetadataRequest, responseObserver: StreamObserver<GetMetadataResponse>) =
         runGrpc(request, responseObserver, onGetMetadataRequest)
-    }
 
     private fun <T, U : StreamObserver<*>> runGrpc(request: T, response: U, handler: (T, U) -> Unit) {
         try {

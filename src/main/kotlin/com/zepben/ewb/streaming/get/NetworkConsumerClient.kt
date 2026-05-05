@@ -11,6 +11,8 @@ package com.zepben.ewb.streaming.get
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.iec61968.operations.OperationalRestriction
 import com.zepben.ewb.cim.iec61970.base.core.*
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
+import com.zepben.ewb.database.paths.VariantContents
 import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.common.translator.EnumMapper
 import com.zepben.ewb.services.common.translator.mRID
@@ -28,6 +30,7 @@ import com.zepben.protobuf.nc.*
 import io.grpc.CallCredentials
 import io.grpc.Channel
 import java.io.IOException
+import java.time.LocalDate
 import java.util.concurrent.Executors
 import com.zepben.protobuf.nc.IncludedEnergizedContainers as PBIncludedEnergizedContainers
 import com.zepben.protobuf.nc.IncludedEnergizingContainers as PBIncludedEnergizingContainers
@@ -474,6 +477,35 @@ class NetworkConsumerClient(
         resolveReferences(mor)?.let { return it }
 
         return GrpcResult(mor)
+    }
+
+    /**
+     * Retrieve the network contents of a [ChangeSet] from the server.
+     * This will return a new [NetworkService] with just the network related contents of the [ChangeSet].
+     * Note this function does not populate [service] as merging a [ChangeSet] with a [NetworkService] should use XXXX TODO fill this in.
+     *
+     * @param mRID The mRID of the [ChangeSet] to retrieve contents for.
+     * @param variantContents The contents to retrieve from the server.
+     * @return A [GrpcResult] of a [NetworkService].
+     */
+    fun getChangeSetObjects(mRID: String, variantContents: VariantContents, baseModelVersion: LocalDate? = null): GrpcResult<NetworkService> = tryRpc {
+        val networkService = NetworkService()
+        val streamObserver = AwaitableStreamObserver<GetChangeSetObjectsResponse> { response ->
+            networkService.addFromPb(response.identifiableObject)
+        }
+
+        val request = GetChangeSetObjectsRequest.newBuilder().apply {
+            changeSetMRID = mRID
+            this.variantContents = mapVariantContents.toPb(variantContents)
+            if (baseModelVersion != null)
+                modelVersion = baseModelVersion.toTimestamp()
+        }.build()
+
+        stub.getChangeSetObjects(request, streamObserver)
+
+        streamObserver.await()
+
+        networkService
     }
 
     override fun processIdentifiables(mRIDs: Sequence<String>): Sequence<ExtractResult> {

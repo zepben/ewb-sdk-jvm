@@ -1,0 +1,44 @@
+/*
+ * Copyright 2025 Zeppelin Bend Pty Ltd
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+package com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects
+
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
+
+/**
+ * Represents the relationship between two network model project stages.
+ *
+ * @property dependencyType Describes the dependency relationship between the two classes.
+ * @property dependencyDependentOnStage NetworkModelProjectStage required by this stage.
+ * @property dependencyDependingStage NetworkModelProjectStages that cannot be applied alongside this stage.
+ */
+class AnnotatedProjectDependency(override val mRID: String): Identifiable {
+
+    var dependencyType: DependencyKind = DependencyKind.UNKNOWN
+
+    var dependencyDependentOnStage: NetworkModelProjectStage? = null
+    var dependencyDependingStage: NetworkModelProjectStage? = null
+
+    override fun nameAndMRID(): String = mRID
+
+    override fun typeNameAndMRID(): String = "${javaClass.simpleName} $mRID"
+
+    fun contentEquals(other: AnnotatedProjectDependency): Boolean {
+        if (dependencyType != other.dependencyType  ||
+            dependencyDependingStage != other.dependencyDependingStage ||
+            dependencyDependentOnStage != other.dependencyDependentOnStage)
+            return false
+        else
+            return true
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return super.equals(other)
+    }
+
+}

@@ -15,7 +15,7 @@ import java.sql.SQLException
 @Throws(SQLException::class)
 internal fun PreparedStatement.executeConfiguredQuery(): ResultSet {
     this.queryTimeout = 30
-    this.fetchSize = 10000
+    this.fetchSize = fetchSize
 
     val results = this.executeQuery()
     if (!results.isClosed)

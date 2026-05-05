@@ -11,6 +11,7 @@ package com.zepben.ewb.services.common.testdata
 import com.zepben.ewb.cim.iec61968.common.Document
 import com.zepben.ewb.cim.iec61968.common.Organisation
 import com.zepben.ewb.cim.iec61968.common.OrganisationRole
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.core.NameType
 import com.zepben.ewb.services.common.BaseService
@@ -78,5 +79,12 @@ fun IdentifiedObject.fillFieldsCommon(service: BaseService, @Suppress("UNUSED_PA
         addName(nameType, "name_$i")
     }
 
+    return this
+}
+
+//
+// Note: Included just for consistency in case we ever add something to this interface...
+//
+fun Identifiable.fillFieldsCommon(service: BaseService, @Suppress("UNUSED_PARAMETER") includeRuntime: Boolean = true): Identifiable {
     return this
 }

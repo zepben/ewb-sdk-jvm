@@ -12,6 +12,7 @@ import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.ewb.cim.iec61970.base.diagramlayout.DiagramObject
 import com.zepben.ewb.database.sql.cim.CimDatabaseSchemaTest
+import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.common.Resolvers
 import com.zepben.ewb.services.common.testdata.SchemaServices
 import com.zepben.ewb.services.common.testdata.generateId
@@ -29,7 +30,16 @@ import java.nio.file.Paths
 import java.sql.Connection
 import java.sql.DriverManager
 
-class DiagramDatabaseSchemaTest : CimDatabaseSchemaTest<DiagramService, DiagramDatabaseWriter, DiagramDatabaseReader, DiagramServiceComparator>() {
+class DiagramDatabaseSchemaTest : CimDatabaseSchemaTest<
+    DiagramService,
+    DiagramDatabaseWriter,
+    DiagramDatabaseReader,
+    DiagramServiceComparator,
+    IdentifiedObject
+>(
+    describeObject = IdentifiedObject::typeNameAndMRID,
+    addToService = BaseService::tryAdd
+){
 
     companion object {
         @JvmField

@@ -88,7 +88,7 @@ abstract class SqlTable internal constructor() {
     /**
      * The names of the columns in this table, sorted by their index.
      */
-    private val columnNames: List<String> by lazy { columnSet.map { it.name } }
+    val columnNames: List<String> by lazy { columnSet.map { it.name } }
 
     private val logger = LoggerFactory.getLogger(javaClass)
 

@@ -14,13 +14,10 @@ import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmode
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.AnnotatedProjectDependency
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStage
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSetMember
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.DataSet
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectCreation
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectDeletion
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectModification
-import com.zepben.ewb.services.common.translator.*
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.*
+import com.zepben.ewb.services.common.translator.BaseCimToProto
+import com.zepben.ewb.services.common.translator.toPb
+import com.zepben.ewb.services.common.translator.toTimestamp
 import com.zepben.ewb.services.variant.whenVariantIdentifiedObject
 import com.zepben.protobuf.vc.VariantObject
 import com.zepben.protobuf.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProject as PBNetworkModelProject
@@ -48,7 +45,6 @@ fun variantObject(identified: Identifiable): VariantObject =
             isObjectCreation = { objectCreation = it.toPb() },
             isObjectDeletion = { objectDeletion = it.toPb() },
             isObjectModification = { objectModification = it.toPb() },
-//            isObjectReverseModification = { objectReverseModification = it.toPb() },
         )
     }.build()
 
@@ -236,24 +232,9 @@ fun toPb(cim: ObjectDeletion, pb: PBObjectDeletion.Builder): PBObjectDeletion.Bu
  */
 fun toPb(cim: ObjectModification, pb: PBObjectModification.Builder): PBObjectModification.Builder =
     pb.apply {
-//        pb.objectReverseModificationMRID = cim.objectReverseModification.mRID
-
         toPb(cim, csmBuilder)
     }
 
-/**
- * Convert the [ObjectReverseModification] into its protobuf counterpart.
- *
- * @param cim The [ObjectReverseModification] to convert.
- * @param pb The protobuf builder to populate.
- * @return [pb] for fluent use.
- */
-//fun toPb(cim: ObjectReverseModification, pb: PBObjectReverseModification.Builder): PBObjectReverseModification.Builder =
-//    pb.apply {
-//        objectModificationMRID = cim.objectModification.mRID
-//
-//        toPb(cim, csmBuilder)
-//    }
 
 /**
  * An extension for converting any [ChangeSet] into its protobuf counterpart.
@@ -274,11 +255,6 @@ fun ObjectDeletion.toPb(): PBObjectDeletion = toPb(this, PBObjectDeletion.newBui
  * An extension for converting any [ObjectModification] into its protobuf counterpart.
  */
 fun ObjectModification.toPb(): PBObjectModification = toPb(this, PBObjectModification.newBuilder()).build()
-
-/**
- * An extension for converting any [ObjectReverseModification] into its protobuf counterpart.
- */
-//fun ObjectReverseModification.toPb(): PBObjectReverseModification = toPb(this, PBObjectReverseModification.newBuilder()).build()
 
 // #################################
 // # Class for Java friendly usage #

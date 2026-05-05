@@ -1,5 +1,5 @@
 # Zepben EWB SDK changelog
-## [1.10.0] - UNRELEASED
+## [1.10.0] - 2026-05-05
 ### Breaking Changes
 * None.
 
@@ -13,7 +13,7 @@
 * None.
 
 ### Notes
-* Finalise version of `com.zepben.protobuf` from `1.7.0b1` -> `1.7.0`.
+* Updated to `com.zepben.protobuf` 1.7.0
 
 ## [1.9.0] - 2026-04-09
 ### Breaking Changes

@@ -10,10 +10,13 @@ package com.zepben.ewb.streaming.get
 
 import com.zepben.ewb.cim.iec61968.customers.Customer
 import com.zepben.ewb.cim.iec61970.base.core.EquipmentContainer
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
+import com.zepben.ewb.database.paths.VariantContents
 import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.customer.CustomerService
 import com.zepben.ewb.services.customer.translator.CustomerProtoToCim
 import com.zepben.ewb.services.customer.translator.addFromPb
+import com.zepben.ewb.services.diagram.DiagramService
 import com.zepben.ewb.streaming.grpc.GrpcChannel
 import com.zepben.ewb.streaming.grpc.GrpcResult
 import com.zepben.protobuf.cc.*
@@ -21,6 +24,7 @@ import com.zepben.protobuf.metadata.GetMetadataRequest
 import com.zepben.protobuf.metadata.GetMetadataResponse
 import io.grpc.CallCredentials
 import io.grpc.Channel
+import java.time.LocalDate
 import java.util.concurrent.Executors
 
 /**
@@ -84,6 +88,34 @@ class CustomerConsumerClient @JvmOverloads constructor(
      */
     fun getCustomersForContainers(mRIDs: Set<String>): GrpcResult<MultiObjectResult> = handleMultiObjectRPC {
         processCustomersForContainers(mRIDs)
+    }
+
+    /**
+     * Retrieve the network contents of a [ChangeSet] from the server.
+     * This will return a new [CustomerService] with just the network related contents of the [ChangeSet].
+     * Note this function does not populate [service] as merging a [ChangeSet] with a [DiagramService] should use XXXX TODO fill this in with merge functionality???.
+     *
+     * @param mRID The mRID of the [ChangeSet] to retrieve contents for.
+     * @return A [GrpcResult] of a [CustomerService].
+     */
+    fun getChangeSetObjects(mRID: String, variantContents: VariantContents, baseModelVersion: LocalDate? = null): GrpcResult<CustomerService> = tryRpc {
+        val customerService = CustomerService()
+        val streamObserver = AwaitableStreamObserver<GetChangeSetObjectsResponse> { response ->
+            customerService.addFromPb(response.identifiableObject)
+        }
+
+        val request = GetChangeSetObjectsRequest.newBuilder().apply {
+            changeSetMRID = mRID
+            this.variantContents = mapVariantContents.toPb(variantContents)
+            if (baseModelVersion != null)
+                modelVersion = baseModelVersion.toTimestamp()
+        }.build()
+
+        stub.getChangeSetObjects(request, streamObserver)
+
+        streamObserver.await()
+
+        customerService
     }
 
     override fun processIdentifiables(mRIDs: Sequence<String>): Sequence<ExtractResult> {

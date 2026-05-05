@@ -10,6 +10,10 @@ package com.zepben.ewb.database.sql.cim
 
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.database.sql.cim.tables.tableCimVersion
+import com.zepben.ewb.database.sql.common.tables.TableVersion
+import com.zepben.ewb.database.sql.initialisers.DatabaseInitialiser
+import com.zepben.ewb.database.sql.initialisers.NoOpDatabaseInitialiser
+import com.zepben.ewb.database.sql.initialisers.SqliteDatabaseInitialiser
 import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.common.BaseServiceComparator
 import com.zepben.ewb.services.common.meta.MetadataCollection
@@ -31,7 +35,19 @@ import java.sql.DriverManager
 /**
  * Base class for CIM service database schema tests
  */
-abstract class CimDatabaseSchemaTest<TService : BaseService, TWriter : CimDatabaseWriter<*, TService>, TReader : CimDatabaseReader<*, TService>, TComparator : BaseServiceComparator> {
+abstract class CimDatabaseSchemaTest<
+    TService : BaseService,
+    TWriter : CimDatabaseWriter<*, TService>,
+    TReader : CimDatabaseReader<*, TService>,
+    TComparator : BaseServiceComparator,
+    TMaxsCoolObject: Any,
+    >(
+    private val tableVersion: TableVersion = tableCimVersion,
+    private val schemaTestFile: String = "src/test/data/schemaTest.sqlite",
+    private val databaseInitialiser: DatabaseInitialiser<CimDatabaseTables> = SqliteDatabaseInitialiser(schemaTestFile),
+    private val describeObject: TMaxsCoolObject.() -> String,
+    private val addToService: TService.(TMaxsCoolObject) -> Boolean,
+) {
 
     companion object {
         @JvmField
@@ -40,7 +56,6 @@ abstract class CimDatabaseSchemaTest<TService : BaseService, TWriter : CimDataba
     }
 
     protected val logger: Logger = LoggerFactory.getLogger(javaClass)
-    private val schemaTestFile = "src/test/data/schemaTest.sqlite"
 
     abstract fun createService(): TService
     abstract fun createWriter(filename: String): TWriter
@@ -99,12 +114,17 @@ abstract class CimDatabaseSchemaTest<TService : BaseService, TWriter : CimDataba
     ) {
         assertThat("Database should have been written", createWriter(schemaTestFile).write(writeService))
 
-        assertThat(systemErr.log, containsString("Creating database schema v${tableCimVersion.supportedVersion}"))
-        assertThat("Database should now exist", Files.exists(Paths.get(schemaTestFile)))
+        if (databaseInitialiser is SqliteDatabaseInitialiser) {
+            assertThat(systemErr.log, containsString("Creating database schema v${tableVersion.supportedVersion}"))
+            assertThat("Database should now exist", Files.exists(Paths.get(schemaTestFile)))
+        } else if (databaseInitialiser is NoOpDatabaseInitialiser) {
+            assertThat(systemErr.log, containsString("Committing..."))
+            assertThat(systemErr.log, containsString("Done."))
+        }
 
         systemErr.clearCapturedLog()
-        val status = DriverManager.getConnection("jdbc:sqlite:$schemaTestFile").use { connection ->
-            createReader(connection, schemaTestFile).read(readService)
+        val status = databaseInitialiser.connect().use {
+            createReader(it, schemaTestFile).read(readService)
         }
 
         if (validateRead != null) {

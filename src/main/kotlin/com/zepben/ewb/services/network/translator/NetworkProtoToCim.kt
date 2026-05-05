@@ -4023,3 +4023,4 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
     fun addFromPb(pb: PBCircuit): Circuit? = networkService.addFromPb(pb)
 
 }
+

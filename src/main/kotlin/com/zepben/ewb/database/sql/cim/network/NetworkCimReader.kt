@@ -1677,6 +1677,7 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
             )
             conductingEquipment?.addTerminal(this)
             phases = PhaseCode.valueOf(resultSet.getString(table.PHASES.queryIndex))
+            // TODO: Probs needs test... point of this is to allow directions to be used in variants. At EWB startup it'll still get overwritten for base network though.
             resultSet.getNullableString(table.NORMAL_FEEDER_DIRECTION.queryIndex)?.also { normalFeederDirection = FeederDirection.valueOf(it) }
         }
 

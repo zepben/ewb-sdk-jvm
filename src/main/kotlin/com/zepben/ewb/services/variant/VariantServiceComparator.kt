@@ -116,14 +116,6 @@ class VariantServiceComparator : BaseServiceComparator() {
     fun compareObjectModification(source: ObjectModification, target: ObjectModification): ObjectDifference<ObjectModification> =
         ObjectDifference(source, target).apply {
             compareChangeSetMember()
-//            compareIdReferences(ObjectModification::objectReverseModification)
         }
-
-//    private fun compareObjectReverseModification(source: ObjectReverseModification, target: ObjectReverseModification): ObjectDifference<ObjectReverseModification> =
-//        ObjectDifference(source, target).apply {
-//            compareChangeSetMember()
-//            compareIdReferences(ObjectReverseModification::objectModification)
-//        }
-
 
 }

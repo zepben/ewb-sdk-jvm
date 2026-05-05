@@ -56,8 +56,6 @@ import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.N
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSetMember
 
-//import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectReverseModification
-
 /**
  * These should be used to access [ReferenceResolver] instances for use with [BaseService.resolveOrDeferReference] and
  * [BaseService.getUnresolvedReferenceMrids].
@@ -668,19 +666,4 @@ object Resolvers {
             ChangeSetToChangeSetMemberResolver,
         )
 
-//    @JvmStatic
-//    fun modification(reverseModification: ObjectReverseModification): BoundReferenceResolver<ObjectReverseModification, ObjectModification> =
-//        BoundReferenceResolver(
-//            reverseModification,
-//            ObjectReverseModificationToObjectModificationResolver,
-//            ObjectModificationToObjectReverseModificationResolver,
-//        )
-//
-//    @JvmStatic
-//    fun reverseModification(modification: ObjectModification): BoundReferenceResolver<ObjectModification, ObjectReverseModification> =
-//        BoundReferenceResolver(
-//            modification,
-//            ObjectModificationToObjectReverseModificationResolver,
-//            ObjectReverseModificationToObjectModificationResolver,
-//        )
 }

@@ -131,13 +131,12 @@
 * Phase paths through a `ShuntCompensator` now add paths for mismatched phases between the grounding and normal terminals. This works in the same way as the
   `PowerTransformer`. This will only impact traces that are tracking the included phase paths, and will allow traces that previously stopped at the
   `ShuntCompensator` to continue. You should use the new `stopOnShuntCompensatorGround` condition to maintain current behaviour.
-* `typeNameAndMRID()` and `nameAndMRID()` helpers have been moved directly onto `IdentifiedObject`. You will need to remove imports to these functions.
 
 ### New Features
 * Added `Conditions.stopOnShuntCompensatorGround`, a new condition to prevent tracing through a `ShuntCompensator` using its grounding terminal.
 
 ### Enhancements
-* Introduced interface `Identifiable`, which implements `mRID`. `IdentifiedObject`, `Name`, `NameType`, and `DataSet` now implement this interface.
+* None.
 
 ### Fixes
 * Fixed an error in `PhaseCode` when adding `NONE` which previously resulted in `NONE` instead of the existing `PhaseCode`.

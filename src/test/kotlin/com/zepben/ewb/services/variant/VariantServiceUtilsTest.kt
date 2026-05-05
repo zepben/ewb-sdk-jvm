@@ -23,7 +23,7 @@ internal class VariantServiceUtilsTest {
     @RegisterExtension
     val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
-    // TODO: ObjCreation etc
+    // TODO: Re-enable
 //    @Test
     internal fun `supports all variant service types`() {
         verifyWhenServiceFunctionSupportsAllServiceTypes(VariantService().supportedKClasses, ::whenVariantIdentifiedObjectProxy)

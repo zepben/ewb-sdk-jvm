@@ -58,7 +58,6 @@ abstract class BaseCollectionReader<T>(
         crossinline processRow: (T, TTable, ResultSet, setIdentifier: (String) -> String) -> Boolean,
         crossinline prepareSelectStatement: Connection.(TTable) -> PreparedStatement = { prepareStatement(it.selectSql) }
     ): Boolean {
-        val u = UnitSymbol.M3COMPENSATED.ordinal
         val table = databaseTables.getTable<TTable>()
         return table.readAll(connection.prepareSelectStatement(table)) { results ->
             var lastIdentifier: String? = null

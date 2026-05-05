@@ -1,4 +1,20 @@
 # Zepben EWB SDK changelog
+## [1.11.0] - UNRELEASED
+### Breaking Changes
+* None.
+
+### New Features
+* None.
+
+### Enhancements
+* None.
+
+### Fixes
+* None.
+
+### Notes
+* None.
+
 ## [1.10.0] - 2026-05-05
 ### Breaking Changes
 * None.

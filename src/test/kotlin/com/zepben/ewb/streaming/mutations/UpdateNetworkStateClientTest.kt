@@ -31,6 +31,7 @@ import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.verify
 import java.time.LocalDateTime
+import kotlin.streams.toList
 import com.zepben.protobuf.ns.data.BatchFailure as PBBatchFailure
 import com.zepben.protobuf.ns.data.BatchNotProcessed as PBBatchNotProcessed
 import com.zepben.protobuf.ns.data.BatchSuccessful as PBBatchSuccessful

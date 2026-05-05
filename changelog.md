@@ -13,7 +13,7 @@
 * None.
 
 ### Notes
-* None.
+* Finalise version of `com.zepben.protobuf` from `1.7.0b1` -> `1.7.0`.
 
 ## [1.9.0] - 2026-04-09
 ### Breaking Changes

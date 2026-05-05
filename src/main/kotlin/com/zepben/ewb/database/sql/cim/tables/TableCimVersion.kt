@@ -13,4 +13,4 @@ import com.zepben.ewb.database.sql.common.tables.TableVersion
 /**
  * The `version` table in the CIM databases. Increment this when doing a schema update.
  */
-val tableCimVersion: TableVersion = TableVersion(64)
+val tableCimVersion: TableVersion = TableVersion(65)

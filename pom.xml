@@ -69,13 +69,14 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jacoco.coverage>0.5</jacoco.coverage>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>com.zepben</groupId>
             <artifactId>protobuf</artifactId>
-            <version>1.7.0</version>
+            <version>1.7.0-variant</version>
         </dependency>
         <dependency>
             <groupId>com.zepben</groupId>

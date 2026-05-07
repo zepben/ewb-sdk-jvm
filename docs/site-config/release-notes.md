@@ -2,6 +2,7 @@
 
 | Version         | Released            |
 |-----------------|---------------------|
+|[1.11.1](#1111)| `07 May 2026` |
 | [1.10.0](#1100) | `05 May 2026`       |
 | [1.9.0](#190)   | `09 April 2026`     |
 | [1.8.0](#180)   | `26 March 2026`     |
@@ -50,6 +51,13 @@
 ---
 
 NOTE: This library is not yet stable, and breaking changes should be expected until a 1.0.0 release.
+
+---
+
+## [1.11.1]
+
+### Fixes
+* Fixed errors in handling phase energisation of `LinearShuntCompensator` instances with a `groundingTerminal`.
 
 ---
 

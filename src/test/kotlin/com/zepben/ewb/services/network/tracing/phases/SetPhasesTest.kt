@@ -12,8 +12,7 @@ package com.zepben.ewb.services.network.tracing.phases
 import com.zepben.ewb.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.ewb.cim.iec61970.base.core.PhaseCode
 import com.zepben.ewb.cim.iec61970.base.core.Terminal
-import com.zepben.ewb.cim.iec61970.base.wires.AcLineSegment
-import com.zepben.ewb.cim.iec61970.base.wires.EnergySource
+import com.zepben.ewb.cim.iec61970.base.wires.*
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.testdata.PhaseSwapLoopNetwork
 import com.zepben.ewb.services.network.tracing.networktrace.operators.NetworkStateOperators
@@ -624,6 +623,32 @@ internal class SetPhasesTest {
         PhaseValidator.validatePhases(ns, "tx9", PhaseCode.A, PhaseCode.ABN)
         PhaseValidator.validatePhases(ns, "c10", PhaseCode.ABN, PhaseCode.ABN)
         PhaseValidator.validatePhases(ns, "c11", PhaseCode.ABN, PhaseCode.ABN)
+    }
+
+    @Test
+    internal fun `doesn't set phases either way through a grounding terminal of a shunt compensator`() {
+        //
+        // s0 11--c1--21 lsc2 21--c3--2
+        //
+        // s4 11--c5--21 lsc6 21--c7--2
+        //
+        val ns = TestNetworkBuilder()
+            .fromSource() // s0
+            .toAcls() // c1
+            .toOther<LinearShuntCompensator>(defaultMridPrefix = "lsc") { groundingTerminal = terminals.last().apply { phases = PhaseCode.N } } // lsc2
+            .toAcls(nominalPhases = PhaseCode.N) // c3
+            .fromSource(phases = PhaseCode.N) // s4
+            .toAcls(nominalPhases = PhaseCode.N) // c5
+            .toOther<LinearShuntCompensator>(defaultMridPrefix = "lsc") { groundingTerminal = terminals.first().apply { phases = PhaseCode.N } } // lcs6
+            .toAcls() // c7
+            .buildAndLog()
+
+        PhaseValidator.validatePhases(ns, "c1", PhaseCode.ABC, PhaseCode.ABC)
+        PhaseValidator.validatePhases(ns, "lsc2", PhaseCode.ABC, PhaseCode.NONE)
+        PhaseValidator.validatePhases(ns, "c3", PhaseCode.NONE, PhaseCode.NONE)
+        PhaseValidator.validatePhases(ns, "c5", PhaseCode.N, PhaseCode.N)
+        PhaseValidator.validatePhases(ns, "lsc6", PhaseCode.N, PhaseCode.NONE)
+        PhaseValidator.validatePhases(ns, "c7", PhaseCode.NONE, PhaseCode.NONE)
     }
 
     private fun validateTxPhases(sourcePhases: PhaseCode, txPhase1: PhaseCode, txPhase2: PhaseCode, expectedPhases1: PhaseCode, expectedPhases2: PhaseCode) =

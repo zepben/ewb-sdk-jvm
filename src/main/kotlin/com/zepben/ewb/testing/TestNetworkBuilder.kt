@@ -384,6 +384,7 @@ open class TestNetworkBuilder {
      * @param nominalPhases The nominal phases for the new [ConductingEquipment].
      * @param numTerminals The number of terminals to create on the new [ConductingEquipment]. Defaults to 2.
      * @param mRID Optional mRID for the new [ConductingEquipment].
+     * @param defaultMridPrefix Optional default prefix to add to any generated mRID. defaults to "o". Only used if no [mRID] is provided.
      * @param action An action that accepts the new [ConductingEquipment] to allow for additional initialisation.
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
@@ -408,6 +409,7 @@ open class TestNetworkBuilder {
      * @param nominalPhases The nominal phases for the new [ConductingEquipment].
      * @param numTerminals The number of terminals to create on the new [ConductingEquipment]. Defaults to 2.
      * @param mRID Optional mRID for the new [ConductingEquipment].
+     * @param defaultMridPrefix Optional default prefix to add to any generated mRID. defaults to "o". Only used if no [mRID] is provided.
      * @param action An action that accepts the new [ConductingEquipment] to allow for additional initialisation.
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
@@ -430,6 +432,7 @@ open class TestNetworkBuilder {
      * @param mRID Optional mRID for the new [ConductingEquipment].
      * @param connectivityNodeMrid Optional id of the connectivity node used to connect this [ConductingEquipment] to the previous item. Will only be used if
      * the previous item is not already connected.
+     * @param defaultMridPrefix Optional default prefix to add to any generated mRID. defaults to "o". Only used if no [mRID] is provided.
      * @param action An action that accepts the new [ConductingEquipment] to allow for additional initialisation.
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
@@ -460,6 +463,7 @@ open class TestNetworkBuilder {
      * @param mRID Optional mRID for the new [ConductingEquipment].
      * @param connectivityNodeMrid Optional id of the connectivity node used to connect this [ConductingEquipment] to the previous item. Will only be used if
      * the previous item is not already connected.
+     * @param defaultMridPrefix Optional default prefix to add to any generated mRID. defaults to "o". Only used if no [mRID] is provided.
      * @param action An action that accepts the new [ConductingEquipment] to allow for additional initialisation.
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.

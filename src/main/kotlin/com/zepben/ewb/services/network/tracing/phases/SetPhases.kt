@@ -22,6 +22,7 @@ import com.zepben.ewb.services.network.tracing.networktrace.ComputeData
 import com.zepben.ewb.services.network.tracing.networktrace.NetworkTrace
 import com.zepben.ewb.services.network.tracing.networktrace.NetworkTraceActionType
 import com.zepben.ewb.services.network.tracing.networktrace.Tracing
+import com.zepben.ewb.services.network.tracing.networktrace.conditions.Conditions.stopOnShuntCompensatorGround
 import com.zepben.ewb.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.ewb.services.network.tracing.traversal.WeightedPriorityQueue
 import org.slf4j.Logger
@@ -207,6 +208,9 @@ class SetPhases(
             computeData = computeNextPhasesToFlow(stateOperators)
         )
             .addQueueCondition { nextStep, _, _, _ -> nextStep.data.nominalPhasePaths.isNotEmpty() }
+            // We don't want to "energise" the neutral from the primary or vise versa for `ShuntCompensator` grounding terminals. These sides should
+            // have their "energisation" via other connectivity.
+            .addCondition { stopOnShuntCompensatorGround() }
             .addStepAction { (path, phasesToFlow), ctx ->
                 // We always assume the first step terminal already has the phases applied, so we don't do anything on the first step
                 phasesToFlow.stepFlowedPhases =

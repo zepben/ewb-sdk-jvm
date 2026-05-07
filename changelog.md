@@ -1,5 +1,5 @@
 # Zepben EWB SDK changelog
-## [1.11.1] - UNRELEASED
+## [1.11.1] - 2026-05-07
 ### Fixes
 * Fixed errors in handling phase energisation of `LinearShuntCompensator` instances with a `groundingTerminal`.
 

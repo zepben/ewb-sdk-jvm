@@ -65,7 +65,7 @@ class NetworkConsumerClient(
     @JvmOverloads
     constructor(channel: Channel, callCredentials: CallCredentials? = null) :
         this(
-            NetworkConsumerGrpc.newStub(channel).withExecutor(Executors.newSingleThreadExecutor()).apply { callCredentials?.let { withCallCredentials(it) } }
+            NetworkConsumerGrpc.newStub(channel).withExecutor(GrpcExecutorFactory.create("network-consumer")).apply { callCredentials?.let { withCallCredentials(it) } }
         )
 
     /**

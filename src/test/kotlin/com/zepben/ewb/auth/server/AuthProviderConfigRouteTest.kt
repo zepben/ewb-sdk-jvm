@@ -11,7 +11,7 @@ package com.zepben.ewb.auth.server
 
 import com.zepben.ewb.auth.common.AuthMethod
 import com.zepben.testutils.junit.SystemLogExtension
-import com.zepben.vertxutils.routing.RouteVersionUtils
+import com.zepben.vertxutils.routing.RouteVersionUtils.forVersion
 import com.zepben.vertxutils.testing.TestHttpServer
 import io.netty.handler.codec.http.HttpResponseStatus
 import io.restassured.RestAssured
@@ -36,17 +36,11 @@ class AuthProviderConfigRouteTest {
     @BeforeEach
     fun before() {
         server = TestHttpServer().addRoutes(
-            RouteVersionUtils.forVersion(
-                AvailableRoute.entries.toTypedArray(),
-                2
-            ) {
-                routeFactory(
-                    it,
-                    audience = "test-audience",
-                    issuer = "test-issuer",
-                    authType = AuthMethod.AUTH0,
-                )
-            }
+            AuthConfigRoute.routeFactory(
+                audience = "test-audience",
+                issuer = "test-issuer",
+                authType = AuthMethod.AUTH0,
+            ).forVersion(2)
         )
         port = server!!.listen()
     }

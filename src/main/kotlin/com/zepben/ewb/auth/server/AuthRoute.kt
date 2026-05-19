@@ -60,11 +60,8 @@ class AuthRoute {
             }
     }
 
-    enum class AvailableRoute(private val rv: RouteVersion) : VersionableRoute {
+    enum class AvailableRoute(override val routeVersion: RouteVersion) : VersionableRoute {
         AUTH(RouteVersion.since(0));
-
-        override fun routeVersion(): RouteVersion {
-            return rv
-        }
     }
+
 }

@@ -1,7 +1,17 @@
 # Zepben EWB SDK changelog
 ## [1.12.0] - UNRELEASED
 ### Breaking Changes
-* None.
+* Updated to use Kotlin version of the vertx-utils library, with many breaking changes. This only impacts if you are using it as a transitive dependency:
+  * The `RouteRegisterLogger` class has been replaced with the `logRegisteredRoutes` factory function.
+  * The following functions have been replaced with `contains`, allowing use of the Kotlin `in` operator:
+    * `PathParams.exists`.
+    * `QueryParams.exists`.
+    * `RouteVersion.includes`.
+  * `RouteVersionUtils.forVersion` has been replaced with a Kotlin inline equivalent that only needs the factory, not the available routes enum.
+  * All `JsonUtils` extract helpers are now extensions.
+  * Many other general Kotlin vs Java differences. e.g. getters/setters.
+* `AuthConfigRoute.routeFactory` has been moved from a top level function into the companion object. It has also changed to return the route factory, rather
+  than a route. This was done to be compatible with the Kotlin `vertx-utils`.
 
 ### New Features
 * None.

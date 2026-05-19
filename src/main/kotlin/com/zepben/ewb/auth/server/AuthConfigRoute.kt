@@ -19,36 +19,6 @@ import io.vertx.core.http.HttpMethod
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.RoutingContext
 
-private data class AuthConfigResponse(
-    val authType: AuthMethod,
-    val issuer: String,
-    val audience: String
-)
-
-fun routeFactory(
-    availableRoute: AvailableRoute,
-    audience: String,
-    issuer: String,
-    authType: AuthMethod = AuthMethod.OAUTH
-): Route =
-    when (availableRoute) {
-        AvailableRoute.AUTH_CONFIG ->
-            Route.builder()
-                .method(HttpMethod.GET)
-                .path("/auth")
-                .addHandler(AuthConfigRoute(audience, issuer, authType))
-                .build()
-
-    }
-
-enum class AvailableRoute(private val rv: RouteVersion) : VersionableRoute {
-    AUTH_CONFIG(RouteVersion.since(2));
-
-    override fun routeVersion(): RouteVersion {
-        return rv
-    }
-}
-
 class AuthConfigRoute(audience: String, issuer: String, authType: AuthMethod) : Handler<RoutingContext> {
 
     private val json: JsonObject =
@@ -57,4 +27,35 @@ class AuthConfigRoute(audience: String, issuer: String, authType: AuthMethod) : 
     override fun handle(event: RoutingContext) {
         Respond.withJson(event, HttpResponseStatus.OK, json.encode())
     }
+
+    enum class AvailableRoute(override val routeVersion: RouteVersion) : VersionableRoute {
+        AUTH_CONFIG(RouteVersion.since(2))
+    }
+
+    private data class AuthConfigResponse(
+        val authType: AuthMethod,
+        val issuer: String,
+        val audience: String
+    )
+
+    companion object {
+
+        fun routeFactory(
+            audience: String,
+            issuer: String,
+            authType: AuthMethod = AuthMethod.OAUTH
+        ): (AvailableRoute) -> Route = {
+            when (it) {
+                AvailableRoute.AUTH_CONFIG ->
+                    Route.builder()
+                        .method(HttpMethod.GET)
+                        .path("/auth")
+                        .addHandler(AuthConfigRoute(audience, issuer, authType))
+                        .build()
+
+            }
+        }
+
+    }
+
 }

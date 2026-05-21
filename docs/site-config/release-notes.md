@@ -2,6 +2,7 @@
 
 | Version         | Released            |
 |-----------------|---------------------|
+|[1.12.0](#1120)| `21 May 2026` |
 |[1.11.1](#1111)| `07 May 2026` |
 | [1.10.0](#1100) | `05 May 2026`       |
 | [1.9.0](#190)   | `09 April 2026`     |
@@ -51,6 +52,35 @@
 ---
 
 NOTE: This library is not yet stable, and breaking changes should be expected until a 1.0.0 release.
+
+---
+
+## [1.12.0]
+
+### Breaking Changes
+* Updated to use Kotlin version of the vertx-utils library, with many breaking changes. This only impacts if you are using it as a transitive dependency:
+  * The `RouteRegisterLogger` class has been replaced with the `logRegisteredRoutes` factory function.
+  * The following functions have been replaced with `contains`, allowing use of the Kotlin `in` operator:
+    * `PathParams.exists`.
+    * `QueryParams.exists`.
+    * `RouteVersion.includes`.
+  * `RouteVersionUtils.forVersion` has been replaced with a Kotlin inline equivalent that only needs the factory, not the available routes enum.
+  * All `JsonUtils` extract helpers are now extensions.
+  * Many other general Kotlin vs Java differences. e.g. getters/setters.
+* `AuthConfigRoute.routeFactory` has been moved from a top level function into the companion object. It has also changed to return the route factory, rather
+  than a route. This was done to be compatible with the Kotlin `vertx-utils`.
+
+### New Features
+* None.
+
+### Enhancements
+* None.
+
+### Fixes
+* None.
+
+### Notes
+* None.
 
 ---
 

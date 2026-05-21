@@ -1,4 +1,20 @@
 # Zepben EWB SDK changelog
+## [1.13.0] - UNRELEASED
+### Breaking Changes
+* None.
+
+### New Features
+* None.
+
+### Enhancements
+* None.
+
+### Fixes
+* None.
+
+### Notes
+* None.
+
 ## [1.12.0] - 2026-05-21
 ### Breaking Changes
 * Updated to use Kotlin version of the vertx-utils library, with many breaking changes. This only impacts if you are using it as a transitive dependency:

@@ -1,5 +1,5 @@
 # Zepben EWB SDK changelog
-## [1.12.0] - UNRELEASED
+## [1.12.0] - 2026-05-21
 ### Breaking Changes
 * Updated to use Kotlin version of the vertx-utils library, with many breaking changes. This only impacts if you are using it as a transitive dependency:
   * The `RouteRegisterLogger` class has been replaced with the `logRegisteredRoutes` factory function.

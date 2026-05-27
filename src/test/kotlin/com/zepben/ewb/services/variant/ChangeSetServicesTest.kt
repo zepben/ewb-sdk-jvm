@@ -14,7 +14,6 @@ import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectCreation
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectDeletion
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectModification
-import com.zepben.testutils.exception.ExpectException.Companion.expect
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.isA
@@ -49,15 +48,7 @@ class ChangeSetServicesTest {
         val ioThrowsMRID = AcLineSegment("test3")
         val ioThrowsType = Junction("test")
 
-        expect {
-            services.addModification(variantService, cs, io, ioThrowsMRID)
-        }.toThrow<IllegalArgumentException>()
-            .withMessage("newObject (${io.mRID}) and originalObject (${ioThrowsMRID.mRID}) must share the same mRID.")
-
-        expect {
-            services.addModification(variantService, cs, io, ioThrowsType)
-        }.toThrow<IllegalArgumentException>()
-            .withMessage("newObject (${io.typeNameAndMRID()}) and originalObject (${ioThrowsType.typeNameAndMRID()}) must be of the same type.")
+        //Required Check for addModification has been disabled as that should be picked up later with conflict detection with different handling.
 
         services.addModification(variantService, cs, io, ioOriginal)
 

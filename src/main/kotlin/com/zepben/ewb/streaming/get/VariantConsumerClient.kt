@@ -63,7 +63,11 @@ class VariantConsumerClient @JvmOverloads constructor(
      * @param callCredentials [CallCredentials] to be attached to the stub.
      */
     @JvmOverloads
-    constructor(channel: GrpcChannel, variantService: VariantService = VariantService(), callCredentials: CallCredentials? = null) : this(channel.channel, variantService, callCredentials)
+    constructor(channel: GrpcChannel, variantService: VariantService = VariantService(), callCredentials: CallCredentials? = null) : this(
+        channel.channel,
+        variantService,
+        callCredentials
+    )
 
     override fun processIdentifiables(mRIDs: Sequence<String>): Sequence<ExtractResult> {
         val extractResults = mutableListOf<ExtractResult>()
@@ -106,7 +110,7 @@ class VariantConsumerClient @JvmOverloads constructor(
         mRIDs.forEach { mRID ->
             val streamObserver = AwaitableStreamObserver<GetChangeSetResponse> { response ->
                 val result = service.addFromPb(response.identifiableObject)
-                result.identifiedObject?.let { mor.objects[result.mRID] = it } ?: mor.failed.add(result.mRID)
+                result.identifiable?.let { mor.objects[result.mRID] = it } ?: mor.failed.add(result.mRID)
             }
             val requestBuilder = GetChangeSetRequest.newBuilder().setChangeSetMRID(mRID)
             baseModelVersion?.atStartOfDay()?.toInstant(ZoneOffset.UTC)?.toTimestamp()?.also {
@@ -210,7 +214,7 @@ class VariantConsumerClient @JvmOverloads constructor(
                 .distinct()
                 .toList()
 
-            res = getIdentifiedObjects(toResolve).onError { thrown, wasHandled ->
+            res = getIdentifiables(toResolve).onError { thrown, wasHandled ->
                 return GrpcResult.ofError(thrown, wasHandled)
             }.value
             mor.objects.putAll(res.objects)

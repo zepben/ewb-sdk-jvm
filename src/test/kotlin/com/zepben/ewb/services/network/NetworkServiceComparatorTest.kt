@@ -1665,8 +1665,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             { PowerTransformerEnd(it) },
             { TransformerEndRatedS(TransformerCoolingType.UNKNOWN, 1) },
             { TransformerEndRatedS(TransformerCoolingType.UNKNOWN, 2) },
-            ::ValueCollectionDifference,
-            expectedDifferences = setOf("ratedS")
+            ::ValueCollectionDifference
         )
 
     }

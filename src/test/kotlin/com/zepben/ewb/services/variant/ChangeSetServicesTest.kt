@@ -9,18 +9,24 @@
 package com.zepben.ewb.services.variant
 
 import com.zepben.ewb.cim.iec61970.base.wires.AcLineSegment
-import com.zepben.ewb.cim.iec61970.base.wires.Junction
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectCreation
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectDeletion
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectModification
+import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.isA
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 
 class ChangeSetServicesTest {
 
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     @Test
     fun testAddCreation() {
@@ -45,8 +51,6 @@ class ChangeSetServicesTest {
         val variantService = VariantService()
         val io = AcLineSegment("test")
         val ioOriginal = AcLineSegment("test")
-        val ioThrowsMRID = AcLineSegment("test3")
-        val ioThrowsType = Junction("test")
 
         //Required Check for addModification has been disabled as that should be picked up later with conflict detection with different handling.
 

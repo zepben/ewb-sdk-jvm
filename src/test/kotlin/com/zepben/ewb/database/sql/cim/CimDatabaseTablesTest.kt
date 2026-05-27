@@ -13,6 +13,7 @@ import com.zepben.ewb.database.sql.cim.changeset.ChangeSetDatabaseTables
 import com.zepben.ewb.database.sql.cim.customer.CustomerDatabaseTables
 import com.zepben.ewb.database.sql.cim.diagram.DiagramDatabaseTables
 import com.zepben.ewb.database.sql.cim.network.NetworkDatabaseTables
+import com.zepben.ewb.database.sql.cim.variant.tables.EWBDatabaseTables
 import com.zepben.ewb.database.sql.common.MissingTableConfigException
 import com.zepben.ewb.database.sql.common.tables.SqlTable
 import com.zepben.ewb.database.sql.common.tables.TableVersion
@@ -57,6 +58,7 @@ internal class CimDatabaseTablesTest {
             DiagramDatabaseTables(),
             NetworkDatabaseTables(),
             ChangeSetDatabaseTables(),
+            EWBDatabaseTables()
         )
             .flatMap { it.tables.keys }
             .filter { !it.isSubclassOf(TableVersion::class) }
@@ -71,12 +73,12 @@ internal class CimDatabaseTablesTest {
             // Tables declared in ${serviceName}DatabaseTables but not used.
             val unusedTables = usedTables.filterNot {
                 allFinalTables.contains(it)
-            }.joinToString( ", " )
+            }.joinToString(", ")
 
             // Tables used, but not declared in ${serviceName}DatabaseTables.
             val undeclaredTables = allFinalTables.filterNot {
                 usedTables.contains(it)
-            }.joinToString( ", " )
+            }.joinToString(", ")
 
             throw AssertionError("\n  Unused Tables: $unusedTables\n  Undeclared Tables: $undeclaredTables", assertionError)
 

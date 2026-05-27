@@ -9,22 +9,30 @@
 package com.zepben.ewb.streaming.get
 
 import com.zepben.ewb.streaming.grpc.GrpcChannel
+import com.zepben.testutils.junit.SystemLogExtension
 import io.grpc.Channel
 import io.mockk.mockk
 import io.mockk.verifySequence
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 
 
 class ChangeSetConsumerClientTest {
 
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
+
     @Test
     fun `constructor coverage`() {
         ChangeSetConsumerClient(
-            variantChannel = mockk<GrpcChannel>(),
-            variantService = mockk(),
-            networkChannel = mockk(),
-            diagramChannel = mockk(),
-            customerChannel = mockk(),
+            variantChannel = mockk<GrpcChannel>(relaxed = true),
+            variantService = mockk(relaxed = true),
+            networkChannel = mockk(relaxed = true),
+            diagramChannel = mockk(relaxed = true),
+            customerChannel = mockk(relaxed = true),
             variantCallCredentials = mockk(),
             networkCallCredentials = mockk(),
             diagramCallCredentials = mockk(),
@@ -44,7 +52,7 @@ class ChangeSetConsumerClientTest {
         )
 
         ChangeSetConsumerClient(
-            channel = mockk<GrpcChannel>(),
+            channel = mockk<GrpcChannel>(relaxed = true),
             variantService = mockk(),
             callCredentials = mockk(),
         )

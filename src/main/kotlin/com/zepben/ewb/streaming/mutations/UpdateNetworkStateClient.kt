@@ -12,6 +12,7 @@ import com.zepben.ewb.streaming.data.CurrentStateEvent
 import com.zepben.ewb.streaming.data.CurrentStateEventBatch
 import com.zepben.ewb.streaming.data.SetCurrentStatesStatus
 import com.zepben.ewb.streaming.get.AwaitableStreamObserver
+import com.zepben.ewb.streaming.get.GrpcExecutorFactory
 import com.zepben.ewb.streaming.grpc.GrpcChannel
 import com.zepben.ewb.streaming.grpc.GrpcClient
 import com.zepben.protobuf.ns.UpdateNetworkStateServiceGrpc
@@ -43,7 +44,7 @@ class UpdateNetworkStateClient(
     @JvmOverloads
     constructor(channel: Channel, callCredentials: CallCredentials? = null) :
         this(
-            UpdateNetworkStateServiceGrpc.newStub(channel).withExecutor(Executors.newSingleThreadExecutor()).apply {
+            UpdateNetworkStateServiceGrpc.newStub(channel).withExecutor(GrpcExecutorFactory.create("update-network-state")).apply {
                 callCredentials?.let { withCallCredentials(it) }
             },
         )

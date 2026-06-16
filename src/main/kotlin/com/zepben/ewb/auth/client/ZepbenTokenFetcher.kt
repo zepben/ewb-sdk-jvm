@@ -121,6 +121,11 @@ class ZepbenTokenFetcher(
                 refreshRequestData.put("scope", "${audience}/.default")
             }
 
+            AuthMethod.KEYCLOAK -> {
+                tokenRequestData.put("audience", audience)
+                refreshRequestData.put("audience", audience)
+            }
+
             else -> {}
         }
     }

@@ -18,5 +18,6 @@ enum class AuthMethod {
     SELF,
     OAUTH,
     AUTH0,
-    ENTRAID
+    ENTRAID,
+    KEYCLOAK
 }

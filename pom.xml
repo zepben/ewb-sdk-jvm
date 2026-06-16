@@ -12,12 +12,12 @@
     <parent>
         <groupId>com.zepben.maven</groupId>
         <artifactId>evolve-super-pom</artifactId>
-        <version>0.50.0</version>
+        <version>0.49.0</version>
     </parent>
 
     <groupId>com.zepben</groupId>
     <artifactId>ewb-sdk</artifactId>
-    <version>1.13.0b2</version>
+    <version>1.12.0</version>
     <packaging>jar</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>SDK for interaction with the evolve platform</description>

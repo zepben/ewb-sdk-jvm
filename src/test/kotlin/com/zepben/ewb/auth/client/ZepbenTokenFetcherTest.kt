@@ -75,6 +75,14 @@ internal class ZepbenTokenFetcherTest {
         every { HttpClient.newBuilder().sslContext(insecureSSLContext).build() } returns insecureClient
         every { HttpClient.newBuilder().sslContext(secureConfSSLContext).build() } returns secureConfClient
         every { HttpClient.newBuilder().sslContext(secureAuthSSLContext).build() } returns secureAuthClient
+
+        mockkStatic("com.zepben.ewb.auth.client.ZepbenTokenFetcherKt")
+        every { createAuthHttpClient(verifyCertificates = true, caFilename = null) } returns secureClient
+        every { createAuthHttpClient(verifyCertificates = false, caFilename = null) } returns insecureClient
+        every { createAuthHttpClient(verifyCertificates = true, caFilename = "confCAFilename") } returns secureConfClient
+        every { createAuthHttpClient(verifyCertificates = true, caFilename = "authCAFilename") } returns secureAuthClient
+        every { createAuthHttpClient(verifyCertificates = false, caFilename = "confCAFilename") } returns insecureClient
+        every { createAuthHttpClient(verifyCertificates = false, caFilename = "authCAFilename") } returns insecureClient
     }
 
     @AfterEach

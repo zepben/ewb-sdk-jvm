@@ -46,11 +46,7 @@ fun fetchProviderDetails(
     issuer: String,
     verifyCertificates: Boolean = true,
     httpClientCreator: () -> HttpClient = {
-        if (!verifyCertificates) {
-            HttpClient.newBuilder().sslContext(SSLContextUtils.allTrustingSSLContext()).build()
-        } else {
-            HttpClient.newBuilder().build()
-        }
+        createAuthHttpClient(verifyCertificates = verifyCertificates)
     },
     handler: HttpResponse.BodyHandler<String> = HttpResponse.BodyHandlers.ofString()
 ): ProviderDetails {
@@ -99,11 +95,7 @@ fun createProviderConfig(
     confAddress: String,
     verifyCertificates: Boolean = true,
     httpClientCreator: () -> HttpClient = {
-        if (!verifyCertificates) {
-            HttpClient.newBuilder().sslContext(SSLContextUtils.allTrustingSSLContext()).build()
-        } else {
-            HttpClient.newBuilder().build()
-        }
+        createAuthHttpClient(verifyCertificates = verifyCertificates)
     },
     handler: HttpResponse.BodyHandler<String> = HttpResponse.BodyHandlers.ofString(),
     authTypeField: String = "authType",

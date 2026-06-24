@@ -24,6 +24,33 @@ import java.net.http.HttpResponse
 import java.time.Instant
 
 /**
+ * Creates an HttpClient for authentication purposes.
+ *
+ * If the system property `ewb.auth.forceHttp11` is set to "true", the client will use HTTP/1.1 only.
+ * This is useful for debugging HTTP/2 compatibility issues with authentication providers.
+ *
+ * @param verifyCertificates Whether to verify the SSL certificate of the server
+ * @param caFilename Optional filename of a CA certificate to use for verification
+ * @return An HttpClient configured according to the parameters
+ */
+fun createAuthHttpClient(
+    verifyCertificates: Boolean = true,
+    caFilename: String? = null
+): HttpClient {
+    val forceHttp11 = System.getProperty("ewb.auth.forceHttp11", "false") == "true"
+    val builder = HttpClient.newBuilder()
+    if (forceHttp11) {
+        builder.version(HttpClient.Version.HTTP_1_1)
+    }
+    if (caFilename != null) {
+        builder.sslContext(SSLContextUtils.singleCACertSSLContext(caFilename))
+    } else if (!verifyCertificates) {
+        builder.sslContext(SSLContextUtils.allTrustingSSLContext())
+    }
+    return builder.build()
+}
+
+/**
  * Fetches access tokens from an authentication provider using the OAuth 2.0 protocol.
  *
  * @property audience Audience to use when requesting tokens.
@@ -40,7 +67,7 @@ class ZepbenTokenFetcher(
     val authMethod: AuthMethod = AuthMethod.OAUTH,
     val tokenRequestData: JsonObject = JsonObject(),
     val refreshRequestData: JsonObject = JsonObject(),
-    private val client: HttpClient = HttpClient.newHttpClient(),
+    private val client: HttpClient = createAuthHttpClient(),
     private var refreshToken: String? = null,
     val requestBuilder: (String, String) -> HttpRequest = { issuerURL, body ->
         HttpRequest.newBuilder()
@@ -78,7 +105,7 @@ class ZepbenTokenFetcher(
         authMethod = authMethod,
         tokenRequestData = tokenRequestData,
         refreshRequestData = refreshRequestData,
-        client = if (verifyCertificate) HttpClient.newHttpClient() else HttpClient.newBuilder().sslContext(SSLContextUtils.allTrustingSSLContext()).build()
+        client = createAuthHttpClient(verifyCertificates = verifyCertificate)
     )
 
     /**
@@ -104,9 +131,7 @@ class ZepbenTokenFetcher(
         authMethod = authMethod,
         tokenRequestData = tokenRequestData,
         refreshRequestData = refreshRequestData,
-        client = caFilename?.let {
-            HttpClient.newBuilder().sslContext(SSLContextUtils.singleCACertSSLContext(caFilename)).build()
-        } ?: HttpClient.newHttpClient()
+        client = createAuthHttpClient(caFilename = caFilename)
     )
 
     init {
@@ -232,9 +257,7 @@ fun createTokenFetcher(
     verifyCertificates: Boolean,
 ): ZepbenTokenFetcher {
 
-    val client =
-        authClient ?: if (verifyCertificates) HttpClient.newHttpClient() else HttpClient.newBuilder().sslContext(SSLContextUtils.allTrustingSSLContext())
-            .build()
+    val client = authClient ?: createAuthHttpClient(verifyCertificates)
     val config = AuthProviderConfig(
         authMethod = authMethod,
         issuer = issuer,
@@ -303,8 +326,8 @@ fun createTokenFetcher(
     issuerField: String = "issuer",
 ) = createTokenFetcher(
     confAddress = confAddress,
-    confClient = if (verifyCertificates) HttpClient.newHttpClient() else HttpClient.newBuilder().sslContext(SSLContextUtils.allTrustingSSLContext()).build(),
-    authClient = if (verifyCertificates) HttpClient.newHttpClient() else HttpClient.newBuilder().sslContext(SSLContextUtils.allTrustingSSLContext()).build(),
+    confClient = createAuthHttpClient(verifyCertificates),
+    authClient = createAuthHttpClient(verifyCertificates),
     audienceField = audienceField,
     issuerField = issuerField
 )
@@ -333,12 +356,8 @@ fun createTokenFetcher(
     verifyCertificates: Boolean = true,
 ) = createTokenFetcher(
     confAddress = confAddress,
-    confClient = confCAFilename?.let {
-        HttpClient.newBuilder().sslContext(SSLContextUtils.singleCACertSSLContext(it)).build()
-    } ?: if (verifyCertificates) HttpClient.newHttpClient() else HttpClient.newBuilder().sslContext(SSLContextUtils.allTrustingSSLContext()).build(),
-    authClient = authCAFilename?.let {
-        HttpClient.newBuilder().sslContext(SSLContextUtils.singleCACertSSLContext(it)).build()
-    } ?: if (verifyCertificates) HttpClient.newHttpClient() else HttpClient.newBuilder().sslContext(SSLContextUtils.allTrustingSSLContext()).build(),
+    confClient = createAuthHttpClient(verifyCertificates = verifyCertificates, caFilename = confCAFilename),
+    authClient = createAuthHttpClient(verifyCertificates = verifyCertificates, caFilename = authCAFilename),
     audienceField = audienceField,
     issuerField = issuerField,
 )

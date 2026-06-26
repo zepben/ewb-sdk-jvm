@@ -1024,7 +1024,7 @@ fun Substation.fillFields(service: NetworkService, includeRuntime: Boolean = tru
 fun Terminal.fillFields(service: NetworkService, includeRuntime: Boolean = true): Terminal {
     (this as AcDcTerminal).fillFields(service, includeRuntime)
 
-    conductingEquipment = Junction(generateId()).also { service.add(it) }
+    _conductingEquipment = Junction(generateId()).also { service.add(it) }
     conductingEquipment?.addTerminal(this)
 
     phases = PhaseCode.X

@@ -8,11 +8,13 @@
 
 package com.zepben.ewb.cim.iec61970.base.core
 
+import com.zepben.ewb.cim.iec61970.base.wires.AcLineSegment
 import com.zepben.ewb.cim.iec61970.base.wires.Junction
 import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.testdata.fillFields
 import com.zepben.ewb.services.network.tracing.feeder.FeederDirection
+import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -55,6 +57,33 @@ internal class TerminalTest {
         assertThat(terminal.currentPhases.phaseStatusInternal, equalTo(2u))
         assertThat(terminal.normalFeederDirection, equalTo(FeederDirection.UPSTREAM))
         assertThat(terminal.currentFeederDirection, equalTo(FeederDirection.DOWNSTREAM))
+    }
+
+    @Test
+    internal fun internalConductingEquipmentSetFunctionThrowsWhenChangingFromNonNullValueToAnotherNonNullValue() {
+        val terminal = Terminal(generateId())
+        val acls = AcLineSegment(generateId())
+        val acls2 = AcLineSegment(generateId())
+        terminal._conductingEquipment = acls
+
+        expect { terminal._conductingEquipment = acls2 }
+            .toThrow<IllegalArgumentException>()
+            .withMessage(
+                "conductingEquipment has already been set to $acls. Please remove this terminal from the conducting equipment before setting this field again."
+            )
+    }
+
+    @Test
+    internal fun internalConductingEquipmentSetFunctionThrowsWhenChangingFromNonNullValueToNullIfItStillBelongsToOutgoingConductingEquipment() {
+        val terminal = Terminal(generateId())
+        val acls = AcLineSegment(generateId())
+        acls.addTerminal(terminal)
+
+        expect { terminal._conductingEquipment = null }
+            .toThrow<IllegalArgumentException>()
+            .withMessage(
+                "conductingEquipment has already been set to $acls. Please remove this terminal from the conducting equipment before setting this field again."
+            )
     }
 
     @Test

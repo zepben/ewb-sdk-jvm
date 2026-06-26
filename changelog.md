@@ -7,7 +7,8 @@
 * None.
 
 ### Enhancements
-* None.
+* Terminal can now update its conductingEquipment after its set. 
+  To do this, first remove the terminal from associated conducting equipment then add the terminal to new conducting equipment.
 
 ### Fixes
 * None.

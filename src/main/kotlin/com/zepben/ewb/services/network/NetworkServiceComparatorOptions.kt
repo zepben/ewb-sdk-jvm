@@ -14,6 +14,7 @@ data class NetworkServiceComparatorOptions(
     val compareFeederEquipment: Boolean,
     val compareEquipmentContainers: Boolean,
     val compareLvSimplification: Boolean,
+    val compareRunTimeVariables: Boolean,
 ) {
 
     companion object {
@@ -25,6 +26,7 @@ data class NetworkServiceComparatorOptions(
                 compareFeederEquipment = true,
                 compareEquipmentContainers = true,
                 compareLvSimplification = true,
+                compareRunTimeVariables = true,
             )
 
         @JvmStatic
@@ -35,6 +37,7 @@ data class NetworkServiceComparatorOptions(
                 compareFeederEquipment = false,
                 compareEquipmentContainers = false,
                 compareLvSimplification = false,
+                compareRunTimeVariables = false,
             )
 
         @JvmStatic
@@ -47,6 +50,7 @@ data class NetworkServiceComparatorOptions(
         private var compareFeederEquipment = false
         private var compareEquipmentContainers = false
         private var compareLvSimplification = false
+        private var compareRunTimeVariables = false
         fun compareTerminals(): Builder {
             compareTerminals = true
             return this
@@ -72,6 +76,11 @@ data class NetworkServiceComparatorOptions(
             return this
         }
 
+        fun compareRunTimeVariables(): Builder {
+            compareRunTimeVariables = true
+            return this
+        }
+
         fun build(): NetworkServiceComparatorOptions {
             return NetworkServiceComparatorOptions(
                 compareTerminals,
@@ -79,6 +88,7 @@ data class NetworkServiceComparatorOptions(
                 compareFeederEquipment,
                 compareEquipmentContainers,
                 compareLvSimplification,
+                compareRunTimeVariables,
             )
         }
     }

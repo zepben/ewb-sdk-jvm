@@ -4,7 +4,7 @@
 * None.
 
 ### New Features
-* None.
+* Adds `compareRunTimeVariables` to `NetworkServiceComparatorOptions` to allow the users to ignore variables that are only populated during EWB spin up.
 
 ### Enhancements
 * Terminal can now update its conductingEquipment after its set. 

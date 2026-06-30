@@ -29,6 +29,7 @@ internal class NetworkServiceComparatorOptionsTest {
         assertThat("compareFeederEquipment should be true for all()", options.compareFeederEquipment)
         assertThat("compareEquipmentContainers should be true for all()", options.compareEquipmentContainers)
         assertThat("compareLvSimplification should be true for all()", options.compareLvSimplification)
+        assertThat("compareRunTimeVariables should be true for all()", options.compareRunTimeVariables)
     }
 
     @Test
@@ -39,6 +40,7 @@ internal class NetworkServiceComparatorOptionsTest {
         assertThat("compareFeederEquipment should be false for none()", !options.compareFeederEquipment)
         assertThat("compareEquipmentContainers should be false for none()", !options.compareEquipmentContainers)
         assertThat("compareLvSimplification should be false for none()", !options.compareLvSimplification)
+        assertThat("compareRunTimeVariables should be false for none()", !options.compareRunTimeVariables)
     }
 
     @Test
@@ -49,6 +51,7 @@ internal class NetworkServiceComparatorOptionsTest {
             .compareFeederEquipment()
             .compareEquipmentContainers()
             .compareLvSimplification()
+            .compareRunTimeVariables()
             .build()
 
         assertThat("compareTracedPhases should be true when building with all options enabled", options.compareTracedPhases)
@@ -56,6 +59,7 @@ internal class NetworkServiceComparatorOptionsTest {
         assertThat("compareFeederEquipment should be true when building with all options enabled", options.compareFeederEquipment)
         assertThat("compareEquipmentContainers should be true when building with all options enabled", options.compareEquipmentContainers)
         assertThat("compareLvSimplification should be true when building with all options enabled", options.compareLvSimplification)
+        assertThat("compareRunTimeVariables should be true when building with all options enabled", options.compareRunTimeVariables)
     }
 
     @Test
@@ -67,5 +71,6 @@ internal class NetworkServiceComparatorOptionsTest {
         assertThat("compareFeederEquipment should be false when building without any options enabled", !options.compareFeederEquipment)
         assertThat("compareEquipmentContainers should be false when building without any options enabled", !options.compareEquipmentContainers)
         assertThat("compareLvSimplification should be false when building without any options enabled", !options.compareLvSimplification)
+        assertThat("compareRunTimeVariables should be false when building without any options enabled", !options.compareRunTimeVariables)
     }
 }

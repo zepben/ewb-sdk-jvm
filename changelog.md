@@ -1,7 +1,7 @@
 # Zepben EWB SDK changelog
 ## [1.13.0] - UNRELEASED
 ### Breaking Changes
-* None.
+* Deprecated `NetworkServiceComparatorOptions.Builder`. This will be removed in a future release.
 
 ### New Features
 * Adds `compareRunTimeVariables` to `NetworkServiceComparatorOptions` to allow the users to ignore variables that are only populated during EWB spin up.

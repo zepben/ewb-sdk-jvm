@@ -118,7 +118,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
             compareIdReferences(LvFeeder::normalHeadTerminal)
             compareIdReferences(LvFeeder::normalEnergizingLvSubstation)
 
-            if (options.compareRunTimeVariables) {
+            if (options.compareRunTime) {
                 compareIdReferenceCollections(LvFeeder::normalEnergizingFeeders)
                 compareIdReferenceCollections(LvFeeder::currentEnergizingFeeders)
                 if (options.compareFeederEquipment) {
@@ -133,7 +133,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
 
             compareIdReferenceCollections(LvSubstation::normalEnergizedLvFeeders)
 
-            if (options.compareRunTimeVariables) {
+            if (options.compareRunTime) {
                 compareIdReferenceCollections(LvSubstation::normalEnergizingFeeders)
                 compareIdReferenceCollections(LvSubstation::currentEnergizingFeeders)
             }
@@ -612,7 +612,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
             compareValues(Equipment::inService, Equipment::normallyInService, Equipment::commissionedDate)
 
             if (options.compareEquipmentContainers) {
-                if (options.compareRunTimeVariables)
+                if (options.compareRunTime)
                     compareIdReferenceCollections(Equipment::containers)
                 else {
                     compareIdReferenceCollection(
@@ -627,7 +627,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
 
             compareIdReferenceCollections(Equipment::operationalRestrictions)
 
-            if (options.compareEquipmentContainers && options.compareRunTimeVariables)
+            if (options.compareEquipmentContainers && options.compareRunTime)
                 compareIdReferenceCollections(Equipment::currentContainers)
         }
 
@@ -635,7 +635,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
         apply {
             compareConnectivityNodeContainer()
 
-            if (options.compareRunTimeVariables || !source.populatedAtRuntTime)
+            if (options.compareRunTime || !source.populatedAtRuntTime)
                 compareIdReferenceCollections(EquipmentContainer::equipment)
         }
 
@@ -644,7 +644,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
             compareEquipmentContainer()
 
             compareIdReferences(Feeder::normalHeadTerminal, Feeder::normalEnergizingSubstation)
-            if (options.compareRunTimeVariables) {
+            if (options.compareRunTime) {
                 compareIdReferenceCollections(Feeder::normalEnergizedLvFeeders)
                 compareIdReferenceCollections(Feeder::currentEnergizedLvFeeders)
                 compareIdReferenceCollections(Feeder::normalEnergizedLvSubstations)
@@ -694,7 +694,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
 
             compareIdReferences(Terminal::conductingEquipment, Terminal::connectivityNode)
             compareValues(Terminal::phases, Terminal::sequenceNumber)
-            if (options.compareRunTimeVariables) {
+            if (options.compareRunTime) {
                 compareValues(Terminal::normalFeederDirection, Terminal::currentFeederDirection)
                 addIfDifferent(Terminal::normalPhases.name, Terminal::normalPhases.compareValues(source, target) { it.phaseStatusInternal })
                 addIfDifferent(Terminal::currentPhases.name, Terminal::currentPhases.compareValues(source, target) { it.phaseStatusInternal })

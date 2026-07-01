@@ -91,21 +91,29 @@ fun <T, R : Identifiable> KProperty1<in T, R?>.compareIdReference(source: T?, ta
  * @param target The second object to compare.
  * @return The [ObjectCollectionDifference] if there were any differences, otherwise `null`.
  */
-fun <T, R : Identifiable> KProperty1<in T, Collection<R>>.compareIdReferenceCollection(source: T, target: T): ObjectCollectionDifference? {
+fun <T, R : Identifiable> KProperty1<in T, Collection<R>>.compareIdReferenceCollection(source: T, target: T): ObjectCollectionDifference? =
+    compareIdReferenceCollection(get(source), get(target))
+
+/**
+ * Compare the mRID references of all items in a collection, in any order, between [source] and [target].
+ *
+ * @param source The first collection to compare.
+ * @param target The second collection to compare.
+ * @return The [ObjectCollectionDifference] if there were any differences, otherwise `null`.
+ */
+fun <T : Identifiable> compareIdReferenceCollection(source: Collection<T>, target: Collection<T>): ObjectCollectionDifference? {
     val differences = ObjectCollectionDifference()
-    val sourceCollection = this.get(source)
-    val targetCollection = this.get(target)
 
     val sourceMRIDs = mutableSetOf<String>()
-    sourceCollection.forEach { sourceIdObj ->
+    source.forEach { sourceIdObj ->
         sourceMRIDs.add(sourceIdObj.mRID)
-        val targetIdObj = targetCollection.find { it.mRID == sourceIdObj.mRID }
+        val targetIdObj = target.find { it.mRID == sourceIdObj.mRID }
         if (targetIdObj == null) {
             differences.missingFromTarget.add(sourceIdObj)
         }
     }
 
-    targetCollection.forEach {
+    target.forEach {
         if (!sourceMRIDs.contains(it.mRID))
             differences.missingFromSource.add(it)
     }

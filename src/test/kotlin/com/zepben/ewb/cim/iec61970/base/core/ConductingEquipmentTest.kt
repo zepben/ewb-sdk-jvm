@@ -193,4 +193,17 @@ internal class ConductingEquipmentTest {
         ce.addTerminal(t)
     }
 
+    @Test
+    internal fun `doesn't remove terminals conducting equipment link if it's not removed`() {
+        val ce1 = object : ConductingEquipment(generateId()) {}
+        val ce2 = object : ConductingEquipment(generateId()) {}
+
+        val t = Terminal(generateId())
+        ce1.addTerminal(t)
+
+        ce2.removeTerminal(t)
+
+        assertThat(t.conductingEquipment, sameInstance(ce1))
+    }
+
 }

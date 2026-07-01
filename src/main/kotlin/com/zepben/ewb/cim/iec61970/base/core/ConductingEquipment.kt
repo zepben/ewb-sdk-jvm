@@ -94,12 +94,16 @@ abstract class ConductingEquipment(mRID: String) : Equipment(mRID) {
     open val maxTerminals: Int get() = Int.MAX_VALUE
 
     /**
-     * Remove a [Terminal] from this [ConductingEquipment].
+     * Remove a [Terminal] from this [ConductingEquipment]. If the [terminal] is removed,
+     * the reverse link to this [ConductingEquipment] will also be cleared.
      *
      * @param terminal The [Terminal] to remove.
      * @return true if [terminal] is removed from the collection.
      */
-    fun removeTerminal(terminal: Terminal): Boolean = _terminals.remove(terminal).also { terminal._conductingEquipment = null }
+    fun removeTerminal(terminal: Terminal): Boolean = _terminals.remove(terminal).also { removed ->
+        if (removed)
+            terminal._conductingEquipment = null
+    }
 
     /**
      * Clear all [Terminal]'s from this [ConductingEquipment].

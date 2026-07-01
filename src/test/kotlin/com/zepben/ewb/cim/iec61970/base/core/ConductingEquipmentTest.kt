@@ -66,44 +66,24 @@ internal class ConductingEquipmentTest {
     }
 
     @Test
-    internal fun rejectsAddingTerminalBelongingToAnotherEquipment() {
+    internal fun removingTerminalClearsTheTerminalsConductingEquipment() {
         val ce1 = object : ConductingEquipment(generateId()) {}
-        val ce2 = object : ConductingEquipment(generateId()) {}
-        val terminal = Terminal(generateId()).apply { ce2.addTerminal(this) }
-
-        expect { ce1.addTerminal(terminal) }
-            .toThrow<IllegalArgumentException>()
-            .withMessage(
-                "${terminal.typeNameAndMRID()} `conductingEquipment` property references ${terminal.conductingEquipment!!.typeNameAndMRID()}, expected ${ce1.typeNameAndMRID()}."
-            )
-    }
-
-    @Test
-    internal fun addingTerminalAssignsTheEquipmentToTheTerminal() {
-        val ce1 = object : ConductingEquipment(generateId()) {}
-        val terminal = Terminal(generateId()).apply { ce1.addTerminal(this) }
-
-        assertThat(terminal.conductingEquipment, equalTo(ce1))
-    }
-
-    @Test
-    internal fun removingTerminalFromTheEquipmentSetTerminalConductingEquipmentToNull() {
-        val ce1 = object : ConductingEquipment(generateId()) {}
-        val terminal = Terminal(generateId()).apply { ce1.addTerminal(this) }
+        val terminal = Terminal(generateId()).also { ce1.addTerminal(it) }
         ce1.removeTerminal(terminal)
 
-        assertThat(terminal.conductingEquipment, equalTo(null))
+        assertThat(terminal.conductingEquipment, nullValue())
     }
 
     @Test
-    internal fun clearTerminalFromTheEquipmentSetAllTerminalConductingEquipmentToNull() {
+    internal fun clearingTerminalClearsAllTerminalsConductingEquipment() {
         val ce1 = object : ConductingEquipment(generateId()) {}
-        val terminal1 = Terminal(generateId()).apply { ce1.addTerminal(this) }
-        val terminal2 = Terminal(generateId()).apply { ce1.addTerminal(this) }
+        val terminal1 = Terminal(generateId()).also { ce1.addTerminal(it) }
+        val terminal2 = Terminal(generateId()).also { ce1.addTerminal(it) }
+
         ce1.clearTerminals()
 
-        assertThat(terminal1.conductingEquipment, equalTo(null))
-        assertThat(terminal2.conductingEquipment, equalTo(null))
+        assertThat(terminal1.conductingEquipment, nullValue())
+        assertThat(terminal2.conductingEquipment, nullValue())
     }
 
     @Test

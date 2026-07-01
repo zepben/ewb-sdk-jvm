@@ -4,11 +4,11 @@
 * Deprecated `NetworkServiceComparatorOptions.Builder`. This will be removed in a future release.
 
 ### New Features
-* Adds `compareRunTimeVariables` to `NetworkServiceComparatorOptions` to allow the users to ignore variables that are only populated during EWB spin up.
+* Adds `compareRunTime` to `NetworkServiceComparatorOptions` to allow the users to ignore variables/references that are only populated during EWB spin up.
 
 ### Enhancements
-* Terminal can now update its conductingEquipment after its set. 
-  To do this, first remove the terminal from associated conducting equipment then add the terminal to new conducting equipment.
+* `Terminal` can now update its `conductingEquipment` as long as there is no back reference. If you want to reassign a terminal,
+  first remove the terminal from associated conducting equipment, then add the terminal to new conducting equipment.
 
 ### Fixes
 * None.

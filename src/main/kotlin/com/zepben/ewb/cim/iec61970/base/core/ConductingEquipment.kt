@@ -111,6 +111,10 @@ abstract class ConductingEquipment(mRID: String) : Equipment(mRID) {
      * @return This [ConductingEquipment] for fluent use.
      */
     fun clearTerminals(): ConductingEquipment {
+        //
+        // NOTE: We can only set the terminals `conductingEquiment` if it doesn't belong to the terminals list,
+        //       so we must clear our list of terminals before removing each terminals conducting equipemnt.
+        //
         val toClearAssociation = _terminals.toList()
         _terminals.clear()
         toClearAssociation.forEach { terminal -> terminal._conductingEquipment = null }

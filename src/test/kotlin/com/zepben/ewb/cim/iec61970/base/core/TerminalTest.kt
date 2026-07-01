@@ -60,30 +60,43 @@ internal class TerminalTest {
     }
 
     @Test
-    internal fun internalConductingEquipmentSetFunctionThrowsWhenChangingFromNonNullValueToAnotherNonNullValue() {
-        val terminal = Terminal(generateId())
+    internal fun `can only reassign conducting equipment for unused terminals`() {
         val acls = AcLineSegment(generateId())
         val acls2 = AcLineSegment(generateId())
-        terminal._conductingEquipment = acls
+        val terminal = Terminal(generateId())
 
+        fun confirmReassign() {
+            terminal._conductingEquipment = acls
+            terminal._conductingEquipment = null
+            terminal._conductingEquipment = acls2
+            terminal._conductingEquipment = null
+        }
+
+        // Should be able to freely reassign the conducting equipment without a back reference.
+        confirmReassign()
+
+        // Create a back reference.
+        acls.addTerminal(terminal)
+
+        // We shouldn't be able to reassign the terminal to another condcuting equipment while it is still assigned to acls.
         expect { terminal._conductingEquipment = acls2 }
             .toThrow<IllegalArgumentException>()
             .withMessage(
-                "conductingEquipment has already been set to $acls. Please remove this terminal from the conducting equipment before setting this field again."
+                "This terminal is currently being used by ${acls.typeNameAndMRID()}. Please remove this terminal from the conducting equipment before setting this field again."
             )
-    }
 
-    @Test
-    internal fun internalConductingEquipmentSetFunctionThrowsWhenChangingFromNonNullValueToNullIfItStillBelongsToOutgoingConductingEquipment() {
-        val terminal = Terminal(generateId())
-        val acls = AcLineSegment(generateId())
-        acls.addTerminal(terminal)
-
+        // We shouldn't be able to clear the terminals condcuting equipment while it is still assigned to acls.
         expect { terminal._conductingEquipment = null }
             .toThrow<IllegalArgumentException>()
             .withMessage(
-                "conductingEquipment has already been set to $acls. Please remove this terminal from the conducting equipment before setting this field again."
+                "This terminal is currently being used by ${acls.typeNameAndMRID()}. Please remove this terminal from the conducting equipment before setting this field again.",
             )
+
+        // Remove the back reference.
+        acls.removeTerminal(terminal)
+
+        // Should be able to freely reassign the conducting equipment after removing the back reference.
+        confirmReassign()
     }
 
     @Test

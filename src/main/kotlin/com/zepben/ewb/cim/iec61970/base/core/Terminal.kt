@@ -34,7 +34,7 @@ class Terminal(mRID: String) : AcDcTerminal(mRID) {
         internal set(value) {
             field?.also {
                 require((value == null && this !in it.terminals) || field === value) {
-                    "conductingEquipment has already been set to $field. Please remove this terminal from the conducting equipment before setting this field again."
+                    "This terminal is currently being used by ${it.typeNameAndMRID()}. Please remove this terminal from the conducting equipment before setting this field again."
                 }
             }
             field = value

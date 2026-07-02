@@ -74,7 +74,7 @@ class PowerTransformerEnd(mRID: String) : TransformerEnd(mRID) {
         get() = _sRatings?.firstOrNull()?.ratedS
         @Deprecated(
             "Use addRating() instead, as this will clear all ratings and is intended for backwards compatibility only",
-            ReplaceWith("addRating(value, TransformerCoolingType.UNKNOWN_COOLING_TYPE)")
+            ReplaceWith("addRating(value, TransformerCoolingType.UNKNOWN_COOLING_TYPE)"),
         )
         set(value) {
             if (value != null) {

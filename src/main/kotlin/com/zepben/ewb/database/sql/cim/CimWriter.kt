@@ -33,7 +33,7 @@ import java.sql.SQLException
  * @property databaseTables The tables that are available in the database.
  */
 abstract class CimWriter(
-    protected open val databaseTables: CimDatabaseTables
+    protected open val databaseTables: CimDatabaseTables,
 ) : BaseEntryWriter() {
 
     // ###################
@@ -95,7 +95,7 @@ abstract class CimWriter(
         table: TableOrganisationRoles,
         insert: PreparedStatement,
         organisationRole: OrganisationRole,
-        description: String
+        description: String,
     ): Boolean {
         insert.setNullableString(table.ORGANISATION_MRID.queryIndex, organisationRole.organisation?.mRID)
 
@@ -122,7 +122,7 @@ abstract class CimWriter(
         table: TableIdentifiedObjects,
         insert: PreparedStatement,
         identifiedObject: IdentifiedObject,
-        description: String
+        description: String,
     ): Boolean {
         insert.setString(table.MRID.queryIndex, identifiedObject.mRID)
         insert.setNullableString(table.NAME.queryIndex, identifiedObject.name)

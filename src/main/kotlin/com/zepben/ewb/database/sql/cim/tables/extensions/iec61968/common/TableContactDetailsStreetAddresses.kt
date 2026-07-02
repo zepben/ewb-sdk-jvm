@@ -27,7 +27,7 @@ class TableContactDetailsStreetAddresses : TableStreetAddresses() {
 
     init {
         addNonUniqueIndexes(
-            listOf(CONTACT_DETAILS_ID)
+            listOf(CONTACT_DETAILS_ID),
         )
     }
 

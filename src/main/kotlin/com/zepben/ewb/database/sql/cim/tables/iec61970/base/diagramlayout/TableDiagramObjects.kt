@@ -33,7 +33,7 @@ class TableDiagramObjects : TableIdentifiedObjects() {
     init {
         addNonUniqueIndexes(
             listOf(IDENTIFIED_OBJECT_MRID),
-            listOf(DIAGRAM_MRID)
+            listOf(DIAGRAM_MRID),
         )
     }
 

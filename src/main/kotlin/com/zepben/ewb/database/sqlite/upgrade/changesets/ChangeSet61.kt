@@ -19,7 +19,7 @@ internal fun changeSet61() = ChangeSet(
         `retype nonnull columns to null network`,
         `retype nonnull columns to null diagram`,
         `retype nonnull columns to null customer`,
-    )
+    ),
 )
 
 // ###################
@@ -117,7 +117,7 @@ private val `retype nonnull columns to null network` = Change(
         usagePoint("usage_points") +
         powerSystemResource("voltage_relays"),
 
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )
 
 @Suppress("ObjectPropertyName")
@@ -126,7 +126,7 @@ private val `retype nonnull columns to null diagram` = Change(
         identifiedObject("diagrams") +
         alterToNullableColumn("diagram_object_points", "x_position") +
         alterToNullableColumn("diagram_object_points", "y_position"),
-    targetDatabases = setOf(DatabaseType.DIAGRAM)
+    targetDatabases = setOf(DatabaseType.DIAGRAM),
 )
 
 @Suppress("ObjectPropertyName")
@@ -135,7 +135,7 @@ private val `retype nonnull columns to null customer` = Change(
         identifiedObject("customers") +
         document("pricing_structures") +
         document("tariffs"),
-    targetDatabases = setOf(DatabaseType.CUSTOMER)
+    targetDatabases = setOf(DatabaseType.CUSTOMER),
 )
 
 @Suppress("SameParameterValue")
@@ -240,5 +240,5 @@ private fun alterToNullableColumn(tableName: String, columnName: String): List<S
         "ALTER TABLE $tableName RENAME COLUMN $columnName to ${columnName}_old",
         "ALTER TABLE $tableName ADD COLUMN $columnName TEXT",
         "UPDATE $tableName SET $columnName = ${columnName}_old",
-        "ALTER TABLE $tableName DROP COLUMN ${columnName}_old"
+        "ALTER TABLE $tableName DROP COLUMN ${columnName}_old",
     )

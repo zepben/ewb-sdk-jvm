@@ -20,5 +20,5 @@ data class StreetAddress(
     val postalCode: String? = null,
     val townDetail: TownDetail? = null,
     val poBox: String? = null,
-    val streetDetail: StreetDetail? = null
+    val streetDetail: StreetDetail? = null,
 )

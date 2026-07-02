@@ -9,8 +9,8 @@
 package com.zepben.ewb.cim.iec61970.base.core
 
 import com.zepben.ewb.cim.extensions.ZBEX
-import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvSubstation
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
+import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvSubstation
 import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import com.zepben.ewb.services.common.extensions.validateReference
 

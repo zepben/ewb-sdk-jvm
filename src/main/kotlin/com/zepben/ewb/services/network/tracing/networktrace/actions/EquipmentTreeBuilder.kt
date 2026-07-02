@@ -25,7 +25,7 @@ private typealias EquipmentTreeNode = TreeNode<ConductingEquipment>
 class EquipmentTreeBuilder(calculateLeaves: Boolean? = false) : StepActionWithContextValue<NetworkTraceStep<*>, EquipmentTreeNode> {
     private val _roots: MutableMap<ConductingEquipment, EquipmentTreeNode> = mutableMapOf()
     private val _leaves: MutableList<EquipmentTreeNode> = mutableListOf()
-    private val _calculateLeaves: Boolean = calculateLeaves?: false
+    private val _calculateLeaves: Boolean = calculateLeaves ?: false
 
     /**
      * The root nodes in the tree. These represent the start items in the trace.
@@ -35,7 +35,9 @@ class EquipmentTreeBuilder(calculateLeaves: Boolean? = false) : StepActionWithCo
     /**
      * Leaf nodes in the tree. These represent any ending point of the trace.
      */
-    val leaves: Collection<EquipmentTreeNode> get() = _leaves.takeIf { _calculateLeaves } ?: throw IllegalArgumentException("Leaves were not calculated, you must pass calculateLeaves = true to the EquipmentTreeBuilder when creating.")
+    val leaves: Collection<EquipmentTreeNode>
+        get() = _leaves.takeIf { _calculateLeaves }
+            ?: throw IllegalArgumentException("Leaves were not calculated, you must pass calculateLeaves = true to the EquipmentTreeBuilder when creating.")
 
     override fun computeInitialValue(item: NetworkTraceStep<*>): EquipmentTreeNode {
         val node = _roots.getOrPut(item.path.toEquipment) { TreeNode(item.path.toEquipment, null) }
@@ -50,7 +52,7 @@ class EquipmentTreeBuilder(calculateLeaves: Boolean? = false) : StepActionWithCo
         val currentNode = context.value
         currentNode.parent?.addChild(currentNode)
 
-        currentNode.takeIf {_calculateLeaves}?.let {
+        currentNode.takeIf { _calculateLeaves }?.let {
             _leaves.add(it) // add this node to _leaves as it has no children
             it.parent?.let { parent ->
                 _leaves.remove(parent) // this nodes parent now has a child, it's not a leaf anymore

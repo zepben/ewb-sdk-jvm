@@ -28,12 +28,12 @@ class TableProtectionRelayFunctionsProtectedSwitches : SqlTable() {
 
     init {
         addUniqueIndexes(
-            listOf(PROTECTION_RELAY_FUNCTION_MRID, PROTECTED_SWITCH_MRID)
+            listOf(PROTECTION_RELAY_FUNCTION_MRID, PROTECTED_SWITCH_MRID),
         )
 
         addNonUniqueIndexes(
             listOf(PROTECTION_RELAY_FUNCTION_MRID),
-            listOf(PROTECTED_SWITCH_MRID)
+            listOf(PROTECTED_SWITCH_MRID),
         )
     }
 

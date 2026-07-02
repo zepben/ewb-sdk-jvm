@@ -35,7 +35,7 @@ class AuthConfigRoute(audience: String, issuer: String, authType: AuthMethod) : 
     private data class AuthConfigResponse(
         val authType: AuthMethod,
         val issuer: String,
-        val audience: String
+        val audience: String,
     )
 
     companion object {
@@ -43,7 +43,7 @@ class AuthConfigRoute(audience: String, issuer: String, authType: AuthMethod) : 
         fun routeFactory(
             audience: String,
             issuer: String,
-            authType: AuthMethod = AuthMethod.OAUTH
+            authType: AuthMethod = AuthMethod.OAUTH,
         ): (AvailableRoute) -> Route = {
             when (it) {
                 AvailableRoute.AUTH_CONFIG ->

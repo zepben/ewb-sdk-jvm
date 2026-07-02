@@ -16,7 +16,7 @@ import kotlin.reflect.KClass
 
 internal class EquipmentTypeStepLimitCondition<T>(
     val limit: Int,
-    val equipmentType: KClass<out ConductingEquipment>
+    val equipmentType: KClass<out ConductingEquipment>,
 ) : StopConditionWithContextValue<NetworkTraceStep<T>, Int> {
 
     override fun shouldStop(item: NetworkTraceStep<T>, context: StepContext): Boolean = context.value >= limit

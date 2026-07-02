@@ -14,5 +14,5 @@ data class SslContextConfig(
     val certChainFilePath: String? = null,
     val privateKeyFilePath: String? = null,
     val trustCertCollectionFilePath: String? = null,
-    val clientAuth: ClientAuth = ClientAuth.OPTIONAL
+    val clientAuth: ClientAuth = ClientAuth.OPTIONAL,
 )

@@ -16,7 +16,7 @@ class ExceptionInterceptor : ServerInterceptor {
      * log the cause of errors.
      */
     private class ExceptionTranslatingServerCall<ReqT, RespT>(
-        delegate: ServerCall<ReqT, RespT>
+        delegate: ServerCall<ReqT, RespT>,
     ) : ForwardingServerCall.SimpleForwardingServerCall<ReqT, RespT>(delegate) {
 
         override fun close(status: Status?, trailers: Metadata?) {
@@ -45,7 +45,7 @@ class ExceptionInterceptor : ServerInterceptor {
     override fun <ReqT : Any?, RespT : Any?> interceptCall(
         call: ServerCall<ReqT, RespT>?,
         headers: Metadata?,
-        next: ServerCallHandler<ReqT, RespT>?
+        next: ServerCallHandler<ReqT, RespT>?,
     ): ServerCall.Listener<ReqT>? {
         return next?.startCall(ExceptionTranslatingServerCall(call ?: return null), headers)
     }

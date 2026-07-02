@@ -34,7 +34,7 @@ internal fun changeSet62() = ChangeSet(
         `retype missed non-null columns customer`,
         `retype incorrectly converted columns customer`,
         `add missing customer indexes`,
-    )
+    ),
 )
 
 // ###################
@@ -59,7 +59,7 @@ private val `retype missed non-null network columns` = Change(
         *alterToNullable("synchronous_machines", "num_controls", "INTEGER"),
         *alterToNullable("synchronous_machines", "control_enabled", "BOOLEAN"),
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )
 
 @Suppress("ObjectPropertyName")
@@ -210,7 +210,7 @@ private val `retype incorrectly converted network columns` = Change(
         *alterToNullable("voltage_relays", "num_diagram_objects", "INTEGER"),
         *alterToNullable("voltage_relays", "num_controls", "INTEGER"),
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )
 
 @Suppress("ObjectPropertyName")
@@ -490,7 +490,7 @@ private val `add missing network indexes` = Change(
         "CREATE INDEX IF NOT EXISTS usage_points_end_devices_usage_point_mrid ON usage_points_end_devices (usage_point_mrid);",
         "CREATE INDEX IF NOT EXISTS usage_points_end_devices_end_device_mrid ON usage_points_end_devices (end_device_mrid);",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )
 
 // ###################
@@ -505,7 +505,7 @@ private val `retype incorrectly converted columns diagram` = Change(
         *alterToNullable("diagram_objects", "num_diagram_objects", "INTEGER"),
         *alterToNullable("diagrams", "num_diagram_objects", "INTEGER"),
     ),
-    targetDatabases = setOf(DatabaseType.DIAGRAM)
+    targetDatabases = setOf(DatabaseType.DIAGRAM),
 )
 
 @Suppress("ObjectPropertyName")
@@ -525,7 +525,7 @@ private val `add missing diagram indexes` = Change(
         "CREATE UNIQUE INDEX IF NOT EXISTS diagrams_mrid ON diagrams (mrid);",
         "CREATE INDEX IF NOT EXISTS diagrams_name ON diagrams (name);",
     ),
-    targetDatabases = setOf(DatabaseType.DIAGRAM)
+    targetDatabases = setOf(DatabaseType.DIAGRAM),
 )
 
 // ####################
@@ -542,7 +542,7 @@ private val `retype missed non-null columns customer` = Change(
         *alterToNullable("pricing_structures", "comment", "TEXT"),
         *alterToNullable("tariffs", "comment", "TEXT"),
     ),
-    targetDatabases = setOf(DatabaseType.CUSTOMER)
+    targetDatabases = setOf(DatabaseType.CUSTOMER),
 )
 
 @Suppress("ObjectPropertyName")
@@ -554,7 +554,7 @@ private val `retype incorrectly converted columns customer` = Change(
         *alterToNullable("pricing_structures", "num_diagram_objects", "INTEGER"),
         *alterToNullable("tariffs", "num_diagram_objects", "INTEGER"),
     ),
-    targetDatabases = setOf(DatabaseType.CUSTOMER)
+    targetDatabases = setOf(DatabaseType.CUSTOMER),
 )
 
 @Suppress("ObjectPropertyName")
@@ -583,7 +583,7 @@ private val `add missing customer indexes` = Change(
         "CREATE UNIQUE INDEX IF NOT EXISTS tariffs_mrid ON tariffs (mrid);",
         "CREATE INDEX IF NOT EXISTS tariffs_name ON tariffs (name);",
     ),
-    targetDatabases = setOf(DatabaseType.CUSTOMER)
+    targetDatabases = setOf(DatabaseType.CUSTOMER),
 )
 
 @Suppress("SameParameterValue")

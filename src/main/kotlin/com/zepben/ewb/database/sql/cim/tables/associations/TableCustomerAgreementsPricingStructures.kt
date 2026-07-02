@@ -28,12 +28,12 @@ class TableCustomerAgreementsPricingStructures : SqlTable() {
 
     init {
         addUniqueIndexes(
-            listOf(CUSTOMER_AGREEMENT_MRID, PRICING_STRUCTURE_MRID)
+            listOf(CUSTOMER_AGREEMENT_MRID, PRICING_STRUCTURE_MRID),
         )
 
         addNonUniqueIndexes(
             listOf(CUSTOMER_AGREEMENT_MRID),
-            listOf(PRICING_STRUCTURE_MRID)
+            listOf(PRICING_STRUCTURE_MRID),
         )
     }
 

@@ -32,7 +32,7 @@ fun statusCodeToStatus(statusCode: StatusCode): Status =
 
 fun authRespToGrpcAuthResp(response: AuthResponse): GrpcAuthResp =
     GrpcAuthResp(
-        statusCodeToStatus(response.statusCode).withDescription(response.message).withCause(response.cause)
+        statusCodeToStatus(response.statusCode).withDescription(response.message).withCause(response.cause),
     )
 
 data class GrpcAuthResp(val status: Status, val token: DecodedJWT? = null)
@@ -55,13 +55,13 @@ class AuthInterceptor(
             authRespToGrpcAuthResp(JWTAuthoriser.authorise(token, claim))
         }
             ?: GrpcAuthResp(Status.UNAUTHENTICATED.withDescription("Server has not defined a permission scope for ${serviceName}. This is a bug, contact the developers."))
-    }
+    },
 ) : ServerInterceptor {
 
     override fun <ReqT, RespT> interceptCall(
         serverCall: ServerCall<ReqT, RespT>,
         metadata: Metadata,
-        serverCallHandler: ServerCallHandler<ReqT, RespT>?
+        serverCallHandler: ServerCallHandler<ReqT, RespT>?,
     ): ServerCall.Listener<ReqT> {
         val value = metadata[AUTHORIZATION_METADATA_KEY]
         val authResp = if (value == null) {

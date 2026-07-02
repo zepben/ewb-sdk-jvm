@@ -31,13 +31,13 @@ class TableJobs : MultiJobTable() {
 
     init {
         addUniqueIndexes(
-            listOf(JOB_ID)
+            listOf(JOB_ID),
         )
 
         addNonUniqueIndexes(
             listOf(INGEST_TIME),
             listOf(SOURCE),
-            listOf(APPLICATION, APPLICATION_VERSION)
+            listOf(APPLICATION, APPLICATION_VERSION),
         )
     }
 

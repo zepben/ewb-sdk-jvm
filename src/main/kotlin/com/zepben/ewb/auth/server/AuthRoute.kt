@@ -40,7 +40,7 @@ class AuthRoute {
             trustedIssuers: List<TrustedIssuer>,
             requiredClaims: Iterable<String> = emptySet(),
             isRegexPath: Boolean = false,
-            verifyCertificates: Boolean = true
+            verifyCertificates: Boolean = true,
         ): (AvailableRoute) -> Route =
             { availableRoute ->
                 when (availableRoute) {
@@ -53,7 +53,7 @@ class AuthRoute {
                                 Auth0AuthHandler(
                                     JWTAuthProvider(JWTAuthenticator(audience, trustedIssuers, verifyCertificates)),
                                     mutableSetOf<String>().apply { addAll(requiredClaims) },
-                                )
+                                ),
                             )
                             .build()
                 }

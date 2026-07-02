@@ -71,7 +71,7 @@ import java.sql.Connection
 internal class NetworkServiceReader(
     databaseTables: NetworkDatabaseTables,
     connection: Connection,
-    override val reader: NetworkCimReader = NetworkCimReader()
+    override val reader: NetworkCimReader = NetworkCimReader(),
 ) : BaseServiceReader<NetworkService>(databaseTables, connection, reader) {
 
     override fun readService(service: NetworkService): Boolean =

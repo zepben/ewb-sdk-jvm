@@ -41,7 +41,7 @@ import java.util.concurrent.atomic.AtomicInteger
 class UpdateNetworkStateService(
     private val onSetCurrentStates: (batchId: Long, events: List<CurrentStateEvent>) -> CompletableFuture<SetCurrentStatesStatus>,
     private val onProcessingError: (Throwable) -> Unit = {},
-    private val timeout: Long = 60
+    private val timeout: Long = 60,
 ) : UpdateNetworkStateServiceGrpc.UpdateNetworkStateServiceImplBase() {
 
     init {

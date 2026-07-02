@@ -14,7 +14,7 @@ import java.util.*
  * A simple queue implementation for use with traversals.
  */
 internal class BasicQueue<T>(
-    private val queue: Queue<T>
+    private val queue: Queue<T>,
 ) : TraversalQueue<T> {
 
     override fun hasNext(): Boolean {

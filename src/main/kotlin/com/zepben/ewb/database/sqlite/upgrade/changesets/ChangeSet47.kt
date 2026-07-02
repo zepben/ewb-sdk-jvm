@@ -15,8 +15,8 @@ import com.zepben.ewb.database.sqlite.upgrade.ChangeSet
 internal fun changeSet47() = ChangeSet(
     47,
     listOf(
-        `Delete all reclose sequences`
-    )
+        `Delete all reclose sequences`,
+    ),
 )
 
 @Suppress("ObjectPropertyName")
@@ -26,5 +26,5 @@ private val `Delete all reclose sequences` = Change(
         "DROP INDEX IF EXISTS reclose_sequences_name;",
         "DROP TABLE IF EXISTS reclose_sequences;",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )

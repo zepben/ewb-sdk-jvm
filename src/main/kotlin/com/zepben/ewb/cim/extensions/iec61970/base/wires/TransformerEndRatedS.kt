@@ -20,5 +20,5 @@ import com.zepben.ewb.cim.extensions.ZBEX
 @ZBEX
 data class TransformerEndRatedS(
     @ZBEX val coolingType: TransformerCoolingType,
-    @ZBEX val ratedS: Int
+    @ZBEX val ratedS: Int,
 )

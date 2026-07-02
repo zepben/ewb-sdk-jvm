@@ -9,7 +9,6 @@
 package com.zepben.ewb.cim.iec61968.assetinfo
 
 import com.zepben.ewb.cim.extensions.ZBEX
-import com.zepben.ewb.cim.iec61968.assetinfo.WireInsulationKind.*
 
 /**
  * Kind of wire insulation.

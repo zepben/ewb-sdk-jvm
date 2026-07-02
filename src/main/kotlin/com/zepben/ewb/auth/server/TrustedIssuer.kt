@@ -13,7 +13,7 @@ import com.zepben.ewb.auth.client.fetchProviderDetails
 
 data class TrustedIssuer(
     val issuerDomain: String,
-    private val providerDetailsProvider: (String) -> ProviderDetails = { fetchProviderDetails(issuerDomain) }
+    private val providerDetailsProvider: (String) -> ProviderDetails = { fetchProviderDetails(issuerDomain) },
 ) {
 
     constructor(issuerDomain: String, providerDetails: ProviderDetails) : this(issuerDomain, { _ -> providerDetails })

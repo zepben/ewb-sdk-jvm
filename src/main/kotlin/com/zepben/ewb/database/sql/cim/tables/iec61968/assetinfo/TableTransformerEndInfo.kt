@@ -63,7 +63,7 @@ class TableTransformerEndInfo : TableAssetInfo() {
             listOf(ENERGISED_END_SHORT_CIRCUIT_TESTS),
             listOf(GROUNDED_END_SHORT_CIRCUIT_TESTS),
             listOf(OPEN_END_OPEN_CIRCUIT_TESTS),
-            listOf(ENERGISED_END_OPEN_CIRCUIT_TESTS)
+            listOf(ENERGISED_END_OPEN_CIRCUIT_TESTS),
         )
     }
 

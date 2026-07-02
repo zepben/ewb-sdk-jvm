@@ -18,7 +18,7 @@ import com.zepben.ewb.database.sql.metrics.tables.*
  * The collection of tables for our metrics databases.
  */
 class MetricsDatabaseTables internal constructor(
-    override val sqlGenerator: SqlGenerator = PostgresGenerator
+    override val sqlGenerator: SqlGenerator = PostgresGenerator,
 ) : BaseDatabaseTables() {
 
     override val includedTables: Sequence<SqlTable> =
@@ -27,7 +27,7 @@ class MetricsDatabaseTables internal constructor(
             TableJobs(),
             TableJobSources(),
             TableNetworkContainerMetrics(),
-            TableVariantMetrics()
+            TableVariantMetrics(),
         )
 
 }

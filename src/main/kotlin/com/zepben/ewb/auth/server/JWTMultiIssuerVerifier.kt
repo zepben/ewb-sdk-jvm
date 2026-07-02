@@ -20,7 +20,7 @@ class JWTMultiIssuerVerifierBuilder(
     private val requiredAudience: String,
     private val trustedIssuers: List<TrustedIssuer>,
     private val verifyCertificates: Boolean,
-    internal val jwkHolder: JWKHolder = JWKHolder(verifyCertificates)
+    internal val jwkHolder: JWKHolder = JWKHolder(verifyCertificates),
 ) {
     fun getVerifier(token: DecodedJWT): JWTVerifier {
         val issuer = trustedIssuers.firstOrNull { it.issuerDomain == token.issuer }

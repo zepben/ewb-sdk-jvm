@@ -9,7 +9,10 @@
 package com.zepben.ewb.cim.iec61970.base.wires
 
 import com.zepben.ewb.cim.iec61968.assetinfo.WireInfo
-import com.zepben.ewb.services.common.extensions.*
+import com.zepben.ewb.services.common.extensions.asUnmodifiable
+import com.zepben.ewb.services.common.extensions.getByMRID
+import com.zepben.ewb.services.common.extensions.safeRemove
+import com.zepben.ewb.services.common.extensions.validateReference
 
 /**
  * A wire or combination of wires, with consistent electrical characteristics, building a single electrical system, used to carry alternating current

@@ -53,59 +53,59 @@ import kotlin.reflect.KClass
 
 
 internal object AcLineSegmentToPerLengthImpedanceResolver : ReferenceResolver<AcLineSegment, PerLengthImpedance> by KReferenceResolver(
-    AcLineSegment::class, PerLengthImpedance::class, AcLineSegment::perLengthImpedance.setter
+    AcLineSegment::class, PerLengthImpedance::class, AcLineSegment::perLengthImpedance.setter,
 )
 
 internal object AcLineSegmentToCutResolver : ReferenceResolver<AcLineSegment, Cut> by KReferenceResolver(
-    AcLineSegment::class, Cut::class, AcLineSegment::addCut
+    AcLineSegment::class, Cut::class, AcLineSegment::addCut,
 )
 
 internal object AcLineSegmentToClampResolver : ReferenceResolver<AcLineSegment, Clamp> by KReferenceResolver(
-    AcLineSegment::class, Clamp::class, AcLineSegment::addClamp
+    AcLineSegment::class, Clamp::class, AcLineSegment::addClamp,
 )
 
 internal object CutToAcLineSegmentResolver : ReferenceResolver<Cut, AcLineSegment> by KReferenceResolver(
-    Cut::class, AcLineSegment::class, Cut::acLineSegment.setter
+    Cut::class, AcLineSegment::class, Cut::acLineSegment.setter,
 )
 
 internal object ClampToAcLineSegmentResolver : ReferenceResolver<Clamp, AcLineSegment> by KReferenceResolver(
-    Clamp::class, AcLineSegment::class, Clamp::acLineSegment.setter
+    Clamp::class, AcLineSegment::class, Clamp::acLineSegment.setter,
 )
 
 internal object AcLineSegmentToAcLineSegmentPhaseResolver : ReferenceResolver<AcLineSegment, AcLineSegmentPhase> by KReferenceResolver(
-    AcLineSegment::class, AcLineSegmentPhase::class, AcLineSegment::addPhase
+    AcLineSegment::class, AcLineSegmentPhase::class, AcLineSegment::addPhase,
 )
 
 internal object AcLineSegmentPhaseToAcLineSegmentResolver : ReferenceResolver<AcLineSegmentPhase, AcLineSegment> by KReferenceResolver(
-    AcLineSegmentPhase::class, AcLineSegment::class, AcLineSegmentPhase::acLineSegment.setter
+    AcLineSegmentPhase::class, AcLineSegment::class, AcLineSegmentPhase::acLineSegment.setter,
 )
 
 internal object AcLineSegmentPhaseToWireInfoResolver : ReferenceResolver<AcLineSegmentPhase, WireInfo> by KReferenceResolver(
-    AcLineSegmentPhase::class, WireInfo::class, AcLineSegmentPhase::assetInfo.setter
+    AcLineSegmentPhase::class, WireInfo::class, AcLineSegmentPhase::assetInfo.setter,
 )
 
 internal object AssetToAssetOrganisationRoleResolver : ReferenceResolver<Asset, AssetOrganisationRole> by KReferenceResolver(
-    Asset::class, AssetOrganisationRole::class, Asset::addOrganisationRole
+    Asset::class, AssetOrganisationRole::class, Asset::addOrganisationRole,
 )
 
 internal object AssetToLocationResolver : ReferenceResolver<Asset, Location> by KReferenceResolver(
-    Asset::class, Location::class, Asset::location.setter
+    Asset::class, Location::class, Asset::location.setter,
 )
 
 internal object PoleToStreetlightResolver : ReferenceResolver<Pole, Streetlight> by KReferenceResolver(
-    Pole::class, Streetlight::class, Pole::addStreetlight
+    Pole::class, Streetlight::class, Pole::addStreetlight,
 )
 
 internal object StreetlightToPoleResolver : ReferenceResolver<Streetlight, Pole> by KReferenceResolver(
-    Streetlight::class, Pole::class, Streetlight::pole.setter
+    Streetlight::class, Pole::class, Streetlight::pole.setter,
 )
 
 internal object AuxiliaryEquipmentToTerminalResolver : ReferenceResolver<AuxiliaryEquipment, Terminal> by KReferenceResolver(
-    AuxiliaryEquipment::class, Terminal::class, AuxiliaryEquipment::terminal.setter
+    AuxiliaryEquipment::class, Terminal::class, AuxiliaryEquipment::terminal.setter,
 )
 
 internal object ConductingEquipmentToBaseVoltageResolver : ReferenceResolver<ConductingEquipment, BaseVoltage> by KReferenceResolver(
-    ConductingEquipment::class, BaseVoltage::class, ConductingEquipment::baseVoltage.setter
+    ConductingEquipment::class, BaseVoltage::class, ConductingEquipment::baseVoltage.setter,
 )
 
 internal object ConductingEquipmentToTerminalsResolver : ReferenceResolver<ConductingEquipment, Terminal> by KReferenceResolver(
@@ -114,55 +114,56 @@ internal object ConductingEquipmentToTerminalsResolver : ReferenceResolver<Condu
     { ce, t ->
         t.conductingEquipment = ce
         ce.addTerminal(t)
-    })
+    },
+)
 
 internal object ConductorToWireInfoResolver : ReferenceResolver<Conductor, WireInfo> by KReferenceResolver(
-    Conductor::class, WireInfo::class, Conductor::assetInfo.setter
+    Conductor::class, WireInfo::class, Conductor::assetInfo.setter,
 )
 
 internal object CurrentTransformerToCurrentTransformerInfoResolver : ReferenceResolver<CurrentTransformer, CurrentTransformerInfo> by KReferenceResolver(
-    CurrentTransformer::class, CurrentTransformerInfo::class, CurrentTransformer::assetInfo.setter
+    CurrentTransformer::class, CurrentTransformerInfo::class, CurrentTransformer::assetInfo.setter,
 )
 
 internal object PotentialTransformerToPotentialTransformerInfoResolver :
     ReferenceResolver<PotentialTransformer, PotentialTransformerInfo> by KReferenceResolver(
-        PotentialTransformer::class, PotentialTransformerInfo::class, PotentialTransformer::assetInfo.setter
+        PotentialTransformer::class, PotentialTransformerInfo::class, PotentialTransformer::assetInfo.setter,
     )
 
 internal object PowerTransformerToPowerTransformerInfoResolver : ReferenceResolver<PowerTransformer, PowerTransformerInfo> by KReferenceResolver(
-    PowerTransformer::class, PowerTransformerInfo::class, PowerTransformer::assetInfo.setter
+    PowerTransformer::class, PowerTransformerInfo::class, PowerTransformer::assetInfo.setter,
 )
 
 internal object ShuntCompensatorToShuntCompensatorInfoResolver : ReferenceResolver<ShuntCompensator, ShuntCompensatorInfo> by KReferenceResolver(
-    ShuntCompensator::class, ShuntCompensatorInfo::class, ShuntCompensator::assetInfo.setter
+    ShuntCompensator::class, ShuntCompensatorInfo::class, ShuntCompensator::assetInfo.setter,
 )
 
 internal object ShuntCompensatorToTerminalResolver : ReferenceResolver<ShuntCompensator, Terminal> by KReferenceResolver(
-    ShuntCompensator::class, Terminal::class, ShuntCompensator::groundingTerminal.setter
+    ShuntCompensator::class, Terminal::class, ShuntCompensator::groundingTerminal.setter,
 )
 
 internal object SwitchToSwitchInfoResolver : ReferenceResolver<Switch, SwitchInfo> by KReferenceResolver(
-    Switch::class, SwitchInfo::class, Switch::assetInfo.setter
+    Switch::class, SwitchInfo::class, Switch::assetInfo.setter,
 )
 
 internal object ConnectivityNodeToTerminalResolver : ReferenceResolver<ConnectivityNode, Terminal> by KReferenceResolver(
-    ConnectivityNode::class, Terminal::class, ConnectivityNode::addTerminal
+    ConnectivityNode::class, Terminal::class, ConnectivityNode::addTerminal,
 )
 
 internal object ControlToRemoteControlResolver : ReferenceResolver<Control, RemoteControl> by KReferenceResolver(
-    Control::class, RemoteControl::class, Control::remoteControl.setter
+    Control::class, RemoteControl::class, Control::remoteControl.setter,
 )
 
 internal object CustomerToCustomerAgreementResolver : ReferenceResolver<Customer, CustomerAgreement> by KReferenceResolver(
-    Customer::class, CustomerAgreement::class, Customer::addAgreement
+    Customer::class, CustomerAgreement::class, Customer::addAgreement,
 )
 
 internal object CustomerAgreementToCustomerResolver : ReferenceResolver<CustomerAgreement, Customer> by KReferenceResolver(
-    CustomerAgreement::class, Customer::class, CustomerAgreement::customer.setter
+    CustomerAgreement::class, Customer::class, CustomerAgreement::customer.setter,
 )
 
 internal object CustomerAgreementToPricingStructureResolver : ReferenceResolver<CustomerAgreement, PricingStructure> by KReferenceResolver(
-    CustomerAgreement::class, PricingStructure::class, CustomerAgreement::addPricingStructure
+    CustomerAgreement::class, PricingStructure::class, CustomerAgreement::addPricingStructure,
 )
 
 internal object DiagramToDiagramObjectResolver : ReferenceResolver<Diagram, DiagramObject> by KReferenceResolver(
@@ -170,102 +171,103 @@ internal object DiagramToDiagramObjectResolver : ReferenceResolver<Diagram, Diag
     { diagram, diagramObject ->
         diagramObject.diagram = diagram
         diagram.addDiagramObject(diagramObject)
-    })
+    },
+)
 
 internal object DiagramObjectToDiagramResolver : ReferenceResolver<DiagramObject, Diagram> by KReferenceResolver(
-    DiagramObject::class, Diagram::class, DiagramObject::diagram.setter
+    DiagramObject::class, Diagram::class, DiagramObject::diagram.setter,
 )
 
 internal object EndDeviceToUsagePointResolver : ReferenceResolver<EndDevice, UsagePoint> by KReferenceResolver(
-    EndDevice::class, UsagePoint::class, EndDevice::addUsagePoint
+    EndDevice::class, UsagePoint::class, EndDevice::addUsagePoint,
 )
 
 internal object EndDeviceToServiceLocationResolver : ReferenceResolver<EndDevice, Location> by KReferenceResolver(
-    EndDevice::class, Location::class, EndDevice::serviceLocation.setter
+    EndDevice::class, Location::class, EndDevice::serviceLocation.setter,
 )
 
 internal object EnergyConsumerToEnergyConsumerPhaseResolver : ReferenceResolver<EnergyConsumer, EnergyConsumerPhase> by KReferenceResolver(
-    EnergyConsumer::class, EnergyConsumerPhase::class, EnergyConsumer::addPhase
+    EnergyConsumer::class, EnergyConsumerPhase::class, EnergyConsumer::addPhase,
 )
 
 internal object EnergyConsumerPhaseToEnergyConsumerResolver : ReferenceResolver<EnergyConsumerPhase, EnergyConsumer> by KReferenceResolver(
-    EnergyConsumerPhase::class, EnergyConsumer::class, EnergyConsumerPhase::energyConsumer.setter
+    EnergyConsumerPhase::class, EnergyConsumer::class, EnergyConsumerPhase::energyConsumer.setter,
 )
 
 internal object EnergySourceToEnergySourcePhaseResolver : ReferenceResolver<EnergySource, EnergySourcePhase> by KReferenceResolver(
-    EnergySource::class, EnergySourcePhase::class, EnergySource::addPhase
+    EnergySource::class, EnergySourcePhase::class, EnergySource::addPhase,
 )
 
 internal object EnergySourcePhaseToEnergySourceResolver : ReferenceResolver<EnergySourcePhase, EnergySource> by KReferenceResolver(
-    EnergySourcePhase::class, EnergySource::class, EnergySourcePhase::energySource.setter
+    EnergySourcePhase::class, EnergySource::class, EnergySourcePhase::energySource.setter,
 )
 
 internal object EquipmentToCurrentContainersResolver : ReferenceResolver<Equipment, EquipmentContainer> by KReferenceResolver(
-    Equipment::class, EquipmentContainer::class, Equipment::addCurrentContainer
+    Equipment::class, EquipmentContainer::class, Equipment::addCurrentContainer,
 )
 
 internal object EquipmentToEquipmentContainerResolver : ReferenceResolver<Equipment, EquipmentContainer> by KReferenceResolver(
-    Equipment::class, EquipmentContainer::class, Equipment::addContainer
+    Equipment::class, EquipmentContainer::class, Equipment::addContainer,
 )
 
 internal object EquipmentToOperationalRestrictionResolver : ReferenceResolver<Equipment, OperationalRestriction> by KReferenceResolver(
-    Equipment::class, OperationalRestriction::class, Equipment::addOperationalRestriction
+    Equipment::class, OperationalRestriction::class, Equipment::addOperationalRestriction,
 )
 
 internal object EquipmentToUsagePointResolver : ReferenceResolver<Equipment, UsagePoint> by KReferenceResolver(
-    Equipment::class, UsagePoint::class, Equipment::addUsagePoint
+    Equipment::class, UsagePoint::class, Equipment::addUsagePoint,
 )
 
 internal object EquipmentContainerToEquipmentResolver : ReferenceResolver<EquipmentContainer, Equipment> by KReferenceResolver(
-    EquipmentContainer::class, Equipment::class, EquipmentContainer::addEquipment
+    EquipmentContainer::class, Equipment::class, EquipmentContainer::addEquipment,
 )
 
 internal object EquipmentContainerToCurrentEquipmentResolver : ReferenceResolver<EquipmentContainer, Equipment> by KReferenceResolver(
-    EquipmentContainer::class, Equipment::class, EquipmentContainer::addCurrentEquipment
+    EquipmentContainer::class, Equipment::class, EquipmentContainer::addCurrentEquipment,
 )
 
 internal object FeederToNormalEnergizingSubstationResolver : ReferenceResolver<Feeder, Substation> by KReferenceResolver(
-    Feeder::class, Substation::class, Feeder::normalEnergizingSubstation.setter
+    Feeder::class, Substation::class, Feeder::normalEnergizingSubstation.setter,
 )
 
 internal object FeederToNormalHeadTerminalResolver : ReferenceResolver<Feeder, Terminal> by KReferenceResolver(
-    Feeder::class, Terminal::class, Feeder::normalHeadTerminal.setter
+    Feeder::class, Terminal::class, Feeder::normalHeadTerminal.setter,
 )
 
 internal object FeederToNormalEnergizedLvFeedersResolver : ReferenceResolver<Feeder, LvFeeder> by KReferenceResolver(
-    Feeder::class, LvFeeder::class, Feeder::addNormalEnergizedLvFeeder
+    Feeder::class, LvFeeder::class, Feeder::addNormalEnergizedLvFeeder,
 )
 
 internal object FeederToCurrentEnergizedLvFeedersResolver : ReferenceResolver<Feeder, LvFeeder> by KReferenceResolver(
-    Feeder::class, LvFeeder::class, Feeder::addCurrentEnergizedLvFeeder
+    Feeder::class, LvFeeder::class, Feeder::addCurrentEnergizedLvFeeder,
 )
 
 internal object LvSubstationToNormalEnergizedLvFeedersResolver : ReferenceResolver<LvSubstation, LvFeeder> by KReferenceResolver(
-    LvSubstation::class, LvFeeder::class, LvSubstation::addNormalEnergizedLvFeeder
+    LvSubstation::class, LvFeeder::class, LvSubstation::addNormalEnergizedLvFeeder,
 )
 
 internal object LvFeederToNormalEnergizingLvSubstationsResolver : ReferenceResolver<LvFeeder, LvSubstation> by KReferenceResolver(
-    LvFeeder::class, LvSubstation::class, LvFeeder::normalEnergizingLvSubstation.setter
+    LvFeeder::class, LvSubstation::class, LvFeeder::normalEnergizingLvSubstation.setter,
 )
 
 internal object GeographicalRegionToSubGeographicalRegionResolver : ReferenceResolver<GeographicalRegion, SubGeographicalRegion> by KReferenceResolver(
-    GeographicalRegion::class, SubGeographicalRegion::class, GeographicalRegion::addSubGeographicalRegion
+    GeographicalRegion::class, SubGeographicalRegion::class, GeographicalRegion::addSubGeographicalRegion,
 )
 
 internal object MeasurementToRemoteSourceResolver : ReferenceResolver<Measurement, RemoteSource> by KReferenceResolver(
-    Measurement::class, RemoteSource::class, Measurement::remoteSource.setter
+    Measurement::class, RemoteSource::class, Measurement::remoteSource.setter,
 )
 
 internal object OperationalRestrictionToEquipmentResolver : ReferenceResolver<OperationalRestriction, Equipment> by KReferenceResolver(
-    OperationalRestriction::class, Equipment::class, OperationalRestriction::addEquipment
+    OperationalRestriction::class, Equipment::class, OperationalRestriction::addEquipment,
 )
 
 internal object OrganisationRoleToOrganisationResolver : ReferenceResolver<OrganisationRole, Organisation> by KReferenceResolver(
-    OrganisationRole::class, Organisation::class, OrganisationRole::organisation.setter
+    OrganisationRole::class, Organisation::class, OrganisationRole::organisation.setter,
 )
 
 internal object PowerSystemResourceToLocationResolver : ReferenceResolver<PowerSystemResource, Location> by KReferenceResolver(
-    PowerSystemResource::class, Location::class, PowerSystemResource::location.setter
+    PowerSystemResource::class, Location::class, PowerSystemResource::location.setter,
 )
 
 internal object PowerTransformerToPowerTransformerEndResolver : ReferenceResolver<PowerTransformer, PowerTransformerEnd> by KReferenceResolver(
@@ -274,284 +276,285 @@ internal object PowerTransformerToPowerTransformerEndResolver : ReferenceResolve
     { pt, pte ->
         pte.powerTransformer = pt
         pt.addEnd(pte)
-    })
+    },
+)
 
 internal object PowerTransformerEndToPowerTransformerResolver : ReferenceResolver<PowerTransformerEnd, PowerTransformer> by KReferenceResolver(
-    PowerTransformerEnd::class, PowerTransformer::class, PowerTransformerEnd::powerTransformer.setter
+    PowerTransformerEnd::class, PowerTransformer::class, PowerTransformerEnd::powerTransformer.setter,
 )
 
 internal object PricingStructureToTariffResolver : ReferenceResolver<PricingStructure, Tariff> by KReferenceResolver(
-    PricingStructure::class, Tariff::class, PricingStructure::addTariff
+    PricingStructure::class, Tariff::class, PricingStructure::addTariff,
 )
 
 internal object RatioTapChangerToTransformerEndResolver : ReferenceResolver<RatioTapChanger, TransformerEnd> by KReferenceResolver(
-    RatioTapChanger::class, TransformerEnd::class, RatioTapChanger::transformerEnd.setter
+    RatioTapChanger::class, TransformerEnd::class, RatioTapChanger::transformerEnd.setter,
 )
 
 internal object RegulatingCondEqToRegulatingControlResolver : ReferenceResolver<RegulatingCondEq, RegulatingControl> by KReferenceResolver(
-    RegulatingCondEq::class, RegulatingControl::class, RegulatingCondEq::regulatingControl.setter
+    RegulatingCondEq::class, RegulatingControl::class, RegulatingCondEq::regulatingControl.setter,
 )
 
 internal object RegulatingControlToTerminalResolver : ReferenceResolver<RegulatingControl, Terminal> by KReferenceResolver(
-    RegulatingControl::class, Terminal::class, RegulatingControl::terminal.setter
+    RegulatingControl::class, Terminal::class, RegulatingControl::terminal.setter,
 )
 
 internal object RegulatingControlToRegulatingCondEqResolver : ReferenceResolver<RegulatingControl, RegulatingCondEq> by KReferenceResolver(
-    RegulatingControl::class, RegulatingCondEq::class, RegulatingControl::addRegulatingCondEq
+    RegulatingControl::class, RegulatingCondEq::class, RegulatingControl::addRegulatingCondEq,
 )
 
 internal object RemoteControlToControlResolver : ReferenceResolver<RemoteControl, Control> by KReferenceResolver(
-    RemoteControl::class, Control::class, RemoteControl::control.setter
+    RemoteControl::class, Control::class, RemoteControl::control.setter,
 )
 
 internal object RemoteSourceToMeasurementResolver : ReferenceResolver<RemoteSource, Measurement> by KReferenceResolver(
-    RemoteSource::class, Measurement::class, RemoteSource::measurement.setter
+    RemoteSource::class, Measurement::class, RemoteSource::measurement.setter,
 )
 
 internal object SubGeographicalRegionToGeographicalRegionResolver : ReferenceResolver<SubGeographicalRegion, GeographicalRegion> by KReferenceResolver(
-    SubGeographicalRegion::class, GeographicalRegion::class, SubGeographicalRegion::geographicalRegion.setter
+    SubGeographicalRegion::class, GeographicalRegion::class, SubGeographicalRegion::geographicalRegion.setter,
 )
 
 internal object SubGeographicalRegionToSubstationResolver : ReferenceResolver<SubGeographicalRegion, Substation> by KReferenceResolver(
-    SubGeographicalRegion::class, Substation::class, SubGeographicalRegion::addSubstation
+    SubGeographicalRegion::class, Substation::class, SubGeographicalRegion::addSubstation,
 )
 
 internal object SubstationToNormalEnergizedFeedersResolver : ReferenceResolver<Substation, Feeder> by KReferenceResolver(
-    Substation::class, Feeder::class, Substation::addFeeder
+    Substation::class, Feeder::class, Substation::addFeeder,
 )
 
 internal object SubstationToSubGeographicalRegionResolver : ReferenceResolver<Substation, SubGeographicalRegion> by KReferenceResolver(
-    Substation::class, SubGeographicalRegion::class, Substation::subGeographicalRegion.setter
+    Substation::class, SubGeographicalRegion::class, Substation::subGeographicalRegion.setter,
 )
 
 internal object SubstationToCircuitResolver : ReferenceResolver<Substation, Circuit> by KReferenceResolver(
-    Substation::class, Circuit::class, Substation::addCircuit
+    Substation::class, Circuit::class, Substation::addCircuit,
 )
 
 internal object SubstationToLoopResolver : ReferenceResolver<Substation, Loop> by KReferenceResolver(
-    Substation::class, Loop::class, Substation::addLoop
+    Substation::class, Loop::class, Substation::addLoop,
 )
 
 internal object SubstationToEnergizedLoopResolver : ReferenceResolver<Substation, Loop> by KReferenceResolver(
-    Substation::class, Loop::class, Substation::addEnergizedLoop
+    Substation::class, Loop::class, Substation::addEnergizedLoop,
 )
 
 internal object TerminalToConductingEquipmentResolver : ReferenceResolver<Terminal, ConductingEquipment> by KReferenceResolver(
-    Terminal::class, ConductingEquipment::class, Terminal::conductingEquipment.setter
+    Terminal::class, ConductingEquipment::class, Terminal::conductingEquipment.setter,
 )
 
 internal object TerminalToConnectivityNodeResolver : ReferenceResolver<Terminal, ConnectivityNode> by KReferenceResolver(
-    Terminal::class, ConnectivityNode::class, Terminal::connectivityNode.setter
+    Terminal::class, ConnectivityNode::class, Terminal::connectivityNode.setter,
 )
 
 internal object TransformerEndToTerminalResolver : ReferenceResolver<TransformerEnd, Terminal> by KReferenceResolver(
-    TransformerEnd::class, Terminal::class, TransformerEnd::terminal.setter
+    TransformerEnd::class, Terminal::class, TransformerEnd::terminal.setter,
 )
 
 internal object TransformerEndToBaseVoltageResolver : ReferenceResolver<TransformerEnd, BaseVoltage> by KReferenceResolver(
-    TransformerEnd::class, BaseVoltage::class, TransformerEnd::baseVoltage.setter
+    TransformerEnd::class, BaseVoltage::class, TransformerEnd::baseVoltage.setter,
 )
 
 internal object TransformerEndToRatioTapChangerResolver : ReferenceResolver<TransformerEnd, RatioTapChanger> by KReferenceResolver(
-    TransformerEnd::class, RatioTapChanger::class, TransformerEnd::ratioTapChanger.setter
+    TransformerEnd::class, RatioTapChanger::class, TransformerEnd::ratioTapChanger.setter,
 )
 
 internal object UsagePointToEndDeviceResolver : ReferenceResolver<UsagePoint, EndDevice> by KReferenceResolver(
-    UsagePoint::class, EndDevice::class, UsagePoint::addEndDevice
+    UsagePoint::class, EndDevice::class, UsagePoint::addEndDevice,
 )
 
 internal object UsagePointToEquipmentResolver : ReferenceResolver<UsagePoint, Equipment> by KReferenceResolver(
-    UsagePoint::class, Equipment::class, UsagePoint::addEquipment
+    UsagePoint::class, Equipment::class, UsagePoint::addEquipment,
 )
 
 internal object UsagePointToLocationResolver : ReferenceResolver<UsagePoint, Location> by KReferenceResolver(
-    UsagePoint::class, Location::class, UsagePoint::usagePointLocation.setter
+    UsagePoint::class, Location::class, UsagePoint::usagePointLocation.setter,
 )
 
 internal object CircuitToTerminalResolver : ReferenceResolver<Circuit, Terminal> by KReferenceResolver(
-    Circuit::class, Terminal::class, Circuit::addEndTerminal
+    Circuit::class, Terminal::class, Circuit::addEndTerminal,
 )
 
 internal object CircuitToLoopResolver : ReferenceResolver<Circuit, Loop> by KReferenceResolver(
-    Circuit::class, Loop::class, Circuit::loop.setter
+    Circuit::class, Loop::class, Circuit::loop.setter,
 )
 
 internal object CircuitToSubstationResolver : ReferenceResolver<Circuit, Substation> by KReferenceResolver(
-    Circuit::class, Substation::class, Circuit::addEndSubstation
+    Circuit::class, Substation::class, Circuit::addEndSubstation,
 )
 
 internal object LoopToCircuitResolver : ReferenceResolver<Loop, Circuit> by KReferenceResolver(
-    Loop::class, Circuit::class, Loop::addCircuit
+    Loop::class, Circuit::class, Loop::addCircuit,
 )
 
 internal object LoopToSubstationResolver : ReferenceResolver<Loop, Substation> by KReferenceResolver(
-    Loop::class, Substation::class, Loop::addSubstation
+    Loop::class, Substation::class, Loop::addSubstation,
 )
 
 internal object LoopToEnergizingSubstationResolver : ReferenceResolver<Loop, Substation> by KReferenceResolver(
-    Loop::class, Substation::class, Loop::addEnergizingSubstation
+    Loop::class, Substation::class, Loop::addEnergizingSubstation,
 )
 
 internal object LvFeederToNormalHeadTerminalResolver : ReferenceResolver<LvFeeder, Terminal> by KReferenceResolver(
-    LvFeeder::class, Terminal::class, LvFeeder::normalHeadTerminal.setter
+    LvFeeder::class, Terminal::class, LvFeeder::normalHeadTerminal.setter,
 )
 
 internal object LvFeederToNormalEnergizingFeedersResolver : ReferenceResolver<LvFeeder, Feeder> by KReferenceResolver(
-    LvFeeder::class, Feeder::class, LvFeeder::addNormalEnergizingFeeder
+    LvFeeder::class, Feeder::class, LvFeeder::addNormalEnergizingFeeder,
 )
 
 internal object LvFeederToCurrentEnergizingFeedersResolver : ReferenceResolver<LvFeeder, Feeder> by KReferenceResolver(
-    LvFeeder::class, Feeder::class, LvFeeder::addCurrentEnergizingFeeder
+    LvFeeder::class, Feeder::class, LvFeeder::addCurrentEnergizingFeeder,
 )
 
 internal object LvSubstationToNormalEnergizingFeedersResolver : ReferenceResolver<LvSubstation, Feeder> by KReferenceResolver(
-    LvSubstation::class, Feeder::class, LvSubstation::addNormalEnergizingFeeder
+    LvSubstation::class, Feeder::class, LvSubstation::addNormalEnergizingFeeder,
 )
 
 internal object LvSubstationToCurrentEnergizingFeedersResolver : ReferenceResolver<LvSubstation, Feeder> by KReferenceResolver(
-    LvSubstation::class, Feeder::class, LvSubstation::addCurrentEnergizingFeeder
+    LvSubstation::class, Feeder::class, LvSubstation::addCurrentEnergizingFeeder,
 )
 
 internal object FeederToNormalEnergizedLvSubstationsResolver : ReferenceResolver<Feeder, LvSubstation> by KReferenceResolver(
-    Feeder::class, LvSubstation::class, Feeder::addNormalEnergizedLvSubstation
+    Feeder::class, LvSubstation::class, Feeder::addNormalEnergizedLvSubstation,
 )
 
 internal object FeederToCurrentEnergizedLvSubstationsResolver : ReferenceResolver<Feeder, LvSubstation> by KReferenceResolver(
-    Feeder::class, LvSubstation::class, Feeder::addCurrentEnergizedLvSubstation
+    Feeder::class, LvSubstation::class, Feeder::addCurrentEnergizedLvSubstation,
 )
 
 internal object PowerElectronicsConnectionToPowerElectronicsConnectionPhaseResolver :
     ReferenceResolver<PowerElectronicsConnection, PowerElectronicsConnectionPhase> by KReferenceResolver(
-        PowerElectronicsConnection::class, PowerElectronicsConnectionPhase::class, PowerElectronicsConnection::addPhase
+        PowerElectronicsConnection::class, PowerElectronicsConnectionPhase::class, PowerElectronicsConnection::addPhase,
     )
 
 internal object PowerElectronicsConnectionPhaseToPowerElectronicsConnectionResolver :
     ReferenceResolver<PowerElectronicsConnectionPhase, PowerElectronicsConnection> by KReferenceResolver(
-        PowerElectronicsConnectionPhase::class, PowerElectronicsConnection::class, PowerElectronicsConnectionPhase::powerElectronicsConnection.setter
+        PowerElectronicsConnectionPhase::class, PowerElectronicsConnection::class, PowerElectronicsConnectionPhase::powerElectronicsConnection.setter,
     )
 
 internal object PowerElectronicsConnectionToPowerElectronicsUnitResolver :
     ReferenceResolver<PowerElectronicsConnection, PowerElectronicsUnit> by KReferenceResolver(
-        PowerElectronicsConnection::class, PowerElectronicsUnit::class, PowerElectronicsConnection::addUnit
+        PowerElectronicsConnection::class, PowerElectronicsUnit::class, PowerElectronicsConnection::addUnit,
     )
 
 internal object PowerElectronicsUnitToPowerElectronicsConnectionResolver :
     ReferenceResolver<PowerElectronicsUnit, PowerElectronicsConnection> by KReferenceResolver(
-        PowerElectronicsUnit::class, PowerElectronicsConnection::class, PowerElectronicsUnit::powerElectronicsConnection.setter
+        PowerElectronicsUnit::class, PowerElectronicsConnection::class, PowerElectronicsUnit::powerElectronicsConnection.setter,
     )
 
 internal object TapChangerToTapChangerControlResolver : ReferenceResolver<TapChanger, TapChangerControl> by KReferenceResolver(
-    TapChanger::class, TapChangerControl::class, TapChanger::tapChangerControl.setter
+    TapChanger::class, TapChangerControl::class, TapChanger::tapChangerControl.setter,
 )
 
 internal object TransformerEndToTransformerStarImpedanceResolver : ReferenceResolver<TransformerEnd, TransformerStarImpedance> by KReferenceResolver(
-    TransformerEnd::class, TransformerStarImpedance::class, TransformerEnd::starImpedance.setter
+    TransformerEnd::class, TransformerStarImpedance::class, TransformerEnd::starImpedance.setter,
 )
 
 internal object PowerTransformerInfoToTransformerTankInfoResolver : ReferenceResolver<PowerTransformerInfo, TransformerTankInfo> by KReferenceResolver(
-    PowerTransformerInfo::class, TransformerTankInfo::class, PowerTransformerInfo::addTransformerTankInfo
+    PowerTransformerInfo::class, TransformerTankInfo::class, PowerTransformerInfo::addTransformerTankInfo,
 )
 
 internal object TransformerTankInfoToPowerTransformerInfoResolver : ReferenceResolver<TransformerTankInfo, PowerTransformerInfo> by KReferenceResolver(
-    TransformerTankInfo::class, PowerTransformerInfo::class, TransformerTankInfo::powerTransformerInfo.setter
+    TransformerTankInfo::class, PowerTransformerInfo::class, TransformerTankInfo::powerTransformerInfo.setter,
 )
 
 internal object TransformerTankInfoToTransformerEndInfoResolver : ReferenceResolver<TransformerTankInfo, TransformerEndInfo> by KReferenceResolver(
-    TransformerTankInfo::class, TransformerEndInfo::class, TransformerTankInfo::addTransformerEndInfo
+    TransformerTankInfo::class, TransformerEndInfo::class, TransformerTankInfo::addTransformerEndInfo,
 )
 
 internal object TransformerEndInfoToTransformerTankInfoResolver : ReferenceResolver<TransformerEndInfo, TransformerTankInfo> by KReferenceResolver(
-    TransformerEndInfo::class, TransformerTankInfo::class, TransformerEndInfo::transformerTankInfo.setter
+    TransformerEndInfo::class, TransformerTankInfo::class, TransformerEndInfo::transformerTankInfo.setter,
 )
 
 internal object TransformerEndInfoToTransformerStarImpedanceResolver : ReferenceResolver<TransformerEndInfo, TransformerStarImpedance> by KReferenceResolver(
-    TransformerEndInfo::class, TransformerStarImpedance::class, TransformerEndInfo::transformerStarImpedance.setter
+    TransformerEndInfo::class, TransformerStarImpedance::class, TransformerEndInfo::transformerStarImpedance.setter,
 )
 
 internal object TransformerStarImpedanceToTransformerEndInfoResolver : ReferenceResolver<TransformerStarImpedance, TransformerEndInfo> by KReferenceResolver(
-    TransformerStarImpedance::class, TransformerEndInfo::class, TransformerStarImpedance::transformerEndInfo.setter
+    TransformerStarImpedance::class, TransformerEndInfo::class, TransformerStarImpedance::transformerEndInfo.setter,
 )
 
 internal object TransformerEndInfoToNoLoadTestResolver : ReferenceResolver<TransformerEndInfo, NoLoadTest> by KReferenceResolver(
-    TransformerEndInfo::class, NoLoadTest::class, TransformerEndInfo::energisedEndNoLoadTests.setter
+    TransformerEndInfo::class, NoLoadTest::class, TransformerEndInfo::energisedEndNoLoadTests.setter,
 )
 
 internal object TransformerEndInfoToEnergisedEndShortCircuitTestResolver : ReferenceResolver<TransformerEndInfo, ShortCircuitTest> by KReferenceResolver(
-    TransformerEndInfo::class, ShortCircuitTest::class, TransformerEndInfo::energisedEndShortCircuitTests.setter
+    TransformerEndInfo::class, ShortCircuitTest::class, TransformerEndInfo::energisedEndShortCircuitTests.setter,
 )
 
 internal object TransformerEndInfoToGroundedEndShortCircuitTestResolver : ReferenceResolver<TransformerEndInfo, ShortCircuitTest> by KReferenceResolver(
-    TransformerEndInfo::class, ShortCircuitTest::class, TransformerEndInfo::groundedEndShortCircuitTests.setter
+    TransformerEndInfo::class, ShortCircuitTest::class, TransformerEndInfo::groundedEndShortCircuitTests.setter,
 )
 
 internal object TransformerEndInfoToOpenEndOpenCircuitTestResolver : ReferenceResolver<TransformerEndInfo, OpenCircuitTest> by KReferenceResolver(
-    TransformerEndInfo::class, OpenCircuitTest::class, TransformerEndInfo::openEndOpenCircuitTests.setter
+    TransformerEndInfo::class, OpenCircuitTest::class, TransformerEndInfo::openEndOpenCircuitTests.setter,
 )
 
 internal object TransformerEndInfoToEnergisedEndOpenCircuitTestResolver : ReferenceResolver<TransformerEndInfo, OpenCircuitTest> by KReferenceResolver(
-    TransformerEndInfo::class, OpenCircuitTest::class, TransformerEndInfo::energisedEndOpenCircuitTests.setter
+    TransformerEndInfo::class, OpenCircuitTest::class, TransformerEndInfo::energisedEndOpenCircuitTests.setter,
 )
 
 internal object ProtectionRelayFunctionToProtectedSwitchResolver : ReferenceResolver<ProtectionRelayFunction, ProtectedSwitch> by KReferenceResolver(
-    ProtectionRelayFunction::class, ProtectedSwitch::class, ProtectionRelayFunction::addProtectedSwitch
+    ProtectionRelayFunction::class, ProtectedSwitch::class, ProtectionRelayFunction::addProtectedSwitch,
 )
 
 internal object ProtectedSwitchToProtectionRelayFunctionResolver : ReferenceResolver<ProtectedSwitch, ProtectionRelayFunction> by KReferenceResolver(
-    ProtectedSwitch::class, ProtectionRelayFunction::class, ProtectedSwitch::addRelayFunction
+    ProtectedSwitch::class, ProtectionRelayFunction::class, ProtectedSwitch::addRelayFunction,
 )
 
 internal object ProtectionRelayFunctionToSensorResolver : ReferenceResolver<ProtectionRelayFunction, Sensor> by KReferenceResolver(
-    ProtectionRelayFunction::class, Sensor::class, ProtectionRelayFunction::addSensor
+    ProtectionRelayFunction::class, Sensor::class, ProtectionRelayFunction::addSensor,
 )
 
 internal object SensorToProtectionRelayFunctionResolver : ReferenceResolver<Sensor, ProtectionRelayFunction> by KReferenceResolver(
-    Sensor::class, ProtectionRelayFunction::class, Sensor::addRelayFunction
+    Sensor::class, ProtectionRelayFunction::class, Sensor::addRelayFunction,
 )
 
 internal object ProtectionRelayFunctionToProtectionRelaySchemeResolver :
     ReferenceResolver<ProtectionRelayFunction, ProtectionRelayScheme> by KReferenceResolver(
-        ProtectionRelayFunction::class, ProtectionRelayScheme::class, ProtectionRelayFunction::addScheme
+        ProtectionRelayFunction::class, ProtectionRelayScheme::class, ProtectionRelayFunction::addScheme,
     )
 
 internal object ProtectionRelaySchemeToProtectionRelayFunctionResolver :
     ReferenceResolver<ProtectionRelayScheme, ProtectionRelayFunction> by KReferenceResolver(
-        ProtectionRelayScheme::class, ProtectionRelayFunction::class, ProtectionRelayScheme::addFunction
+        ProtectionRelayScheme::class, ProtectionRelayFunction::class, ProtectionRelayScheme::addFunction,
     )
 
 internal object ProtectionRelaySchemeToProtectionRelaySystemResolver : ReferenceResolver<ProtectionRelayScheme, ProtectionRelaySystem> by KReferenceResolver(
-    ProtectionRelayScheme::class, ProtectionRelaySystem::class, ProtectionRelayScheme::system.setter
+    ProtectionRelayScheme::class, ProtectionRelaySystem::class, ProtectionRelayScheme::system.setter,
 )
 
 internal object ProtectionRelaySystemToProtectionRelaySchemeResolver : ReferenceResolver<ProtectionRelaySystem, ProtectionRelayScheme> by KReferenceResolver(
-    ProtectionRelaySystem::class, ProtectionRelayScheme::class, ProtectionRelaySystem::addScheme
+    ProtectionRelaySystem::class, ProtectionRelayScheme::class, ProtectionRelaySystem::addScheme,
 )
 
 internal object FuseToProtectionRelayFunctionResolver : ReferenceResolver<Fuse, ProtectionRelayFunction> by KReferenceResolver(
-    Fuse::class, ProtectionRelayFunction::class, Fuse::function.setter
+    Fuse::class, ProtectionRelayFunction::class, Fuse::function.setter,
 )
 
 internal object ProtectionRelayFunctionToRelayInfoResolver : ReferenceResolver<ProtectionRelayFunction, RelayInfo> by KReferenceResolver(
-    ProtectionRelayFunction::class, RelayInfo::class, ProtectionRelayFunction::assetInfo.setter
+    ProtectionRelayFunction::class, RelayInfo::class, ProtectionRelayFunction::assetInfo.setter,
 )
 
 internal object SynchronousMachineToReactiveCapabilityCurveResolver : ReferenceResolver<SynchronousMachine, ReactiveCapabilityCurve> by KReferenceResolver(
-    SynchronousMachine::class, ReactiveCapabilityCurve::class, SynchronousMachine::addCurve
+    SynchronousMachine::class, ReactiveCapabilityCurve::class, SynchronousMachine::addCurve,
 )
 
 internal object BatteryUnitToBatteryControlResolver : ReferenceResolver<BatteryUnit, BatteryControl> by KReferenceResolver(
-    BatteryUnit::class, BatteryControl::class, BatteryUnit::addControl
+    BatteryUnit::class, BatteryControl::class, BatteryUnit::addControl,
 )
 
 internal object EndDeviceToEndDeviceFunctionResolver : ReferenceResolver<EndDevice, EndDeviceFunction> by KReferenceResolver(
-    EndDevice::class, EndDeviceFunction::class, EndDevice::addFunction
+    EndDevice::class, EndDeviceFunction::class, EndDevice::addFunction,
 )
 
 internal object AssetToPowerSystemResourceResolver : ReferenceResolver<Asset, PowerSystemResource> by KReferenceResolver(
-    Asset::class, PowerSystemResource::class, Asset::addPowerSystemResource
+    Asset::class, PowerSystemResource::class, Asset::addPowerSystemResource,
 )
 
 internal object PowerSystemResourceToAssetResolver : ReferenceResolver<PowerSystemResource, Asset> by KReferenceResolver(
-    PowerSystemResource::class, Asset::class, PowerSystemResource::addAsset
+    PowerSystemResource::class, Asset::class, PowerSystemResource::addAsset,
 )
 
 //-------------------------------------------//
@@ -559,7 +562,7 @@ internal object PowerSystemResourceToAssetResolver : ReferenceResolver<PowerSyst
 class KReferenceResolver<T : Identifiable, R : Identifiable>(
     private val fromKClass: KClass<T>,
     private val toKClass: KClass<R>,
-    private val resolveFun: (T, R) -> Unit
+    private val resolveFun: (T, R) -> Unit,
 ) : ReferenceResolver<T, R> {
 
     override val fromClass: Class<T> get() = fromKClass.java

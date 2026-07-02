@@ -18,7 +18,7 @@ import java.time.Instant
  */
 data class SourceMetadata(
     var timestamp: Instant? = null,
-    var fileHash: ByteArray? = null
+    var fileHash: ByteArray? = null,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

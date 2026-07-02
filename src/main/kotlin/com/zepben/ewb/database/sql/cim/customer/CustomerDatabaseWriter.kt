@@ -24,7 +24,7 @@ class CustomerDatabaseWriter internal constructor(
     override val databaseTables: CustomerDatabaseTables,
 ) : CimDatabaseWriter<CustomerDatabaseTables, CustomerService>(
     ::MetadataCollectionWriter,
-    ::CustomerServiceWriter
+    ::CustomerServiceWriter,
 ) {
 
     /**

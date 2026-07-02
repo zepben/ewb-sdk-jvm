@@ -39,18 +39,18 @@ abstract class NetworkTraceStopCondition<T>(val stepType: NetworkTraceStep.Type)
      */
     abstract fun shouldStopMatchedStep(
         item: NetworkTraceStep<T>,
-        context: StepContext
+        context: StepContext,
     ): Boolean
 
     private fun shouldStopInternalStep(
         item: NetworkTraceStep<T>,
-        context: StepContext
+        context: StepContext,
     ): Boolean =
         if (item.type == NetworkTraceStep.Type.INTERNAL) shouldStopMatchedStep(item, context) else false
 
     private fun shouldStopExternalStep(
         item: NetworkTraceStep<T>,
-        context: StepContext
+        context: StepContext,
     ): Boolean =
         // We also need to check start items as they are always marked as internal, but we still want to be able to stop on them.
         if ((item.type == NetworkTraceStep.Type.EXTERNAL) || context.isStartItem) shouldStopMatchedStep(item, context) else false
@@ -72,10 +72,10 @@ abstract class NetworkTraceStopCondition<T>(val stepType: NetworkTraceStep.Type)
 
 private class DelegatedNetworkTraceStopCondition<T>(
     stepType: NetworkTraceStep.Type,
-    val delegate: StopCondition<NetworkTraceStep<T>>
+    val delegate: StopCondition<NetworkTraceStep<T>>,
 ) : NetworkTraceStopCondition<T>(stepType) {
     override fun shouldStopMatchedStep(
         item: NetworkTraceStep<T>,
-        context: StepContext
+        context: StepContext,
     ): Boolean = delegate.shouldStop(item, context)
 }

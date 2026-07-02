@@ -155,7 +155,7 @@ fun <T : Identifiable> KProperty1<in T, Collection<Name>>.compareNames(source: T
  */
 fun <T, R : Identifiable> KProperty1<in T, List<R>>.compareIndexedIdReferenceCollection(
     source: T,
-    target: T
+    target: T,
 ): ObjectCollectionDifference? {
     val differences = ObjectCollectionDifference()
     val sourceList = this.get(source)
@@ -186,7 +186,7 @@ fun <T, R : Identifiable> KProperty1<in T, List<R>>.compareIndexedIdReferenceCol
  */
 fun <T, R> KProperty1<in T, List<R>>.compareIndexedValueCollection(
     source: T,
-    target: T
+    target: T,
 ): ValueCollectionDifference? {
     val differences = ValueCollectionDifference()
     val sourceList = this.get(source)
@@ -219,7 +219,7 @@ fun <T, R> KProperty1<in T, List<R>>.compareIndexedValueCollection(
 fun <T, R, K : Comparable<K>> KProperty1<in T, Collection<R>>.compareUnorderedValueCollection(
     source: T,
     target: T,
-    keySelector: (R) -> K
+    keySelector: (R) -> K,
 ): ValueCollectionDifference? {
     val differences = ValueCollectionDifference()
     val sourceList = this.get(source).sortedBy { keySelector(it) }

@@ -251,7 +251,7 @@ inline fun <R> whenNetworkServiceObject(
     isLvSubstation: (LvSubstation) -> R,
     isHvCustomer: (HvCustomer) -> R,
     isAcLineSegmentPhase: (AcLineSegmentPhase) -> R,
-    isOther: (Identifiable) -> R = { throw IllegalArgumentException("Identifiable type ${it::class} is not supported by the network service") }
+    isOther: (Identifiable) -> R = { throw IllegalArgumentException("Identifiable type ${it::class} is not supported by the network service") },
 ): R = when (identifiable) {
     is BatteryUnit -> isBatteryUnit(identifiable)
     is PhotoVoltaicUnit -> isPhotoVoltaicUnit(identifiable)

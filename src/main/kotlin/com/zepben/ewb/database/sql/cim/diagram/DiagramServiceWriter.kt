@@ -20,7 +20,7 @@ import com.zepben.ewb.services.diagram.DiagramService
  */
 internal class DiagramServiceWriter(
     databaseTables: DiagramDatabaseTables,
-    override val writer: DiagramCimWriter = DiagramCimWriter(databaseTables)
+    override val writer: DiagramCimWriter = DiagramCimWriter(databaseTables),
 ) : BaseServiceWriter<DiagramService>(writer) {
 
     override fun DiagramService.writeService(): Boolean =

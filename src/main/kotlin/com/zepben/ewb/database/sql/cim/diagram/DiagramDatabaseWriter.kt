@@ -24,7 +24,7 @@ class DiagramDatabaseWriter internal constructor(
     override val databaseTables: DiagramDatabaseTables,
 ) : CimDatabaseWriter<DiagramDatabaseTables, DiagramService>(
     ::MetadataCollectionWriter,
-    ::DiagramServiceWriter
+    ::DiagramServiceWriter,
 ) {
 
     /**

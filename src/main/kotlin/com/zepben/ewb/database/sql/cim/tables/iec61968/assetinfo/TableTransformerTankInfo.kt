@@ -26,7 +26,7 @@ class TableTransformerTankInfo : TableAssetInfo() {
 
     init {
         addNonUniqueIndexes(
-            listOf(POWER_TRANSFORMER_INFO_MRID)
+            listOf(POWER_TRANSFORMER_INFO_MRID),
         )
     }
 

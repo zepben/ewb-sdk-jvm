@@ -28,7 +28,7 @@ import com.zepben.ewb.cim.iec61970.base.wires.SinglePhaseKind
 class ConnectivityResult private constructor(
     val fromTerminal: Terminal,
     val toTerminal: Terminal,
-    val nominalPhasePaths: List<NominalPhasePath>
+    val nominalPhasePaths: List<NominalPhasePath>,
 ) {
     val from: ConductingEquipment? get() = fromTerminal.conductingEquipment
     val to: ConductingEquipment? get() = toTerminal.conductingEquipment

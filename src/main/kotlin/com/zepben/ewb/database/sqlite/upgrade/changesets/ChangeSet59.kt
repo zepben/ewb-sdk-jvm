@@ -16,8 +16,8 @@ internal fun changeSet59() = ChangeSet(
     59,
     listOf(
         // Network Change
-        `Create asset to power system resource association table`
-    )
+        `Create asset to power system resource association table`,
+    ),
 )
 
 // ###################
@@ -33,7 +33,7 @@ private val `Create asset to power system resource association table` = Change(
         );""".trimIndent(),
         "CREATE UNIQUE INDEX asset_mrid_power_system_resource_mrid ON assets_power_system_resources (asset_mrid, power_system_resource_mrid);",
         "CREATE INDEX assets_power_system_resources_asset_mrid ON assets_power_system_resources (asset_mrid);",
-        "CREATE INDEX assets_power_system_resources_power_system_resource_mrid ON assets_power_system_resources (power_system_resource_mrid);"
+        "CREATE INDEX assets_power_system_resources_power_system_resource_mrid ON assets_power_system_resources (power_system_resource_mrid);",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )

@@ -8,7 +8,6 @@
 
 package com.zepben.ewb.services.network.tracing.feeder
 
-import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
 import com.zepben.ewb.cim.iec61970.base.core.*
 import com.zepben.ewb.services.network.tracing.networktrace.operators.NetworkStateOperators

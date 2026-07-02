@@ -44,11 +44,11 @@ class TableEnergyConsumerPhases : TablePowerSystemResources() {
 
     init {
         addUniqueIndexes(
-            listOf(ENERGY_CONSUMER_MRID, PHASE)
+            listOf(ENERGY_CONSUMER_MRID, PHASE),
         )
 
         addNonUniqueIndexes(
-            listOf(ENERGY_CONSUMER_MRID)
+            listOf(ENERGY_CONSUMER_MRID),
         )
     }
 

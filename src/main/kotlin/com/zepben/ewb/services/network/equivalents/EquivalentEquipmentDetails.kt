@@ -23,5 +23,5 @@ import com.zepben.ewb.cim.iec61970.base.equivalents.EquivalentBranch
 data class EquivalentEquipmentDetails(
     val edgeEquipment: ConductingEquipment,
     val edgeNode: ConnectivityNode,
-    val equivalentBranch: EquivalentBranch
+    val equivalentBranch: EquivalentBranch,
 )

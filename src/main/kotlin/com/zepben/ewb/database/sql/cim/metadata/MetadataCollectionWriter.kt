@@ -20,7 +20,7 @@ import com.zepben.ewb.services.common.meta.MetadataCollection
  */
 internal class MetadataCollectionWriter(
     databaseTables: CimDatabaseTables,
-    private val writer: MetadataEntryWriter = MetadataEntryWriter(databaseTables)
+    private val writer: MetadataEntryWriter = MetadataEntryWriter(databaseTables),
 ) : BaseCollectionWriter() {
 
     fun write(data: MetadataCollection): Boolean = data.run {

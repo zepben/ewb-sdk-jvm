@@ -22,5 +22,5 @@ data class IngestionMetadata(
     val startTime: Instant,
     val source: String,
     val application: String,
-    val applicationVersion: String
+    val applicationVersion: String,
 )

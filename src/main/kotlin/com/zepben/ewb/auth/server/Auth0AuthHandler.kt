@@ -171,14 +171,14 @@ class Auth0AuthHandler(
 
     private fun parseAuthorization(
         ctx: RoutingContext,
-        handler: Handler<AsyncResult<String?>>
+        handler: Handler<AsyncResult<String?>>,
     ) {
         val request = ctx.request()
         val authorization = request.headers()[HttpHeaders.AUTHORIZATION] ?: run {
             handler.handle(
                 Future.failedFuture(
-                    HttpException(401, "Missing Authorization header")
-                )
+                    HttpException(401, "Missing Authorization header"),
+                ),
             ); return
         }
 
@@ -214,10 +214,10 @@ class Auth0AuthHandler(
                 }
                 handler!!.handle(
                     Future.succeededFuture(
-                        JsonObject().put("jwt", parseAuthorization.result())
-                    )
+                        JsonObject().put("jwt", parseAuthorization.result()),
+                    ),
                 )
-            }
+            },
         )
 //        context.response().end() TODO: this must not occur on some endpoints. needs to occur if auth fails. maybe we are not
         // failing fast if authN/Z fails? need to make sure permissions are in the web client scope too - token is missing them.

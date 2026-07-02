@@ -117,7 +117,7 @@ class NetworkDatabaseReader internal constructor(
             if (inferPhases) {
                 logInferredPhases(
                     phaseInferrer.run(service, NetworkStateOperators.NORMAL),
-                    phaseInferrer.run(service, NetworkStateOperators.CURRENT)
+                    phaseInferrer.run(service, NetworkStateOperators.CURRENT),
                 )
             }
             logger.info("Phasing applied to network.")
@@ -174,7 +174,7 @@ class NetworkDatabaseReader internal constructor(
             .forEach { es ->
                 logger.warn(
                     "External grid source ${es.nameAndMRID()} has been assigned to the following feeders: normal [${es.normalFeeders.joinToString { it.mRID }}], " +
-                        "current [${es.currentFeeders.joinToString { it.mRID }}]"
+                        "current [${es.currentFeeders.joinToString { it.mRID }}]",
                 )
             }
     }

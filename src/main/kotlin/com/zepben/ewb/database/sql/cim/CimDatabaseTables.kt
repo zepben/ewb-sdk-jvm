@@ -24,7 +24,7 @@ abstract class CimDatabaseTables internal constructor() : BaseDatabaseTables() {
         tableCimVersion,
         TableMetadataDataSources(),
         TableNameTypes(),
-        TableNames()
+        TableNames(),
     )
 
 }

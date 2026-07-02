@@ -22,5 +22,5 @@ data class ChangeSet @JvmOverloads constructor(
     val number: Int,
     val commands: List<Change>,
     val preCommandHooks: List<Hook> = emptyList(),
-    val postCommandHooks: List<Hook> = emptyList()
+    val postCommandHooks: List<Hook> = emptyList(),
 )

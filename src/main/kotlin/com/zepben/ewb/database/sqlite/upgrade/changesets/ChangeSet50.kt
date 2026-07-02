@@ -30,8 +30,8 @@ internal fun changeSet50() = ChangeSet(
         `Drop customer tables`,
         `Drop diagram tables`,
         `Drop network tables`,
-        `Drop tables shared between customer and network`
-    )
+        `Drop tables shared between customer and network`,
+    ),
 )
 
 @Suppress("ObjectPropertyName")
@@ -44,9 +44,9 @@ private val `Clean customer data from tables shared with network` = Change(
             identified_object_mrid IN (SELECT mrid FROM organisations)
             AND identified_object_mrid NOT IN (SELECT organisation_mrid FROM asset_owners);
         """.trimIndent(),
-        "DELETE FROM organisations WHERE mrid NOT IN (SELECT organisation_mrid FROM asset_owners);"
+        "DELETE FROM organisations WHERE mrid NOT IN (SELECT organisation_mrid FROM asset_owners);",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )
 
 @Suppress("ObjectPropertyName")
@@ -59,17 +59,17 @@ private val `Clean network data from tables shared with customer` = Change(
             identified_object_mrid IN (SELECT mrid FROM organisations)
             AND identified_object_mrid NOT IN (SELECT organisation_mrid FROM customers);
         """.trimIndent(),
-        "DELETE FROM organisations WHERE mrid NOT IN (SELECT organisation_mrid FROM customers);"
+        "DELETE FROM organisations WHERE mrid NOT IN (SELECT organisation_mrid FROM customers);",
     ),
-    targetDatabases = setOf(DatabaseType.CUSTOMER)
+    targetDatabases = setOf(DatabaseType.CUSTOMER),
 )
 
 @Suppress("ObjectPropertyName")
 private val `Clean organisation names from diagrams database` = Change(
     listOf(
-        "DELETE FROM names WHERE identified_object_mrid IN (SELECT mrid FROM organisations);"
+        "DELETE FROM names WHERE identified_object_mrid IN (SELECT mrid FROM organisations);",
     ),
-    targetDatabases = setOf(DatabaseType.DIAGRAM)
+    targetDatabases = setOf(DatabaseType.DIAGRAM),
 )
 
 @Suppress("ObjectPropertyName")
@@ -85,7 +85,7 @@ private val `Clean customer names` = Change(
         DELETE FROM names WHERE identified_object_mrid IN (SELECT mrid FROM mrids);
         """.trimIndent(),
     ),
-    targetDatabases = setOf(DatabaseType.DIAGRAM, DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.DIAGRAM, DatabaseType.NETWORK_MODEL),
 )
 
 @Suppress("ObjectPropertyName")
@@ -99,7 +99,7 @@ private val `Clean diagram names` = Change(
         DELETE FROM names WHERE identified_object_mrid IN (SELECT mrid FROM mrids);
         """.trimIndent(),
     ),
-    targetDatabases = setOf(DatabaseType.CUSTOMER, DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.CUSTOMER, DatabaseType.NETWORK_MODEL),
 )
 
 @Suppress("ObjectPropertyName")
@@ -186,15 +186,15 @@ private val `Clean network names` = Change(
         DELETE FROM names WHERE identified_object_mrid IN (SELECT mrid FROM mrids);
         """.trimIndent(),
     ),
-    targetDatabases = setOf(DatabaseType.CUSTOMER, DatabaseType.DIAGRAM)
+    targetDatabases = setOf(DatabaseType.CUSTOMER, DatabaseType.DIAGRAM),
 )
 
 @Suppress("ObjectPropertyName")
 private val `Clean unused name types` = Change(
     listOf(
-        "DELETE FROM name_types WHERE name NOT IN (SELECT name_type_name FROM names);"
+        "DELETE FROM name_types WHERE name NOT IN (SELECT name_type_name FROM names);",
     ),
-    targetDatabases = setOf(DatabaseType.CUSTOMER, DatabaseType.DIAGRAM, DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.CUSTOMER, DatabaseType.DIAGRAM, DatabaseType.NETWORK_MODEL),
 )
 
 @Suppress("ObjectPropertyName")
@@ -207,7 +207,7 @@ private val `Drop customer tables` = Change(
         "DROP TABLE pricing_structures_tariffs;",
         "DROP TABLE tariffs;",
     ),
-    targetDatabases = setOf(DatabaseType.DIAGRAM, DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.DIAGRAM, DatabaseType.NETWORK_MODEL),
 )
 
 @Suppress("ObjectPropertyName")
@@ -215,9 +215,9 @@ private val `Drop diagram tables` = Change(
     listOf(
         "DROP TABLE diagrams;",
         "DROP TABLE diagram_objects;",
-        "DROP TABLE diagram_object_points;"
+        "DROP TABLE diagram_object_points;",
     ),
-    targetDatabases = setOf(DatabaseType.CUSTOMER, DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.CUSTOMER, DatabaseType.NETWORK_MODEL),
 )
 
 @Suppress("ObjectPropertyName")
@@ -316,13 +316,13 @@ private val `Drop network tables` = Change(
         "DROP TABLE usage_points_end_devices;",
         "DROP TABLE voltage_relays;",
     ),
-    targetDatabases = setOf(DatabaseType.CUSTOMER, DatabaseType.DIAGRAM)
+    targetDatabases = setOf(DatabaseType.CUSTOMER, DatabaseType.DIAGRAM),
 )
 
 @Suppress("ObjectPropertyName")
 private val `Drop tables shared between customer and network` = Change(
     listOf(
-        "DROP TABLE organisations;"
+        "DROP TABLE organisations;",
     ),
-    targetDatabases = setOf(DatabaseType.DIAGRAM)
+    targetDatabases = setOf(DatabaseType.DIAGRAM),
 )

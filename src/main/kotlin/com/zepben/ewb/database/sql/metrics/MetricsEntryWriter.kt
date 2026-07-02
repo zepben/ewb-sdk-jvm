@@ -16,7 +16,6 @@ import com.zepben.ewb.database.sql.metrics.tables.TableNetworkContainerMetrics
 import com.zepben.ewb.database.sql.metrics.tables.TableVariantMetrics
 import com.zepben.ewb.metrics.*
 import com.zepben.ewb.metrics.variants.VariantMetricEntry
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.sql.Timestamp
 import java.sql.Types.VARCHAR
@@ -34,7 +33,7 @@ internal class MetricsEntryWriter(
         encodeDefaults = true
         ignoreUnknownKeys = false
         isLenient = false
-    }
+    },
 ) : BaseEntryWriter() {
 
     /**
@@ -128,7 +127,7 @@ internal class MetricsEntryWriter(
         networkModelProjectStageId: String,
         baseModelVersion: String,
         changeSetId: String,
-        variantMetricEntry: VariantMetricEntry
+        variantMetricEntry: VariantMetricEntry,
     ): Boolean {
         val table = databaseTables.getTable<TableVariantMetrics>()
         val insert = databaseTables.getInsert<TableVariantMetrics>()

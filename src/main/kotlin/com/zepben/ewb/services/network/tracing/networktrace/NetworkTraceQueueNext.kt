@@ -50,7 +50,7 @@ internal abstract class NetworkTraceQueueNext(private val stateOperators: Networ
             item: NetworkTraceStep<T>,
             context: StepContext,
             queueItem: (NetworkTraceStep<T>) -> Boolean,
-            queueBranch: (NetworkTraceStep<T>) -> Boolean
+            queueBranch: (NetworkTraceStep<T>) -> Boolean,
         ) {
             val nextSteps = getNextSteps(item, context)
             if (nextSteps.size == 1) queueItem(nextSteps[0]) else nextSteps.forEach { queueBranch(it) }

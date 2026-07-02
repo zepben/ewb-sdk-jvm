@@ -9,7 +9,6 @@
 
 package com.zepben.ewb.auth.server.vertx
 
-import com.zepben.ewb.auth.*
 import com.zepben.ewb.auth.common.StatusCode
 import com.zepben.ewb.auth.server.TokenAuthenticator
 import com.zepben.ewb.auth.server.asHttpException
@@ -41,7 +40,7 @@ class JWTAuthProvider(private val tokenAuthenticator: TokenAuthenticator) : Auth
             val user = User.create(JsonObject().put("access_token", it.token), JsonObject().put("token", it))
             resultHandler?.handle(Future.succeededFuture(user))
         } ?: resultHandler?.handle(
-            Future.failedFuture("Token was missing on successful auth - this is a bug.")
+            Future.failedFuture("Token was missing on successful auth - this is a bug."),
         )
     }
 

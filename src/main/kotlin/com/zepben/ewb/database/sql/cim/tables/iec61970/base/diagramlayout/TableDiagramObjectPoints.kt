@@ -32,11 +32,11 @@ class TableDiagramObjectPoints : SqlTable() {
 
     init {
         addUniqueIndexes(
-            listOf(DIAGRAM_OBJECT_MRID, SEQUENCE_NUMBER)
+            listOf(DIAGRAM_OBJECT_MRID, SEQUENCE_NUMBER),
         )
 
         addNonUniqueIndexes(
-            listOf(DIAGRAM_OBJECT_MRID)
+            listOf(DIAGRAM_OBJECT_MRID),
         )
     }
 

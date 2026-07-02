@@ -33,7 +33,7 @@ import kotlin.collections.ArrayDeque
 abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
     internal val queueType: QueueType<T, D>,
     protected val parent: D? = null,
-    private val debugLogger: Logger?
+    private val debugLogger: Logger?,
 ) {
 
     /**

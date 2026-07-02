@@ -293,7 +293,7 @@ fun NetworkService.addFromPb(pb: NetworkIdentifiable): AddFromPbResult =
         LVSUBSTATION -> getOrAddFromPb(pb.lvSubstation.mRID()) { addFromPb(pb.lvSubstation) }
         ACLINESEGMENTPHASE -> getOrAddFromPb(pb.acLineSegmentPhase.mRID()) { addFromPb(pb.acLineSegmentPhase) }
         OTHER, IDENTIFIABLE_NOT_SET, null -> throw UnsupportedOperationException(
-            "Identified object type ${pb.identifiableCase} is not supported by the network service"
+            "Identified object type ${pb.identifiableCase} is not supported by the network service",
         )
 
     }
@@ -481,7 +481,6 @@ fun toCim(pb: PBLvSubstation, networkService: NetworkService): LvSubstation =
 
         toCim(pb.ec, this, networkService)
     }
-
 
 
 /**
@@ -1126,7 +1125,7 @@ fun toCim(pb: PBStreetAddress): StreetAddress =
         pb.postalCodeSet.takeUnless { pb.hasPostalCodeNull() },
         if (pb.hasTownDetail()) toCim(pb.townDetail) else null,
         pb.poBoxSet.takeUnless { pb.hasPoBoxNull() },
-        if (pb.hasStreetDetail()) toCim(pb.streetDetail) else null
+        if (pb.hasStreetDetail()) toCim(pb.streetDetail) else null,
     )
 
 /**
@@ -1570,7 +1569,7 @@ fun toCim(pb: PBCurveData): CurveData =
         pb.xValue,
         pb.y1Value,
         pb.y2ValueSet.takeUnless { pb.hasY2ValueNull() },
-        pb.y3ValueSet.takeUnless { pb.hasY3ValueNull() }
+        pb.y3ValueSet.takeUnless { pb.hasY3ValueNull() },
     )
 
 /**
@@ -2547,7 +2546,7 @@ fun toCim(pb: PBPhaseImpedanceData): PhaseImpedanceData =
         pb.bSet.takeUnless { pb.hasBNull() },
         pb.gSet.takeUnless { pb.hasGNull() },
         pb.rSet.takeUnless { pb.hasRNull() },
-        pb.xSet.takeUnless { pb.hasXNull() }
+        pb.xSet.takeUnless { pb.hasXNull() },
     )
 
 /**

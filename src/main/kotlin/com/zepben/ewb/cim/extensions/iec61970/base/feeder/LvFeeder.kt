@@ -36,7 +36,7 @@ class LvFeeder(mRID: String) : EquipmentContainer(mRID) {
             field =
                 if ((equipment.isEmpty() && currentEquipment.isEmpty()) || normalHeadTerminal == null) value
                 else throw IllegalStateException(
-                    "LvFeeder $mRID has equipment assigned to it. Cannot update normalHeadTerminal on a feeder with equipment assigned."
+                    "LvFeeder $mRID has equipment assigned to it. Cannot update normalHeadTerminal on a feeder with equipment assigned.",
                 )
         }
 

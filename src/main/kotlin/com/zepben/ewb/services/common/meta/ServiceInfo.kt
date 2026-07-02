@@ -18,5 +18,5 @@ package com.zepben.ewb.services.common.meta
 data class ServiceInfo(
     val title: String,
     val version: String,
-    val dataSources: List<DataSource>
+    val dataSources: List<DataSource>,
 )

@@ -35,11 +35,11 @@ class TableCurveData : SqlTable() {
 
     init {
         addUniqueIndexes(
-            listOf(CURVE_MRID, X_VALUE)
+            listOf(CURVE_MRID, X_VALUE),
         )
 
         addNonUniqueIndexes(
-            listOf(CURVE_MRID)
+            listOf(CURVE_MRID),
         )
     }
 

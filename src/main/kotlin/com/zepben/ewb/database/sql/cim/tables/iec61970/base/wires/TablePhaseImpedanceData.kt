@@ -39,11 +39,11 @@ class TablePhaseImpedanceData : SqlTable() {
 
     init {
         addUniqueIndexes(
-            listOf(PER_LENGTH_PHASE_IMPEDANCE_MRID, FROM_PHASE, TO_PHASE)
+            listOf(PER_LENGTH_PHASE_IMPEDANCE_MRID, FROM_PHASE, TO_PHASE),
         )
 
         addNonUniqueIndexes(
-            listOf(PER_LENGTH_PHASE_IMPEDANCE_MRID)
+            listOf(PER_LENGTH_PHASE_IMPEDANCE_MRID),
         )
     }
 

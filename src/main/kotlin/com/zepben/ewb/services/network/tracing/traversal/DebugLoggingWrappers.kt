@@ -25,7 +25,7 @@ internal object DebugLoggingWrappers {
                 nextItem: T,
                 nextContext: StepContext,
                 currentItem: T,
-                currentContext: StepContext
+                currentContext: StepContext,
             ): Boolean {
                 val shouldQueue = condition.shouldQueue(nextItem, nextContext, currentItem, currentContext)
                 debugLogger.info("$description: shouldQueue($count)=$shouldQueue [nextItem=$nextItem, nextContext=$nextContext, currentItem=$currentItem, currentContext=$currentContext]")

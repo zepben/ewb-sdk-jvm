@@ -28,7 +28,7 @@ class TableCircuits : TableLines() {
 
     init {
         addNonUniqueIndexes(
-            listOf(LOOP_MRID)
+            listOf(LOOP_MRID),
         )
     }
 

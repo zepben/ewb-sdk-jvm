@@ -27,7 +27,7 @@ import org.slf4j.Logger
  * This class is backed by a [NetworkTrace].
  */
 class RemovePhases(
-    private val debugLogger: Logger?
+    private val debugLogger: Logger?,
 ) {
 
     /**
@@ -84,7 +84,7 @@ class RemovePhases(
             debugLogger,
             name = "RemovePhases(${stateOperators.description})",
             processQueue { it.data.phasesToEbb.size },
-            computeData = ::computeNextEbbPhases
+            computeData = ::computeNextEbbPhases,
         )
             .addCondition { stopAtOpen() }
             .addStepAction { (path, ebbPhases), _ ->

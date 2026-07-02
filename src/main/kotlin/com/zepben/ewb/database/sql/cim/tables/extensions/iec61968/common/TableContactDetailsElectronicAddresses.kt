@@ -27,11 +27,11 @@ class TableContactDetailsElectronicAddresses : TableElectronicAddresses() {
 
     init {
         addUniqueIndexes(
-            listOf(CONTACT_DETAILS_ID, EMAIL_1)
+            listOf(CONTACT_DETAILS_ID, EMAIL_1),
         )
 
         addNonUniqueIndexes(
-            listOf(CONTACT_DETAILS_ID)
+            listOf(CONTACT_DETAILS_ID),
         )
     }
 

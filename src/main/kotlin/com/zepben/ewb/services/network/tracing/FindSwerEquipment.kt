@@ -24,7 +24,7 @@ import org.slf4j.Logger
  * A class which can be used for finding the SWER equipment in a [NetworkService] or [Feeder].
  */
 class FindSwerEquipment(
-    private val debugLogger: Logger?
+    private val debugLogger: Logger?,
 ) {
 
     private fun createTrace(stateOperators: NetworkStateOperators) =

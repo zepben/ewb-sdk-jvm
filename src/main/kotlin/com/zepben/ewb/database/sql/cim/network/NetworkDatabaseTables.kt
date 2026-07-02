@@ -64,7 +64,7 @@ import com.zepben.ewb.database.sql.generators.SqliteGenerator
  * The collection of tables for our network databases.
  */
 class NetworkDatabaseTables(
-    override val sqlGenerator: SqlGenerator = SqliteGenerator
+    override val sqlGenerator: SqlGenerator = SqliteGenerator,
 ) : CimDatabaseTables() {
 
     override val includedTables: Sequence<SqlTable> =
@@ -185,7 +185,7 @@ class NetworkDatabaseTables(
             TableUsagePoints(),
             TableUsagePointsEndDevices(),
             TableUsagePointsContactDetails(),
-            TableVoltageRelays()
+            TableVoltageRelays(),
         )
 
 }

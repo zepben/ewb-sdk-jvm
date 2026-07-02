@@ -20,7 +20,7 @@ import com.zepben.ewb.services.common.BaseService
  * @property writer The [BaseServiceWriter] used to actually write the objects to the database.
  */
 abstract class BaseServiceWriter<TService : BaseService>(
-    protected open val writer: CimWriter
+    protected open val writer: CimWriter,
 ) : BaseCollectionWriter() {
 
     fun write(data: TService): Boolean =

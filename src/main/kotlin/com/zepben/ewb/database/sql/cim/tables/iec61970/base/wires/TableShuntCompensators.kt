@@ -45,7 +45,7 @@ abstract class TableShuntCompensators : TableRegulatingCondEq() {
 
     init {
         addNonUniqueIndexes(
-            listOf(GROUNDING_TERMINAL_MRID)
+            listOf(GROUNDING_TERMINAL_MRID),
         )
     }
 

@@ -354,7 +354,7 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
         val lvFeeder = LvFeeder(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             normalHeadTerminal = service.ensureGet(
                 resultSet.getNullableString(table.NORMAL_HEAD_TERMINAL_MRID.queryIndex),
-                typeNameAndMRID()
+                typeNameAndMRID(),
             )
             normalEnergizingLvSubstation = service.ensureGet(resultSet.getNullableString(table.LV_SUBSTATION_MRID.queryIndex), typeNameAndMRID())
             normalEnergizingLvSubstation?.addNormalEnergizedLvFeeder(this)
@@ -466,12 +466,12 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
         service: NetworkService,
         protectionRelayFunction: ProtectionRelayFunction,
         table: TableProtectionRelayFunctions,
-        resultSet: ResultSet
+        resultSet: ResultSet,
     ): Boolean {
         protectionRelayFunction.apply {
             assetInfo = service.ensureGet(
                 resultSet.getNullableString(table.RELAY_INFO_MRID.queryIndex),
-                typeNameAndMRID()
+                typeNameAndMRID(),
             )
             model = resultSet.getNullableString(table.MODEL.queryIndex)
             reclosing = resultSet.getNullableBoolean(table.RECLOSING.queryIndex)
@@ -505,7 +505,7 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
 
         val protectionRelayFunction = service.getOrThrow<ProtectionRelayFunction>(
             protectionRelayFunctionMRID,
-            "$protectionRelayFunctionMRID time limit $timeLimit"
+            "$protectionRelayFunctionMRID time limit $timeLimit",
         )
         protectionRelayFunction.addTimeLimit(timeLimit)
 
@@ -572,16 +572,16 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
         val id = setIdentifier("$protectionRelayFunctionMRID-threshold$sequenceNumber")
         val protectionRelayFunction = service.getOrThrow<ProtectionRelayFunction>(
             protectionRelayFunctionMRID,
-            "ProtectionRelayFunction to RelaySetting association $id"
+            "ProtectionRelayFunction to RelaySetting association $id",
         )
 
         protectionRelayFunction.addThreshold(
             RelaySetting(
                 UnitSymbol.valueOf(resultSet.getString(table.UNIT_SYMBOL.queryIndex)),
                 resultSet.getDouble(table.VALUE.queryIndex),
-                resultSet.getNullableString(table.NAME.queryIndex)
+                resultSet.getNullableString(table.NAME.queryIndex),
             ),
-            sequenceNumber
+            sequenceNumber,
         )
 
         return true
@@ -950,7 +950,7 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
         service: NetworkService,
         assetOrganisationRole: AssetOrganisationRole,
         table: TableAssetOrganisationRoles,
-        resultSet: ResultSet
+        resultSet: ResultSet,
     ): Boolean =
         readOrganisationRole(service, assetOrganisationRole, table, resultSet)
 
@@ -1000,7 +1000,7 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
         service: NetworkService,
         structure: Structure,
         table: TableStructures,
-        resultSet: ResultSet
+        resultSet: ResultSet,
     ): Boolean =
         readAssetContainer(service, structure, table, resultSet)
 
@@ -1082,9 +1082,9 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
         location.addPoint(
             PositionPoint(
                 resultSet.getDouble(table.X_POSITION.queryIndex),
-                resultSet.getDouble(table.Y_POSITION.queryIndex)
+                resultSet.getDouble(table.Y_POSITION.queryIndex),
             ),
-            sequenceNumber
+            sequenceNumber,
         )
 
         return true
@@ -1096,7 +1096,7 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
             resultSet.getNullableString(table.POSTAL_CODE.queryIndex),
             readTownDetail(table, resultSet),
             resultSet.getNullableString(table.PO_BOX.queryIndex),
-            readStreetDetail(table, resultSet)
+            readStreetDetail(table, resultSet),
         )
 
     @Throws(SQLException::class)
@@ -1228,7 +1228,7 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
             customerMRID = resultSet.getNullableString(table.CUSTOMER_MRID.queryIndex)
             serviceLocation = service.ensureGet(
                 resultSet.getNullableString(table.SERVICE_LOCATION_MRID.queryIndex),
-                typeNameAndMRID()
+                typeNameAndMRID(),
             )
         }
 
@@ -1345,7 +1345,7 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
         service: NetworkService,
         auxiliaryEquipment: AuxiliaryEquipment,
         table: TableAuxiliaryEquipment,
-        resultSet: ResultSet
+        resultSet: ResultSet,
     ): Boolean {
         auxiliaryEquipment.apply {
             terminal =
@@ -1452,12 +1452,12 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
         service: NetworkService,
         conductingEquipment: ConductingEquipment,
         table: TableConductingEquipment,
-        resultSet: ResultSet
+        resultSet: ResultSet,
     ): Boolean {
         conductingEquipment.apply {
             baseVoltage = service.ensureGet(
                 resultSet.getNullableString(table.BASE_VOLTAGE_MRID.queryIndex),
-                typeNameAndMRID()
+                typeNameAndMRID(),
             )
         }
 
@@ -1487,7 +1487,7 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
         service: NetworkService,
         connectivityNodeContainer: ConnectivityNodeContainer,
         table: TableConnectivityNodeContainers,
-        resultSet: ResultSet
+        resultSet: ResultSet,
     ): Boolean =
         readPowerSystemResource(service, connectivityNodeContainer, table, resultSet)
 
@@ -1518,7 +1518,7 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
             xValue,
             resultSet.getFloat(table.Y1_VALUE.queryIndex),
             resultSet.getNullableFloat(table.Y2_VALUE.queryIndex),
-            resultSet.getNullableFloat(table.Y3_VALUE.queryIndex)
+            resultSet.getNullableFloat(table.Y3_VALUE.queryIndex),
         )
 
         return true
@@ -1540,7 +1540,7 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
         service: NetworkService,
         equipmentContainer: EquipmentContainer,
         table: TableEquipmentContainers,
-        resultSet: ResultSet
+        resultSet: ResultSet,
     ): Boolean =
         readConnectivityNodeContainer(service, equipmentContainer, table, resultSet)
 
@@ -1560,12 +1560,12 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
         val feeder = Feeder(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             normalHeadTerminal = service.ensureGet(
                 resultSet.getNullableString(table.NORMAL_HEAD_TERMINAL_MRID.queryIndex),
-                typeNameAndMRID()
+                typeNameAndMRID(),
             )
             normalEnergizingSubstation =
                 service.ensureGet(
                     resultSet.getNullableString(table.NORMAL_ENERGIZING_SUBSTATION_MRID.queryIndex),
-                    typeNameAndMRID()
+                    typeNameAndMRID(),
                 )
             normalEnergizingSubstation?.addFeeder(this)
         }
@@ -1596,7 +1596,7 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
         service: NetworkService,
         powerSystemResource: PowerSystemResource,
         table: TablePowerSystemResources,
-        resultSet: ResultSet
+        resultSet: ResultSet,
     ): Boolean {
         powerSystemResource.apply {
             location = service.ensureGet(resultSet.getNullableString(table.LOCATION_MRID.queryIndex), typeNameAndMRID())
@@ -1623,7 +1623,7 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
             SubGeographicalRegion(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
                 geographicalRegion = service.ensureGet(
                     resultSet.getNullableString(table.GEOGRAPHICAL_REGION_MRID.queryIndex),
-                    typeNameAndMRID()
+                    typeNameAndMRID(),
                 )
                 geographicalRegion?.addSubGeographicalRegion(this)
             }
@@ -1647,7 +1647,7 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
         val substation = Substation(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             subGeographicalRegion = service.ensureGet(
                 resultSet.getNullableString(table.SUB_GEOGRAPHICAL_REGION_MRID.queryIndex),
-                typeNameAndMRID()
+                typeNameAndMRID(),
             )
             subGeographicalRegion?.addSubstation(this)
         }
@@ -1672,7 +1672,7 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
             sequenceNumber = resultSet.getInt(table.SEQUENCE_NUMBER.queryIndex)
             conductingEquipment = service.ensureGet(
                 resultSet.getNullableString(table.CONDUCTING_EQUIPMENT_MRID.queryIndex),
-                typeNameAndMRID()
+                typeNameAndMRID(),
             )
             conductingEquipment?.addTerminal(this)
             phases = PhaseCode.valueOf(resultSet.getString(table.PHASES.queryIndex))
@@ -1727,7 +1727,7 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
         service: NetworkService,
         equivalentEquipment: EquivalentEquipment,
         table: TableEquivalentEquipment,
-        resultSet: ResultSet
+        resultSet: ResultSet,
     ): Boolean =
         readConductingEquipment(service, equivalentEquipment, table, resultSet)
 
@@ -1780,12 +1780,12 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
         service: NetworkService,
         powerElectronicsUnit: PowerElectronicsUnit,
         table: TablePowerElectronicsUnits,
-        resultSet: ResultSet
+        resultSet: ResultSet,
     ): Boolean {
         powerElectronicsUnit.apply {
             powerElectronicsConnection = service.ensureGet(
                 resultSet.getNullableString(table.POWER_ELECTRONICS_CONNECTION_MRID.queryIndex),
-                typeNameAndMRID()
+                typeNameAndMRID(),
             )
             powerElectronicsConnection?.addUnit(this)
 
@@ -1904,7 +1904,7 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
             powerSystemResourceMRID = resultSet.getNullableString(table.POWER_SYSTEM_RESOURCE_MRID.queryIndex)
             remoteSource = service.ensureGet(
                 resultSet.getNullableString(table.REMOTE_SOURCE_MRID.queryIndex),
-                typeNameAndMRID()
+                typeNameAndMRID(),
             )
             remoteSource?.measurement = this
             terminalMRID = resultSet.getNullableString(table.TERMINAL_MRID.queryIndex)
@@ -2104,7 +2104,7 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
             designRating = resultSet.getNullableDouble(table.DESIGN_RATING.queryIndex)
             assetInfo = service.ensureGet(
                 resultSet.getNullableString(table.WIRE_INFO_MRID.queryIndex),
-                typeNameAndMRID()
+                typeNameAndMRID(),
             )
         }
 
@@ -2160,7 +2160,7 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
         service: NetworkService,
         earthFaultCompensator: EarthFaultCompensator,
         table: TableEarthFaultCompensators,
-        resultSet: ResultSet
+        resultSet: ResultSet,
     ): Boolean {
         earthFaultCompensator.apply {
             r = resultSet.getNullableDouble(table.R.queryIndex)
@@ -2174,7 +2174,7 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
         service: NetworkService,
         energyConnection: EnergyConnection,
         table: TableEnergyConnections,
-        resultSet: ResultSet
+        resultSet: ResultSet,
     ): Boolean =
         readConductingEquipment(service, energyConnection, table, resultSet)
 
@@ -2559,7 +2559,7 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
                 resultSet.getNullableDouble(table.G.queryIndex),
                 resultSet.getNullableDouble(table.R.queryIndex),
                 resultSet.getNullableDouble(table.X.queryIndex),
-            )
+            ),
         )
 
         return true
@@ -2662,7 +2662,7 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
             function = TransformerFunctionKind.valueOf(resultSet.getString(table.FUNCTION.queryIndex))
             assetInfo = service.ensureGet(
                 resultSet.getNullableString(table.POWER_TRANSFORMER_INFO_MRID.queryIndex),
-                typeNameAndMRID()
+                typeNameAndMRID(),
             )
         }
 
@@ -2728,7 +2728,7 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
         val ratioTapChanger = RatioTapChanger(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             transformerEnd = service.ensureGet(
                 resultSet.getNullableString(table.TRANSFORMER_END_MRID.queryIndex),
-                typeNameAndMRID()
+                typeNameAndMRID(),
             )
             transformerEnd?.ratioTapChanger = this
 
@@ -2779,7 +2779,7 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
         service: NetworkService,
         regulatingCondEq: RegulatingCondEq,
         table: TableRegulatingCondEq,
-        resultSet: ResultSet
+        resultSet: ResultSet,
     ): Boolean {
         regulatingCondEq.apply {
             controlEnabled = resultSet.getNullableBoolean(table.CONTROL_ENABLED.queryIndex)
@@ -2796,7 +2796,7 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
         service: NetworkService,
         regulatingControl: RegulatingControl,
         table: TableRegulatingControls,
-        resultSet: ResultSet
+        resultSet: ResultSet,
     ): Boolean {
         regulatingControl.apply {
             discrete = resultSet.getNullableBoolean(table.DISCRETE.queryIndex)
@@ -2858,12 +2858,12 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
         service: NetworkService,
         shuntCompensator: ShuntCompensator,
         table: TableShuntCompensators,
-        resultSet: ResultSet
+        resultSet: ResultSet,
     ): Boolean {
         shuntCompensator.apply {
             assetInfo = service.ensureGet(
                 resultSet.getNullableString(table.SHUNT_COMPENSATOR_INFO_MRID.queryIndex),
-                typeNameAndMRID()
+                typeNameAndMRID(),
             )
 
             grounded = resultSet.getNullableBoolean(table.GROUNDED.queryIndex)
@@ -3437,7 +3437,7 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
         service: NetworkService,
         table: TableProtectionRelaySchemesProtectionRelayFunctions,
         resultSet: ResultSet,
-        setIdentifier: (String) -> String
+        setIdentifier: (String) -> String,
     ): Boolean {
         val protectionRelaySchemeMRID = resultSet.getString(table.PROTECTION_RELAY_SCHEME_MRID.queryIndex)
         setIdentifier("${protectionRelaySchemeMRID}-to-UNKNOWN")
@@ -3471,7 +3471,7 @@ internal class NetworkCimReader : CimReader<NetworkService>(), AutoCloseable {
         service: NetworkService,
         table: TableSynchronousMachinesReactiveCapabilityCurves,
         resultSet: ResultSet,
-        setIdentifier: (String) -> String
+        setIdentifier: (String) -> String,
     ): Boolean {
         val synchronousMachineMRID = resultSet.getString(table.SYNCHRONOUS_MACHINE_MRID.queryIndex)
         setIdentifier("${synchronousMachineMRID}-to-UNKNOWN")

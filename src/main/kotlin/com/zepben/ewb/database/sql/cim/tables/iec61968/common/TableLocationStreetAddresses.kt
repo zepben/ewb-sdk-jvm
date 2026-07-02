@@ -27,11 +27,11 @@ class TableLocationStreetAddresses : TableStreetAddresses() {
 
     init {
         addUniqueIndexes(
-            listOf(LOCATION_MRID, ADDRESS_FIELD)
+            listOf(LOCATION_MRID, ADDRESS_FIELD),
         )
 
         addNonUniqueIndexes(
-            listOf(LOCATION_MRID)
+            listOf(LOCATION_MRID),
         )
     }
 

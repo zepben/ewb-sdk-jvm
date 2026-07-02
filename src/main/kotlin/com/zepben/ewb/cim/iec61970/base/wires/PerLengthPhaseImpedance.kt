@@ -49,7 +49,8 @@ class PerLengthPhaseImpedance(mRID: String) : PerLengthImpedance(mRID) {
     fun addData(phaseImpedanceData: PhaseImpedanceData): PerLengthPhaseImpedance {
         require(
             _data.isNullOrEmpty()
-                || _data?.none { pid -> pid.fromPhase == phaseImpedanceData.fromPhase && pid.toPhase == phaseImpedanceData.toPhase } == true) {
+                || _data?.none { pid -> pid.fromPhase == phaseImpedanceData.fromPhase && pid.toPhase == phaseImpedanceData.toPhase } == true,
+        ) {
             "Unable to add PhaseImpedanceData to ${typeNameAndMRID()}. " +
                 "A PhaseImpedanceData with fromPhase ${phaseImpedanceData.fromPhase} and toPhase ${phaseImpedanceData.toPhase} already exists in " +
                 "this PerLengthPhaseImpedance."

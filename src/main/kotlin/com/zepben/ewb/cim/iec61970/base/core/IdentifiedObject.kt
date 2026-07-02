@@ -20,7 +20,7 @@ package com.zepben.ewb.cim.iec61970.base.core
  * @property numDiagramObjects Number of DiagramObject's known to associate with this [IdentifiedObject]
  */
 abstract class IdentifiedObject(
-    override val mRID: String
+    override val mRID: String,
 ) : Identifiable {
 
     // Changed to use mutableSet to prevent duplicated entries from addName function

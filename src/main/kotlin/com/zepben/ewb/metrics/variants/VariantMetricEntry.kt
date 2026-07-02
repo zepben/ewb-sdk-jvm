@@ -15,5 +15,5 @@ data class VariantMetricEntry(
     val type: VariantMetricKind,
     val name: String,
     val value: Int,
-    val metadata: List<String>
+    val metadata: List<String>,
 )

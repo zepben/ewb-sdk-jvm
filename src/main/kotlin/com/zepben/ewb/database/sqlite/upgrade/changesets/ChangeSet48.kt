@@ -25,8 +25,8 @@ internal fun changeSet48() = ChangeSet(
         `Add columns to power_electronics_connection`,
         `Add column to linear_shunt_compensators`,
         `Add column to ratio_tap_changers`,
-        `Translate rated_s from power_transformer_ends to new table power_transformer_end_ratings`
-    )
+        `Translate rated_s from power_transformer_ends to new table power_transformer_end_ratings`,
+    ),
 )
 
 @Suppress("ObjectPropertyName")
@@ -59,9 +59,9 @@ private val `Create table tap_changer_controls` = Change(
             co_generation_enabled BOOLEAN NULL
         );""".trimIndent(),
         "CREATE UNIQUE INDEX tap_changer_controls_mrid ON tap_changer_controls (mrid);",
-        "CREATE INDEX tap_changer_controls_name ON tap_changer_controls (name);"
+        "CREATE INDEX tap_changer_controls_name ON tap_changer_controls (name);",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )
 
 @Suppress("ObjectPropertyName")
@@ -83,9 +83,9 @@ private val `Create table ev_charging_units` = Change(
         );""".trimIndent(),
         "CREATE UNIQUE INDEX ev_charging_units_mrid ON ev_charging_units (mrid);",
         "CREATE INDEX ev_charging_units_name ON ev_charging_units (name);",
-        "CREATE INDEX ev_charging_units_power_electronics_connection_mrid ON ev_charging_units (power_electronics_connection_mrid);"
+        "CREATE INDEX ev_charging_units_power_electronics_connection_mrid ON ev_charging_units (power_electronics_connection_mrid);",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )
 
 @Suppress("ObjectPropertyName")
@@ -97,9 +97,9 @@ private val `Create table reclose_delays` = Change(
             sequence_number INTEGER NOT NULL
         );""".trimIndent(),
         "CREATE UNIQUE INDEX reclose_delays_current_relay_info_mrid_sequence_number ON reclose_delays (current_relay_info_mrid, sequence_number);",
-        "CREATE INDEX reclose_delays_current_relay_info_mrid ON reclose_delays (current_relay_info_mrid);"
+        "CREATE INDEX reclose_delays_current_relay_info_mrid ON reclose_delays (current_relay_info_mrid);",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )
 
 @Suppress("ObjectPropertyName")
@@ -111,27 +111,27 @@ private val `Create table power_transformer_end_ratings` = Change(
             rated_s INTEGER NOT NULL
         );""".trimIndent(),
         "CREATE UNIQUE INDEX power_transformer_end_ratings_power_transformer_end_mrid_cooling_type ON power_transformer_end_ratings (power_transformer_end_mrid, cooling_type);",
-        "CREATE INDEX power_transformer_end_ratings_power_transformer_end_mrid ON power_transformer_end_ratings (power_transformer_end_mrid);"
+        "CREATE INDEX power_transformer_end_ratings_power_transformer_end_mrid ON power_transformer_end_ratings (power_transformer_end_mrid);",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )
 
 @Suppress("ObjectPropertyName")
 private val `Add columns to usage_points` = Change(
     listOf(
         "ALTER TABLE usage_points ADD rated_power INTEGER NULL;",
-        "ALTER TABLE usage_points ADD approved_inverter_capacity INTEGER NULL;"
+        "ALTER TABLE usage_points ADD approved_inverter_capacity INTEGER NULL;",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )
 
 @Suppress("ObjectPropertyName")
 private val `Add columns to current_relays` = Change(
     listOf(
         "ALTER TABLE current_relays ADD directable BOOLEAN NULL;",
-        "ALTER TABLE current_relays ADD power_direction TEXT NOT NULL DEFAULT 'UNKNOWN_DIRECTION';"
+        "ALTER TABLE current_relays ADD power_direction TEXT NOT NULL DEFAULT 'UNKNOWN_DIRECTION';",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )
 
 @Suppress("ObjectPropertyName")
@@ -158,9 +158,9 @@ private val `Update all equipment tables with commissioned_date` = Change(
         "ALTER TABLE current_relays ADD COLUMN commissioned_date TEXT NULL;",
         "ALTER TABLE fault_indicators ADD COLUMN commissioned_date TEXT NULL;",
         "ALTER TABLE current_transformers ADD COLUMN commissioned_date TEXT NULL;",
-        "ALTER TABLE potential_transformers ADD COLUMN commissioned_date TEXT NULL;"
+        "ALTER TABLE potential_transformers ADD COLUMN commissioned_date TEXT NULL;",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )
 
 @Suppress("ObjectPropertyName")
@@ -190,25 +190,25 @@ private val `Add columns to power_electronics_connection` = Change(
         "ALTER TABLE power_electronics_connection ADD COLUMN inv_var_resp_q_at_v4 NUMBER NULL;",
         "ALTER TABLE power_electronics_connection ADD COLUMN inv_reactive_power_mode BOOLEAN NULL;",
         "ALTER TABLE power_electronics_connection ADD COLUMN inv_fix_reactive_power NUMBER NULL;",
-        "ALTER TABLE power_electronics_connection ADD COLUMN regulating_control_mrid;"
+        "ALTER TABLE power_electronics_connection ADD COLUMN regulating_control_mrid;",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )
 
 @Suppress("ObjectPropertyName")
 private val `Add column to linear_shunt_compensators` = Change(
     listOf(
-        "ALTER TABLE linear_shunt_compensators ADD COLUMN regulating_control_mrid;"
+        "ALTER TABLE linear_shunt_compensators ADD COLUMN regulating_control_mrid;",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )
 
 @Suppress("ObjectPropertyName")
 private val `Add column to ratio_tap_changers` = Change(
     listOf(
-        "ALTER TABLE ratio_tap_changers ADD COLUMN tap_changer_control_mrid;"
+        "ALTER TABLE ratio_tap_changers ADD COLUMN tap_changer_control_mrid;",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )
 
 @Suppress("ObjectPropertyName")
@@ -218,7 +218,7 @@ private val `Translate rated_s from power_transformer_ends to new table power_tr
         insert into power_transformer_end_ratings (power_transformer_end_mrid, cooling_type, rated_s)
         SELECT mrid, "UNKNOWN_COOLING_TYPE", rated_s FROM power_transformer_ends where rated_s IS NOT NULL;
         """.trimIndent(),
-        "ALTER TABLE power_transformer_ends DROP COLUMN rated_s;"
+        "ALTER TABLE power_transformer_ends DROP COLUMN rated_s;",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )

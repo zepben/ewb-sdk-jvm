@@ -10,7 +10,7 @@ package com.zepben.ewb.database.paths
 
 enum class DatabaseType(
     val perDate: Boolean,
-    val fileDescriptor: String
+    val fileDescriptor: String,
 ) {
 
     CUSTOMER(perDate = true, fileDescriptor = "customers"),

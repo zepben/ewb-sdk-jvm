@@ -34,11 +34,11 @@ class TableNetworkContainerMetrics : MultiJobTable() {
 
     init {
         addUniqueIndexes(
-            listOf(JOB_ID, HIERARCHY_ID, CONTAINER_TYPE, METRIC_NAME)
+            listOf(JOB_ID, HIERARCHY_ID, CONTAINER_TYPE, METRIC_NAME),
         )
 
         addNonUniqueIndexes(
-            listOf(HIERARCHY_ID, CONTAINER_TYPE, METRIC_NAME)
+            listOf(HIERARCHY_ID, CONTAINER_TYPE, METRIC_NAME),
         )
     }
 

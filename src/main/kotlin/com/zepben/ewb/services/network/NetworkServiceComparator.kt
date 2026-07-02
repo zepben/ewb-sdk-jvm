@@ -60,7 +60,7 @@ import com.zepben.ewb.services.common.compareValues
 //
 @Suppress("unused")
 class NetworkServiceComparator @JvmOverloads constructor(
-    private var options: NetworkServiceComparatorOptions = NetworkServiceComparatorOptions.all()
+    private var options: NetworkServiceComparatorOptions = NetworkServiceComparatorOptions.all(),
 ) : BaseServiceComparator() {
 
     // ##################################
@@ -81,7 +81,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
 
     private fun comparePanDemandResponseFunction(
         source: PanDemandResponseFunction,
-        target: PanDemandResponseFunction
+        target: PanDemandResponseFunction,
     ): ObjectDifference<PanDemandResponseFunction> =
         ObjectDifference(source, target).apply {
             compareEndDeviceFunction()
@@ -177,7 +177,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
                 DistanceRelay::forwardReactance,
                 DistanceRelay::operationPhaseAngle1,
                 DistanceRelay::operationPhaseAngle2,
-                DistanceRelay::operationPhaseAngle3
+                DistanceRelay::operationPhaseAngle3,
             )
         }
 
@@ -191,13 +191,13 @@ class NetworkServiceComparator @JvmOverloads constructor(
                 ProtectionRelayFunction::relayDelayTime,
                 ProtectionRelayFunction::protectionKind,
                 ProtectionRelayFunction::directable,
-                ProtectionRelayFunction::powerDirection
+                ProtectionRelayFunction::powerDirection,
             )
             compareIndexedValueCollections(ProtectionRelayFunction::timeLimits, ProtectionRelayFunction::thresholds)
             compareIdReferenceCollections(
                 ProtectionRelayFunction::protectedSwitches,
                 ProtectionRelayFunction::sensors,
-                ProtectionRelayFunction::schemes
+                ProtectionRelayFunction::schemes,
             )
         }
 
@@ -234,7 +234,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
                 BatteryControl::chargingRate,
                 BatteryControl::dischargingRate,
                 BatteryControl::reservePercent,
-                BatteryControl::controlMode
+                BatteryControl::controlMode,
             )
         }
 
@@ -261,7 +261,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
                 OpenCircuitTest::energisedEndVoltage,
                 OpenCircuitTest::openEndStep,
                 OpenCircuitTest::openEndVoltage,
-                OpenCircuitTest::phaseShift
+                OpenCircuitTest::phaseShift,
             )
         }
 
@@ -289,7 +289,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
                 ShortCircuitTest::lossZero,
                 ShortCircuitTest::power,
                 ShortCircuitTest::voltage,
-                ShortCircuitTest::voltageOhmicPart
+                ShortCircuitTest::voltageOhmicPart,
             )
         }
 
@@ -301,7 +301,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
                 ShuntCompensatorInfo::maxPowerLoss,
                 ShuntCompensatorInfo::ratedCurrent,
                 ShuntCompensatorInfo::ratedReactivePower,
-                ShuntCompensatorInfo::ratedVoltage
+                ShuntCompensatorInfo::ratedVoltage,
             )
         }
 
@@ -322,7 +322,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
                 TransformerEndInfo::energisedEndShortCircuitTests,
                 TransformerEndInfo::groundedEndShortCircuitTests,
                 TransformerEndInfo::openEndOpenCircuitTests,
-                TransformerEndInfo::energisedEndOpenCircuitTests
+                TransformerEndInfo::energisedEndOpenCircuitTests,
             )
             compareValues(
                 TransformerEndInfo::connectionKind,
@@ -333,7 +333,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
                 TransformerEndInfo::r,
                 TransformerEndInfo::ratedS,
                 TransformerEndInfo::ratedU,
-                TransformerEndInfo::shortTermS
+                TransformerEndInfo::shortTermS,
             )
         }
 
@@ -438,13 +438,13 @@ class NetworkServiceComparator @JvmOverloads constructor(
                 CurrentTransformerInfo::ratedCurrent,
                 CurrentTransformerInfo::secondaryFlsRating,
                 CurrentTransformerInfo::secondaryRatio,
-                CurrentTransformerInfo::usage
+                CurrentTransformerInfo::usage,
             )
         }
 
     private fun comparePotentialTransformerInfo(
         source: PotentialTransformerInfo,
-        target: PotentialTransformerInfo
+        target: PotentialTransformerInfo,
     ): ObjectDifference<PotentialTransformerInfo> =
         ObjectDifference(source, target).apply {
             compareAssetInfo()
@@ -455,7 +455,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
                 PotentialTransformerInfo::primaryRatio,
                 PotentialTransformerInfo::ptClass,
                 PotentialTransformerInfo::ratedVoltage,
-                PotentialTransformerInfo::secondaryRatio
+                PotentialTransformerInfo::secondaryRatio,
             )
         }
 
@@ -507,7 +507,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
                 UsagePoint::connectionCategory,
                 UsagePoint::ratedPower,
                 UsagePoint::approvedInverterCapacity,
-                UsagePoint::phaseCode
+                UsagePoint::phaseCode,
             )
             compareUnorderedValueCollection(UsagePoint::contacts, ContactDetails::id)
 
@@ -708,7 +708,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
                 EquivalentBranch::zeroR12,
                 EquivalentBranch::zeroR21,
                 EquivalentBranch::zeroX12,
-                EquivalentBranch::zeroX21
+                EquivalentBranch::zeroX21,
             )
         }
 
@@ -742,7 +742,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
 
     private fun comparePowerElectronicsWindUnit(
         source: PowerElectronicsWindUnit,
-        target: PowerElectronicsWindUnit
+        target: PowerElectronicsWindUnit,
     ): ObjectDifference<PowerElectronicsWindUnit> =
         ObjectDifference(source, target).apply {
             comparePowerElectronicsUnit()
@@ -906,7 +906,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
                 EnergyConsumer::pFixed,
                 EnergyConsumer::phaseConnection,
                 EnergyConsumer::q,
-                EnergyConsumer::qFixed
+                EnergyConsumer::qFixed,
             )
         }
 
@@ -948,7 +948,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
                 EnergySource::r0Max,
                 EnergySource::xMax,
                 EnergySource::xnMax,
-                EnergySource::x0Max
+                EnergySource::x0Max,
             )
         }
 
@@ -1003,7 +1003,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
                 LinearShuntCompensator::b0PerSection,
                 LinearShuntCompensator::bPerSection,
                 LinearShuntCompensator::g0PerSection,
-                LinearShuntCompensator::gPerSection
+                LinearShuntCompensator::gPerSection,
             )
         }
 
@@ -1018,7 +1018,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
 
     private fun comparePerLengthPhaseImpedance(
         source: PerLengthPhaseImpedance,
-        target: PerLengthPhaseImpedance
+        target: PerLengthPhaseImpedance,
     ): ObjectDifference<PerLengthPhaseImpedance> =
         ObjectDifference(source, target).apply {
             comparePerLengthImpedance()
@@ -1028,7 +1028,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
 
     private fun comparePerLengthSequenceImpedance(
         source: PerLengthSequenceImpedance,
-        target: PerLengthSequenceImpedance
+        target: PerLengthSequenceImpedance,
     ): ObjectDifference<PerLengthSequenceImpedance> =
         ObjectDifference(source, target).apply {
             comparePerLengthImpedance()
@@ -1041,7 +1041,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
                 PerLengthSequenceImpedance::r0,
                 PerLengthSequenceImpedance::x0,
                 PerLengthSequenceImpedance::b0ch,
-                PerLengthSequenceImpedance::g0ch
+                PerLengthSequenceImpedance::g0ch,
             )
         }
 
@@ -1054,7 +1054,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
 
     private fun comparePowerElectronicsConnection(
         source: PowerElectronicsConnection,
-        target: PowerElectronicsConnection
+        target: PowerElectronicsConnection,
     ): ObjectDifference<PowerElectronicsConnection> =
         ObjectDifference(source, target).apply {
             compareRegulatingCondEq()
@@ -1091,13 +1091,13 @@ class NetworkServiceComparator @JvmOverloads constructor(
                 PowerElectronicsConnection::invVarRespQAtV3,
                 PowerElectronicsConnection::invVarRespQAtV4,
                 PowerElectronicsConnection::invReactivePowerMode,
-                PowerElectronicsConnection::invFixReactivePower
+                PowerElectronicsConnection::invFixReactivePower,
             )
         }
 
     private fun comparePowerElectronicsConnectionPhase(
         source: PowerElectronicsConnectionPhase,
-        target: PowerElectronicsConnectionPhase
+        target: PowerElectronicsConnectionPhase,
     ): ObjectDifference<PowerElectronicsConnectionPhase> =
         ObjectDifference(source, target).apply {
             comparePowerSystemResource()
@@ -1115,7 +1115,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
                 PowerTransformer::vectorGroup,
                 PowerTransformer::transformerUtilisation,
                 PowerTransformer::constructionKind,
-                PowerTransformer::function
+                PowerTransformer::function,
             )
         }
 
@@ -1136,7 +1136,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
                 PowerTransformerEnd::ratedS,
                 PowerTransformerEnd::ratedU,
                 PowerTransformerEnd::x,
-                PowerTransformerEnd::x0
+                PowerTransformerEnd::x0,
             )
 
             compareIndexedValueCollections(PowerTransformerEnd::sRatings)
@@ -1187,7 +1187,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
                 RegulatingControl::minAllowedTargetValue,
                 RegulatingControl::ratedCurrent,
                 RegulatingControl::ctPrimary,
-                RegulatingControl::minTargetDeadband
+                RegulatingControl::minTargetDeadband,
             )
             compareIdReferences(RegulatingControl::terminal)
             compareIdReferenceCollections(RegulatingControl::regulatingCondEqs)
@@ -1210,7 +1210,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
                 SeriesCompensator::x,
                 SeriesCompensator::x0,
                 SeriesCompensator::varistorRatedCurrent,
-                SeriesCompensator::varistorVoltageThreshold
+                SeriesCompensator::varistorVoltageThreshold,
             )
         }
 
@@ -1231,7 +1231,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
                 StaticVarCompensator::inductiveRating,
                 StaticVarCompensator::q,
                 StaticVarCompensator::svcControlMode,
-                StaticVarCompensator::voltageSetPoint
+                StaticVarCompensator::voltageSetPoint,
             )
         }
 
@@ -1269,7 +1269,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
                 SynchronousMachine::x0,
                 SynchronousMachine::x2,
                 SynchronousMachine::type,
-                SynchronousMachine::operatingMode
+                SynchronousMachine::operatingMode,
             )
             compareIdReferenceCollections(SynchronousMachine::curves)
         }
@@ -1285,7 +1285,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
                 TapChanger::lowStep,
                 TapChanger::neutralStep,
                 TapChanger::normalStep,
-                TapChanger::step
+                TapChanger::step,
             )
             compareIdReferences(TapChanger::tapChangerControl)
         }
@@ -1303,7 +1303,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
                 TapChangerControl::reverseLineDropX,
                 TapChangerControl::forwardLDCBlocking,
                 TapChangerControl::timeDelay,
-                TapChangerControl::coGenerationEnabled
+                TapChangerControl::coGenerationEnabled,
             )
         }
 
@@ -1317,7 +1317,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
 
     private fun compareTransformerStarImpedance(
         source: TransformerStarImpedance,
-        target: TransformerStarImpedance
+        target: TransformerStarImpedance,
     ): ObjectDifference<TransformerStarImpedance> =
         ObjectDifference(source, target).apply {
             compareIdentifiedObject()

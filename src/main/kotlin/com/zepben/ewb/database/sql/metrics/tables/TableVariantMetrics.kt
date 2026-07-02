@@ -40,7 +40,7 @@ class TableVariantMetrics : SqlTable() {
 
     init {
         addUniqueIndexes(
-            listOf(NETWORK_MODEL_PROJECT_ID, NETWORK_MODEL_PROJECT_STAGE_ID, BASE_MODEL_VERSION, CHANGE_SET_ID, TYPE, NAME)
+            listOf(NETWORK_MODEL_PROJECT_ID, NETWORK_MODEL_PROJECT_STAGE_ID, BASE_MODEL_VERSION, CHANGE_SET_ID, TYPE, NAME),
         )
 
         addNonUniqueIndexes()

@@ -47,7 +47,7 @@ inline fun <R> whenCustomerServiceObject(
     isOrganisation: (Organisation) -> R,
     isPricingStructure: (PricingStructure) -> R,
     isTariff: (Tariff) -> R,
-    isOther: (Identifiable) -> R = { throw IllegalArgumentException("Identifiable type ${it::class} is not supported by the customer service") }
+    isOther: (Identifiable) -> R = { throw IllegalArgumentException("Identifiable type ${it::class} is not supported by the customer service") },
 ): R = when (identifiable) {
     is Customer -> isCustomer(identifiable)
     is CustomerAgreement -> isCustomerAgreement(identifiable)

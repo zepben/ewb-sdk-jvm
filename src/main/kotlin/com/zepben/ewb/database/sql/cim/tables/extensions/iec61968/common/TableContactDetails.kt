@@ -39,7 +39,7 @@ abstract class TableContactDetails : SqlTable() {
 
     init {
         addUniqueIndexes(
-            listOf(ID)
+            listOf(ID),
         )
     }
 

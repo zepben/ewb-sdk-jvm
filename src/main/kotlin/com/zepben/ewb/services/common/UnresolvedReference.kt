@@ -14,5 +14,5 @@ data class UnresolvedReference<T : Identifiable, R : Identifiable>(
     val from: T,
     val toMrid: String,
     val resolver: ReferenceResolver<T, R>,
-    val reverseResolver: ReferenceResolver<R, T>? = null
+    val reverseResolver: ReferenceResolver<R, T>? = null,
 )

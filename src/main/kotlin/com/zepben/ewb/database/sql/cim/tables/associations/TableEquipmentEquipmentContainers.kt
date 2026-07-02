@@ -28,12 +28,12 @@ class TableEquipmentEquipmentContainers : SqlTable() {
 
     init {
         addUniqueIndexes(
-            listOf(EQUIPMENT_MRID, EQUIPMENT_CONTAINER_MRID)
+            listOf(EQUIPMENT_MRID, EQUIPMENT_CONTAINER_MRID),
         )
 
         addNonUniqueIndexes(
             listOf(EQUIPMENT_MRID),
-            listOf(EQUIPMENT_CONTAINER_MRID)
+            listOf(EQUIPMENT_CONTAINER_MRID),
         )
     }
 

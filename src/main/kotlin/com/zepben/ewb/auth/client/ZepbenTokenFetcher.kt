@@ -48,7 +48,7 @@ class ZepbenTokenFetcher(
             .header(CONTENT_TYPE, "application/x-www-form-urlencoded")
             .POST(HttpRequest.BodyPublishers.ofString(body))
             .build()
-    }
+    },
 ) {
 
     private var accessToken: String? = null
@@ -78,7 +78,7 @@ class ZepbenTokenFetcher(
         authMethod = authMethod,
         tokenRequestData = tokenRequestData,
         refreshRequestData = refreshRequestData,
-        client = if (verifyCertificate) HttpClient.newHttpClient() else HttpClient.newBuilder().sslContext(SSLContextUtils.allTrustingSSLContext()).build()
+        client = if (verifyCertificate) HttpClient.newHttpClient() else HttpClient.newBuilder().sslContext(SSLContextUtils.allTrustingSSLContext()).build(),
     )
 
     /**
@@ -106,7 +106,7 @@ class ZepbenTokenFetcher(
         refreshRequestData = refreshRequestData,
         client = caFilename?.let {
             HttpClient.newBuilder().sslContext(SSLContextUtils.singleCACertSSLContext(caFilename)).build()
-        } ?: HttpClient.newHttpClient()
+        } ?: HttpClient.newHttpClient(),
     )
 
     init {
@@ -146,7 +146,7 @@ class ZepbenTokenFetcher(
             if (tokenType.isNullOrEmpty() or accessToken.isNullOrEmpty()) {
                 throw Exception(
                     "Token couldn't be retrieved from ${URL(tokenEndpoint)} using " +
-                        "audience: $audience, token endpoint: $tokenEndpoint"
+                        "audience: $audience, token endpoint: $tokenEndpoint",
                 )
             }
         }
@@ -171,7 +171,7 @@ class ZepbenTokenFetcher(
         if (response.statusCode() != StatusCode.OK.code) {
             throw AuthException(
                 response.statusCode(),
-                "Token fetch failed, Error was: ${response.statusCode()} - ${response.body()}"
+                "Token fetch failed, Error was: ${response.statusCode()} - ${response.body()}",
             )
         }
 
@@ -181,12 +181,12 @@ class ZepbenTokenFetcher(
         } catch (e: DecodeException) {
             throw AuthException(
                 response.statusCode(),
-                "Response did not contain valid JSON - response was: ${response.body()}"
+                "Response did not contain valid JSON - response was: ${response.body()}",
             )
         } catch (e: ClassCastException) {
             throw AuthException(
                 response.statusCode(),
-                "Response was not a JSON object - response was: ${response.body()}"
+                "Response was not a JSON object - response was: ${response.body()}",
             )
         }
 
@@ -194,7 +194,7 @@ class ZepbenTokenFetcher(
             throw AuthException(
                 response.statusCode(),
                 (data.getString("error") ?: "Access Token absent in token response") + " - " +
-                    (data.getString("error_description") ?: "Response was: $data")
+                    (data.getString("error_description") ?: "Response was: $data"),
             )
         }
 
@@ -234,7 +234,7 @@ fun createTokenFetcher(
         authMethod = authMethod,
         issuer = issuer,
         audience = audience,
-        providerDetails = fetchProviderDetails(issuer = issuer, httpClientCreator = { client })
+        providerDetails = fetchProviderDetails(issuer = issuer, httpClientCreator = { client }),
     )
 
     return ZepbenTokenFetcher(
@@ -301,7 +301,7 @@ fun createTokenFetcher(
     confClient = if (verifyCertificates) HttpClient.newHttpClient() else HttpClient.newBuilder().sslContext(SSLContextUtils.allTrustingSSLContext()).build(),
     authClient = if (verifyCertificates) HttpClient.newHttpClient() else HttpClient.newBuilder().sslContext(SSLContextUtils.allTrustingSSLContext()).build(),
     audienceField = audienceField,
-    issuerField = issuerField
+    issuerField = issuerField,
 )
 
 /**
@@ -345,10 +345,15 @@ fun createTokenFetcher(
  * http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=<SOME_RESOURCE_ID>
  */
 fun createTokenFetcherManagedIdentity(identityUrl: String): ZepbenTokenFetcher =
-    ZepbenTokenFetcher(audience = "", tokenEndpoint = "", authMethod = AuthMethod.OAUTH, requestBuilder = { _, _ ->
-        HttpRequest.newBuilder()
-            .uri(URI(identityUrl))
-            .header("Metadata", "true")
-            .GET()
-            .build()
-    })
+    ZepbenTokenFetcher(
+        audience = "",
+        tokenEndpoint = "",
+        authMethod = AuthMethod.OAUTH,
+        requestBuilder = { _, _ ->
+            HttpRequest.newBuilder()
+                .uri(URI(identityUrl))
+                .header("Metadata", "true")
+                .GET()
+                .build()
+        },
+    )

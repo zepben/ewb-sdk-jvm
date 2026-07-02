@@ -20,5 +20,5 @@ import java.time.Instant
 data class DataSource(
     val source: String,
     val version: String,
-    val timestamp: Instant = Instant.now()
+    val timestamp: Instant = Instant.now(),
 )

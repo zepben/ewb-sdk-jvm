@@ -25,5 +25,5 @@ import com.zepben.ewb.cim.iec61970.base.domain.UnitSymbol
 data class RelaySetting @JvmOverloads constructor(
     @ZBEX val unitSymbol: UnitSymbol,
     @ZBEX val value: Double,
-    @ZBEX val name: String? = null
+    @ZBEX val name: String? = null,
 )

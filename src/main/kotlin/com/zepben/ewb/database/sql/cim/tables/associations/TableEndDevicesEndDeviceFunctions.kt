@@ -28,12 +28,12 @@ class TableEndDevicesEndDeviceFunctions : SqlTable() {
 
     init {
         addUniqueIndexes(
-            listOf(END_DEVICE_MRID, END_DEVICE_FUNCTION_MRID)
+            listOf(END_DEVICE_MRID, END_DEVICE_FUNCTION_MRID),
         )
 
         addNonUniqueIndexes(
             listOf(END_DEVICE_MRID),
-            listOf(END_DEVICE_FUNCTION_MRID)
+            listOf(END_DEVICE_FUNCTION_MRID),
         )
     }
 

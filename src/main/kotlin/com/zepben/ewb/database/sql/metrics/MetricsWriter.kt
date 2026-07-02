@@ -20,7 +20,7 @@ import com.zepben.ewb.metrics.variants.VariantMetrics
  */
 internal class MetricsWriter(
     databaseTables: MetricsDatabaseTables,
-    private val writer: MetricsEntryWriter = MetricsEntryWriter(databaseTables)
+    private val writer: MetricsEntryWriter = MetricsEntryWriter(databaseTables),
 ) : BaseCollectionWriter() {
 
     fun write(data: IngestionJob): Boolean =
@@ -33,13 +33,18 @@ internal class MetricsWriter(
             }
 
     fun write(data: VariantMetrics): Boolean =
-        writeEach(data.metrics, { writer.writeVariantMetricEntry(
-            networkModelProjectId = data.networkModelProjectId,
-            networkModelProjectStageId = data.networkModelProjectStageId,
-            baseModelVersion = data.baseModelVersion,
-            changeSetId = data.changeSetId,
-            variantMetricEntry = it
-        ) } ) { metricEntry, e ->
+        writeEach(
+            data.metrics,
+            {
+                writer.writeVariantMetricEntry(
+                    networkModelProjectId = data.networkModelProjectId,
+                    networkModelProjectStageId = data.networkModelProjectStageId,
+                    baseModelVersion = data.baseModelVersion,
+                    changeSetId = data.changeSetId,
+                    variantMetricEntry = it,
+                )
+            },
+        ) { metricEntry, e ->
             logger.error("Failed to write metric entry $metricEntry: ${e.message}")
         }
 }

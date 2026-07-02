@@ -24,7 +24,7 @@ import com.zepben.ewb.database.sql.generators.SqliteGenerator
  * The collection of tables for our customer databases.
  */
 class CustomerDatabaseTables(
-    override val sqlGenerator: SqlGenerator = SqliteGenerator
+    override val sqlGenerator: SqlGenerator = SqliteGenerator,
 ) : CimDatabaseTables() {
 
     override val includedTables: Sequence<SqlTable> =

@@ -25,5 +25,5 @@ data class PhaseImpedanceData(
     val b: Double? = null,
     val g: Double? = null,
     val r: Double? = null,
-    val x: Double? = null
+    val x: Double? = null,
 )

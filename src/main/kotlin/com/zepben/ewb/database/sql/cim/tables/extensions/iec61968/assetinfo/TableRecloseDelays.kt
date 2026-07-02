@@ -33,11 +33,11 @@ class TableRecloseDelays : SqlTable() {
 
     init {
         addUniqueIndexes(
-            listOf(RELAY_INFO_MRID, SEQUENCE_NUMBER)
+            listOf(RELAY_INFO_MRID, SEQUENCE_NUMBER),
         )
 
         addNonUniqueIndexes(
-            listOf(RELAY_INFO_MRID)
+            listOf(RELAY_INFO_MRID),
         )
     }
 

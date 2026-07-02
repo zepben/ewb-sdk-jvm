@@ -22,7 +22,7 @@ import com.zepben.ewb.services.network.NetworkService
 open class Services(
     val networkService: NetworkService = NetworkService(),
     val diagramService: DiagramService = DiagramService(),
-    val customerService: CustomerService = CustomerService()
+    val customerService: CustomerService = CustomerService(),
 ) {
 
     /**

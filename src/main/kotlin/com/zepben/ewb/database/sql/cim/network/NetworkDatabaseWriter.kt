@@ -24,7 +24,7 @@ class NetworkDatabaseWriter internal constructor(
     override val databaseTables: NetworkDatabaseTables,
 ) : CimDatabaseWriter<NetworkDatabaseTables, NetworkService>(
     ::MetadataCollectionWriter,
-    ::NetworkServiceWriter
+    ::NetworkServiceWriter,
 ) {
 
     /**

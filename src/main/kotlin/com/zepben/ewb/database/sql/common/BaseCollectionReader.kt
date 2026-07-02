@@ -28,7 +28,7 @@ import java.sql.SQLException
  */
 abstract class BaseCollectionReader<T>(
     val databaseTables: BaseDatabaseTables,
-    protected val connection: Connection
+    protected val connection: Connection,
 ) {
 
     val logger: Logger = LoggerFactory.getLogger(javaClass)
@@ -55,7 +55,7 @@ abstract class BaseCollectionReader<T>(
     protected inline fun <reified TTable : SqlTable> readEach(
         data: T,
         crossinline processRow: (T, TTable, ResultSet, setIdentifier: (String) -> String) -> Boolean,
-        crossinline prepareSelectStatement: Connection.(TTable) -> PreparedStatement = { prepareStatement(it.selectSql) }
+        crossinline prepareSelectStatement: Connection.(TTable) -> PreparedStatement = { prepareStatement(it.selectSql) },
     ): Boolean {
         val table = databaseTables.getTable<TTable>()
         return table.readAll(connection.prepareSelectStatement(table)) { results ->
@@ -102,7 +102,8 @@ abstract class BaseCollectionReader<T>(
             when (t) {
                 is SQLException,
                 is IllegalArgumentException,
-                is ReaderException -> t
+                is ReaderException,
+                    -> t
 
                 else -> throw t
             }

@@ -17,8 +17,8 @@ internal fun changeSet53() = ChangeSet(
     listOf(
         // Network Changes
 
-        `Add design rating columns for conductors`
-    )
+        `Add design rating columns for conductors`,
+    ),
 )
 
 // ###################
@@ -31,5 +31,5 @@ private val `Add design rating columns for conductors` = Change(
         "ALTER TABLE ac_line_segments ADD COLUMN design_temperature INTEGER NULL;",
         "ALTER TABLE ac_line_segments ADD COLUMN design_rating NUMBER NULL;",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )

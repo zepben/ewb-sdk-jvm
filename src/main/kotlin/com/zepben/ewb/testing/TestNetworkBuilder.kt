@@ -48,7 +48,7 @@ open class TestNetworkBuilder {
     fun fromSource(
         phases: PhaseCode = PhaseCode.ABC,
         mRID: String? = null,
-        action: EnergySource.() -> Unit = {}
+        action: EnergySource.() -> Unit = {},
     ): TestNetworkBuilder {
         current = network.createExternalSource(mRID, phases).also(action)
         return this
@@ -70,7 +70,7 @@ open class TestNetworkBuilder {
         phases: PhaseCode = PhaseCode.ABC,
         mRID: String? = null,
         connectivityNodeMrid: String? = null,
-        action: EnergySource.() -> Unit = {}
+        action: EnergySource.() -> Unit = {},
     ): TestNetworkBuilder {
         current = network.createExternalSource(mRID, phases).also {
             connect(current!!, it, connectivityNodeMrid)
@@ -92,7 +92,7 @@ open class TestNetworkBuilder {
     fun fromAcls(
         nominalPhases: PhaseCode = PhaseCode.ABC,
         mRID: String? = null,
-        action: AcLineSegment.() -> Unit = {}
+        action: AcLineSegment.() -> Unit = {},
     ): TestNetworkBuilder {
         current = network.createAcls(mRID, nominalPhases).also(action)
         return this
@@ -114,7 +114,7 @@ open class TestNetworkBuilder {
         nominalPhases: PhaseCode = PhaseCode.ABC,
         mRID: String? = null,
         connectivityNodeMrid: String? = null,
-        action: AcLineSegment.() -> Unit = {}
+        action: AcLineSegment.() -> Unit = {},
     ): TestNetworkBuilder {
         current = network.createAcls(mRID, nominalPhases).also {
             connect(current!!, it, connectivityNodeMrid)
@@ -140,7 +140,7 @@ open class TestNetworkBuilder {
         isNormallyOpen: Boolean = false,
         isOpen: Boolean? = null,
         mRID: String? = null,
-        action: Breaker.() -> Unit = {}
+        action: Breaker.() -> Unit = {},
     ): TestNetworkBuilder {
         current = network.createBreaker(mRID, nominalPhases, isNormallyOpen = isNormallyOpen, isOpen = isOpen ?: isNormallyOpen).also(action)
         return this
@@ -166,7 +166,7 @@ open class TestNetworkBuilder {
         isOpen: Boolean? = null,
         mRID: String? = null,
         connectivityNodeMrid: String? = null,
-        action: Breaker.() -> Unit = {}
+        action: Breaker.() -> Unit = {},
     ): TestNetworkBuilder {
         current = network.createBreaker(mRID, nominalPhases, isNormallyOpen = isNormallyOpen, isOpen = isOpen ?: isNormallyOpen).also {
             connect(current!!, it, connectivityNodeMrid)
@@ -190,7 +190,7 @@ open class TestNetworkBuilder {
         nominalPhases: PhaseCode = PhaseCode.ABC,
         numTerminals: Int? = null,
         mRID: String? = null,
-        action: Junction.() -> Unit = {}
+        action: Junction.() -> Unit = {},
     ): TestNetworkBuilder {
         current = network.createJunction(mRID, nominalPhases, numTerminals).also(action)
         return this
@@ -214,7 +214,7 @@ open class TestNetworkBuilder {
         numTerminals: Int? = null,
         mRID: String? = null,
         connectivityNodeMrid: String? = null,
-        action: Junction.() -> Unit = {}
+        action: Junction.() -> Unit = {},
     ): TestNetworkBuilder {
         current = network.createJunction(mRID, nominalPhases, numTerminals).also {
             connect(current!!, it, connectivityNodeMrid)
@@ -242,7 +242,7 @@ open class TestNetworkBuilder {
         numTerminals: Int = 2,
         mRID: String? = null,
         connectivityNodeMrid: String? = null,
-        action: PowerElectronicsConnection.() -> Unit = {}
+        action: PowerElectronicsConnection.() -> Unit = {},
     ): TestNetworkBuilder {
         current = network.createPowerElectronicsConnection(mRID, nominalPhases, numTerminals).also {
             connect(current!!, it, connectivityNodeMrid)
@@ -266,7 +266,7 @@ open class TestNetworkBuilder {
         nominalPhases: List<PhaseCode> = listOf(PhaseCode.ABC, PhaseCode.ABC),
         endActions: List<PowerTransformerEnd.() -> Unit>? = null,
         mRID: String? = null,
-        action: PowerTransformer.() -> Unit = {}
+        action: PowerTransformer.() -> Unit = {},
     ): TestNetworkBuilder {
         current = network.createPowerTransformer(mRID, nominalPhases).also {
             endActions?.forEachIndexed { index, endAction ->
@@ -295,7 +295,7 @@ open class TestNetworkBuilder {
         endActions: List<PowerTransformerEnd.() -> Unit>? = null,
         mRID: String? = null,
         connectivityNodeMrid: String? = null,
-        action: PowerTransformer.() -> Unit = {}
+        action: PowerTransformer.() -> Unit = {},
     ): TestNetworkBuilder {
         current = network.createPowerTransformer(mRID, nominalPhases).also {
             connect(current!!, it, connectivityNodeMrid)
@@ -324,7 +324,7 @@ open class TestNetworkBuilder {
         nominalPhases: PhaseCode = PhaseCode.ABC,
         mRID: String? = null,
         connectivityNodeMrid: String? = null,
-        action: EnergyConsumer.() -> Unit = {}
+        action: EnergyConsumer.() -> Unit = {},
     ): TestNetworkBuilder {
         current = network.createEnergyConsumer(mRID, nominalPhases).also {
             connect(current!!, it, connectivityNodeMrid)
@@ -346,7 +346,7 @@ open class TestNetworkBuilder {
     fun fromBusbarSection(
         nominalPhases: PhaseCode = PhaseCode.ABC,
         mRID: String? = null,
-        action: BusbarSection.() -> Unit = {}
+        action: BusbarSection.() -> Unit = {},
     ): TestNetworkBuilder {
         current = network.createBusbarSection(mRID, nominalPhases).also(action)
         return this
@@ -368,7 +368,7 @@ open class TestNetworkBuilder {
         nominalPhases: PhaseCode = PhaseCode.ABC,
         mRID: String? = null,
         connectivityNodeMrid: String? = null,
-        action: BusbarSection.() -> Unit = {}
+        action: BusbarSection.() -> Unit = {},
     ): TestNetworkBuilder {
         current = network.createBusbarSection(mRID, nominalPhases).also {
             connect(current!!, it, connectivityNodeMrid)
@@ -396,7 +396,7 @@ open class TestNetworkBuilder {
         numTerminals: Int? = null,
         mRID: String? = null,
         defaultMridPrefix: String? = null,
-        action: T.() -> Unit = {}
+        action: T.() -> Unit = {},
     ): TestNetworkBuilder {
         current = network.createOther(mRID, defaultMridPrefix, creator, nominalPhases, numTerminals).also(action)
         return this
@@ -419,7 +419,7 @@ open class TestNetworkBuilder {
         numTerminals: Int? = null,
         mRID: String? = null,
         defaultMridPrefix: String? = null,
-        noinline action: T.() -> Unit = {}
+        noinline action: T.() -> Unit = {},
     ): TestNetworkBuilder =
         fromOther({ T::class.primaryConstructor!!.call(it) }, nominalPhases, numTerminals, mRID, defaultMridPrefix, action)
 
@@ -445,7 +445,7 @@ open class TestNetworkBuilder {
         mRID: String? = null,
         defaultMridPrefix: String? = null,
         connectivityNodeMrid: String? = null,
-        action: T.() -> Unit = {}
+        action: T.() -> Unit = {},
     ): TestNetworkBuilder {
         current = network.createOther(mRID, defaultMridPrefix, creator, nominalPhases, numTerminals).also {
             connect(current!!, it, connectivityNodeMrid)
@@ -474,7 +474,7 @@ open class TestNetworkBuilder {
         mRID: String? = null,
         connectivityNodeMrid: String? = null,
         defaultMridPrefix: String? = null,
-        noinline action: T.() -> Unit = {}
+        noinline action: T.() -> Unit = {},
     ): TestNetworkBuilder =
         toOther({ T::class.primaryConstructor!!.call(it) }, nominalPhases, numTerminals, mRID, defaultMridPrefix, connectivityNodeMrid, action)
 
@@ -491,7 +491,7 @@ open class TestNetworkBuilder {
     fun withClamp(
         mRID: String? = null,
         lengthFromTerminal1: Double? = null,
-        action: Clamp.() -> Unit = {}
+        action: Clamp.() -> Unit = {},
     ): TestNetworkBuilder = apply {
         val acls = current
         check(acls is AcLineSegment) {
@@ -519,7 +519,7 @@ open class TestNetworkBuilder {
         lengthFromTerminal1: Double? = null,
         isNormallyOpen: Boolean = true,
         isOpen: Boolean? = null,
-        action: Cut.() -> Unit = {}
+        action: Cut.() -> Unit = {},
     ): TestNetworkBuilder = apply {
         val acls = current
         check(acls is AcLineSegment) {
@@ -558,7 +558,7 @@ open class TestNetworkBuilder {
         to: String,
         toTerminal: Int? = null,
         fromTerminal: Int? = null,
-        connectivityNodeMrid: String? = null
+        connectivityNodeMrid: String? = null,
     ): TestNetworkBuilder {
         connect(current!!, network[to]!!, connectivityNodeMrid, fromTerminal ?: currentTerminal, toTerminal)
         return this
@@ -582,7 +582,7 @@ open class TestNetworkBuilder {
         to: String,
         fromTerminal: Int,
         toTerminal: Int,
-        connectivityNodeMrid: String? = null
+        connectivityNodeMrid: String? = null,
     ): TestNetworkBuilder {
         connect(network[from]!!, network[to]!!, connectivityNodeMrid, fromTerminal, toTerminal)
         return this
@@ -659,6 +659,7 @@ open class TestNetworkBuilder {
         network.createSubstation(mRID, equipmentMrids)
         return this
     }
+
     /**
      * Get the [NetworkService] after apply traced phasing, feeder directions, and HV/LV feeder assignment.
      *
@@ -697,7 +698,7 @@ open class TestNetworkBuilder {
         to: ConductingEquipment,
         connectivityNodeMrid: String? = null,
         fromTerminal: Int? = null,
-        toTerminal: Int? = null
+        toTerminal: Int? = null,
     ) {
         val fromTerm = from.getTerminal(fromTerminal ?: currentTerminal ?: from.numTerminals())!!
         val toTerm = to.getTerminal(toTerminal ?: 1)!!
@@ -753,7 +754,7 @@ open class TestNetworkBuilder {
         defaultMridPrefix: String? = null,
         creator: (String) -> T,
         phaseCode: PhaseCode = PhaseCode.ABC,
-        numTerminals: Int?
+        numTerminals: Int?,
     ): T = createObject(mRID, defaultMridPrefix ?: "o", creator, phaseCode, numTerminals ?: 2)
 
     private fun <T : ConductingEquipment> NetworkService.createObject(
@@ -761,7 +762,7 @@ open class TestNetworkBuilder {
         defaultMridPrefix: String,
         creator: (String) -> T,
         phaseCode: PhaseCode = PhaseCode.ABC,
-        numTerminals: Int
+        numTerminals: Int,
     ): T =
         mRID.orNextId(defaultMridPrefix).let { id ->
             creator(id).apply {

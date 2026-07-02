@@ -43,10 +43,12 @@ abstract class BaseServiceComparator {
         .filter { it.returnType.classifier == ObjectDifference::class }
         .filter {
             try {
-                AccessController.doPrivileged(PrivilegedExceptionAction {
-                    it.isAccessible = true
-                    true
-                })
+                AccessController.doPrivileged(
+                    PrivilegedExceptionAction {
+                        it.isAccessible = true
+                        true
+                    },
+                )
             } catch (_: PrivilegedActionException) {
                 false
             }
@@ -62,7 +64,7 @@ abstract class BaseServiceComparator {
      */
     fun compare(
         source: BaseService,
-        target: BaseService
+        target: BaseService,
     ): ServiceDifferences {
         val differences = ServiceDifferences({ source[it] }, { target[it] }, { source.getNameType(it) }, { target.getNameType(it) })
 
@@ -228,7 +230,7 @@ abstract class BaseServiceComparator {
      * @return The [ObjectDifference] being populated for fluent use.
      */
     fun <T> ObjectDifference<T>.compareValues(
-        vararg properties: KProperty1<in T, *>
+        vararg properties: KProperty1<in T, *>,
     ): ObjectDifference<T> {
         properties.forEach { addIfDifferent(it.name, it.compareValues(source, target)) }
         return this
@@ -244,14 +246,14 @@ abstract class BaseServiceComparator {
      * @return The [ObjectDifference] being populated for fluent use.
      */
     fun <T : Identifiable, R : Identifiable> ObjectDifference<T>.compareIdReferences(
-        vararg properties: KProperty1<in T, R?>
+        vararg properties: KProperty1<in T, R?>,
     ): ObjectDifference<T> {
         properties.forEach { addIfDifferent(it.name, it.compareIdReference(source, target)) }
         return this
     }
 
     private fun <T : IdentifiedObject> ObjectDifference<T>.compareNames(
-        vararg properties: KProperty1<IdentifiedObject, Collection<Name>>
+        vararg properties: KProperty1<IdentifiedObject, Collection<Name>>,
     ): ObjectDifference<T> {
         properties.forEach { addIfDifferent(it.name, it.compareNames(source, target)) }
         return this
@@ -267,7 +269,7 @@ abstract class BaseServiceComparator {
      * @return The [ObjectDifference] being populated for fluent use.
      */
     fun <T : Identifiable, R : Identifiable> ObjectDifference<T>.compareIdReferenceCollections(
-        vararg properties: KProperty1<in T, Collection<R>>
+        vararg properties: KProperty1<in T, Collection<R>>,
     ): ObjectDifference<T> {
         properties.forEach { addIfDifferent(it.name, it.compareIdReferenceCollection(source, target)) }
         return this
@@ -283,7 +285,7 @@ abstract class BaseServiceComparator {
      * @return The [ObjectDifference] being populated for fluent use.
      */
     fun <T : Identifiable, R : Identifiable> ObjectDifference<T>.compareIndexedIdReferenceCollections(
-        vararg properties: KProperty1<in T, List<R>>
+        vararg properties: KProperty1<in T, List<R>>,
     ): ObjectDifference<T> {
         properties.forEach { addIfDifferent(it.name, it.compareIndexedIdReferenceCollection(source, target)) }
         return this
@@ -297,7 +299,7 @@ abstract class BaseServiceComparator {
      * @return The [ObjectDifference] being populated for fluent use.
      */
     fun <T> ObjectDifference<T>.compareIndexedValueCollections(
-        vararg properties: KProperty1<in T, List<*>>
+        vararg properties: KProperty1<in T, List<*>>,
     ): ObjectDifference<T> {
         properties.forEach { addIfDifferent(it.name, it.compareIndexedValueCollection(source, target)) }
         return this
@@ -314,7 +316,7 @@ abstract class BaseServiceComparator {
      */
     fun <T, R, K : Comparable<K>> ObjectDifference<T>.compareUnorderedValueCollection(
         property: KProperty1<in T, Collection<R>>,
-        keySelector: (R) -> K
+        keySelector: (R) -> K,
     ): ObjectDifference<T> {
         addIfDifferent(property.name, property.compareUnorderedValueCollection(source, target, keySelector))
         return this

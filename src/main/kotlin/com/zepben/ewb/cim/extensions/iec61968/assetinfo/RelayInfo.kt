@@ -66,7 +66,7 @@ class RelayInfo(mRID: String) : AssetInfo(mRID) {
     @JvmOverloads
     fun addDelay(
         delay: Double,
-        sequenceNumber: Int = numDelays()
+        sequenceNumber: Int = numDelays(),
     ): RelayInfo {
         require(sequenceNumber in 0..(numDelays())) {
             "Unable to add Double to ${typeNameAndMRID()}. " +

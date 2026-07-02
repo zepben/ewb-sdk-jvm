@@ -20,14 +20,14 @@ import com.zepben.ewb.database.sql.generators.SqliteGenerator
  * The collection of tables for our diagram databases.
  */
 class DiagramDatabaseTables(
-    override val sqlGenerator: SqlGenerator = SqliteGenerator
+    override val sqlGenerator: SqlGenerator = SqliteGenerator,
 ) : CimDatabaseTables() {
 
     override val includedTables: Sequence<SqlTable> =
         super.includedTables + sequenceOf(
             TableDiagramObjectPoints(),
             TableDiagramObjects(),
-            TableDiagrams()
+            TableDiagrams(),
         )
 
 }

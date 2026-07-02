@@ -70,7 +70,7 @@ class NetworkTrace<T> private constructor(
     parent: NetworkTrace<T>? = null,
     private val actionType: NetworkTraceActionType,
     debugLogger: Logger?,
-    override val name: String
+    override val name: String,
 ) : Traversal<NetworkTraceStep<T>, NetworkTrace<T>>(queueType, parent, debugLogger) {
 
     // Setting initial capacity greater than default of 16 for non-branching traces as we suspect a majority of network traces will step on more than 12
@@ -79,7 +79,7 @@ class NetworkTrace<T> private constructor(
         when (queueType) {
             is BasicQueueType<*, *> -> 256
             is BranchingQueueType<*, *> -> 16
-        }
+        },
     )
 
     // Non-branching instance that takes a normal compute data
@@ -132,7 +132,7 @@ class NetworkTrace<T> private constructor(
         BranchingQueueType(
             NetworkTraceQueueNext.Branching(networkStateOperators, computeData.withActionType(actionType)),
             queueFactory,
-            branchQueueFactory
+            branchQueueFactory,
         ),
         parent,
         actionType,
@@ -156,7 +156,7 @@ class NetworkTrace<T> private constructor(
         BranchingQueueType(
             NetworkTraceQueueNext.Branching(networkStateOperators, computeNextT.withActionType(actionType)),
             queueFactory,
-            branchQueueFactory
+            branchQueueFactory,
         ),
         parent,
         actionType,

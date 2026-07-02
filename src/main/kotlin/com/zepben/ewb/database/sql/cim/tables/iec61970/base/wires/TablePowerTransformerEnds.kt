@@ -55,11 +55,11 @@ class TablePowerTransformerEnds : TableTransformerEnds() {
 
     init {
         addUniqueIndexes(
-            listOf(POWER_TRANSFORMER_MRID, END_NUMBER)
+            listOf(POWER_TRANSFORMER_MRID, END_NUMBER),
         )
 
         addNonUniqueIndexes(
-            listOf(POWER_TRANSFORMER_MRID)
+            listOf(POWER_TRANSFORMER_MRID),
         )
     }
 

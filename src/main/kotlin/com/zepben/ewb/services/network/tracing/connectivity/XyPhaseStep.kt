@@ -17,5 +17,5 @@ import com.zepben.ewb.cim.iec61970.base.core.Terminal
  */
 data class XyPhaseStep(
     val terminal: Terminal,
-    val phaseCode: PhaseCode
+    val phaseCode: PhaseCode,
 )

@@ -35,7 +35,7 @@ internal class MetadataEntryReader {
         val dataSource = DataSource(
             setIdentifier(resultSet.getString(table.SOURCE.queryIndex)),
             resultSet.getString(table.VERSION.queryIndex),
-            resultSet.getInstant(table.TIMESTAMP.queryIndex) ?: Instant.EPOCH
+            resultSet.getInstant(table.TIMESTAMP.queryIndex) ?: Instant.EPOCH,
         )
 
         return metadata.add(dataSource)

@@ -39,7 +39,7 @@ class IssueTracker(
     fun track(
         format: String,
         vararg formatArgs: Any?,
-        networkContainers: List<NetworkContainer> = emptyList()
+        networkContainers: List<NetworkContainer> = emptyList(),
     ): IssueTracker = track(String.format(format, *formatArgs), networkContainers)
 
     /**

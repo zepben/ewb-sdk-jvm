@@ -20,7 +20,7 @@ class Column internal constructor(
     val queryIndex: Int,
     val name: String,
     val type: Type,
-    val nullable: Nullable
+    val nullable: Nullable,
 ) {
 
     /**

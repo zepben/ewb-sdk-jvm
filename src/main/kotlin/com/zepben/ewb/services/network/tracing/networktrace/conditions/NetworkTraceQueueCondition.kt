@@ -41,14 +41,14 @@ abstract class NetworkTraceQueueCondition<T>(val stepType: NetworkTraceStep.Type
         nextItem: NetworkTraceStep<T>,
         nextContext: StepContext,
         currentItem: NetworkTraceStep<T>,
-        currentContext: StepContext
+        currentContext: StepContext,
     ): Boolean
 
     private fun shouldQueueInternalStep(
         nextItem: NetworkTraceStep<T>,
         nextContext: StepContext,
         currentItem: NetworkTraceStep<T>,
-        currentContext: StepContext
+        currentContext: StepContext,
     ): Boolean =
         if (nextItem.type == NetworkTraceStep.Type.INTERNAL) shouldQueueMatchedStep(nextItem, nextContext, currentItem, currentContext) else true
 
@@ -56,7 +56,7 @@ abstract class NetworkTraceQueueCondition<T>(val stepType: NetworkTraceStep.Type
         nextItem: NetworkTraceStep<T>,
         nextContext: StepContext,
         currentItem: NetworkTraceStep<T>,
-        currentContext: StepContext
+        currentContext: StepContext,
     ): Boolean =
         if (nextItem.type == NetworkTraceStep.Type.EXTERNAL) shouldQueueMatchedStep(nextItem, nextContext, currentItem, currentContext) else true
 
@@ -77,13 +77,13 @@ abstract class NetworkTraceQueueCondition<T>(val stepType: NetworkTraceStep.Type
 
 private class DelegatedNetworkTraceQueueCondition<T>(
     stepType: NetworkTraceStep.Type,
-    val delegate: QueueCondition<NetworkTraceStep<T>>
+    val delegate: QueueCondition<NetworkTraceStep<T>>,
 ) : NetworkTraceQueueCondition<T>(stepType) {
     override fun shouldQueueMatchedStep(
         nextItem: NetworkTraceStep<T>,
         nextContext: StepContext,
         currentItem: NetworkTraceStep<T>,
-        currentContext: StepContext
+        currentContext: StepContext,
     ): Boolean = delegate.shouldQueue(nextItem, nextContext, currentItem, currentContext)
 
     override fun shouldQueueStartItem(item: NetworkTraceStep<T>): Boolean = delegate.shouldQueueStartItem(item)

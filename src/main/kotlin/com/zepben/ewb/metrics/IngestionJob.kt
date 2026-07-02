@@ -22,5 +22,5 @@ data class IngestionJob @JvmOverloads constructor(
     val id: UUID,
     val metadata: IngestionMetadata,
     val sources: JobSources = JobSources(),
-    val networkMetrics: NetworkMetrics = NetworkMetrics()
+    val networkMetrics: NetworkMetrics = NetworkMetrics(),
 )

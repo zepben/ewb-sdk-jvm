@@ -33,12 +33,12 @@ class TableAcLineSegmentPhases : TablePowerSystemResources() {
 
     init {
         addUniqueIndexes(
-            listOf(AC_LINE_SEGMENT_MRID, PHASE)
+            listOf(AC_LINE_SEGMENT_MRID, PHASE),
         )
 
         addNonUniqueIndexes(
             listOf(AC_LINE_SEGMENT_MRID),
-            listOf(WIRE_INFO_MRID)
+            listOf(WIRE_INFO_MRID),
         )
     }
 

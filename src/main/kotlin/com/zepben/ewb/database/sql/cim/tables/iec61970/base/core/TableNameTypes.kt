@@ -29,7 +29,7 @@ class TableNameTypes : SqlTable() {
 
     init {
         addUniqueIndexes(
-            listOf(NAME)
+            listOf(NAME),
         )
     }
 

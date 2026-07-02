@@ -25,7 +25,7 @@ internal fun changeSet63() = ChangeSet(
 
         // Customer changes
         `add validity interval fields to agreements table`,
-    )
+    ),
 )
 
 // ###################
@@ -39,7 +39,7 @@ private val `create usage_points_contact_details table` = Change(
         "CREATE UNIQUE INDEX usage_points_contact_details_id ON usage_points_contact_details (id);",
         "CREATE INDEX usage_points_contact_details_usage_point_mrid ON usage_points_contact_details (usage_point_mrid);",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )
 
 @Suppress("ObjectPropertyName")
@@ -48,7 +48,7 @@ private val `create contact_details_electronic_addresses table` = Change(
         "CREATE TABLE contact_details_electronic_addresses (email_1 TEXT NULL, is_primary BOOLEAN NULL, description TEXT NULL, contact_details_id TEXT NOT NULL);",
         "CREATE INDEX contact_details_electronic_addresses_contact_details_id ON contact_details_electronic_addresses (contact_details_id);",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )
 
 @Suppress("ObjectPropertyName")
@@ -57,7 +57,7 @@ private val `create contact_details_street_addresses table` = Change(
         "CREATE TABLE contact_details_street_addresses (town_name TEXT NULL, state_or_province TEXT NULL, country TEXT NULL, postal_code TEXT NULL, po_box TEXT NULL, building_name TEXT NULL, floor_identification TEXT NULL, name TEXT NULL, number TEXT NULL, suite_number TEXT NULL, type TEXT NULL, display_address TEXT NULL, building_number TEXT NULL, contact_details_id TEXT NOT NULL);",
         "CREATE INDEX contact_details_street_addresses_contact_details_id ON contact_details_street_addresses (contact_details_id);",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )
 
 @Suppress("ObjectPropertyName")
@@ -66,7 +66,7 @@ private val `create contact_details_telephone_numbers table` = Change(
         "CREATE TABLE contact_details_telephone_numbers (area_code TEXT NULL, city_code TEXT NULL, country_code TEXT NULL, dial_out TEXT NULL, extension TEXT NULL, international_prefix TEXT NULL, local_number TEXT NULL, is_primary BOOLEAN NULL, description TEXT NULL, contact_details_id TEXT NOT NULL);",
         "CREATE INDEX contact_details_telephone_numbers_contact_details_id ON contact_details_telephone_numbers (contact_details_id);",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )
 
 @Suppress("ObjectPropertyName")
@@ -76,7 +76,7 @@ private val `create directional_current_relays table` = Change(
         "CREATE UNIQUE INDEX directional_current_relays_mrid ON directional_current_relays (mrid);",
         "CREATE INDEX directional_current_relays_name ON directional_current_relays (name);",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )
 
 @Suppress("ObjectPropertyName")
@@ -85,7 +85,7 @@ private val `add building number and country fields to street address tables` = 
         "ALTER TABLE location_street_addresses ADD building_number TEXT NULL;",
         "ALTER TABLE location_street_addresses ADD country TEXT NULL;",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )
 
 // ####################
@@ -98,5 +98,5 @@ private val `add validity interval fields to agreements table` = Change(
         "ALTER TABLE customer_agreements ADD validity_interval_start TEXT NULL;",
         "ALTER TABLE customer_agreements ADD validity_interval_end TEXT NULL;",
     ),
-    targetDatabases = setOf(DatabaseType.CUSTOMER)
+    targetDatabases = setOf(DatabaseType.CUSTOMER),
 )

@@ -35,7 +35,7 @@ class CustomerDatabaseReader internal constructor(
     databaseDescription,
     databaseTables,
     createMetadataReader,
-    createServiceReader
+    createServiceReader,
 ) {
 
     /**
@@ -44,13 +44,13 @@ class CustomerDatabaseReader internal constructor(
      */
     constructor(
         connection: Connection,
-        databaseDescription: String
+        databaseDescription: String,
     ) : this(
         connection,
         databaseDescription,
         CustomerDatabaseTables(),
         ::MetadataCollectionReader,
-        ::CustomerServiceReader
+        ::CustomerServiceReader,
     )
 
 }

@@ -28,12 +28,12 @@ class TableSynchronousMachinesReactiveCapabilityCurves : SqlTable() {
 
     init {
         addUniqueIndexes(
-            listOf(SYNCHRONOUS_MACHINE_MRID, REACTIVE_CAPABILITY_CURVE_MRID)
+            listOf(SYNCHRONOUS_MACHINE_MRID, REACTIVE_CAPABILITY_CURVE_MRID),
         )
 
         addNonUniqueIndexes(
             listOf(SYNCHRONOUS_MACHINE_MRID),
-            listOf(REACTIVE_CAPABILITY_CURVE_MRID)
+            listOf(REACTIVE_CAPABILITY_CURVE_MRID),
         )
     }
 

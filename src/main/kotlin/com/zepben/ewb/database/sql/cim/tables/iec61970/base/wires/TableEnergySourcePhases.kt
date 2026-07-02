@@ -30,11 +30,11 @@ class TableEnergySourcePhases : TablePowerSystemResources() {
 
     init {
         addUniqueIndexes(
-            listOf(ENERGY_SOURCE_MRID, PHASE)
+            listOf(ENERGY_SOURCE_MRID, PHASE),
         )
 
         addNonUniqueIndexes(
-            listOf(ENERGY_SOURCE_MRID)
+            listOf(ENERGY_SOURCE_MRID),
         )
     }
 

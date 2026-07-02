@@ -22,14 +22,14 @@ import java.net.http.HttpResponse
 
 data class ProviderDetails(
     val tokenEndpoint: String,
-    val jwkUrl: String
+    val jwkUrl: String,
 )
 
 data class AuthProviderConfig(
     val issuer: String,
     val audience: String,
     val authMethod: AuthMethod = AuthMethod.OAUTH,
-    val providerDetails: ProviderDetails = ProviderDetails("", "")
+    val providerDetails: ProviderDetails = ProviderDetails("", ""),
 )
 
 /**
@@ -52,7 +52,7 @@ fun fetchProviderDetails(
             HttpClient.newBuilder().build()
         }
     },
-    handler: HttpResponse.BodyHandler<String> = HttpResponse.BodyHandlers.ofString()
+    handler: HttpResponse.BodyHandler<String> = HttpResponse.BodyHandlers.ofString(),
 ): ProviderDetails {
     val issuerURL = "${issuer.trimEnd('/')}/.well-known/openid-configuration"
     val response: HttpResponse<String> = httpClientCreator().send(HttpRequest.newBuilder().uri(URI(issuerURL)).GET().build(), handler)
@@ -67,18 +67,18 @@ fun fetchProviderDetails(
         } catch (e: DecodeException) {
             throw AuthException(
                 response.statusCode(),
-                "Expected JSON response from $issuerURL, but got: ${response.body()}."
+                "Expected JSON response from $issuerURL, but got: ${response.body()}.",
             )
         } catch (e: ClassCastException) {
             throw AuthException(
                 response.statusCode(),
-                "Expected JSON object from $issuerURL, but got: ${response.body()}."
+                "Expected JSON object from $issuerURL, but got: ${response.body()}.",
             )
         }
     } else {
         throw AuthException(
             response.statusCode(),
-            "$issuerURL responded with error: ${response.statusCode()} - ${response.body()}"
+            "$issuerURL responded with error: ${response.statusCode()} - ${response.body()}",
         )
     }
 }
@@ -108,7 +108,7 @@ fun createProviderConfig(
     handler: HttpResponse.BodyHandler<String> = HttpResponse.BodyHandlers.ofString(),
     authTypeField: String = "authType",
     audienceField: String = "audience",
-    issuerField: String = "issuer"
+    issuerField: String = "issuer",
 ): AuthProviderConfig {
 
     // Fetch the auth data from EWB
@@ -129,7 +129,7 @@ fun createProviderConfig(
                 if (authMethod == AuthMethod.NONE) {
                     throw AuthException(
                         1,
-                        "Detected Auth set to NONE, this is not supported for fetching tokens! Check your configuration matches $confAddress"
+                        "Detected Auth set to NONE, this is not supported for fetching tokens! Check your configuration matches $confAddress",
                     )
                 }
 
@@ -137,23 +137,23 @@ fun createProviderConfig(
                     authMethod = authMethod,
                     issuer = issuer,
                     audience = authConfigJson.getString(audienceField, ""),
-                    providerDetails = fetchProviderDetails(issuer, verifyCertificates, httpClientCreator, handler)
+                    providerDetails = fetchProviderDetails(issuer, verifyCertificates, httpClientCreator, handler),
                 )
             } catch (e: DecodeException) {
                 throw AuthException(
                     response.statusCode(),
-                    "Expected JSON response from $confAddress, but got: ${response.body()}."
+                    "Expected JSON response from $confAddress, but got: ${response.body()}.",
                 )
             } catch (e: ClassCastException) {
                 throw AuthException(
                     response.statusCode(),
-                    "Expected JSON object from $confAddress, but got: ${response.body()}."
+                    "Expected JSON object from $confAddress, but got: ${response.body()}.",
                 )
             }
         } else {
             throw AuthException(
                 response.statusCode(),
-                "$confAddress responded with error: ${response.statusCode()} - ${response.body()}"
+                "$confAddress responded with error: ${response.statusCode()} - ${response.body()}",
             )
         }
     } ?: throw AuthException(1, "Unexpected error while attempting to fetch auth details from $confAddress")

@@ -72,7 +72,7 @@ internal class NetworkTraceStepPathProvider(val stateOperators: InServiceStateOp
                     towardsSegmentT2 = true,
                     canStopAtCutsAtSamePosition = true,
                     cutAtSamePositionTerminalNumber = 1,
-                    pathFactory = pathFactory
+                    pathFactory = pathFactory,
                 )
             else {
                 segment.traverseFromTerminal(
@@ -81,7 +81,7 @@ internal class NetworkTraceStepPathProvider(val stateOperators: InServiceStateOp
                     towardsSegmentT2 = false,
                     canStopAtCutsAtSamePosition = true,
                     cutAtSamePositionTerminalNumber = 2,
-                    pathFactory = pathFactory
+                    pathFactory = pathFactory,
                 )
             }
         }
@@ -110,7 +110,7 @@ internal class NetworkTraceStepPathProvider(val stateOperators: InServiceStateOp
     private fun traverseAcLineSegmentFromClamp(
         clamp: Clamp,
         path: NetworkTraceStep.Path,
-        pathFactory: PathFactory
+        pathFactory: PathFactory,
     ): Sequence<NetworkTraceStep.Path> {
         // Because we consider clamps at the same position as a cut on the terminal 1 side of the cut, we do not stop at cuts at the same position when
         // traversing towards t1, but we do when traversing towards t2.
@@ -120,7 +120,7 @@ internal class NetworkTraceStepPathProvider(val stateOperators: InServiceStateOp
             towardsSegmentT2 = false,
             canStopAtCutsAtSamePosition = false,
             cutAtSamePositionTerminalNumber = 1,
-            pathFactory = pathFactory
+            pathFactory = pathFactory,
         ).orEmpty()
 
         val nextPathsTowardsT2 = clamp.acLineSegment?.traverseFromTerminal(
@@ -129,7 +129,7 @@ internal class NetworkTraceStepPathProvider(val stateOperators: InServiceStateOp
             towardsSegmentT2 = true,
             canStopAtCutsAtSamePosition = true,
             cutAtSamePositionTerminalNumber = 1,
-            pathFactory = pathFactory
+            pathFactory = pathFactory,
         ).orEmpty()
 
         return (nextPathsTowardsT1 + nextPathsTowardsT2).distinctBy { it.toTerminal }
@@ -147,7 +147,7 @@ internal class NetworkTraceStepPathProvider(val stateOperators: InServiceStateOp
                 towardsSegmentT2 = path.toTerminal.sequenceNumber != 1,
                 canStopAtCutsAtSamePosition = false,
                 cutAtSamePositionTerminalNumber = path.toTerminal.sequenceNumber,
-                pathFactory = pathFactory
+                pathFactory = pathFactory,
             ).orEmpty()
         }
 
@@ -203,7 +203,7 @@ internal class NetworkTraceStepPathProvider(val stateOperators: InServiceStateOp
         towardsSegmentT2: Boolean,
         canStopAtCutsAtSamePosition: Boolean,
         cutAtSamePositionTerminalNumber: Int,
-        pathFactory: PathFactory
+        pathFactory: PathFactory,
     ): Sequence<NetworkTraceStep.Path> {
         // Can do a simple return if we don't need to do any special cuts/clamps processing
         if (cuts.isEmpty() && clamps.isEmpty())
@@ -237,7 +237,8 @@ internal class NetworkTraceStepPathProvider(val stateOperators: InServiceStateOp
                 towardsSegmentT2 -> { it: Clamp -> it.lengthFromT1Or0 > lengthFromT1 && it.lengthFromT1Or0 <= nextTerminalLengthFromTerminal1 }
                 nextTerminalLengthFromTerminal1 == 0.0 && nextCuts.isEmpty() -> { it: Clamp -> it.lengthFromT1Or0 in nextTerminalLengthFromTerminal1..lengthFromT1 }
                 else -> { it: Clamp -> it.lengthFromT1Or0 <= lengthFromT1 && it.lengthFromT1Or0 > nextTerminalLengthFromTerminal1 }
-            })
+            },
+        )
 
         val nextStopTerminals = when {
             stopAtCutsAtSamePosition -> sequenceOf()

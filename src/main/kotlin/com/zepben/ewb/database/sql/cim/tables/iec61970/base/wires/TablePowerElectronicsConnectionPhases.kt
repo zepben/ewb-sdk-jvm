@@ -35,7 +35,7 @@ class TablePowerElectronicsConnectionPhases : TablePowerSystemResources() {
 
     init {
         addNonUniqueIndexes(
-            listOf(POWER_ELECTRONICS_CONNECTION_MRID)
+            listOf(POWER_ELECTRONICS_CONNECTION_MRID),
         )
     }
 

@@ -52,7 +52,7 @@ data class TelephoneNumber(
             listOfNotNull(
                 dialOut,
                 internationalPrefix?.let { "$it$maybeItuFormattedPhone" } ?: maybeItuFormattedPhone,
-                extension?.let { "ext $it" }
+                extension?.let { "ext $it" },
             ).joinToString(separator = " ")
         } [primary: $isPrimary]"
 

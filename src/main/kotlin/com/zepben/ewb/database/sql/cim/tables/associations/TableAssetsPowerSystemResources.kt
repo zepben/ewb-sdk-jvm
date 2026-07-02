@@ -28,12 +28,12 @@ class TableAssetsPowerSystemResources : SqlTable() {
 
     init {
         addUniqueIndexes(
-            listOf(ASSET_MRID, POWER_SYSTEM_RESOURCE_MRID)
+            listOf(ASSET_MRID, POWER_SYSTEM_RESOURCE_MRID),
         )
 
         addNonUniqueIndexes(
             listOf(ASSET_MRID),
-            listOf(POWER_SYSTEM_RESOURCE_MRID)
+            listOf(POWER_SYSTEM_RESOURCE_MRID),
         )
     }
 

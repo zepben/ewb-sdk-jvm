@@ -14,7 +14,6 @@ import com.zepben.ewb.services.common.translator.toLocalDateTime
 import com.zepben.ewb.streaming.data.CurrentStateEvent
 import com.zepben.ewb.streaming.data.CurrentStateEventBatch
 import com.zepben.ewb.streaming.data.SetCurrentStatesStatus
-import com.zepben.ewb.streaming.get.QueryNetworkStateService.ProcessingErrorHandler
 import com.zepben.protobuf.connection.CheckConnectionRequest
 import com.zepben.protobuf.ns.GetCurrentStatesRequest
 import com.zepben.protobuf.ns.GetCurrentStatesResponse
@@ -26,7 +25,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 import java.util.stream.Stream
-import kotlin.jvm.javaClass
 import kotlin.streams.asSequence
 
 /**
@@ -107,7 +105,7 @@ class QueryNetworkStateService(
             { from, to -> onGetCurrentStates.get(from, to).asSequence() },
             { eventStatus -> onCurrentStatesStatus.handle(eventStatus) },
             logger,
-            { error -> onProcessingError.handle(error) }
+            { error -> onProcessingError.handle(error) },
         )
 
     /**
@@ -139,9 +137,10 @@ class QueryNetworkStateService(
 
             responseObserver.onCompleted()
         } catch (e: Throwable) {
-            responseObserver.onError(Status.fromThrowable(e)
-                .withDescription("Failed to query current state events, contact your administrator")
-                .asException()
+            responseObserver.onError(
+                Status.fromThrowable(e)
+                    .withDescription("Failed to query current state events, contact your administrator")
+                    .asException(),
             )
             logger.error("Failed to retrieve current state events: ", e)
         }

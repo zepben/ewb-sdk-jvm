@@ -23,7 +23,7 @@ open class NetworkStateIssues(logger: Logger, networkMetrics: NetworkMetrics) : 
         summaryLogLevel = Level.WARN,
         logIssues = true,
         networkMetrics = networkMetrics,
-        metricName = "invalid_backlog_events"
+        metricName = "invalid_backlog_events",
     ) {
         "$it backlog events could not be deserialised"
     }

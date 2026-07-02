@@ -37,7 +37,7 @@ data class GrpcBuildArgs(
     val skipConnectionTest: Boolean = false,
     val debugConnectionTest: Boolean = false,
     val connectionTestTimeoutMs: Long = 10000,
-    val maxInboundMessageSize: Int = TWENTY_MEGABYTES
+    val maxInboundMessageSize: Int = TWENTY_MEGABYTES,
 )
 
 val DEFAULT_BUILD_ARGS =
@@ -72,7 +72,7 @@ class GrpcChannelBuilder {
             _callCredentials?.let { callCreds ->
                 channelBuilder.intercept(CallCredentialApplier(callCreds)).build()
             } ?: channelBuilder.build()
-        } ?: NettyChannelBuilder.forAddress(_host, _port).usePlaintext().maxInboundMessageSize(buildArgs.maxInboundMessageSize).build()
+        } ?: NettyChannelBuilder.forAddress(_host, _port).usePlaintext().maxInboundMessageSize(buildArgs.maxInboundMessageSize).build(),
     ).also {
         if (!buildArgs.skipConnectionTest)
             testConnection(it, GRPC_CLIENT_CONNECTION_TESTS, buildArgs.debugConnectionTest, buildArgs.connectionTestTimeoutMs)
@@ -82,7 +82,7 @@ class GrpcChannelBuilder {
         grpcChannel: GrpcChannel,
         clients: Map<String, MethodDescriptor<CheckConnectionRequest, Empty>>,
         debug: Boolean,
-        timeoutMs: Long
+        timeoutMs: Long,
     ) {
 
         val debugErrors = mutableMapOf<String, StatusRuntimeException>()
@@ -98,7 +98,7 @@ class GrpcChannelBuilder {
                 // TODO: this could probably just use client stubs because deadlines don't really work
                 ClientCalls.blockingUnaryCall(
                     grpcChannel.channel.newCall(methodDescriptor, callOptions.withDeadlineAfter(timeoutMs, TimeUnit.MILLISECONDS)),
-                    request
+                    request,
                 )
                 logger.debug("Initial connection test with $desc succeeded. Returning GrpcChannel to client.")
                 return
@@ -118,7 +118,7 @@ class GrpcChannelBuilder {
 
     fun forAddress(
         host: String,
-        port: Int
+        port: Int,
     ): GrpcChannelBuilder = apply {
         _host = host
         _port = port
@@ -126,7 +126,7 @@ class GrpcChannelBuilder {
 
     fun makeSecure(
         rootCertificates: File,
-        verifyCertificates: Boolean = true
+        verifyCertificates: Boolean = true,
     ): GrpcChannelBuilder = apply {
         _channelCredentials = if (!verifyCertificates) {
             TlsChannelCredentials.newBuilder().trustManager(*InsecureTrustManagerFactory.INSTANCE.trustManagers).build()
@@ -148,7 +148,7 @@ class GrpcChannelBuilder {
     fun makeSecure(
         rootCertificates: File? = null,
         certificateChain: File,
-        privateKey: File
+        privateKey: File,
     ): GrpcChannelBuilder = apply {
         var channelCredentialsBuilder = TlsChannelCredentials.newBuilder().keyManager(certificateChain, privateKey)
         if (rootCertificates != null) {
@@ -160,7 +160,7 @@ class GrpcChannelBuilder {
     fun makeSecure(
         rootCertificates: String? = null,
         certificateChain: String,
-        privateKey: String
+        privateKey: String,
     ): GrpcChannelBuilder = makeSecure(rootCertificates?.let { File(it) }, File(certificateChain), File(privateKey))
 
     fun makeInsecure(): GrpcChannelBuilder = apply {

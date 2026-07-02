@@ -19,7 +19,7 @@ import java.util.*
  */
 class WeightedPriorityQueue<T>(
     private val queueProvider: () -> TraversalQueue<T>,
-    private val getWeight: (T) -> Int
+    private val getWeight: (T) -> Int,
 ) : TraversalQueue<T> {
 
     private val queue: MutableMap<Int, TraversalQueue<T>> = TreeMap(Collections.reverseOrder())
@@ -78,7 +78,7 @@ class WeightedPriorityQueue<T>(
          */
         fun <T, U : Traversal<T, *>> branchQueue(getWeight: (T) -> Int): TraversalQueue<U> = WeightedPriorityQueue(
             { TraversalQueue.breadthFirst() },
-            { traversal -> traversal.startItems().firstOrNull()?.let { getWeight(it) } ?: -1 }
+            { traversal -> traversal.startItems().firstOrNull()?.let { getWeight(it) } ?: -1 },
         )
 
     }

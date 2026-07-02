@@ -14,7 +14,7 @@ import java.lang.ref.WeakReference
 
 class TreeNode<T : IdentifiedObject>(
     val identifiedObject: T,
-    parent: TreeNode<T>?
+    parent: TreeNode<T>?,
 ) {
 
     val parent: TreeNode<T>?

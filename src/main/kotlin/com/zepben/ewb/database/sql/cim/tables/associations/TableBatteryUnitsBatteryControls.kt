@@ -28,12 +28,12 @@ class TableBatteryUnitsBatteryControls : SqlTable() {
 
     init {
         addUniqueIndexes(
-            listOf(BATTERY_UNIT_MRID, BATTERY_CONTROL_MRID)
+            listOf(BATTERY_UNIT_MRID, BATTERY_CONTROL_MRID),
         )
 
         addNonUniqueIndexes(
             listOf(BATTERY_UNIT_MRID),
-            listOf(BATTERY_CONTROL_MRID)
+            listOf(BATTERY_CONTROL_MRID),
         )
     }
 

@@ -23,7 +23,7 @@ data class AuthResponse(
     val statusCode: StatusCode,
     val message: String? = null,
     val cause: Throwable? = null,
-    val token: DecodedJWT? = null
+    val token: DecodedJWT? = null,
 )
 
 fun AuthResponse.asException(): AuthException = AuthException(statusCode.code, message)
@@ -47,8 +47,8 @@ open class JWTAuthenticator(
     private val verifierBuilder: JWTMultiIssuerVerifierBuilder = JWTMultiIssuerVerifierBuilder(
         requiredAudience = audience,
         trustedIssuers = trustedIssuers,
-        verifyCertificates = verifyCertificates
-    )
+        verifyCertificates = verifyCertificates,
+    ),
 ) : TokenAuthenticator {
 
     private val logger = LoggerFactory.getLogger(javaClass)

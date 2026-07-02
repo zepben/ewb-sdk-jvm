@@ -56,7 +56,7 @@ import com.zepben.ewb.services.network.NetworkService
  */
 internal class NetworkServiceWriter(
     databaseTables: NetworkDatabaseTables,
-    override val writer: NetworkCimWriter = NetworkCimWriter(databaseTables)
+    override val writer: NetworkCimWriter = NetworkCimWriter(databaseTables),
 ) : BaseServiceWriter<NetworkService>(writer) {
 
     override fun NetworkService.writeService(): Boolean =

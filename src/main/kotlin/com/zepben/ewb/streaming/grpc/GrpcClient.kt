@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit
  *
  * Inherits from [AutoCloseable] to shut down any executors created to monitor the gRPC stub. These executors stubs will be implemented in the leaves as they share no common ancestry.
  */
-abstract class GrpcClient<T : AbstractAsyncStub<T>>: AutoCloseable {
+abstract class GrpcClient<T : AbstractAsyncStub<T>> : AutoCloseable {
 
     protected abstract val stub: T
 

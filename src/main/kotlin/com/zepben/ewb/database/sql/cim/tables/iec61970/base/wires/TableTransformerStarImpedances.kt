@@ -34,7 +34,7 @@ class TableTransformerStarImpedances : TableIdentifiedObjects() {
 
     init {
         addUniqueIndexes(
-            listOf(TRANSFORMER_END_INFO_MRID)
+            listOf(TRANSFORMER_END_INFO_MRID),
         )
     }
 

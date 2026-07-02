@@ -28,12 +28,12 @@ class TableEquipmentOperationalRestrictions : SqlTable() {
 
     init {
         addUniqueIndexes(
-            listOf(EQUIPMENT_MRID, OPERATIONAL_RESTRICTION_MRID)
+            listOf(EQUIPMENT_MRID, OPERATIONAL_RESTRICTION_MRID),
         )
 
         addNonUniqueIndexes(
             listOf(EQUIPMENT_MRID),
-            listOf(OPERATIONAL_RESTRICTION_MRID)
+            listOf(OPERATIONAL_RESTRICTION_MRID),
         )
     }
 

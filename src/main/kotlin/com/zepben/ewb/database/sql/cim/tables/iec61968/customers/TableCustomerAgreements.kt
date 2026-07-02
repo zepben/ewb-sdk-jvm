@@ -26,7 +26,7 @@ class TableCustomerAgreements : TableAgreements() {
 
     init {
         addNonUniqueIndexes(
-            listOf(CUSTOMER_MRID)
+            listOf(CUSTOMER_MRID),
         )
     }
 

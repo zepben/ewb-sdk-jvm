@@ -16,7 +16,10 @@ import com.zepben.ewb.cim.iec61970.base.core.BaseVoltage
 import com.zepben.ewb.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.ewb.cim.iec61970.base.core.ConnectivityNode
 import com.zepben.ewb.cim.iec61970.base.core.Terminal
-import com.zepben.ewb.services.common.extensions.*
+import com.zepben.ewb.services.common.extensions.asUnmodifiable
+import com.zepben.ewb.services.common.extensions.getByMRID
+import com.zepben.ewb.services.common.extensions.safeRemove
+import com.zepben.ewb.services.common.extensions.validateReference
 
 /**
  * An electrical device consisting of  two or more coupled windings, with or without a magnetic core, for introducing mutual coupling

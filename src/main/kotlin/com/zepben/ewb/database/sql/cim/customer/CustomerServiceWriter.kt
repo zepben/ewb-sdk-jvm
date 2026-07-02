@@ -23,7 +23,7 @@ import com.zepben.ewb.services.customer.CustomerService
  */
 internal class CustomerServiceWriter(
     databaseTables: CustomerDatabaseTables,
-    override val writer: CustomerCimWriter = CustomerCimWriter(databaseTables)
+    override val writer: CustomerCimWriter = CustomerCimWriter(databaseTables),
 ) : BaseServiceWriter<CustomerService>(writer) {
 
     override fun CustomerService.writeService(): Boolean =

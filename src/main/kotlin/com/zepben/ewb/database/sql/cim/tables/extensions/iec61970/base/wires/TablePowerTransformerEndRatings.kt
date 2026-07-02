@@ -30,11 +30,11 @@ class TablePowerTransformerEndRatings : SqlTable() {
 
     init {
         addUniqueIndexes(
-            listOf(POWER_TRANSFORMER_END_MRID, COOLING_TYPE)
+            listOf(POWER_TRANSFORMER_END_MRID, COOLING_TYPE),
         )
 
         addNonUniqueIndexes(
-            listOf(POWER_TRANSFORMER_END_MRID)
+            listOf(POWER_TRANSFORMER_END_MRID),
         )
     }
 

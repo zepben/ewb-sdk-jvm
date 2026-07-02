@@ -30,12 +30,12 @@ class TableLoopsSubstations : SqlTable() {
 
     init {
         addUniqueIndexes(
-            listOf(LOOP_MRID, SUBSTATION_MRID)
+            listOf(LOOP_MRID, SUBSTATION_MRID),
         )
 
         addNonUniqueIndexes(
             listOf(LOOP_MRID),
-            listOf(SUBSTATION_MRID)
+            listOf(SUBSTATION_MRID),
         )
     }
 

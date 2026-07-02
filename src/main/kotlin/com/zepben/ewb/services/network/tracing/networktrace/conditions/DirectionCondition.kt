@@ -19,7 +19,7 @@ import com.zepben.ewb.services.network.tracing.traversal.StepContext
 
 internal class DirectionCondition<T>(
     val direction: FeederDirection,
-    val stateOperators: NetworkStateOperators
+    val stateOperators: NetworkStateOperators,
 ) : QueueCondition<NetworkTraceStep<T>> {
 
     private val getDirection = stateOperators::getDirection

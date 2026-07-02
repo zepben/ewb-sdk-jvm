@@ -31,11 +31,11 @@ class TableProtectionRelayFunctionTimeLimits : SqlTable() {
 
     init {
         addUniqueIndexes(
-            listOf(PROTECTION_RELAY_FUNCTION_MRID, SEQUENCE_NUMBER)
+            listOf(PROTECTION_RELAY_FUNCTION_MRID, SEQUENCE_NUMBER),
         )
 
         addNonUniqueIndexes(
-            listOf(PROTECTION_RELAY_FUNCTION_MRID)
+            listOf(PROTECTION_RELAY_FUNCTION_MRID),
         )
     }
 

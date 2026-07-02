@@ -31,7 +31,7 @@ class TableLvFeeders : TableEquipmentContainers() {
     init {
         addNonUniqueIndexes(
             listOf(NORMAL_HEAD_TERMINAL_MRID),
-            listOf(LV_SUBSTATION_MRID)
+            listOf(LV_SUBSTATION_MRID),
         )
     }
 

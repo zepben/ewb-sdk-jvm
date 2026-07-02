@@ -20,7 +20,7 @@ import com.zepben.ewb.services.network.tracing.networktrace.operators.NetworkSta
 import org.slf4j.Logger
 
 class PhaseInferrer(
-    private val debugLogger: Logger?
+    private val debugLogger: Logger?,
 ) {
 
     data class InferredPhase(val conductingEquipment: ConductingEquipment, val suspect: Boolean) {
@@ -42,7 +42,7 @@ class PhaseInferrer(
 
     private class PhaseInferrerInternal(
         val stateOperators: NetworkStateOperators,
-        private val debugLogger: Logger?
+        private val debugLogger: Logger?,
     ) {
         fun inferMissingPhases(network: NetworkService, tracking: MutableMap<ConductingEquipment, Boolean>) {
             do {

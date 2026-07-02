@@ -33,7 +33,7 @@ import org.slf4j.Logger
  * This class is backed by a [NetworkTrace].
  */
 class AssignToFeeders(
-    private val debugLogger: Logger?
+    private val debugLogger: Logger?,
 ) {
 
     /**
@@ -48,7 +48,7 @@ class AssignToFeeders(
     fun run(
         network: NetworkService,
         networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
-        startTerminal: Terminal? = null
+        startTerminal: Terminal? = null,
     ): Unit = AssignToFeedersInternal(networkStateOperators, debugLogger)
         .run(network, startTerminal)
 
@@ -70,13 +70,13 @@ class AssignToFeeders(
         lvFeederStartPoints: Set<ConductingEquipment>,
         terminalToAuxEquipment: Map<Terminal, List<AuxiliaryEquipment>>,
         feedersToAssign: List<Feeder>,
-        networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL
+        networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
     ): Unit = AssignToFeedersInternal(networkStateOperators, debugLogger)
         .run(terminal, feederStartPoints, lvFeederStartPoints, terminalToAuxEquipment, feedersToAssign)
 
     private class AssignToFeedersInternal(
         private val stateOperators: NetworkStateOperators,
-        private val debugLogger: Logger?
+        private val debugLogger: Logger?,
     ) {
 
         fun run(network: NetworkService, startTerminal: Terminal?) {
@@ -97,7 +97,7 @@ class AssignToFeeders(
             feederStartPoints: Set<ConductingEquipment>,
             lvFeederStartPoints: Set<ConductingEquipment>,
             terminalToAuxEquipment: Map<Terminal, List<AuxiliaryEquipment>>,
-            feedersToAssign: List<Feeder>
+            feedersToAssign: List<Feeder>,
         ) {
             // If there is no terminal, or there are no feeders to assign, then we have nothing to do.
             if ((terminal == null) || (feedersToAssign.isEmpty()))
@@ -135,7 +135,7 @@ class AssignToFeeders(
             stepContext: StepContext,
             terminalToAuxEquipment: Map<Terminal, Collection<AuxiliaryEquipment>>,
             lvFeederStartPoints: Set<ConductingEquipment>,
-            feedersToAssign: List<Feeder>
+            feedersToAssign: List<Feeder>,
         ) {
             if (stepPath.tracedInternally && !stepContext.isStartItem)
                 return

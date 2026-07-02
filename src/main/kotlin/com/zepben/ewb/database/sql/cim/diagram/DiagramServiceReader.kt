@@ -24,7 +24,7 @@ import java.sql.Connection
 internal class DiagramServiceReader(
     databaseTables: DiagramDatabaseTables,
     connection: Connection,
-    override val reader: DiagramCimReader = DiagramCimReader()
+    override val reader: DiagramCimReader = DiagramCimReader(),
 ) : BaseServiceReader<DiagramService>(databaseTables, connection, reader) {
 
     override fun readService(service: DiagramService): Boolean =

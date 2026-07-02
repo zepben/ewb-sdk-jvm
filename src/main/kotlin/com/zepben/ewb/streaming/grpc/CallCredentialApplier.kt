@@ -18,7 +18,7 @@ class CallCredentialApplier(private val callCredentials: CallCredentials) : Clie
     override fun <ReqT, RespT> interceptCall(
         methodDescriptor: MethodDescriptor<ReqT, RespT>,
         callOptions: CallOptions,
-        channel: Channel
+        channel: Channel,
     ): ClientCall<ReqT, RespT> = channel.newCall(methodDescriptor, callOptions.withCallCredentials(callCredentials))
 
 }

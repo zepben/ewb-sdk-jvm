@@ -31,7 +31,7 @@ class LocalEwbDataFilePaths @JvmOverloads constructor(
     private val createDirectories: (Path) -> Path = { Files.createDirectories(it) },
     isDirectory: (Path) -> Boolean = { Files.isDirectory(it) },
     private val exists: (Path) -> Boolean = { Files.exists(it) },
-    private val listFiles: (Path) -> Iterator<Path> = { Files.walk(it, MAX_DEPTH, FileVisitOption.FOLLOW_LINKS).iterator() }
+    private val listFiles: (Path) -> Iterator<Path> = { Files.walk(it, MAX_DEPTH, FileVisitOption.FOLLOW_LINKS).iterator() },
 ) : EwbDataFilePaths {
 
     init {

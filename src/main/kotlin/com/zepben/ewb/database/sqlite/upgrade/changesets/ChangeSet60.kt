@@ -20,7 +20,7 @@ internal fun changeSet60() = ChangeSet(
         `rename RegulatingControlModeKind UNKNOWN_CONTROL_MODE to UNKNOWN`,
         `rename TransformerCoolingType UNKNOWN_COOLING_TYPE to UNKNOWN`,
         `rename WindingConnection UNKNOWN_WINDING to UNKNOWN`,
-    )
+    ),
 )
 
 // ###################
@@ -34,7 +34,7 @@ private val `rename PowerDirectionKind UNKNOWN_DIRECTION to UNKNOWN` = Change(
         "UPDATE distance_relays SET power_direction = 'UNKNOWN' WHERE power_direction = 'UNKNOWN_DIRECTION'",
         "UPDATE voltage_relays SET power_direction = 'UNKNOWN' WHERE power_direction = 'UNKNOWN_DIRECTION'",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )
 
 @Suppress("ObjectPropertyName")
@@ -43,7 +43,7 @@ private val `rename RegulatingControlModeKind UNKNOWN_CONTROL_MODE to UNKNOWN` =
         "UPDATE battery_controls SET mode = 'UNKNOWN' WHERE mode = 'UNKNOWN_CONTROL_MODE'",
         "UPDATE tap_changer_controls SET mode = 'UNKNOWN' WHERE mode = 'UNKNOWN_CONTROL_MODE'",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )
 
 @Suppress("ObjectPropertyName")
@@ -51,7 +51,7 @@ private val `rename TransformerCoolingType UNKNOWN_COOLING_TYPE to UNKNOWN` = Ch
     listOf(
         "UPDATE power_transformer_end_ratings SET cooling_type = 'UNKNOWN' WHERE cooling_type = 'UNKNOWN_COOLING_TYPE'",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )
 
 @Suppress("ObjectPropertyName")
@@ -60,5 +60,5 @@ private val `rename WindingConnection UNKNOWN_WINDING to UNKNOWN` = Change(
         "UPDATE power_transformer_ends SET connection_kind = 'UNKNOWN' WHERE connection_kind = 'UNKNOWN_WINDING'",
         "UPDATE transformer_end_info SET connection_kind = 'UNKNOWN' WHERE connection_kind = 'UNKNOWN_WINDING'",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )

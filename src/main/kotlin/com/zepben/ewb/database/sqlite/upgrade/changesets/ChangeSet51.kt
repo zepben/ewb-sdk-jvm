@@ -21,7 +21,7 @@ internal fun changeSet51() = ChangeSet(
         `Rename power_electronics_connection_phase to power_electronics_connection_phases`,
         `Rename power_electronics_wind_unit to power_electronics_wind_units`,
         `Rename transformer_star_impedance to transformer_star_impedances`,
-    )
+    ),
 )
 
 @Suppress("ObjectPropertyName")
@@ -35,9 +35,9 @@ private val `Rename battery_unit to battery_units` = Change(
 
         "CREATE UNIQUE INDEX battery_units_mrid ON battery_units (mrid);",
         "CREATE INDEX battery_units_name ON battery_units (name);",
-        "CREATE INDEX battery_units_power_electronics_connection_mrid ON battery_units (power_electronics_connection_mrid);"
+        "CREATE INDEX battery_units_power_electronics_connection_mrid ON battery_units (power_electronics_connection_mrid);",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )
 
 @Suppress("ObjectPropertyName")
@@ -51,9 +51,9 @@ private val `Rename photo_voltaic_unit to photo_voltaic_units` = Change(
 
         "CREATE UNIQUE INDEX photo_voltaic_units_mrid ON photo_voltaic_units (mrid);",
         "CREATE INDEX photo_voltaic_units_name ON photo_voltaic_units (name);",
-        "CREATE INDEX photo_voltaic_units_power_electronics_connection_mrid ON photo_voltaic_units (power_electronics_connection_mrid);"
+        "CREATE INDEX photo_voltaic_units_power_electronics_connection_mrid ON photo_voltaic_units (power_electronics_connection_mrid);",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )
 
 @Suppress("ObjectPropertyName")
@@ -67,7 +67,7 @@ private val `Rename power_electronics_connection to power_electronics_connection
         "CREATE UNIQUE INDEX power_electronics_connections_mrid ON power_electronics_connections (mrid);",
         "CREATE INDEX power_electronics_connections_name ON power_electronics_connections (name);",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )
 
 @Suppress("ObjectPropertyName")
@@ -81,9 +81,9 @@ private val `Rename power_electronics_connection_phase to power_electronics_conn
 
         "CREATE UNIQUE INDEX power_electronics_connection_phases_mrid ON power_electronics_connection_phases (mrid);",
         "CREATE INDEX power_electronics_connection_phases_name ON power_electronics_connection_phases (name);",
-        "CREATE INDEX power_electronics_connection_phases_power_electronics_connection_mrid ON power_electronics_connection_phases (power_electronics_connection_mrid);"
+        "CREATE INDEX power_electronics_connection_phases_power_electronics_connection_mrid ON power_electronics_connection_phases (power_electronics_connection_mrid);",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )
 
 @Suppress("ObjectPropertyName")
@@ -97,9 +97,9 @@ private val `Rename power_electronics_wind_unit to power_electronics_wind_units`
 
         "CREATE UNIQUE INDEX power_electronics_wind_units_mrid ON power_electronics_wind_units (mrid);",
         "CREATE INDEX power_electronics_wind_units_name ON power_electronics_wind_units (name);",
-        "CREATE INDEX power_electronics_wind_units_power_electronics_connection_mrid ON power_electronics_wind_units (power_electronics_connection_mrid);"
+        "CREATE INDEX power_electronics_wind_units_power_electronics_connection_mrid ON power_electronics_wind_units (power_electronics_connection_mrid);",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )
 
 @Suppress("ObjectPropertyName")
@@ -113,7 +113,7 @@ private val `Rename transformer_star_impedance to transformer_star_impedances` =
 
         "CREATE UNIQUE INDEX transformer_star_impedances_mrid ON transformer_star_impedances (mrid);",
         "CREATE UNIQUE INDEX transformer_star_impedances_transformer_end_info_mrid ON transformer_star_impedances (transformer_end_info_mrid);",
-        "CREATE INDEX transformer_star_impedances_name ON transformer_star_impedances (name);"
+        "CREATE INDEX transformer_star_impedances_name ON transformer_star_impedances (name);",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )

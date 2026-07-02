@@ -23,7 +23,7 @@ import org.slf4j.Logger
  * Convenience class that provides methods for clearing feeder direction on a [NetworkService]
  */
 class ClearDirection(
-    private val debugLogger: Logger?
+    private val debugLogger: Logger?,
 ) {
 
     /*

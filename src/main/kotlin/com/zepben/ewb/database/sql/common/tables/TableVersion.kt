@@ -22,7 +22,7 @@ import java.sql.SQLException
  */
 @Suppress("PropertyName")
 class TableVersion(
-    val supportedVersion: Int
+    val supportedVersion: Int,
 ) : SqlTable() {
 
     val VERSION: Column = Column(++columnIndex, "version", Column.Type.STRING, Column.Nullable.NOT_NULL)

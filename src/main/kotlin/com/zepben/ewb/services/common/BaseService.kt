@@ -36,7 +36,7 @@ import kotlin.streams.asStream
  */
 abstract class BaseService(
     val name: String,
-    val metadata: MetadataCollection
+    val metadata: MetadataCollection,
 ) {
 
     /**
@@ -179,7 +179,7 @@ abstract class BaseService(
             objectsByType.values
                 .asSequence()
                 .mapNotNull { it[mRID] }
-                .firstOrNull()
+                .firstOrNull(),
         )
     }
 
@@ -330,7 +330,7 @@ abstract class BaseService(
             } catch (ex: ClassCastException) {
                 throw IllegalStateException(
                     "Expected a ${it.resolver.toClass.simpleName} when resolving ${identifiable.nameAndMRID()} references but got a ${identifiable::class.simpleName}. Make sure you sent the correct types in every reference.",
-                    ex
+                    ex,
                 )
             }
         }
@@ -357,7 +357,7 @@ abstract class BaseService(
      */
     fun <T : Identifiable, R : Identifiable> resolveOrDeferReference(
         boundResolver: BoundReferenceResolver<T, R>,
-        toMrid: String?
+        toMrid: String?,
     ): Boolean {
         if (toMrid.isNullOrEmpty()) {
             return true
@@ -394,7 +394,7 @@ abstract class BaseService(
         } catch (ex: ClassCastException) {
             throw IllegalStateException(
                 "$toMrid didn't match the expected class ${resolver.toClass.simpleName}. Did you re-use an mRID?: ${ex.localizedMessage}",
-                ex
+                ex,
             )
         }
     }
@@ -645,7 +645,7 @@ abstract class BaseService(
             .toMap()
     }
 
-    private fun <T: Any> MutableMap<String, T>.removeIf(id: String, obj: T): Boolean =
+    private fun <T : Any> MutableMap<String, T>.removeIf(id: String, obj: T): Boolean =
         when {
             get(id) === obj -> remove(id) != null
             else -> false

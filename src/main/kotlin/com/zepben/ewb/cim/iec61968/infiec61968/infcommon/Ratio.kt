@@ -18,7 +18,7 @@ package com.zepben.ewb.cim.iec61968.infiec61968.infcommon
  */
 data class Ratio(
     val numerator: Double,
-    val denominator: Double
+    val denominator: Double,
 ) {
 
     @get:Throws(IllegalArgumentException::class)

@@ -46,7 +46,7 @@ abstract class CollectionDifference : Difference() {
 data class ValueCollectionDifference @JvmOverloads constructor(
     override val missingFromTarget: MutableList<in Any> = mutableListOf(),
     override val missingFromSource: MutableList<in Any> = mutableListOf(),
-    override val modifications: MutableList<Difference> = mutableListOf()
+    override val modifications: MutableList<Difference> = mutableListOf(),
 ) : CollectionDifference()
 
 /**
@@ -55,7 +55,7 @@ data class ValueCollectionDifference @JvmOverloads constructor(
 data class ObjectCollectionDifference @JvmOverloads constructor(
     override val missingFromTarget: MutableList<in Any> = mutableListOf(),
     override val missingFromSource: MutableList<in Any> = mutableListOf(),
-    override val modifications: MutableList<Difference> = mutableListOf()
+    override val modifications: MutableList<Difference> = mutableListOf(),
 ) : CollectionDifference()
 
 /**
@@ -68,7 +68,7 @@ data class ObjectCollectionDifference @JvmOverloads constructor(
 data class ObjectDifference<T> @JvmOverloads constructor(
     val source: T,
     val target: T,
-    val differences: MutableMap<String, Difference> = mutableMapOf()
+    val differences: MutableMap<String, Difference> = mutableMapOf(),
 ) : Difference()
 
 /**

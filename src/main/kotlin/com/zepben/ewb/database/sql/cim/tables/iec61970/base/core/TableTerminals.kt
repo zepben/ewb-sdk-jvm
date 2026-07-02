@@ -38,11 +38,11 @@ class TableTerminals : TableAcDcTerminals() {
 
     init {
         addUniqueIndexes(
-            listOf(CONDUCTING_EQUIPMENT_MRID, SEQUENCE_NUMBER)
+            listOf(CONDUCTING_EQUIPMENT_MRID, SEQUENCE_NUMBER),
         )
 
         addNonUniqueIndexes(
-            listOf(CONNECTIVITY_NODE_MRID)
+            listOf(CONNECTIVITY_NODE_MRID),
         )
     }
 

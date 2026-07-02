@@ -17,7 +17,6 @@ import com.zepben.ewb.streaming.grpc.GrpcClient
 import com.zepben.protobuf.ns.UpdateNetworkStateServiceGrpc
 import io.grpc.CallCredentials
 import io.grpc.Channel
-import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.stream.Stream
 import kotlin.streams.asSequence

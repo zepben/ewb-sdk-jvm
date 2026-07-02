@@ -29,13 +29,13 @@ class DiagramDatabaseReader internal constructor(
     databaseDescription: String,
     databaseTables: DiagramDatabaseTables,
     createMetadataReader: (DiagramDatabaseTables, Connection) -> MetadataCollectionReader,
-    createServiceReader: (DiagramDatabaseTables, Connection) -> BaseServiceReader<DiagramService>
+    createServiceReader: (DiagramDatabaseTables, Connection) -> BaseServiceReader<DiagramService>,
 ) : CimDatabaseReader<DiagramDatabaseTables, DiagramService>(
     connection,
     databaseDescription,
     databaseTables,
     createMetadataReader,
-    createServiceReader
+    createServiceReader,
 ) {
 
     /**
@@ -44,13 +44,13 @@ class DiagramDatabaseReader internal constructor(
      */
     constructor(
         connection: Connection,
-        databaseDescription: String
+        databaseDescription: String,
     ) : this(
         connection,
         databaseDescription,
         DiagramDatabaseTables(),
         ::MetadataCollectionReader,
-        ::DiagramServiceReader
+        ::DiagramServiceReader,
     )
 
 }

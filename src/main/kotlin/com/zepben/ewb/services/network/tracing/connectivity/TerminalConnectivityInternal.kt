@@ -32,7 +32,7 @@ object TerminalConnectivityInternal {
     fun between(
         terminal: Terminal,
         otherTerminal: Terminal,
-        includePhases: Set<SPK> = terminal.phases.singlePhases.toSet()
+        includePhases: Set<SPK> = terminal.phases.singlePhases.toSet(),
     ): ConnectivityResult =
         ConnectivityResult.between(
             fromTerminal = terminal,
@@ -47,7 +47,7 @@ object TerminalConnectivityInternal {
     private fun findTransformerPhasePaths(
         terminal: Terminal,
         otherTerminal: Terminal,
-        includePhases: Set<SPK>
+        includePhases: Set<SPK>,
     ): Collection<NominalPhasePath> =
         (TransformerPhasePaths.lookup[terminal.phases]?.let { it[otherTerminal.phases] }.orEmpty())
             .filter { (it.from in includePhases) || (it.from == SPK.NONE) }
@@ -55,7 +55,7 @@ object TerminalConnectivityInternal {
     private fun findShuntCompensatorPhasePaths(
         terminal: Terminal,
         otherTerminal: Terminal,
-        includePhases: Set<SPK>
+        includePhases: Set<SPK>,
     ): Collection<NominalPhasePath> =
         when ((terminal.conductingEquipment as ShuntCompensator).groundingTerminal) {
             terminal -> otherTerminal.phases.singlePhases.map { NominalPhasePath(SPK.NONE, it) }
@@ -66,7 +66,7 @@ object TerminalConnectivityInternal {
     private fun findStraightPhasePaths(
         terminal: Terminal,
         otherTerminal: Terminal,
-        includePhases: Set<SPK>
+        includePhases: Set<SPK>,
     ): List<NominalPhasePath> =
         terminal.phases.singlePhases.toSet()
             .intersect(otherTerminal.phases.singlePhases.toSet())

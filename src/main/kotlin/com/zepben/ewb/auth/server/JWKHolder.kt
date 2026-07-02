@@ -16,12 +16,12 @@ import java.net.URL
 fun trustedIssuerUrlJwkProvider(
     issuer: TrustedIssuer,
     verifyCertificates: Boolean = true,
-    urlJwkProviderProvider: (URL) -> ConfigurableJwkProvider = { url -> ConfigurableJwkProvider(url, verifyCertificates) }
+    urlJwkProviderProvider: (URL) -> ConfigurableJwkProvider = { url -> ConfigurableJwkProvider(url, verifyCertificates) },
 ) = urlJwkProviderProvider(URI(issuer.providerDetails.jwkUrl).toURL()).allKeys.associateBy { it.id }
 
 class JWKHolder(
     private val verifyCertificates: Boolean,
-    private val jwkProvider: (TrustedIssuer) -> Map<String, Jwk> = { issuer -> trustedIssuerUrlJwkProvider(issuer, verifyCertificates) }
+    private val jwkProvider: (TrustedIssuer) -> Map<String, Jwk> = { issuer -> trustedIssuerUrlJwkProvider(issuer, verifyCertificates) },
 ) {
     private var keys: MutableMap<String, Map<String, Jwk>> = mutableMapOf()
 

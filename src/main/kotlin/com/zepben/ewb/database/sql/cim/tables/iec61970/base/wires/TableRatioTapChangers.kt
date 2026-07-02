@@ -27,7 +27,7 @@ class TableRatioTapChangers : TableTapChangers() {
 
     init {
         addUniqueIndexes(
-            listOf(TRANSFORMER_END_MRID)
+            listOf(TRANSFORMER_END_MRID),
         )
     }
 

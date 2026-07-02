@@ -23,7 +23,7 @@ internal fun changeSet55() = ChangeSet(
         `Create table reactive_capability_curves`,
         `Create table synchronous_machines`,
         `Create table synchronous_machines_reactive_capability_curves`,
-    )
+    ),
 )
 
 // ###################
@@ -33,9 +33,9 @@ internal fun changeSet55() = ChangeSet(
 @Suppress("ObjectPropertyName")
 private val `Add phase code columns for usage_points` = Change(
     listOf(
-        "ALTER TABLE usage_points ADD COLUMN phase_code TEXT NOT NULL DEFAULT 'NONE';"
+        "ALTER TABLE usage_points ADD COLUMN phase_code TEXT NOT NULL DEFAULT 'NONE';",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )
 
 @Suppress("ObjectPropertyName")
@@ -49,9 +49,9 @@ private val `Create table curve_data` = Change(
             y3_value NUMBER NULL
         );""".trimIndent(),
         "CREATE UNIQUE INDEX curve_data_curve_mrid_x_value ON curve_data (curve_mrid, x_value);",
-        "CREATE INDEX curve_data_curve_mrid ON curve_data (curve_mrid);"
+        "CREATE INDEX curve_data_curve_mrid ON curve_data (curve_mrid);",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )
 
 @Suppress("ObjectPropertyName")
@@ -71,9 +71,9 @@ private val `Create table grounding_impedances` = Change(
             r NUMBER NULL,
             x NUMBER NULL
         );""".trimIndent(),
-        "CREATE UNIQUE INDEX grounding_impedances_mrid ON grounding_impedances (mrid);"
+        "CREATE UNIQUE INDEX grounding_impedances_mrid ON grounding_impedances (mrid);",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )
 
 @Suppress("ObjectPropertyName")
@@ -93,9 +93,9 @@ private val `Create table petersen_coils` = Change(
             r NUMBER NULL,
             x_ground_nominal NUMBER NULL
         );""".trimIndent(),
-        "CREATE UNIQUE INDEX petersen_coils_mrid ON petersen_coils (mrid);"
+        "CREATE UNIQUE INDEX petersen_coils_mrid ON petersen_coils (mrid);",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )
 
 @Suppress("ObjectPropertyName")
@@ -107,9 +107,9 @@ private val `Create table reactive_capability_curves` = Change(
             description TEXT NOT NULL,
             num_diagram_objects INTEGER NOT NULL
         );""".trimIndent(),
-        "CREATE UNIQUE INDEX reactive_capability_curves_mrid ON reactive_capability_curves (mrid);"
+        "CREATE UNIQUE INDEX reactive_capability_curves_mrid ON reactive_capability_curves (mrid);",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )
 
 @Suppress("ObjectPropertyName")
@@ -155,9 +155,9 @@ private val `Create table synchronous_machines` = Change(
             type TEXT NOT NULL,
             operating_mode TEXT NOT NULL
         );""".trimIndent(),
-        "CREATE UNIQUE INDEX synchronous_machines_mrid ON synchronous_machines (mrid);"
+        "CREATE UNIQUE INDEX synchronous_machines_mrid ON synchronous_machines (mrid);",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )
 
 // #######################
@@ -173,7 +173,7 @@ private val `Create table synchronous_machines_reactive_capability_curves` = Cha
         );""".trimIndent(),
         "CREATE UNIQUE INDEX synchronous_machines_mrid_reactive_capability_curve_mrid ON synchronous_machines_reactive_capability_curves (synchronous_machine_mrid, reactive_capability_curve_mrid);",
         "CREATE INDEX synchronous_machines_reactive_capability_curves_synchronous_machine_mrid ON synchronous_machines_reactive_capability_curves (synchronous_machine_mrid);",
-        "CREATE INDEX synchronous_machines_reactive_capability_curves_reactive_capability_curve_mrid ON synchronous_machines_reactive_capability_curves (reactive_capability_curve_mrid);"
+        "CREATE INDEX synchronous_machines_reactive_capability_curves_reactive_capability_curve_mrid ON synchronous_machines_reactive_capability_curves (reactive_capability_curve_mrid);",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )

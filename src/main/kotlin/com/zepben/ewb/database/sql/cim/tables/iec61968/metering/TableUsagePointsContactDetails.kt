@@ -27,7 +27,7 @@ class TableUsagePointsContactDetails : TableContactDetails() {
 
     init {
         addNonUniqueIndexes(
-            listOf(USAGE_POINT_MRID)
+            listOf(USAGE_POINT_MRID),
         )
     }
 

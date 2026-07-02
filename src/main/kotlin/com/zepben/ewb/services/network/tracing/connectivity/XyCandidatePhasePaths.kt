@@ -126,7 +126,7 @@ class XyCandidatePhasePaths {
         candidateCounts: Map<SPK, Int>,
         priority: List<SPK>,
         before: SPK? = null,
-        after: SPK? = null
+        after: SPK? = null,
     ): SPK {
         candidateCounts.filterKeys { it.isBefore(before) && it.isAfter(after) }.apply {
             if (isEmpty())

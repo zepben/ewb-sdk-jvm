@@ -18,7 +18,7 @@ class CompressionInterceptor(val compressor: String = "gzip") : ServerIntercepto
     override fun <ReqT : Any?, RespT : Any?> interceptCall(
         call: ServerCall<ReqT, RespT>?,
         headers: Metadata?,
-        next: ServerCallHandler<ReqT, RespT>?
+        next: ServerCallHandler<ReqT, RespT>?,
     ): ServerCall.Listener<ReqT>? {
         call?.setCompression(compressor)
         return next?.startCall(call, headers)

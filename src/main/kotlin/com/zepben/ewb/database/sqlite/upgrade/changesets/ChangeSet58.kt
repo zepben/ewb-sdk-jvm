@@ -17,8 +17,8 @@ internal fun changeSet58() = ChangeSet(
     listOf(
         // Network Change
         `Create table cuts`,
-        `Create table clamps`
-    )
+        `Create table clamps`,
+    ),
 )
 
 // ###################
@@ -47,9 +47,9 @@ private val `Create table cuts` = Change(
             ac_line_segment_mrid TEXT NULL
         );""".trimIndent(),
         "CREATE UNIQUE INDEX cuts_mrid ON cuts (mrid);",
-        "CREATE INDEX cuts_ac_line_segment_mrid ON cuts (ac_line_segment_mrid);"
+        "CREATE INDEX cuts_ac_line_segment_mrid ON cuts (ac_line_segment_mrid);",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )
 
 @Suppress("ObjectPropertyName")
@@ -70,7 +70,7 @@ private val `Create table clamps` = Change(
             ac_line_segment_mrid TEXT NULL
         );""".trimIndent(),
         "CREATE UNIQUE INDEX clamps_mrid ON clamps (mrid);",
-        "CREATE INDEX clamps_ac_line_segment_mrid ON clamps (ac_line_segment_mrid);"
+        "CREATE INDEX clamps_ac_line_segment_mrid ON clamps (ac_line_segment_mrid);",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )

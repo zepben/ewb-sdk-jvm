@@ -32,7 +32,7 @@ class TablePositionPoints : SqlTable() {
 
     init {
         addUniqueIndexes(
-            listOf(LOCATION_MRID, SEQUENCE_NUMBER)
+            listOf(LOCATION_MRID, SEQUENCE_NUMBER),
         )
     }
 

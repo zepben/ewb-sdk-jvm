@@ -97,9 +97,9 @@ internal class DiagramCimReader : CimReader<DiagramService>() {
             .addPoint(
                 DiagramObjectPoint(
                     resultSet.getDouble(table.X_POSITION.queryIndex),
-                    resultSet.getDouble(table.Y_POSITION.queryIndex)
+                    resultSet.getDouble(table.Y_POSITION.queryIndex),
                 ),
-                sequenceNumber
+                sequenceNumber,
             )
 
         return true

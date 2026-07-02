@@ -15,7 +15,7 @@ import com.zepben.ewb.services.network.tracing.traversal.StepContext
 
 internal class OpenCondition<T>(
     val isOpen: (Switch, SinglePhaseKind?) -> Boolean,
-    val phase: SinglePhaseKind? = null
+    val phase: SinglePhaseKind? = null,
 ) : NetworkTraceQueueCondition<T>(NetworkTraceStep.Type.INTERNAL) {
 
     override fun shouldQueueMatchedStep(

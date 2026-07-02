@@ -35,11 +35,11 @@ abstract class TableIdentifiedObjects : SqlTable() {
 
     init {
         addUniqueIndexes(
-            listOf(MRID)
+            listOf(MRID),
         )
 
         addNonUniqueIndexes(
-            listOf(NAME)
+            listOf(NAME),
         )
     }
 

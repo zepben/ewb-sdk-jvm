@@ -21,5 +21,5 @@ data class CurveData(
     val xValue: Float,
     val y1Value: Float,
     val y2Value: Float? = null,
-    val y3Value: Float? = null
+    val y3Value: Float? = null,
 )

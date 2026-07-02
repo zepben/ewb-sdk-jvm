@@ -12,7 +12,6 @@ import com.zepben.ewb.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.ewb.cim.iec61970.base.core.Terminal
 import com.zepben.ewb.cim.iec61970.base.wires.AcLineSegment
 import com.zepben.ewb.services.network.tracing.connectivity.NominalPhasePath
-import com.zepben.ewb.services.network.tracing.networktrace.NetworkTraceStep.Type
 
 /**
  * Represents a single step in a network trace, containing information about the path taken and associated data.
@@ -28,7 +27,7 @@ class NetworkTraceStep<out T>(
     val path: Path,
     val numTerminalSteps: Int,
     val numEquipmentSteps: Int,
-    val data: T
+    val data: T,
 ) {
 
     /**

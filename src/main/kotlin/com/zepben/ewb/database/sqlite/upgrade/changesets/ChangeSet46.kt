@@ -15,8 +15,8 @@ import com.zepben.ewb.database.sqlite.upgrade.ChangeSet
 internal fun changeSet46() = ChangeSet(
     46,
     listOf(
-        `Make potential_transformers type non-null`
-    )
+        `Make potential_transformers type non-null`,
+    ),
 )
 
 // Non-null columns cannot be added to existing tables without specifying a default, which cannot be removed later.
@@ -60,7 +60,7 @@ private val `Make potential_transformers type non-null` = Change(
         "DROP TABLE potential_transformers;",
         "ALTER TABLE potential_transformers_new RENAME TO potential_transformers;",
         "CREATE UNIQUE INDEX potential_transformers_mrid ON potential_transformers (mrid);",
-        "CREATE INDEX potential_transformers_name ON potential_transformers (name);"
+        "CREATE INDEX potential_transformers_name ON potential_transformers (name);",
     ),
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )

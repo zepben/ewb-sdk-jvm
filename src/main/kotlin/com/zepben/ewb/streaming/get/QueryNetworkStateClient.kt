@@ -22,7 +22,6 @@ import io.grpc.CallCredentials
 import io.grpc.Channel
 import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
-import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.stream.Stream
 import kotlin.streams.asStream
@@ -38,6 +37,7 @@ class QueryNetworkStateClient(
 ) : GrpcClient<QueryNetworkStateServiceGrpc.QueryNetworkStateServiceStub>() {
 
     private val logger = LoggerFactory.getLogger("QueryNetworkStateClient")
+
     /**
      * Create a [QueryNetworkStateClient]
      *

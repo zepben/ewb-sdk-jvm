@@ -25,7 +25,7 @@ class TableSubGeographicalRegions : TableIdentifiedObjects() {
 
     init {
         addNonUniqueIndexes(
-            listOf(GEOGRAPHICAL_REGION_MRID)
+            listOf(GEOGRAPHICAL_REGION_MRID),
         )
     }
 

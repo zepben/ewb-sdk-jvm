@@ -43,7 +43,7 @@ class TokenCallCredentials(private val getToken: () -> String) : CallCredentials
                         else -> Status.UNAUTHENTICATED
                     }
                     return applier.fail(
-                        grpcStatusCode.withDescription("Getting authorization data from token fetcher failed with error: $e").withCause(e)
+                        grpcStatusCode.withDescription("Getting authorization data from token fetcher failed with error: $e").withCause(e),
                     )
                 }
 

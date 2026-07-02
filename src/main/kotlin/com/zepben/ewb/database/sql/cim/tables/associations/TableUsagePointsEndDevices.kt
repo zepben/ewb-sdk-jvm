@@ -28,12 +28,12 @@ class TableUsagePointsEndDevices : SqlTable() {
 
     init {
         addUniqueIndexes(
-            listOf(USAGE_POINT_MRID, END_DEVICE_MRID)
+            listOf(USAGE_POINT_MRID, END_DEVICE_MRID),
         )
 
         addNonUniqueIndexes(
             listOf(USAGE_POINT_MRID),
-            listOf(END_DEVICE_MRID)
+            listOf(END_DEVICE_MRID),
         )
     }
 

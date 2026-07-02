@@ -19,5 +19,5 @@ package com.zepben.ewb.streaming.data
  */
 data class CurrentStateEventBatch(
     val batchId: Long,
-    val events: List<CurrentStateEvent>
+    val events: List<CurrentStateEvent>,
 )

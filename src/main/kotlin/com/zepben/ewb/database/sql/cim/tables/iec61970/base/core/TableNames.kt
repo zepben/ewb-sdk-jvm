@@ -30,13 +30,13 @@ class TableNames : SqlTable() {
 
     init {
         addUniqueIndexes(
-            listOf(IDENTIFIED_OBJECT_MRID, NAME_TYPE_NAME, NAME)
+            listOf(IDENTIFIED_OBJECT_MRID, NAME_TYPE_NAME, NAME),
         )
 
         addNonUniqueIndexes(
             listOf(IDENTIFIED_OBJECT_MRID),
             listOf(NAME),
-            listOf(NAME_TYPE_NAME)
+            listOf(NAME_TYPE_NAME),
         )
     }
 

@@ -18,7 +18,7 @@ data class ResistanceReactance(
     val r: Double? = null,
     val x: Double? = null,
     val r0: Double? = null,
-    val x0: Double? = null
+    val x0: Double? = null,
 ) {
 
     fun isEmpty(): Boolean = (r == null) && (x == null) && (r0 == null) && (x0 == null)
@@ -36,7 +36,7 @@ internal fun ResistanceReactance.mergeIfIncomplete(toMerge: () -> ResistanceReac
                 r ?: rr.r,
                 x ?: rr.x,
                 r0 ?: rr.r0,
-                x0 ?: rr.x0
+                x0 ?: rr.x0,
             )
         } ?: this
     }

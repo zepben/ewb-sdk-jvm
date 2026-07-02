@@ -27,7 +27,7 @@ class TableContactDetailsTelephoneNumbers : TableTelephoneNumbers() {
 
     init {
         addNonUniqueIndexes(
-            listOf(CONTACT_DETAILS_ID)
+            listOf(CONTACT_DETAILS_ID),
         )
     }
 

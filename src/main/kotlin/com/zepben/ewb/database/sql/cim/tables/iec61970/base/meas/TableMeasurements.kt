@@ -44,7 +44,7 @@ abstract class TableMeasurements : TableIdentifiedObjects() {
         addNonUniqueIndexes(
             listOf(POWER_SYSTEM_RESOURCE_MRID),
             listOf(REMOTE_SOURCE_MRID),
-            listOf(TERMINAL_MRID)
+            listOf(TERMINAL_MRID),
         )
     }
 

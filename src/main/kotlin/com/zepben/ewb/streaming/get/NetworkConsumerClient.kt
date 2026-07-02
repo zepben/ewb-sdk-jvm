@@ -65,7 +65,7 @@ class NetworkConsumerClient(
     @JvmOverloads
     constructor(channel: Channel, callCredentials: CallCredentials? = null) :
         this(
-            NetworkConsumerGrpc.newStub(channel).withExecutor(Executors.newSingleThreadExecutor()).apply { callCredentials?.let { withCallCredentials(it) } }
+            NetworkConsumerGrpc.newStub(channel).withExecutor(Executors.newSingleThreadExecutor()).apply { callCredentials?.let { withCallCredentials(it) } },
         )
 
     /**
@@ -102,7 +102,7 @@ class NetworkConsumerClient(
         equipmentContainer: EquipmentContainer,
         includeEnergizingContainers: IncludedEnergizingContainers = IncludedEnergizingContainers.NONE,
         includeEnergizedContainers: IncludedEnergizedContainers = IncludedEnergizedContainers.NONE,
-        networkState: NetworkState = NetworkState.NORMAL
+        networkState: NetworkState = NetworkState.NORMAL,
     ): GrpcResult<MultiObjectResult> =
         getEquipmentForContainer(equipmentContainer.mRID, includeEnergizingContainers, includeEnergizedContainers, networkState)
 
@@ -127,7 +127,7 @@ class NetworkConsumerClient(
         mRID: String,
         includeEnergizingContainers: IncludedEnergizingContainers = IncludedEnergizingContainers.NONE,
         includeEnergizedContainers: IncludedEnergizedContainers = IncludedEnergizedContainers.NONE,
-        networkState: NetworkState = NetworkState.NORMAL
+        networkState: NetworkState = NetworkState.NORMAL,
     ): GrpcResult<MultiObjectResult> =
         getEquipmentForContainers(sequenceOf(mRID), includeEnergizingContainers, includeEnergizedContainers, networkState)
 
@@ -152,7 +152,7 @@ class NetworkConsumerClient(
         mRIDs: Iterable<String>,
         includeEnergizingContainers: IncludedEnergizingContainers = IncludedEnergizingContainers.NONE,
         includeEnergizedContainers: IncludedEnergizedContainers = IncludedEnergizedContainers.NONE,
-        networkState: NetworkState = NetworkState.NORMAL
+        networkState: NetworkState = NetworkState.NORMAL,
     ): GrpcResult<MultiObjectResult> =
         getEquipmentForContainers(mRIDs.asSequence(), includeEnergizingContainers, includeEnergizedContainers, networkState)
 
@@ -177,7 +177,7 @@ class NetworkConsumerClient(
         mRIDs: Sequence<String>,
         includeEnergizingContainers: IncludedEnergizingContainers = IncludedEnergizingContainers.NONE,
         includeEnergizedContainers: IncludedEnergizedContainers = IncludedEnergizedContainers.NONE,
-        networkState: NetworkState = NetworkState.NORMAL
+        networkState: NetworkState = NetworkState.NORMAL,
     ): GrpcResult<MultiObjectResult> =
         handleMultiObjectRPC { processEquipmentForContainers(mRIDs, includeEnergizingContainers, includeEnergizedContainers, networkState) }
 
@@ -313,7 +313,7 @@ class NetworkConsumerClient(
         expectedClass: Class<out EquipmentContainer> = EquipmentContainer::class.java,
         includeEnergizingContainers: IncludedEnergizingContainers = IncludedEnergizingContainers.NONE,
         includeEnergizedContainers: IncludedEnergizedContainers = IncludedEnergizedContainers.NONE,
-        networkState: NetworkState = NetworkState.NORMAL
+        networkState: NetworkState = NetworkState.NORMAL,
     ): GrpcResult<MultiObjectResult> =
         tryRpc {
             val result = getEquipmentContainers(sequenceOf(mRID), expectedClass, includeEnergizingContainers, includeEnergizedContainers, networkState)
@@ -350,7 +350,7 @@ class NetworkConsumerClient(
         expectedClass: Class<out EquipmentContainer> = EquipmentContainer::class.java,
         includeEnergizingContainers: IncludedEnergizingContainers = IncludedEnergizingContainers.NONE,
         includeEnergizedContainers: IncludedEnergizedContainers = IncludedEnergizedContainers.NONE,
-        networkState: NetworkState = NetworkState.NORMAL
+        networkState: NetworkState = NetworkState.NORMAL,
     ): GrpcResult<MultiObjectResult> =
         getEquipmentContainers(mRIDs.asSequence(), expectedClass, includeEnergizingContainers, includeEnergizedContainers, networkState)
 
@@ -378,13 +378,13 @@ class NetworkConsumerClient(
         expectedClass: Class<out EquipmentContainer> = EquipmentContainer::class.java,
         includeEnergizingContainers: IncludedEnergizingContainers = IncludedEnergizingContainers.NONE,
         includeEnergizedContainers: IncludedEnergizedContainers = IncludedEnergizedContainers.NONE,
-        networkState: NetworkState = NetworkState.NORMAL
+        networkState: NetworkState = NetworkState.NORMAL,
     ): GrpcResult<MultiObjectResult> =
         getWithReferences(mRIDs, expectedClass) { it, (objects, _) ->
             objects.putAll(
                 getEquipmentForContainers(it.map { eq -> eq.mRID }, includeEnergizingContainers, includeEnergizedContainers, networkState)
                     .onError { thrown, wasHandled -> return@getWithReferences GrpcResult.ofError(thrown, wasHandled) }
-                    .value.objects
+                    .value.objects,
             )
             null
         }
@@ -430,7 +430,8 @@ class NetworkConsumerClient(
             objects.putAll(
                 getEquipmentForContainers(containers.map { it.mRID }, networkState = networkState)
                     .onError { thrown, wasHandled -> return@getWithReferences GrpcResult.ofError(thrown, wasHandled) }
-                    .value.objects)
+                    .value.objects,
+            )
             null
         }
 
@@ -468,7 +469,7 @@ class NetworkConsumerClient(
         mor.objects.putAll(
             getEquipmentForContainers(mrids, networkState = networkState)
                 .onError { thrown, wasHandled -> return GrpcResult.ofError(thrown, wasHandled) }
-                .value.objects
+                .value.objects,
         )
 
         resolveReferences(mor)?.let { return it }
@@ -503,7 +504,7 @@ class NetworkConsumerClient(
         mRIDs: Sequence<String>,
         includeEnergizingContainers: IncludedEnergizingContainers,
         includeEnergizedContainers: IncludedEnergizedContainers,
-        networkState: NetworkState
+        networkState: NetworkState,
     ): Sequence<ExtractResult> {
         val extractResults = mutableListOf<ExtractResult>()
         val streamObserver = AwaitableStreamObserver<GetEquipmentForContainersResponse> { response ->
@@ -570,14 +571,14 @@ class NetworkConsumerClient(
     private inline fun <reified T> getWithReferences(
         mRID: String,
         expectedClass: Class<out T>,
-        getAdditional: (T, MultiObjectResult) -> GrpcResult<MultiObjectResult>?
+        getAdditional: (T, MultiObjectResult) -> GrpcResult<MultiObjectResult>?,
     ): GrpcResult<MultiObjectResult> =
         getWithReferences(sequenceOf(mRID), expectedClass) { it, mor -> getAdditional(it.elementAt(0), mor) }
 
     private inline fun <reified T> getWithReferences(
         mRIDs: Sequence<String>,
         expectedClass: Class<out T>,
-        getAdditional: (Sequence<T>, MultiObjectResult) -> GrpcResult<MultiObjectResult>?
+        getAdditional: (Sequence<T>, MultiObjectResult) -> GrpcResult<MultiObjectResult>?,
     ): GrpcResult<MultiObjectResult> {
         val mor = MultiObjectResult()
 
@@ -653,7 +654,7 @@ inline fun <reified T : EquipmentContainer> NetworkConsumerClient.getEquipmentCo
     mRID: String,
     includeEnergizingContainers: IncludedEnergizingContainers = IncludedEnergizingContainers.NONE,
     includeEnergizedContainers: IncludedEnergizedContainers = IncludedEnergizedContainers.NONE,
-    networkState: NetworkState = NetworkState.NORMAL
+    networkState: NetworkState = NetworkState.NORMAL,
 ): GrpcResult<MultiObjectResult> {
     return getEquipmentContainer(mRID, T::class.java, includeEnergizingContainers, includeEnergizedContainers, networkState)
 }

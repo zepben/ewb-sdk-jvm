@@ -40,7 +40,7 @@ abstract class TableTransformerEnds : TableIdentifiedObjects() {
 
     init {
         addNonUniqueIndexes(
-            listOf(STAR_IMPEDANCE_MRID)
+            listOf(STAR_IMPEDANCE_MRID),
         )
     }
 

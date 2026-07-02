@@ -17,7 +17,7 @@ fun PBDataSource.fromPb(): DataSource =
     DataSource(
         source,
         version,
-        Instant.ofEpochSecond(timestamp.seconds, timestamp.nanos.toLong())
+        Instant.ofEpochSecond(timestamp.seconds, timestamp.nanos.toLong()),
     )
 
 fun DataSource.toPb(): PBDataSource =
@@ -27,7 +27,7 @@ fun DataSource.toPb(): PBDataSource =
         .setTimestamp(
             Timestamp.newBuilder()
                 .setSeconds(timestamp.epochSecond)
-                .setNanos(timestamp.nano)
+                .setNanos(timestamp.nano),
         )
         .build()
 
@@ -35,7 +35,7 @@ fun PBServiceInfo.fromPb(): ServiceInfo =
     ServiceInfo(
         title,
         version,
-        dataSourcesList.map { it.fromPb() }
+        dataSourcesList.map { it.fromPb() },
     )
 
 fun ServiceInfo.toPb(): PBServiceInfo =

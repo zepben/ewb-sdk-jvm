@@ -13,7 +13,7 @@ data class NetworkServiceComparatorOptions(
     val compareTracedPhases: Boolean,
     val compareFeederEquipment: Boolean,
     val compareEquipmentContainers: Boolean,
-    val compareLvSimplification: Boolean
+    val compareLvSimplification: Boolean,
 ) {
 
     companion object {
@@ -24,7 +24,7 @@ data class NetworkServiceComparatorOptions(
                 compareTracedPhases = true,
                 compareFeederEquipment = true,
                 compareEquipmentContainers = true,
-                compareLvSimplification = true
+                compareLvSimplification = true,
             )
 
         @JvmStatic
@@ -34,7 +34,7 @@ data class NetworkServiceComparatorOptions(
                 compareTracedPhases = false,
                 compareFeederEquipment = false,
                 compareEquipmentContainers = false,
-                compareLvSimplification = false
+                compareLvSimplification = false,
             )
 
         @JvmStatic
@@ -78,7 +78,7 @@ data class NetworkServiceComparatorOptions(
                 comparePhases,
                 compareFeederEquipment,
                 compareEquipmentContainers,
-                compareLvSimplification
+                compareLvSimplification,
             )
         }
     }

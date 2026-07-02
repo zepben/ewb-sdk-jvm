@@ -55,7 +55,7 @@ class PhaseStatus(private val terminal: Terminal) {
                 phaseStatusInternal = TracedPhasesBitManipulation.set(
                     phaseStatusInternal,
                     nominalPhase,
-                    singlePhaseKind
+                    singlePhaseKind,
                 )
                 true
             } else

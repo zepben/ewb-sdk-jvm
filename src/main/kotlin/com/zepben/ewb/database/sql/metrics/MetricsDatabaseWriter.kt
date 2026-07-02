@@ -16,11 +16,7 @@ import com.zepben.ewb.metrics.variants.VariantMetrics
 import java.io.IOException
 import java.nio.file.Path
 import java.sql.Connection
-import kotlin.io.path.absolute
-import kotlin.io.path.createFile
-import kotlin.io.path.createParentDirectories
-import kotlin.io.path.deleteIfExists
-import kotlin.io.path.listDirectoryEntries
+import kotlin.io.path.*
 
 internal const val JOB_ID_FILE_EXTENSION = "zjid"
 
@@ -47,7 +43,7 @@ class MetricsDatabaseWriter internal constructor(
     @JvmOverloads
     constructor(
         getConnection: () -> Connection,
-        modelPath: Path? = null
+        modelPath: Path? = null,
     ) : this(
         MetricsDatabaseTables(),
         NoOpDatabaseInitialiser(getConnection),

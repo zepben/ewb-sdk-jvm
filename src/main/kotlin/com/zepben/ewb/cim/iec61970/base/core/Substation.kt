@@ -10,7 +10,10 @@ package com.zepben.ewb.cim.iec61970.base.core
 
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
-import com.zepben.ewb.services.common.extensions.*
+import com.zepben.ewb.services.common.extensions.asUnmodifiable
+import com.zepben.ewb.services.common.extensions.getByMRID
+import com.zepben.ewb.services.common.extensions.safeRemove
+import com.zepben.ewb.services.common.extensions.validateReference
 
 /**
  * A collection of equipment for purposes other than generation or utilization, through which electric energy in bulk

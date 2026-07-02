@@ -28,12 +28,12 @@ class TableAssetOrganisationRolesAssets : SqlTable() {
 
     init {
         addUniqueIndexes(
-            listOf(ASSET_ORGANISATION_ROLE_MRID, ASSET_MRID)
+            listOf(ASSET_ORGANISATION_ROLE_MRID, ASSET_MRID),
         )
 
         addNonUniqueIndexes(
             listOf(ASSET_ORGANISATION_ROLE_MRID),
-            listOf(ASSET_MRID)
+            listOf(ASSET_MRID),
         )
     }
 

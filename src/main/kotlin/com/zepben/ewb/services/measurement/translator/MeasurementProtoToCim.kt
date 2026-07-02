@@ -8,7 +8,10 @@
 
 package com.zepben.ewb.services.measurement.translator
 
-import com.zepben.ewb.cim.iec61970.base.meas.*
+import com.zepben.ewb.cim.iec61970.base.meas.AccumulatorValue
+import com.zepben.ewb.cim.iec61970.base.meas.AnalogValue
+import com.zepben.ewb.cim.iec61970.base.meas.DiscreteValue
+import com.zepben.ewb.cim.iec61970.base.meas.MeasurementValue
 import com.zepben.ewb.services.common.translator.toInstant
 import com.zepben.ewb.services.measurement.MeasurementService
 import com.zepben.protobuf.cim.iec61970.base.meas.AccumulatorValue as PBAccumulatorValue

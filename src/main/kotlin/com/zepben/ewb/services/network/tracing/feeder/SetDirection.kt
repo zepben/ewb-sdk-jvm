@@ -33,14 +33,14 @@ import org.slf4j.Logger
  * should only ever be used in a debug cycle, and should always be `null` in production code.
  */
 class SetDirection(
-    private val debugLogger: Logger?
+    private val debugLogger: Logger?,
 ) {
 
     private fun computeData(
         reprocessedLoopTerminals: MutableSet<Terminal>,
         stateOperators: NetworkStateOperators,
         step: NetworkTraceStep<FeederDirection>,
-        nextPath: NetworkTraceStep.Path
+        nextPath: NetworkTraceStep.Path,
     ): FeederDirection {
         if (nextPath.toEquipment is BusbarSection) {
             return FeederDirection.CONNECTOR
@@ -82,7 +82,7 @@ class SetDirection(
             debugLogger,
             name = "SetDirection(${stateOperators.description})",
             { WeightedPriorityQueue.processQueue { it.path.toTerminal.phases.numPhases() } },
-            { WeightedPriorityQueue.branchQueue { it.path.toTerminal.phases.numPhases() } }
+            { WeightedPriorityQueue.branchQueue { it.path.toTerminal.phases.numPhases() } },
         ) { step: NetworkTraceStep<FeederDirection>, _, nextPath ->
             computeData(reprocessedLoopTerminals, stateOperators, step, nextPath)
         }

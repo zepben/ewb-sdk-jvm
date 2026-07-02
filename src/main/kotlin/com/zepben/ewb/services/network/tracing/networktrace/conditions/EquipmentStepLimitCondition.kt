@@ -13,7 +13,7 @@ import com.zepben.ewb.services.network.tracing.traversal.StepContext
 import com.zepben.ewb.services.network.tracing.traversal.StopCondition
 
 class EquipmentStepLimitCondition<T>(
-    val limit: Int
+    val limit: Int,
 ) : StopCondition<NetworkTraceStep<T>> {
     override fun shouldStop(item: NetworkTraceStep<T>, context: StepContext): Boolean {
         return item.numEquipmentSteps >= limit

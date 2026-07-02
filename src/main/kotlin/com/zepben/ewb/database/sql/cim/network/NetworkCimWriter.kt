@@ -98,7 +98,7 @@ import java.sql.SQLException
  */
 @Suppress("SameParameterValue")
 class NetworkCimWriter(
-    override val databaseTables: NetworkDatabaseTables
+    override val databaseTables: NetworkDatabaseTables,
 ) : CimWriter(databaseTables) {
 
     // ##################################
@@ -384,7 +384,7 @@ class NetworkCimWriter(
         table: TableProtectionRelayFunctions,
         insert: PreparedStatement,
         protectionRelayFunction: ProtectionRelayFunction,
-        description: String
+        description: String,
     ): Boolean {
         insert.setNullableString(table.MODEL.queryIndex, protectionRelayFunction.model)
         insert.setNullableBoolean(table.RECLOSING.queryIndex, protectionRelayFunction.reclosing)
@@ -785,7 +785,7 @@ class NetworkCimWriter(
         table: TableAssetOrganisationRoles,
         insert: PreparedStatement,
         assetOrganisationRole: AssetOrganisationRole,
-        description: String
+        description: String,
     ): Boolean {
         return writeOrganisationRole(table, insert, assetOrganisationRole, description)
     }
@@ -839,7 +839,7 @@ class NetworkCimWriter(
         table: TableElectronicAddresses,
         insert: PreparedStatement,
         electronicAddress: ElectronicAddress,
-        description: String
+        description: String,
     ): Boolean {
         insert.setNullableString(table.EMAIL_1.queryIndex, electronicAddress.email1)
         insert.setNullableBoolean(table.IS_PRIMARY.queryIndex, electronicAddress.isPrimary)
@@ -872,7 +872,7 @@ class NetworkCimWriter(
         location: Location,
         field: TableLocationStreetAddressField,
         streetAddress: StreetAddress?,
-        description: String
+        description: String,
     ): Boolean {
         if (streetAddress == null)
             return true
@@ -887,7 +887,7 @@ class NetworkCimWriter(
             table,
             insert,
             streetAddress,
-            description
+            description,
         )
     }
 
@@ -909,7 +909,7 @@ class NetworkCimWriter(
         table: TableStreetAddresses,
         insert: PreparedStatement,
         streetAddress: StreetAddress,
-        description: String
+        description: String,
     ): Boolean {
         insert.setNullableString(table.POSTAL_CODE.queryIndex, streetAddress.postalCode)
         insert.setNullableString(table.PO_BOX.queryIndex, streetAddress.poBox)
@@ -936,7 +936,7 @@ class NetworkCimWriter(
         table: TableTelephoneNumbers,
         insert: PreparedStatement,
         telephoneNumber: TelephoneNumber,
-        description: String
+        description: String,
     ): Boolean {
         insert.setNullableString(table.AREA_CODE.queryIndex, telephoneNumber.areaCode)
         insert.setNullableString(table.CITY_CODE.queryIndex, telephoneNumber.cityCode)
@@ -1056,7 +1056,7 @@ class NetworkCimWriter(
         table: TableEndDeviceFunctions,
         insert: PreparedStatement,
         endDeviceFunction: EndDeviceFunction,
-        description: String
+        description: String,
     ): Boolean {
         insert.setNullableBoolean(table.ENABLED.queryIndex, endDeviceFunction.enabled)
 
@@ -1117,7 +1117,7 @@ class NetworkCimWriter(
             table,
             insert,
             contactDetails,
-            "contact details [${contactDetails.id}] for usage point ${usagePoint.mRID}"
+            "contact details [${contactDetails.id}] for usage point ${usagePoint.mRID}",
         )
     }
 
@@ -1153,7 +1153,7 @@ class NetworkCimWriter(
         table: TableAuxiliaryEquipment,
         insert: PreparedStatement,
         auxiliaryEquipment: AuxiliaryEquipment,
-        description: String
+        description: String,
     ): Boolean {
         insert.setNullableString(table.TERMINAL_MRID.queryIndex, auxiliaryEquipment.terminal?.mRID)
 
@@ -1251,7 +1251,7 @@ class NetworkCimWriter(
         table: TableConductingEquipment,
         insert: PreparedStatement,
         conductingEquipment: ConductingEquipment,
-        description: String
+        description: String,
     ): Boolean {
         insert.setNullableString(table.BASE_VOLTAGE_MRID.queryIndex, conductingEquipment.baseVoltage?.mRID)
 
@@ -1279,7 +1279,7 @@ class NetworkCimWriter(
         table: TableConnectivityNodeContainers,
         insert: PreparedStatement,
         connectivityNodeContainer: ConnectivityNodeContainer,
-        description: String
+        description: String,
     ): Boolean {
         return writePowerSystemResource(table, insert, connectivityNodeContainer, description)
     }
@@ -1326,7 +1326,7 @@ class NetworkCimWriter(
         table: TableEquipmentContainers,
         insert: PreparedStatement,
         equipmentContainer: EquipmentContainer,
-        description: String
+        description: String,
     ): Boolean {
         return writeConnectivityNodeContainer(table, insert, equipmentContainer, description)
     }
@@ -1347,7 +1347,7 @@ class NetworkCimWriter(
         insert.setNullableString(table.NORMAL_HEAD_TERMINAL_MRID.queryIndex, feeder.normalHeadTerminal?.mRID)
         insert.setNullableString(
             table.NORMAL_ENERGIZING_SUBSTATION_MRID.queryIndex,
-            feeder.normalEnergizingSubstation?.mRID
+            feeder.normalEnergizingSubstation?.mRID,
         )
 
         return writeEquipmentContainer(table, insert, feeder, "feeder")
@@ -1374,7 +1374,7 @@ class NetworkCimWriter(
         table: TablePowerSystemResources,
         insert: PreparedStatement,
         powerSystemResource: PowerSystemResource,
-        description: String
+        description: String,
     ): Boolean {
         insert.setNullableString(table.LOCATION_MRID.queryIndex, powerSystemResource.location?.mRID)
         insert.setNullableInt(table.NUM_CONTROLS.queryIndex, powerSystemResource.numControls)
@@ -1397,7 +1397,7 @@ class NetworkCimWriter(
 
         insert.setNullableString(
             table.GEOGRAPHICAL_REGION_MRID.queryIndex,
-            subGeographicalRegion.geographicalRegion?.mRID
+            subGeographicalRegion.geographicalRegion?.mRID,
         )
 
         return writeIdentifiedObject(table, insert, subGeographicalRegion, "sub-geographical region")
@@ -1484,7 +1484,7 @@ class NetworkCimWriter(
         table: TableEquivalentEquipment,
         insert: PreparedStatement,
         equivalentEquipment: EquivalentEquipment,
-        description: String
+        description: String,
     ): Boolean =
         writeConductingEquipment(table, insert, equivalentEquipment, description)
 
@@ -1536,7 +1536,7 @@ class NetworkCimWriter(
         table: TablePowerElectronicsUnits,
         insert: PreparedStatement,
         powerElectronicsUnit: PowerElectronicsUnit,
-        description: String
+        description: String,
     ): Boolean {
         insert.setNullableString(table.POWER_ELECTRONICS_CONNECTION_MRID.queryIndex, powerElectronicsUnit.powerElectronicsConnection?.mRID)
         insert.setNullableInt(table.MAX_P.queryIndex, powerElectronicsUnit.maxP)
@@ -1643,7 +1643,7 @@ class NetworkCimWriter(
         table: TableMeasurements,
         insert: PreparedStatement,
         measurement: Measurement,
-        description: String
+        description: String,
     ): Boolean {
         insert.setNullableString(table.POWER_SYSTEM_RESOURCE_MRID.queryIndex, measurement.powerSystemResourceMRID)
         insert.setNullableString(table.REMOTE_SOURCE_MRID.queryIndex, measurement.remoteSource?.mRID)
@@ -1873,7 +1873,7 @@ class NetworkCimWriter(
         table: TableEarthFaultCompensators,
         insert: PreparedStatement,
         earthFaultCompensator: EarthFaultCompensator,
-        description: String
+        description: String,
     ): Boolean {
         insert.setNullableDouble(table.R.queryIndex, earthFaultCompensator.r)
 
@@ -1885,7 +1885,7 @@ class NetworkCimWriter(
         table: TableEnergyConnections,
         insert: PreparedStatement,
         energyConnection: EnergyConnection,
-        description: String
+        description: String,
     ): Boolean {
         return writeConductingEquipment(table, insert, energyConnection, description)
     }
@@ -2145,7 +2145,7 @@ class NetworkCimWriter(
         table: TablePerLengthImpedances,
         insert: PreparedStatement,
         perLengthImpedance: PerLengthImpedance,
-        description: String
+        description: String,
     ): Boolean {
         return writePerLengthLineParameter(table, insert, perLengthImpedance, description)
     }
@@ -2155,7 +2155,7 @@ class NetworkCimWriter(
         table: TablePerLengthLineParameters,
         insert: PreparedStatement,
         perLengthLineParameter: PerLengthLineParameter,
-        description: String
+        description: String,
     ): Boolean {
         return writeIdentifiedObject(table, insert, perLengthLineParameter, description)
     }
@@ -2430,7 +2430,7 @@ class NetworkCimWriter(
         table: TableRegulatingCondEq,
         insert: PreparedStatement,
         regulatingCondEq: RegulatingCondEq,
-        description: String
+        description: String,
     ): Boolean {
         insert.setNullableBoolean(table.CONTROL_ENABLED.queryIndex, regulatingCondEq.controlEnabled)
         insert.setNullableString(table.REGULATING_CONTROL_MRID.queryIndex, regulatingCondEq.regulatingControl?.mRID)
@@ -2443,7 +2443,7 @@ class NetworkCimWriter(
         table: TableRegulatingControls,
         insert: PreparedStatement,
         regulatingControl: RegulatingControl,
-        description: String
+        description: String,
     ): Boolean {
         insert.setNullableBoolean(table.DISCRETE.queryIndex, regulatingControl.discrete)
         insert.setString(table.MODE.queryIndex, regulatingControl.mode.name)
@@ -2500,7 +2500,7 @@ class NetworkCimWriter(
         table: TableShuntCompensators,
         insert: PreparedStatement,
         shuntCompensator: ShuntCompensator,
-        description: String
+        description: String,
     ): Boolean {
         insert.setNullableString(table.SHUNT_COMPENSATOR_INFO_MRID.queryIndex, shuntCompensator.assetInfo?.mRID)
         insert.setNullableBoolean(table.GROUNDED.queryIndex, shuntCompensator.grounded)
@@ -2630,7 +2630,7 @@ class NetworkCimWriter(
         table: TableTransformerEnds,
         insert: PreparedStatement,
         transformerEnd: TransformerEnd,
-        description: String
+        description: String,
     ): Boolean {
         insert.setInt(table.END_NUMBER.queryIndex, transformerEnd.endNumber)
         insert.setNullableString(table.TERMINAL_MRID.queryIndex, transformerEnd.terminal?.mRID)

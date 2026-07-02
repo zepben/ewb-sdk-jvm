@@ -30,7 +30,7 @@ abstract class GrpcServer(
     val port: Int,
     val maxInboundMessageSize: Int = 0,
     sslContextConfig: SslContextConfig? = null,
-    interceptors: List<ServerInterceptor> = emptyList()
+    interceptors: List<ServerInterceptor> = emptyList(),
 ) {
     /**
      * The server builder to configure your server instance
@@ -78,7 +78,7 @@ abstract class GrpcServer(
      * credentials.
      */
     private fun createSslContext(
-        config: SslContextConfig? = null
+        config: SslContextConfig? = null,
     ): SslContext? {
         if (config == null)
             return null
@@ -89,7 +89,7 @@ abstract class GrpcServer(
 
             val sslClientContextBuilder = SslContextBuilder.forServer(
                 File(certChainFilePath),
-                File(privateKeyFilePath)
+                File(privateKeyFilePath),
             )
             if (!trustCertCollectionFilePath.isNullOrBlank()) {
                 sslClientContextBuilder.trustManager(File(trustCertCollectionFilePath))

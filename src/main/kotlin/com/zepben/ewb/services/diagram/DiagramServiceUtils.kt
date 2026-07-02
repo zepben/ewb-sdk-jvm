@@ -39,7 +39,7 @@ inline fun <R> whenDiagramServiceObject(
     identifiable: Identifiable,
     isDiagram: (Diagram) -> R,
     isDiagramObject: (DiagramObject) -> R,
-    isOther: (Identifiable) -> R = { throw IllegalArgumentException("Identifiable type ${it::class} is not supported by the diagram service") }
+    isOther: (Identifiable) -> R = { throw IllegalArgumentException("Identifiable type ${it::class} is not supported by the diagram service") },
 ): R = when (identifiable) {
     is Diagram -> isDiagram(identifiable)
     is DiagramObject -> isDiagramObject(identifiable)

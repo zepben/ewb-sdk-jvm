@@ -28,12 +28,12 @@ class TableCircuitsSubstations : SqlTable() {
 
     init {
         addUniqueIndexes(
-            listOf(CIRCUIT_MRID, SUBSTATION_MRID)
+            listOf(CIRCUIT_MRID, SUBSTATION_MRID),
         )
 
         addNonUniqueIndexes(
             listOf(CIRCUIT_MRID),
-            listOf(SUBSTATION_MRID)
+            listOf(SUBSTATION_MRID),
         )
     }
 

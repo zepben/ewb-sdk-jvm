@@ -32,7 +32,7 @@ import org.slf4j.Logger
  * This class is backed by a [NetworkTrace].
  */
 class SetPhases(
-    private val debugLogger: Logger?
+    private val debugLogger: Logger?,
 ) {
 
     private class PhasesToFlow(val nominalPhasePaths: List<NominalPhasePath>, var stepFlowedPhases: Boolean = false) {
@@ -54,7 +54,7 @@ class SetPhases(
                 .flatMap { it.terminals.asSequence() }
                 .onEach { applyPhases(networkStateOperators, it, it.phases.singlePhases) }
                 .toList(),
-            networkStateOperators
+            networkStateOperators,
         )
     }
 
@@ -84,7 +84,7 @@ class SetPhases(
         if (phases.size != terminal.phases.singlePhases.size) {
             throw IllegalArgumentException(
                 "Attempted to apply phases $phases to $terminal with nominal phases ${terminal.phases}. " +
-                    "Number of phases to apply must match the number of nominal phases. Found ${phases.size}, expected ${terminal.phases.singlePhases.size}"
+                    "Number of phases to apply must match the number of nominal phases. Found ${phases.size}, expected ${terminal.phases.singlePhases.size}",
             )
         }
 
@@ -105,7 +105,7 @@ class SetPhases(
         seedTerminal: Terminal,
         startTerminal: Terminal,
         phases: List<SinglePhaseKind>,
-        networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL
+        networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
     ) {
         val nominalPhasePaths = getNominalPhasePaths(networkStateOperators, seedTerminal, startTerminal, phases.asSequence())
         if (flowPhases(networkStateOperators, seedTerminal, startTerminal, nominalPhasePaths)) {
@@ -132,7 +132,7 @@ class SetPhases(
     fun spreadPhases(
         fromTerminal: Terminal,
         toTerminal: Terminal,
-        networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL
+        networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
     ) {
         spreadPhases(fromTerminal, toTerminal, fromTerminal.phases.singlePhases, networkStateOperators)
     }
@@ -150,7 +150,7 @@ class SetPhases(
         fromTerminal: Terminal,
         toTerminal: Terminal,
         phases: List<SinglePhaseKind>,
-        networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL
+        networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
     ) {
         val paths = getNominalPhasePaths(networkStateOperators, fromTerminal, toTerminal, phases.asSequence())
         flowPhases(networkStateOperators, fromTerminal, toTerminal, paths)
@@ -196,7 +196,7 @@ class SetPhases(
 
     private fun createNetworkTrace(
         stateOperators: NetworkStateOperators,
-        partiallyEnergisedTransformers: MutableSet<PowerTransformer>
+        partiallyEnergisedTransformers: MutableSet<PowerTransformer>,
     ): NetworkTrace<PhasesToFlow> =
         Tracing.networkTraceBranching(
             networkStateOperators = stateOperators,
@@ -205,7 +205,7 @@ class SetPhases(
             name = "SetPhases(${stateOperators.description})",
             queueFactory = { WeightedPriorityQueue.processQueue { it.path.toTerminal.phases.numPhases() } },
             branchQueueFactory = { WeightedPriorityQueue.branchQueue { it.path.toTerminal.phases.numPhases() } },
-            computeData = computeNextPhasesToFlow(stateOperators)
+            computeData = computeNextPhasesToFlow(stateOperators),
         )
             .addQueueCondition { nextStep, _, _, _ -> nextStep.data.nominalPhasePaths.isNotEmpty() }
             // We don't want to "energise" the neutral from the primary or vise versa for `ShuntCompensator` grounding terminals. These sides should
@@ -243,7 +243,7 @@ class SetPhases(
         stateOperators: NetworkStateOperators,
         fromTerminal: Terminal,
         toTerminal: Terminal,
-        phases: Sequence<SinglePhaseKind> = fromTerminal.phases.singlePhases.asSequence()
+        phases: Sequence<SinglePhaseKind> = fromTerminal.phases.singlePhases.asSequence(),
     ): List<NominalPhasePath> {
         val tracedInternally = fromTerminal.conductingEquipment == toTerminal.conductingEquipment
         val phasesToFlow = getPhasesToFlow(stateOperators, fromTerminal, phases, tracedInternally)
@@ -259,7 +259,7 @@ class SetPhases(
         stateOperators: NetworkStateOperators,
         terminal: Terminal,
         phases: Sequence<SinglePhaseKind>,
-        internalFlow: Boolean
+        internalFlow: Boolean,
     ): Set<SinglePhaseKind> =
         if (internalFlow) {
             terminal.conductingEquipment?.let { ce -> phases.filter { !stateOperators.isOpen(ce, it) }.toSet() } ?: emptySet()
@@ -301,7 +301,7 @@ class SetPhases(
         fromTerminal: Terminal,
         toTerminal: Terminal,
         nominalPhasePaths: List<NominalPhasePath>? = null,
-        allowSuspectFlow: Boolean
+        allowSuspectFlow: Boolean,
     ): Boolean {
         val paths = nominalPhasePaths ?: getNominalPhasePaths(stateOperators, fromTerminal, toTerminal)
 
@@ -351,7 +351,7 @@ class SetPhases(
         toTerminal: Terminal,
         toPhases: PhaseStatus,
         to: SinglePhaseKind,
-        onSuccess: () -> Unit
+        onSuccess: () -> Unit,
     ) {
         try {
             if ((phase != SinglePhaseKind.NONE) && toPhases.set(to, phase)) {
@@ -370,7 +370,7 @@ class SetPhases(
         toPhases: PhaseStatus,
         to: SinglePhaseKind,
         allowSuspectFlow: Boolean,
-        onSuccess: () -> Unit
+        onSuccess: () -> Unit,
     ) {
         // The phases that can be added are ABCN and Y, so for all cases other than Y we can just use the added phase. For Y we need to look
         // at what the phases on the other side of the transformer are to determine what has been added.
@@ -388,7 +388,7 @@ class SetPhases(
         from: SinglePhaseKind,
         toTerminal: Terminal,
         toPhases: PhaseStatus,
-        to: SinglePhaseKind
+        to: SinglePhaseKind,
     ): Nothing {
         val phaseDesc = if (from == to)
             "$from"
@@ -403,7 +403,7 @@ class SetPhases(
         throw IllegalStateException(
             "Attempted to flow conflicting phase ${fromPhases[from]} onto ${toPhases[to]} on nominal phase $phaseDesc. This occurred while " +
                 "flowing $terminalDesc. This is often caused by missing open points, or incorrect phases in upstream equipment that should be " +
-                "corrected in the source data."
+                "corrected in the source data.",
         )
     }
 

@@ -29,7 +29,7 @@ class TableClamps : TableConductingEquipment() {
 
     init {
         addNonUniqueIndexes(
-            listOf(AC_LINE_SEGMENT_MRID)
+            listOf(AC_LINE_SEGMENT_MRID),
         )
     }
 

@@ -34,7 +34,7 @@ import org.slf4j.Logger
  * This class is backed by a [NetworkTrace].
  */
 class AssignToLvFeeders(
-    private val debugLogger: Logger?
+    private val debugLogger: Logger?,
 ) {
 
     /**
@@ -51,7 +51,7 @@ class AssignToLvFeeders(
     fun run(
         network: NetworkService,
         networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
-        startTerminal: Terminal? = null
+        startTerminal: Terminal? = null,
     ): Unit = AssignToLvFeedersInternal(networkStateOperators, debugLogger)
         .run(network, startTerminal)
 
@@ -70,13 +70,13 @@ class AssignToLvFeeders(
         lvFeederStartPoints: Set<ConductingEquipment>,
         terminalToAuxEquipment: Map<Terminal, List<AuxiliaryEquipment>>,
         lvFeedersToAssign: List<LvFeeder>,
-        networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL
+        networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
     ): Unit = AssignToLvFeedersInternal(networkStateOperators, debugLogger)
         .run(terminal, lvFeederStartPoints, terminalToAuxEquipment, lvFeedersToAssign)
 
     private class AssignToLvFeedersInternal(
         val stateOperators: NetworkStateOperators,
-        private val debugLogger: Logger?
+        private val debugLogger: Logger?,
     ) {
 
         fun run(network: NetworkService, startTerminal: Terminal?) {
@@ -103,7 +103,7 @@ class AssignToLvFeeders(
             terminal: Terminal?,
             lvFeederStartPoints: Set<ConductingEquipment>,
             terminalToAuxEquipment: Map<Terminal, List<AuxiliaryEquipment>>,
-            lvFeedersToAssign: List<LvFeeder>
+            lvFeedersToAssign: List<LvFeeder>,
         ) {
             // If there is no terminal, or there are no LV feeders to assign, then we have nothing to do.
             if ((terminal == null) || (lvFeedersToAssign.isEmpty()))
@@ -132,7 +132,7 @@ class AssignToLvFeeders(
                 stateOperators,
                 NetworkTraceActionType.ALL_STEPS,
                 debugLogger,
-                name = "AssignToLvFeeders(${stateOperators.description})"
+                name = "AssignToLvFeeders(${stateOperators.description})",
             ) { _, _, nextPath ->
                 // Store if we found an LV feeder head in the `data` to prevent looking this up multiple times on each iteration.
                 lvFeederStartPoints.contains(nextPath.toEquipment)
@@ -149,7 +149,7 @@ class AssignToLvFeeders(
                         context,
                         terminalToAuxEquipment,
                         lvFeederStartPoints,
-                        lvFeedersToAssign
+                        lvFeedersToAssign,
                     )
                 }
         }
@@ -160,7 +160,7 @@ class AssignToLvFeeders(
             stepContext: StepContext,
             terminalToAuxEquipment: Map<Terminal, Collection<AuxiliaryEquipment>>,
             lvFeederStartPoints: Set<ConductingEquipment>,
-            lvFeedersToAssign: List<LvFeeder>
+            lvFeedersToAssign: List<LvFeeder>,
         ) {
             if (stepPath.tracedInternally && !stepContext.isStartItem)
                 return
@@ -175,7 +175,8 @@ class AssignToLvFeeders(
                 foundLvFeeders.energizedBy(lvFeedersToAssign.flatMap { stateOperators.getEnergizingFeeders(it) })
 
                 // Energize any LvSubstations for these LvFeeders by the same feeders.
-                val foundLvSubstations = foundLvFeeders.mapNotNull { it.normalEnergizingLvSubstation } + lvFeedersToAssign.mapNotNull { it.normalEnergizingLvSubstation }
+                val foundLvSubstations =
+                    foundLvFeeders.mapNotNull { it.normalEnergizingLvSubstation } + lvFeedersToAssign.mapNotNull { it.normalEnergizingLvSubstation }
                 foundLvSubstations.lvSubstationEnergizedBy(foundLvFeeders.flatMap { stateOperators.getEnergizingFeeders(it) })
             }
 

@@ -50,7 +50,7 @@ abstract class CimDatabaseReader<TTables : CimDatabaseTables, TService : BaseSer
         service.unresolvedReferences().forEach {
             throw IllegalStateException(
                 "Unresolved references were found in ${service.name} service after read - this should not occur. Failing reference was from " +
-                    "${it.from.typeNameAndMRID()} resolving ${it.resolver.toClass.simpleName} ${it.toMrid}"
+                    "${it.from.typeNameAndMRID()} resolving ${it.resolver.toClass.simpleName} ${it.toMrid}",
             )
         }
         logger.info("Unresolved references were all resolved during read.")

@@ -44,7 +44,7 @@ object PhasePaths {
             PhaseCode.BC to mapOf(SPK.X to listOf(SPK.B, SPK.C), SPK.Y to listOf(SPK.B, SPK.C)),
             PhaseCode.A to mapOf(SPK.X to listOf(SPK.A)),
             PhaseCode.B to mapOf(SPK.X to listOf(SPK.B), SPK.Y to listOf(SPK.B)),
-            PhaseCode.C to mapOf(SPK.X to listOf(SPK.C), SPK.Y to listOf(SPK.C))
+            PhaseCode.C to mapOf(SPK.X to listOf(SPK.C), SPK.Y to listOf(SPK.C)),
         ),
         PhaseCode.X to mapOf(
             PhaseCode.ABC to mapOf(SPK.X to listOf(SPK.A, SPK.B, SPK.C)),
@@ -53,7 +53,7 @@ object PhasePaths {
             PhaseCode.BC to mapOf(SPK.X to listOf(SPK.B, SPK.C)),
             PhaseCode.A to mapOf(SPK.X to listOf(SPK.A)),
             PhaseCode.B to mapOf(SPK.X to listOf(SPK.B)),
-            PhaseCode.C to mapOf(SPK.X to listOf(SPK.C))
+            PhaseCode.C to mapOf(SPK.X to listOf(SPK.C)),
         ),
         PhaseCode.Y to mapOf(
             PhaseCode.ABC to mapOf(SPK.Y to listOf(SPK.B, SPK.C)),
@@ -62,8 +62,8 @@ object PhasePaths {
             PhaseCode.BC to mapOf(SPK.Y to listOf(SPK.B, SPK.C)),
             PhaseCode.A to mapOf(),
             PhaseCode.B to mapOf(SPK.Y to listOf(SPK.B)),
-            PhaseCode.C to mapOf(SPK.Y to listOf(SPK.C))
-        )
+            PhaseCode.C to mapOf(SPK.Y to listOf(SPK.C)),
+        ),
     )
 
 }

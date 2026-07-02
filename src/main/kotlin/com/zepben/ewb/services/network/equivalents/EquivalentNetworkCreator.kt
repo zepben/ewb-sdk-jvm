@@ -76,14 +76,14 @@ object EquivalentNetworkCreator {
         noinline equipmentMrid: EquipmentMridSupplier = { (edgeEquipment, _, _) -> "${edgeEquipment.mRID}-eeq" },
         noinline initBranch: BranchInitialisation = {},
         noinline initEquipment: EquipmentInitialisation<T> = {},
-        maxNumber: Int? = null
+        maxNumber: Int? = null,
     ): Set<EquivalentNetworkConnection> =
         addToEdgeBetween(
             network,
             edgeDetectionDetails,
             maxNumber,
             singleEquivalentBranchCreator(branchMrid, initBranch),
-            singleEquipmentCreator(equipmentMrid, initEquipment)
+            singleEquipmentCreator(equipmentMrid, initEquipment),
         )
 
     /**
@@ -126,7 +126,7 @@ object EquivalentNetworkCreator {
         edgeDetectionDetails: EdgeDetectionDetails,
         maxNumber: Int? = null,
         createEquivalentBranches: EquivalentBranchesCreator = singleEquivalentBranchCreator(),
-        createEquivalentEquipment: EquivalentEquipmentCreator
+        createEquivalentEquipment: EquivalentEquipmentCreator,
     ): Set<EquivalentNetworkConnection> {
         val edgeCnn = getEdgeNodes(network, edgeDetectionDetails)
         val edgeCnToProcess = maxNumber?.let { edgeCnn.take(it) } ?: edgeCnn
@@ -154,7 +154,7 @@ object EquivalentNetworkCreator {
                     location = edgeEquipment.location
                     baseVoltage = edgeEquipment.getEquivalentBaseVoltage(edgeNode)
                     initBranch(edgeEquipment via edgeNode)
-                }
+                },
             )
         }
 
@@ -196,7 +196,7 @@ object EquivalentNetworkCreator {
                             location = edgeEquipment.location
                             baseVoltage = edgeEquipment.getEquivalentBaseVoltage(edgeNode)
                             initEquipment(edgeEquipment via edgeNode via equivalentBranch)
-                        }
+                        },
             )
         }
 
@@ -213,7 +213,7 @@ object EquivalentNetworkCreator {
         network: NetworkService,
         edgeNode: ConnectivityNode,
         createEquivalentBranches: EquivalentBranchesCreator,
-        createEquivalentEquipment: EquivalentEquipmentCreator
+        createEquivalentEquipment: EquivalentEquipmentCreator,
     ): EquivalentNetworkConnection {
         // An edgeNode by definition must have an associated ConductingEquipment with multiple equipment containers, so conductingEquipment must be non-null.
         val edgeEquipment = edgeNode.terminals.first().conductingEquipment!!
@@ -242,7 +242,7 @@ object EquivalentNetworkCreator {
         network: NetworkService,
         phaseCode: PhaseCode?,
         eqBranchTerminal: Terminal,
-        containersForEquivalentNetwork: Set<EquipmentContainer>
+        containersForEquivalentNetwork: Set<EquipmentContainer>,
     ) {
         prepareAndAdd(network, phaseCode ?: eqBranchTerminal.phases, 1, containersForEquivalentNetwork)
         network.connect(terminals.first(), eqBranchTerminal)
@@ -252,7 +252,7 @@ object EquivalentNetworkCreator {
         network: NetworkService,
         phaseCode: PhaseCode,
         minTerminals: Int,
-        containersForEquivalentNetwork: Set<EquipmentContainer>
+        containersForEquivalentNetwork: Set<EquipmentContainer>,
     ) {
         network.tryAdd(this)
 
@@ -275,7 +275,7 @@ object EquivalentNetworkCreator {
         edgeNode.terminals.first().conductingEquipment!!.containers.toSet().minus(
             edgeNode.terminals.first().otherTerminals()
                 .flatMap { ot -> ot.connectedTerminals().flatMap { it.conductingEquipment?.containers ?: emptyList() } }
-                .toSet()
+                .toSet(),
         )
             .asSequence()
             .filter { it !is Site } // We do not want Sites, so we filter them out.
@@ -352,7 +352,7 @@ inline fun <reified T : ConductingEquipment> NetworkService.addToEdgeBetween(
     noinline equipmentMrid: EquipmentMridSupplier = { (edgeEquipment, _, _) -> "${edgeEquipment.mRID}-eeq" },
     maxNumber: Int? = null,
     noinline initBranch: BranchInitialisation = {},
-    noinline initEquipment: EquipmentInitialisation<T> = {}
+    noinline initEquipment: EquipmentInitialisation<T> = {},
 ): Set<EquivalentNetworkConnection> =
     addToEdgeBetween(
         this,
@@ -361,7 +361,7 @@ inline fun <reified T : ConductingEquipment> NetworkService.addToEdgeBetween(
         equipmentMrid,
         initBranch,
         initEquipment,
-        maxNumber
+        maxNumber,
     )
 
 /**
@@ -393,7 +393,7 @@ inline fun <reified OtherContainer : EquipmentContainer, reified T : ConductingE
     noinline equipmentMrid: EquipmentMridSupplier = { (edgeEquipment, _, _) -> "${edgeEquipment.mRID}-eeq" },
     maxNumber: Int? = null,
     noinline initBranch: BranchInitialisation = {},
-    noinline initEquipment: EquipmentInitialisation<T> = {}
+    noinline initEquipment: EquipmentInitialisation<T> = {},
 ): Set<EquivalentNetworkConnection> =
     addToEdgeBetween(
         this,
@@ -402,7 +402,7 @@ inline fun <reified OtherContainer : EquipmentContainer, reified T : ConductingE
         equipmentMrid,
         initBranch,
         initEquipment,
-        maxNumber
+        maxNumber,
     )
 
 /**
@@ -433,7 +433,7 @@ inline fun <reified Container : EquipmentContainer, reified OtherContainer : Equ
     noinline equipmentMrid: EquipmentMridSupplier = { (edgeEquipment, _, _) -> "${edgeEquipment.mRID}-eeq" },
     maxNumber: Int? = null,
     noinline initBranch: BranchInitialisation = {},
-    noinline initEquipment: EquipmentInitialisation<T> = {}
+    noinline initEquipment: EquipmentInitialisation<T> = {},
 ): Set<EquivalentNetworkConnection> =
     addToEdgeBetween(
         this,
@@ -442,5 +442,5 @@ inline fun <reified Container : EquipmentContainer, reified OtherContainer : Equ
         equipmentMrid,
         initBranch,
         initEquipment,
-        maxNumber
+        maxNumber,
     )

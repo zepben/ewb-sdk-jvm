@@ -404,7 +404,7 @@ object Resolvers {
         BoundReferenceResolver(
             powerElectronicsUnit,
             PowerElectronicsUnitToPowerElectronicsConnectionResolver,
-            PowerElectronicsConnectionToPowerElectronicsUnitResolver
+            PowerElectronicsConnectionToPowerElectronicsUnitResolver,
         )
 
     @JvmStatic
@@ -412,7 +412,7 @@ object Resolvers {
         BoundReferenceResolver(
             powerElectronicsConnectionPhase,
             PowerElectronicsConnectionPhaseToPowerElectronicsConnectionResolver,
-            PowerElectronicsConnectionToPowerElectronicsConnectionPhaseResolver
+            PowerElectronicsConnectionToPowerElectronicsConnectionPhaseResolver,
         )
 
     @JvmStatic
@@ -420,7 +420,7 @@ object Resolvers {
         BoundReferenceResolver(
             powerElectronicsConnection,
             PowerElectronicsConnectionToPowerElectronicsUnitResolver,
-            PowerElectronicsUnitToPowerElectronicsConnectionResolver
+            PowerElectronicsUnitToPowerElectronicsConnectionResolver,
         )
 
     @JvmStatic
@@ -428,7 +428,7 @@ object Resolvers {
         BoundReferenceResolver(
             powerElectronicsConnection,
             PowerElectronicsConnectionToPowerElectronicsConnectionPhaseResolver,
-            PowerElectronicsConnectionPhaseToPowerElectronicsConnectionResolver
+            PowerElectronicsConnectionPhaseToPowerElectronicsConnectionResolver,
         )
 
     @JvmStatic
@@ -460,7 +460,7 @@ object Resolvers {
         BoundReferenceResolver(
             transformerStarImpedance,
             TransformerStarImpedanceToTransformerEndInfoResolver,
-            TransformerEndInfoToTransformerStarImpedanceResolver
+            TransformerEndInfoToTransformerStarImpedanceResolver,
         )
 
     @JvmStatic
@@ -492,7 +492,7 @@ object Resolvers {
         BoundReferenceResolver(
             regulatingControl,
             RegulatingControlToRegulatingCondEqResolver,
-            RegulatingCondEqToRegulatingControlResolver
+            RegulatingCondEqToRegulatingControlResolver,
         )
 
     @JvmStatic
@@ -500,7 +500,7 @@ object Resolvers {
         BoundReferenceResolver(
             regulatingCondEq,
             RegulatingCondEqToRegulatingControlResolver,
-            RegulatingControlToRegulatingCondEqResolver
+            RegulatingControlToRegulatingCondEqResolver,
         )
 
     @JvmStatic
@@ -512,7 +512,7 @@ object Resolvers {
         BoundReferenceResolver(
             protectionRelayFunction,
             ProtectionRelayFunctionToProtectedSwitchResolver,
-            ProtectedSwitchToProtectionRelayFunctionResolver
+            ProtectedSwitchToProtectionRelayFunctionResolver,
         )
 
     @JvmStatic
@@ -524,7 +524,7 @@ object Resolvers {
         BoundReferenceResolver(
             protectionRelayFunction,
             ProtectionRelayFunctionToProtectionRelaySchemeResolver,
-            ProtectionRelaySchemeToProtectionRelayFunctionResolver
+            ProtectionRelaySchemeToProtectionRelayFunctionResolver,
         )
 
     @JvmStatic
@@ -532,7 +532,7 @@ object Resolvers {
         BoundReferenceResolver(
             protectionRelayScheme,
             ProtectionRelaySchemeToProtectionRelaySystemResolver,
-            ProtectionRelaySystemToProtectionRelaySchemeResolver
+            ProtectionRelaySystemToProtectionRelaySchemeResolver,
         )
 
     @JvmStatic
@@ -540,7 +540,7 @@ object Resolvers {
         BoundReferenceResolver(
             protectionRelayScheme,
             ProtectionRelaySchemeToProtectionRelayFunctionResolver,
-            ProtectionRelayFunctionToProtectionRelaySchemeResolver
+            ProtectionRelayFunctionToProtectionRelaySchemeResolver,
         )
 
     @JvmStatic
@@ -548,7 +548,7 @@ object Resolvers {
         BoundReferenceResolver(
             protectionRelaySystem,
             ProtectionRelaySystemToProtectionRelaySchemeResolver,
-            ProtectionRelaySchemeToProtectionRelaySystemResolver
+            ProtectionRelaySchemeToProtectionRelaySystemResolver,
         )
 
     @JvmStatic
@@ -556,7 +556,7 @@ object Resolvers {
         BoundReferenceResolver(
             sensor,
             SensorToProtectionRelayFunctionResolver,
-            ProtectionRelayFunctionToSensorResolver
+            ProtectionRelayFunctionToSensorResolver,
         )
 
     @JvmStatic
@@ -564,7 +564,7 @@ object Resolvers {
         BoundReferenceResolver(
             protectedSwitch,
             ProtectedSwitchToProtectionRelayFunctionResolver,
-            ProtectionRelayFunctionToProtectedSwitchResolver
+            ProtectionRelayFunctionToProtectedSwitchResolver,
         )
 
     @JvmStatic

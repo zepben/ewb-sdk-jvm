@@ -13,7 +13,10 @@ import com.zepben.ewb.cim.extensions.iec61968.assetinfo.RelayInfo
 import com.zepben.ewb.cim.iec61970.base.auxiliaryequipment.Sensor
 import com.zepben.ewb.cim.iec61970.base.core.PowerSystemResource
 import com.zepben.ewb.cim.iec61970.base.wires.ProtectedSwitch
-import com.zepben.ewb.services.common.extensions.*
+import com.zepben.ewb.services.common.extensions.asUnmodifiable
+import com.zepben.ewb.services.common.extensions.getByMRID
+import com.zepben.ewb.services.common.extensions.safeRemove
+import com.zepben.ewb.services.common.extensions.validateReference
 import java.util.function.BiConsumer
 
 /**
@@ -97,7 +100,7 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
     @JvmOverloads
     fun addTimeLimit(
         timeLimit: Double,
-        index: Int = numTimeLimits()
+        index: Int = numTimeLimits(),
     ): ProtectionRelayFunction {
         require(index in 0..(numTimeLimits())) {
             "Unable to add Double to ${typeNameAndMRID()}. " +

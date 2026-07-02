@@ -33,7 +33,7 @@ import com.zepben.protobuf.ns.data.SwitchStateEvent as PBSwitchStateEvent
  */
 sealed class CurrentStateEvent(
     val eventId: String,
-    val timestamp: LocalDateTime?
+    val timestamp: LocalDateTime?,
 ) {
 
     companion object {
@@ -81,7 +81,7 @@ class SwitchStateEvent @JvmOverloads constructor(
     timestamp: LocalDateTime?,
     val mRID: String,
     val action: SwitchAction,
-    val phases: PhaseCode = PhaseCode.NONE
+    val phases: PhaseCode = PhaseCode.NONE,
 ) : CurrentStateEvent(eventId, timestamp) {
 
     companion object {
@@ -94,7 +94,7 @@ class SwitchStateEvent @JvmOverloads constructor(
                 event.timestamp.toLocalDateTime(),
                 event.switch.mrid,
                 mapSwitchAction.toCim(event.switch.action),
-                mapPhaseCode.toCim(event.switch.phases)
+                mapPhaseCode.toCim(event.switch.phases),
             )
     }
 
@@ -141,7 +141,7 @@ class AddCutEvent(
     eventId: String,
     timestamp: LocalDateTime?,
     val mRID: String,
-    val aclsMRID: String
+    val aclsMRID: String,
 ) : CurrentStateEvent(eventId, timestamp) {
 
     companion object {
@@ -153,7 +153,7 @@ class AddCutEvent(
                 event.eventId,
                 event.timestamp.toLocalDateTime(),
                 event.addCut.mrid,
-                event.addCut.aclsMRID
+                event.addCut.aclsMRID,
             )
     }
 
@@ -196,7 +196,7 @@ class AddCutEvent(
 class RemoveCutEvent(
     eventId: String,
     timestamp: LocalDateTime?,
-    val mRID: String
+    val mRID: String,
 ) : CurrentStateEvent(eventId, timestamp) {
 
     companion object {
@@ -207,7 +207,7 @@ class RemoveCutEvent(
             RemoveCutEvent(
                 event.eventId,
                 event.timestamp.toLocalDateTime(),
-                event.removeCut.mrid
+                event.removeCut.mrid,
             )
     }
 
@@ -252,7 +252,7 @@ class AddJumperEvent(
     timestamp: LocalDateTime?,
     val mRID: String,
     val from: JumperConnection,
-    val to: JumperConnection
+    val to: JumperConnection,
 ) : CurrentStateEvent(eventId, timestamp) {
 
     companion object {
@@ -265,7 +265,7 @@ class AddJumperEvent(
                 event.timestamp.toLocalDateTime(),
                 event.addJumper.mrid,
                 JumperConnection.fromPb(event.addJumper.fromConnection),
-                JumperConnection.fromPb(event.addJumper.toConnection)
+                JumperConnection.fromPb(event.addJumper.toConnection),
             )
     }
 
@@ -310,7 +310,7 @@ class AddJumperEvent(
 class RemoveJumperEvent(
     eventId: String,
     timestamp: LocalDateTime?,
-    val mRID: String
+    val mRID: String,
 ) : CurrentStateEvent(eventId, timestamp) {
 
     companion object {
@@ -321,7 +321,7 @@ class RemoveJumperEvent(
             RemoveJumperEvent(
                 event.eventId,
                 event.timestamp.toLocalDateTime(),
-                event.removeJumper.mrid
+                event.removeJumper.mrid,
             )
     }
 
@@ -377,7 +377,7 @@ enum class SwitchAction {
  * @property connectedMRID The mRID of the conducting equipment (or terminal) connected to this end of the jumper.
  */
 class JumperConnection(
-    val connectedMRID: String
+    val connectedMRID: String,
 ) {
 
     companion object {
@@ -386,7 +386,7 @@ class JumperConnection(
          */
         internal fun fromPb(connection: PBJumperConnection): JumperConnection =
             JumperConnection(
-                connection.connectedMRID
+                connection.connectedMRID,
             )
     }
 

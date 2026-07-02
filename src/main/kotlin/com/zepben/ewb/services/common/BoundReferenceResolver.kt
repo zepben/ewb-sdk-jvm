@@ -18,5 +18,5 @@ package com.zepben.ewb.services.common
 data class BoundReferenceResolver<T, R>(
     val from: T,
     val resolver: ReferenceResolver<T, R>,
-    val reverseResolver: ReferenceResolver<R, T>?
+    val reverseResolver: ReferenceResolver<R, T>?,
 )

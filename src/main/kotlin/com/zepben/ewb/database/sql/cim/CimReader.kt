@@ -107,7 +107,7 @@ abstract class CimReader<TService : BaseService> {
         organisationRole.apply {
             organisation = service.ensureGet(
                 resultSet.getNullableString(table.ORGANISATION_MRID.queryIndex),
-                typeNameAndMRID()
+                typeNameAndMRID(),
             )
         }
 
@@ -205,7 +205,7 @@ abstract class CimReader<TService : BaseService> {
         } else {
             val duplicate = get<Identifiable>(identifiable.mRID)
             throw DuplicateMRIDException(
-                "Failed to read ${identifiable.typeNameAndMRID()}. Unable to add to service '$name': duplicate MRID (${duplicate?.typeNameAndMRID()})"
+                "Failed to read ${identifiable.typeNameAndMRID()}. Unable to add to service '$name': duplicate MRID (${duplicate?.typeNameAndMRID()})",
             )
         }
     }

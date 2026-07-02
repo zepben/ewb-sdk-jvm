@@ -28,7 +28,7 @@ class TableFeeders : TableEquipmentContainers() {
 
     init {
         addNonUniqueIndexes(
-            listOf(NORMAL_ENERGIZING_SUBSTATION_MRID)
+            listOf(NORMAL_ENERGIZING_SUBSTATION_MRID),
         )
     }
 

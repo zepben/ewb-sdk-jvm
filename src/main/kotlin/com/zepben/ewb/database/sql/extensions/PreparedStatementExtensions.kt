@@ -46,7 +46,7 @@ internal fun PreparedStatement.logFailure(logger: Logger, description: String) {
     logger.warn(
         "Failed to write $description.\n" +
             "SQL: ${sql()}\n" +
-            "Fields: ${parameters()}"
+            "Fields: ${parameters()}",
     )
 }
 
@@ -173,8 +173,10 @@ internal fun PreparedStatement.parameters(): String {
 }
 
 private inline fun <reified T : Any> PreparedStatement.accessProtectedProperty(propertyName: String): T =
-    AccessController.doPrivileged(PrivilegedExceptionAction {
-        val prop = this::class.memberProperties.first { it.name == propertyName }
-        prop.isAccessible = true
-        prop.getter.call(this)
-    }) as T
+    AccessController.doPrivileged(
+        PrivilegedExceptionAction {
+            val prop = this::class.memberProperties.first { it.name == propertyName }
+            prop.isAccessible = true
+            prop.getter.call(this)
+        },
+    ) as T

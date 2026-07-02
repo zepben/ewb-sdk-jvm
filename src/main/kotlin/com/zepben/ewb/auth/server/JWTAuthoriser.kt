@@ -44,7 +44,7 @@ object JWTAuthoriser {
             return AuthResponse(StatusCode.OK)
         return AuthResponse(
             StatusCode.UNAUTHENTICATED,
-            "Token was missing a required claim. Had [${permissions.joinToString(", ")}] but needed [${requiredClaims.joinToString(", ")}]"
+            "Token was missing a required claim. Had [${permissions.joinToString(", ")}] but needed [${requiredClaims.joinToString(", ")}]",
         )
     }
 }

@@ -25,7 +25,7 @@ import java.sql.SQLException
  * @property databaseTables The tables available in the database.
  */
 class DiagramCimWriter(
-    override val databaseTables: DiagramDatabaseTables
+    override val databaseTables: DiagramDatabaseTables,
 ) : CimWriter(databaseTables) {
 
     // ################################

@@ -30,11 +30,11 @@ class TableJobSources : MultiJobTable() {
 
     init {
         addUniqueIndexes(
-            listOf(JOB_ID, DATA_SOURCE)
+            listOf(JOB_ID, DATA_SOURCE),
         )
 
         addNonUniqueIndexes(
-            listOf(FILE_SHA)
+            listOf(FILE_SHA),
         )
     }
 

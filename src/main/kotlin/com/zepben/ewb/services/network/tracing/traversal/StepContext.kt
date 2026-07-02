@@ -25,7 +25,7 @@ class StepContext(
     val isBranchStartItem: Boolean,
     val stepNumber: Int = 0,
     val branchDepth: Int,
-    private var values: MutableMap<String, Any?>? = null
+    private var values: MutableMap<String, Any?>? = null,
 ) {
     var isStopping: Boolean = false
         // This is internal because it needs to be set after all stop conditions are called, however stop conditions take a context.

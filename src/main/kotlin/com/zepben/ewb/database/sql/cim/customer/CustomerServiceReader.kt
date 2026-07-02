@@ -28,7 +28,7 @@ import java.sql.Connection
 internal class CustomerServiceReader(
     databaseTables: CustomerDatabaseTables,
     connection: Connection,
-    override val reader: CustomerCimReader = CustomerCimReader()
+    override val reader: CustomerCimReader = CustomerCimReader(),
 ) : BaseServiceReader<CustomerService>(databaseTables, connection, reader) {
 
     override fun readService(service: CustomerService): Boolean =

@@ -17,7 +17,7 @@ internal fun changeSet56() = ChangeSet(
     listOf(
         // Network Changes.
         `Change switch rated_current to float`,
-    )
+    ),
 )
 
 // ###################
@@ -42,5 +42,5 @@ private val `Change switch rated_current to float` = Change(
             "ALTER TABLE $table RENAME COLUMN new_rated_current TO rated_current;",
         )
     },
-    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL),
 )

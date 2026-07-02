@@ -41,7 +41,7 @@ object TerminalConnectivityConnected {
     fun terminalConnectivity(
         terminal: Terminal,
         connectedTerminal: Terminal,
-        includePhases: Set<SPK>
+        includePhases: Set<SPK>,
     ): ConnectivityResult =
         ConnectivityResult.between(
             terminal,
@@ -49,7 +49,7 @@ object TerminalConnectivityConnected {
             (findStraightPhasePaths(terminal, connectedTerminal)
                 ?: findXyPhasePaths(terminal, connectedTerminal))
                 .filter { it.from in includePhases }
-                .filter { it.to in connectedTerminal.phases }
+                .filter { it.to in connectedTerminal.phases },
         )
 
     private fun findStraightPhasePaths(terminal: Terminal, connectedTerminal: Terminal): Collection<NominalPhasePath>? =
@@ -109,7 +109,7 @@ object TerminalConnectivityConnected {
         step: XyPhaseStep,
         visited: MutableSet<XyPhaseStep>,
         queue: ArrayDeque<XyPhaseStep>,
-        candidatePhases: XyCandidatePhasePaths
+        candidatePhases: XyCandidatePhasePaths,
     ) {
         if (!visited.add(step))
             return

@@ -16,7 +16,7 @@ class ServiceDifferences internal constructor(
     private val sourceObjLookup: (mRID: String) -> Identifiable?,
     private val targetObjLookup: (mRID: String) -> Identifiable?,
     private val sourceNameTypeLookup: (mRID: String) -> NameType?,
-    private val targetNameTypeLookup: (mRID: String) -> NameType?
+    private val targetNameTypeLookup: (mRID: String) -> NameType?,
 ) {
 
     private val missingFromTarget = linkedSetOf<String>()

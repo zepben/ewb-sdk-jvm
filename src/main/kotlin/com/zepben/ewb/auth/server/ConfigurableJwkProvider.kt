@@ -37,7 +37,7 @@ class ConfigurableJwkProvider(
         } else {
             HttpClient.newBuilder().build()
         }
-    }
+    },
 ) : JwkProvider {
     val allKeys by lazy { getAll() }
 

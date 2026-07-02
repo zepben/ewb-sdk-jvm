@@ -17,8 +17,8 @@ internal fun changeSet54() = ChangeSet(
     listOf(
         // Customer Changes
 
-        `Add special need columns for customers`
-    )
+        `Add special need columns for customers`,
+    ),
 )
 
 // ###################
@@ -28,7 +28,7 @@ internal fun changeSet54() = ChangeSet(
 @Suppress("ObjectPropertyName")
 private val `Add special need columns for customers` = Change(
     listOf(
-        "ALTER TABLE customers ADD COLUMN special_need TEXT NULL;"
+        "ALTER TABLE customers ADD COLUMN special_need TEXT NULL;",
     ),
-    targetDatabases = setOf(DatabaseType.CUSTOMER)
+    targetDatabases = setOf(DatabaseType.CUSTOMER),
 )

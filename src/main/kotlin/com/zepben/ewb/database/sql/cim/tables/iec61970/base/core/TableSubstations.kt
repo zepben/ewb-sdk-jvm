@@ -25,7 +25,7 @@ class TableSubstations : TableEquipmentContainers() {
 
     init {
         addNonUniqueIndexes(
-            listOf(SUB_GEOGRAPHICAL_REGION_MRID)
+            listOf(SUB_GEOGRAPHICAL_REGION_MRID),
         )
     }
 

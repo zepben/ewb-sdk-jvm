@@ -28,10 +28,24 @@ import java.lang.ref.WeakReference
  */
 class Terminal(mRID: String) : AcDcTerminal(mRID) {
 
-    var conductingEquipment: ConductingEquipment? = null
+    // When deprecating original set for conductingEquipment, this variable is a replacement for the original conductingEquipment variable. (Set should remain to be internal)
+    @Suppress("RedundantVisibilityModifier")
+    internal var _conductingEquipment: ConductingEquipment? = null
+        internal set(value) {
+            field?.also {
+                require((value == null && this !in it.terminals) || field === value) {
+                    "This terminal is currently being used by ${it.typeNameAndMRID()}. Please remove this terminal from the conducting equipment before setting this field again."
+                }
+            }
+            field = value
+        }
+
+    var conductingEquipment: ConductingEquipment?
+        get() = _conductingEquipment
+        @Deprecated("Setting Conducting Equipment Directly has been deprecated. Replace with Adding/Removing Terminal from the conducting equipment.")
         set(value) {
-            field =
-                if (field == null || field === value) value else throw IllegalStateException("conductingEquipment has already been set to $field. Cannot set this field again")
+            _conductingEquipment =
+                if (_conductingEquipment == null || _conductingEquipment === value) value else throw IllegalStateException("conductingEquipment has already been set to $_conductingEquipment. Cannot set this field again")
         }
 
     var phases: PhaseCode = PhaseCode.ABC

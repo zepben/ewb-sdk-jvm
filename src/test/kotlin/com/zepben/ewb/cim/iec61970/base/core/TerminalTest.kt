@@ -8,11 +8,13 @@
 
 package com.zepben.ewb.cim.iec61970.base.core
 
+import com.zepben.ewb.cim.iec61970.base.wires.AcLineSegment
 import com.zepben.ewb.cim.iec61970.base.wires.Junction
 import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.testdata.fillFields
 import com.zepben.ewb.services.network.tracing.feeder.FeederDirection
+import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -55,6 +57,46 @@ internal class TerminalTest {
         assertThat(terminal.currentPhases.phaseStatusInternal, equalTo(2u))
         assertThat(terminal.normalFeederDirection, equalTo(FeederDirection.UPSTREAM))
         assertThat(terminal.currentFeederDirection, equalTo(FeederDirection.DOWNSTREAM))
+    }
+
+    @Test
+    internal fun `can only reassign conducting equipment for unused terminals`() {
+        val acls = AcLineSegment(generateId())
+        val acls2 = AcLineSegment(generateId())
+        val terminal = Terminal(generateId())
+
+        fun confirmReassign() {
+            terminal._conductingEquipment = acls
+            terminal._conductingEquipment = null
+            terminal._conductingEquipment = acls2
+            terminal._conductingEquipment = null
+        }
+
+        // Should be able to freely reassign the conducting equipment without a back reference.
+        confirmReassign()
+
+        // Create a back reference.
+        acls.addTerminal(terminal)
+
+        // We shouldn't be able to reassign the terminal to another condcuting equipment while it is still assigned to acls.
+        expect { terminal._conductingEquipment = acls2 }
+            .toThrow<IllegalArgumentException>()
+            .withMessage(
+                "This terminal is currently being used by ${acls.typeNameAndMRID()}. Please remove this terminal from the conducting equipment before setting this field again."
+            )
+
+        // We shouldn't be able to clear the terminals condcuting equipment while it is still assigned to acls.
+        expect { terminal._conductingEquipment = null }
+            .toThrow<IllegalArgumentException>()
+            .withMessage(
+                "This terminal is currently being used by ${acls.typeNameAndMRID()}. Please remove this terminal from the conducting equipment before setting this field again.",
+            )
+
+        // Remove the back reference.
+        acls.removeTerminal(terminal)
+
+        // Should be able to freely reassign the conducting equipment after removing the back reference.
+        confirmReassign()
     }
 
     @Test

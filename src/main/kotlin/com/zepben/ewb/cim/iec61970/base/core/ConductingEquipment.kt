@@ -94,12 +94,16 @@ abstract class ConductingEquipment(mRID: String) : Equipment(mRID) {
     open val maxTerminals: Int get() = Int.MAX_VALUE
 
     /**
-     * Remove a [Terminal] from this [ConductingEquipment].
+     * Remove a [Terminal] from this [ConductingEquipment]. If the [terminal] is removed,
+     * the reverse link to this [ConductingEquipment] will also be cleared.
      *
      * @param terminal The [Terminal] to remove.
      * @return true if [terminal] is removed from the collection.
      */
-    fun removeTerminal(terminal: Terminal): Boolean = _terminals.remove(terminal)
+    fun removeTerminal(terminal: Terminal): Boolean = _terminals.remove(terminal).also { removed ->
+        if (removed)
+            terminal._conductingEquipment = null
+    }
 
     /**
      * Clear all [Terminal]'s from this [ConductingEquipment].
@@ -107,7 +111,13 @@ abstract class ConductingEquipment(mRID: String) : Equipment(mRID) {
      * @return This [ConductingEquipment] for fluent use.
      */
     fun clearTerminals(): ConductingEquipment {
+        //
+        // NOTE: We can only set the terminals `conductingEquiment` if it doesn't belong to the terminals list,
+        //       so we must clear our list of terminals before removing each terminals conducting equipemnt.
+        //
+        val toClearAssociation = _terminals.toList()
         _terminals.clear()
+        toClearAssociation.forEach { terminal -> terminal._conductingEquipment = null }
         return this
     }
 
@@ -116,7 +126,7 @@ abstract class ConductingEquipment(mRID: String) : Equipment(mRID) {
             return true
 
         if (terminal.conductingEquipment == null)
-            terminal.conductingEquipment = this
+            terminal._conductingEquipment = this
 
         require(terminal.conductingEquipment === this) {
             "${terminal.typeNameAndMRID()} `conductingEquipment` property references ${terminal.conductingEquipment!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."

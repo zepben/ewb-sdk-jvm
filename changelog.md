@@ -1,13 +1,14 @@
 # Zepben EWB SDK changelog
 ## [1.13.0] - UNRELEASED
 ### Breaking Changes
-* None.
+* Deprecated `NetworkServiceComparatorOptions.Builder`. This will be removed in a future release.
 
 ### New Features
-* None.
+* Adds `compareRunTime` to `NetworkServiceComparatorOptions` to allow the users to ignore variables/references that are only populated during EWB spin up.
 
 ### Enhancements
-* None.
+* `Terminal` can now update its `conductingEquipment` as long as there is no back reference. If you want to reassign a terminal,
+  first remove the terminal from associated conducting equipment, then add the terminal to new conducting equipment.
 
 ### Fixes
 * None.

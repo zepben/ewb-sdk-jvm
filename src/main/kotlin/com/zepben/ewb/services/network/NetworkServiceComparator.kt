@@ -45,10 +45,7 @@ import com.zepben.ewb.cim.iec61970.base.scada.RemotePoint
 import com.zepben.ewb.cim.iec61970.base.scada.RemoteSource
 import com.zepben.ewb.cim.iec61970.base.wires.*
 import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
-import com.zepben.ewb.services.common.BaseServiceComparator
-import com.zepben.ewb.services.common.ObjectDifference
-import com.zepben.ewb.services.common.ValueDifference
-import com.zepben.ewb.services.common.compareValues
+import com.zepben.ewb.services.common.*
 
 /**
  * @param options Indicates which optional checks to perform
@@ -119,11 +116,14 @@ class NetworkServiceComparator @JvmOverloads constructor(
             compareEquipmentContainer()
 
             compareIdReferences(LvFeeder::normalHeadTerminal)
-            compareIdReferenceCollections(LvFeeder::normalEnergizingFeeders)
-            compareIdReferenceCollections(LvFeeder::currentEnergizingFeeders)
             compareIdReferences(LvFeeder::normalEnergizingLvSubstation)
-            if (options.compareFeederEquipment) {
-                compareIdReferenceCollections(LvFeeder::currentEquipment)
+
+            if (options.compareRunTime) {
+                compareIdReferenceCollections(LvFeeder::normalEnergizingFeeders)
+                compareIdReferenceCollections(LvFeeder::currentEnergizingFeeders)
+                if (options.compareFeederEquipment) {
+                    compareIdReferenceCollections(LvFeeder::currentEquipment)
+                }
             }
         }
 
@@ -131,9 +131,12 @@ class NetworkServiceComparator @JvmOverloads constructor(
         ObjectDifference(source, target).apply {
             compareEquipmentContainer()
 
-            compareIdReferenceCollections(LvSubstation::normalEnergizingFeeders)
-            compareIdReferenceCollections(LvSubstation::currentEnergizingFeeders)
             compareIdReferenceCollections(LvSubstation::normalEnergizedLvFeeders)
+
+            if (options.compareRunTime) {
+                compareIdReferenceCollections(LvSubstation::normalEnergizingFeeders)
+                compareIdReferenceCollections(LvSubstation::currentEnergizingFeeders)
+            }
         }
 
     // ##################################################
@@ -608,15 +611,23 @@ class NetworkServiceComparator @JvmOverloads constructor(
 
             compareValues(Equipment::inService, Equipment::normallyInService, Equipment::commissionedDate)
 
-            if (options.compareEquipmentContainers)
-                compareIdReferenceCollections(Equipment::containers)
+            if (options.compareEquipmentContainers) {
+                if (options.compareRunTime)
+                    compareIdReferenceCollections(Equipment::containers)
+                else {
+                    compareIdReferenceCollection(
+                        source.containers.filterNot { it.populatedAtRuntTime },
+                        target.containers.filterNot { it.populatedAtRuntTime },
+                    )
+                }
+            }
 
             if (options.compareLvSimplification)
                 compareIdReferenceCollections(Equipment::usagePoints)
 
             compareIdReferenceCollections(Equipment::operationalRestrictions)
 
-            if (options.compareEquipmentContainers)
+            if (options.compareEquipmentContainers && options.compareRunTime)
                 compareIdReferenceCollections(Equipment::currentContainers)
         }
 
@@ -624,7 +635,8 @@ class NetworkServiceComparator @JvmOverloads constructor(
         apply {
             compareConnectivityNodeContainer()
 
-            compareIdReferenceCollections(EquipmentContainer::equipment)
+            if (options.compareRunTime || !source.populatedAtRuntTime)
+                compareIdReferenceCollections(EquipmentContainer::equipment)
         }
 
     private fun compareFeeder(source: Feeder, target: Feeder): ObjectDifference<Feeder> =
@@ -632,12 +644,15 @@ class NetworkServiceComparator @JvmOverloads constructor(
             compareEquipmentContainer()
 
             compareIdReferences(Feeder::normalHeadTerminal, Feeder::normalEnergizingSubstation)
-            compareIdReferenceCollections(Feeder::normalEnergizedLvFeeders)
-            compareIdReferenceCollections(Feeder::currentEnergizedLvFeeders)
-            compareIdReferenceCollections(Feeder::normalEnergizedLvSubstations)
-            compareIdReferenceCollections(Feeder::currentEnergizedLvSubstations)
-            if (options.compareFeederEquipment)
-                compareIdReferenceCollections(Feeder::currentEquipment)
+            if (options.compareRunTime) {
+                compareIdReferenceCollections(Feeder::normalEnergizedLvFeeders)
+                compareIdReferenceCollections(Feeder::currentEnergizedLvFeeders)
+                compareIdReferenceCollections(Feeder::normalEnergizedLvSubstations)
+                compareIdReferenceCollections(Feeder::currentEnergizedLvSubstations)
+                if (options.compareFeederEquipment) {
+                    compareIdReferenceCollections(Feeder::currentEquipment)
+                }
+            }
         }
 
     private fun compareGeographicalRegion(source: GeographicalRegion, target: GeographicalRegion): ObjectDifference<GeographicalRegion> =
@@ -678,10 +693,12 @@ class NetworkServiceComparator @JvmOverloads constructor(
             compareAcDcTerminal()
 
             compareIdReferences(Terminal::conductingEquipment, Terminal::connectivityNode)
-            compareValues(Terminal::phases, Terminal::sequenceNumber, Terminal::normalFeederDirection, Terminal::currentFeederDirection)
-
-            addIfDifferent(Terminal::normalPhases.name, Terminal::normalPhases.compareValues(source, target) { it.phaseStatusInternal })
-            addIfDifferent(Terminal::currentPhases.name, Terminal::currentPhases.compareValues(source, target) { it.phaseStatusInternal })
+            compareValues(Terminal::phases, Terminal::sequenceNumber)
+            if (options.compareRunTime) {
+                compareValues(Terminal::normalFeederDirection, Terminal::currentFeederDirection)
+                addIfDifferent(Terminal::normalPhases.name, Terminal::normalPhases.compareValues(source, target) { it.phaseStatusInternal })
+                addIfDifferent(Terminal::currentPhases.name, Terminal::currentPhases.compareValues(source, target) { it.phaseStatusInternal })
+            }
         }
 
     // #############################
@@ -1338,6 +1355,10 @@ class NetworkServiceComparator @JvmOverloads constructor(
             compareIdReferenceCollections(Circuit::endTerminals, Circuit::endSubstations)
         }
 
+    // ###########
+    // # Helpers #
+    // ###########
+
     private fun compareOpenStatus(source: Switch, target: Switch, openTest: (Switch, SinglePhaseKind) -> Boolean): ValueDifference? {
         val sourceStatus = PhaseCode.ABCN.singlePhases.associateWith { openTest(source, it) }
         val targetStatus = PhaseCode.ABCN.singlePhases.associateWith { openTest(target, it) }
@@ -1348,5 +1369,12 @@ class NetworkServiceComparator @JvmOverloads constructor(
             null
         }
     }
+
+    private val EquipmentContainer.populatedAtRuntTime: Boolean
+        get() = when (this) {
+            is LvFeeder -> true
+            is Feeder -> true
+            else -> false
+        }
 
 }

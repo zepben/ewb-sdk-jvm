@@ -66,6 +66,27 @@ internal class ConductingEquipmentTest {
     }
 
     @Test
+    internal fun removingTerminalClearsTheTerminalsConductingEquipment() {
+        val ce1 = object : ConductingEquipment(generateId()) {}
+        val terminal = Terminal(generateId()).also { ce1.addTerminal(it) }
+        ce1.removeTerminal(terminal)
+
+        assertThat(terminal.conductingEquipment, nullValue())
+    }
+
+    @Test
+    internal fun clearingTerminalClearsAllTerminalsConductingEquipment() {
+        val ce1 = object : ConductingEquipment(generateId()) {}
+        val terminal1 = Terminal(generateId()).also { ce1.addTerminal(it) }
+        val terminal2 = Terminal(generateId()).also { ce1.addTerminal(it) }
+
+        ce1.clearTerminals()
+
+        assertThat(terminal1.conductingEquipment, nullValue())
+        assertThat(terminal2.conductingEquipment, nullValue())
+    }
+
+    @Test
     internal fun terminals() {
         PrivateCollectionValidator.validateOrdered(
             { id -> object : ConductingEquipment(id) {} },
@@ -150,6 +171,19 @@ internal class ConductingEquipmentTest {
         val t = Terminal(generateId())
         ce.addTerminal(t)
         ce.addTerminal(t)
+    }
+
+    @Test
+    internal fun `doesn't remove terminals conducting equipment link if it's not removed`() {
+        val ce1 = object : ConductingEquipment(generateId()) {}
+        val ce2 = object : ConductingEquipment(generateId()) {}
+
+        val t = Terminal(generateId())
+        ce1.addTerminal(t)
+
+        ce2.removeTerminal(t)
+
+        assertThat(t.conductingEquipment, sameInstance(ce1))
     }
 
 }

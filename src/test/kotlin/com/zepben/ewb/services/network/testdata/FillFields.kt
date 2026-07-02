@@ -218,6 +218,13 @@ fun LvFeeder.fillFields(service: NetworkService, includeRuntime: Boolean = true)
 fun LvSubstation.fillFields(service: NetworkService, includeRuntime: Boolean = true): LvSubstation {
     (this as EquipmentContainer).fillFields(service, includeRuntime)
 
+    repeat(2) {
+        addNormalEnergizedLvFeeder(LvFeeder(generateId()).also {
+            it.normalEnergizingLvSubstation = this
+            service.add(it)
+        })
+    }
+
     if (includeRuntime) {
         repeat(2) {
             addNormalEnergizingFeeder(Feeder(generateId()).also {
@@ -229,17 +236,6 @@ fun LvSubstation.fillFields(service: NetworkService, includeRuntime: Boolean = t
                 it.addCurrentEnergizedLvSubstation(this)
                 service.add(it)
             })
-
-            addCurrentEquipment(Junction(generateId()).also {
-                it.addCurrentContainer(this)
-                service.add(it)
-            })
-
-            addNormalEnergizedLvFeeder(LvFeeder(generateId()).also {
-                it.normalEnergizingLvSubstation = this
-                service.add(it)
-            })
-
         }
     } else {
         equipment.forEach { it.removeContainer(this) }
@@ -1024,7 +1020,7 @@ fun Substation.fillFields(service: NetworkService, includeRuntime: Boolean = tru
 fun Terminal.fillFields(service: NetworkService, includeRuntime: Boolean = true): Terminal {
     (this as AcDcTerminal).fillFields(service, includeRuntime)
 
-    conductingEquipment = Junction(generateId()).also { service.add(it) }
+    _conductingEquipment = Junction(generateId()).also { service.add(it) }
     conductingEquipment?.addTerminal(this)
 
     phases = PhaseCode.X

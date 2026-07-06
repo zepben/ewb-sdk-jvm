@@ -8,10 +8,7 @@
 
 package com.zepben.ewb.cim.iec61970.base.core
 
-import com.zepben.ewb.services.common.extensions.asUnmodifiable
-import com.zepben.ewb.services.common.extensions.getByMRID
-import com.zepben.ewb.services.common.extensions.safeRemove
-import com.zepben.ewb.services.common.extensions.validateReference
+import com.zepben.ewb.boilerplate.LazyMridList
 
 /**
  * A geographical region of a power system network model.
@@ -23,58 +20,65 @@ class GeographicalRegion(mRID: String) : IdentifiedObject(mRID) {
     /**
      * All sub-geographical regions within this geographical region. The returned collection is read only.
      */
-    val subGeographicalRegions: Collection<SubGeographicalRegion> get() = _subGeographicalRegions.asUnmodifiable()
+    val subGeographicalRegions: LazyMridList<SubGeographicalRegion> get() = LazyMridList(
+        getter = { _subGeographicalRegions },
+        setter = { _subGeographicalRegions = it },
+        owner = { this },
+        elementDescription = "A SubGeographicalRegion",
+        validate = { validateSubGeographicalRegion(it) }
+    )
 
-    /**
-     * Get the number of entries in the [SubGeographicalRegion] collection.
-     */
-    fun numSubGeographicalRegions(): Int = _subGeographicalRegions?.size ?: 0
-
-    /**
-     * All sub-geographical regions within this geographical region.
-     *
-     * @param mRID the mRID of the required [SubGeographicalRegion]
-     * @return The [SubGeographicalRegion] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getSubGeographicalRegion(mRID: String): SubGeographicalRegion? = _subGeographicalRegions.getByMRID(mRID)
-
-    /**
-     * @param subGeographicalRegion The sub geographical region to associate within this geographical region.
-     * @return A reference to this [GeographicalRegion] to allow fluent use.
-     */
-    fun addSubGeographicalRegion(subGeographicalRegion: SubGeographicalRegion): GeographicalRegion {
-        if (validateReference(subGeographicalRegion, ::getSubGeographicalRegion, "A SubGeographicalRegion"))
-            return this
-
+    private fun validateSubGeographicalRegion(subGeographicalRegion: SubGeographicalRegion) {
         if (subGeographicalRegion.geographicalRegion == null)
             subGeographicalRegion.geographicalRegion = this
-
-        require(subGeographicalRegion.geographicalRegion === this) {
-            "${subGeographicalRegion.typeNameAndMRID()} `geographicalRegion` property references ${subGeographicalRegion.geographicalRegion!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
-        }
-
-        _subGeographicalRegions = _subGeographicalRegions ?: mutableListOf()
-        _subGeographicalRegions!!.add(subGeographicalRegion)
-
-        return this
+        else
+            require(subGeographicalRegion.geographicalRegion === this) {
+                "${subGeographicalRegion.typeNameAndMRID()} `geographicalRegion` property references ${subGeographicalRegion.geographicalRegion!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
+            }
     }
 
-    /**
-     * @param subGeographicalRegion The sub geographical region to disassociate from this geographical region.
-     * @return True if the subGeographicalRegion existed and was removed from this GeographicalRegion, false otherwise
-     */
-    fun removeSubGeographicalRegion(subGeographicalRegion: SubGeographicalRegion): Boolean {
-        val ret = _subGeographicalRegions.safeRemove(subGeographicalRegion)
-        if (_subGeographicalRegions.isNullOrEmpty()) _subGeographicalRegions = null
-        return ret
-    }
+    // region deprecated list boilerplate
+    //
+    // ("region/endregion" is an IntelliJ feature letting you hide the entire thing)
+    // This boilerplate exists solely to enable backwards compatibility.
+    // It will be removed eventually.
+    // Every single method simply forwards the call to the corresponding list.
 
-    /**
-     * @return A reference to this [GeographicalRegion] to allow fluent use.
-     */
+    @Deprecated(
+        message = "Use subGeographicalRegions.size instead.",
+        replaceWith = ReplaceWith("subGeographicalRegions.size")
+    )
+    fun numSubGeographicalRegions(): Int = subGeographicalRegions.size
+
+    @Deprecated(
+        message = "Use subGeographicalRegions.getByMRID(mRID) instead.",
+        replaceWith = ReplaceWith("subGeographicalRegions.getByMRID(mRID)")
+    )
+    fun getSubGeographicalRegion(mRID: String): SubGeographicalRegion? = subGeographicalRegions.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use subGeographicalRegions.remove(subGeographicalRegion) instead.",
+        replaceWith = ReplaceWith("subGeographicalRegions.remove(subGeographicalRegion)")
+    )
+    fun removeSubGeographicalRegion(subGeographicalRegion: SubGeographicalRegion): Boolean = subGeographicalRegions.remove(subGeographicalRegion)
+
+    @Deprecated(
+        message = "Use subGeographicalRegions.clear() instead.",
+        replaceWith = ReplaceWith("subGeographicalRegions.clear()")
+    )
     fun clearSubGeographicalRegions(): GeographicalRegion {
-        _subGeographicalRegions = null
+        subGeographicalRegions.clear()
         return this
     }
 
+    @Deprecated(
+        message = "Use subGeographicalRegions.add(subGeographicalRegion) instead.",
+        replaceWith = ReplaceWith("also { it.subGeographicalRegions.add(subGeographicalRegion) }")
+    )
+    fun addSubGeographicalRegion(subGeographicalRegion: SubGeographicalRegion): GeographicalRegion {
+        subGeographicalRegions.add(subGeographicalRegion)
+        return this
+    }
+
+    // endregion
 }

@@ -8,13 +8,10 @@
 
 package com.zepben.ewb.cim.iec61970.base.core
 
+import com.zepben.ewb.boilerplate.LazyMridList
 import com.zepben.ewb.cim.iec61968.assets.Asset
 import com.zepben.ewb.cim.iec61968.assets.AssetInfo
 import com.zepben.ewb.cim.iec61968.common.Location
-import com.zepben.ewb.services.common.extensions.asUnmodifiable
-import com.zepben.ewb.services.common.extensions.getByMRID
-import com.zepben.ewb.services.common.extensions.safeRemove
-import com.zepben.ewb.services.common.extensions.validateReference
 
 /**
  *  Abstract class, should only be used through subclasses.
@@ -41,54 +38,55 @@ abstract class PowerSystemResource(mRID: String) : IdentifiedObject(mRID) {
     /**
      * All assets represented by this power system resource. For example, multiple conductor assets are electrically modelled as a single AC line segment.
      */
-    val assets: Collection<Asset> get() = _assets.asUnmodifiable()
+    val assets: LazyMridList<Asset> get() = LazyMridList(
+        getter = { _assets },
+        setter = { _assets = it },
+        owner = { this },
+        elementDescription = "An Asset"
+    )
 
-    /**
-     * Get the number of entries in the [Asset]s collection.
-     */
-    fun numAssets(): Int = _assets?.size ?: 0
+    // region deprecated list boilerplate
+    //
+    // ("region/endregion" is an IntelliJ feature letting you hide the entire thing)
+    // This boilerplate exists solely to enable backwards compatibility.
+    // It will be removed eventually.
+    // Every single method simply forwards the call to the corresponding list.
 
-    /**
-     * Get an [Asset] associated with this [PowerSystemResource]
-     *
-     * @param mRID the mRID of the required [Asset]
-     * @return The [Asset] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getAsset(mRID: String): Asset? = _assets.getByMRID(mRID)
+    @Deprecated(
+        message = "Use assets.size instead.",
+        replaceWith = ReplaceWith("assets.size")
+    )
+    fun numAssets(): Int = assets.size
 
-    /**
-     * Add an [Asset] to this PowerSystemResource
-     *
-     * @param asset the [Asset] to associate with this [PowerSystemResource].
-     * @return A reference to this [PowerSystemResource] to allow fluent use.
-     */
-    fun addAsset(asset: Asset): PowerSystemResource {
-        if (validateReference(asset, ::getAsset, "An Asset"))
-            return this
+    @Deprecated(
+        message = "Use assets.getByMRID(mRID) instead.",
+        replaceWith = ReplaceWith("assets.getByMRID(mRID)")
+    )
+    fun getAsset(mRID: String): Asset? = assets.getByMrid(mRID)
 
-        _assets = _assets ?: mutableListOf()
-        _assets!!.add(asset)
+    @Deprecated(
+        message = "Use assets.remove(asset) instead.",
+        replaceWith = ReplaceWith("assets.remove(asset)")
+    )
+    fun removeAsset(asset: Asset): Boolean = assets.remove(asset)
 
-        return this
-    }
-
-    /**
-     * @param asset the [Asset] to disassociate from this [PowerSystemResource].
-     * @return true if the [Asset] is disassociated.
-     */
-    fun removeAsset(asset: Asset): Boolean {
-        val ret = _assets.safeRemove(asset)
-        if (_assets.isNullOrEmpty()) _assets = null
-        return ret
-    }
-
-    /**
-     * Remove all [Asset]s from this PowerSystemResource
-     * @return A reference to this [PowerSystemResource] to allow fluent use.
-     */
+    @Deprecated(
+        message = "Use assets.clear() instead.",
+        replaceWith = ReplaceWith("assets.clear()")
+    )
     fun clearAssets(): PowerSystemResource {
-        _assets = null
+        assets.clear()
         return this
     }
 
+    @Deprecated(
+        message = "Use assets.add(asset) instead.",
+        replaceWith = ReplaceWith("also { it.assets.add(asset) }")
+    )
+    fun addAsset(asset: Asset): PowerSystemResource {
+        assets.add(asset)
+        return this
+    }
+
+    // endregion
 }

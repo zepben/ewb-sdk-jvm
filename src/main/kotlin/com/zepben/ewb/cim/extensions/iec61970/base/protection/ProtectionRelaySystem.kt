@@ -8,12 +8,9 @@
 
 package com.zepben.ewb.cim.extensions.iec61970.base.protection
 
+import com.zepben.ewb.boilerplate.LazyMridList
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.iec61970.base.core.Equipment
-import com.zepben.ewb.services.common.extensions.asUnmodifiable
-import com.zepben.ewb.services.common.extensions.getByMRID
-import com.zepben.ewb.services.common.extensions.safeRemove
-import com.zepben.ewb.services.common.extensions.validateReference
 
 /**
  * [ZBEX] This extension is in-line with the CIM working group for replacing the `protection` package, can be replaced when the working
@@ -33,56 +30,55 @@ class ProtectionRelaySystem(mRID: String) : Equipment(mRID) {
     private var _schemes: MutableList<ProtectionRelayScheme>? = null
 
     @ZBEX
-    val schemes: Collection<ProtectionRelayScheme> get() = _schemes.asUnmodifiable()
+    val schemes: LazyMridList<ProtectionRelayScheme> get() = LazyMridList(
+        getter = { _schemes },
+        setter = { _schemes = it },
+        owner = { this },
+        elementDescription = "A ProtectionRelayScheme"
+    )
 
-    /**
-     * Returns the number of schemes for this [ProtectionRelaySystem]
-     */
-    fun numSchemes(): Int = _schemes?.size ?: 0
+    // region deprecated list boilerplate
+    //
+    // ("region/endregion" is an IntelliJ feature letting you hide the entire thing)
+    // This boilerplate exists solely to enable backwards compatibility.
+    // It will be removed eventually.
+    // Every single method simply forwards the call to the corresponding list.
 
-    /**
-     * Get a scheme for this [ProtectionRelaySystem] by its mRID.
-     *
-     * @param mRID The mRID of the [ProtectionRelayScheme]
-     * @return The [ProtectionRelayScheme] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getScheme(mRID: String): ProtectionRelayScheme? = _schemes.getByMRID(mRID)
+    @Deprecated(
+        message = "Use schemes.size instead.",
+        replaceWith = ReplaceWith("schemes.size")
+    )
+    fun numSchemes(): Int = schemes.size
 
-    /**
-     * Add a scheme to this [ProtectionRelaySystem]
-     * @param scheme The scheme to add.
-     * @return This [ProtectionRelaySystem] for fluent use.
-     */
-    fun addScheme(
-        scheme: ProtectionRelayScheme,
-    ): ProtectionRelaySystem {
-        if (validateReference(scheme, ::getScheme, "A ProtectionRelayScheme"))
-            return this
+    @Deprecated(
+        message = "Use schemes.getByMRID(mRID) instead.",
+        replaceWith = ReplaceWith("schemes.getByMRID(mRID)")
+    )
+    fun getScheme(mRID: String): ProtectionRelayScheme? = schemes.getByMrid(mRID)
 
-        _schemes = _schemes ?: mutableListOf()
-        _schemes!!.add(scheme)
+    @Deprecated(
+        message = "Use schemes.remove(scheme) instead.",
+        replaceWith = ReplaceWith("schemes.remove(scheme)")
+    )
+    fun removeScheme(scheme: ProtectionRelayScheme): Boolean = schemes.remove(scheme)
 
-        return this
-    }
-
-    /**
-     * Remove a scheme from this [ProtectionRelaySystem].
-     * @param scheme The [ProtectionRelayScheme] to remove.
-     * @return true if the scheme was removed.
-     */
-    fun removeScheme(scheme: ProtectionRelayScheme): Boolean {
-        val ret = _schemes.safeRemove(scheme)
-        if (_schemes.isNullOrEmpty()) _schemes = null
-        return ret
-    }
-
-    /**
-     * Clear [schemes].
-     * @return This [ProtectionRelaySystem] for fluent use.
-     */
+    @Deprecated(
+        message = "Use schemes.clear() instead.",
+        replaceWith = ReplaceWith("schemes.clear()")
+    )
     fun clearSchemes(): ProtectionRelaySystem {
-        _schemes = null
+        schemes.clear()
         return this
     }
 
+    @Deprecated(
+        message = "Use schemes.add(scheme) instead.",
+        replaceWith = ReplaceWith("also { it.schemes.add(scheme) }")
+    )
+    fun addScheme( scheme: ProtectionRelayScheme, ): ProtectionRelaySystem {
+        schemes.add(scheme)
+        return this
+    }
+
+    // endregion
 }

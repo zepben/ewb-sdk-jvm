@@ -8,10 +8,9 @@
 
 package com.zepben.ewb.cim.iec61968.operations
 
+import com.zepben.ewb.boilerplate.LazyMridList
 import com.zepben.ewb.cim.iec61968.common.Document
 import com.zepben.ewb.cim.iec61970.base.core.Equipment
-import com.zepben.ewb.services.common.extensions.asUnmodifiable
-import com.zepben.ewb.services.common.extensions.validateReference
 
 /**
  * A document that can be associated with equipment to describe any sort of restrictions compared with the
@@ -31,57 +30,55 @@ class OperationalRestriction(mRID: String) : Document(mRID) {
     /**
      * All equipment to which this restriction applies. The returned collection is read only.
      */
-    val equipment: Collection<Equipment> get() = _equipment.asUnmodifiable()
+    val equipment: LazyMridList<Equipment> get() = LazyMridList(
+        getter = { _equipment },
+        setter = { _equipment = it },
+        owner = { this },
+        elementDescription = "An Equipment",
+    )
 
-    /**
-     * Get the number of entries in the [Equipment] collection.
-     */
-    fun numEquipment(): Int = _equipment?.size ?: 0
+    // region deprecated list boilerplate
+    //
+    // ("region/endregion" is an IntelliJ feature letting you hide the entire thing)
+    // This boilerplate exists solely to enable backwards compatibility.
+    // It will be removed eventually.
+    // Every single method simply forwards the call to the corresponding list.
 
-    /**
-     * All equipments to which this restriction applies.
-     *
-     * @param mRID the mRID of the required [Equipment]
-     * @return The [Equipment] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getEquipment(mRID: String): Equipment? = _equipment?.firstOrNull { it.mRID == mRID }
+    @Deprecated(
+        message = "Use equipment.size instead.",
+        replaceWith = ReplaceWith("equipment.size")
+    )
+    fun numEquipment(): Int = equipment.size
 
-    /**
-     * Add equipment to which this restriction applies.
-     *
-     * @param equipment the equipment to add.
-     * @return A reference to this [OperationalRestriction] to allow fluent use.
-     */
-    fun addEquipment(equipment: Equipment): OperationalRestriction {
-        if (validateReference(equipment, ::getEquipment, "An Equipment"))
-            return this
+    @Deprecated(
+        message = "Use equipment.getByMRID(mRID) instead.",
+        replaceWith = ReplaceWith("equipment.getByMRID(mRID)")
+    )
+    fun getEquipment(mRID: String): Equipment? = equipment.getByMrid(mRID)
 
-        _equipment = _equipment ?: mutableListOf()
-        _equipment!!.add(equipment)
+    @Deprecated(
+        message = "Use this.equipment.remove(equipment) instead.",
+        replaceWith = ReplaceWith("this.equipment.remove(equipment)")
+    )
+    fun removeEquipment(equipment: Equipment): Boolean = this.equipment.remove(equipment)
 
-        return this
-    }
-
-    /**
-     * Remove equipment already associated with this restriction.
-     *
-     * @param equipment The equipment tor remove.
-     * @return true if [equipment] is removed from the collection.
-     */
-    fun removeEquipment(equipment: Equipment): Boolean {
-        val ret = _equipment?.remove(equipment) == true
-        if (_equipment.isNullOrEmpty()) _equipment = null
-        return ret
-    }
-
-    /**
-     * Clear the collection of equipment to which this restriction applies.
-     *
-     * @return A reference to this [OperationalRestriction] to allow fluent use.
-     */
+    @Deprecated(
+        message = "Use equipment.clear() instead.",
+        replaceWith = ReplaceWith("equipment.clear()")
+    )
     fun clearEquipment(): OperationalRestriction {
-        _equipment = null
+        equipment.clear()
         return this
     }
 
+    @Deprecated(
+        message = "Use this.equipment.add(equipment) instead.",
+        replaceWith = ReplaceWith("also { it.equipment.add(equipment) }")
+    )
+    fun addEquipment(equipment: Equipment): OperationalRestriction {
+        this.equipment.add(equipment)
+        return this
+    }
+
+    // endregion
 }

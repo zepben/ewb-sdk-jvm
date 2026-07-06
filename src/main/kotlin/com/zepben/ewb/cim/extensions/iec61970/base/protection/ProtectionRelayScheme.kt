@@ -8,12 +8,9 @@
 
 package com.zepben.ewb.cim.extensions.iec61970.base.protection
 
+import com.zepben.ewb.boilerplate.LazyMridList
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
-import com.zepben.ewb.services.common.extensions.asUnmodifiable
-import com.zepben.ewb.services.common.extensions.getByMRID
-import com.zepben.ewb.services.common.extensions.safeRemove
-import com.zepben.ewb.services.common.extensions.validateReference
 
 /**
  * [ZBEX] This extension is in-line with the CIM working group for replacing the `protection` package, can be replaced when the working
@@ -33,59 +30,55 @@ class ProtectionRelayScheme(mRID: String) : IdentifiedObject(mRID) {
     private var _functions: MutableList<ProtectionRelayFunction>? = null
 
     @ZBEX
-    val functions: Collection<ProtectionRelayFunction> get() = _functions.asUnmodifiable()
+    val functions: LazyMridList<ProtectionRelayFunction> get() = LazyMridList(
+        getter = { _functions },
+        setter = { _functions = it },
+        owner = { this },
+        elementDescription = "A ProtectionRelayFunction"
+    )
 
-    /**
-     * Get the number of [ProtectionRelayFunction]s operated as a part of this [ProtectionRelayScheme].
-     *
-     * @return The number of [ProtectionRelayFunction]s operated as a part of this [ProtectionRelayScheme].
-     */
-    fun numFunctions(): Int = _functions?.size ?: 0
+    // region deprecated list boilerplate
+    //
+    // ("region/endregion" is an IntelliJ feature letting you hide the entire thing)
+    // This boilerplate exists solely to enable backwards compatibility.
+    // It will be removed eventually.
+    // Every single method simply forwards the call to the corresponding list.
 
-    /**
-     * Get a [ProtectionRelayFunction] operated as a part of this [ProtectionRelayScheme] by its mRID.
-     *
-     * @param mRID The mRID of the desired [ProtectionRelayFunction]
-     * @return The [ProtectionRelayFunction] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getFunction(mRID: String): ProtectionRelayFunction? = _functions?.getByMRID(mRID)
+    @Deprecated(
+        message = "Use functions.size instead.",
+        replaceWith = ReplaceWith("functions.size")
+    )
+    fun numFunctions(): Int = functions.size
 
-    /**
-     * Associate a [ProtectionRelayFunction] with this [ProtectionRelayScheme].
-     *
-     * @param function The [ProtectionRelayFunction] to associate with this [ProtectionRelayScheme].
-     * @return A reference to this [ProtectionRelayScheme] for fluent use.
-     */
-    fun addFunction(function: ProtectionRelayFunction): ProtectionRelayScheme {
-        if (validateReference(function, ::getFunction, "A ProtectionRelayFunction"))
-            return this
+    @Deprecated(
+        message = "Use functions.getByMRID(mRID) instead.",
+        replaceWith = ReplaceWith("functions.getByMRID(mRID)")
+    )
+    fun getFunction(mRID: String): ProtectionRelayFunction? = functions.getByMrid(mRID)
 
-        _functions = _functions ?: mutableListOf()
-        _functions!!.add(function)
+    @Deprecated(
+        message = "Use functions.remove(function) instead.",
+        replaceWith = ReplaceWith("functions.remove(function)")
+    )
+    fun removeFunction(function: ProtectionRelayFunction): Boolean = functions.remove(function)
 
-        return this
-    }
-
-    /**
-     * Disassociate a [ProtectionRelayFunction] from this [ProtectionRelayScheme].
-     *
-     * @param function The [ProtectionRelayFunction] to disassociate from this [ProtectionRelayScheme].
-     * @return true if the [ProtectionRelayFunction] was disassociated.
-     */
-    fun removeFunction(function: ProtectionRelayFunction): Boolean {
-        val ret = _functions.safeRemove(function)
-        if (_functions.isNullOrEmpty()) _functions = null
-        return ret
-    }
-
-    /**
-     * Disassociate all [ProtectionRelayFunction]s from this [ProtectionRelayScheme].
-     *
-     * @return A reference to this [ProtectionRelayScheme] for fluent use.
-     */
+    @Deprecated(
+        message = "Use functions.clear() instead.",
+        replaceWith = ReplaceWith("functions.clear()")
+    )
     fun clearFunctions(): ProtectionRelayScheme {
-        _functions = null
+        functions.clear()
         return this
     }
 
+    @Deprecated(
+        message = "Use functions.add(function) instead.",
+        replaceWith = ReplaceWith("also { it.functions.add(function) }")
+    )
+    fun addFunction(function: ProtectionRelayFunction): ProtectionRelayScheme {
+        functions.add(function)
+        return this
+    }
+
+    // endregion
 }

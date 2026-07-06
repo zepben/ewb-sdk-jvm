@@ -8,9 +8,7 @@
 
 package com.zepben.ewb.cim.iec61970.base.wires
 
-import com.zepben.ewb.services.common.extensions.asUnmodifiable
-import com.zepben.ewb.services.common.extensions.getByMRID
-import com.zepben.ewb.services.common.extensions.validateReference
+import com.zepben.ewb.boilerplate.LazyMridList
 
 /**
  * Generic user of energy - a  point of consumption on the power system model.
@@ -39,64 +37,65 @@ class EnergyConsumer(mRID: String) : EnergyConnection(mRID) {
     /**
      * The individual phase models for this energy consumer. The returned collection is read only.
      */
-    val phases: Collection<EnergyConsumerPhase> get() = _energyConsumerPhases.asUnmodifiable()
+    val phases: LazyMridList<EnergyConsumerPhase> get() = LazyMridList(
+        getter = { _energyConsumerPhases },
+        setter = { _energyConsumerPhases = it },
+        owner = { this },
+        elementDescription = "An EnergyConsumerPhase",
+        validate = { validatePhase(it) }
+    )
 
-    /**
-     * Get the number of entries in the [EnergyConsumerPhase] collection.
-     */
-    fun numPhases(): Int = _energyConsumerPhases?.size ?: 0
-
-    /**
-     * The individual phase models for this energy consumer.
-     *
-     * @param mRID the mRID of the required [EnergyConsumerPhase]
-     * @return The [EnergyConsumerPhase] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getPhase(mRID: String): EnergyConsumerPhase? = _energyConsumerPhases?.getByMRID(mRID)
-
-    /**
-     * Add an [EnergyConsumerPhase] to this [EnergyConsumer].
-     *
-     * @param phase The [EnergyConsumerPhase] to add.
-     * @return This [EnergyConsumer] for fluent use.
-     */
-    fun addPhase(phase: EnergyConsumerPhase): EnergyConsumer {
-        if (validateReference(phase, ::getPhase, "An EnergyConsumerPhase"))
-            return this
-
+    private fun validatePhase(phase: EnergyConsumerPhase) {
         if (phase.energyConsumer == null)
             phase.energyConsumer = this
 
         require(phase.energyConsumer === this) {
             "${phase.typeNameAndMRID()} `energyConsumer` property references ${phase.energyConsumer!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
         }
-
-        _energyConsumerPhases = _energyConsumerPhases ?: mutableListOf()
-        _energyConsumerPhases!!.add(phase)
-
-        return this
     }
 
-    /**
-     * Remove an [EnergyConsumerPhase] from this [EnergyConsumer].
-     *
-     * @param phase The [EnergyConsumerPhase] to remove.
-     * @return true if [phase] is removed from the collection.
-     */
-    fun removePhase(phase: EnergyConsumerPhase): Boolean {
-        val ret = _energyConsumerPhases?.remove(phase) == true
-        if (_energyConsumerPhases.isNullOrEmpty()) _energyConsumerPhases = null
-        return ret
-    }
+    // region deprecated list boilerplate
+    //
+    // ("region/endregion" is an IntelliJ feature letting you hide the entire thing)
+    // This boilerplate exists solely to enable backwards compatibility.
+    // It will be removed eventually.
+    // Every single method simply forwards the call to the corresponding list.
 
-    /**
-     * Clear all [EnergyConsumerPhase]'s from this [EnergyConsumer].
-     *
-     * @return This [EnergyConsumer] for fluent use.
-     */
+    @Deprecated(
+        message = "Use phases.size instead.",
+        replaceWith = ReplaceWith("phases.size")
+    )
+    fun numPhases(): Int = phases.size
+
+    @Deprecated(
+        message = "Use phases.getByMRID(mRID) instead.",
+        replaceWith = ReplaceWith("phases.getByMRID(mRID)")
+    )
+    fun getPhase(mRID: String): EnergyConsumerPhase? = phases.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use phases.remove(phase) instead.",
+        replaceWith = ReplaceWith("phases.remove(phase)")
+    )
+    fun removePhase(phase: EnergyConsumerPhase): Boolean = phases.remove(phase)
+
+    @Deprecated(
+        message = "Use phases.clear() instead.",
+        replaceWith = ReplaceWith("phases.clear()")
+    )
     fun clearPhases(): EnergyConsumer {
-        _energyConsumerPhases = null
+        phases.clear()
         return this
     }
 
+    @Deprecated(
+        message = "Use phases.add(phase) instead.",
+        replaceWith = ReplaceWith("also { it.phases.add(phase) }")
+    )
+    fun addPhase(phase: EnergyConsumerPhase): EnergyConsumer {
+        phases.add(phase)
+        return this
+    }
+
+    // endregion
 }

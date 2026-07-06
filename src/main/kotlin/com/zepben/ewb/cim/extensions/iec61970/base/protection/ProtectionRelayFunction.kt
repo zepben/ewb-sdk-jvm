@@ -8,15 +8,13 @@
 
 package com.zepben.ewb.cim.extensions.iec61970.base.protection
 
+import com.zepben.ewb.boilerplate.LazyMridList
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.extensions.iec61968.assetinfo.RelayInfo
 import com.zepben.ewb.cim.iec61970.base.auxiliaryequipment.Sensor
 import com.zepben.ewb.cim.iec61970.base.core.PowerSystemResource
 import com.zepben.ewb.cim.iec61970.base.wires.ProtectedSwitch
 import com.zepben.ewb.services.common.extensions.asUnmodifiable
-import com.zepben.ewb.services.common.extensions.getByMRID
-import com.zepben.ewb.services.common.extensions.safeRemove
-import com.zepben.ewb.services.common.extensions.validateReference
 import java.util.function.BiConsumer
 
 /**
@@ -147,7 +145,7 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
      */
     fun removeTimeLimit(timeLimit: Double): Boolean {
         val ret = _timeLimits?.remove(timeLimit) ?: false
-        if (_sensors.isNullOrEmpty()) _sensors = null
+        if (_timeLimits.isNullOrEmpty()) _timeLimits = null
         return ret
     }
 
@@ -259,165 +257,146 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
         return this
     }
 
-    /**
-     * Get the number of [ProtectedSwitch]es operated by this [ProtectionRelayFunction].
-     *
-     * @return The number of [ProtectedSwitch]es operated by this [ProtectionRelayFunction].
-     */
-    fun numProtectedSwitches(): Int = _protectedSwitches?.size ?: 0
+    @ZBEX
+    val protectedSwitches: LazyMridList<ProtectedSwitch> get() = LazyMridList(
+        getter = { _protectedSwitches },
+        setter = { _protectedSwitches = it },
+        owner = { this },
+        elementDescription = "A ProtectedSwitch"
+    )
 
-    /**
-     * Get a [ProtectedSwitch] operated by this [ProtectionRelayFunction] by its mRID.
-     *
-     * @param mRID The mRID of the desired [ProtectedSwitch]
-     * @return The [ProtectedSwitch] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getProtectedSwitch(mRID: String): ProtectedSwitch? = _protectedSwitches?.getByMRID(mRID)
+    @ZBEX
+    val sensors: LazyMridList<Sensor> get() = LazyMridList(
+        getter = { _sensors },
+        setter = { _sensors = it },
+        owner = { this },
+        elementDescription = "A Sensor"
+    )
 
-    /**
-     * Associate this [ProtectionRelayFunction] with a [ProtectedSwitch] that it operates.
-     *
-     * @param protectedSwitch The [ProtectedSwitch] to associate with this [ProtectionRelayFunction].
-     * @return A reference to this [ProtectionRelayFunction] for fluent use.
-     */
-    fun addProtectedSwitch(protectedSwitch: ProtectedSwitch): ProtectionRelayFunction {
-        if (validateReference(protectedSwitch, ::getProtectedSwitch, "A ProtectedSwitch"))
-            return this
+    @ZBEX
+    val schemes: LazyMridList<ProtectionRelayScheme> get() = LazyMridList(
+        getter = { _schemes },
+        setter = { _schemes = it },
+        owner = { this },
+        elementDescription = "A ProtectionRelayScheme"
+    )
 
-        _protectedSwitches = _protectedSwitches ?: mutableListOf()
-        _protectedSwitches!!.add(protectedSwitch)
+    // region deprecated list boilerplate
+    //
+    // ("region/endregion" is an IntelliJ feature letting you hide the entire thing)
+    // This boilerplate exists solely to enable backwards compatibility.
+    // It will be removed eventually.
+    // Every single method simply forwards the call to the corresponding list.
 
-        return this
-    }
+    @Deprecated(
+        message = "Use protectedSwitches.size instead.",
+        replaceWith = ReplaceWith("protectedSwitches.size")
+    )
+    fun numProtectedSwitches(): Int = protectedSwitches.size
 
-    /**
-     * Disassociate this [ProtectionRelayFunction] from a [ProtectedSwitch].
-     *
-     * @param protectedSwitch The [ProtectedSwitch] to disassociate from this [ProtectionRelayFunction].
-     * @return true if the [ProtectedSwitch] was disassociated.
-     */
-    fun removeProtectedSwitch(protectedSwitch: ProtectedSwitch): Boolean {
-        val ret = _protectedSwitches.safeRemove(protectedSwitch)
-        if (_protectedSwitches.isNullOrEmpty()) _protectedSwitches = null
-        return ret
-    }
+    @Deprecated(
+        message = "Use protectedSwitches.getByMRID(mRID) instead.",
+        replaceWith = ReplaceWith("protectedSwitches.getByMRID(mRID)")
+    )
+    fun getProtectedSwitch(mRID: String): ProtectedSwitch? = protectedSwitches.getByMrid(mRID)
 
-    /**
-     * Disassociate all [ProtectedSwitch]es from this [ProtectionRelayFunction].
-     *
-     * @return A reference to this [ProtectionRelayFunction] for fluent use.
-     */
+    @Deprecated(
+        message = "Use protectedSwitches.remove(protectedSwitch) instead.",
+        replaceWith = ReplaceWith("protectedSwitches.remove(protectedSwitch)")
+    )
+    fun removeProtectedSwitch(protectedSwitch: ProtectedSwitch): Boolean = protectedSwitches.remove(protectedSwitch)
+
+    @Deprecated(
+        message = "Use protectedSwitches.clear() instead.",
+        replaceWith = ReplaceWith("protectedSwitches.clear()")
+    )
     fun clearProtectedSwitches(): ProtectionRelayFunction {
-        _protectedSwitches = null
+        protectedSwitches.clear()
         return this
     }
 
-    /**
-     * Get the number of [Sensor]s for this [ProtectionRelayFunction].
-     *
-     * @return The number of [Sensor]s for this [ProtectionRelayFunction].
-     */
-    fun numSensors(): Int = _sensors?.size ?: 0
+    @Deprecated(
+        message = "Use sensors.size instead.",
+        replaceWith = ReplaceWith("sensors.size")
+    )
+    fun numSensors(): Int = sensors.size
 
-    /**
-     * Get a [Sensor] for this [ProtectionRelayFunction] by its mRID.
-     *
-     * @param mRID The mRID of the desired [Sensor]
-     * @return The [Sensor] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getSensor(mRID: String): Sensor? = _sensors?.getByMRID(mRID)
+    @Deprecated(
+        message = "Use sensors.getByMRID(mRID) instead.",
+        replaceWith = ReplaceWith("sensors.getByMRID(mRID)")
+    )
+    fun getSensor(mRID: String): Sensor? = sensors.getByMrid(mRID)
 
-    /**
-     * Associate this [ProtectionRelayFunction] with a [Sensor].
-     *
-     * @param sensor The [Sensor] to associate with this [ProtectionRelayFunction].
-     * @return A reference to this [ProtectionRelayFunction] for fluent use.
-     */
-    fun addSensor(sensor: Sensor): ProtectionRelayFunction {
-        if (validateReference(sensor, ::getSensor, "A Sensor"))
-            return this
+    @Deprecated(
+        message = "Use sensors.remove(sensor) instead.",
+        replaceWith = ReplaceWith("sensors.remove(sensor)")
+    )
+    fun removeSensor(sensor: Sensor): Boolean = sensors.remove(sensor)
 
-        _sensors = _sensors ?: mutableListOf()
-        _sensors!!.add(sensor)
-
-        return this
-    }
-
-    /**
-     * Disassociate this [ProtectionRelayFunction] from a [Sensor].
-     *
-     * @param sensor The [Sensor] to disassociate from this [ProtectionRelayFunction].
-     * @return true if the [Sensor] was disassociated.
-     */
-    fun removeSensor(sensor: Sensor): Boolean {
-        val ret = _sensors.safeRemove(sensor)
-        if (_sensors.isNullOrEmpty()) _sensors = null
-        return ret
-    }
-
-    /**
-     * Disassociate all [Sensor]s from this [ProtectionRelayFunction].
-     *
-     * @return A reference to this [ProtectionRelayFunction] for fluent use.
-     */
+    @Deprecated(
+        message = "Use sensors.clear() instead.",
+        replaceWith = ReplaceWith("sensors.clear()")
+    )
     fun clearSensors(): ProtectionRelayFunction {
-        _sensors = null
+        sensors.clear()
         return this
     }
 
-    /**
-     * Get the number of [ProtectionRelayScheme]s this [ProtectionRelayFunction] operates under.
-     *
-     * @return The number of [ProtectionRelayScheme]s this [ProtectionRelayFunction] operates under.
-     */
-    fun numSchemes(): Int = _schemes?.size ?: 0
+    @Deprecated(
+        message = "Use schemes.size instead.",
+        replaceWith = ReplaceWith("schemes.size")
+    )
+    fun numSchemes(): Int = schemes.size
 
-    /**
-     * Get a [ProtectionRelayScheme] this [ProtectionRelayFunction] operates under by its mRID.
-     *
-     * @param mRID The mRID of the desired [ProtectionRelayScheme]
-     * @return The [ProtectionRelayScheme] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getScheme(mRID: String): ProtectionRelayScheme? = _schemes?.getByMRID(mRID)
+    @Deprecated(
+        message = "Use schemes.getByMRID(mRID) instead.",
+        replaceWith = ReplaceWith("schemes.getByMRID(mRID)")
+    )
+    fun getScheme(mRID: String): ProtectionRelayScheme? = schemes.getByMrid(mRID)
 
-    /**
-     * Associate this [ProtectionRelayFunction] to a [ProtectionRelayScheme] it operates under.
-     *
-     * @param scheme The [ProtectionRelayScheme] to associate with this [ProtectionRelayFunction].
-     * @return A reference to this [ProtectionRelayFunction] for fluent use.
-     */
-    fun addScheme(scheme: ProtectionRelayScheme): ProtectionRelayFunction {
-        if (validateReference(scheme, ::getScheme, "A ProtectionRelayScheme"))
-            return this
+    @Deprecated(
+        message = "Use schemes.remove(scheme) instead.",
+        replaceWith = ReplaceWith("schemes.remove(scheme)")
+    )
+    fun removeScheme(scheme: ProtectionRelayScheme): Boolean = schemes.remove(scheme)
 
-        _schemes = _schemes ?: mutableListOf()
-        _schemes!!.add(scheme)
-
-        return this
-    }
-
-    /**
-     * Disassociate this [ProtectionRelayFunction] from a [ProtectionRelayScheme].
-     *
-     * @param scheme The [ProtectionRelayScheme] to disassociate from this [ProtectionRelayFunction].
-     * @return true if the [ProtectionRelayScheme] was disassociated.
-     */
-    fun removeScheme(scheme: ProtectionRelayScheme): Boolean {
-        val ret = _schemes.safeRemove(scheme)
-        if (_schemes.isNullOrEmpty()) _schemes = null
-        return ret
-    }
-
-    /**
-     * Disassociate all [ProtectionRelayScheme]s from this [ProtectionRelayFunction].
-     *
-     * @return A reference to this [ProtectionRelayFunction] for fluent use.
-     */
+    @Deprecated(
+        message = "Use schemes.clear() instead.",
+        replaceWith = ReplaceWith("schemes.clear()")
+    )
     fun clearSchemes(): ProtectionRelayFunction {
-        _schemes = null
+        schemes.clear()
         return this
     }
 
+    @Deprecated(
+        message = "Use protectedSwitches.add(protectedSwitch) instead.",
+        replaceWith = ReplaceWith("also { it.protectedSwitches.add(protectedSwitch) }")
+    )
+    fun addProtectedSwitch(protectedSwitch: ProtectedSwitch): ProtectionRelayFunction {
+        protectedSwitches.add(protectedSwitch)
+        return this
+    }
+
+    @Deprecated(
+        message = "Use sensors.add(sensor) instead.",
+        replaceWith = ReplaceWith("also { it.sensors.add(sensor) }")
+    )
+    fun addSensor(sensor: Sensor): ProtectionRelayFunction {
+        sensors.add(sensor)
+        return this
+    }
+
+    @Deprecated(
+        message = "Use schemes.add(scheme) instead.",
+        replaceWith = ReplaceWith("also { it.schemes.add(scheme) }")
+    )
+    fun addScheme(scheme: ProtectionRelayScheme): ProtectionRelayFunction {
+        schemes.add(scheme)
+        return this
+    }
+
+    // endregion
 }
 
 /**

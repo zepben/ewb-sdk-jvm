@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.cim.iec61968.metering
 
+import com.zepben.ewb.boilerplate.LazyMridList
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.extensions.iec61968.common.ContactDetails
 import com.zepben.ewb.cim.iec61968.common.Location
@@ -15,9 +16,7 @@ import com.zepben.ewb.cim.iec61970.base.core.Equipment
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.core.PhaseCode
 import com.zepben.ewb.services.common.extensions.asUnmodifiable
-import com.zepben.ewb.services.common.extensions.getByMRID
 import com.zepben.ewb.services.common.extensions.validateReference
-
 
 /**
  * Logical or physical point in the network to which readings or events may be attributed. Used at the place where a physical
@@ -53,85 +52,22 @@ class UsagePoint(mRID: String) : IdentifiedObject(mRID) {
     /**
      *  All equipment connecting this usage point to the electrical grid. The returned collection is read only
      */
-    val equipment: Collection<Equipment> get() = _equipment.asUnmodifiable()
+    val equipment: LazyMridList<Equipment> get() = LazyMridList(
+        getter = { _equipment },
+        setter = { _equipment = it },
+        owner = { this },
+        elementDescription = "An Equipment"
+    )
 
     /**
      * All end devices at this usage point. The returned collection is read only.
      */
-    val endDevices: Collection<EndDevice> get() = _endDevices.asUnmodifiable()
-
-    @ZBEX
-    val contacts: Collection<ContactDetails> get() = _contacts.asUnmodifiable()
-
-    /**
-     * Get the number of entries in the [Equipment] collection.
-     */
-    fun numEquipment(): Int = _equipment?.size ?: 0
-
-    /**
-     * All equipment connecting this usage point to the electrical grid.
-     *
-     * @param mRID the mRID of the required [Equipment]
-     * @return The [Equipment] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getEquipment(mRID: String): Equipment? = _equipment?.getByMRID(mRID)
-
-    /**
-     * Remove an [Equipment] from this [UsagePoint].
-     *
-     * @param equipment The [Equipment] to remove.
-     * @return true if the [Equipment] was removed.
-     */
-    fun removeEquipment(equipment: Equipment): Boolean {
-        val ret = _equipment?.remove(equipment) == true
-        if (_equipment.isNullOrEmpty()) _equipment = null
-        return ret
-    }
-
-    /**
-     * Clear all [Equipment] from this [UsagePoint].
-     *
-     * @return This [UsagePoint] for fluent use.
-     */
-    fun clearEquipment(): UsagePoint {
-        _equipment = null
-        return this
-    }
-
-    /**
-     * Get the number of entries in the [EndDevice] collection.
-     */
-    fun numEndDevices(): Int = _endDevices?.size ?: 0
-
-    /**
-     * All end devices at this usage point.
-     *
-     * @param mRID the mRID of the required [EndDevice]
-     * @return The [EndDevice] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getEndDevice(mRID: String): EndDevice? = _endDevices?.getByMRID(mRID)
-
-    /**
-     * Remove an [EndDevice] from this [UsagePoint].
-     *
-     * @param endDevice The [EndDevice] to remove.
-     * @return true if the [EndDevice] was removed.
-     */
-    fun removeEndDevice(endDevice: EndDevice): Boolean {
-        val ret = _endDevices?.remove(endDevice) == true
-        if (_endDevices.isNullOrEmpty()) _endDevices = null
-        return ret
-    }
-
-    /**
-     * Clear all [EndDevice]'s from this [UsagePoint].
-     *
-     * @return This [UsagePoint] for fluent use.
-     */
-    fun clearEndDevices(): UsagePoint {
-        _endDevices = null
-        return this
-    }
+    val endDevices: LazyMridList<EndDevice> get() = LazyMridList(
+        getter = { _endDevices },
+        setter = { _endDevices = it },
+        owner = { this },
+        elementDescription = "An EndDevice"
+    )
 
     /**
      * Add an [Equipment] to this [UsagePoint].
@@ -216,4 +152,84 @@ class UsagePoint(mRID: String) : IdentifiedObject(mRID) {
         return this
     }
 
+    // region deprecated list boilerplate
+    //
+    // ("region/endregion" is an IntelliJ feature letting you hide the entire thing)
+    // This boilerplate exists solely to enable backwards compatibility.
+    // It will be removed eventually.
+    // Every single method simply forwards the call to the corresponding list.
+
+    @Deprecated(
+        message = "Use equipment.size instead.",
+        replaceWith = ReplaceWith("equipment.size")
+    )
+    fun numEquipment(): Int = equipment.size
+
+    @Deprecated(
+        message = "Use equipment.getByMRID(mRID) instead.",
+        replaceWith = ReplaceWith("equipment.getByMRID(mRID)")
+    )
+    fun getEquipment(mRID: String): Equipment? = equipment.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use this.equipment.remove(equipment) instead.",
+        replaceWith = ReplaceWith("this.equipment.remove(equipment)")
+    )
+    fun removeEquipment(equipment: Equipment): Boolean = this.equipment.remove(equipment)
+
+    @Deprecated(
+        message = "Use equipment.clear() instead.",
+        replaceWith = ReplaceWith("equipment.clear()")
+    )
+    fun clearEquipment(): UsagePoint {
+        equipment.clear()
+        return this
+    }
+
+    @Deprecated(
+        message = "Use endDevices.size instead.",
+        replaceWith = ReplaceWith("endDevices.size")
+    )
+    fun numEndDevices(): Int = endDevices.size
+
+    @Deprecated(
+        message = "Use endDevices.getByMRID(mRID) instead.",
+        replaceWith = ReplaceWith("endDevices.getByMRID(mRID)")
+    )
+    fun getEndDevice(mRID: String): EndDevice? = endDevices.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use endDevices.remove(endDevice) instead.",
+        replaceWith = ReplaceWith("endDevices.remove(endDevice)")
+    )
+    fun removeEndDevice(endDevice: EndDevice): Boolean = endDevices.remove(endDevice)
+
+    @Deprecated(
+        message = "Use endDevices.clear() instead.",
+        replaceWith = ReplaceWith("endDevices.clear()")
+    )
+    fun clearEndDevices(): UsagePoint {
+        endDevices.clear()
+        return this
+    }
+
+    @Deprecated(
+        message = "Use this.equipment.add(equipment) instead.",
+        replaceWith = ReplaceWith("also { it.equipment.add(equipment) }")
+    )
+    fun addEquipment(equipment: Equipment): UsagePoint {
+        this.equipment.add(equipment)
+        return this
+    }
+
+    @Deprecated(
+        message = "Use endDevices.add(endDevice) instead.",
+        replaceWith = ReplaceWith("also { it.endDevices.add(endDevice) }")
+    )
+    fun addEndDevice(endDevice: EndDevice): UsagePoint {
+        endDevices.add(endDevice)
+        return this
+    }
+
+    // endregion
 }

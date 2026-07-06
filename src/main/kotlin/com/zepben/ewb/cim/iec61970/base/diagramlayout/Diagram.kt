@@ -8,9 +8,8 @@
 
 package com.zepben.ewb.cim.iec61970.base.diagramlayout
 
+import com.zepben.ewb.boilerplate.LazyMridMap
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
-import com.zepben.ewb.services.common.extensions.asUnmodifiable
-import com.zepben.ewb.services.common.extensions.validateReference
 
 /**
  * The diagram being exchanged.  The coordinate system is a standard Cartesian coordinate system and the orientation attribute defines the orientation.
@@ -23,60 +22,72 @@ class Diagram(mRID: String) : IdentifiedObject(mRID) {
     var diagramStyle: DiagramStyle = DiagramStyle.SCHEMATIC
     var orientationKind: OrientationKind = OrientationKind.POSITIVE
 
-    private var _diagramObjects: MutableMap<String?, DiagramObject>? = null
+    private var _diagramObjects: MutableMap<String, DiagramObject>? = null
 
     /**
-     * The diagram objects belonging to this diagram. The returned collection is read only.
+     * The diagramObjects belonging to this object.
      */
-    val diagramObjects: Collection<DiagramObject> get() = _diagramObjects?.values.asUnmodifiable()
+    val diagramObjects: LazyMridMap<DiagramObject> get() = LazyMridMap(
+        getter = { _diagramObjects },
+        setter = { _diagramObjects = it },
+        owner = { this },
+        elementDescription = "A DiagramObject",
+        validate = ::validateDiagramObject
+    )
 
-    /**
-     * Get the number of entries in the [DiagramObject] collection.
-     */
-    fun numDiagramObjects(): Int = _diagramObjects?.size ?: 0
-
-    /**
-     * A diagram is made up of multiple diagram objects.
-     *
-     * @param mRID the mRID of the required [DiagramObject]
-     * @return The [DiagramObject] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getDiagramObject(mRID: String): DiagramObject? = _diagramObjects?.get(mRID)
-
-    /**
-     * @param diagramObject The diagram object to add to the [DiagramObject] collection.
-     */
-    fun addDiagramObject(diagramObject: DiagramObject): Diagram {
-        if (validateReference(diagramObject, ::getDiagramObject, "A DiagramObject"))
-            return this
-
+    private fun validateDiagramObject(diagramObject: DiagramObject) {
         if (diagramObject.diagram == null)
             diagramObject.diagram = this
 
         require(diagramObject.diagram === this) {
             "${diagramObject.typeNameAndMRID()} `diagram` property references ${diagramObject.diagram!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
         }
+    }
 
-        _diagramObjects = _diagramObjects ?: mutableMapOf()
-        _diagramObjects!!.putIfAbsent(diagramObject.mRID, diagramObject)
+    // region deprecated dict boilerplate
+    //
+    // ("region/endregion" is an IntelliJ feature letting you hide the entire thing)
+    // This boilerplate exists solely to enable backwards compatibility.
+    // It will be removed eventually.
+    // Every single method simply forwards the call to the corresponding dict.
 
+    @Deprecated(
+        message = "Use diagramObjects.size instead.",
+        replaceWith = ReplaceWith("diagramObjects.size")
+    )
+    fun numDiagramObjects(): Int = diagramObjects.size
+
+    @Deprecated(
+        message = "Use diagramObjects.getByMrid(mRID) instead.",
+        replaceWith = ReplaceWith("diagramObjects.getByMrid(mRID)")
+    )
+    fun getDiagramObject(mRID: String): DiagramObject? = diagramObjects.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use diagramObjects.add(diagramObject) instead.",
+        replaceWith = ReplaceWith("also { it.diagramObjects.add(diagramObject) }")
+    )
+    fun addDiagramObject(diagramObject: DiagramObject): Diagram {
+        diagramObjects.add(diagramObject)
         return this
     }
 
-    /**
-     * @param diagramObject The diagram object to remove from the [DiagramObject] collection.
-     */
-    fun removeDiagramObject(diagramObject: DiagramObject): Boolean {
-        val ret = _diagramObjects?.remove(diagramObject.mRID) != null
-        if (_diagramObjects.isNullOrEmpty()) clearDiagramObjects()
-        return ret
-    }
+    @Deprecated(
+        message = "Use diagramObjects.remove(diagramObject) instead.",
+        replaceWith = ReplaceWith("diagramObjects.remove(diagramObject)")
+    )
+    fun removeDiagramObject(diagramObject: DiagramObject): Boolean =
+        diagramObjects.remove(diagramObject)
 
-    /**
-     * Removes all diagram objects from the [DiagramObject] collection.
-     */
+    @Deprecated(
+        message = "Use diagramObjects.clear() instead.",
+        replaceWith = ReplaceWith("also { it.diagramObjects.clear() }")
+    )
     fun clearDiagramObjects(): Diagram {
-        _diagramObjects = null
+        diagramObjects.clear()
         return this
     }
+
+    // endregion
+
 }

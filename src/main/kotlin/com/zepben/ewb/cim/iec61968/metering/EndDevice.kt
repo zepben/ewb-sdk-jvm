@@ -57,6 +57,8 @@ abstract class EndDevice(mRID: String) : AssetContainer(mRID) {
     // It will be removed eventually.
     // Every single method simply forwards the call to the corresponding list.
 
+    // region usagePoints boilerplate
+
     @Deprecated(
         message = "Use usagePoints.size instead.",
         replaceWith = ReplaceWith("usagePoints.size")
@@ -68,6 +70,15 @@ abstract class EndDevice(mRID: String) : AssetContainer(mRID) {
         replaceWith = ReplaceWith("usagePoints.getByMRID(mRID)")
     )
     fun getUsagePoint(mRID: String): UsagePoint? = usagePoints.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use usagePoints.add(usagePoint) instead.",
+        replaceWith = ReplaceWith("also { it.usagePoints.add(usagePoint) }")
+    )
+    fun addUsagePoint(usagePoint: UsagePoint): EndDevice {
+        usagePoints.add(usagePoint)
+        return this
+    }
 
     @Deprecated(
         message = "Use usagePoints.remove(usagePoint) instead.",
@@ -84,6 +95,10 @@ abstract class EndDevice(mRID: String) : AssetContainer(mRID) {
         return this
     }
 
+    // endregion
+
+    // region functions boilerplate
+
     @Deprecated(
         message = "Use functions.size instead.",
         replaceWith = ReplaceWith("functions.size")
@@ -95,6 +110,15 @@ abstract class EndDevice(mRID: String) : AssetContainer(mRID) {
         replaceWith = ReplaceWith("functions.getByMRID(mRID)")
     )
     fun getFunction(mRID: String): EndDeviceFunction? = functions.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use functions.add(function) instead.",
+        replaceWith = ReplaceWith("also { it.functions.add(function) }")
+    )
+    fun addFunction(function: EndDeviceFunction): EndDevice {
+        functions.add(function)
+        return this
+    }
 
     @Deprecated(
         message = "Use functions.remove(function) instead.",
@@ -111,23 +135,7 @@ abstract class EndDevice(mRID: String) : AssetContainer(mRID) {
         return this
     }
 
-    @Deprecated(
-        message = "Use usagePoints.add(usagePoint) instead.",
-        replaceWith = ReplaceWith("also { it.usagePoints.add(usagePoint) }")
-    )
-    fun addUsagePoint(usagePoint: UsagePoint): EndDevice {
-        usagePoints.add(usagePoint)
-        return this
-    }
-
-    @Deprecated(
-        message = "Use functions.add(function) instead.",
-        replaceWith = ReplaceWith("also { it.functions.add(function) }")
-    )
-    fun addFunction(function: EndDeviceFunction): EndDevice {
-        functions.add(function)
-        return this
-    }
+    // endregion
 
     // endregion
 }

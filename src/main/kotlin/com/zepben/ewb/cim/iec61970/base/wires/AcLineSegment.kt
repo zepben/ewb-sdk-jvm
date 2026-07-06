@@ -120,6 +120,8 @@ class AcLineSegment(mRID: String) : Conductor(mRID) {
     // It will be removed eventually.
     // Every single method simply forwards the call to the corresponding list.
 
+    // region cuts boilerplate
+
     @Deprecated(
         message = "Use cuts.size instead.",
         replaceWith = ReplaceWith("cuts.size")
@@ -131,6 +133,15 @@ class AcLineSegment(mRID: String) : Conductor(mRID) {
         replaceWith = ReplaceWith("cuts.getByMRID(mRID)")
     )
     fun getCut(mRID: String): Cut? = cuts.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use cuts.add(cut) instead.",
+        replaceWith = ReplaceWith("also { it.cuts.add(cut) }")
+    )
+    fun addCut(cut: Cut): AcLineSegment {
+        cuts.add(cut)
+        return this
+    }
 
     @Deprecated(
         message = "Use cuts.remove(cut) instead.",
@@ -147,6 +158,10 @@ class AcLineSegment(mRID: String) : Conductor(mRID) {
         return this
     }
 
+    // endregion
+
+    // region clamps boilerplate
+
     @Deprecated(
         message = "Use clamps.size instead.",
         replaceWith = ReplaceWith("clamps.size")
@@ -158,6 +173,15 @@ class AcLineSegment(mRID: String) : Conductor(mRID) {
         replaceWith = ReplaceWith("clamps.getByMRID(mRID)")
     )
     fun getClamp(mRID: String): Clamp? = clamps.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use clamps.add(clamp) instead.",
+        replaceWith = ReplaceWith("also { it.clamps.add(clamp) }")
+    )
+    fun addClamp(clamp: Clamp): AcLineSegment {
+        clamps.add(clamp)
+        return this
+    }
 
     @Deprecated(
         message = "Use clamps.remove(clamp) instead.",
@@ -173,6 +197,10 @@ class AcLineSegment(mRID: String) : Conductor(mRID) {
         clamps.clear()
         return this
     }
+
+    // endregion
+
+    // region phases boilerplate
 
     @Deprecated(
         message = "Use phases.size instead.",
@@ -193,6 +221,15 @@ class AcLineSegment(mRID: String) : Conductor(mRID) {
     fun getPhase(phase: SinglePhaseKind): AcLineSegmentPhase? = phases.getBy(phase)
 
     @Deprecated(
+        message = "Use phases.add(phase) instead.",
+        replaceWith = ReplaceWith("also { it.phases.add(phase) }")
+    )
+    fun addPhase(phase: AcLineSegmentPhase): AcLineSegment {
+        phases.add(phase)
+        return this
+    }
+
+    @Deprecated(
         message = "Use phases.remove(phase) instead.",
         replaceWith = ReplaceWith("phases.remove(phase)")
     )
@@ -207,32 +244,7 @@ class AcLineSegment(mRID: String) : Conductor(mRID) {
         return this
     }
 
-    @Deprecated(
-        message = "Use cuts.add(cut) instead.",
-        replaceWith = ReplaceWith("also { it.cuts.add(cut) }")
-    )
-    fun addCut(cut: Cut): AcLineSegment {
-        cuts.add(cut)
-        return this
-    }
-
-    @Deprecated(
-        message = "Use clamps.add(clamp) instead.",
-        replaceWith = ReplaceWith("also { it.clamps.add(clamp) }")
-    )
-    fun addClamp(clamp: Clamp): AcLineSegment {
-        clamps.add(clamp)
-        return this
-    }
-
-    @Deprecated(
-        message = "Use phases.add(phase) instead.",
-        replaceWith = ReplaceWith("also { it.phases.add(phase) }")
-    )
-    fun addPhase(phase: AcLineSegmentPhase): AcLineSegment {
-        phases.add(phase)
-        return this
-    }
+    // endregion
 
     // endregion
 }

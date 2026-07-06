@@ -105,6 +105,8 @@ class EnergySource(mRID: String) : EnergyConnection(mRID) {
     // It will be removed eventually.
     // Every single method simply forwards the call to the corresponding list.
 
+    // region phases boilerplate
+
     @Deprecated(
         message = "Use phases.size instead.",
         replaceWith = ReplaceWith("phases.size")
@@ -116,6 +118,15 @@ class EnergySource(mRID: String) : EnergyConnection(mRID) {
         replaceWith = ReplaceWith("phases.getByMRID(mRID)")
     )
     fun getPhase(mRID: String): EnergySourcePhase? = phases.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use phases.add(phase) instead.",
+        replaceWith = ReplaceWith("also { it.phases.add(phase) }")
+    )
+    fun addPhase(phase: EnergySourcePhase): EnergySource {
+        phases.add(phase)
+        return this
+    }
 
     @Deprecated(
         message = "Use phases.remove(phase) instead.",
@@ -132,14 +143,7 @@ class EnergySource(mRID: String) : EnergyConnection(mRID) {
         return this
     }
 
-    @Deprecated(
-        message = "Use phases.add(phase) instead.",
-        replaceWith = ReplaceWith("also { it.phases.add(phase) }")
-    )
-    fun addPhase(phase: EnergySourcePhase): EnergySource {
-        phases.add(phase)
-        return this
-    }
+    // endregion
 
     // endregion
 }

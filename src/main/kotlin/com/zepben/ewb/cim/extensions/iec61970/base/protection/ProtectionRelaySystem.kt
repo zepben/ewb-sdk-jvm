@@ -44,6 +44,8 @@ class ProtectionRelaySystem(mRID: String) : Equipment(mRID) {
     // It will be removed eventually.
     // Every single method simply forwards the call to the corresponding list.
 
+    // region schemes boilerplate
+
     @Deprecated(
         message = "Use schemes.size instead.",
         replaceWith = ReplaceWith("schemes.size")
@@ -55,6 +57,15 @@ class ProtectionRelaySystem(mRID: String) : Equipment(mRID) {
         replaceWith = ReplaceWith("schemes.getByMRID(mRID)")
     )
     fun getScheme(mRID: String): ProtectionRelayScheme? = schemes.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use schemes.add(scheme) instead.",
+        replaceWith = ReplaceWith("also { it.schemes.add(scheme) }")
+    )
+    fun addScheme( scheme: ProtectionRelayScheme, ): ProtectionRelaySystem {
+        schemes.add(scheme)
+        return this
+    }
 
     @Deprecated(
         message = "Use schemes.remove(scheme) instead.",
@@ -71,14 +82,7 @@ class ProtectionRelaySystem(mRID: String) : Equipment(mRID) {
         return this
     }
 
-    @Deprecated(
-        message = "Use schemes.add(scheme) instead.",
-        replaceWith = ReplaceWith("also { it.schemes.add(scheme) }")
-    )
-    fun addScheme( scheme: ProtectionRelayScheme, ): ProtectionRelaySystem {
-        schemes.add(scheme)
-        return this
-    }
+    // endregion
 
     // endregion
 }

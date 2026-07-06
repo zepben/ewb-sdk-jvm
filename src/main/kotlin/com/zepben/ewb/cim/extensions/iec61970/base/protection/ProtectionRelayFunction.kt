@@ -288,6 +288,8 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
     // It will be removed eventually.
     // Every single method simply forwards the call to the corresponding list.
 
+    // region protectedSwitches boilerplate
+
     @Deprecated(
         message = "Use protectedSwitches.size instead.",
         replaceWith = ReplaceWith("protectedSwitches.size")
@@ -299,6 +301,15 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
         replaceWith = ReplaceWith("protectedSwitches.getByMRID(mRID)")
     )
     fun getProtectedSwitch(mRID: String): ProtectedSwitch? = protectedSwitches.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use protectedSwitches.add(protectedSwitch) instead.",
+        replaceWith = ReplaceWith("also { it.protectedSwitches.add(protectedSwitch) }")
+    )
+    fun addProtectedSwitch(protectedSwitch: ProtectedSwitch): ProtectionRelayFunction {
+        protectedSwitches.add(protectedSwitch)
+        return this
+    }
 
     @Deprecated(
         message = "Use protectedSwitches.remove(protectedSwitch) instead.",
@@ -315,6 +326,10 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
         return this
     }
 
+    // endregion
+
+    // region sensors boilerplate
+
     @Deprecated(
         message = "Use sensors.size instead.",
         replaceWith = ReplaceWith("sensors.size")
@@ -326,6 +341,15 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
         replaceWith = ReplaceWith("sensors.getByMRID(mRID)")
     )
     fun getSensor(mRID: String): Sensor? = sensors.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use sensors.add(sensor) instead.",
+        replaceWith = ReplaceWith("also { it.sensors.add(sensor) }")
+    )
+    fun addSensor(sensor: Sensor): ProtectionRelayFunction {
+        sensors.add(sensor)
+        return this
+    }
 
     @Deprecated(
         message = "Use sensors.remove(sensor) instead.",
@@ -342,6 +366,10 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
         return this
     }
 
+    // endregion
+
+    // region schemes boilerplate
+
     @Deprecated(
         message = "Use schemes.size instead.",
         replaceWith = ReplaceWith("schemes.size")
@@ -353,6 +381,15 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
         replaceWith = ReplaceWith("schemes.getByMRID(mRID)")
     )
     fun getScheme(mRID: String): ProtectionRelayScheme? = schemes.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use schemes.add(scheme) instead.",
+        replaceWith = ReplaceWith("also { it.schemes.add(scheme) }")
+    )
+    fun addScheme(scheme: ProtectionRelayScheme): ProtectionRelayFunction {
+        schemes.add(scheme)
+        return this
+    }
 
     @Deprecated(
         message = "Use schemes.remove(scheme) instead.",
@@ -369,32 +406,7 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
         return this
     }
 
-    @Deprecated(
-        message = "Use protectedSwitches.add(protectedSwitch) instead.",
-        replaceWith = ReplaceWith("also { it.protectedSwitches.add(protectedSwitch) }")
-    )
-    fun addProtectedSwitch(protectedSwitch: ProtectedSwitch): ProtectionRelayFunction {
-        protectedSwitches.add(protectedSwitch)
-        return this
-    }
-
-    @Deprecated(
-        message = "Use sensors.add(sensor) instead.",
-        replaceWith = ReplaceWith("also { it.sensors.add(sensor) }")
-    )
-    fun addSensor(sensor: Sensor): ProtectionRelayFunction {
-        sensors.add(sensor)
-        return this
-    }
-
-    @Deprecated(
-        message = "Use schemes.add(scheme) instead.",
-        replaceWith = ReplaceWith("also { it.schemes.add(scheme) }")
-    )
-    fun addScheme(scheme: ProtectionRelayScheme): ProtectionRelayFunction {
-        schemes.add(scheme)
-        return this
-    }
+    // endregion
 
     // endregion
 }

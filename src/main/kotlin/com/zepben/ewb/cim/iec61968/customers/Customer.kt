@@ -48,6 +48,8 @@ class Customer(mRID: String) : OrganisationRole(mRID) {
     // It will be removed eventually.
     // Every single method simply forwards the call to the corresponding list.
 
+    // region agreements boilerplate
+
     @Deprecated(
         message = "Use agreements.size instead.",
         replaceWith = ReplaceWith("agreements.size")
@@ -59,6 +61,15 @@ class Customer(mRID: String) : OrganisationRole(mRID) {
         replaceWith = ReplaceWith("agreements.getByMRID(mRID)")
     )
     fun getAgreement(mRID: String): CustomerAgreement? = agreements.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use agreements.add(customerAgreement) instead.",
+        replaceWith = ReplaceWith("also { it.agreements.add(customerAgreement) }")
+    )
+    fun addAgreement(customerAgreement: CustomerAgreement): Customer {
+        agreements.add(customerAgreement)
+        return this
+    }
 
     @Deprecated(
         message = "Use agreements.remove(customerAgreement) instead.",
@@ -75,14 +86,7 @@ class Customer(mRID: String) : OrganisationRole(mRID) {
         return this
     }
 
-    @Deprecated(
-        message = "Use agreements.add(customerAgreement) instead.",
-        replaceWith = ReplaceWith("also { it.agreements.add(customerAgreement) }")
-    )
-    fun addAgreement(customerAgreement: CustomerAgreement): Customer {
-        agreements.add(customerAgreement)
-        return this
-    }
+    // endregion
 
     // endregion
 }

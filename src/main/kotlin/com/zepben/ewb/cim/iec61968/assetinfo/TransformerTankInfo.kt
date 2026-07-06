@@ -46,6 +46,8 @@ class TransformerTankInfo(mRID: String) : AssetInfo(mRID) {
     // It will be removed eventually.
     // Every single method simply forwards the call to the corresponding list.
 
+    // region transformerEndInfos boilerplate
+
     @Deprecated(
         message = "Use transformerEndInfos.size instead.",
         replaceWith = ReplaceWith("transformerEndInfos.size")
@@ -57,6 +59,15 @@ class TransformerTankInfo(mRID: String) : AssetInfo(mRID) {
         replaceWith = ReplaceWith("transformerEndInfos.getByMRID(mRID)")
     )
     fun getTransformerEndInfo(mRID: String): TransformerEndInfo? = transformerEndInfos.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use transformerEndInfos.add(transformerEndInfo) instead.",
+        replaceWith = ReplaceWith("also { it.transformerEndInfos.add(transformerEndInfo) }")
+    )
+    fun addTransformerEndInfo(transformerEndInfo: TransformerEndInfo): TransformerTankInfo {
+        transformerEndInfos.add(transformerEndInfo)
+        return this
+    }
 
     @Deprecated(
         message = "Use transformerEndInfos.remove(transformerEndInfo) instead.",
@@ -73,14 +84,7 @@ class TransformerTankInfo(mRID: String) : AssetInfo(mRID) {
         return this
     }
 
-    @Deprecated(
-        message = "Use transformerEndInfos.add(transformerEndInfo) instead.",
-        replaceWith = ReplaceWith("also { it.transformerEndInfos.add(transformerEndInfo) }")
-    )
-    fun addTransformerEndInfo(transformerEndInfo: TransformerEndInfo): TransformerTankInfo {
-        transformerEndInfos.add(transformerEndInfo)
-        return this
-    }
+    // endregion
 
     // endregion
 }

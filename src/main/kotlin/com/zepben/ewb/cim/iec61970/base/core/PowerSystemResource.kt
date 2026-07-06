@@ -52,6 +52,8 @@ abstract class PowerSystemResource(mRID: String) : IdentifiedObject(mRID) {
     // It will be removed eventually.
     // Every single method simply forwards the call to the corresponding list.
 
+    // region assets boilerplate
+
     @Deprecated(
         message = "Use assets.size instead.",
         replaceWith = ReplaceWith("assets.size")
@@ -63,6 +65,15 @@ abstract class PowerSystemResource(mRID: String) : IdentifiedObject(mRID) {
         replaceWith = ReplaceWith("assets.getByMRID(mRID)")
     )
     fun getAsset(mRID: String): Asset? = assets.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use assets.add(asset) instead.",
+        replaceWith = ReplaceWith("also { it.assets.add(asset) }")
+    )
+    fun addAsset(asset: Asset): PowerSystemResource {
+        assets.add(asset)
+        return this
+    }
 
     @Deprecated(
         message = "Use assets.remove(asset) instead.",
@@ -79,14 +90,7 @@ abstract class PowerSystemResource(mRID: String) : IdentifiedObject(mRID) {
         return this
     }
 
-    @Deprecated(
-        message = "Use assets.add(asset) instead.",
-        replaceWith = ReplaceWith("also { it.assets.add(asset) }")
-    )
-    fun addAsset(asset: Asset): PowerSystemResource {
-        assets.add(asset)
-        return this
-    }
+    // endregion
 
     // endregion
 }

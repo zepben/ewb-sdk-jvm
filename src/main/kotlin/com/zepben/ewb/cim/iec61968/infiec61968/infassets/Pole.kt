@@ -40,6 +40,8 @@ class Pole(mRID: String) : Structure(mRID) {
     // It will be removed eventually.
     // Every single method simply forwards the call to the corresponding list.
 
+    // region streetlights boilerplate
+
     @Deprecated(
         message = "Use streetlights.size instead.",
         replaceWith = ReplaceWith("streetlights.size")
@@ -51,6 +53,15 @@ class Pole(mRID: String) : Structure(mRID) {
         replaceWith = ReplaceWith("streetlights.getByMRID(mRID)")
     )
     fun getStreetlight(mRID: String): Streetlight? = streetlights.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use streetlights.add(streetlight) instead.",
+        replaceWith = ReplaceWith("also { it.streetlights.add(streetlight) }")
+    )
+    fun addStreetlight(streetlight: Streetlight): Pole {
+        streetlights.add(streetlight)
+        return this
+    }
 
     @Deprecated(
         message = "Use streetlights.remove(streetlight) instead.",
@@ -67,14 +78,7 @@ class Pole(mRID: String) : Structure(mRID) {
         return this
     }
 
-    @Deprecated(
-        message = "Use streetlights.add(streetlight) instead.",
-        replaceWith = ReplaceWith("also { it.streetlights.add(streetlight) }")
-    )
-    fun addStreetlight(streetlight: Streetlight): Pole {
-        streetlights.add(streetlight)
-        return this
-    }
+    // endregion
 
     // endregion
 }

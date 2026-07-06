@@ -44,6 +44,8 @@ class ProtectionRelayScheme(mRID: String) : IdentifiedObject(mRID) {
     // It will be removed eventually.
     // Every single method simply forwards the call to the corresponding list.
 
+    // region functions boilerplate
+
     @Deprecated(
         message = "Use functions.size instead.",
         replaceWith = ReplaceWith("functions.size")
@@ -55,6 +57,15 @@ class ProtectionRelayScheme(mRID: String) : IdentifiedObject(mRID) {
         replaceWith = ReplaceWith("functions.getByMRID(mRID)")
     )
     fun getFunction(mRID: String): ProtectionRelayFunction? = functions.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use functions.add(function) instead.",
+        replaceWith = ReplaceWith("also { it.functions.add(function) }")
+    )
+    fun addFunction(function: ProtectionRelayFunction): ProtectionRelayScheme {
+        functions.add(function)
+        return this
+    }
 
     @Deprecated(
         message = "Use functions.remove(function) instead.",
@@ -71,14 +82,7 @@ class ProtectionRelayScheme(mRID: String) : IdentifiedObject(mRID) {
         return this
     }
 
-    @Deprecated(
-        message = "Use functions.add(function) instead.",
-        replaceWith = ReplaceWith("also { it.functions.add(function) }")
-    )
-    fun addFunction(function: ProtectionRelayFunction): ProtectionRelayScheme {
-        functions.add(function)
-        return this
-    }
+    // endregion
 
     // endregion
 }

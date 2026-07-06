@@ -92,6 +92,8 @@ class SynchronousMachine(mRID: String) : RotatingMachine(mRID) {
     // It will be removed eventually.
     // Every single method simply forwards the call to the corresponding list.
 
+    // region curves boilerplate
+
     @Deprecated(
         message = "Use curves.size instead.",
         replaceWith = ReplaceWith("curves.size")
@@ -103,6 +105,15 @@ class SynchronousMachine(mRID: String) : RotatingMachine(mRID) {
         replaceWith = ReplaceWith("curves.getByMRID(mRID)")
     )
     fun getCurve(mRID: String): ReactiveCapabilityCurve? = curves.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use curves.add(rcc) instead.",
+        replaceWith = ReplaceWith("also { it.curves.add(rcc) }")
+    )
+    fun addCurve(rcc: ReactiveCapabilityCurve): SynchronousMachine {
+        curves.add(rcc)
+        return this
+    }
 
     @Deprecated(
         message = "Use curves.remove(curve) instead.",
@@ -119,14 +130,7 @@ class SynchronousMachine(mRID: String) : RotatingMachine(mRID) {
         return this
     }
 
-    @Deprecated(
-        message = "Use curves.add(rcc) instead.",
-        replaceWith = ReplaceWith("also { it.curves.add(rcc) }")
-    )
-    fun addCurve(rcc: ReactiveCapabilityCurve): SynchronousMachine {
-        curves.add(rcc)
-        return this
-    }
+    // endregion
 
     // endregion
 }

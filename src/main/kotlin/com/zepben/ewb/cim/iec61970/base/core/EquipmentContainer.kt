@@ -22,7 +22,7 @@ abstract class EquipmentContainer(mRID: String) : ConnectivityNodeContainer(mRID
     private var _equipmentById: MutableMap<String, Equipment>? = null
 
     /**
-     * The equipment belonging to this object.
+     * Contained equipment. The returned collection is read only.
      */
     val equipment: MridCollection<Equipment> get() = LazyMridMap(
         getter = { _equipmentById },

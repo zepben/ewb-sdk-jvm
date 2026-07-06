@@ -69,6 +69,8 @@ class Loop(mRID: String) : IdentifiedObject(mRID) {
     // It will be removed eventually.
     // Every single method simply forwards the call to the corresponding list.
 
+    // region circuits boilerplate
+
     @Deprecated(
         message = "Use circuits.size instead.",
         replaceWith = ReplaceWith("circuits.size")
@@ -80,6 +82,15 @@ class Loop(mRID: String) : IdentifiedObject(mRID) {
         replaceWith = ReplaceWith("circuits.getByMRID(mRID)")
     )
     fun getCircuit(mRID: String): Circuit? = circuits.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use circuits.add(circuit) instead.",
+        replaceWith = ReplaceWith("also { it.circuits.add(circuit) }")
+    )
+    fun addCircuit(circuit: Circuit): Loop {
+        circuits.add(circuit)
+        return this
+    }
 
     @Deprecated(
         message = "Use circuits.remove(circuit) instead.",
@@ -96,6 +107,10 @@ class Loop(mRID: String) : IdentifiedObject(mRID) {
         return this
     }
 
+    // endregion
+
+    // region substations boilerplate
+
     @Deprecated(
         message = "Use substations.size instead.",
         replaceWith = ReplaceWith("substations.size")
@@ -107,6 +122,15 @@ class Loop(mRID: String) : IdentifiedObject(mRID) {
         replaceWith = ReplaceWith("substations.getByMRID(mRID)")
     )
     fun getSubstation(mRID: String): Substation? = substations.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use substations.add(substation) instead.",
+        replaceWith = ReplaceWith("also { it.substations.add(substation) }")
+    )
+    fun addSubstation(substation: Substation): Loop {
+        substations.add(substation)
+        return this
+    }
 
     @Deprecated(
         message = "Use substations.remove(substation) instead.",
@@ -123,6 +147,10 @@ class Loop(mRID: String) : IdentifiedObject(mRID) {
         return this
     }
 
+    // endregion
+
+    // region energizingSubstations boilerplate
+
     @Deprecated(
         message = "Use energizingSubstations.size instead.",
         replaceWith = ReplaceWith("energizingSubstations.size")
@@ -134,6 +162,15 @@ class Loop(mRID: String) : IdentifiedObject(mRID) {
         replaceWith = ReplaceWith("energizingSubstations.getByMRID(mRID)")
     )
     fun getEnergizingSubstation(mRID: String): Substation? = energizingSubstations.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use energizingSubstations.add(substation) instead.",
+        replaceWith = ReplaceWith("also { it.energizingSubstations.add(substation) }")
+    )
+    fun addEnergizingSubstation(substation: Substation): Loop {
+        energizingSubstations.add(substation)
+        return this
+    }
 
     @Deprecated(
         message = "Use energizingSubstations.remove(substation) instead.",
@@ -150,32 +187,7 @@ class Loop(mRID: String) : IdentifiedObject(mRID) {
         return this
     }
 
-    @Deprecated(
-        message = "Use circuits.add(circuit) instead.",
-        replaceWith = ReplaceWith("also { it.circuits.add(circuit) }")
-    )
-    fun addCircuit(circuit: Circuit): Loop {
-        circuits.add(circuit)
-        return this
-    }
-
-    @Deprecated(
-        message = "Use substations.add(substation) instead.",
-        replaceWith = ReplaceWith("also { it.substations.add(substation) }")
-    )
-    fun addSubstation(substation: Substation): Loop {
-        substations.add(substation)
-        return this
-    }
-
-    @Deprecated(
-        message = "Use energizingSubstations.add(substation) instead.",
-        replaceWith = ReplaceWith("also { it.energizingSubstations.add(substation) }")
-    )
-    fun addEnergizingSubstation(substation: Substation): Loop {
-        energizingSubstations.add(substation)
-        return this
-    }
+    // endregion
 
     // endregion
 }

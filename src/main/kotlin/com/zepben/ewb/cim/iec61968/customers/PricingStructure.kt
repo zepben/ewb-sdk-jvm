@@ -40,6 +40,8 @@ class PricingStructure(mRID: String) : Document(mRID) {
     // It will be removed eventually.
     // Every single method simply forwards the call to the corresponding list.
 
+    // region tariffs boilerplate
+
     @Deprecated(
         message = "Use tariffs.size instead.",
         replaceWith = ReplaceWith("tariffs.size")
@@ -51,6 +53,15 @@ class PricingStructure(mRID: String) : Document(mRID) {
         replaceWith = ReplaceWith("tariffs.getByMRID(mRID)")
     )
     fun getTariff(mRID: String): Tariff? = tariffs.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use tariffs.add(tariff) instead.",
+        replaceWith = ReplaceWith("also { it.tariffs.add(tariff) }")
+    )
+    fun addTariff(tariff: Tariff): PricingStructure {
+        tariffs.add(tariff)
+        return this
+    }
 
     @Deprecated(
         message = "Use tariffs.remove(tariff) instead.",
@@ -67,14 +78,7 @@ class PricingStructure(mRID: String) : Document(mRID) {
         return this
     }
 
-    @Deprecated(
-        message = "Use tariffs.add(tariff) instead.",
-        replaceWith = ReplaceWith("also { it.tariffs.add(tariff) }")
-    )
-    fun addTariff(tariff: Tariff): PricingStructure {
-        tariffs.add(tariff)
-        return this
-    }
+    // endregion
 
     // endregion
 }

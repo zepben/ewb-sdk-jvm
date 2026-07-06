@@ -46,6 +46,8 @@ class SubGeographicalRegion(mRID: String) : IdentifiedObject(mRID) {
     // It will be removed eventually.
     // Every single method simply forwards the call to the corresponding list.
 
+    // region substations boilerplate
+
     @Deprecated(
         message = "Use substations.size instead.",
         replaceWith = ReplaceWith("substations.size")
@@ -57,6 +59,15 @@ class SubGeographicalRegion(mRID: String) : IdentifiedObject(mRID) {
         replaceWith = ReplaceWith("substations.getByMRID(mRID)")
     )
     fun getSubstation(mRID: String): Substation? = substations.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use substations.add(substation) instead.",
+        replaceWith = ReplaceWith("also { it.substations.add(substation) }")
+    )
+    fun addSubstation(substation: Substation): SubGeographicalRegion {
+        substations.add(substation)
+        return this
+    }
 
     @Deprecated(
         message = "Use substations.remove(substation) instead.",
@@ -73,14 +84,7 @@ class SubGeographicalRegion(mRID: String) : IdentifiedObject(mRID) {
         return this
     }
 
-    @Deprecated(
-        message = "Use substations.add(substation) instead.",
-        replaceWith = ReplaceWith("also { it.substations.add(substation) }")
-    )
-    fun addSubstation(substation: Substation): SubGeographicalRegion {
-        substations.add(substation)
-        return this
-    }
+    // endregion
 
     // endregion
 }

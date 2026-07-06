@@ -57,6 +57,8 @@ abstract class Asset(mRID: String) : IdentifiedObject(mRID) {
     // It will be removed eventually.
     // Every single method simply forwards the call to the corresponding list.
 
+    // region organisationRoles boilerplate
+
     @Deprecated(
         message = "Use organisationRoles.size instead.",
         replaceWith = ReplaceWith("organisationRoles.size")
@@ -68,6 +70,15 @@ abstract class Asset(mRID: String) : IdentifiedObject(mRID) {
         replaceWith = ReplaceWith("organisationRoles.getByMRID(mRID)")
     )
     fun getOrganisationRole(mRID: String): AssetOrganisationRole? = organisationRoles.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use organisationRoles.add(organisationRole) instead.",
+        replaceWith = ReplaceWith("also { it.organisationRoles.add(organisationRole) }")
+    )
+    fun addOrganisationRole(organisationRole: AssetOrganisationRole): Asset {
+        organisationRoles.add(organisationRole)
+        return this
+    }
 
     @Deprecated(
         message = "Use organisationRoles.remove(organisationRole) instead.",
@@ -84,6 +95,10 @@ abstract class Asset(mRID: String) : IdentifiedObject(mRID) {
         return this
     }
 
+    // endregion
+
+    // region powerSystemResources boilerplate
+
     @Deprecated(
         message = "Use powerSystemResources.size instead.",
         replaceWith = ReplaceWith("powerSystemResources.size")
@@ -95,6 +110,15 @@ abstract class Asset(mRID: String) : IdentifiedObject(mRID) {
         replaceWith = ReplaceWith("powerSystemResources.getByMRID(mRID)")
     )
     fun getPowerSystemResource(mRID: String): PowerSystemResource? = powerSystemResources.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use powerSystemResources.add(powerSystemResource) instead.",
+        replaceWith = ReplaceWith("also { it.powerSystemResources.add(powerSystemResource) }")
+    )
+    fun addPowerSystemResource(powerSystemResource: PowerSystemResource): Asset {
+        powerSystemResources.add(powerSystemResource)
+        return this
+    }
 
     @Deprecated(
         message = "Use powerSystemResources.remove(powerSystemResource) instead.",
@@ -111,23 +135,7 @@ abstract class Asset(mRID: String) : IdentifiedObject(mRID) {
         return this
     }
 
-    @Deprecated(
-        message = "Use organisationRoles.add(organisationRole) instead.",
-        replaceWith = ReplaceWith("also { it.organisationRoles.add(organisationRole) }")
-    )
-    fun addOrganisationRole(organisationRole: AssetOrganisationRole): Asset {
-        organisationRoles.add(organisationRole)
-        return this
-    }
-
-    @Deprecated(
-        message = "Use powerSystemResources.add(powerSystemResource) instead.",
-        replaceWith = ReplaceWith("also { it.powerSystemResources.add(powerSystemResource) }")
-    )
-    fun addPowerSystemResource(powerSystemResource: PowerSystemResource): Asset {
-        powerSystemResources.add(powerSystemResource)
-        return this
-    }
+    // endregion
 
     // endregion
 }

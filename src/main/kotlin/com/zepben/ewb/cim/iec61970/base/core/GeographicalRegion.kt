@@ -44,6 +44,8 @@ class GeographicalRegion(mRID: String) : IdentifiedObject(mRID) {
     // It will be removed eventually.
     // Every single method simply forwards the call to the corresponding list.
 
+    // region subGeographicalRegions boilerplate
+
     @Deprecated(
         message = "Use subGeographicalRegions.size instead.",
         replaceWith = ReplaceWith("subGeographicalRegions.size")
@@ -55,6 +57,15 @@ class GeographicalRegion(mRID: String) : IdentifiedObject(mRID) {
         replaceWith = ReplaceWith("subGeographicalRegions.getByMRID(mRID)")
     )
     fun getSubGeographicalRegion(mRID: String): SubGeographicalRegion? = subGeographicalRegions.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use subGeographicalRegions.add(subGeographicalRegion) instead.",
+        replaceWith = ReplaceWith("also { it.subGeographicalRegions.add(subGeographicalRegion) }")
+    )
+    fun addSubGeographicalRegion(subGeographicalRegion: SubGeographicalRegion): GeographicalRegion {
+        subGeographicalRegions.add(subGeographicalRegion)
+        return this
+    }
 
     @Deprecated(
         message = "Use subGeographicalRegions.remove(subGeographicalRegion) instead.",
@@ -71,14 +82,7 @@ class GeographicalRegion(mRID: String) : IdentifiedObject(mRID) {
         return this
     }
 
-    @Deprecated(
-        message = "Use subGeographicalRegions.add(subGeographicalRegion) instead.",
-        replaceWith = ReplaceWith("also { it.subGeographicalRegions.add(subGeographicalRegion) }")
-    )
-    fun addSubGeographicalRegion(subGeographicalRegion: SubGeographicalRegion): GeographicalRegion {
-        subGeographicalRegions.add(subGeographicalRegion)
-        return this
-    }
+    // endregion
 
     // endregion
 }

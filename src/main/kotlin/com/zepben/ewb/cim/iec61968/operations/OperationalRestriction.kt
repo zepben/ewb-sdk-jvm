@@ -44,6 +44,8 @@ class OperationalRestriction(mRID: String) : Document(mRID) {
     // It will be removed eventually.
     // Every single method simply forwards the call to the corresponding list.
 
+    // region equipment boilerplate
+
     @Deprecated(
         message = "Use equipment.size instead.",
         replaceWith = ReplaceWith("equipment.size")
@@ -55,6 +57,15 @@ class OperationalRestriction(mRID: String) : Document(mRID) {
         replaceWith = ReplaceWith("equipment.getByMRID(mRID)")
     )
     fun getEquipment(mRID: String): Equipment? = equipment.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use this.equipment.add(equipment) instead.",
+        replaceWith = ReplaceWith("also { it.equipment.add(equipment) }")
+    )
+    fun addEquipment(equipment: Equipment): OperationalRestriction {
+        this.equipment.add(equipment)
+        return this
+    }
 
     @Deprecated(
         message = "Use this.equipment.remove(equipment) instead.",
@@ -71,14 +82,7 @@ class OperationalRestriction(mRID: String) : Document(mRID) {
         return this
     }
 
-    @Deprecated(
-        message = "Use this.equipment.add(equipment) instead.",
-        replaceWith = ReplaceWith("also { it.equipment.add(equipment) }")
-    )
-    fun addEquipment(equipment: Equipment): OperationalRestriction {
-        this.equipment.add(equipment)
-        return this
-    }
+    // endregion
 
     // endregion
 }

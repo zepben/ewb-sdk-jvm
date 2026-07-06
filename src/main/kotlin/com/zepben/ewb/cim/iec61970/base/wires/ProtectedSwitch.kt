@@ -36,6 +36,8 @@ abstract class ProtectedSwitch(mRID: String) : Switch(mRID) {
     // It will be removed eventually.
     // Every single method simply forwards the call to the corresponding list.
 
+    // region relayFunctions boilerplate
+
     @Deprecated(
         message = "Use relayFunctions.size instead.",
         replaceWith = ReplaceWith("relayFunctions.size")
@@ -47,6 +49,15 @@ abstract class ProtectedSwitch(mRID: String) : Switch(mRID) {
         replaceWith = ReplaceWith("relayFunctions.getByMRID(mRID)")
     )
     fun getRelayFunction(mRID: String): ProtectionRelayFunction? = relayFunctions.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use relayFunctions.add(relayFunction) instead.",
+        replaceWith = ReplaceWith("also { it.relayFunctions.add(relayFunction) }")
+    )
+    fun addRelayFunction(relayFunction: ProtectionRelayFunction): ProtectedSwitch {
+        relayFunctions.add(relayFunction)
+        return this
+    }
 
     @Deprecated(
         message = "Use relayFunctions.remove(relayFunction) instead.",
@@ -63,14 +74,7 @@ abstract class ProtectedSwitch(mRID: String) : Switch(mRID) {
         return this
     }
 
-    @Deprecated(
-        message = "Use relayFunctions.add(relayFunction) instead.",
-        replaceWith = ReplaceWith("also { it.relayFunctions.add(relayFunction) }")
-    )
-    fun addRelayFunction(relayFunction: ProtectionRelayFunction): ProtectedSwitch {
-        relayFunctions.add(relayFunction)
-        return this
-    }
+    // endregion
 
     // endregion
 }

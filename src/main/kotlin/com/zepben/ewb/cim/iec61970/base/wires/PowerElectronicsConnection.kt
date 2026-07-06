@@ -239,6 +239,8 @@ class PowerElectronicsConnection(mRID: String) : RegulatingCondEq(mRID) {
     // It will be removed eventually.
     // Every single method simply forwards the call to the corresponding list.
 
+    // region units boilerplate
+
     @Deprecated(
         message = "Use units.size instead.",
         replaceWith = ReplaceWith("units.size")
@@ -250,6 +252,15 @@ class PowerElectronicsConnection(mRID: String) : RegulatingCondEq(mRID) {
         replaceWith = ReplaceWith("units.getByMRID(mRID)")
     )
     fun getUnit(mRID: String): PowerElectronicsUnit? = units.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use units.add(unit) instead.",
+        replaceWith = ReplaceWith("also { it.units.add(unit) }")
+    )
+    fun addUnit(unit: PowerElectronicsUnit): PowerElectronicsConnection {
+        units.add(unit)
+        return this
+    }
 
     @Deprecated(
         message = "Use units.remove(unit) instead.",
@@ -266,6 +277,10 @@ class PowerElectronicsConnection(mRID: String) : RegulatingCondEq(mRID) {
         return this
     }
 
+    // endregion
+
+    // region phases boilerplate
+
     @Deprecated(
         message = "Use phases.size instead.",
         replaceWith = ReplaceWith("phases.size")
@@ -277,6 +292,15 @@ class PowerElectronicsConnection(mRID: String) : RegulatingCondEq(mRID) {
         replaceWith = ReplaceWith("phases.getByMRID(mRID)")
     )
     fun getPhase(mRID: String): PowerElectronicsConnectionPhase? = phases.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use phases.add(phase) instead.",
+        replaceWith = ReplaceWith("also { it.phases.add(phase) }")
+    )
+    fun addPhase(phase: PowerElectronicsConnectionPhase): PowerElectronicsConnection {
+        phases.add(phase)
+        return this
+    }
 
     @Deprecated(
         message = "Use phases.remove(phase) instead.",
@@ -293,23 +317,7 @@ class PowerElectronicsConnection(mRID: String) : RegulatingCondEq(mRID) {
         return this
     }
 
-    @Deprecated(
-        message = "Use units.add(unit) instead.",
-        replaceWith = ReplaceWith("also { it.units.add(unit) }")
-    )
-    fun addUnit(unit: PowerElectronicsUnit): PowerElectronicsConnection {
-        units.add(unit)
-        return this
-    }
-
-    @Deprecated(
-        message = "Use phases.add(phase) instead.",
-        replaceWith = ReplaceWith("also { it.phases.add(phase) }")
-    )
-    fun addPhase(phase: PowerElectronicsConnectionPhase): PowerElectronicsConnection {
-        phases.add(phase)
-        return this
-    }
+    // endregion
 
     // endregion
 }

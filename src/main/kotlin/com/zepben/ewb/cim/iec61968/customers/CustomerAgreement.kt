@@ -45,6 +45,8 @@ class CustomerAgreement(mRID: String) : Agreement(mRID) {
     // It will be removed eventually.
     // Every single method simply forwards the call to the corresponding list.
 
+    // region pricingStructures boilerplate
+
     @Deprecated(
         message = "Use pricingStructures.size instead.",
         replaceWith = ReplaceWith("pricingStructures.size")
@@ -56,6 +58,15 @@ class CustomerAgreement(mRID: String) : Agreement(mRID) {
         replaceWith = ReplaceWith("pricingStructures.getByMRID(mRID)")
     )
     fun getPricingStructure(mRID: String): PricingStructure? = pricingStructures.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use pricingStructures.add(pricingStructure) instead.",
+        replaceWith = ReplaceWith("also { it.pricingStructures.add(pricingStructure) }")
+    )
+    fun addPricingStructure(pricingStructure: PricingStructure): CustomerAgreement {
+        pricingStructures.add(pricingStructure)
+        return this
+    }
 
     @Deprecated(
         message = "Use pricingStructures.remove(pricingStructure) instead.",
@@ -72,14 +83,7 @@ class CustomerAgreement(mRID: String) : Agreement(mRID) {
         return this
     }
 
-    @Deprecated(
-        message = "Use pricingStructures.add(pricingStructure) instead.",
-        replaceWith = ReplaceWith("also { it.pricingStructures.add(pricingStructure) }")
-    )
-    fun addPricingStructure(pricingStructure: PricingStructure): CustomerAgreement {
-        pricingStructures.add(pricingStructure)
-        return this
-    }
+    // endregion
 
     // endregion
 }

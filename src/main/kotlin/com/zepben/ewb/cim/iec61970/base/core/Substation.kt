@@ -86,6 +86,8 @@ class Substation(mRID: String) : EquipmentContainer(mRID) {
     // It will be removed eventually.
     // Every single method simply forwards the call to the corresponding list.
 
+    // region feeders boilerplate
+
     @Deprecated(
         message = "Use feeders.size instead.",
         replaceWith = ReplaceWith("feeders.size")
@@ -97,6 +99,15 @@ class Substation(mRID: String) : EquipmentContainer(mRID) {
         replaceWith = ReplaceWith("feeders.getByMRID(mRID)")
     )
     fun getFeeder(mRID: String): Feeder? = feeders.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use feeders.add(feeder) instead.",
+        replaceWith = ReplaceWith("also { it.feeders.add(feeder) }")
+    )
+    fun addFeeder(feeder: Feeder): Substation {
+        feeders.add(feeder)
+        return this
+    }
 
     @Deprecated(
         message = "Use feeders.remove(feeder) instead.",
@@ -113,6 +124,10 @@ class Substation(mRID: String) : EquipmentContainer(mRID) {
         return this
     }
 
+    // endregion
+
+    // region loops boilerplate
+
     @Deprecated(
         message = "Use loops.size instead.",
         replaceWith = ReplaceWith("loops.size")
@@ -124,6 +139,15 @@ class Substation(mRID: String) : EquipmentContainer(mRID) {
         replaceWith = ReplaceWith("loops.getByMRID(mRID)")
     )
     fun getLoop(mRID: String): Loop? = loops.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use loops.add(loop) instead.",
+        replaceWith = ReplaceWith("also { it.loops.add(loop) }")
+    )
+    fun addLoop(loop: Loop): Substation {
+        loops.add(loop)
+        return this
+    }
 
     @Deprecated(
         message = "Use loops.remove(loop) instead.",
@@ -140,6 +164,10 @@ class Substation(mRID: String) : EquipmentContainer(mRID) {
         return this
     }
 
+    // endregion
+
+    // region energizedLoops boilerplate
+
     @Deprecated(
         message = "Use energizedLoops.size instead.",
         replaceWith = ReplaceWith("energizedLoops.size")
@@ -151,6 +179,15 @@ class Substation(mRID: String) : EquipmentContainer(mRID) {
         replaceWith = ReplaceWith("energizedLoops.getByMRID(mRID)")
     )
     fun getEnergizedLoop(mRID: String): Loop? = energizedLoops.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use energizedLoops.add(loop) instead.",
+        replaceWith = ReplaceWith("also { it.energizedLoops.add(loop) }")
+    )
+    fun addEnergizedLoop(loop: Loop): Substation {
+        energizedLoops.add(loop)
+        return this
+    }
 
     @Deprecated(
         message = "Use energizedLoops.remove(loop) instead.",
@@ -167,6 +204,10 @@ class Substation(mRID: String) : EquipmentContainer(mRID) {
         return this
     }
 
+    // endregion
+
+    // region circuits boilerplate
+
     @Deprecated(
         message = "Use circuits.size instead.",
         replaceWith = ReplaceWith("circuits.size")
@@ -178,6 +219,15 @@ class Substation(mRID: String) : EquipmentContainer(mRID) {
         replaceWith = ReplaceWith("circuits.getByMRID(mRID)")
     )
     fun getCircuit(mRID: String): Circuit? = circuits.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use circuits.add(circuit) instead.",
+        replaceWith = ReplaceWith("also { it.circuits.add(circuit) }")
+    )
+    fun addCircuit(circuit: Circuit): Substation {
+        circuits.add(circuit)
+        return this
+    }
 
     @Deprecated(
         message = "Use circuits.remove(circuit) instead.",
@@ -194,41 +244,7 @@ class Substation(mRID: String) : EquipmentContainer(mRID) {
         return this
     }
 
-    @Deprecated(
-        message = "Use feeders.add(feeder) instead.",
-        replaceWith = ReplaceWith("also { it.feeders.add(feeder) }")
-    )
-    fun addFeeder(feeder: Feeder): Substation {
-        feeders.add(feeder)
-        return this
-    }
-
-    @Deprecated(
-        message = "Use loops.add(loop) instead.",
-        replaceWith = ReplaceWith("also { it.loops.add(loop) }")
-    )
-    fun addLoop(loop: Loop): Substation {
-        loops.add(loop)
-        return this
-    }
-
-    @Deprecated(
-        message = "Use energizedLoops.add(loop) instead.",
-        replaceWith = ReplaceWith("also { it.energizedLoops.add(loop) }")
-    )
-    fun addEnergizedLoop(loop: Loop): Substation {
-        energizedLoops.add(loop)
-        return this
-    }
-
-    @Deprecated(
-        message = "Use circuits.add(circuit) instead.",
-        replaceWith = ReplaceWith("also { it.circuits.add(circuit) }")
-    )
-    fun addCircuit(circuit: Circuit): Substation {
-        circuits.add(circuit)
-        return this
-    }
+    // endregion
 
     // endregion
 }

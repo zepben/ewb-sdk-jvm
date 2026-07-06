@@ -34,6 +34,7 @@ class ConnectivityNode(mRID: String) : IdentifiedObject(mRID) {
     // It will be removed eventually.
     // Every single method simply forwards the call to the corresponding list.
 
+    // region terminals boilerplate
 
     @Deprecated(
         message = "Use terminals.size instead.",
@@ -70,6 +71,8 @@ class ConnectivityNode(mRID: String) : IdentifiedObject(mRID) {
         terminals.clear()
         return this
     }
+
+    // endregion
 
     // endregion
 

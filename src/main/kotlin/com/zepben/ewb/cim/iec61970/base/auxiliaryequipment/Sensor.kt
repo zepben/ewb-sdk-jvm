@@ -37,6 +37,8 @@ abstract class Sensor(mRID: String) : AuxiliaryEquipment(mRID) {
     // It will be removed eventually.
     // Every single method simply forwards the call to the corresponding list.
 
+    // region relayFunctions boilerplate
+
     @Deprecated(
         message = "Use relayFunctions.size instead.",
         replaceWith = ReplaceWith("relayFunctions.size")
@@ -48,6 +50,15 @@ abstract class Sensor(mRID: String) : AuxiliaryEquipment(mRID) {
         replaceWith = ReplaceWith("relayFunctions.getByMRID(mRID)")
     )
     fun getRelayFunction(mRID: String): ProtectionRelayFunction? = relayFunctions.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use relayFunctions.add(protectionRelayFunction) instead.",
+        replaceWith = ReplaceWith("also { it.relayFunctions.add(protectionRelayFunction) }")
+    )
+    fun addRelayFunction(protectionRelayFunction: ProtectionRelayFunction): Sensor {
+        relayFunctions.add(protectionRelayFunction)
+        return this
+    }
 
     @Deprecated(
         message = "Use relayFunctions.remove(relayFunction) instead.",
@@ -64,14 +75,7 @@ abstract class Sensor(mRID: String) : AuxiliaryEquipment(mRID) {
         return this
     }
 
-    @Deprecated(
-        message = "Use relayFunctions.add(protectionRelayFunction) instead.",
-        replaceWith = ReplaceWith("also { it.relayFunctions.add(protectionRelayFunction) }")
-    )
-    fun addRelayFunction(protectionRelayFunction: ProtectionRelayFunction): Sensor {
-        relayFunctions.add(protectionRelayFunction)
-        return this
-    }
+    // endregion
 
     // endregion
 }

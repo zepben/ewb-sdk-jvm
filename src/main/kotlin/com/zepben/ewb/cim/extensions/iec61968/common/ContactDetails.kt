@@ -134,6 +134,15 @@ class ContactDetails(
     fun numPhoneNumbers(): Int = phoneNumbers.size
 
     @Deprecated(
+        message = "Use phoneNumbers.add(phoneNumber) instead.",
+        replaceWith = ReplaceWith("also { it.phoneNumbers.add(phoneNumber) }")
+    )
+    fun addPhoneNumber(phoneNumber: TelephoneNumber): ContactDetails {
+        phoneNumbers.add(phoneNumber)
+        return this
+    }
+
+    @Deprecated(
         message = "Use phoneNumbers.remove(phoneNumber) instead.",
         replaceWith = ReplaceWith("phoneNumbers.remove(phoneNumber)")
     )
@@ -148,15 +157,6 @@ class ContactDetails(
         return this
     }
 
-    @Deprecated(
-        message = "Use phoneNumbers.add(phoneNumber) instead.",
-        replaceWith = ReplaceWith("also { it.phoneNumbers.add(phoneNumber) }")
-    )
-    fun addPhoneNumber(phoneNumber: TelephoneNumber): ContactDetails {
-        phoneNumbers.add(phoneNumber)
-        return this
-    }
-
     // endregion
 
     // region electronicAddresses boilerplate
@@ -166,6 +166,15 @@ class ContactDetails(
         replaceWith = ReplaceWith("electronicAddresses.size")
     )
     fun numElectronicAddresses(): Int = electronicAddresses.size
+
+    @Deprecated(
+        message = "Use electronicAddresses.add(electronicAddress) instead.",
+        replaceWith = ReplaceWith("also { it.electronicAddresses.add(electronicAddress) }")
+    )
+    fun addElectronicAddress(electronicAddress: ElectronicAddress): ContactDetails {
+        electronicAddresses.add(electronicAddress)
+        return this
+    }
 
     @Deprecated(
         message = "Use electronicAddresses.remove(electronicAddress) instead.",
@@ -179,15 +188,6 @@ class ContactDetails(
     )
     fun clearElectronicAddresses(): ContactDetails {
         electronicAddresses.clear()
-        return this
-    }
-
-    @Deprecated(
-        message = "Use electronicAddresses.add(electronicAddress) instead.",
-        replaceWith = ReplaceWith("also { it.electronicAddresses.add(electronicAddress) }")
-    )
-    fun addElectronicAddress(electronicAddress: ElectronicAddress): ContactDetails {
-        electronicAddresses.add(electronicAddress)
         return this
     }
 

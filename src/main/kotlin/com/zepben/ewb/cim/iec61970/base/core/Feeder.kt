@@ -145,6 +145,9 @@ class Feeder(mRID: String) : EquipmentContainer(mRID) {
         replaceWith = ReplaceWith("normalEnergizedLvFeeders.remove(lvFeeder)")
     )
     fun removeNormalEnergizedLvFeeder(lvFeeder: LvFeeder): Boolean =
+
+    // endregion
+
         normalEnergizedLvFeeders.remove(lvFeeder)
 
     @Deprecated(
@@ -156,9 +159,7 @@ class Feeder(mRID: String) : EquipmentContainer(mRID) {
         return this
     }
 
-    // endregion
 
-    // region currentEnergizedLvFeeders
 
     @Deprecated(
         message = "Use currentEnergizedLvFeeders.size instead.",
@@ -197,9 +198,7 @@ class Feeder(mRID: String) : EquipmentContainer(mRID) {
         return this
     }
 
-    // endregion
 
-    // region normalEnergizedLvSubstations boilerplate
 
     @Deprecated(
         message = "Use normalEnergizedLvSubstations.size instead.",
@@ -238,9 +237,7 @@ class Feeder(mRID: String) : EquipmentContainer(mRID) {
         return this
     }
 
-    // endregion
 
-    // region currentEnergizedLvSubstations boilerplate
 
     @Deprecated(
         message = "Use currentEnergizedLvSubstations.size instead.",
@@ -278,8 +275,6 @@ class Feeder(mRID: String) : EquipmentContainer(mRID) {
         currentEnergizedLvSubstations.clear()
         return this
     }
-
-    // endregion
 
     // endregion
 

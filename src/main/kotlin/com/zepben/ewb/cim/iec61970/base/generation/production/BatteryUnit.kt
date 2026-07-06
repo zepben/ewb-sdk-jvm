@@ -9,6 +9,7 @@
 package com.zepben.ewb.cim.iec61970.base.generation.production
 
 import com.zepben.ewb.boilerplate.LazyMridList
+import com.zepben.ewb.boilerplate.MridCollection
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.BatteryControl
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.BatteryControlMode
@@ -37,14 +38,6 @@ class BatteryUnit(mRID: String) : PowerElectronicsUnit(mRID) {
         elementDescription = "A BatteryControl"
     )
 
-    /**
-     * Get a [BatteryControl] of this [BatteryUnit] by its [BatteryControl.controlMode]
-     *
-     * @param controlMode the control mode of the required [BatteryControl]
-     * @return The [BatteryControl] with the specified [BatteryControlMode] if it exists, otherwise null
-     */
-    fun getControl(controlMode: BatteryControlMode): BatteryControl? = _batteryControls?.firstOrNull { it.controlMode == controlMode }
-
     //
     // NOTE: This is called `numBatteryControls` because `numControls` is already used by `PowerSystemResource`.
     //
@@ -55,6 +48,8 @@ class BatteryUnit(mRID: String) : PowerElectronicsUnit(mRID) {
     // This boilerplate exists solely to enable backwards compatibility.
     // It will be removed eventually.
     // Every single method simply forwards the call to the corresponding list.
+
+    // region controls boilerplate
 
     @Deprecated(
         message = "Use controls.size instead.",
@@ -67,6 +62,22 @@ class BatteryUnit(mRID: String) : PowerElectronicsUnit(mRID) {
         replaceWith = ReplaceWith("controls.getByMRID(mRID)")
     )
     fun getControl(mRID: String): BatteryControl? = controls.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use controls.getBy(controlMode) instead.",
+        replaceWith = ReplaceWith("controls.getBy(controlMode)")
+    )
+    fun getControl(controlMode: BatteryControlMode): BatteryControl? = controls.getBy(controlMode)
+
+
+    @Deprecated(
+        message = "Use controls.add(control) instead.",
+        replaceWith = ReplaceWith("also { it.controls.add(control) }")
+    )
+    fun addControl(control: BatteryControl): BatteryUnit {
+        controls.add(control)
+        return this
+    }
 
     @Deprecated(
         message = "Use controls.remove(control) instead.",
@@ -83,14 +94,16 @@ class BatteryUnit(mRID: String) : PowerElectronicsUnit(mRID) {
         return this
     }
 
-    @Deprecated(
-        message = "Use controls.add(control) instead.",
-        replaceWith = ReplaceWith("also { it.controls.add(control) }")
-    )
-    fun addControl(control: BatteryControl): BatteryUnit {
-        controls.add(control)
-        return this
-    }
+    // endregion
 
     // endregion
 }
+
+
+/**
+ * Get a [BatteryControl] of this [BatteryUnit] by its [BatteryControl.controlMode]
+ *
+ * @param controlMode the control mode of the required [BatteryControl]
+ * @return The [BatteryControl] with the specified [BatteryControlMode] if it exists, otherwise null
+ */
+fun MridCollection<BatteryControl>.getBy(controlMode: BatteryControlMode): BatteryControl? = firstOrNull { it.controlMode == controlMode }

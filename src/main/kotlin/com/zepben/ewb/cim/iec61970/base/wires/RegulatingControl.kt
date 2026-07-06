@@ -99,6 +99,8 @@ abstract class RegulatingControl(mRID: String) : PowerSystemResource(mRID) {
     // It will be removed eventually.
     // Every single method simply forwards the call to the corresponding list.
 
+    // region regulatingCondEqs boilerplate
+
     @Deprecated(
         message = "Use regulatingCondEqs.size instead.",
         replaceWith = ReplaceWith("regulatingCondEqs.size")
@@ -110,6 +112,15 @@ abstract class RegulatingControl(mRID: String) : PowerSystemResource(mRID) {
         replaceWith = ReplaceWith("regulatingCondEqs.getByMRID(mRID)")
     )
     fun getRegulatingCondEq(mRID: String): RegulatingCondEq? = regulatingCondEqs.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use regulatingCondEqs.add(regulatingCondEq) instead.",
+        replaceWith = ReplaceWith("also { it.regulatingCondEqs.add(regulatingCondEq) }")
+    )
+    fun addRegulatingCondEq(regulatingCondEq: RegulatingCondEq): RegulatingControl {
+        regulatingCondEqs.add(regulatingCondEq)
+        return this
+    }
 
     @Deprecated(
         message = "Use regulatingCondEqs.remove(regulatingCondEq) instead.",
@@ -126,14 +137,7 @@ abstract class RegulatingControl(mRID: String) : PowerSystemResource(mRID) {
         return this
     }
 
-    @Deprecated(
-        message = "Use regulatingCondEqs.add(regulatingCondEq) instead.",
-        replaceWith = ReplaceWith("also { it.regulatingCondEqs.add(regulatingCondEq) }")
-    )
-    fun addRegulatingCondEq(regulatingCondEq: RegulatingCondEq): RegulatingControl {
-        regulatingCondEqs.add(regulatingCondEq)
-        return this
-    }
+    // endregion
 
     // endregion
 }

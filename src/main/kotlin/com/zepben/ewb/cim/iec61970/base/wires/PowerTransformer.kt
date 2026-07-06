@@ -138,6 +138,7 @@ class PowerTransformer(mRID: String) : ConductingEquipment(mRID) {
     // It will be removed eventually.
     // Every single method simply forwards the call to the corresponding list.
 
+    // region ends boilerplate
 
     @Deprecated(
         message = "Use ends.size instead.",
@@ -192,6 +193,8 @@ class PowerTransformer(mRID: String) : ConductingEquipment(mRID) {
         ends.clear()
         return this
     }
+
+    // endregion
 
     // endregion
 

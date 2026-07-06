@@ -48,6 +48,8 @@ class PerLengthPhaseImpedance(mRID: String) : PerLengthImpedance(mRID) {
     // It will be removed eventually.
     // Every single method simply forwards the call to the corresponding list.
 
+    // region data boilerplate
+
     @Deprecated(
         message = "Use data.size instead.",
         replaceWith = ReplaceWith("data.size")
@@ -83,6 +85,8 @@ class PerLengthPhaseImpedance(mRID: String) : PerLengthImpedance(mRID) {
         data.clear()
         return this
     }
+
+    // endregion
 
     // endregion
 

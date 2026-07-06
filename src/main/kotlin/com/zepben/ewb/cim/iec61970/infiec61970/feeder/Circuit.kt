@@ -55,6 +55,8 @@ class Circuit(mRID: String) : Line(mRID) {
     // It will be removed eventually.
     // Every single method simply forwards the call to the corresponding list.
 
+    // region endTerminals boilerplate
+
     @Deprecated(
         message = "Use endTerminals.size instead.",
         replaceWith = ReplaceWith("endTerminals.size")
@@ -66,6 +68,15 @@ class Circuit(mRID: String) : Line(mRID) {
         replaceWith = ReplaceWith("endTerminals.getByMRID(mRID)")
     )
     fun getEndTerminal(mRID: String): Terminal? = endTerminals.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use endTerminals.add(endTerminal) instead.",
+        replaceWith = ReplaceWith("also { it.endTerminals.add(endTerminal) }")
+    )
+    fun addEndTerminal(endTerminal: Terminal): Circuit {
+        endTerminals.add(endTerminal)
+        return this
+    }
 
     @Deprecated(
         message = "Use endTerminals.remove(endTerminal) instead.",
@@ -82,6 +93,10 @@ class Circuit(mRID: String) : Line(mRID) {
         return this
     }
 
+    // endregion
+
+    // region endSubstations boilerplate
+
     @Deprecated(
         message = "Use endSubstations.size instead.",
         replaceWith = ReplaceWith("endSubstations.size")
@@ -93,6 +108,15 @@ class Circuit(mRID: String) : Line(mRID) {
         replaceWith = ReplaceWith("endSubstations.getByMRID(mRID)")
     )
     fun getEndSubstation(mRID: String): Substation? = endSubstations.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use endSubstations.add(substation) instead.",
+        replaceWith = ReplaceWith("also { it.endSubstations.add(substation) }")
+    )
+    fun addEndSubstation(substation: Substation): Circuit {
+        endSubstations.add(substation)
+        return this
+    }
 
     @Deprecated(
         message = "Use endSubstations.remove(substation) instead.",
@@ -109,23 +133,7 @@ class Circuit(mRID: String) : Line(mRID) {
         return this
     }
 
-    @Deprecated(
-        message = "Use endTerminals.add(endTerminal) instead.",
-        replaceWith = ReplaceWith("also { it.endTerminals.add(endTerminal) }")
-    )
-    fun addEndTerminal(endTerminal: Terminal): Circuit {
-        endTerminals.add(endTerminal)
-        return this
-    }
-
-    @Deprecated(
-        message = "Use endSubstations.add(substation) instead.",
-        replaceWith = ReplaceWith("also { it.endSubstations.add(substation) }")
-    )
-    fun addEndSubstation(substation: Substation): Circuit {
-        endSubstations.add(substation)
-        return this
-    }
+    // endregion
 
     // endregion
 }

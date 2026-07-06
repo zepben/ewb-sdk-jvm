@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.services.network.tracing.networktrace.operators
 
+import com.zepben.ewb.boilerplate.MridList
 import com.zepben.ewb.cim.iec61970.base.core.Equipment
 import com.zepben.ewb.cim.iec61970.base.core.EquipmentContainer
 import com.zepben.testutils.junit.SystemLogExtension
@@ -36,13 +37,16 @@ internal class EquipmentContainerStateOperatorsTest {
         fun test(operators: EquipmentContainerStateOperators, equipmentProp: KProperty1<EquipmentContainer, Collection<Equipment>>) {
             val equipment1 = mockk<Equipment>()
             val equipment2 = mockk<Equipment>()
-            val equipment = listOf(equipment1, equipment2)
+            val equipment = MridList(
+                mutableListOf(equipment1, equipment2),
+                { object : EquipmentContainer("Test") {} },
+                "Test Equipment")
             val container = mockk<EquipmentContainer>()
             every { equipmentProp.get(container) } returns equipment
 
             val result = operators.getEquipment(container)
 
-            assertThat(result, equalTo(equipment))
+            assertThat(result.toList(), equalTo(equipment))
             verify { equipmentProp.get(container) }
         }
 
@@ -55,7 +59,11 @@ internal class EquipmentContainerStateOperatorsTest {
         fun test(operators: EquipmentContainerStateOperators, containersProp: KProperty1<Equipment, Collection<EquipmentContainer>>) {
             val container1 = mockk<EquipmentContainer>()
             val container2 = mockk<EquipmentContainer>()
-            val containers = listOf(container1, container2)
+            val containers = MridList(
+                mutableListOf(container1, container2),
+                { object : Equipment("Test") {} },
+                "Test EquipmentContainer"
+                )
             val equipment = mockk<Equipment>()
             every { containersProp.get(equipment) } returns containers
 

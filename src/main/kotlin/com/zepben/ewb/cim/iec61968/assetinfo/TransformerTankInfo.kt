@@ -8,11 +8,8 @@
 
 package com.zepben.ewb.cim.iec61968.assetinfo
 
+import com.zepben.ewb.boilerplate.LazyMridList
 import com.zepben.ewb.cim.iec61968.assets.AssetInfo
-import com.zepben.ewb.services.common.extensions.asUnmodifiable
-import com.zepben.ewb.services.common.extensions.getByMRID
-import com.zepben.ewb.services.common.extensions.safeRemove
-import com.zepben.ewb.services.common.extensions.validateReference
 import com.zepben.ewb.services.network.ResistanceReactance
 
 /**
@@ -29,7 +26,12 @@ class TransformerTankInfo(mRID: String) : AssetInfo(mRID) {
     /**
      * Data for all the ends described by this transformer tank data. The returned collection is read only.
      */
-    val transformerEndInfos: List<TransformerEndInfo> get() = _transformerEndInfos.asUnmodifiable()
+    val transformerEndInfos: LazyMridList<TransformerEndInfo> get() = LazyMridList(
+        getter = { _transformerEndInfos },
+        setter = { _transformerEndInfos = it },
+        owner = { this },
+        elementDescription = "A TransformerEndInfo"
+    )
 
     /**
      * Get the [ResistanceReactance] for the specified [endNumber] from the datasheet information.
@@ -37,54 +39,48 @@ class TransformerTankInfo(mRID: String) : AssetInfo(mRID) {
     fun resistanceReactance(endNumber: Int): ResistanceReactance? =
         transformerEndInfos.firstOrNull { it.endNumber == endNumber }?.resistanceReactance()
 
-    /**
-     * Get the number of entries in the [TransformerEndInfo] collection.
-     */
-    fun numTransformerEndInfos(): Int = _transformerEndInfos?.size ?: 0
+    // region deprecated list boilerplate
+    //
+    // ("region/endregion" is an IntelliJ feature letting you hide the entire thing)
+    // This boilerplate exists solely to enable backwards compatibility.
+    // It will be removed eventually.
+    // Every single method simply forwards the call to the corresponding list.
 
-    /**
-     * Get the [TransformerEndInfo] of this [TransformerTankInfo] represented by [mRID]
-     *
-     * @param mRID the mRID of the required [TransformerEndInfo]
-     * @return The [TransformerEndInfo] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getTransformerEndInfo(mRID: String): TransformerEndInfo? = _transformerEndInfos.getByMRID(mRID)
+    @Deprecated(
+        message = "Use transformerEndInfos.size instead.",
+        replaceWith = ReplaceWith("transformerEndInfos.size")
+    )
+    fun numTransformerEndInfos(): Int = transformerEndInfos.size
 
-    /**
-     * Add a [TransformerEndInfo] to this [TransformerTankInfo]
-     *
-     * @return This [TransformerTankInfo] for fluent use
-     */
-    fun addTransformerEndInfo(transformerEndInfo: TransformerEndInfo): TransformerTankInfo {
-        if (validateReference(transformerEndInfo, ::getTransformerEndInfo, "A TransformerEndInfo"))
-            return this
+    @Deprecated(
+        message = "Use transformerEndInfos.getByMRID(mRID) instead.",
+        replaceWith = ReplaceWith("transformerEndInfos.getByMRID(mRID)")
+    )
+    fun getTransformerEndInfo(mRID: String): TransformerEndInfo? = transformerEndInfos.getByMrid(mRID)
 
-        _transformerEndInfos = _transformerEndInfos ?: mutableListOf()
-        _transformerEndInfos!!.add(transformerEndInfo)
+    @Deprecated(
+        message = "Use transformerEndInfos.remove(transformerEndInfo) instead.",
+        replaceWith = ReplaceWith("transformerEndInfos.remove(transformerEndInfo)")
+    )
+    fun removeTransformerEndInfo(transformerEndInfo: TransformerEndInfo): Boolean = transformerEndInfos.remove(transformerEndInfo)
 
-        return this
-    }
-
-    /**
-     * Remove a [TransformerEndInfo] from this [TransformerTankInfo]
-     *
-     * @param transformerEndInfo The [TransformerEndInfo] to remove
-     * @return true if [transformerEndInfo] is removed from the collection
-     */
-    fun removeTransformerEndInfo(transformerEndInfo: TransformerEndInfo): Boolean {
-        val ret = _transformerEndInfos.safeRemove(transformerEndInfo)
-        if (_transformerEndInfos.isNullOrEmpty()) _transformerEndInfos = null
-        return ret
-    }
-
-    /**
-     * Clear all [TransformerEndInfo]'s from this [TransformerTankInfo]
-     *
-     * @return This [TransformerTankInfo] for fluent use
-     */
+    @Deprecated(
+        message = "Use transformerEndInfos.clear() instead.",
+        replaceWith = ReplaceWith("transformerEndInfos.clear()")
+    )
     fun clearTransformerEndInfos(): TransformerTankInfo {
-        _transformerEndInfos = null
+        transformerEndInfos.clear()
         return this
     }
 
+    @Deprecated(
+        message = "Use transformerEndInfos.add(transformerEndInfo) instead.",
+        replaceWith = ReplaceWith("also { it.transformerEndInfos.add(transformerEndInfo) }")
+    )
+    fun addTransformerEndInfo(transformerEndInfo: TransformerEndInfo): TransformerTankInfo {
+        transformerEndInfos.add(transformerEndInfo)
+        return this
+    }
+
+    // endregion
 }

@@ -8,12 +8,9 @@
 
 package com.zepben.ewb.cim.iec61970.base.core
 
+import com.zepben.ewb.boilerplate.LazyMridList
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
-import com.zepben.ewb.services.common.extensions.asUnmodifiable
-import com.zepben.ewb.services.common.extensions.getByMRID
-import com.zepben.ewb.services.common.extensions.safeRemove
-import com.zepben.ewb.services.common.extensions.validateReference
 
 /**
  * A collection of equipment for purposes other than generation or utilization, through which electric energy in bulk
@@ -32,214 +29,206 @@ class Substation(mRID: String) : EquipmentContainer(mRID) {
     /**
      * The normal energized feeders of the substation. Also used for naming purposes. The returned collection is read only.
      */
-    val feeders: Collection<Feeder> get() = _normalEnergizedFeeders.asUnmodifiable()
+    val feeders: LazyMridList<Feeder> get() = LazyMridList(
+        getter = { _normalEnergizedFeeders },
+        setter = { _normalEnergizedFeeders = it },
+        owner = { this },
+        elementDescription = "A Feeder",
+        validate = { validateFeeder(it) }
+    )
 
-    /**
-     * <no description from CIM>
-     * The returned collection is read only.
-     */
-    val loops: List<Loop> get() = _loops.asUnmodifiable()
-
-    /**
-     * <no description from CIM>
-     * The returned collection is read only.
-     */
-    val energizedLoops: List<Loop> get() = _energizedLoops.asUnmodifiable()
-
-    /**
-     * Simplification of the CIM association via Bay to [Circuit].
-     * The returned collection is read only.
-     */
-    val circuits: List<Circuit> get() = _circuits.asUnmodifiable()
-
-    /**
-     * Get the number of entries in the [Feeder] collection.
-     */
-    fun numFeeders(): Int = _normalEnergizedFeeders?.size ?: 0
-
-    /**
-     * The normal energized feeders of the substation. Also used for naming purposes.
-     *
-     * @param mRID the mRID of the required [Feeder]
-     * @return The [Feeder] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getFeeder(mRID: String): Feeder? = _normalEnergizedFeeders.getByMRID(mRID)
-
-    /**
-     * @param feeder the [Feeder] to associate with this [Substation].
-     * @return A reference to this [Substation] to allow fluent use.
-     */
-    fun addFeeder(feeder: Feeder): Substation {
-        if (validateReference(feeder, ::getFeeder, "A Feeder"))
-            return this
-
+    private fun validateFeeder(feeder: Feeder) {
         if (feeder.normalEnergizingSubstation == null)
             feeder.normalEnergizingSubstation = this
 
         require(feeder.normalEnergizingSubstation === this) {
             "${feeder.typeNameAndMRID()} `normalEnergizingSubstation` property references ${feeder.normalEnergizingSubstation!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
         }
-
-        _normalEnergizedFeeders = _normalEnergizedFeeders ?: mutableListOf()
-        _normalEnergizedFeeders!!.add(feeder)
-
-        return this
     }
 
     /**
-     * @param feeder the [Feeder] to disassociate with this [Substation].
-     * @return true if the feeder is disassociated.
+     * <no description from CIM>
+     * The returned collection is read only.
      */
-    fun removeFeeder(feeder: Feeder): Boolean {
-        val ret = _normalEnergizedFeeders.safeRemove(feeder)
-        if (_normalEnergizedFeeders.isNullOrEmpty()) _normalEnergizedFeeders = null
-        return ret
-    }
+    val loops: LazyMridList<Loop> get() = LazyMridList(
+        getter = { _loops },
+        setter = { _loops = it },
+        owner = { this },
+        elementDescription = "A Loop"
+    )
 
     /**
-     * Clear this [Substation]'s [Feeder]'s
-     * @return this [Substation]
+     * <no description from CIM>
+     * The returned collection is read only.
      */
+    val energizedLoops: LazyMridList<Loop> get() = LazyMridList(
+        getter = { _energizedLoops },
+        setter = { _energizedLoops = it },
+        owner = { this },
+        elementDescription = "A Loop"
+    )
+
+    /**
+     * Simplification of the CIM association via Bay to [Circuit].
+     * The returned collection is read only.
+     */
+    val circuits: LazyMridList<Circuit> get() = LazyMridList(
+        getter = { _circuits },
+        setter = { _circuits = it },
+        owner = { this },
+        elementDescription = "A Circuit"
+    )
+
+    // region deprecated list boilerplate
+    //
+    // ("region/endregion" is an IntelliJ feature letting you hide the entire thing)
+    // This boilerplate exists solely to enable backwards compatibility.
+    // It will be removed eventually.
+    // Every single method simply forwards the call to the corresponding list.
+
+    @Deprecated(
+        message = "Use feeders.size instead.",
+        replaceWith = ReplaceWith("feeders.size")
+    )
+    fun numFeeders(): Int = feeders.size
+
+    @Deprecated(
+        message = "Use feeders.getByMRID(mRID) instead.",
+        replaceWith = ReplaceWith("feeders.getByMRID(mRID)")
+    )
+    fun getFeeder(mRID: String): Feeder? = feeders.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use feeders.remove(feeder) instead.",
+        replaceWith = ReplaceWith("feeders.remove(feeder)")
+    )
+    fun removeFeeder(feeder: Feeder): Boolean = feeders.remove(feeder)
+
+    @Deprecated(
+        message = "Use feeders.clear() instead.",
+        replaceWith = ReplaceWith("feeders.clear()")
+    )
     fun clearFeeders(): Substation {
-        _normalEnergizedFeeders = null
+        feeders.clear()
         return this
     }
 
-    /**
-     * Get the number of entries in the [loops] collection.
-     */
-    fun numLoops(): Int = _loops?.size ?: 0
+    @Deprecated(
+        message = "Use loops.size instead.",
+        replaceWith = ReplaceWith("loops.size")
+    )
+    fun numLoops(): Int = loops.size
 
-    /**
-     * Retrieve a [Loop] from the [loops] collection.
-     *
-     * @param mRID the mRID of the required [Loop]
-     * @return The [Loop] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getLoop(mRID: String): Loop? = _loops.getByMRID(mRID)
+    @Deprecated(
+        message = "Use loops.getByMRID(mRID) instead.",
+        replaceWith = ReplaceWith("loops.getByMRID(mRID)")
+    )
+    fun getLoop(mRID: String): Loop? = loops.getByMrid(mRID)
 
-    /**
-     * @param loop the [Loop] to associate with this [Substation].
-     * @return A reference to this [Substation] to allow fluent use.
-     */
-    fun addLoop(loop: Loop): Substation {
-        if (validateReference(loop, ::getLoop, "A Loop"))
-            return this
+    @Deprecated(
+        message = "Use loops.remove(loop) instead.",
+        replaceWith = ReplaceWith("loops.remove(loop)")
+    )
+    fun removeLoop(loop: Loop): Boolean = loops.remove(loop)
 
-        _loops = _loops ?: mutableListOf()
-        _loops!!.add(loop)
-
-        return this
-    }
-
-    /**
-     * @param loop the [Loop] to disassociate with this [Substation].
-     * @return `true` if [loop] has been successfully removed; `false` if it was not present.
-     */
-    fun removeLoop(loop: Loop): Boolean {
-        val ret = _loops?.remove(loop) == true
-        if (_loops.isNullOrEmpty()) _loops = null
-        return ret
-    }
-
-    /**
-     * Clear this [Substation]'s associated [loops].
-     * @return this [Substation]
-     */
+    @Deprecated(
+        message = "Use loops.clear() instead.",
+        replaceWith = ReplaceWith("loops.clear()")
+    )
     fun clearLoops(): Substation {
-        _loops = null
+        loops.clear()
         return this
     }
 
-    /**
-     * Get the number of entries in the [energizedLoops] collection.
-     */
-    fun numEnergizedLoops(): Int = _energizedLoops?.size ?: 0
+    @Deprecated(
+        message = "Use energizedLoops.size instead.",
+        replaceWith = ReplaceWith("energizedLoops.size")
+    )
+    fun numEnergizedLoops(): Int = energizedLoops.size
 
-    /**
-     * Retrieve a [Loop] from the [energizedLoops] collection.
-     *
-     * @param mRID the mRID of the required [Loop]
-     * @return The [Loop] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getEnergizedLoop(mRID: String): Loop? = _energizedLoops.getByMRID(mRID)
+    @Deprecated(
+        message = "Use energizedLoops.getByMRID(mRID) instead.",
+        replaceWith = ReplaceWith("energizedLoops.getByMRID(mRID)")
+    )
+    fun getEnergizedLoop(mRID: String): Loop? = energizedLoops.getByMrid(mRID)
 
-    /**
-     * @param loop the [Loop] to associate with this [Substation].
-     * @return A reference to this [Substation] to allow fluent use.
-     */
-    fun addEnergizedLoop(loop: Loop): Substation {
-        if (validateReference(loop, ::getEnergizedLoop, "A Loop"))
-            return this
+    @Deprecated(
+        message = "Use energizedLoops.remove(loop) instead.",
+        replaceWith = ReplaceWith("energizedLoops.remove(loop)")
+    )
+    fun removeEnergizedLoop(loop: Loop): Boolean = energizedLoops.remove(loop)
 
-        _energizedLoops = _energizedLoops ?: mutableListOf()
-        _energizedLoops!!.add(loop)
-
-        return this
-    }
-
-    /**
-     * @param loop the [Loop] to disassociate with this [Substation].
-     * @return `true` if [loop] has been successfully removed; `false` if it was not present.
-     */
-    fun removeEnergizedLoop(loop: Loop): Boolean {
-        val ret = _energizedLoops?.remove(loop) == true
-        if (_energizedLoops.isNullOrEmpty()) _energizedLoops = null
-        return ret
-    }
-
-    /**
-     * Clear this [Substation]'s associated [energizedLoops].
-     * @return this [Substation]
-     */
+    @Deprecated(
+        message = "Use energizedLoops.clear() instead.",
+        replaceWith = ReplaceWith("energizedLoops.clear()")
+    )
     fun clearEnergizedLoops(): Substation {
-        _energizedLoops = null
+        energizedLoops.clear()
         return this
     }
 
-    /**
-     * Get the number of entries in the [circuits] collection.
-     */
-    fun numCircuits(): Int = _circuits?.size ?: 0
+    @Deprecated(
+        message = "Use circuits.size instead.",
+        replaceWith = ReplaceWith("circuits.size")
+    )
+    fun numCircuits(): Int = circuits.size
 
-    /**
-     * Retrieve a [Circuit] from the [circuits] collection.
-     *
-     * @param mRID the mRID of the required [Circuit]
-     * @return The [Circuit] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getCircuit(mRID: String): Circuit? = _circuits.getByMRID(mRID)
+    @Deprecated(
+        message = "Use circuits.getByMRID(mRID) instead.",
+        replaceWith = ReplaceWith("circuits.getByMRID(mRID)")
+    )
+    fun getCircuit(mRID: String): Circuit? = circuits.getByMrid(mRID)
 
-    /**
-     * @param circuit the [Circuit] to associate with this [Substation].
-     * @return A reference to this [Substation] to allow fluent use.
-     */
-    fun addCircuit(circuit: Circuit): Substation {
-        if (validateReference(circuit, ::getCircuit, "A Circuit"))
-            return this
+    @Deprecated(
+        message = "Use circuits.remove(circuit) instead.",
+        replaceWith = ReplaceWith("circuits.remove(circuit)")
+    )
+    fun removeCircuit(circuit: Circuit): Boolean = circuits.remove(circuit)
 
-        _circuits = _circuits ?: mutableListOf()
-        _circuits!!.add(circuit)
-
-        return this
-    }
-
-    /**
-     * @param circuit the [Circuit] to disassociate with this [Substation].
-     * @return `true` if [circuit] has been successfully removed; `false` if it was not present.
-     */
-    fun removeCircuit(circuit: Circuit): Boolean {
-        val ret = _circuits?.remove(circuit) == true
-        if (_circuits.isNullOrEmpty()) _circuits = null
-        return ret
-    }
-
-    /**
-     * Clear this [Substation]'s associated [circuits].
-     * @return this [Substation]
-     */
+    @Deprecated(
+        message = "Use circuits.clear() instead.",
+        replaceWith = ReplaceWith("circuits.clear()")
+    )
     fun clearCircuits(): Substation {
-        _circuits = null
+        circuits.clear()
         return this
     }
+
+    @Deprecated(
+        message = "Use feeders.add(feeder) instead.",
+        replaceWith = ReplaceWith("also { it.feeders.add(feeder) }")
+    )
+    fun addFeeder(feeder: Feeder): Substation {
+        feeders.add(feeder)
+        return this
+    }
+
+    @Deprecated(
+        message = "Use loops.add(loop) instead.",
+        replaceWith = ReplaceWith("also { it.loops.add(loop) }")
+    )
+    fun addLoop(loop: Loop): Substation {
+        loops.add(loop)
+        return this
+    }
+
+    @Deprecated(
+        message = "Use energizedLoops.add(loop) instead.",
+        replaceWith = ReplaceWith("also { it.energizedLoops.add(loop) }")
+    )
+    fun addEnergizedLoop(loop: Loop): Substation {
+        energizedLoops.add(loop)
+        return this
+    }
+
+    @Deprecated(
+        message = "Use circuits.add(circuit) instead.",
+        replaceWith = ReplaceWith("also { it.circuits.add(circuit) }")
+    )
+    fun addCircuit(circuit: Circuit): Substation {
+        circuits.add(circuit)
+        return this
+    }
+
+    // endregion
 }

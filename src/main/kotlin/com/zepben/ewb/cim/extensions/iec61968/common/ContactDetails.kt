@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.cim.extensions.iec61968.common
 
+import com.zepben.ewb.boilerplate.LazyValidatedList
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.iec61968.common.ElectronicAddress
 import com.zepben.ewb.cim.iec61968.common.StreetAddress
@@ -68,9 +69,15 @@ class ContactDetails(
     @ZBEX
     private var _electronicAddresses: MutableList<ElectronicAddress>? = null
 
-    val phoneNumbers: Collection<TelephoneNumber> get() = _phoneNumbers.asUnmodifiable()
+    val phoneNumbers: MutableCollection<TelephoneNumber> get() = LazyValidatedList(
+        getter = { _phoneNumbers },
+        setter = { _phoneNumbers = it },
+    )
 
-    val electronicAddresses: Collection<ElectronicAddress> get() = _electronicAddresses.asUnmodifiable()
+    val electronicAddresses: MutableCollection<ElectronicAddress> get() = LazyValidatedList(
+        getter = { _electronicAddresses },
+        setter = { _electronicAddresses = it },
+    )
 
     override fun equals(other: Any?): Boolean {
         //
@@ -111,6 +118,82 @@ class ContactDetails(
     }
 
 
+    // region deprecated list boilerplate
+    //
+    // ("region/endregion" is an IntelliJ feature letting you hide the entire thing)
+    // This boilerplate exists solely to enable backwards compatibility.
+    // It will be removed eventually.
+    // Every single method simply forwards the call to the corresponding list.
+
+    // region phoneNumbers boilerplate
+
+    @Deprecated(
+        message = "Use phoneNumbers.size instead.",
+        replaceWith = ReplaceWith("phoneNumbers.size")
+    )
+    fun numPhoneNumbers(): Int = phoneNumbers.size
+
+    @Deprecated(
+        message = "Use phoneNumbers.remove(phoneNumber) instead.",
+        replaceWith = ReplaceWith("phoneNumbers.remove(phoneNumber)")
+    )
+    fun removePhoneNumber(phoneNumber: TelephoneNumber): Boolean = phoneNumbers.remove(phoneNumber)
+
+    @Deprecated(
+        message = "Use phoneNumbers.clear() instead.",
+        replaceWith = ReplaceWith("phoneNumbers.clear()")
+    )
+    fun clearPhoneNumbers(): ContactDetails {
+        phoneNumbers.clear()
+        return this
+    }
+
+    @Deprecated(
+        message = "Use phoneNumbers.add(phoneNumber) instead.",
+        replaceWith = ReplaceWith("also { it.phoneNumbers.add(phoneNumber) }")
+    )
+    fun addPhoneNumber(phoneNumber: TelephoneNumber): ContactDetails {
+        phoneNumbers.add(phoneNumber)
+        return this
+    }
+
+    // endregion
+
+    // region electronicAddresses boilerplate
+
+    @Deprecated(
+        message = "Use electronicAddresses.size instead.",
+        replaceWith = ReplaceWith("electronicAddresses.size")
+    )
+    fun numElectronicAddresses(): Int = electronicAddresses.size
+
+    @Deprecated(
+        message = "Use electronicAddresses.remove(electronicAddress) instead.",
+        replaceWith = ReplaceWith("electronicAddresses.remove(electronicAddress)")
+    )
+    fun removeElectronicAddress(electronicAddress: ElectronicAddress): Boolean = electronicAddresses.remove(electronicAddress)
+
+    @Deprecated(
+        message = "Use electronicAddresses.clear() instead.",
+        replaceWith = ReplaceWith("electronicAddresses.clear()")
+    )
+    fun clearElectronicAddresses(): ContactDetails {
+        electronicAddresses.clear()
+        return this
+    }
+
+    @Deprecated(
+        message = "Use electronicAddresses.add(electronicAddress) instead.",
+        replaceWith = ReplaceWith("also { it.electronicAddresses.add(electronicAddress) }")
+    )
+    fun addElectronicAddress(electronicAddress: ElectronicAddress): ContactDetails {
+        electronicAddresses.add(electronicAddress)
+        return this
+    }
+
+    // endregion
+
+    // endregion
     override fun typeNameAndMRID(): String = "${javaClass.simpleName} $mRID"
 
     override fun nameAndMRID(): String = mRID

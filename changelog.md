@@ -2,6 +2,7 @@
 ## [1.13.0] - UNRELEASED
 ### Breaking Changes
 * Deprecated `NetworkServiceComparatorOptions.Builder`. This will be removed in a future release.
+* `ContactDetails` now require an mRID on creation - they do not generate a defaul ID 
 
 ### New Features
 * Adds `compareRunTime` to `NetworkServiceComparatorOptions` to allow the users to ignore variables/references that are only populated during EWB spin up.
@@ -14,7 +15,7 @@
 * None.
 
 ### Notes
-* None.
+* `ContactDetails` are now Identifiable and use `mRID` instead of `id`. `id` is deprecated and gets the `mRID` instead.
 
 ## [1.12.0] - 2026-05-21
 ### Breaking Changes

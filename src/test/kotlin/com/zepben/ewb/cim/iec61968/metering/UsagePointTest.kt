@@ -87,15 +87,13 @@ internal class UsagePointTest {
     internal fun contacts() {
         PrivateCollectionValidator.validateUnordered(
             ::UsagePoint,
-            { id -> ContactDetails(id = "$id") },
+            { id -> ContactDetails(id) },
             UsagePoint::contacts,
             UsagePoint::numContacts,
             UsagePoint::getContact,
             UsagePoint::addContact,
             UsagePoint::removeContact,
             UsagePoint::clearContacts,
-            ContactDetails::id,
-            PrivateCollectionValidator.DuplicateBehaviour.IGNORED,
         )
     }
 

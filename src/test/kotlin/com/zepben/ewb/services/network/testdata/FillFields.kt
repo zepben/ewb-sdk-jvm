@@ -719,7 +719,7 @@ fun UsagePoint.fillFields(service: NetworkService, includeRuntime: Boolean = tru
             service.add(it)
         })
 
-        addContact(ContactDetails().fillFields())
+        addContact(ContactDetails(generateId()).fillFields())
     }
 
     return this

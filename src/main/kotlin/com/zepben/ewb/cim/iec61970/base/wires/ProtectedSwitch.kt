@@ -25,7 +25,7 @@ abstract class ProtectedSwitch(mRID: String) : Switch(mRID) {
     val relayFunctions: LazyMridList<ProtectionRelayFunction> get() = LazyMridList(
         getter = { _relayFunctions },
         setter = { _relayFunctions = it },
-        owner = { this },
+        owner = this,
         elementDescription = "A ProtectionRelayFunction"
     )
 

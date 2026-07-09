@@ -23,7 +23,7 @@ class GeographicalRegion(mRID: String) : IdentifiedObject(mRID) {
     val subGeographicalRegions: LazyMridList<SubGeographicalRegion> get() = LazyMridList(
         getter = { _subGeographicalRegions },
         setter = { _subGeographicalRegions = it },
-        owner = { this },
+        owner = this,
         elementDescription = "A SubGeographicalRegion",
         validate = { validateSubGeographicalRegion(it) }
     )

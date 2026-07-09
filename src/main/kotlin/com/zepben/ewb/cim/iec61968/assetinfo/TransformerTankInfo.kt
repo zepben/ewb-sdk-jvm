@@ -29,7 +29,7 @@ class TransformerTankInfo(mRID: String) : AssetInfo(mRID) {
     val transformerEndInfos: LazyMridList<TransformerEndInfo> get() = LazyMridList(
         getter = { _transformerEndInfos },
         setter = { _transformerEndInfos = it },
-        owner = { this },
+        owner = this,
         elementDescription = "A TransformerEndInfo"
     )
 

@@ -25,7 +25,7 @@ class PowerTransformerInfo(mRID: String) : AssetInfo(mRID) {
     val transformerTankInfos: LazyMridList<TransformerTankInfo> get() = LazyMridList(
         getter = { _transformerTankInfos },
         setter = { _transformerTankInfos = it },
-        owner = { this },
+        owner = this,
         elementDescription = "A TransformerTankInfo"
     )
 

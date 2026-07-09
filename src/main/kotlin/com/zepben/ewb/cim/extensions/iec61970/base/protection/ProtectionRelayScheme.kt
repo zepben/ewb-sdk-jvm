@@ -33,7 +33,7 @@ class ProtectionRelayScheme(mRID: String) : IdentifiedObject(mRID) {
     val functions: LazyMridList<ProtectionRelayFunction> get() = LazyMridList(
         getter = { _functions },
         setter = { _functions = it },
-        owner = { this },
+        owner = this,
         elementDescription = "A ProtectionRelayFunction"
     )
 

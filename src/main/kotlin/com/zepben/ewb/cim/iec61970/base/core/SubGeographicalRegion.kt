@@ -25,7 +25,7 @@ class SubGeographicalRegion(mRID: String) : IdentifiedObject(mRID) {
     val substations: LazyMridList<Substation> get() = LazyMridList(
         getter = { _substations },
         setter = { _substations = it },
-        owner = { this },
+        owner = this,
         elementDescription = "A Substation",
         validate = { validateSubstation(it) }
     )

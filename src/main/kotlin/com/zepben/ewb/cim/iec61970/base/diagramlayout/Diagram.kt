@@ -30,7 +30,7 @@ class Diagram(mRID: String) : IdentifiedObject(mRID) {
     val diagramObjects: LazyMridMap<DiagramObject> get() = LazyMridMap(
         getter = { _diagramObjects },
         setter = { _diagramObjects = it },
-        owner = { this },
+        owner = this,
         elementDescription = "A DiagramObject",
         validate = ::validateDiagramObject
     )

@@ -40,7 +40,7 @@ class EnergyConsumer(mRID: String) : EnergyConnection(mRID) {
     val phases: LazyMridList<EnergyConsumerPhase> get() = LazyMridList(
         getter = { _energyConsumerPhases },
         setter = { _energyConsumerPhases = it },
-        owner = { this },
+        owner = this,
         elementDescription = "An EnergyConsumerPhase",
         validate = { validatePhase(it) }
     )

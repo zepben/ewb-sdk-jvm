@@ -34,7 +34,7 @@ class Loop(mRID: String) : IdentifiedObject(mRID) {
     val circuits: LazyMridList<Circuit> get() = LazyMridList(
         getter = { _circuits },
         setter = { _circuits = it },
-        owner = { this },
+        owner = this,
         elementDescription = "A Circuit",
     )
 
@@ -46,7 +46,7 @@ class Loop(mRID: String) : IdentifiedObject(mRID) {
     val substations: LazyMridList<Substation> get() = LazyMridList(
         getter = { _substations },
         setter = { _substations = it },
-        owner = { this },
+        owner = this,
         elementDescription = "A Substation",
     )
 
@@ -58,7 +58,7 @@ class Loop(mRID: String) : IdentifiedObject(mRID) {
     val energizingSubstations: LazyMridList<Substation> get() = LazyMridList(
         getter = { _energizingSubstations },
         setter = { _energizingSubstations = it },
-        owner = { this },
+        owner = this,
         elementDescription = "A Substation",
     )
 

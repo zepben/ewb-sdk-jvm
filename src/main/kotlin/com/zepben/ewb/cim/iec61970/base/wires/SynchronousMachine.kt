@@ -81,7 +81,7 @@ class SynchronousMachine(mRID: String) : RotatingMachine(mRID) {
     val curves: LazyMridList<ReactiveCapabilityCurve> get() = LazyMridList(
         getter = { _reactiveCapabilityCurves },
         setter = { _reactiveCapabilityCurves = it },
-        owner = { this },
+        owner = this,
         elementDescription = "A ReactiveCapabilityCurve"
     )
 

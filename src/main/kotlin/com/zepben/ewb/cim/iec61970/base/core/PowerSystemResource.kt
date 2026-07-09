@@ -41,7 +41,7 @@ abstract class PowerSystemResource(mRID: String) : IdentifiedObject(mRID) {
     val assets: LazyMridList<Asset> get() = LazyMridList(
         getter = { _assets },
         setter = { _assets = it },
-        owner = { this },
+        owner = this,
         elementDescription = "An Asset"
     )
 

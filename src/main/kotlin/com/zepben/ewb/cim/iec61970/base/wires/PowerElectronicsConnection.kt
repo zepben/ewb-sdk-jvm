@@ -208,7 +208,7 @@ class PowerElectronicsConnection(mRID: String) : RegulatingCondEq(mRID) {
     val units: LazyMridList<PowerElectronicsUnit> get() = LazyMridList(
         getter = { _powerElectronicsUnits },
         setter = { _powerElectronicsUnits = it },
-        owner = { this },
+        owner = this,
         elementDescription = "A PowerElectronicsUnit",
     )
 
@@ -218,7 +218,7 @@ class PowerElectronicsConnection(mRID: String) : RegulatingCondEq(mRID) {
     val phases: LazyMridList<PowerElectronicsConnectionPhase> get() = LazyMridList(
         getter = { _powerElectronicsConnectionPhases },
         setter = { _powerElectronicsConnectionPhases = it },
-        owner = { this },
+        owner = this,
         elementDescription = "A PowerElectronicsConnectionPhase",
         validate = { validatePhase(it) }
     )

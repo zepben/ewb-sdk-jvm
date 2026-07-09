@@ -261,7 +261,7 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
     val protectedSwitches: LazyMridList<ProtectedSwitch> get() = LazyMridList(
         getter = { _protectedSwitches },
         setter = { _protectedSwitches = it },
-        owner = { this },
+        owner = this,
         elementDescription = "A ProtectedSwitch"
     )
 
@@ -269,7 +269,7 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
     val sensors: LazyMridList<Sensor> get() = LazyMridList(
         getter = { _sensors },
         setter = { _sensors = it },
-        owner = { this },
+        owner = this,
         elementDescription = "A Sensor"
     )
 
@@ -277,7 +277,7 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
     val schemes: LazyMridList<ProtectionRelayScheme> get() = LazyMridList(
         getter = { _schemes },
         setter = { _schemes = it },
-        owner = { this },
+        owner = this,
         elementDescription = "A ProtectionRelayScheme"
     )
 

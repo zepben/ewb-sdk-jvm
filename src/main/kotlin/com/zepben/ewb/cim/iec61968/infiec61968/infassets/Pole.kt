@@ -29,7 +29,7 @@ class Pole(mRID: String) : Structure(mRID) {
     val streetlights: LazyMridList<Streetlight> get() = LazyMridList(
         getter = { _streetlights },
         setter = { _streetlights = it },
-        owner = { this },
+        owner = this,
         elementDescription = "A Streetlight",
     )
 

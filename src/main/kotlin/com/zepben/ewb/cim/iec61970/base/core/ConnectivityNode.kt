@@ -23,7 +23,7 @@ class ConnectivityNode(mRID: String) : IdentifiedObject(mRID) {
      */
     val terminals: MridList<Terminal> get() = MridList(
         _terminals,
-        owner = { this },
+        owner = this,
         elementDescription = "A Terminal"
     )
 

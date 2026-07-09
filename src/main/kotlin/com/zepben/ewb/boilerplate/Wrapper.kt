@@ -87,7 +87,7 @@ open class LazyValidatedList<T>(
 
 
 interface MridCollection<T : Identifiable> : MutableCollection<T> {
-    val owner: () -> Identifiable
+    val owner: Identifiable
     val elementDescription: String
 
     fun getByMrid(mRID: String): T?
@@ -96,7 +96,7 @@ interface MridCollection<T : Identifiable> : MutableCollection<T> {
         val existing = getByMrid(element.mRID) ?: return true
 
         require(existing === element) {
-            "$elementDescription with mRID ${element.mRID} already exists in ${owner().typeNameAndMRID()}."
+            "$elementDescription with mRID ${element.mRID} already exists in ${owner.typeNameAndMRID()}."
         }
 
         return false
@@ -109,7 +109,7 @@ interface MridCollection<T : Identifiable> : MutableCollection<T> {
 class LazyMridList<T : Identifiable>(
     private val getter: () -> MutableList<T>?,
     setter: (MutableList<T>?) -> Unit,
-    override val owner: () -> Identifiable,
+    override val owner: Identifiable,
     override val elementDescription: String,
     validate: ((T) -> Unit)? = null,
     sortBy: ((T) -> Comparable<*>?)? = null
@@ -137,7 +137,7 @@ class LazyMridList<T : Identifiable>(
 
 class MridList<T : Identifiable>(
     private val list: MutableList<T> = mutableListOf(),
-    override val owner: () -> Identifiable,
+    override val owner: Identifiable,
     override val elementDescription: String,
     private val validate: ((T) -> Unit)? = null,
     private val sortBy: ((T) -> Comparable<*>?)? = null,
@@ -186,7 +186,7 @@ class MridList<T : Identifiable>(
 class LazyMridMap<T : Identifiable>(
     private val getter: () -> MutableMap<String, T>?,
     private val setter: (MutableMap<String, T>?) -> Unit,
-    override val owner: () -> Identifiable,
+    override val owner: Identifiable,
     override val elementDescription: String,
     private val validate: ((T) -> Unit)? = null
 ) : AbstractMutableCollection<T>(), MridCollection<T> {

@@ -32,7 +32,7 @@ class Substation(mRID: String) : EquipmentContainer(mRID) {
     val feeders: LazyMridList<Feeder> get() = LazyMridList(
         getter = { _normalEnergizedFeeders },
         setter = { _normalEnergizedFeeders = it },
-        owner = { this },
+        owner = this,
         elementDescription = "A Feeder",
         validate = { validateFeeder(it) }
     )
@@ -53,7 +53,7 @@ class Substation(mRID: String) : EquipmentContainer(mRID) {
     val loops: LazyMridList<Loop> get() = LazyMridList(
         getter = { _loops },
         setter = { _loops = it },
-        owner = { this },
+        owner = this,
         elementDescription = "A Loop"
     )
 
@@ -64,7 +64,7 @@ class Substation(mRID: String) : EquipmentContainer(mRID) {
     val energizedLoops: LazyMridList<Loop> get() = LazyMridList(
         getter = { _energizedLoops },
         setter = { _energizedLoops = it },
-        owner = { this },
+        owner = this,
         elementDescription = "A Loop"
     )
 
@@ -75,7 +75,7 @@ class Substation(mRID: String) : EquipmentContainer(mRID) {
     val circuits: LazyMridList<Circuit> get() = LazyMridList(
         getter = { _circuits },
         setter = { _circuits = it },
-        owner = { this },
+        owner = this,
         elementDescription = "A Circuit"
     )
 

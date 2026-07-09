@@ -33,7 +33,7 @@ class OperationalRestriction(mRID: String) : Document(mRID) {
     val equipment: LazyMridList<Equipment> get() = LazyMridList(
         getter = { _equipment },
         setter = { _equipment = it },
-        owner = { this },
+        owner = this,
         elementDescription = "An Equipment",
     )
 

@@ -29,7 +29,7 @@ class PricingStructure(mRID: String) : Document(mRID) {
     val tariffs: LazyMridList<Tariff> get() = LazyMridList(
         getter = { _tariffs },
         setter = { _tariffs = it },
-        owner = { this },
+        owner = this,
         elementDescription = "A Tariff"
     )
 

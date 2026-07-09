@@ -33,7 +33,7 @@ class Circuit(mRID: String) : Line(mRID) {
     val endTerminals: LazyMridList<Terminal> get() = LazyMridList(
         getter = { _endTerminals },
         setter = { _endTerminals = it },
-        owner = { this },
+        owner = this,
         elementDescription = "A Terminal"
     )
 
@@ -44,7 +44,7 @@ class Circuit(mRID: String) : Line(mRID) {
     val endSubstations: LazyMridList<Substation> get() = LazyMridList(
         getter = { _endSubstations },
         setter = { _endSubstations = it },
-        owner = { this },
+        owner = this,
         elementDescription = "A Substation"
     )
 

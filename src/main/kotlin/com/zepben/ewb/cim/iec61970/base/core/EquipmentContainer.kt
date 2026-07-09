@@ -27,7 +27,7 @@ abstract class EquipmentContainer(mRID: String) : ConnectivityNodeContainer(mRID
     val equipment: MridCollection<Equipment> get() = LazyMridMap(
         getter = { _equipmentById },
         setter = { _equipmentById = it },
-        owner = { this },
+        owner = this,
         elementDescription = "An Equipment"
     )
 

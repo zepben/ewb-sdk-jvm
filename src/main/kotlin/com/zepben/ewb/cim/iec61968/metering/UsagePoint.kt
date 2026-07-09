@@ -55,7 +55,7 @@ class UsagePoint(mRID: String) : IdentifiedObject(mRID) {
     val equipment: LazyMridList<Equipment> get() = LazyMridList(
         getter = { _equipment },
         setter = { _equipment = it },
-        owner = { this },
+        owner = this,
         elementDescription = "An Equipment"
     )
 
@@ -65,7 +65,7 @@ class UsagePoint(mRID: String) : IdentifiedObject(mRID) {
     val endDevices: LazyMridList<EndDevice> get() = LazyMridList(
         getter = { _endDevices },
         setter = { _endDevices = it },
-        owner = { this },
+        owner = this,
         elementDescription = "An EndDevice"
     )
 

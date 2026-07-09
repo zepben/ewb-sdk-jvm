@@ -32,7 +32,7 @@ internal class MridWrapperTest {
         val wrapper = LazyMridList<Clamp>(
             getter = { backing },
             setter = { backing = it },
-            owner = { Clamp("owner") },
+            owner = Clamp("owner"),
             elementDescription = "A Clamp"
         )
 
@@ -50,7 +50,7 @@ internal class MridWrapperTest {
         val wrapper = LazyMridList<Clamp>(
             getter = { backing },
             setter = { backing = it },
-            owner = { Clamp("owner") },
+            owner = Clamp("owner"),
             elementDescription = "A Clamp"
         )
 
@@ -71,7 +71,7 @@ internal class MridWrapperTest {
         val wrapper = LazyMridList<Clamp>(
             getter = { backing },
             setter = { backing = it },
-            owner = { Clamp("owner") },
+            owner = Clamp("owner"),
             elementDescription = "A Clamp"
         )
 
@@ -92,7 +92,7 @@ internal class MridWrapperTest {
         val wrapper = LazyMridList<Clamp>(
             getter = { backing },
             setter = { backing = it },
-            owner = { Clamp("owner") },
+            owner = Clamp("owner"),
             elementDescription = "A Clamp"
         )
 
@@ -118,7 +118,7 @@ internal class MridWrapperTest {
         val wrapper = LazyMridList<Clamp>(
             getter = { backing },
             setter = { backing = it },
-            owner = { Clamp("owner") },
+            owner = Clamp("owner"),
             elementDescription = "A Clamp",
             validate = {
                 if (it === rejected)
@@ -142,7 +142,7 @@ internal class MridWrapperTest {
         val wrapper = LazyMridList<Clamp>(
             getter = { backing },
             setter = { backing = it },
-            owner = { Clamp("owner") },
+            owner = Clamp("owner"),
             elementDescription = "A Clamp",
             sortBy = { it.mRID }
         )
@@ -167,7 +167,7 @@ internal class MridWrapperTest {
         val wrapper = LazyMridList<Clamp>(
             getter = { backing },
             setter = { backing = it },
-            owner = { Clamp("owner") },
+            owner = Clamp("owner"),
             elementDescription = "A Clamp"
         )
 
@@ -186,7 +186,7 @@ internal class MridWrapperTest {
         val wrapper = LazyMridList<Clamp>(
             getter = { backing },
             setter = { backing = it },
-            owner = { Clamp("owner") },
+            owner = Clamp("owner"),
             elementDescription = "A Clamp"
         )
 
@@ -206,7 +206,7 @@ internal class MridWrapperTest {
         val wrapper = LazyMridList<Clamp>(
             getter = { backing },
             setter = { backing = it },
-            owner = { Clamp("owner") },
+            owner = Clamp("owner"),
             elementDescription = "A Clamp"
         )
 
@@ -228,7 +228,7 @@ internal class MridWrapperTest {
         val wrapper = LazyMridList<Clamp>(
             getter = { backing },
             setter = { backing = it },
-            owner = { Clamp("owner") },
+            owner = Clamp("owner"),
             elementDescription = "A Clamp"
         )
 
@@ -245,7 +245,7 @@ internal class MridWrapperTest {
         val wrapper = LazyMridMap<Clamp>(
             getter = { backing },
             setter = { backing = it },
-            owner = { Clamp("owner") },
+            owner = Clamp("owner"),
             elementDescription = "A Clamp"
         )
 
@@ -263,7 +263,7 @@ internal class MridWrapperTest {
         val wrapper = LazyMridMap<Clamp>(
             getter = { backing },
             setter = { backing = it },
-            owner = { Clamp("owner") },
+            owner = Clamp("owner"),
             elementDescription = "A Clamp"
         )
 
@@ -284,7 +284,7 @@ internal class MridWrapperTest {
         val wrapper = LazyMridMap<Clamp>(
             getter = { backing },
             setter = { backing = it },
-            owner = { Clamp("owner") },
+            owner = Clamp("owner"),
             elementDescription = "A Clamp"
         )
 
@@ -304,7 +304,7 @@ internal class MridWrapperTest {
         val wrapper = LazyMridMap<Clamp>(
             getter = { backing },
             setter = { backing = it },
-            owner = { Clamp("owner") },
+            owner = Clamp("owner"),
             elementDescription = "A Clamp"
         )
 
@@ -330,7 +330,7 @@ internal class MridWrapperTest {
         val wrapper = LazyMridMap<Clamp>(
             getter = { backing },
             setter = { backing = it },
-            owner = { Clamp("owner") },
+            owner = Clamp("owner"),
             elementDescription = "A Clamp",
             validate = {
                 if (it === rejected)
@@ -355,7 +355,7 @@ internal class MridWrapperTest {
         val wrapper = LazyMridMap<Clamp>(
             getter = { backing },
             setter = { backing = it },
-            owner = { Clamp("owner") },
+            owner = Clamp("owner"),
             elementDescription = "A Clamp"
         )
 
@@ -373,7 +373,7 @@ internal class MridWrapperTest {
         val wrapper = LazyMridMap<Clamp>(
             getter = { backing },
             setter = { backing = it },
-            owner = { Clamp("owner") },
+            owner = Clamp("owner"),
             elementDescription = "A Clamp"
         )
 
@@ -395,7 +395,7 @@ internal class MridWrapperTest {
         val wrapper = LazyMridMap<Clamp>(
             getter = { backing },
             setter = { backing = it },
-            owner = { Clamp("owner") },
+            owner = Clamp("owner"),
             elementDescription = "A Clamp"
         )
 
@@ -408,7 +408,7 @@ internal class MridWrapperTest {
     @Test
     fun `not null list wrapper starts empty without external backing field`() {
         val wrapper = MridList<Clamp>(
-            owner = { Clamp("owner") },
+            owner = Clamp("owner"),
             elementDescription = "A Clamp"
         )
 
@@ -421,7 +421,7 @@ internal class MridWrapperTest {
     @Test
     fun `not null list wrapper add stores element in internal list`() {
         val wrapper = MridList<Clamp>(
-            owner = { Clamp("owner") },
+            owner = Clamp("owner"),
             elementDescription = "A Clamp"
         )
 
@@ -437,7 +437,7 @@ internal class MridWrapperTest {
     @Test
     fun `not null list wrapper adding same instance twice is ignored`() {
         val wrapper = MridList<Clamp>(
-            owner = { Clamp("owner") },
+            owner = Clamp("owner"),
             elementDescription = "A Clamp"
         )
 
@@ -454,7 +454,7 @@ internal class MridWrapperTest {
     @Test
     fun `not null list wrapper rejects mrid collision before mutating internal list`() {
         val wrapper = MridList<Clamp>(
-            owner = { Clamp("owner") },
+            owner = Clamp("owner"),
             elementDescription = "A Clamp"
         )
 
@@ -477,7 +477,7 @@ internal class MridWrapperTest {
         val rejected = Clamp("a")
 
         val wrapper = MridList<Clamp>(
-            owner = { Clamp("owner") },
+            owner = Clamp("owner"),
             elementDescription = "A Clamp",
             validate = {
                 if (it === rejected)
@@ -497,7 +497,7 @@ internal class MridWrapperTest {
     @Test
     fun `not null list wrapper sorts after successful addition`() {
         val wrapper = MridList<Clamp>(
-            owner = { Clamp("owner") },
+            owner = Clamp("owner"),
             elementDescription = "A Clamp",
             sortBy = { it.mRID }
         )
@@ -516,7 +516,7 @@ internal class MridWrapperTest {
     @Test
     fun `not null list wrapper remove mutates internal list`() {
         val wrapper = MridList<Clamp>(
-            owner = { Clamp("owner") },
+            owner = Clamp("owner"),
             elementDescription = "A Clamp"
         )
 
@@ -537,7 +537,7 @@ internal class MridWrapperTest {
     @Test
     fun `not null list wrapper clear mutates internal list`() {
         val wrapper = MridList<Clamp>(
-            owner = { Clamp("owner") },
+            owner = Clamp("owner"),
             elementDescription = "A Clamp"
         )
 

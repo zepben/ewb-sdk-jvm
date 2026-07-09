@@ -34,7 +34,7 @@ class BatteryUnit(mRID: String) : PowerElectronicsUnit(mRID) {
     val controls: LazyMridList<BatteryControl> get() = LazyMridList(
         getter = { _batteryControls },
         setter = { _batteryControls = it },
-        owner = { this },
+        owner = this,
         elementDescription = "A BatteryControl"
     )
 

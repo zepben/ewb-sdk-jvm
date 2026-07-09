@@ -35,7 +35,7 @@ abstract class Asset(mRID: String) : IdentifiedObject(mRID) {
     val organisationRoles: LazyMridList<AssetOrganisationRole> get() = LazyMridList(
         getter = { _organisationRoles },
         setter = { _organisationRoles = it },
-        owner = { this },
+        owner = this,
         elementDescription = "An AssetOrganisationRole"
     )
 
@@ -46,7 +46,7 @@ abstract class Asset(mRID: String) : IdentifiedObject(mRID) {
     val powerSystemResources: LazyMridList<PowerSystemResource> get() = LazyMridList(
         getter = { _powerSystemResources },
         setter = { _powerSystemResources = it },
-        owner = { this },
+        owner = this,
         elementDescription = "A PowerSystemResource"
     )
 

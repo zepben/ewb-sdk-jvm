@@ -34,7 +34,7 @@ class CustomerAgreement(mRID: String) : Agreement(mRID) {
     val pricingStructures: LazyMridList<PricingStructure> get() = LazyMridList(
         getter = { _pricingStructures },
         setter = { _pricingStructures = it },
-        owner = { this },
+        owner = this,
         elementDescription = "A PricingStructure"
     )
 

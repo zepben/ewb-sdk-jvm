@@ -51,7 +51,7 @@ class LvFeeder(mRID: String) : EquipmentContainer(mRID) {
     val normalEnergizingFeeders: LazyMridMap<Feeder> get() = LazyMridMap(
         getter = { _normalEnergizingFeedersById },
         setter = { _normalEnergizingFeedersById = it },
-        owner = { this },
+        owner = this,
         elementDescription = "A Feeder"
     )
 
@@ -62,7 +62,7 @@ class LvFeeder(mRID: String) : EquipmentContainer(mRID) {
     val currentEnergizingFeeders: LazyMridMap<Feeder> get() = LazyMridMap(
         getter = { _currentEnergizingFeedersById },
         setter = { _currentEnergizingFeedersById = it },
-        owner = { this },
+        owner = this,
         elementDescription = "A Feeder"
     )
 
@@ -72,7 +72,7 @@ class LvFeeder(mRID: String) : EquipmentContainer(mRID) {
     override val currentEquipment: LazyMridMap<Equipment> get() = LazyMridMap(
         getter = { _currentEquipmentById },
         setter = { _currentEquipmentById = it },
-        owner = { this },
+        owner = this,
         elementDescription = "A current Equipment",
     )
 

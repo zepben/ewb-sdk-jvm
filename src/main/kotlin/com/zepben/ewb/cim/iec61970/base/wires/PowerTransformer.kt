@@ -88,7 +88,7 @@ class PowerTransformer(mRID: String) : ConductingEquipment(mRID) {
     val ends: LazyMridList<PowerTransformerEnd> get() = LazyMridList(
         getter = { _powerTransformerEnds },
         setter = {_powerTransformerEnds = it },
-        owner = { this },
+        owner = this,
         elementDescription = "A PowerTransformerEnd",
         validate = { validateEnd(it) },
         sortBy = { it.endNumber }

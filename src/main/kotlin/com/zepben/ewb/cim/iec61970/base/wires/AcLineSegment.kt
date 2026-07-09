@@ -53,7 +53,7 @@ class AcLineSegment(mRID: String) : Conductor(mRID) {
     val cuts: LazyMridList<Cut> get() = LazyMridList(
         getter = { _cuts },
         setter = { _cuts = it },
-        owner = { this },
+        owner = this,
         elementDescription = "A Cut",
         validate = { validateCut(it) }
     )
@@ -70,7 +70,7 @@ class AcLineSegment(mRID: String) : Conductor(mRID) {
     val clamps: LazyMridList<Clamp> get() = LazyMridList(
         getter = { _clamps },
         setter = { _clamps = it },
-        owner = { this },
+        owner = this,
         elementDescription = "A Clamp",
         validate = { validateClamp(it) }
     )
@@ -91,7 +91,7 @@ class AcLineSegment(mRID: String) : Conductor(mRID) {
     val phases: LazyMridList<AcLineSegmentPhase> get() = LazyMridList(
         getter = { _phases },
         setter = { _phases = it },
-        owner = { this },
+        owner = this,
         elementDescription = "An AcLineSegmentPhase",
         validate = { validatePhase(it) },
         sortBy = { it.sequenceNumber }

@@ -88,7 +88,7 @@ abstract class RegulatingControl(mRID: String) : PowerSystemResource(mRID) {
     val regulatingCondEqs: LazyMridList<RegulatingCondEq> get() = LazyMridList(
         getter = { _regulatingCondEqs },
         setter = { _regulatingCondEqs = it },
-        owner = { this },
+        owner = this,
         elementDescription = "A RegulatingCondEq"
     )
 

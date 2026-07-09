@@ -53,7 +53,7 @@ abstract class Equipment(mRID: String) : PowerSystemResource(mRID) {
     val containers: MridCollection<EquipmentContainer> get() = LazyMridList(
         getter = { _equipmentContainers },
         setter = { _equipmentContainers = it },
-        owner = { this },
+        owner = this,
         elementDescription = "An EquipmentContainer"
     )
 
@@ -63,7 +63,7 @@ abstract class Equipment(mRID: String) : PowerSystemResource(mRID) {
     val currentContainers: MridCollection<EquipmentContainer> get() = LazyMridList(
         getter = { _currentContainers },
         setter = { _currentContainers = it },
-        owner = { this },
+        owner = this,
         elementDescription = "An EquipmentContainer"
     )
 
@@ -73,7 +73,7 @@ abstract class Equipment(mRID: String) : PowerSystemResource(mRID) {
     val usagePoints: MridCollection<UsagePoint> get() = LazyMridList(
         getter = { _usagePoints },
         setter = { _usagePoints = it },
-        owner = { this },
+        owner = this,
         elementDescription = "A UsagePoint"
     )
 
@@ -83,7 +83,7 @@ abstract class Equipment(mRID: String) : PowerSystemResource(mRID) {
     val operationalRestrictions: MridCollection<OperationalRestriction> get() = LazyMridList(
         getter = { _operationalRestrictions },
         setter = { _operationalRestrictions = it },
-        owner = { this },
+        owner = this,
         elementDescription = "An OperationalRestriction"
     )
 

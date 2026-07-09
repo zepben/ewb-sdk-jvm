@@ -39,14 +39,14 @@ abstract class EndDevice(mRID: String) : AssetContainer(mRID) {
     val usagePoints: LazyMridList<UsagePoint> get() = LazyMridList(
         getter = { _usagePoints },
         setter = { _usagePoints = it },
-        owner = { this },
+        owner = this,
         elementDescription = "A UsagePoint"
     )
 
     val functions: LazyMridList<EndDeviceFunction> get() = LazyMridList(
         getter = { _functions },
         setter = { _functions = it },
-        owner = { this },
+        owner = this,
         elementDescription = "An EndDeviceFunction"
     )
 

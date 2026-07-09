@@ -39,7 +39,7 @@ internal class EquipmentContainerStateOperatorsTest {
             val equipment2 = mockk<Equipment>()
             val equipment = MridList(
                 mutableListOf(equipment1, equipment2),
-                { object : EquipmentContainer("Test") {} },
+                object : EquipmentContainer("Test") {},
                 "Test Equipment")
             val container = mockk<EquipmentContainer>()
             every { equipmentProp.get(container) } returns equipment
@@ -61,7 +61,7 @@ internal class EquipmentContainerStateOperatorsTest {
             val container2 = mockk<EquipmentContainer>()
             val containers = MridList(
                 mutableListOf(container1, container2),
-                { object : Equipment("Test") {} },
+                object : Equipment("Test") {},
                 "Test EquipmentContainer"
                 )
             val equipment = mockk<Equipment>()

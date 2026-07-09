@@ -37,7 +37,7 @@ class Customer(mRID: String) : OrganisationRole(mRID) {
     val agreements: LazyMridList<CustomerAgreement> get() = LazyMridList(
         getter = { _customerAgreements },
         setter = { _customerAgreements = it },
-        owner = { this },
+        owner = this,
         elementDescription = "A CustomerAgreement"
     )
 

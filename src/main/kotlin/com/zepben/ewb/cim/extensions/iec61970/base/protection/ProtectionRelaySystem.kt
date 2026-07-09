@@ -33,7 +33,7 @@ class ProtectionRelaySystem(mRID: String) : Equipment(mRID) {
     val schemes: LazyMridList<ProtectionRelayScheme> get() = LazyMridList(
         getter = { _schemes },
         setter = { _schemes = it },
-        owner = { this },
+        owner = this,
         elementDescription = "A ProtectionRelayScheme"
     )
 

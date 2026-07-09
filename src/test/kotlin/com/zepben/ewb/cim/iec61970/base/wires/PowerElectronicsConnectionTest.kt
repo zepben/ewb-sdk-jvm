@@ -213,26 +213,6 @@ internal class PowerElectronicsConnectionTest {
     }
 
     @Test
-    internal fun assignsPowerElectronicsConnectionToPowerElectronicsConnectionPhaseIfMissing() {
-        val powerElectronicsConnection = PowerElectronicsConnection(generateId())
-        val phase = PowerElectronicsConnectionPhase(generateId())
-
-        powerElectronicsConnection.addPhase(phase)
-        assertThat(phase.powerElectronicsConnection, equalTo(powerElectronicsConnection))
-    }
-
-    @Test
-    internal fun rejectsPowerElectronicsConnectionPhaseWithWrongPowerElectronicsConnection() {
-        val powerElectronicsConnection1 = PowerElectronicsConnection(generateId())
-        val powerElectronicsConnection2 = PowerElectronicsConnection(generateId())
-        val phase = PowerElectronicsConnectionPhase(generateId()).apply { powerElectronicsConnection = powerElectronicsConnection2 }
-
-        expect { powerElectronicsConnection1.addPhase(phase) }
-            .toThrow<IllegalArgumentException>()
-            .withMessage("${phase.typeNameAndMRID()} `powerElectronicsConnection` property references ${powerElectronicsConnection2.typeNameAndMRID()}, expected ${powerElectronicsConnection1.typeNameAndMRID()}.")
-    }
-
-    @Test
     internal fun powerElectronicsConnectionUnits() {
         PrivateCollectionValidator.validateUnordered(
             ::PowerElectronicsConnection,
@@ -257,6 +237,19 @@ internal class PowerElectronicsConnectionTest {
             PowerElectronicsConnection::addPhase,
             PowerElectronicsConnection::removePhase,
             PowerElectronicsConnection::clearPhases
+        )
+    }
+
+    @Test
+    internal fun powerElectronicsConnectionPhasesBackfill() {
+        PrivateCollectionValidator.validateBackfill(
+            ::PowerElectronicsConnection,
+            ::PowerElectronicsConnectionPhase,
+            "powerElectronicsConnection",
+            { it, other -> other.powerElectronicsConnection = it },
+            { other -> other.powerElectronicsConnection },
+            PowerElectronicsConnection::numPhases,
+            PowerElectronicsConnection::addPhase,
         )
     }
 

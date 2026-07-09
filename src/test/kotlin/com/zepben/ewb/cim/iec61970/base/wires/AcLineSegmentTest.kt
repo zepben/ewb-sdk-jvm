@@ -11,7 +11,6 @@ package com.zepben.ewb.cim.iec61970.base.wires
 import com.zepben.ewb.cim.iec61968.assetinfo.OverheadWireInfo
 import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.utils.PrivateCollectionValidator
-import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -75,6 +74,19 @@ internal class AcLineSegmentTest {
     }
 
     @Test
+    internal fun cutsBackfill() {
+        PrivateCollectionValidator.validateBackfill(
+            ::AcLineSegment,
+            ::Cut,
+            "acLineSegment",
+            { it, other -> other.acLineSegment = it },
+            { other -> other.acLineSegment },
+            AcLineSegment::numCuts,
+            AcLineSegment::addCut,
+        )
+    }
+
+    @Test
     internal fun clamps() {
         PrivateCollectionValidator.validateUnordered(
             { id -> AcLineSegment(id) },
@@ -85,6 +97,19 @@ internal class AcLineSegmentTest {
             AcLineSegment::addClamp,
             AcLineSegment::removeClamp,
             AcLineSegment::clearClamps,
+        )
+    }
+
+    @Test
+    internal fun clampsBackfill() {
+        PrivateCollectionValidator.validateBackfill(
+            ::AcLineSegment,
+            ::Clamp,
+            "acLineSegment",
+            { it, other -> other.acLineSegment = it },
+            { other -> other.acLineSegment },
+            AcLineSegment::numClamps,
+            AcLineSegment::addClamp,
         )
     }
 
@@ -106,26 +131,6 @@ internal class AcLineSegmentTest {
     }
 
     @Test
-    internal fun assignsAcLineSegmentToPhaseIfMissing() {
-        val acls = AcLineSegment(generateId())
-        val phase = AcLineSegmentPhase(generateId())
-
-        acls.addPhase(phase)
-        assertThat(phase.acLineSegment, equalTo(acls))
-    }
-
-    @Test
-    internal fun rejectsAcLineSegmentPhaseWithWrongAcLineSegment() {
-        val acls1 = AcLineSegment(generateId())
-        val acls2 = AcLineSegment(generateId())
-        val phase = AcLineSegmentPhase(generateId()).apply { acLineSegment = acls2 }
-
-        expect { acls1.addPhase(phase) }
-            .toThrow<IllegalArgumentException>()
-            .withMessage("${phase.typeNameAndMRID()} `acLineSegment` property references ${acls2.typeNameAndMRID()}, expected ${acls1.typeNameAndMRID()}.")
-    }
-
-    @Test
     internal fun acLineSegmentPhases() {
         PrivateCollectionValidator.validateUnordered(
             ::AcLineSegment,
@@ -136,6 +141,19 @@ internal class AcLineSegmentTest {
             AcLineSegment::addPhase,
             AcLineSegment::removePhase,
             AcLineSegment::clearPhases
+        )
+    }
+
+    @Test
+    internal fun acLineSegmentPhasesBackfill() {
+        PrivateCollectionValidator.validateBackfill(
+            ::AcLineSegment,
+            ::AcLineSegmentPhase,
+            "acLineSegment",
+            { it, other -> other.acLineSegment = it },
+            { other -> other.acLineSegment },
+            AcLineSegment::numPhases,
+            AcLineSegment::addPhase,
         )
     }
 

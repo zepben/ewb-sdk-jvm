@@ -63,9 +63,7 @@ internal class SubstationTest {
         PrivateCollectionValidator.validateBackfill(
             ::Substation,
             ::Feeder,
-            "normalEnergizingSubstation",
-            { it, other -> other.normalEnergizingSubstation = it },
-            { other -> other.normalEnergizingSubstation },
+            Feeder::normalEnergizingSubstation,
             Substation::numFeeders,
             Substation::addFeeder,
         )

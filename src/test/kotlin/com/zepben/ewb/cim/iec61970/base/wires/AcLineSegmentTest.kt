@@ -78,9 +78,7 @@ internal class AcLineSegmentTest {
         PrivateCollectionValidator.validateBackfill(
             ::AcLineSegment,
             ::Cut,
-            "acLineSegment",
-            { it, other -> other.acLineSegment = it },
-            { other -> other.acLineSegment },
+            Cut::acLineSegment,
             AcLineSegment::numCuts,
             AcLineSegment::addCut,
         )
@@ -105,9 +103,7 @@ internal class AcLineSegmentTest {
         PrivateCollectionValidator.validateBackfill(
             ::AcLineSegment,
             ::Clamp,
-            "acLineSegment",
-            { it, other -> other.acLineSegment = it },
-            { other -> other.acLineSegment },
+            Clamp::acLineSegment,
             AcLineSegment::numClamps,
             AcLineSegment::addClamp,
         )
@@ -149,9 +145,7 @@ internal class AcLineSegmentTest {
         PrivateCollectionValidator.validateBackfill(
             ::AcLineSegment,
             ::AcLineSegmentPhase,
-            "acLineSegment",
-            { it, other -> other.acLineSegment = it },
-            { other -> other.acLineSegment },
+            AcLineSegmentPhase::acLineSegment,
             AcLineSegment::numPhases,
             AcLineSegment::addPhase,
         )

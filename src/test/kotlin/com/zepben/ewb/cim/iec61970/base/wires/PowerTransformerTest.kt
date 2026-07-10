@@ -83,9 +83,7 @@ internal class PowerTransformerTest {
         PrivateCollectionValidator.validateBackfill(
             ::PowerTransformer,
             ::PowerTransformerEnd,
-            "powerTransformer",
-            { it, other -> other.powerTransformer = it },
-            { other -> other.powerTransformer },
+            PowerTransformerEnd::powerTransformer,
             PowerTransformer::numEnds,
             PowerTransformer::addEnd,
         )

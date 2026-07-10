@@ -78,9 +78,7 @@ internal class EnergyConsumerTest {
         PrivateCollectionValidator.validateBackfill(
             ::EnergyConsumer,
             ::EnergyConsumerPhase,
-            "energyConsumer",
-            { it, other -> other.energyConsumer = it },
-            { other -> other.energyConsumer },
+            EnergyConsumerPhase::energyConsumer,
             EnergyConsumer::numPhases,
             EnergyConsumer::addPhase,
         )

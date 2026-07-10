@@ -61,9 +61,7 @@ internal class SubGeographicalRegionTest {
         PrivateCollectionValidator.validateBackfill(
             ::SubGeographicalRegion,
             ::Substation,
-            "subGeographicalRegion",
-            { it, other -> other.subGeographicalRegion = it },
-            { other -> other.subGeographicalRegion },
+            Substation::subGeographicalRegion,
             SubGeographicalRegion::numSubstations,
             SubGeographicalRegion::addSubstation,
         )

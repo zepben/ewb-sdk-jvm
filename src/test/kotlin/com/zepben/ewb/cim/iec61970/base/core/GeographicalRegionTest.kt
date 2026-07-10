@@ -47,9 +47,7 @@ internal class GeographicalRegionTest {
         PrivateCollectionValidator.validateBackfill(
             ::GeographicalRegion,
             ::SubGeographicalRegion,
-            "geographicalRegion",
-            { it, other -> other.geographicalRegion = it },
-            { other -> other.geographicalRegion },
+            SubGeographicalRegion::geographicalRegion,
             GeographicalRegion::numSubGeographicalRegions,
             GeographicalRegion::addSubGeographicalRegion,
         )

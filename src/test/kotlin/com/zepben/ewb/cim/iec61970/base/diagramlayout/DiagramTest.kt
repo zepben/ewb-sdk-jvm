@@ -62,9 +62,7 @@ internal class DiagramTest {
         PrivateCollectionValidator.validateBackfill(
             ::Diagram,
             ::DiagramObject,
-            "diagram",
-            { it, other -> other.diagram = it },
-            { other -> other.diagram },
+            DiagramObject::diagram,
             Diagram::numDiagramObjects,
             Diagram::addDiagramObject,
         )

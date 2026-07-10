@@ -245,9 +245,7 @@ internal class PowerElectronicsConnectionTest {
         PrivateCollectionValidator.validateBackfill(
             ::PowerElectronicsConnection,
             ::PowerElectronicsConnectionPhase,
-            "powerElectronicsConnection",
-            { it, other -> other.powerElectronicsConnection = it },
-            { other -> other.powerElectronicsConnection },
+            PowerElectronicsConnectionPhase::powerElectronicsConnection,
             PowerElectronicsConnection::numPhases,
             PowerElectronicsConnection::addPhase,
         )

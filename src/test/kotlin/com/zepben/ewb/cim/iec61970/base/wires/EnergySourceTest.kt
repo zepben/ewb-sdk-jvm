@@ -132,9 +132,7 @@ internal class EnergySourceTest {
         PrivateCollectionValidator.validateBackfill(
             ::EnergySource,
             ::EnergySourcePhase,
-            "energySource",
-            { it, other -> other.energySource = it },
-            { other -> other.energySource },
+            EnergySourcePhase::energySource,
             EnergySource::numPhases,
             EnergySource::addPhase,
         )

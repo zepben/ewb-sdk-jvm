@@ -12,7 +12,6 @@ import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.utils.PrivateCollectionValidator
-import com.zepben.testutils.exception.ExpectException
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -46,26 +45,6 @@ internal class SubstationTest {
     }
 
     @Test
-    internal fun assignsSubstationToFeederIfMissing() {
-        val substation = Substation(generateId())
-        val feeder = Feeder(generateId())
-
-        substation.addFeeder(feeder)
-        assertThat(feeder.normalEnergizingSubstation, equalTo(substation))
-    }
-
-    @Test
-    internal fun rejectsFeederWithWrongSubstation() {
-        val substation1 = Substation(generateId())
-        val substation2 = Substation(generateId())
-        val feeder = Feeder(generateId()).apply { normalEnergizingSubstation = substation2 }
-
-        ExpectException.expect { substation1.addFeeder(feeder) }
-            .toThrow<IllegalArgumentException>()
-            .withMessage("${feeder.typeNameAndMRID()} `normalEnergizingSubstation` property references ${substation2.typeNameAndMRID()}, expected ${substation1.typeNameAndMRID()}.")
-    }
-
-    @Test
     internal fun feederAssociations() {
         PrivateCollectionValidator.validateUnordered(
             ::Substation,
@@ -76,6 +55,17 @@ internal class SubstationTest {
             Substation::addFeeder,
             Substation::removeFeeder,
             Substation::clearFeeders
+        )
+    }
+
+    @Test
+    internal fun feederAssociationsBackfill() {
+        PrivateCollectionValidator.validateBackfill(
+            ::Substation,
+            ::Feeder,
+            Feeder::normalEnergizingSubstation,
+            Substation::numFeeders,
+            Substation::addFeeder,
         )
     }
 

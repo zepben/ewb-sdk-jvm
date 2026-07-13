@@ -10,7 +10,6 @@ package com.zepben.ewb.cim.iec61970.base.core
 
 import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.utils.PrivateCollectionValidator
-import com.zepben.testutils.exception.ExpectException
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -44,26 +43,6 @@ internal class SubGeographicalRegionTest {
     }
 
     @Test
-    internal fun assignsSubGeographicalRegionToSubstationIfMissing() {
-        val subGeographicalRegion = SubGeographicalRegion(generateId())
-        val substation = Substation(generateId())
-
-        subGeographicalRegion.addSubstation(substation)
-        assertThat(substation.subGeographicalRegion, equalTo(subGeographicalRegion))
-    }
-
-    @Test
-    internal fun rejectsSubstationWithWrongSubGeographicalRegion() {
-        val subGeographicalRegion1 = SubGeographicalRegion(generateId())
-        val subGeographicalRegion2 = SubGeographicalRegion(generateId())
-        val substation = Substation(generateId()).apply { subGeographicalRegion = subGeographicalRegion2 }
-
-        ExpectException.expect { subGeographicalRegion1.addSubstation(substation) }
-            .toThrow<IllegalArgumentException>()
-            .withMessage("${substation.typeNameAndMRID()} `subGeographicalRegion` property references ${subGeographicalRegion2.typeNameAndMRID()}, expected ${subGeographicalRegion1.typeNameAndMRID()}.")
-    }
-
-    @Test
     internal fun substations() {
         PrivateCollectionValidator.validateUnordered(
             ::SubGeographicalRegion,
@@ -74,6 +53,17 @@ internal class SubGeographicalRegionTest {
             SubGeographicalRegion::addSubstation,
             SubGeographicalRegion::removeSubstation,
             SubGeographicalRegion::clearSubstations
+        )
+    }
+
+    @Test
+    internal fun substationsBackfill() {
+        PrivateCollectionValidator.validateBackfill(
+            ::SubGeographicalRegion,
+            ::Substation,
+            Substation::subGeographicalRegion,
+            SubGeographicalRegion::numSubstations,
+            SubGeographicalRegion::addSubstation,
         )
     }
 

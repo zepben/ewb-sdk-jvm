@@ -13,6 +13,7 @@ import com.zepben.testutils.exception.ExpectException.Companion.expect
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import java.util.regex.Pattern
+import kotlin.reflect.KMutableProperty1
 
 
 internal class PrivateCollectionValidator {
@@ -268,6 +269,51 @@ internal class PrivateCollectionValidator {
                 },
                 othersHaveOrder = false // Order comes from insertion order, not the other objects.
             )
+        }
+
+        /**
+         * Check that list-related auto-linked relationships function as expected
+         * @param createIt lambda creating containing object by mRID
+         * @param createOther lambda creating object that's added to the list (also by mRID)
+         * @param backfillProp The property on the contained object referencing the containing object
+         * @param num retrieve size of collection
+         * @param add attempt to add to the collection
+         */
+        internal fun <T: Identifiable, U : Identifiable> validateBackfill(
+            createIt: (String) -> T,
+            createOther: (String) -> U,
+            backfillProp: KMutableProperty1<U, T?>,
+            num: (T) -> Int,
+            add: (T, U) -> T,
+        ) {
+            val it = createIt("it")
+            val wrongIt = createIt("wrongIt")
+            val other1 = createOther("1")
+            val other2 = createOther("2")
+            val otherWrong = createOther("3")
+
+            // Check that container is assigned to an object with no backref gets
+            add(it, other1)
+            assertThat(num(it), equalTo(1))
+            assertThat(backfillProp.get(other1), equalTo(it))
+
+            // Check that an object already backref'd to container is accepted cleanly
+            backfillProp.set(other2, it)
+            assertThat(backfillProp.get(other2), equalTo(it))
+            add(it, other2)
+            assertThat(num(it), equalTo(2))
+            assertThat(backfillProp.get(other2), equalTo(it))
+
+            // Check that an object already backref'd to another container is rejected correctly
+            backfillProp.set(otherWrong, wrongIt)
+            assertThat(backfillProp.get(otherWrong), equalTo(wrongIt))
+            expect { add(it, otherWrong) }
+                .toThrow<IllegalArgumentException>()
+                .withMessage(Pattern.compile(
+                    "${otherWrong.typeNameAndMRID()} `${backfillProp.name}` property references ${wrongIt.typeNameAndMRID()}, expected ${it.typeNameAndMRID()}."
+                ))
+            assertThat(backfillProp.get(otherWrong), equalTo(wrongIt))
+            assertThat(num(it), equalTo(2))
         }
 
         private fun <T, U> validate(

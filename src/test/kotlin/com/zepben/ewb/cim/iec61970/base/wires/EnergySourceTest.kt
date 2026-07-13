@@ -10,7 +10,6 @@ package com.zepben.ewb.cim.iec61970.base.wires
 
 import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.utils.PrivateCollectionValidator
-import com.zepben.testutils.exception.ExpectException
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -115,26 +114,6 @@ internal class EnergySourceTest {
     }
 
     @Test
-    internal fun assignsEnergySourceToEnergySourcePhaseIfMissing() {
-        val energySource = EnergySource(generateId())
-        val phase = EnergySourcePhase(generateId())
-
-        energySource.addPhase(phase)
-        assertThat(phase.energySource, equalTo(energySource))
-    }
-
-    @Test
-    internal fun rejectsEnergySourcePhaseWithWrongEnergySource() {
-        val energySource1 = EnergySource(generateId())
-        val energySource2 = EnergySource(generateId())
-        val phase = EnergySourcePhase(generateId()).apply { energySource = energySource2 }
-
-        ExpectException.expect { energySource1.addPhase(phase) }
-            .toThrow<IllegalArgumentException>()
-            .withMessage("${phase.typeNameAndMRID()} `energySource` property references ${energySource2.typeNameAndMRID()}, expected ${energySource1.typeNameAndMRID()}.")
-    }
-
-    @Test
     internal fun energySourcePhases() {
         PrivateCollectionValidator.validateUnordered(
             ::EnergySource,
@@ -145,6 +124,17 @@ internal class EnergySourceTest {
             EnergySource::addPhase,
             EnergySource::removePhase,
             EnergySource::clearPhases
+        )
+    }
+
+    @Test
+    internal fun energySourcePhasesBackfill() {
+        PrivateCollectionValidator.validateBackfill(
+            ::EnergySource,
+            ::EnergySourcePhase,
+            EnergySourcePhase::energySource,
+            EnergySource::numPhases,
+            EnergySource::addPhase,
         )
     }
 

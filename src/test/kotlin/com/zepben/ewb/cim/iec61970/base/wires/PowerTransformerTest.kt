@@ -63,26 +63,6 @@ internal class PowerTransformerTest {
     }
 
     @Test
-    internal fun assignsTransformerToEndIfMissing() {
-        val transformer = PowerTransformer(generateId())
-        val end = PowerTransformerEnd(generateId())
-
-        transformer.addEnd(end)
-        assertThat(end.powerTransformer, equalTo(transformer))
-    }
-
-    @Test
-    internal fun rejectsEndWithWrongTransformer() {
-        val tx1 = PowerTransformer(generateId())
-        val tx2 = PowerTransformer(generateId())
-        val end = PowerTransformerEnd(generateId()).apply { powerTransformer = tx2 }
-
-        expect { tx1.addEnd(end) }
-            .toThrow<IllegalArgumentException>()
-            .withMessage("${end.typeNameAndMRID()} `powerTransformer` property references ${tx2.typeNameAndMRID()}, expected ${tx1.typeNameAndMRID()}.")
-    }
-
-    @Test
     internal fun powerTransformerEnds() {
         PrivateCollectionValidator.validateOrdered(
             ::PowerTransformer,
@@ -95,6 +75,17 @@ internal class PowerTransformerTest {
             PowerTransformer::removeEnd,
             PowerTransformer::clearEnds,
             PowerTransformerEnd::endNumber
+        )
+    }
+
+    @Test
+    internal fun powerTransformerEndsBackfill() {
+        PrivateCollectionValidator.validateBackfill(
+            ::PowerTransformer,
+            ::PowerTransformerEnd,
+            PowerTransformerEnd::powerTransformer,
+            PowerTransformer::numEnds,
+            PowerTransformer::addEnd,
         )
     }
 

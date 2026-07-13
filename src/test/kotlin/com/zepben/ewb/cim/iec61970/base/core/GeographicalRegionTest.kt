@@ -8,9 +8,7 @@
 
 package com.zepben.ewb.cim.iec61970.base.core
 
-import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.utils.PrivateCollectionValidator
-import com.zepben.testutils.exception.ExpectException
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -31,26 +29,6 @@ internal class GeographicalRegionTest {
     }
 
     @Test
-    internal fun assignsGeographicalRegionToSubGeographicalRegionIfMissing() {
-        val geographicalRegion = GeographicalRegion(generateId())
-        val subGeographicalRegion = SubGeographicalRegion(generateId())
-
-        geographicalRegion.addSubGeographicalRegion(subGeographicalRegion)
-        assertThat(subGeographicalRegion.geographicalRegion, equalTo(geographicalRegion))
-    }
-
-    @Test
-    internal fun rejectsSubGeographicalRegionWithWrongGeographicalRegion() {
-        val geographicalRegion1 = GeographicalRegion(generateId())
-        val geographicalRegion2 = GeographicalRegion(generateId())
-        val subGeographicalRegion = SubGeographicalRegion(generateId()).apply { geographicalRegion = geographicalRegion2 }
-
-        ExpectException.expect { geographicalRegion1.addSubGeographicalRegion(subGeographicalRegion) }
-            .toThrow<IllegalArgumentException>()
-            .withMessage("${subGeographicalRegion.typeNameAndMRID()} `geographicalRegion` property references ${geographicalRegion2.typeNameAndMRID()}, expected ${geographicalRegion1.typeNameAndMRID()}.")
-    }
-
-    @Test
     internal fun subGeographicalRegions() {
         PrivateCollectionValidator.validateUnordered(
             ::GeographicalRegion,
@@ -61,6 +39,17 @@ internal class GeographicalRegionTest {
             GeographicalRegion::addSubGeographicalRegion,
             GeographicalRegion::removeSubGeographicalRegion,
             GeographicalRegion::clearSubGeographicalRegions
+        )
+    }
+
+    @Test
+    internal fun subGeographicalRegionsBackfill() {
+        PrivateCollectionValidator.validateBackfill(
+            ::GeographicalRegion,
+            ::SubGeographicalRegion,
+            SubGeographicalRegion::geographicalRegion,
+            GeographicalRegion::numSubGeographicalRegions,
+            GeographicalRegion::addSubGeographicalRegion,
         )
     }
 

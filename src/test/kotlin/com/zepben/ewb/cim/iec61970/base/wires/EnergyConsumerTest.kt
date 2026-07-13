@@ -10,7 +10,6 @@ package com.zepben.ewb.cim.iec61970.base.wires
 
 import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.ewb.utils.PrivateCollectionValidator
-import com.zepben.testutils.exception.ExpectException
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -61,26 +60,6 @@ internal class EnergyConsumerTest {
     }
 
     @Test
-    internal fun assignsEnergyConsumerToEnergyConsumerPhaseIfMissing() {
-        val energyConsumer = EnergyConsumer(generateId())
-        val phase = EnergyConsumerPhase(generateId())
-
-        energyConsumer.addPhase(phase)
-        assertThat(phase.energyConsumer, equalTo(energyConsumer))
-    }
-
-    @Test
-    internal fun rejectsEnergyConsumerPhaseWithWrongEnergyConsumer() {
-        val energyConsumer1 = EnergyConsumer(generateId())
-        val energyConsumer2 = EnergyConsumer(generateId())
-        val phase = EnergyConsumerPhase(generateId()).apply { energyConsumer = energyConsumer2 }
-
-        ExpectException.expect { energyConsumer1.addPhase(phase) }
-            .toThrow<IllegalArgumentException>()
-            .withMessage("${phase.typeNameAndMRID()} `energyConsumer` property references ${energyConsumer2.typeNameAndMRID()}, expected ${energyConsumer1.typeNameAndMRID()}.")
-    }
-
-    @Test
     internal fun energyConsumerPhases() {
         PrivateCollectionValidator.validateUnordered(
             ::EnergyConsumer,
@@ -93,5 +72,17 @@ internal class EnergyConsumerTest {
             EnergyConsumer::clearPhases
         )
     }
+
+    @Test
+    internal fun energyConsumerPhasesBackfill() {
+        PrivateCollectionValidator.validateBackfill(
+            ::EnergyConsumer,
+            ::EnergyConsumerPhase,
+            EnergyConsumerPhase::energyConsumer,
+            EnergyConsumer::numPhases,
+            EnergyConsumer::addPhase,
+        )
+    }
+
 
 }

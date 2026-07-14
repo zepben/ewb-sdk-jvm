@@ -186,7 +186,7 @@ class UsagePoint(mRID: String) : IdentifiedObject(mRID) {
      * @return This [UsagePoint] for fluent use.
      */
     fun addContact(contact: ContactDetails): UsagePoint {
-        if (validateReference(contact, ContactDetails::id, ::getContact) { "A ContactDetails with ID ${contact.id}" })
+        if (validateReference(contact, ::getContact, "A ContactDetails"))
             return this
 
         _contacts = _contacts ?: mutableListOf()

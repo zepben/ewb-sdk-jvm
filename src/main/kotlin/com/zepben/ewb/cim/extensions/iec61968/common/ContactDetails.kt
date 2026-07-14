@@ -12,8 +12,8 @@ import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.iec61968.common.ElectronicAddress
 import com.zepben.ewb.cim.iec61968.common.StreetAddress
 import com.zepben.ewb.cim.iec61968.common.TelephoneNumber
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.services.common.extensions.asUnmodifiable
-import java.util.*
 
 /**
  * The details required to contact a person or company.
@@ -30,10 +30,16 @@ import java.util.*
  * @property electronicAddresses [ZBEX] Electronic addresses.
  */
 @ZBEX
-class ContactDetails @JvmOverloads constructor(id: String = "") {
+class ContactDetails(
+    override val mRID: String,
+): Identifiable {
 
     @ZBEX
-    val id: String = id.ifEmpty { UUID.randomUUID().toString() }
+    @Deprecated(
+        "Use mRID instead",
+        ReplaceWith("mRID"),
+    )
+    val id: String get() = mRID
 
     @ZBEX
     var contactAddress: StreetAddress? = null
@@ -155,7 +161,7 @@ class ContactDetails @JvmOverloads constructor(id: String = "") {
             this === other -> true
             (other as? ContactDetails) == null -> false
             isPrimary != other.isPrimary -> false
-            id != other.id -> false
+            mRID != other.mRID -> false
             contactAddress != other.contactAddress -> false
             contactType != other.contactType -> false
             firstName != other.firstName -> false
@@ -185,4 +191,7 @@ class ContactDetails @JvmOverloads constructor(id: String = "") {
     }
 
 
+    override fun typeNameAndMRID(): String = "${javaClass.simpleName} $mRID"
+
+    override fun nameAndMRID(): String = mRID
 }

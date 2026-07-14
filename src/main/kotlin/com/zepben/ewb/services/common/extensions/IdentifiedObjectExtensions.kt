@@ -17,11 +17,13 @@ internal fun <T : Identifiable> Iterable<T>?.getByMRID(mRID: String): T? {
 internal fun Identifiable.validateReference(other: Identifiable, getter: (String) -> Identifiable?, typeDescription: String): Boolean =
     validateReference(other, Identifiable::mRID, getter) { "$typeDescription with mRID ${other.mRID}" }
 
-internal fun <T> Identifiable.validateReference(other: T, getIdentifier: T.() -> String, getter: (String) -> T?, describeOther: () -> String): Boolean {
+internal fun <T : Any> Identifiable.validateReference(other: T, getIdentifier: T.() -> String, getter: (String) -> T?, describeOther: () -> String): Boolean {
     val getResult = getter(other.getIdentifier())
-    if (getResult == other)
+    // NOTE: This is an identity check, not equality, since some Identifiable objects override equality,
+    // breaking this.
+    if (getResult === other)
         return true
 
-    require((getResult == null) || (getResult == other)) { "${describeOther()} already exists in ${typeNameAndMRID()}." }
+    require(getResult == null) { "${describeOther()} already exists in ${typeNameAndMRID()}." }
     return false
 }

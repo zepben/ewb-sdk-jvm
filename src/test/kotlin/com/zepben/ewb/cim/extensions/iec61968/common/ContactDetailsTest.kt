@@ -13,7 +13,8 @@ import com.zepben.ewb.services.network.testdata.fillFields
 import com.zepben.ewb.utils.PrivateCollectionValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -27,13 +28,12 @@ class ContactDetailsTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(ContactDetails().id, not(equalTo("")))
         assertThat(ContactDetails("id").id, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val contactDetails = ContactDetails()
+        val contactDetails = ContactDetails("test")
 
         assertThat(contactDetails.contactAddress, nullValue())
         assertThat(contactDetails.contactType, nullValue())

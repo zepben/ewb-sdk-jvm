@@ -8,8 +8,8 @@
 
 package com.zepben.ewb.cim.iec61970.base.wires
 
+import com.zepben.ewb.boilerplate.IndexableMridCollection
 import com.zepben.ewb.boilerplate.LazyMridList
-import com.zepben.ewb.boilerplate.MridCollection
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.VectorGroup
 import com.zepben.ewb.cim.iec61968.assetinfo.PowerTransformerInfo
 import com.zepben.ewb.cim.iec61968.infiec61968.infassetinfo.TransformerConstructionKind
@@ -85,7 +85,7 @@ class PowerTransformer(mRID: String) : ConductingEquipment(mRID) {
     /**
      * The PowerTransformerEnd's for this PowerTransformer. The returned collection is read only.
      */
-    val ends: LazyMridList<PowerTransformerEnd> get() = LazyMridList(
+    val ends: PowerTransformerEndList get() = LazyMridList(
         getter = { _powerTransformerEnds },
         setter = {_powerTransformerEnds = it },
         owner = this,
@@ -200,13 +200,15 @@ class PowerTransformer(mRID: String) : ConductingEquipment(mRID) {
 
 }
 
+typealias PowerTransformerEndList = IndexableMridCollection<PowerTransformerEnd>
+
 /**
  * Get a [PowerTransformerEnd] by its [PowerTransformerEnd.endNumber]
  *
  * @param endNumber the end number of the required [PowerTransformerEnd]
  * @return The [PowerTransformerEnd] with the specified [endNumber] if it exists, otherwise null
  */
-fun MridCollection<PowerTransformerEnd>.getByEndNumber(endNumber: Int): PowerTransformerEnd? =
+fun PowerTransformerEndList.getByEndNumber(endNumber: Int): PowerTransformerEnd? =
     firstOrNull { it.endNumber == endNumber }
 
 /**
@@ -215,7 +217,7 @@ fun MridCollection<PowerTransformerEnd>.getByEndNumber(endNumber: Int): PowerTra
  * @param terminal the terminal of the required [PowerTransformerEnd]
  * @return The [PowerTransformerEnd] with the specified [terminal] if it exists, otherwise null
  */
-fun MridCollection<PowerTransformerEnd>.getBy(terminal: Terminal): PowerTransformerEnd? =
+fun PowerTransformerEndList.getBy(terminal: Terminal): PowerTransformerEnd? =
     firstOrNull { it.terminal == terminal }
 
 /**
@@ -224,5 +226,5 @@ fun MridCollection<PowerTransformerEnd>.getBy(terminal: Terminal): PowerTransfor
  * @param connectivityNode the [ConnectivityNode] of the required [PowerTransformerEnd]
  * @return The [PowerTransformerEnd] with the specified [Terminal] if it exists, otherwise null
  */
-fun MridCollection<PowerTransformerEnd>.getBy(connectivityNode: ConnectivityNode): PowerTransformerEnd? =
+fun PowerTransformerEndList.getBy(connectivityNode: ConnectivityNode): PowerTransformerEnd? =
     firstOrNull { it.terminal?.connectivityNode == connectivityNode }

@@ -19,7 +19,7 @@ class PerLengthPhaseImpedance(mRID: String) : PerLengthImpedance(mRID) {
 
     private var _data: MutableList<PhaseImpedanceData>? = null
 
-    val data: MutableCollection<PhaseImpedanceData> get() = LazyValidatedList(
+    val data: PhaseImpedanceDataList get() = LazyValidatedList(
         { _data },
         { _data = it },
         { validateData(it) }
@@ -92,6 +92,7 @@ class PerLengthPhaseImpedance(mRID: String) : PerLengthImpedance(mRID) {
 
 }
 
+typealias PhaseImpedanceDataList = LazyValidatedList<PhaseImpedanceData>
 
 /**
  * Get the matrix entry for the corresponding to and from phases.
@@ -100,10 +101,10 @@ class PerLengthPhaseImpedance(mRID: String) : PerLengthImpedance(mRID) {
  * @param toPhase The "to" phase to lookup.
  * @return The matching [PhaseImpedanceData] or null if none was found.
  */
-fun Collection<PhaseImpedanceData>.get(fromPhase: SinglePhaseKind, toPhase: SinglePhaseKind): PhaseImpedanceData? =
+fun PhaseImpedanceDataList.get(fromPhase: SinglePhaseKind, toPhase: SinglePhaseKind): PhaseImpedanceData? =
     firstOrNull { it.fromPhase == fromPhase && it.toPhase == toPhase }
 
 /**
  * Get only the diagonal elements of the matrix, i.e toPhase == fromPhase.
  */
-fun Collection<PhaseImpedanceData>.diagonal(): List<PhaseImpedanceData> = filter { it.toPhase == it.fromPhase }
+fun PhaseImpedanceDataList.diagonal(): List<PhaseImpedanceData> = filter { it.toPhase == it.fromPhase }

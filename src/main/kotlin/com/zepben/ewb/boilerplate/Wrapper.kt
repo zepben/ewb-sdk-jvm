@@ -104,7 +104,7 @@ interface MridCollection<T : Identifiable> : MutableCollection<T> {
 
 }
 
-
+interface IndexableMridCollection<T : Identifiable> : MridCollection<T>, IndexableMutableCollection<T>
 
 class LazyMridList<T : Identifiable>(
     private val getter: () -> MutableList<T>?,
@@ -115,7 +115,7 @@ class LazyMridList<T : Identifiable>(
     sortBy: ((T) -> Comparable<*>?)? = null
 ) : LazyValidatedList<T>(
     getter, setter, validate, sortBy
-), IndexableMutableCollection<T>, MridCollection<T> {
+), IndexableMridCollection<T> {
 
     override fun getByMrid(mRID: String): T? {
         return getter()?.firstOrNull { it.mRID == mRID }
@@ -141,7 +141,7 @@ class MridList<T : Identifiable>(
     override val elementDescription: String,
     private val validate: ((T) -> Unit)? = null,
     private val sortBy: ((T) -> Comparable<*>?)? = null,
-) : AbstractMutableCollection<T>(), IndexableMutableCollection<T>, MridCollection<T> {
+) : AbstractMutableCollection<T>(), IndexableMridCollection<T> {
 
     override fun getByMrid(mRID: String): T? =
         list.firstOrNull { it.mRID == mRID }

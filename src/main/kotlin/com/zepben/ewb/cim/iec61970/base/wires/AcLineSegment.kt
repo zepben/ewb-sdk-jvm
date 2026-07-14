@@ -88,7 +88,7 @@ class AcLineSegment(mRID: String) : Conductor(mRID) {
     /**
      * The individual phase models for this AcLineSegment. The returned collection is read only.
      */
-    val phases: LazyMridList<AcLineSegmentPhase> get() = LazyMridList(
+    val phases: AcLineSegmentPhaseList get() = LazyMridList(
         getter = { _phases },
         setter = { _phases = it },
         owner = this,
@@ -249,10 +249,12 @@ class AcLineSegment(mRID: String) : Conductor(mRID) {
     // endregion
 }
 
+typealias AcLineSegmentPhaseList = MridCollection<AcLineSegmentPhase>
+
 /**
  * The individual phase models for an AcLineSegment.
  *
  * @param phase the phase of the required [AcLineSegmentPhase]
  * @return The [AcLineSegmentPhase] with the specified [phase] if it exists, otherwise null
  */
-fun MridCollection<AcLineSegmentPhase>.getBy(phase: SinglePhaseKind): AcLineSegmentPhase? = firstOrNull { it.phase == phase }
+fun AcLineSegmentPhaseList.getBy(phase: SinglePhaseKind): AcLineSegmentPhase? = firstOrNull { it.phase == phase }

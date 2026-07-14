@@ -31,16 +31,14 @@ class BatteryUnit(mRID: String) : PowerElectronicsUnit(mRID) {
     private var _batteryControls: MutableList<BatteryControl>? = null
 
     @ZBEX
-    val controls: LazyMridList<BatteryControl> get() = LazyMridList(
+    val controls: BatteryControlList get() = LazyMridList(
         getter = { _batteryControls },
         setter = { _batteryControls = it },
         owner = this,
         elementDescription = "A BatteryControl"
     )
 
-    //
-    // NOTE: This is called `numBatteryControls` because `numControls` is already used by `PowerSystemResource`.
-    //
+
 
     // region deprecated list boilerplate
     //
@@ -51,6 +49,9 @@ class BatteryUnit(mRID: String) : PowerElectronicsUnit(mRID) {
 
     // region controls boilerplate
 
+    //
+    // NOTE: This is called `numBatteryControls` because `numControls` is already used by `PowerSystemResource`.
+    //
     @Deprecated(
         message = "Use controls.size instead.",
         replaceWith = ReplaceWith("controls.size")
@@ -64,10 +65,10 @@ class BatteryUnit(mRID: String) : PowerElectronicsUnit(mRID) {
     fun getControl(mRID: String): BatteryControl? = controls.getByMrid(mRID)
 
     @Deprecated(
-        message = "Use controls.getBy(controlMode) instead.",
+        message = "Use controls.getByMode(controlMode) instead.",
         replaceWith = ReplaceWith("controls.getBy(controlMode)")
     )
-    fun getControl(controlMode: BatteryControlMode): BatteryControl? = controls.getBy(controlMode)
+    fun getControl(controlMode: BatteryControlMode): BatteryControl? = controls.getByMode(controlMode)
 
 
     @Deprecated(
@@ -99,6 +100,7 @@ class BatteryUnit(mRID: String) : PowerElectronicsUnit(mRID) {
     // endregion
 }
 
+typealias BatteryControlList = MridCollection<BatteryControl>
 
 /**
  * Get a [BatteryControl] of this [BatteryUnit] by its [BatteryControl.controlMode]
@@ -106,4 +108,4 @@ class BatteryUnit(mRID: String) : PowerElectronicsUnit(mRID) {
  * @param controlMode the control mode of the required [BatteryControl]
  * @return The [BatteryControl] with the specified [BatteryControlMode] if it exists, otherwise null
  */
-fun MridCollection<BatteryControl>.getBy(controlMode: BatteryControlMode): BatteryControl? = firstOrNull { it.controlMode == controlMode }
+fun BatteryControlList.getByMode(controlMode: BatteryControlMode): BatteryControl? = firstOrNull { it.controlMode == controlMode }

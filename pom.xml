@@ -77,7 +77,7 @@
         <dependency>
             <groupId>com.zepben</groupId>
             <artifactId>protobuf</artifactId>
-            <version>1.8.0b2-variant</version>
+            <version>1.8.0b3-variant</version>
         </dependency>
         <dependency>
             <groupId>com.zepben</groupId>

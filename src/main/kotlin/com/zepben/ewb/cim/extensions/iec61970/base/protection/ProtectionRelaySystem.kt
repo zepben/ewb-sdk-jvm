@@ -9,6 +9,7 @@
 package com.zepben.ewb.cim.extensions.iec61970.base.protection
 
 import com.zepben.ewb.boilerplate.LazyMridList
+import com.zepben.ewb.boilerplate.MridCollection
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.iec61970.base.core.Equipment
 
@@ -30,7 +31,7 @@ class ProtectionRelaySystem(mRID: String) : Equipment(mRID) {
     private var _schemes: MutableList<ProtectionRelayScheme>? = null
 
     @ZBEX
-    val schemes: LazyMridList<ProtectionRelayScheme> get() = LazyMridList(
+    val schemes: MridCollection<ProtectionRelayScheme> get() = LazyMridList(
         getter = { _schemes },
         setter = { _schemes = it },
         owner = this,

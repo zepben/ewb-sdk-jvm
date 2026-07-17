@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.cim.iec61970.base.wires
 
+import com.zepben.ewb.boilerplate.Backfill
 import com.zepben.ewb.boilerplate.LazyMridList
 import com.zepben.ewb.boilerplate.MridCollection
 import com.zepben.ewb.cim.iec61968.assetinfo.WireInfo
@@ -50,40 +51,29 @@ class AcLineSegment(mRID: String) : Conductor(mRID) {
             perLengthImpedance = it
         }
 
-    val cuts: LazyMridList<Cut> get() = LazyMridList(
+    val cuts: MridCollection<Cut> get() = LazyMridList(
         getter = { _cuts },
         setter = { _cuts = it },
         owner = this,
         elementDescription = "A Cut",
-        validate = { validateCut(it) }
+        backfill = Backfill(
+            { it.acLineSegment },
+            { it, acls -> it.acLineSegment = acls },
+            Cut::acLineSegment
+        )
     )
 
-    private fun validateCut(cut: Cut) {
-        if (cut.acLineSegment == null)
-            cut.acLineSegment = this
-
-        require(cut.acLineSegment === this) {
-            "${cut.typeNameAndMRID()} `acLineSegment` property references ${cut.acLineSegment!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
-        }
-    }
-
-    val clamps: LazyMridList<Clamp> get() = LazyMridList(
+    val clamps: MridCollection<Clamp> get() = LazyMridList(
         getter = { _clamps },
         setter = { _clamps = it },
         owner = this,
         elementDescription = "A Clamp",
-        validate = { validateClamp(it) }
+        backfill = Backfill(
+            { it.acLineSegment },
+            { it, acls -> it.acLineSegment = acls },
+            Clamp::acLineSegment
+        )
     )
-
-    private fun validateClamp(clamp: Clamp) {
-        if (clamp.acLineSegment == null)
-            clamp.acLineSegment = this
-
-        require(clamp.acLineSegment === this) {
-            "${clamp.typeNameAndMRID()} `acLineSegment` property references ${clamp.acLineSegment!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
-        }
-    }
-
 
     /**
      * The individual phase models for this AcLineSegment. The returned collection is read only.
@@ -93,18 +83,13 @@ class AcLineSegment(mRID: String) : Conductor(mRID) {
         setter = { _phases = it },
         owner = this,
         elementDescription = "An AcLineSegmentPhase",
-        validate = { validatePhase(it) },
+        backfill = Backfill(
+            { it.acLineSegment },
+            { it, acls -> it.acLineSegment = acls },
+            AcLineSegmentPhase::acLineSegment
+        ),
         sortBy = { it.sequenceNumber }
     )
-
-    private fun validatePhase(phase: AcLineSegmentPhase) {
-        if (phase.acLineSegment == null)
-            phase.acLineSegment = this
-        else
-            require(phase.acLineSegment === this) {
-                "${phase.typeNameAndMRID()} `acLineSegment` property references ${phase.acLineSegment!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
-            }
-    }
 
     /**
      * Retrieve the WireInfo associated with the requested [phase]. If no specific [WireInfo] is available for the given [phase], [AcLineSegment.assetInfo] will be returned.

@@ -9,6 +9,7 @@
 package com.zepben.ewb.cim.iec61970.base.wires
 
 import com.zepben.ewb.boilerplate.LazyMridList
+import com.zepben.ewb.boilerplate.MridCollection
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.iec61970.base.generation.production.PowerElectronicsUnit
 
@@ -205,7 +206,7 @@ class PowerElectronicsConnection(mRID: String) : RegulatingCondEq(mRID) {
     /**
      * The units for this power electronics connection. The returned collection is read only.
      */
-    val units: LazyMridList<PowerElectronicsUnit> get() = LazyMridList(
+    val units: MridCollection<PowerElectronicsUnit> get() = LazyMridList(
         getter = { _powerElectronicsUnits },
         setter = { _powerElectronicsUnits = it },
         owner = this,
@@ -215,7 +216,7 @@ class PowerElectronicsConnection(mRID: String) : RegulatingCondEq(mRID) {
     /**
      * The phases for this power electronics connection. The returned collection is read only.
      */
-    val phases: LazyMridList<PowerElectronicsConnectionPhase> get() = LazyMridList(
+    val phases: MridCollection<PowerElectronicsConnectionPhase> get() = LazyMridList(
         getter = { _powerElectronicsConnectionPhases },
         setter = { _powerElectronicsConnectionPhases = it },
         owner = this,

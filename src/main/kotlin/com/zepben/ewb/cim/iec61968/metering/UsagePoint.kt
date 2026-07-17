@@ -51,7 +51,7 @@ class UsagePoint(mRID: String) : IdentifiedObject(mRID) {
     /**
      *  All equipment connecting this usage point to the electrical grid. The returned collection is read only
      */
-    val equipment: LazyMridList<Equipment> get() = LazyMridList(
+    val equipment: MridCollection<Equipment> get() = LazyMridList(
         getter = { _equipment },
         setter = { _equipment = it },
         owner = this,
@@ -61,7 +61,7 @@ class UsagePoint(mRID: String) : IdentifiedObject(mRID) {
     /**
      * All end devices at this usage point. The returned collection is read only.
      */
-    val endDevices: LazyMridList<EndDevice> get() = LazyMridList(
+    val endDevices: MridCollection<EndDevice> get() = LazyMridList(
         getter = { _endDevices },
         setter = { _endDevices = it },
         owner = this,

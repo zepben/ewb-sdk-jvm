@@ -9,6 +9,7 @@
 package com.zepben.ewb.cim.extensions.iec61970.base.feeder
 
 import com.zepben.ewb.boilerplate.LazyMridList
+import com.zepben.ewb.boilerplate.MridCollection
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.core.Substation
@@ -31,7 +32,7 @@ class Loop(mRID: String) : IdentifiedObject(mRID) {
      * The returned collection is read only.
      */
     @ZBEX
-    val circuits: LazyMridList<Circuit> get() = LazyMridList(
+    val circuits: MridCollection<Circuit> get() = LazyMridList(
         getter = { _circuits },
         setter = { _circuits = it },
         owner = this,
@@ -43,7 +44,7 @@ class Loop(mRID: String) : IdentifiedObject(mRID) {
      * The returned collection is read only.
      */
     @ZBEX
-    val substations: LazyMridList<Substation> get() = LazyMridList(
+    val substations: MridCollection<Substation> get() = LazyMridList(
         getter = { _substations },
         setter = { _substations = it },
         owner = this,
@@ -55,7 +56,7 @@ class Loop(mRID: String) : IdentifiedObject(mRID) {
      * The returned collection is read only.
      */
     @ZBEX
-    val energizingSubstations: LazyMridList<Substation> get() = LazyMridList(
+    val energizingSubstations: MridCollection<Substation> get() = LazyMridList(
         getter = { _energizingSubstations },
         setter = { _energizingSubstations = it },
         owner = this,

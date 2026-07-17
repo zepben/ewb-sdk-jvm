@@ -10,6 +10,7 @@ package com.zepben.ewb.cim.extensions.iec61970.base.protection
 
 import com.zepben.ewb.boilerplate.LazyIndexedList
 import com.zepben.ewb.boilerplate.LazyMridList
+import com.zepben.ewb.boilerplate.MridCollection
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.extensions.iec61968.assetinfo.RelayInfo
 import com.zepben.ewb.cim.iec61970.base.auxiliaryequipment.Sensor
@@ -81,7 +82,7 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
     )
 
     @ZBEX
-    val protectedSwitches: LazyMridList<ProtectedSwitch> get() = LazyMridList(
+    val protectedSwitches: MridCollection<ProtectedSwitch> get() = LazyMridList(
         getter = { _protectedSwitches },
         setter = { _protectedSwitches = it },
         owner = this,
@@ -89,7 +90,7 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
     )
 
     @ZBEX
-    val sensors: LazyMridList<Sensor> get() = LazyMridList(
+    val sensors: MridCollection<Sensor> get() = LazyMridList(
         getter = { _sensors },
         setter = { _sensors = it },
         owner = this,
@@ -97,7 +98,7 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
     )
 
     @ZBEX
-    val schemes: LazyMridList<ProtectionRelayScheme> get() = LazyMridList(
+    val schemes: MridCollection<ProtectionRelayScheme> get() = LazyMridList(
         getter = { _schemes },
         setter = { _schemes = it },
         owner = this,

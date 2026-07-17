@@ -9,6 +9,7 @@
 package com.zepben.ewb.cim.iec61970.base.wires
 
 import com.zepben.ewb.boilerplate.LazyMridList
+import com.zepben.ewb.boilerplate.MridCollection
 
 /**
  * Generic user of energy - a  point of consumption on the power system model.
@@ -37,7 +38,7 @@ class EnergyConsumer(mRID: String) : EnergyConnection(mRID) {
     /**
      * The individual phase models for this energy consumer. The returned collection is read only.
      */
-    val phases: LazyMridList<EnergyConsumerPhase> get() = LazyMridList(
+    val phases: MridCollection<EnergyConsumerPhase> get() = LazyMridList(
         getter = { _energyConsumerPhases },
         setter = { _energyConsumerPhases = it },
         owner = this,

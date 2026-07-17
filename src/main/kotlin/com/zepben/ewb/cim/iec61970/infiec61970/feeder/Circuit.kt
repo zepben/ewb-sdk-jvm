@@ -9,6 +9,7 @@
 package com.zepben.ewb.cim.iec61970.infiec61970.feeder
 
 import com.zepben.ewb.boilerplate.LazyMridList
+import com.zepben.ewb.boilerplate.MridCollection
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.iec61970.base.core.Substation
 import com.zepben.ewb.cim.iec61970.base.core.Terminal
@@ -30,7 +31,7 @@ class Circuit(mRID: String) : Line(mRID) {
      * <no description from CIM>
      * The returned collection is read only.
      */
-    val endTerminals: LazyMridList<Terminal> get() = LazyMridList(
+    val endTerminals: MridCollection<Terminal> get() = LazyMridList(
         getter = { _endTerminals },
         setter = { _endTerminals = it },
         owner = this,
@@ -41,7 +42,7 @@ class Circuit(mRID: String) : Line(mRID) {
      * Simplification of the CIM association via Bay to [Substation].
      * The returned collection is read only.
      */
-    val endSubstations: LazyMridList<Substation> get() = LazyMridList(
+    val endSubstations: MridCollection<Substation> get() = LazyMridList(
         getter = { _endSubstations },
         setter = { _endSubstations = it },
         owner = this,

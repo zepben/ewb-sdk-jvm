@@ -9,6 +9,7 @@
 package com.zepben.ewb.cim.iec61970.base.wires
 
 import com.zepben.ewb.boilerplate.LazyMridList
+import com.zepben.ewb.boilerplate.MridCollection
 
 /**
  * An electromechanical device that operates with shaft rotating synchronously with the network. It is a single machine operating either as a generator or
@@ -78,7 +79,7 @@ class SynchronousMachine(mRID: String) : RotatingMachine(mRID) {
      * All available [ReactiveCapabilityCurve] for this synchronous machine.
      * First entry is the default [ReactiveCapabilityCurve]
      */
-    val curves: LazyMridList<ReactiveCapabilityCurve> get() = LazyMridList(
+    val curves: MridCollection<ReactiveCapabilityCurve> get() = LazyMridList(
         getter = { _reactiveCapabilityCurves },
         setter = { _reactiveCapabilityCurves = it },
         owner = this,

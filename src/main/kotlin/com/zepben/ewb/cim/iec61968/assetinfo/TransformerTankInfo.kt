@@ -9,6 +9,7 @@
 package com.zepben.ewb.cim.iec61968.assetinfo
 
 import com.zepben.ewb.boilerplate.LazyMridList
+import com.zepben.ewb.boilerplate.MridCollection
 import com.zepben.ewb.cim.iec61968.assets.AssetInfo
 import com.zepben.ewb.services.network.ResistanceReactance
 
@@ -26,7 +27,7 @@ class TransformerTankInfo(mRID: String) : AssetInfo(mRID) {
     /**
      * Data for all the ends described by this transformer tank data. The returned collection is read only.
      */
-    val transformerEndInfos: LazyMridList<TransformerEndInfo> get() = LazyMridList(
+    val transformerEndInfos: MridCollection<TransformerEndInfo> get() = LazyMridList(
         getter = { _transformerEndInfos },
         setter = { _transformerEndInfos = it },
         owner = this,

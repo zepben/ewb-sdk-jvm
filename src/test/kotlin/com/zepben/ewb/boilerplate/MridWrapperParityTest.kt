@@ -38,7 +38,7 @@ internal class MridWrapperParityTest {
         var nullableListBacking: MutableList<Clamp>? = null
         var nullableMapBacking: MutableMap<String, Clamp>? = null
 
-        val nullableListWrapper = LazyMridList<Clamp>(
+        val nullableListWrapper = LazyMridList(
             getter = { nullableListBacking },
             setter = { nullableListBacking = it },
             owner = Clamp("owner"),
@@ -47,7 +47,7 @@ internal class MridWrapperParityTest {
             sortBy = sortBy
         )
 
-        val nullableDictWrapper = LazyMridMap<Clamp>(
+        val nullableDictWrapper = LazyMridMap(
             getter = { nullableMapBacking },
             setter = { nullableMapBacking = it },
             owner = Clamp("owner"),
@@ -55,7 +55,7 @@ internal class MridWrapperParityTest {
             validate = validate
         )
 
-        val notNullListWrapper = MridList<Clamp>(
+        val notNullListWrapper = MridList(
             owner = Clamp("owner"),
             elementDescription = "A Clamp",
             validate = validate,

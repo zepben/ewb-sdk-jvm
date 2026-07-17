@@ -9,6 +9,7 @@
 package com.zepben.ewb.cim.iec61970.base.auxiliaryequipment
 
 import com.zepben.ewb.boilerplate.LazyMridList
+import com.zepben.ewb.boilerplate.MridCollection
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelayFunction
 
@@ -23,7 +24,7 @@ abstract class Sensor(mRID: String) : AuxiliaryEquipment(mRID) {
     private var _relayFunctions: MutableList<ProtectionRelayFunction>? = null
 
     @ZBEX
-    val relayFunctions: LazyMridList<ProtectionRelayFunction> get() = LazyMridList(
+    val relayFunctions: MridCollection<ProtectionRelayFunction> get() = LazyMridList(
         getter = { _relayFunctions },
         setter = { _relayFunctions = it },
         owner = this,

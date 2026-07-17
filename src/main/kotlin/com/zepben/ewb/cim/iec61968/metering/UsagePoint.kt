@@ -9,14 +9,13 @@
 package com.zepben.ewb.cim.iec61968.metering
 
 import com.zepben.ewb.boilerplate.LazyMridList
+import com.zepben.ewb.boilerplate.MridCollection
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.extensions.iec61968.common.ContactDetails
 import com.zepben.ewb.cim.iec61968.common.Location
 import com.zepben.ewb.cim.iec61970.base.core.Equipment
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.core.PhaseCode
-import com.zepben.ewb.services.common.extensions.asUnmodifiable
-import com.zepben.ewb.services.common.extensions.validateReference
 
 /**
  * Logical or physical point in the network to which readings or events may be attributed. Used at the place where a physical
@@ -69,88 +68,14 @@ class UsagePoint(mRID: String) : IdentifiedObject(mRID) {
         elementDescription = "An EndDevice"
     )
 
-    /**
-     * Add an [Equipment] to this [UsagePoint].
-     *
-     * @param equipment The [Equipment] to add.
-     * @return This [UsagePoint] for fluent use.
-     */
-    fun addEquipment(equipment: Equipment): UsagePoint {
-        if (validateReference(equipment, ::getEquipment, "An Equipment"))
-            return this
+    @ZBEX
+    val contacts: MridCollection<ContactDetails> get() = LazyMridList(
+        getter = { _contacts },
+        setter = { _contacts = it },
+        owner = this,
+        elementDescription = "A ContactDetails"
+    )
 
-        _equipment = _equipment ?: mutableListOf()
-        _equipment!!.add(equipment)
-
-        return this
-    }
-
-    /**
-     * Add an [EndDevice] to this [UsagePoint].
-     *
-     * @param endDevice The [EndDevice] to add.
-     * @return This [UsagePoint] for fluent use.
-     */
-    fun addEndDevice(endDevice: EndDevice): UsagePoint {
-        if (validateReference(endDevice, ::getEndDevice, "An EndDevice"))
-            return this
-
-        _endDevices = _endDevices ?: mutableListOf()
-        _endDevices!!.add(endDevice)
-
-        return this
-    }
-
-    /**
-     * Get the number of entries in the [ContactDetails] collection.
-     */
-    fun numContacts(): Int = _contacts?.size ?: 0
-
-    /**
-     * All end devices at this usage point.
-     *
-     * @param id the ID of the required [ContactDetails]
-     * @return The [ContactDetails] with the specified [id] if it exists, otherwise null
-     */
-    fun getContact(id: String): ContactDetails? = _contacts?.firstOrNull { it.id == id }
-
-    /**
-     * Add a [ContactDetails] to this [UsagePoint].
-     *
-     * @param contact The [ContactDetails] to add.
-     * @return This [UsagePoint] for fluent use.
-     */
-    fun addContact(contact: ContactDetails): UsagePoint {
-        if (validateReference(contact, ::getContact, "A ContactDetails"))
-            return this
-
-        _contacts = _contacts ?: mutableListOf()
-        _contacts!!.add(contact)
-
-        return this
-    }
-
-    /**
-     * Remove a [ContactDetails] from this [UsagePoint].
-     *
-     * @param contact The [ContactDetails] to remove.
-     * @return true if the [ContactDetails] were removed.
-     */
-    fun removeContact(contact: ContactDetails): Boolean {
-        val ret = _contacts?.remove(contact) == true
-        if (_contacts.isNullOrEmpty()) _contacts = null
-        return ret
-    }
-
-    /**
-     * Clear all [ContactDetails] from this [UsagePoint].
-     *
-     * @return This [UsagePoint] for fluent use.
-     */
-    fun clearContacts(): UsagePoint {
-        _contacts = null
-        return this
-    }
 
     // region deprecated list boilerplate
     //
@@ -158,6 +83,8 @@ class UsagePoint(mRID: String) : IdentifiedObject(mRID) {
     // This boilerplate exists solely to enable backwards compatibility.
     // It will be removed eventually.
     // Every single method simply forwards the call to the corresponding list.
+
+    // region equipment boilerplate
 
     @Deprecated(
         message = "Use equipment.size instead.",
@@ -185,6 +112,10 @@ class UsagePoint(mRID: String) : IdentifiedObject(mRID) {
         equipment.clear()
         return this
     }
+
+    // endregion
+
+    // region endDevices boilerplate
 
     @Deprecated(
         message = "Use endDevices.size instead.",
@@ -230,6 +161,48 @@ class UsagePoint(mRID: String) : IdentifiedObject(mRID) {
         endDevices.add(endDevice)
         return this
     }
+
+    // endregion
+
+    // region contacts boilerplate
+
+    @Deprecated(
+        message = "Use contacts.size instead.",
+        replaceWith = ReplaceWith("contacts.size")
+    )
+    fun numContacts(): Int = contacts.size
+
+    @Deprecated(
+        message = "Use contacts.getByMrid(id) instead.",
+        replaceWith = ReplaceWith("contacts.getByMrid(id)")
+    )
+    fun getContact(id: String): ContactDetails? = contacts.getByMrid(id)
+
+    @Deprecated(
+        message = "Use contacts.add(contact) instead.",
+        replaceWith = ReplaceWith("also { it.contacts.add(contact) }")
+    )
+    fun addContact(contact: ContactDetails): UsagePoint {
+        contacts.add(contact)
+        return this
+    }
+
+    @Deprecated(
+        message = "Use contacts.remove(contact) instead.",
+        replaceWith = ReplaceWith("contacts.remove(contact)")
+    )
+    fun removeContact(contact: ContactDetails): Boolean = contacts.remove(contact)
+
+    @Deprecated(
+        message = "Use contacts.clear() instead.",
+        replaceWith = ReplaceWith("also { it.contacts.clear() }")
+    )
+    fun clearContacts(): UsagePoint {
+        contacts.clear()
+        return this
+    }
+
+    // endregion
 
     // endregion
 }

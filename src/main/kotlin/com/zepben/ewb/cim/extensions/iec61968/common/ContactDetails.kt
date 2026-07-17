@@ -14,7 +14,6 @@ import com.zepben.ewb.cim.iec61968.common.ElectronicAddress
 import com.zepben.ewb.cim.iec61968.common.StreetAddress
 import com.zepben.ewb.cim.iec61968.common.TelephoneNumber
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
-import com.zepben.ewb.services.common.extensions.asUnmodifiable
 
 /**
  * The details required to contact a person or company.
@@ -118,6 +117,10 @@ class ContactDetails(
     }
 
 
+    override fun typeNameAndMRID(): String = "${javaClass.simpleName} $mRID"
+
+    override fun nameAndMRID(): String = mRID
+
     // region deprecated list boilerplate
     //
     // ("region/endregion" is an IntelliJ feature letting you hide the entire thing)
@@ -194,87 +197,5 @@ class ContactDetails(
     // endregion
 
     // endregion
-    override fun typeNameAndMRID(): String = "${javaClass.simpleName} $mRID"
 
-    override fun nameAndMRID(): String = mRID
-
-    /**
-     * Get the number of entries in the [TelephoneNumber] collection.
-     */
-    fun numPhoneNumbers(): Int = _phoneNumbers?.size ?: 0
-
-    /**
-     * Add an [TelephoneNumber] to this [ContactDetails].
-     *
-     * @param phoneNumber The [TelephoneNumber] to add.
-     * @return This [ContactDetails] for fluent use.
-     */
-    fun addPhoneNumber(phoneNumber: TelephoneNumber): ContactDetails {
-        _phoneNumbers = _phoneNumbers ?: mutableListOf()
-        _phoneNumbers!!.add(phoneNumber)
-
-        return this
-    }
-
-    /**
-     * Remove an [TelephoneNumber] from this [ContactDetails].
-     *
-     * @param phoneNumber The [TelephoneNumber] to remove.
-     * @return true if the [TelephoneNumber] was removed.
-     */
-    fun removePhoneNumber(phoneNumber: TelephoneNumber): Boolean {
-        val ret = _phoneNumbers?.remove(phoneNumber) == true
-        if (_phoneNumbers.isNullOrEmpty()) _phoneNumbers = null
-        return ret
-    }
-
-    /**
-     * Clear all [TelephoneNumber]'s from this [ContactDetails].
-     *
-     * @return This [ContactDetails] for fluent use.
-     */
-    fun clearPhoneNumbers(): ContactDetails {
-        _phoneNumbers = null
-        return this
-    }
-
-    /**
-     * Get the number of entries in the [ElectronicAddress] collection.
-     */
-    fun numElectronicAddresses(): Int = _electronicAddresses?.size ?: 0
-
-    /**
-     * Add an [ElectronicAddress] to this [ContactDetails].
-     *
-     * @param electronicAddress The [ElectronicAddress] to add.
-     * @return This [ContactDetails] for fluent use.
-     */
-    fun addElectronicAddress(electronicAddress: ElectronicAddress): ContactDetails {
-        _electronicAddresses = _electronicAddresses ?: mutableListOf()
-        _electronicAddresses!!.add(electronicAddress)
-
-        return this
-    }
-
-    /**
-     * Remove an [ElectronicAddress] from this [ContactDetails].
-     *
-     * @param electronicAddress The [ElectronicAddress] to remove.
-     * @return true if the [ElectronicAddress] was removed.
-     */
-    fun removeElectronicAddress(electronicAddress: ElectronicAddress): Boolean {
-        val ret = _electronicAddresses?.remove(electronicAddress) == true
-        if (_electronicAddresses.isNullOrEmpty()) _electronicAddresses = null
-        return ret
-    }
-
-    /**
-     * Clear all [ElectronicAddress]'s from this [ContactDetails].
-     *
-     * @return This [ContactDetails] for fluent use.
-     */
-    fun clearElectronicAddresses(): ContactDetails {
-        _electronicAddresses = null
-        return this
-    }
 }

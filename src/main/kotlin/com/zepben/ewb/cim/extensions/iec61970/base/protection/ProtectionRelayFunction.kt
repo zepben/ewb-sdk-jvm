@@ -8,13 +8,13 @@
 
 package com.zepben.ewb.cim.extensions.iec61970.base.protection
 
+import com.zepben.ewb.boilerplate.LazyIndexedList
 import com.zepben.ewb.boilerplate.LazyMridList
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.extensions.iec61968.assetinfo.RelayInfo
 import com.zepben.ewb.cim.iec61970.base.auxiliaryequipment.Sensor
 import com.zepben.ewb.cim.iec61970.base.core.PowerSystemResource
 import com.zepben.ewb.cim.iec61970.base.wires.ProtectedSwitch
-import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import java.util.function.BiConsumer
 
 /**
@@ -65,197 +65,20 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
     private var _schemes: MutableList<ProtectionRelayScheme>? = null
 
     @ZBEX
-    val timeLimits: List<Double> get() = _timeLimits.asUnmodifiable()
+    val timeLimits: LazyIndexedList<Double> get() = LazyIndexedList(
+        { _timeLimits },
+        { _timeLimits = it },
+        this,
+        "Double"
+    )
 
     @ZBEX
-    val thresholds: List<RelaySetting> get() = _thresholds.asUnmodifiable()
-
-    @ZBEX
-    val protectedSwitches: Collection<ProtectedSwitch> get() = _protectedSwitches.asUnmodifiable()
-
-    @ZBEX
-    val sensors: Collection<Sensor> get() = _sensors.asUnmodifiable()
-
-    @ZBEX
-    val schemes: Collection<ProtectionRelayScheme> get() = _schemes.asUnmodifiable()
-
-    /**
-     * Returns the number of time limits for this [ProtectionRelayFunction]
-     */
-    fun numTimeLimits(): Int = _timeLimits?.size ?: 0
-
-    /**
-     * Get the time limit of this [ProtectionRelayFunction] with index [sequenceNumber] if it exists, otherwise null.
-     *
-     * @param sequenceNumber The index of the desired time limit.
-     * @return The time limit with the specified [sequenceNumber] if it exists, otherwise null.
-     */
-    fun getTimeLimit(sequenceNumber: Int): Double? = _timeLimits?.getOrNull(sequenceNumber)
-
-    /**
-     * Java interop forEachIndexed. Perform the specified action against each time limit.
-     *
-     * @param action The action to perform on each time limit
-     */
-    fun forEachTimeLimit(action: BiConsumer<Int, Double>) {
-        _timeLimits?.forEachIndexed(action::accept)
-    }
-
-    /**
-     * Add a time limit
-     * @param timeLimit The time limit in seconds to add.
-     * @param index The index into the list to add the time limit at. Defaults to the end of the list.
-     * @return This [ProtectionRelayFunction] for fluent use.
-     */
-    @JvmOverloads
-    fun addTimeLimit(
-        timeLimit: Double,
-        index: Int = numTimeLimits(),
-    ): ProtectionRelayFunction {
-        require(index in 0..(numTimeLimits())) {
-            "Unable to add Double to ${typeNameAndMRID()}. " +
-                "Sequence number $index is invalid. Expected a value between 0 and ${numTimeLimits()}. " +
-                "Make sure you are adding the items in order and there are no gaps in the numbering."
-        }
-
-        _timeLimits = _timeLimits ?: mutableListOf()
-        _timeLimits!!.add(index, timeLimit)
-
-        return this
-    }
-
-    /**
-     * Add time limits
-     * @param timeLimits The time limits in seconds to add.
-     * @return This [ProtectionRelayFunction] for fluent use.
-     */
-    fun addTimeLimits(vararg timeLimits: Double): ProtectionRelayFunction {
-        _timeLimits = _timeLimits ?: mutableListOf()
-        timeLimits.forEach {
-            _timeLimits!!.add(it)
-        }
-
-        return this
-    }
-
-    /**
-     * Remove a time limit from the list.
-     * @param timeLimit The time limit to remove.
-     * @return true if the time limit was found and removed.
-     */
-    fun removeTimeLimit(timeLimit: Double): Boolean {
-        val ret = _timeLimits?.remove(timeLimit) ?: false
-        if (_timeLimits.isNullOrEmpty()) _timeLimits = null
-        return ret
-    }
-
-    /**
-     * Remove a time limit from the list.
-     * @param index The index of the time limit to remove.
-     * @return The time limit that was removed, or null if no time limit was present at [index].
-     */
-    fun removeTimeLimitAt(index: Int): Double? {
-        if (index >= numTimeLimits()) return null
-        val ret = _timeLimits?.removeAt(index)
-        if (_timeLimits.isNullOrEmpty()) _timeLimits = null
-        return ret
-    }
-
-    /**
-     * Clear [timeLimits].
-     * @return This [ProtectionRelayFunction] for fluent use.
-     */
-    fun clearTimeLimits(): ProtectionRelayFunction {
-        _timeLimits = null
-        return this
-    }
-
-    /**
-     * Get the number of threshold [RelaySetting]s for this [ProtectionRelayFunction].
-     *
-     * @return The number of threshold [RelaySetting]s for this [ProtectionRelayFunction].
-     */
-    fun numThresholds(): Int = _thresholds?.size ?: 0
-
-    /**
-     * Get a threshold [RelaySetting] for this [ProtectionRelayFunction] by its index. Thresholds are 0-indexed. Returns null for out-of-bound indices.
-     *
-     * @param sequenceNumber The sequence number of the desired threshold [RelaySetting]
-     * @return The threshold [RelaySetting] with the specified [sequenceNumber] if it exists, otherwise null
-     */
-    fun getThreshold(sequenceNumber: Int): RelaySetting? = _thresholds?.getOrNull(sequenceNumber)
-
-    /**
-     * Java interop forEachIndexed. Perform the specified action against each threshold [RelaySetting].
-     *
-     * @param action The action to perform on each threshold [RelaySetting]
-     */
-    fun forEachThreshold(action: BiConsumer<Int, RelaySetting>) {
-        _thresholds?.forEachIndexed(action::accept)
-    }
-
-    /**
-     * Add a threshold [RelaySetting] to this [ProtectionRelayFunction]'s list of thresholds.
-     *
-     * @param threshold The threshold [RelaySetting] to add to this [ProtectionRelayFunction].
-     * @return A reference to this [ProtectionRelayFunction] for fluent use.
-     */
-    @JvmOverloads
-    fun addThreshold(threshold: RelaySetting, sequenceNumber: Int = numThresholds()): ProtectionRelayFunction {
-        require(sequenceNumber in 0..(numThresholds())) {
-            "Unable to add RelaySetting to ${typeNameAndMRID()}. " +
-                "Sequence number $sequenceNumber is invalid. Expected a value between 0 and ${numThresholds()}. " +
-                "Make sure you are adding the items in order and there are no gaps in the numbering."
-        }
-
-        _thresholds = _thresholds ?: mutableListOf()
-        _thresholds!!.add(sequenceNumber, threshold)
-
-        return this
-    }
-
-    /**
-     * Removes a threshold [RelaySetting] from this [ProtectionRelayFunction].
-     *
-     * @param threshold The threshold [RelaySetting] to disassociate from this [ProtectionRelayFunction].
-     * @return true if the threshold [RelaySetting] was disassociated.
-     */
-    fun removeThreshold(threshold: RelaySetting): Boolean {
-        val ret = _thresholds?.remove(threshold) == true
-        if (_thresholds.isNullOrEmpty()) _thresholds = null
-        return ret
-    }
-
-    /**
-     * Remove a threshold [RelaySetting] from this [ProtectionRelayFunction] by its sequence number.
-     *
-     * NOTE: This will update the sequence numbers of all items located after the removed sequence number.
-     *
-     * @param sequenceNumber The sequence number of the threshold [RelaySetting] to disassociate from this [ProtectionRelayFunction].
-     * @return the threshold [RelaySetting] that was disassociated, or null if there was no threshold [RelaySetting] for the given [sequenceNumber].
-     */
-    fun removeThreshold(sequenceNumber: Int): RelaySetting? {
-        _thresholds?.apply {
-            if (sequenceNumber >= size)
-                return null
-
-            val ret = removeAt(sequenceNumber)
-            if (isNullOrEmpty()) _thresholds = null
-            return ret
-        }
-
-        return null
-    }
-
-    /**
-     * Removes all threshold [RelaySetting]s from this [ProtectionRelayFunction].
-     *
-     * @return A reference to this [ProtectionRelayFunction] for fluent use.
-     */
-    fun clearThresholds(): ProtectionRelayFunction {
-        _thresholds = null
-        return this
-    }
+    val thresholds: LazyIndexedList<RelaySetting> get() = LazyIndexedList(
+        { _thresholds },
+        { _thresholds = it },
+        this,
+        "RelaySetting"
+    )
 
     @ZBEX
     val protectedSwitches: LazyMridList<ProtectedSwitch> get() = LazyMridList(
@@ -287,6 +110,125 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
     // This boilerplate exists solely to enable backwards compatibility.
     // It will be removed eventually.
     // Every single method simply forwards the call to the corresponding list.
+
+    // region timeLimits boilerplate
+
+    @Deprecated(
+        message = "Use timeLimits.size instead.",
+        replaceWith = ReplaceWith("timeLimits.size")
+    )
+    fun numTimeLimits(): Int = timeLimits.size
+
+    @Deprecated(
+        message = "Use timeLimits.getOrNull(sequenceNumber) instead.",
+        replaceWith = ReplaceWith("timeLimits.getOrNull(sequenceNumber)")
+    )
+    fun getTimeLimit(sequenceNumber: Int): Double? = timeLimits.getOrNull(sequenceNumber)
+
+    @Deprecated(
+        message = "Use timeLimits.forEachIndexed(action::accept) instead.",
+        replaceWith = ReplaceWith("timeLimits.forEachIndexed(action::accept)")
+    )
+    fun forEachTimeLimit(action: BiConsumer<Int, Double>) = timeLimits.forEachIndexed(action::accept)
+
+    @Deprecated(
+        message = "Use timeLimits.add(index, timeLimit) instead.",
+        replaceWith = ReplaceWith("also { it.timeLimits.add(index, timeLimit) }")
+    )
+    @JvmOverloads
+    fun addTimeLimit(
+        timeLimit: Double,
+        index: Int = numTimeLimits(),
+    ): ProtectionRelayFunction {
+        timeLimits.add(index, timeLimit)
+
+        return this
+    }
+
+    @Deprecated(
+        message = "Use timeLimits.addAll(timeLimits.asList()) instead.",
+        replaceWith = ReplaceWith("also { it.timeLimits.addAll(timeLimits.asList()) }")
+    )
+    fun addTimeLimits(vararg timeLimits: Double): ProtectionRelayFunction {
+        this.timeLimits.addAll(timeLimits.asList())
+        return this
+    }
+
+    @Deprecated(
+        message = "Use timeLimits.remove(timeLimit) instead.",
+        replaceWith = ReplaceWith("timeLimits.remove(timeLimit)")
+    )
+    fun removeTimeLimit(timeLimit: Double): Boolean = timeLimits.remove(timeLimit)
+
+    @Deprecated(
+        message = "Use timeLimits.removeAt(index) instead.",
+        replaceWith = ReplaceWith("timeLimits.removeAt(index)")
+    )
+    fun removeTimeLimitAt(index: Int): Double? = timeLimits.removeAt(index)
+
+    @Deprecated(
+        message = "Use timeLimits.clear() instead.",
+        replaceWith = ReplaceWith("also { it.timeLimits.clear() }")
+    )
+    fun clearTimeLimits(): ProtectionRelayFunction {
+        timeLimits.clear()
+        return this
+    }
+
+    // endregion
+
+    // region thresholds boilerplate
+
+    @Deprecated(
+        message = "Use thresholds.size instead.",
+        replaceWith = ReplaceWith("thresholds.size")
+    )
+    fun numThresholds(): Int = thresholds.size
+
+    @Deprecated(
+        message = "Use thresholds.getOrNull(sequenceNumber) instead.",
+        replaceWith = ReplaceWith("thresholds.getOrNull(sequenceNumber)")
+    )
+    fun getThreshold(sequenceNumber: Int): RelaySetting? = thresholds.getOrNull(sequenceNumber)
+
+    @Deprecated(
+        message = "Use thresholds.forEachIndexed(action::accept) instead.",
+        replaceWith = ReplaceWith("thresholds.forEachIndexed(action::accept)")
+    )
+    fun forEachThreshold(action: BiConsumer<Int, RelaySetting>) = thresholds.forEachIndexed(action::accept)
+
+    @Deprecated(
+        message = "Use thresholds.add(sequenceNumber, threshold) instead.",
+        replaceWith = ReplaceWith("also { it.thresholds.add(sequenceNumber, threshold) }")
+    )
+    @JvmOverloads
+    fun addThreshold(threshold: RelaySetting, sequenceNumber: Int = numThresholds()): ProtectionRelayFunction {
+        thresholds.add(sequenceNumber, threshold)
+        return this
+    }
+
+    @Deprecated(
+        message = "Use thresholds.remove(threshold) instead.",
+        replaceWith = ReplaceWith("thresholds.remove(threshold)")
+    )
+    fun removeThreshold(threshold: RelaySetting): Boolean = thresholds.remove(threshold)
+
+    @Deprecated(
+        message = "Use thresholds.removeAt(sequenceNumber) instead.",
+        replaceWith = ReplaceWith("thresholds.removeAt(sequenceNumber)")
+    )
+    fun removeThreshold(sequenceNumber: Int): RelaySetting? = thresholds.removeAt(sequenceNumber)
+
+    @Deprecated(
+        message = "Use thresholds.clear() instead.",
+        replaceWith = ReplaceWith("also { it.thresholds.clear() }")
+    )
+    fun clearThresholds(): ProtectionRelayFunction {
+        thresholds.clear()
+        return this
+    }
+
+    // endregion
 
     // region protectedSwitches boilerplate
 

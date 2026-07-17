@@ -66,7 +66,7 @@ class BatteryUnit(mRID: String) : PowerElectronicsUnit(mRID) {
 
     @Deprecated(
         message = "Use controls.getByMode(controlMode) instead.",
-        replaceWith = ReplaceWith("controls.getBy(controlMode)")
+        replaceWith = ReplaceWith("controls.getByMode(controlMode)")
     )
     fun getControl(controlMode: BatteryControlMode): BatteryControl? = controls.getByMode(controlMode)
 

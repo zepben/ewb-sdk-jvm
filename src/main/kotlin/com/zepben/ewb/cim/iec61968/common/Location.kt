@@ -8,8 +8,8 @@
 
 package com.zepben.ewb.cim.iec61968.common
 
+import com.zepben.ewb.boilerplate.LazyIndexedList
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
-import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import java.util.function.BiConsumer
 
 /**
@@ -27,88 +27,80 @@ class Location(mRID: String) : IdentifiedObject(mRID) {
      * Sequence of [PositionPoint]s describing this location.
      * The returned collection is read only.
      */
-    val points: List<PositionPoint> get() = _positionPoints.asUnmodifiable()
+    val points: LazyIndexedList<PositionPoint> get() = LazyIndexedList(
+        { _positionPoints },
+        { _positionPoints = it },
+        this,
+        "PositionPoint"
+    )
 
-    /**
-     * Get the number of entries in the [PositionPoint] collection.
-     */
-    fun numPoints(): Int = _positionPoints?.size ?: 0
+    // region deprecated list boilerplate
+    //
+    // ("region/endregion" is an IntelliJ feature letting you hide the entire thing)
+    // This boilerplate exists solely to enable backwards compatibility.
+    // It will be removed eventually.
+    // Every single method simply forwards the call to the corresponding list.
 
-    /**
-     * Get a [PositionPoint] of this [Location] by its sequence number.
-     *
-     * @param sequenceNumber the sequence number of the required [PositionPoint]
-     * @return The [PositionPoint] with the specified [sequenceNumber] if it exists, otherwise null
-     */
-    fun getPoint(sequenceNumber: Int): PositionPoint? = _positionPoints?.getOrNull(sequenceNumber)
+    // region points boilerplate
 
-    /**
-     * Java interop forEachIndexed. Perform the specified action against each [PositionPoint].
-     *
-     * @param action The action to perform on each [PositionPoint]
-     */
-    fun forEachPoint(action: BiConsumer<Int, PositionPoint>) {
-        _positionPoints?.forEachIndexed(action::accept)
-    }
+    @Deprecated(
+        message = "Use points.size instead.",
+        replaceWith = ReplaceWith("points.size")
+    )
+    fun numPoints(): Int = points.size
 
-    /**
-     * Add a [PositionPoint] to this [Location]
-     * @param positionPoint The [PositionPoint] to add
-     * @param sequenceNumber The sequence number of the [PositionPoint].
-     */
+    @Deprecated(
+        message = "Use points.getOrNull(sequenceNumber) instead.",
+        replaceWith = ReplaceWith("points.getOrNull(sequenceNumber)")
+    )
+    fun getPoint(sequenceNumber: Int): PositionPoint? = points.getOrNull(sequenceNumber)
+
+    @Deprecated(
+        message = "Use points.getOrNull(sequenceNumber) instead.",
+        replaceWith = ReplaceWith("points.getOrNull(sequenceNumber)")
+    )
+    operator fun get(sequenceNumber: Int): PositionPoint? = getPoint(sequenceNumber)
+
+    @Deprecated(
+        message = "Use points.forEachIndexed(action::accept) instead.",
+        replaceWith = ReplaceWith("points.forEachIndexed(action::accept)")
+    )
+    fun forEachPoint(action: BiConsumer<Int, PositionPoint>) = points.forEachIndexed(action::accept)
+
+    @Deprecated(
+        message = "Use points.add(sequenceNumber, positionPoint) instead.",
+        replaceWith = ReplaceWith("also { it.points.add(sequenceNumber, positionPoint) }")
+    )
     @JvmOverloads
     fun addPoint(positionPoint: PositionPoint, sequenceNumber: Int = numPoints()): Location {
-        require(sequenceNumber in 0..(numPoints())) {
-            "Unable to add PositionPoint to ${typeNameAndMRID()}. " +
-                "Sequence number $sequenceNumber is invalid. Expected a value between 0 and ${numPoints()}. " +
-                "Make sure you are adding the items in order and there are no gaps in the numbering."
-        }
-
-        _positionPoints = _positionPoints ?: mutableListOf()
-        _positionPoints!!.add(sequenceNumber, positionPoint)
-
+        points.add(sequenceNumber, positionPoint)
         return this
     }
 
-    /**
-     * Remove a [PositionPoint] from this [Location]
-     * @param positionPoint The [PositionPoint] to remove.
-     * @return true if the [PositionPoint] was removed.
-     */
-    fun removePoint(positionPoint: PositionPoint): Boolean {
-        val ret = _positionPoints?.remove(positionPoint) == true
-        if (_positionPoints.isNullOrEmpty()) _positionPoints = null
-        return ret
-    }
+    @Deprecated(
+        message = "Use points.remove(positionPoint) instead.",
+        replaceWith = ReplaceWith("points.remove(positionPoint)")
+    )
+    fun removePoint(positionPoint: PositionPoint): Boolean = points.remove(positionPoint)
 
-    /**
-     * Remove a [PositionPoint] from this [Location] by its sequence number.
-     *
-     * NOTE: This will update the sequence numbers of all items located after the removed sequence number.
-     *
-     * @param sequenceNumber The sequence number of the [PositionPoint] to remove.
-     * @return the [PositionPoint] that was removed, or null if there was no [PositionPoint] for the given [sequenceNumber].
-     */
-    fun removePoint(sequenceNumber: Int): PositionPoint? {
-        _positionPoints?.apply {
-            if (sequenceNumber >= size)
-                return null
+    @Deprecated(
+        message = "Use points.removeAt(sequenceNumber) instead.",
+        replaceWith = ReplaceWith("points.removeAt(sequenceNumber)")
+    )
+    fun removePoint(sequenceNumber: Int): PositionPoint? = points.removeAt(sequenceNumber)
 
-            val ret = removeAt(sequenceNumber)
-            if (isNullOrEmpty()) _positionPoints = null
-            return ret
-        }
-
-        return null
-    }
-
-    /**
-     * Clear all [PositionPoint]'s from this [Location]
-     */
+    @Deprecated(
+        message = "Use points.clear() instead.",
+        replaceWith = ReplaceWith("also { it.points.clear() }")
+    )
     fun clearPoints(): Location {
-        _positionPoints = null
+        points.clear()
         return this
     }
+
+    // endregion
+
+    // endregion
 }
 
 /**

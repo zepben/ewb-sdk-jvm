@@ -248,3 +248,41 @@ class LazyMridMap<T : Identifiable>(
         return true
     }
 }
+
+
+
+class LazyIndexedList<T>(
+    val getter: () -> MutableList<T>?,
+    val setter: (MutableList<T>?) -> Unit,
+    val owner: Identifiable,
+    val elementDescription: String,
+    sortBy: ((T) -> Comparable<*>?)? = null
+) : LazyValidatedList<T>(getter, setter, null, sortBy),
+    IndexableMutableCollection<T> {
+
+    fun add(index: Int, element: T) {
+        val data = getter()
+        require(index in 0..size) {
+            "Unable to add $elementDescription to ${owner.typeNameAndMRID()}. " +
+                "Sequence number $index is invalid. Expected a value between 0 and ${size}. " +
+                "Make sure you are adding the items in order and there are no gaps in the numbering."
+        }
+        data
+            ?.add(index, element)
+            ?:setter(mutableListOf(element))
+    }
+
+    override fun add(element: T): Boolean  {
+        add(size, element)
+        return true
+    }
+
+    fun removeAt(index: Int): T? {
+        return if(index in 0..size) {
+            getter()?.removeAt(index)
+        } else
+            null
+    }
+
+}
+

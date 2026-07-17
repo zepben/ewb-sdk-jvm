@@ -159,16 +159,16 @@ class PowerTransformer(mRID: String) : ConductingEquipment(mRID) {
     fun getEnd(endNumber: Int): PowerTransformerEnd? = ends.getByEndNumber(endNumber)
 
     @Deprecated(
-        message = "Use ends.getBy(terminal) instead.",
-        replaceWith = ReplaceWith("ends.getBy(terminal)")
+        message = "Use ends.getByTerminal(terminal) instead.",
+        replaceWith = ReplaceWith("ends.getByTerminal(terminal)")
     )
-    fun getEnd(terminal: Terminal): PowerTransformerEnd? = ends.getBy(terminal)
+    fun getEnd(terminal: Terminal): PowerTransformerEnd? = ends.getByTerminal(terminal)
 
     @Deprecated(
-        message = "Use ends.getBy(connectivityNode) instead.",
-        replaceWith = ReplaceWith("ends.getBy(connectivityNode)")
+        message = "Use ends.getByNode(connectivityNode) instead.",
+        replaceWith = ReplaceWith("ends.getByNode(connectivityNode)")
     )
-    fun getEnd(connectivityNode: ConnectivityNode): PowerTransformerEnd? = ends.getBy(connectivityNode)
+    fun getEnd(connectivityNode: ConnectivityNode): PowerTransformerEnd? = ends.getByNode(connectivityNode)
 
     @Deprecated(
         message = "Use ends.add(end) instead.",
@@ -217,7 +217,7 @@ fun PowerTransformerEndList.getByEndNumber(endNumber: Int): PowerTransformerEnd?
  * @param terminal the terminal of the required [PowerTransformerEnd]
  * @return The [PowerTransformerEnd] with the specified [terminal] if it exists, otherwise null
  */
-fun PowerTransformerEndList.getBy(terminal: Terminal): PowerTransformerEnd? =
+fun PowerTransformerEndList.getByTerminal(terminal: Terminal): PowerTransformerEnd? =
     firstOrNull { it.terminal == terminal }
 
 /**
@@ -226,5 +226,5 @@ fun PowerTransformerEndList.getBy(terminal: Terminal): PowerTransformerEnd? =
  * @param connectivityNode the [ConnectivityNode] of the required [PowerTransformerEnd]
  * @return The [PowerTransformerEnd] with the specified [Terminal] if it exists, otherwise null
  */
-fun PowerTransformerEndList.getBy(connectivityNode: ConnectivityNode): PowerTransformerEnd? =
+fun PowerTransformerEndList.getByNode(connectivityNode: ConnectivityNode): PowerTransformerEnd? =
     firstOrNull { it.terminal?.connectivityNode == connectivityNode }

@@ -218,7 +218,7 @@ class AcLineSegment(mRID: String) : Conductor(mRID) {
         message = "Use phases.getByPhase(phase) instead.",
         replaceWith = ReplaceWith("getByPhase(phase)")
     )
-    fun getPhase(phase: SinglePhaseKind): AcLineSegmentPhase? = phases.getBy(phase)
+    fun getPhase(phase: SinglePhaseKind): AcLineSegmentPhase? = phases.getByPhase(phase)
 
     @Deprecated(
         message = "Use phases.add(phase) instead.",
@@ -257,4 +257,4 @@ typealias AcLineSegmentPhaseList = MridCollection<AcLineSegmentPhase>
  * @param phase the phase of the required [AcLineSegmentPhase]
  * @return The [AcLineSegmentPhase] with the specified [phase] if it exists, otherwise null
  */
-fun AcLineSegmentPhaseList.getBy(phase: SinglePhaseKind): AcLineSegmentPhase? = firstOrNull { it.phase == phase }
+fun AcLineSegmentPhaseList.getByPhase(phase: SinglePhaseKind): AcLineSegmentPhase? = firstOrNull { it.phase == phase }

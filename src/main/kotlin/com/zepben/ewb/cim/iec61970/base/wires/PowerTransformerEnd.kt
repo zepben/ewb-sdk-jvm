@@ -8,10 +8,10 @@
 
 package com.zepben.ewb.cim.iec61970.base.wires
 
+import com.zepben.ewb.boilerplate.LazyValidatedList
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.TransformerCoolingType
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.TransformerEndRatedS
-import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import com.zepben.ewb.services.network.ResistanceReactance
 import com.zepben.ewb.services.network.mergeIfIncomplete
 
@@ -101,7 +101,19 @@ class PowerTransformerEnd(mRID: String) : TransformerEnd(mRID) {
      * The returned collection is read only.
      */
     @ZBEX
-    val sRatings: List<TransformerEndRatedS> get() = _sRatings.asUnmodifiable()
+    val sRatings: LazyValidatedList<TransformerEndRatedS> get() = LazyValidatedList(
+        { _sRatings },
+        { _sRatings = it },
+        ::validateRating,
+        { -it.ratedS }
+
+    )
+
+
+    private fun validateRating(rating: TransformerEndRatedS) {
+        if (_sRatings?.any { r -> r.coolingType == rating.coolingType } == true)
+            throw IllegalArgumentException("A rating for coolingType ${rating.coolingType.name} already exists, please remove it first.")
+    }
 
     /**
      * Get the [ResistanceReactance] for this [PowerTransformerEnd] from either:
@@ -118,80 +130,93 @@ class PowerTransformerEnd(mRID: String) : TransformerEnd(mRID) {
             powerTransformer?.assetInfo?.resistanceReactance(endNumber)
         }
 
-    /**
-     * Find the first rating with the provided cooling type.
-     *
-     * @param coolingType The [TransformerCoolingType] to search for.
-     * @return The [TransformerEndRatedS] for the given [coolingType], or `null` if there were no ratings for that type.
-     */
-    fun getRating(coolingType: TransformerCoolingType): TransformerEndRatedS? = _sRatings?.find { it.coolingType == coolingType }
+    // region deprecated list boilerplate
+    //
+    // ("region/endregion" is an IntelliJ feature letting you hide the entire thing)
+    // This boilerplate exists solely to enable backwards compatibility.
+    // It will be removed eventually.
+    // Every single method simply forwards the call to the corresponding list.
 
-    /**
-     * The number of ratings.
-     */
-    fun numRatings(): Int = _sRatings?.size ?: 0
+    // region sRatings boilerplate
 
-    /**
-     * Add a normal apparent power rating for this PowerTransformerEnd.
-     * The ratings in the underlying collection will be sorted by [ratedS] in descending order.
-     *
-     * @param ratedS The normal apparent power rating to set.
-     * @param coolingType The cooling type used for this rating, defaults to [TransformerCoolingType.UNKNOWN]
-     * @throws IllegalArgumentException if a rating for the provided [coolingType] already exists for this PowerTransformerEnd.
-     */
+    @Deprecated(
+        message = "Use sRatings.getByCoolingType(coolingType) instead.",
+        replaceWith = ReplaceWith("sRatings.getByCoolingType(coolingType)")
+    )
+    fun getRating(coolingType: TransformerCoolingType): TransformerEndRatedS? = sRatings.getByCoolingType(coolingType)
+
+    @Deprecated(
+        message = "Use sRatings.size instead.",
+        replaceWith = ReplaceWith("sRatings.size")
+    )
+    fun numRatings(): Int = sRatings.size
+
+    @Deprecated(
+        message = "Use sRatings.add(ratedS, coolingType) instead.",
+        replaceWith = ReplaceWith("also { it.sRatings.add(ratedS, coolingType) }")
+    )
     fun addRating(
         ratedS: Int,
         coolingType: TransformerCoolingType = TransformerCoolingType.UNKNOWN,
     ): PowerTransformerEnd {
-        if (_sRatings?.any { r -> r.coolingType == coolingType } == true)
-            throw IllegalArgumentException("A rating for coolingType ${coolingType.name} already exists, please remove it first.")
-
-        _sRatings = _sRatings ?: mutableListOf()
-        _sRatings!!.add(TransformerEndRatedS(coolingType, ratedS))
-        _sRatings!!.sortByDescending { it.ratedS }
-
+        sRatings.add(ratedS, coolingType)
         return this
     }
 
-    /**
-     * Add a [TransformerEndRatedS] to this [PowerTransformerEnd].
-     *
-     * @param rating The [TransformerEndRatedS] to add.
-     * @return This [PowerTransformerEnd] for fluent use.
-     */
-    fun addRating(rating: TransformerEndRatedS): PowerTransformerEnd = addRating(rating.ratedS, rating.coolingType)
-
-    /**
-     * Remove [rating] from the [sRatings] collection.
-     *
-     * @param rating The [TransformerEndRatedS] to remove.
-     * @return true if [rating] was removed.
-     */
-    fun removeRating(rating: TransformerEndRatedS): Boolean {
-        val ret = _sRatings?.remove(rating) == true
-        if (_sRatings.isNullOrEmpty()) _sRatings = null
-        return ret
+    @Deprecated(
+        message = "Use sRatings.add(rating) instead.",
+        replaceWith = ReplaceWith("also { it.sRatings.add(rating) }")
+    )
+    fun addRating(rating: TransformerEndRatedS): PowerTransformerEnd {
+        sRatings.add(rating)
+        return this
     }
 
-    /**
-     * Remove the [TransformerEndRatedS] from the [sRatings] collection with a cooling type of [coolingType]
-     *
-     * @param coolingType The [TransformerCoolingType] to remove.
-     * @return The [TransformerEndRatedS] that was removed, or null if none was removed.
-     */
-    fun removeRating(coolingType: TransformerCoolingType): TransformerEndRatedS? {
-        val r = _sRatings?.find { it.coolingType == coolingType }
-        _sRatings?.remove(r)
-        if (_sRatings.isNullOrEmpty()) _sRatings = null
-        return r
-    }
+    @Deprecated(
+        message = "Use sRatings.remove(rating) instead.",
+        replaceWith = ReplaceWith("sRatings.remove(rating)")
+    )
+    fun removeRating(rating: TransformerEndRatedS): Boolean = sRatings.remove(rating)
 
-    /**
-     * Clear the [sRatings] for this end.
-     */
+    @Deprecated(
+        message = "Use sRatings.removeByCoolingType(coolingType) instead.",
+        replaceWith = ReplaceWith("sRatings.removeByCoolingType(coolingType)")
+    )
+    fun removeRating(coolingType: TransformerCoolingType): TransformerEndRatedS? = sRatings.removeByCoolingType(coolingType)
+
+    @Deprecated(
+        message = "Use sRatings.clear() instead.",
+        replaceWith = ReplaceWith("also { it.sRatings.clear() }")
+    )
     fun clearRatings(): PowerTransformerEnd {
-        _sRatings = null
+        sRatings.clear()
         return this
     }
+
+    // endregion
+
+    // endregion
 
 }
+
+typealias TransformerEndRatedSList = LazyValidatedList<TransformerEndRatedS>
+
+fun TransformerEndRatedSList.add(
+    ratedS: Int,
+    coolingType: TransformerCoolingType = TransformerCoolingType.UNKNOWN,
+): Boolean = add(TransformerEndRatedS(coolingType, ratedS))
+
+fun TransformerEndRatedSList.getByCoolingType(coolingType: TransformerCoolingType): TransformerEndRatedS? = firstOrNull { it.coolingType == coolingType }
+
+
+/**
+ * Remove the [TransformerEndRatedS] from the [sRatings] collection with a cooling type of [coolingType]
+ *
+ * @param coolingType The [TransformerCoolingType] to remove.
+ * @return The [TransformerEndRatedS] that was removed, or null if none was removed.
+ */
+fun TransformerEndRatedSList.removeByCoolingType(coolingType: TransformerCoolingType): TransformerEndRatedS? =
+    firstOrNull { it.coolingType == coolingType }?.also{
+        remove(it)
+    }
+

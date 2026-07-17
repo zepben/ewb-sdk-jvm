@@ -8,9 +8,9 @@
 
 package com.zepben.ewb.cim.extensions.iec61968.assetinfo
 
+import com.zepben.ewb.boilerplate.LazyIndexedList
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.iec61968.assets.AssetInfo
-import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import java.util.function.BiConsumer
 
 /**
@@ -33,100 +33,89 @@ class RelayInfo(mRID: String) : AssetInfo(mRID) {
     private var _recloseDelays: MutableList<Double>? = null
 
     @ZBEX
-    val recloseDelays: List<Double> get() = _recloseDelays.asUnmodifiable()
+    val recloseDelays: LazyIndexedList<Double> get() = LazyIndexedList(
+        { _recloseDelays },
+        { _recloseDelays = it },
+        this,
+        "Double"
+    )
 
-    /**
-     * Returns the number of reclose delays for this [RelayInfo]
-     */
-    fun numDelays(): Int = _recloseDelays?.size ?: 0
 
-    /**
-     * Get the reclose delay at the specified index, if it exists. Otherwise, this returns null.
-     *
-     * @param sequenceNumber the index of the reclose delay.
-     * @return the reclose delay at [sequenceNumber] if it exists, otherwise null.
-     */
-    fun getDelay(sequenceNumber: Int): Double? = _recloseDelays?.getOrNull(sequenceNumber)
+    // region deprecated list boilerplate
+    //
+    // ("region/endregion" is an IntelliJ feature letting you hide the entire thing)
+    // This boilerplate exists solely to enable backwards compatibility.
+    // It will be removed eventually.
+    // Every single method simply forwards the call to the corresponding list.
 
-    /**
-     * Java interop forEachIndexed. Perform the specified action against each reclose delay ([Double]).
-     *
-     * @param action The action to perform on each reclose delay ([Double])
-     */
-    fun forEachDelay(action: BiConsumer<Int, Double>) {
-        _recloseDelays?.forEachIndexed(action::accept)
-    }
+    // region recloseDelays boilerplate
 
-    /**
-     * Add a reclose delay
-     * @param delay The delay in seconds to add.
-     * @param sequenceNumber The index into the list to add the delay at. Defaults to the end of the list.
-     * @return This [RelayInfo] for fluent use.
-     */
+    @Deprecated(
+        message = "Use recloseDelays.size instead.",
+        replaceWith = ReplaceWith("recloseDelays.size")
+    )
+    fun numDelays(): Int = recloseDelays.size
+
+    @Deprecated(
+        message = "Use recloseDelays.getOrNull(sequenceNumber) instead.",
+        replaceWith = ReplaceWith("recloseDelays.getOrNull(sequenceNumber)")
+    )
+    fun getDelay(sequenceNumber: Int): Double? = recloseDelays.getOrNull(sequenceNumber)
+
+    @Deprecated(
+        message = "Use recloseDelays.forEachIndexed(action::accept) instead.",
+        replaceWith = ReplaceWith("recloseDelays.forEachIndexed(action::accept)")
+    )
+    fun forEachDelay(action: BiConsumer<Int, Double>) = recloseDelays.forEachIndexed(action::accept)
+
+    @Deprecated(
+        message = "Use recloseDelays.add(sequenceNumber, delay) instead.",
+        replaceWith = ReplaceWith("also { it.recloseDelays.add(sequenceNumber, delay) }")
+    )
     @JvmOverloads
     fun addDelay(
         delay: Double,
         sequenceNumber: Int = numDelays(),
     ): RelayInfo {
-        require(sequenceNumber in 0..(numDelays())) {
-            "Unable to add Double to ${typeNameAndMRID()}. " +
-                "Sequence number $sequenceNumber is invalid. Expected a value between 0 and ${numDelays()}. " +
-                "Make sure you are adding the items in order and there are no gaps in the numbering."
-        }
-
-        _recloseDelays = _recloseDelays ?: mutableListOf()
-        _recloseDelays!!.add(sequenceNumber, delay)
-
+        recloseDelays.add(sequenceNumber, delay)
         return this
     }
 
-    /**
-     * Add reclose delays
-     * @param delays The delays in seconds to add.
-     * @return This [RelayInfo] for fluent use.
-     */
+    @Deprecated(
+        message = "Use recloseDelays.addAll(delays.asList()) instead.",
+        replaceWith = ReplaceWith("also { it.recloseDelays.addAll(delays.asList()) }")
+    )
     fun addDelays(
         vararg delays: Double,
     ): RelayInfo {
-        _recloseDelays = _recloseDelays ?: mutableListOf()
-        delays.forEach {
-            _recloseDelays!!.add(it)
-        }
-
+        recloseDelays.addAll(delays.asList())
         return this
     }
 
-    /**
-     * Remove a delay by its value.
-     * @param delay The value of the delay to remove.
-     * @return true if a delay was removed, false otherwise.
-     */
-    fun removeDelay(delay: Double): Boolean {
-        val ret = _recloseDelays?.remove(delay) == true
-        if (_recloseDelays.isNullOrEmpty()) _recloseDelays = null
-        return ret
-    }
+    @Deprecated(
+        message = "Use recloseDelays.remove(delay) instead.",
+        replaceWith = ReplaceWith("recloseDelays.remove(delay)")
+    )
+    fun removeDelay(delay: Double): Boolean = recloseDelays.remove(delay)
 
-    /**
-     * Remove a delay from the list.
-     * @param index The index of the delay to remove.
-     * @return The delay that was removed, or null if no delay was present at [index].
-     */
-    fun removeDelayAt(index: Int): Double? {
-        if (index >= numDelays()) return null
-        val ret = _recloseDelays?.removeAt(index)
-        if (_recloseDelays.isNullOrEmpty()) _recloseDelays = null
-        return ret
-    }
+    @Deprecated(
+        message = "Use recloseDelays.removeAt(index) instead.",
+        replaceWith = ReplaceWith("recloseDelays.removeAt(index)")
+    )
+    fun removeDelayAt(index: Int): Double? = recloseDelays.removeAt(index)
 
-    /**
-     * Clear [recloseDelays].
-     * @return This [RelayInfo] for fluent use.
-     */
+    @Deprecated(
+        message = "Use recloseDelays.clear() instead.",
+        replaceWith = ReplaceWith("also { it.recloseDelays.clear() }")
+    )
     fun clearDelays(): RelayInfo {
-        _recloseDelays = null
+        recloseDelays.clear()
         return this
     }
+
+    // endregion
+
+    // endregion
 
 }
 

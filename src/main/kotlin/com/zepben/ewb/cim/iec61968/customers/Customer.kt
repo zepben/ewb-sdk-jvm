@@ -9,6 +9,7 @@
 package com.zepben.ewb.cim.iec61968.customers
 
 import com.zepben.ewb.boilerplate.LazyMridList
+import com.zepben.ewb.boilerplate.MridCollection
 import com.zepben.ewb.cim.iec61968.common.OrganisationRole
 
 /**
@@ -34,7 +35,7 @@ class Customer(mRID: String) : OrganisationRole(mRID) {
     /**
      * All agreements of this customer. The returned collection is read only.
      */
-    val agreements: LazyMridList<CustomerAgreement> get() = LazyMridList(
+    val agreements: MridCollection<CustomerAgreement> get() = LazyMridList(
         getter = { _customerAgreements },
         setter = { _customerAgreements = it },
         owner = this,

@@ -29,7 +29,7 @@ internal class MridWrapperTest {
     fun `nullable list wrapper starts empty when backing list is null`() {
         var backing: MutableList<Clamp>? = null
 
-        val wrapper = LazyMridList<Clamp>(
+        val wrapper = LazyMridList(
             getter = { backing },
             setter = { backing = it },
             owner = Clamp("owner"),
@@ -47,7 +47,7 @@ internal class MridWrapperTest {
     fun `nullable list wrapper add creates backing list and stores element`() {
         var backing: MutableList<Clamp>? = null
 
-        val wrapper = LazyMridList<Clamp>(
+        val wrapper = LazyMridList(
             getter = { backing },
             setter = { backing = it },
             owner = Clamp("owner"),
@@ -68,7 +68,7 @@ internal class MridWrapperTest {
     fun `nullable list wrapper adding same instance twice is ignored`() {
         var backing: MutableList<Clamp>? = null
 
-        val wrapper = LazyMridList<Clamp>(
+        val wrapper = LazyMridList(
             getter = { backing },
             setter = { backing = it },
             owner = Clamp("owner"),
@@ -89,7 +89,7 @@ internal class MridWrapperTest {
     fun `nullable list wrapper rejects mrid collision before mutating backing list`() {
         var backing: MutableList<Clamp>? = null
 
-        val wrapper = LazyMridList<Clamp>(
+        val wrapper = LazyMridList(
             getter = { backing },
             setter = { backing = it },
             owner = Clamp("owner"),
@@ -115,7 +115,7 @@ internal class MridWrapperTest {
         var backing: MutableList<Clamp>? = null
         val rejected = Clamp("a")
 
-        val wrapper = LazyMridList<Clamp>(
+        val wrapper = LazyMridList(
             getter = { backing },
             setter = { backing = it },
             owner = Clamp("owner"),
@@ -139,7 +139,7 @@ internal class MridWrapperTest {
     fun `nullable list wrapper sorts after successful addition`() {
         var backing: MutableList<Clamp>? = null
 
-        val wrapper = LazyMridList<Clamp>(
+        val wrapper = LazyMridList(
             getter = { backing },
             setter = { backing = it },
             owner = Clamp("owner"),
@@ -164,7 +164,7 @@ internal class MridWrapperTest {
         val clamp = Clamp("a")
         var backing: MutableList<Clamp>? = mutableListOf(clamp)
 
-        val wrapper = LazyMridList<Clamp>(
+        val wrapper = LazyMridList(
             getter = { backing },
             setter = { backing = it },
             owner = Clamp("owner"),
@@ -183,7 +183,7 @@ internal class MridWrapperTest {
         val b = Clamp("b")
         var backing: MutableList<Clamp>? = mutableListOf(a, b)
 
-        val wrapper = LazyMridList<Clamp>(
+        val wrapper = LazyMridList(
             getter = { backing },
             setter = { backing = it },
             owner = Clamp("owner"),
@@ -203,7 +203,7 @@ internal class MridWrapperTest {
         val clamp = Clamp("a")
         var backing: MutableList<Clamp>? = mutableListOf(clamp)
 
-        val wrapper = LazyMridList<Clamp>(
+        val wrapper = LazyMridList(
             getter = { backing },
             setter = { backing = it },
             owner = Clamp("owner"),
@@ -225,7 +225,7 @@ internal class MridWrapperTest {
     fun `nullable list wrapper clear sets backing list to null`() {
         var backing: MutableList<Clamp>? = mutableListOf(Clamp("a"))
 
-        val wrapper = LazyMridList<Clamp>(
+        val wrapper = LazyMridList(
             getter = { backing },
             setter = { backing = it },
             owner = Clamp("owner"),

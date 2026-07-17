@@ -9,6 +9,7 @@
 package com.zepben.ewb.cim.iec61968.operations
 
 import com.zepben.ewb.boilerplate.LazyMridList
+import com.zepben.ewb.boilerplate.MridCollection
 import com.zepben.ewb.cim.iec61968.common.Document
 import com.zepben.ewb.cim.iec61970.base.core.Equipment
 
@@ -30,7 +31,7 @@ class OperationalRestriction(mRID: String) : Document(mRID) {
     /**
      * All equipment to which this restriction applies. The returned collection is read only.
      */
-    val equipment: LazyMridList<Equipment> get() = LazyMridList(
+    val equipment: MridCollection<Equipment> get() = LazyMridList(
         getter = { _equipment },
         setter = { _equipment = it },
         owner = this,

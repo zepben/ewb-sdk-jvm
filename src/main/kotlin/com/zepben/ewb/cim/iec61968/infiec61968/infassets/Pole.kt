@@ -9,6 +9,7 @@
 package com.zepben.ewb.cim.iec61968.infiec61968.infassets
 
 import com.zepben.ewb.boilerplate.LazyMridList
+import com.zepben.ewb.boilerplate.MridCollection
 import com.zepben.ewb.cim.iec61968.assets.Streetlight
 import com.zepben.ewb.cim.iec61968.assets.Structure
 
@@ -26,7 +27,7 @@ class Pole(mRID: String) : Structure(mRID) {
     /**
      * All streetlights attached to this Pole. Collection is read only.
      */
-    val streetlights: LazyMridList<Streetlight> get() = LazyMridList(
+    val streetlights: MridCollection<Streetlight> get() = LazyMridList(
         getter = { _streetlights },
         setter = { _streetlights = it },
         owner = this,

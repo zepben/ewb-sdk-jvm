@@ -9,6 +9,7 @@
 package com.zepben.ewb.cim.iec61968.assets
 
 import com.zepben.ewb.boilerplate.LazyMridList
+import com.zepben.ewb.boilerplate.MridCollection
 import com.zepben.ewb.cim.iec61968.common.Location
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.core.PowerSystemResource
@@ -32,7 +33,7 @@ abstract class Asset(mRID: String) : IdentifiedObject(mRID) {
     /**
      * All roles an organisation plays for this asset. The returned collection is read only.
      */
-    val organisationRoles: LazyMridList<AssetOrganisationRole> get() = LazyMridList(
+    val organisationRoles: MridCollection<AssetOrganisationRole> get() = LazyMridList(
         getter = { _organisationRoles },
         setter = { _organisationRoles = it },
         owner = this,
@@ -43,7 +44,7 @@ abstract class Asset(mRID: String) : IdentifiedObject(mRID) {
      * All power system resources used to electrically model this asset. For example, transformer asset is electrically modelled with a transformer and its
      * windings and tap changer.
      */
-    val powerSystemResources: LazyMridList<PowerSystemResource> get() = LazyMridList(
+    val powerSystemResources: MridCollection<PowerSystemResource> get() = LazyMridList(
         getter = { _powerSystemResources },
         setter = { _powerSystemResources = it },
         owner = this,

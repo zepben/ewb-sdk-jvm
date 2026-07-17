@@ -8,7 +8,9 @@
 
 package com.zepben.ewb.cim.iec61970.base.core
 
+import com.zepben.ewb.boilerplate.Backfill
 import com.zepben.ewb.boilerplate.LazyMridList
+import com.zepben.ewb.boilerplate.MridCollection
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
 
@@ -29,28 +31,23 @@ class Substation(mRID: String) : EquipmentContainer(mRID) {
     /**
      * The normal energized feeders of the substation. Also used for naming purposes. The returned collection is read only.
      */
-    val feeders: LazyMridList<Feeder> get() = LazyMridList(
+    val feeders: MridCollection<Feeder> get() = LazyMridList(
         getter = { _normalEnergizedFeeders },
         setter = { _normalEnergizedFeeders = it },
         owner = this,
         elementDescription = "A Feeder",
-        validate = { validateFeeder(it) }
+        backfill = Backfill(
+            { it.normalEnergizingSubstation },
+            { it, other -> it.normalEnergizingSubstation = other },
+            Feeder::normalEnergizingSubstation,
+        ),
     )
-
-    private fun validateFeeder(feeder: Feeder) {
-        if (feeder.normalEnergizingSubstation == null)
-            feeder.normalEnergizingSubstation = this
-
-        require(feeder.normalEnergizingSubstation === this) {
-            "${feeder.typeNameAndMRID()} `normalEnergizingSubstation` property references ${feeder.normalEnergizingSubstation!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
-        }
-    }
 
     /**
      * <no description from CIM>
      * The returned collection is read only.
      */
-    val loops: LazyMridList<Loop> get() = LazyMridList(
+    val loops: MridCollection<Loop> get() = LazyMridList(
         getter = { _loops },
         setter = { _loops = it },
         owner = this,
@@ -61,7 +58,7 @@ class Substation(mRID: String) : EquipmentContainer(mRID) {
      * <no description from CIM>
      * The returned collection is read only.
      */
-    val energizedLoops: LazyMridList<Loop> get() = LazyMridList(
+    val energizedLoops: MridCollection<Loop> get() = LazyMridList(
         getter = { _energizedLoops },
         setter = { _energizedLoops = it },
         owner = this,
@@ -72,7 +69,7 @@ class Substation(mRID: String) : EquipmentContainer(mRID) {
      * Simplification of the CIM association via Bay to [Circuit].
      * The returned collection is read only.
      */
-    val circuits: LazyMridList<Circuit> get() = LazyMridList(
+    val circuits: MridCollection<Circuit> get() = LazyMridList(
         getter = { _circuits },
         setter = { _circuits = it },
         owner = this,

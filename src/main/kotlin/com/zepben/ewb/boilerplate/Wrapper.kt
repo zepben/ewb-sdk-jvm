@@ -10,6 +10,7 @@ package com.zepben.ewb.boilerplate
 
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.services.common.extensions.asUnmodifiable
+import kotlin.reflect.KMutableProperty1
 
 
 interface IndexableMutableCollection<T> : MutableCollection<T>, List<T> {
@@ -102,15 +103,37 @@ interface MridCollection<T : Identifiable> : MutableCollection<T> {
         return false
     }
 
+
+    override fun iterator(): MutableIterator<T> {
+        val iterator = super.iterator()
+        var current: T? = null
+
+        return object : MutableIterator<T> by iterator {
+            override fun next(): T =
+                iterator.next().also { current = it }
+
+            override fun remove() {
+                iterator.remove()
+                if (current != null)
+                    postRemove(current)
+            }
+        }
+    }
+
+    fun postRemove(element: T) {
+
+    }
+
 }
 
 interface IndexableMridCollection<T : Identifiable> : MridCollection<T>, IndexableMutableCollection<T>
 
-class LazyMridList<T : Identifiable>(
+class LazyMridList<T : Identifiable, O : Identifiable>(
     private val getter: () -> MutableList<T>?,
     setter: (MutableList<T>?) -> Unit,
-    override val owner: Identifiable,
+    override val owner: O,
     override val elementDescription: String,
+    val backfill: Backfill<T, O>? = null,
     validate: ((T) -> Unit)? = null,
     sortBy: ((T) -> Comparable<*>?)? = null
 ) : LazyValidatedList<T>(
@@ -128,7 +151,27 @@ class LazyMridList<T : Identifiable>(
         if (!canAddByMrid(element))
             return false
 
+        backfill?.apply(owner, element)
+
         return super.add(element)
+    }
+
+    override fun iterator(): MutableIterator<T> {
+        val iterator = super.iterator()
+        var last: T? = null
+
+        return object : MutableIterator<T> by iterator {
+            override fun next(): T =
+                iterator.next().also { last = it }
+
+            override fun remove() {
+                val removed = last
+                iterator.remove()
+
+                if (removed != null)
+                    backfill?.clear(removed)
+            }
+        }
     }
 
 }
@@ -286,3 +329,23 @@ class LazyIndexedList<T>(
 
 }
 
+class Backfill<T : Identifiable, O : Identifiable>(
+    val getter: (T) -> Identifiable?,
+    val setter: (T, O?) -> Unit,
+    val backfillProp: KMutableProperty1<T, O?>,
+) {
+    fun apply(owner: O, element: T) {
+        if (getter(element) == null)
+            setter(element, owner)
+
+        val ref = getter(element)
+        require(ref === owner) {
+            "${element.typeNameAndMRID()} `${backfillProp.name}` property references ${ref?.typeNameAndMRID()}, expected ${owner.typeNameAndMRID()}."
+        }
+    }
+
+    fun clear(element: T) {
+        setter(element, null)
+    }
+
+}

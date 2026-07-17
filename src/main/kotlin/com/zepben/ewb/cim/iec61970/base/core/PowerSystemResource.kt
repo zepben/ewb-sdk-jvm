@@ -9,6 +9,7 @@
 package com.zepben.ewb.cim.iec61970.base.core
 
 import com.zepben.ewb.boilerplate.LazyMridList
+import com.zepben.ewb.boilerplate.MridCollection
 import com.zepben.ewb.cim.iec61968.assets.Asset
 import com.zepben.ewb.cim.iec61968.assets.AssetInfo
 import com.zepben.ewb.cim.iec61968.common.Location
@@ -38,7 +39,7 @@ abstract class PowerSystemResource(mRID: String) : IdentifiedObject(mRID) {
     /**
      * All assets represented by this power system resource. For example, multiple conductor assets are electrically modelled as a single AC line segment.
      */
-    val assets: LazyMridList<Asset> get() = LazyMridList(
+    val assets: MridCollection<Asset> get() = LazyMridList(
         getter = { _assets },
         setter = { _assets = it },
         owner = this,

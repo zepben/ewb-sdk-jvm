@@ -9,6 +9,7 @@
 package com.zepben.ewb.cim.iec61970.base.wires
 
 import com.zepben.ewb.boilerplate.LazyMridList
+import com.zepben.ewb.boilerplate.MridCollection
 
 /**
  * A generic equivalent for an energy supplier on a transmission or distribution voltage level.
@@ -80,7 +81,7 @@ class EnergySource(mRID: String) : EnergyConnection(mRID) {
     /**
      * The phases for this energy source. The returned collection is read only.
      */
-    val phases: LazyMridList<EnergySourcePhase> get() = LazyMridList(
+    val phases: MridCollection<EnergySourcePhase> get() = LazyMridList(
         getter = { _energySourcePhases },
         setter = { _energySourcePhases = it },
         owner = this,

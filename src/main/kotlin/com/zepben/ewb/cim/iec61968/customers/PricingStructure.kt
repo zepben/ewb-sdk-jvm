@@ -9,6 +9,7 @@
 package com.zepben.ewb.cim.iec61968.customers
 
 import com.zepben.ewb.boilerplate.LazyMridList
+import com.zepben.ewb.boilerplate.MridCollection
 import com.zepben.ewb.cim.iec61968.common.Document
 
 /**
@@ -26,7 +27,7 @@ class PricingStructure(mRID: String) : Document(mRID) {
     /**
      * All tariffs used by this pricing structure. The returned collection is read only
      */
-    val tariffs: LazyMridList<Tariff> get() = LazyMridList(
+    val tariffs: MridCollection<Tariff> get() = LazyMridList(
         getter = { _tariffs },
         setter = { _tariffs = it },
         owner = this,

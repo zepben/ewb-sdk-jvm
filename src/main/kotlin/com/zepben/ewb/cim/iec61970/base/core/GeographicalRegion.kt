@@ -9,6 +9,7 @@
 package com.zepben.ewb.cim.iec61970.base.core
 
 import com.zepben.ewb.boilerplate.LazyMridList
+import com.zepben.ewb.boilerplate.MridCollection
 
 /**
  * A geographical region of a power system network model.
@@ -20,7 +21,7 @@ class GeographicalRegion(mRID: String) : IdentifiedObject(mRID) {
     /**
      * All sub-geographical regions within this geographical region. The returned collection is read only.
      */
-    val subGeographicalRegions: LazyMridList<SubGeographicalRegion> get() = LazyMridList(
+    val subGeographicalRegions: MridCollection<SubGeographicalRegion> get() = LazyMridList(
         getter = { _subGeographicalRegions },
         setter = { _subGeographicalRegions = it },
         owner = this,

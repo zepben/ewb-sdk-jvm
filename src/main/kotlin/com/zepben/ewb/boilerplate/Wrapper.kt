@@ -312,8 +312,7 @@ class LazyIndexedList<T>(
     val setter: (MutableList<T>?) -> Unit,
     val owner: Identifiable,
     val elementDescription: String,
-    sortBy: ((T) -> Comparable<*>?)? = null
-) : LazyValidatedList<T>(getter, setter, null, sortBy) {
+) : LazyValidatedList<T>(getter, setter, null, null) {
 
     fun add(index: Int, element: T) {
         val data = getter()

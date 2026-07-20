@@ -9,6 +9,7 @@
 package com.zepben.ewb.cim.extensions.iec61970.base.feeder
 
 import com.zepben.ewb.boilerplate.LazyMridMap
+import com.zepben.ewb.boilerplate.MridCollection
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.iec61970.base.core.Equipment
 import com.zepben.ewb.cim.iec61970.base.core.EquipmentContainer
@@ -48,7 +49,7 @@ class LvFeeder(mRID: String) : EquipmentContainer(mRID) {
      * [ZBEX] The HV/MV feeders that normally energize this LV feeder. The returned collection is read only.
      */
     @ZBEX
-    val normalEnergizingFeeders: LazyMridMap<Feeder> get() = LazyMridMap(
+    val normalEnergizingFeeders: MridCollection<Feeder> get() = LazyMridMap(
         getter = { _normalEnergizingFeedersById },
         setter = { _normalEnergizingFeedersById = it },
         owner = this,
@@ -59,7 +60,7 @@ class LvFeeder(mRID: String) : EquipmentContainer(mRID) {
      * [ZBEX] The HV/MV feeders that currently energize this LV feeder. The returned collection is read only.
      */
     @ZBEX
-    val currentEnergizingFeeders: LazyMridMap<Feeder> get() = LazyMridMap(
+    val currentEnergizingFeeders: MridCollection<Feeder> get() = LazyMridMap(
         getter = { _currentEnergizingFeedersById },
         setter = { _currentEnergizingFeedersById = it },
         owner = this,
@@ -69,7 +70,7 @@ class LvFeeder(mRID: String) : EquipmentContainer(mRID) {
     /**
      * Contained equipment using the current state of the network. The returned collection is read only.
      */
-    override val currentEquipment: LazyMridMap<Equipment> get() = LazyMridMap(
+    override val currentEquipment: MridCollection<Equipment> get() = LazyMridMap(
         getter = { _currentEquipmentById },
         setter = { _currentEquipmentById = it },
         owner = this,

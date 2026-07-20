@@ -9,6 +9,7 @@
 package com.zepben.ewb.cim.extensions.iec61970.base.feeder
 
 import com.zepben.ewb.boilerplate.LazyMridMap
+import com.zepben.ewb.boilerplate.MridCollection
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.iec61970.base.core.EquipmentContainer
 import com.zepben.ewb.cim.iec61970.base.core.Feeder
@@ -30,7 +31,7 @@ class LvSubstation(mRID: String) : EquipmentContainer(mRID) {
     /**
      * [ZBEX] The HV/MV feeders that normally energize this [LvSubstation]. The returned collection is read only.
      */
-    val normalEnergizingFeeders: LazyMridMap<Feeder> get() = LazyMridMap(
+    val normalEnergizingFeeders: MridCollection<Feeder> get() = LazyMridMap(
         getter = { _normalEnergizingFeedersById },
         setter = { _normalEnergizingFeedersById = it },
         owner = this,
@@ -38,7 +39,7 @@ class LvSubstation(mRID: String) : EquipmentContainer(mRID) {
     )
 
     @ZBEX
-    val normalEnergizedLvFeeders: LazyMridMap<LvFeeder> get() = LazyMridMap(
+    val normalEnergizedLvFeeders: MridCollection<LvFeeder> get() = LazyMridMap(
         getter = { _normalEnergizedLvFeedersById },
         setter = { _normalEnergizedLvFeedersById = it },
         owner = this,
@@ -49,7 +50,7 @@ class LvSubstation(mRID: String) : EquipmentContainer(mRID) {
      * [ZBEX] The HV/MV feeders that currently energize this LV substation. The returned collection is read only.
      */
     @ZBEX
-    val currentEnergizingFeeders: LazyMridMap<Feeder> get() = LazyMridMap(
+    val currentEnergizingFeeders: MridCollection<Feeder> get() = LazyMridMap(
         getter = { _currentEnergizingFeedersById },
         setter = { _currentEnergizingFeedersById = it },
         owner = this,

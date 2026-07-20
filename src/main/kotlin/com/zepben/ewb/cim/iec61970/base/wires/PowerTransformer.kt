@@ -8,8 +8,9 @@
 
 package com.zepben.ewb.cim.iec61970.base.wires
 
-import com.zepben.ewb.boilerplate.IndexableMridCollection
+import com.zepben.ewb.boilerplate.Backfill
 import com.zepben.ewb.boilerplate.LazyMridList
+import com.zepben.ewb.boilerplate.MridList
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.VectorGroup
 import com.zepben.ewb.cim.iec61968.assetinfo.PowerTransformerInfo
 import com.zepben.ewb.cim.iec61968.infiec61968.infassetinfo.TransformerConstructionKind
@@ -90,6 +91,11 @@ class PowerTransformer(mRID: String) : ConductingEquipment(mRID) {
         setter = {_powerTransformerEnds = it },
         owner = this,
         elementDescription = "A PowerTransformerEnd",
+        backfill = Backfill(
+            { it.powerTransformer },
+            { it, pt -> it.powerTransformer = pt },
+            PowerTransformerEnd::powerTransformer
+        ),
         validate = { validateEnd(it) },
         sortBy = { it.endNumber }
     )
@@ -200,7 +206,7 @@ class PowerTransformer(mRID: String) : ConductingEquipment(mRID) {
 
 }
 
-typealias PowerTransformerEndList = IndexableMridCollection<PowerTransformerEnd>
+typealias PowerTransformerEndList = MridList<PowerTransformerEnd>
 
 /**
  * Get a [PowerTransformerEnd] by its [PowerTransformerEnd.endNumber]

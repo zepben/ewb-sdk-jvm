@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.cim.iec61970.base.core
 
+import com.zepben.ewb.boilerplate.Backfill
 import com.zepben.ewb.boilerplate.LazyMridList
 import com.zepben.ewb.boilerplate.MridCollection
 
@@ -26,17 +27,13 @@ class GeographicalRegion(mRID: String) : IdentifiedObject(mRID) {
         setter = { _subGeographicalRegions = it },
         owner = this,
         elementDescription = "A SubGeographicalRegion",
-        validate = { validateSubGeographicalRegion(it) }
+        backfill = Backfill(
+            { it.geographicalRegion },
+            { it, geo -> it.geographicalRegion = geo },
+            SubGeographicalRegion::geographicalRegion
+        )
     )
 
-    private fun validateSubGeographicalRegion(subGeographicalRegion: SubGeographicalRegion) {
-        if (subGeographicalRegion.geographicalRegion == null)
-            subGeographicalRegion.geographicalRegion = this
-        else
-            require(subGeographicalRegion.geographicalRegion === this) {
-                "${subGeographicalRegion.typeNameAndMRID()} `geographicalRegion` property references ${subGeographicalRegion.geographicalRegion!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
-            }
-    }
 
     // region deprecated list boilerplate
     //

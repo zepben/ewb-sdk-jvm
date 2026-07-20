@@ -26,8 +26,9 @@ class DiagramObject(mRID: String) : IdentifiedObject(mRID) {
 
     var diagram: Diagram? = null
         set(value) {
-            field =
+            field = value?.run {
                 if (field == null || field === value) value else throw IllegalStateException("diagram has already been set to $field. Cannot set this field again")
+            }
         }
 
     var identifiedObjectMRID: String? = null

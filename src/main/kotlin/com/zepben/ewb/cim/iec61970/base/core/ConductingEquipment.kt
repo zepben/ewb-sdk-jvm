@@ -8,9 +8,11 @@
 
 package com.zepben.ewb.cim.iec61970.base.core
 
+import com.zepben.ewb.boilerplate.Backfill
+import com.zepben.ewb.boilerplate.MridList
+import com.zepben.ewb.boilerplate.RefMridList
 import com.zepben.ewb.services.common.extensions.asUnmodifiable
-import com.zepben.ewb.services.common.extensions.getByMRID
-import com.zepben.ewb.services.common.extensions.validateReference
+
 
 /**
  * The parts of the AC power system that are designed to carry current or that are conductively connected through terminals.
@@ -31,53 +33,35 @@ abstract class ConductingEquipment(mRID: String) : Equipment(mRID) {
             return baseVoltage?.nominalVoltage ?: 0
         }
 
+    internal val terminalsInternal: TerminalList get() = RefMridList(
+        _terminals,
+        this,
+        "A Terminal",
+        backfill = Backfill(
+            { it._conductingEquipment },
+            { it, ce -> it._conductingEquipment = ce },
+            Terminal::conductingEquipment
+        ),
+        validate = { validateTerminal(it) },
+        sortBy = { it.sequenceNumber }
+    )
+
     /**
      * Conducting equipment have terminals that may be connected to other conducting equipment terminals
      * via connectivity nodes or topological nodes.
      *
      * The returned collection is read only.
      */
-    val terminals: List<Terminal> get() = _terminals.asUnmodifiable()
+     val terminals: List<Terminal> = _terminals.asUnmodifiable()
+
+
 
     /**
      * The maximum number of terminals that this conducting equipment can have.
      */
     open val maxTerminals: Int get() = Int.MAX_VALUE
 
-    /**
-     * Get the number of entries in the [Terminal] collection.
-     */
-    fun numTerminals(): Int = _terminals.size
-
-    /**
-     * Conducting equipment have terminals that may be connected to other conducting equipment terminals
-     * via connectivity nodes or topological nodes.
-     *
-     * @param mRID the mRID of the required [Terminal]
-     * @return The [Terminal] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getTerminal(mRID: String): Terminal? = _terminals.getByMRID(mRID)
-
-    /**
-     * Conducting equipment have terminals that may be connected to other conducting equipment terminals
-     * via connectivity nodes or topological nodes.
-     *
-     * @param sequenceNumber the sequence number of the required [Terminal]
-     * @return The [Terminal] with the specified [sequenceNumber] if it exists, otherwise null
-     */
-    fun getTerminal(sequenceNumber: Int): Terminal? = _terminals.firstOrNull { it.sequenceNumber == sequenceNumber }
-
-    /**
-     * Add a [Terminal] to this [ConductingEquipment]
-     *
-     * If [Terminal.sequenceNumber] is 0 [terminal] will receive a sequenceNumber of [numTerminals] + 1 when added.
-     * @throws IllegalArgumentException if the [Terminal] references another [ConductingEquipment] or if a [Terminal] with
-     *         the same sequenceNumber already exists.
-     * @throws IllegalStateException if [maxTerminals] has already been reached.
-     * @return This [ConductingEquipment] for fluent use
-     */
-    fun addTerminal(terminal: Terminal): ConductingEquipment {
-        if (validateTerminal(terminal)) return this
+    private fun validateTerminal(terminal: Terminal) {
 
         check(numTerminals() < maxTerminals) {
             "Unable to add ${terminal.typeNameAndMRID()} to ${typeNameAndMRID()}. This conducting equipment already has the maximum number of terminals ($maxTerminals)."
@@ -85,71 +69,87 @@ abstract class ConductingEquipment(mRID: String) : Equipment(mRID) {
 
         if (terminal.sequenceNumber == 0)
             terminal.sequenceNumber = numTerminals() + 1
-        require(getTerminal(terminal.sequenceNumber) == null) { "Unable to add ${terminal.typeNameAndMRID()} to ${typeNameAndMRID()}. A ${getTerminal(terminal.sequenceNumber)!!.typeNameAndMRID()} already exists with sequenceNumber ${terminal.sequenceNumber}." }
+        require(terminalsInternal.getByNumber(terminal.sequenceNumber) == null) { "Unable to add ${terminal.typeNameAndMRID()} to ${typeNameAndMRID()}. A ${getTerminal(terminal.sequenceNumber)!!.typeNameAndMRID()} already exists with sequenceNumber ${terminal.sequenceNumber}." }
 
-        _terminals.add(terminal)
-        _terminals.sortBy { it.sequenceNumber }
-
-        return this
-    }
-
-    /**
-     * Remove a [Terminal] from this [ConductingEquipment]. If the [terminal] is removed,
-     * the reverse link to this [ConductingEquipment] will also be cleared.
-     *
-     * @param terminal The [Terminal] to remove.
-     * @return true if [terminal] is removed from the collection.
-     */
-    fun removeTerminal(terminal: Terminal): Boolean = _terminals.remove(terminal).also { removed ->
-        if (removed)
-            terminal._conductingEquipment = null
-    }
-
-    /**
-     * Clear all [Terminal]'s from this [ConductingEquipment].
-     *
-     * @return This [ConductingEquipment] for fluent use.
-     */
-    fun clearTerminals(): ConductingEquipment {
-        //
-        // NOTE: We can only set the terminals `conductingEquiment` if it doesn't belong to the terminals list,
-        //       so we must clear our list of terminals before removing each terminals conducting equipemnt.
-        //
-        val toClearAssociation = _terminals.toList()
-        _terminals.clear()
-        toClearAssociation.forEach { terminal -> terminal._conductingEquipment = null }
-        return this
-    }
-
-    private fun validateTerminal(terminal: Terminal): Boolean {
-        if (validateReference(terminal, ::getTerminal, "A Terminal"))
-            return true
-
-        if (terminal.conductingEquipment == null)
-            terminal._conductingEquipment = this
-
-        require(terminal.conductingEquipment === this) {
-            "${terminal.typeNameAndMRID()} `conductingEquipment` property references ${terminal.conductingEquipment!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
-        }
-        return false
     }
 
     /**
      * Helper to get the first terminal for a [ConductingEquipment]. Will throw a [NullPointerException] if the terminal does not exist, so only call it
      * when you know the terminal will be there.
      */
-    val t1: Terminal get() = getTerminal(1)!!
+    val t1: Terminal get() = terminalsInternal.getByNumber(1)!!
 
     /**
      * Helper to get the second terminal for a [ConductingEquipment]. Will throw a [NullPointerException] if the terminal does not exist, so only call it
      * when you know the terminal will be there.
      */
-    val t2: Terminal get() = getTerminal(2)!!
+    val t2: Terminal get() = terminalsInternal.getByNumber(2)!!
 
     /**
      * Helper to get the third terminal for a [ConductingEquipment]. Will throw a [NullPointerException] if the terminal does not exist, so only call it
      * when you know the terminal will be there.
      */
-    val t3: Terminal get() = getTerminal(3)!!
+    val t3: Terminal get() = terminalsInternal.getByNumber(3)!!
 
+
+    // region deprecated list boilerplate
+    //
+    // ("region/endregion" is an IntelliJ feature letting you hide the entire thing)
+    // This boilerplate exists solely to enable backwards compatibility.
+    // It will be removed eventually.
+    // Every single method simply forwards the call to the corresponding list.
+
+    // region terminals boilerplate
+
+    @Deprecated(
+        message = "Use terminalsInternal.size instead.",
+        replaceWith = ReplaceWith("terminalsInternal.size")
+    )
+    fun numTerminals(): Int = terminalsInternal.size
+
+    @Deprecated(
+        message = "Use terminalsInternal.getByMrid(mRID) instead.",
+        replaceWith = ReplaceWith("terminalsInternal.getByMrid(mRID)")
+    )
+    fun getTerminal(mRID: String): Terminal? = terminalsInternal.getByMrid(mRID)
+
+    @Deprecated(
+        message = "Use terminalsInternal.getByNumber(sequenceNumber) instead.",
+        replaceWith = ReplaceWith("terminalsInternal.getByNumber(sequenceNumber)")
+    )
+    fun getTerminal(sequenceNumber: Int): Terminal? = terminalsInternal.getByNumber(sequenceNumber)
+
+    @Deprecated(
+        message = "Use terminalsInternal.addInternal(terminal) instead.",
+        replaceWith = ReplaceWith("also { it.terminalsInternal.addInternal(terminal) }")
+    )
+    fun addTerminal(terminal: Terminal): ConductingEquipment {
+        terminalsInternal.add(terminal)
+        return this
+    }
+
+    @Deprecated(
+        message = "Use terminalsInternal.removeInternal(terminal) instead.",
+        replaceWith = ReplaceWith("terminalsInternal.removeInternal(terminal)")
+    )
+    fun removeTerminal(terminal: Terminal): Boolean =
+        terminalsInternal.remove(terminal)
+
+    @Deprecated(
+        message = "Use terminalsInternal.clear() instead.",
+        replaceWith = ReplaceWith("also { it.terminalsInternal.clear() }")
+    )
+    fun clearTerminals(): ConductingEquipment {
+        terminalsInternal.clear()
+        return this
+    }
+
+    // endregion
+
+    // endregion
 }
+
+typealias TerminalList = MridList<Terminal>
+
+fun TerminalList.getByNumber(sequenceNumber: Int): Terminal? =
+        firstOrNull { it.sequenceNumber == sequenceNumber }

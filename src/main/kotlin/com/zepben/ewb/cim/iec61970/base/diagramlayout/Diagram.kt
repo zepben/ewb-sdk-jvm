@@ -8,7 +8,9 @@
 
 package com.zepben.ewb.cim.iec61970.base.diagramlayout
 
+import com.zepben.ewb.boilerplate.Backfill
 import com.zepben.ewb.boilerplate.LazyMridMap
+import com.zepben.ewb.boilerplate.MridCollection
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 
 /**
@@ -27,22 +29,18 @@ class Diagram(mRID: String) : IdentifiedObject(mRID) {
     /**
      * The diagramObjects belonging to this object.
      */
-    val diagramObjects: LazyMridMap<DiagramObject> get() = LazyMridMap(
+    val diagramObjects: MridCollection<DiagramObject> get() = LazyMridMap(
         getter = { _diagramObjects },
         setter = { _diagramObjects = it },
         owner = this,
         elementDescription = "A DiagramObject",
-        validate = ::validateDiagramObject
+        backfill = Backfill(
+            { it.diagram },
+            { it, dia -> it.diagram = dia },
+            DiagramObject::diagram
+        ),
     )
 
-    private fun validateDiagramObject(diagramObject: DiagramObject) {
-        if (diagramObject.diagram == null)
-            diagramObject.diagram = this
-
-        require(diagramObject.diagram === this) {
-            "${diagramObject.typeNameAndMRID()} `diagram` property references ${diagramObject.diagram!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
-        }
-    }
 
     // region deprecated dict boilerplate
     //

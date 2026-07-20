@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.cim.iec61970.base.wires
 
+import com.zepben.ewb.boilerplate.Backfill
 import com.zepben.ewb.boilerplate.LazyMridList
 import com.zepben.ewb.boilerplate.MridCollection
 
@@ -86,18 +87,13 @@ class EnergySource(mRID: String) : EnergyConnection(mRID) {
         setter = { _energySourcePhases = it },
         owner = this,
         elementDescription = "An EnergySourcePhase",
-        validate = { validatePhase(it) }
+        backfill = Backfill(
+            { it.energySource },
+            { it, es -> it.energySource = es },
+            EnergySourcePhase::energySource
+        )
     )
 
-
-    private fun validatePhase(phase: EnergySourcePhase) {
-        if (phase.energySource == null)
-            phase.energySource = this
-
-        require(phase.energySource === this) {
-            "${phase.typeNameAndMRID()} `energySource` property references ${phase.energySource!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
-        }
-    }
 
     // region deprecated list boilerplate
     //

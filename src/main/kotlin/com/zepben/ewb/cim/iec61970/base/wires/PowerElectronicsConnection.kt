@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.cim.iec61970.base.wires
 
+import com.zepben.ewb.boilerplate.Backfill
 import com.zepben.ewb.boilerplate.LazyMridList
 import com.zepben.ewb.boilerplate.MridCollection
 import com.zepben.ewb.cim.extensions.ZBEX
@@ -221,7 +222,11 @@ class PowerElectronicsConnection(mRID: String) : RegulatingCondEq(mRID) {
         setter = { _powerElectronicsConnectionPhases = it },
         owner = this,
         elementDescription = "A PowerElectronicsConnectionPhase",
-        validate = { validatePhase(it) }
+        backfill = Backfill(
+            { it.powerElectronicsConnection },
+            { it, pec -> it.powerElectronicsConnection = pec },
+            PowerElectronicsConnectionPhase::powerElectronicsConnection
+        )
     )
 
     private fun validatePhase(phase: PowerElectronicsConnectionPhase) {

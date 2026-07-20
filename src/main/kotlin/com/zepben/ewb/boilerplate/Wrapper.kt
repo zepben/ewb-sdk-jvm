@@ -9,25 +9,77 @@
 package com.zepben.ewb.boilerplate
 
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
-import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import kotlin.reflect.KMutableProperty1
 
 
-interface IndexableMutableCollection<T> : MutableCollection<T>, List<T> {
-    override fun iterator(): MutableIterator<T>
+abstract class AbstractBackedCollection<T> :
+    AbstractCollection<T>() {
+
+    protected abstract fun getCollection(): Collection<T>
+
+    abstract fun add(element: T): Boolean
+
+    fun addAll(elements: Collection<T>): Boolean = elements.all { add(it) }
+
+    abstract fun remove(element: T): Boolean
+
+    fun removeAll(elements: Collection<T>): Boolean = elements.all { remove(it) }
+
+    abstract fun clear()
+
+    override val size: Int
+        get() = getCollection().size
+
+    override fun iterator(): Iterator<T> =
+        getCollection().iterator()
+
+    override fun contains(element: T): Boolean =
+        getCollection().contains(element)
+
+    override fun containsAll(elements: Collection<T>): Boolean =
+        elements.all { contains(it) }
+
+    override fun isEmpty(): Boolean =
+        getCollection().isEmpty()
 }
+
+abstract class AbstractBackedList<T> :
+    AbstractBackedCollection<T>(),
+    List<T> {
+
+    abstract override fun getCollection(): List<T>
+
+    override fun get(index: Int): T =
+        getCollection()[index]
+
+    override fun indexOf(element: T): Int =
+        getCollection().indexOf(element)
+
+    override fun lastIndexOf(element: T): Int =
+        getCollection().lastIndexOf(element)
+
+    override fun listIterator(): ListIterator<T> =
+        getCollection().listIterator()
+
+    override fun listIterator(index: Int): ListIterator<T> =
+        getCollection().listIterator(index)
+
+    override fun subList(fromIndex: Int, toIndex: Int): List<T> =
+        getCollection().subList(fromIndex, toIndex)
+}
+
 
 open class LazyValidatedList<T>(
     private val getter: () -> MutableList<T>?,
     private val setter: (MutableList<T>?) -> Unit,
     private val validate: ((T) -> Unit)? = null,
     private val sortBy: ((T) -> Comparable<*>?)? = null
-) : AbstractMutableCollection<T>(), IndexableMutableCollection<T> {
+) : AbstractBackedList<T>() {
 
-    private fun getOrEmpty(): MutableList<T> = getter() ?: mutableListOf()
+    override fun getCollection(): MutableList<T> = getter() ?: mutableListOf()
 
-    private fun clearIfEmpty(list: MutableList<T>) {
-        if (list.isEmpty()) {
+    private fun clearIfEmpty() {
+        if (getter()?.isEmpty() == true) {
             setter(null)
         }
     }
@@ -56,38 +108,18 @@ open class LazyValidatedList<T>(
     override val size: Int
         get() = getter()?.size ?: 0
 
+
     override fun clear() {
         setter(null)
     }
 
-    override fun iterator(): MutableIterator<T> {
-        val list = getter() ?: return mutableListOf<T>().iterator()
-        val iterator = list.iterator()
+    override fun remove(element: T): Boolean = getter()?.remove(element).also { clearIfEmpty() } ?: false
 
-        return object : MutableIterator<T> by iterator {
-            override fun remove() {
-                iterator.remove()
-                clearIfEmpty(list)
-            }
-        }
-    }
-
-    override fun get(index: Int): T = getOrEmpty()[index]
-
-    override fun indexOf(element: T): Int = getOrEmpty().indexOf(element)
-
-    override fun lastIndexOf(element: T): Int = getOrEmpty().lastIndexOf(element)
-
-    override fun listIterator(): ListIterator<T> = getOrEmpty().listIterator()
-
-    override fun listIterator(index: Int): ListIterator<T> = getOrEmpty().listIterator(index)
-
-    override fun subList(fromIndex: Int, toIndex: Int): List<T> = getOrEmpty().subList(fromIndex, toIndex).asUnmodifiable()
 }
 
 
 
-interface MridCollection<T : Identifiable> : MutableCollection<T> {
+interface MridCollection<T : Identifiable> : Collection<T> {
     val owner: Identifiable
     val elementDescription: String
 
@@ -103,30 +135,15 @@ interface MridCollection<T : Identifiable> : MutableCollection<T> {
         return false
     }
 
+    fun add(element: T): Boolean
 
-    override fun iterator(): MutableIterator<T> {
-        val iterator = super.iterator()
-        var current: T? = null
+    fun remove(element: T): Boolean
 
-        return object : MutableIterator<T> by iterator {
-            override fun next(): T =
-                iterator.next().also { current = it }
-
-            override fun remove() {
-                iterator.remove()
-                if (current != null)
-                    postRemove(current)
-            }
-        }
-    }
-
-    fun postRemove(element: T) {
-
-    }
+    fun clear()
 
 }
 
-interface IndexableMridCollection<T : Identifiable> : MridCollection<T>, IndexableMutableCollection<T>
+interface MridList<T : Identifiable> : MridCollection<T>, List<T>
 
 class LazyMridList<T : Identifiable, O : Identifiable>(
     private val getter: () -> MutableList<T>?,
@@ -138,7 +155,7 @@ class LazyMridList<T : Identifiable, O : Identifiable>(
     sortBy: ((T) -> Comparable<*>?)? = null
 ) : LazyValidatedList<T>(
     getter, setter, validate, sortBy
-), IndexableMridCollection<T> {
+), MridList<T> {
 
     override fun getByMrid(mRID: String): T? {
         return getter()?.firstOrNull { it.mRID == mRID }
@@ -156,35 +173,30 @@ class LazyMridList<T : Identifiable, O : Identifiable>(
         return super.add(element)
     }
 
-    override fun iterator(): MutableIterator<T> {
-        val iterator = super.iterator()
-        var last: T? = null
+    override fun remove(element: T): Boolean =
+        super.remove(element).also { backfill?.clear(element) }
 
-        return object : MutableIterator<T> by iterator {
-            override fun next(): T =
-                iterator.next().also { last = it }
-
-            override fun remove() {
-                val removed = last
-                iterator.remove()
-
-                if (removed != null)
-                    backfill?.clear(removed)
-            }
-        }
+    override fun clear() {
+        val old = getter() ?: emptyList<T>()
+        super.clear()
+        backfill?.also { old.forEach { backfill.clear(it) } }
     }
 
 }
 
 
 
-class MridList<T : Identifiable>(
+open class RefMridList<T : Identifiable, O : Identifiable>(
     private val list: MutableList<T> = mutableListOf(),
-    override val owner: Identifiable,
+    override val owner: O,
     override val elementDescription: String,
+    val backfill: Backfill<T, O>? = null,
     private val validate: ((T) -> Unit)? = null,
     private val sortBy: ((T) -> Comparable<*>?)? = null,
-) : AbstractMutableCollection<T>(), IndexableMridCollection<T> {
+) : AbstractBackedList<T>(), MridList<T> {
+
+
+    override fun getCollection(): List<T> = list
 
     override fun getByMrid(mRID: String): T? =
         list.firstOrNull { it.mRID == mRID }
@@ -194,6 +206,8 @@ class MridList<T : Identifiable>(
         // If another element shares mRID, error.
         if (!canAddByMrid(element))
             return false
+
+        backfill?.apply(owner, element)
 
         validate?.invoke(element)
 
@@ -205,42 +219,44 @@ class MridList<T : Identifiable>(
         return result
     }
 
-    override val size: Int
-        get() = list.size
 
-    override fun iterator(): MutableIterator<T> =
-        list.iterator()
+    override fun remove(element: T): Boolean {
+        val result = list.remove(element)
+        if (result)
+            backfill?.clear(element)
+        return result
+    }
 
-    override fun get(index: Int): T = list[index]
 
-    override fun indexOf(element: T): Int = list.indexOf(element)
+    override fun clear() {
+        val old = list.toList()
+        list.clear()
+        backfill?.also { old.forEach { backfill.clear(it) } }
+    }
 
-    override fun lastIndexOf(element: T): Int = list.lastIndexOf(element)
-
-    override fun listIterator(): ListIterator<T> = list.listIterator()
-
-    override fun listIterator(index: Int): ListIterator<T> = list.listIterator(index)
-
-    override fun subList(fromIndex: Int, toIndex: Int): List<T> = list.subList(fromIndex, toIndex).asUnmodifiable()
 }
 
 
 
-class LazyMridMap<T : Identifiable>(
+class LazyMridMap<T : Identifiable, O : Identifiable>(
     private val getter: () -> MutableMap<String, T>?,
     private val setter: (MutableMap<String, T>?) -> Unit,
-    override val owner: Identifiable,
+    override val owner: O,
     override val elementDescription: String,
+    val backfill: Backfill<T, O>? = null,
     private val validate: ((T) -> Unit)? = null
-) : AbstractMutableCollection<T>(), MridCollection<T> {
+) : AbstractBackedCollection<T>(), MridCollection<T> {
 
-    private fun clearIfEmpty(map: MutableMap<String, T>) {
-        if (map.isEmpty())
+    private fun clearIfEmpty() {
+        if (getter()?.isEmpty() == true)
             setter(null)
     }
 
     override fun getByMrid(mRID: String): T? =
         getter()?.get(mRID)
+
+    override fun getCollection(): Collection<T> =
+        getter()?.values ?: emptyList()
 
 
     override fun add(element: T): Boolean {
@@ -249,6 +265,8 @@ class LazyMridMap<T : Identifiable>(
         // If another element shares mRID, error.
         if (!canAddByMrid(element))
             return false
+
+        backfill?.apply(owner, element)
 
         // If a custom validation method is defined, run it.
         validate?.invoke(element)
@@ -259,24 +277,17 @@ class LazyMridMap<T : Identifiable>(
         return true
     }
 
-    override val size: Int
-        get() = getter()?.size ?: 0
+
+    override fun contains(element: T): Boolean =
+        getter()?.get(element.mRID) === element
 
     override fun clear() {
+        val old = getCollection()
         setter(null)
+        backfill?.also { old.forEach { backfill.clear(it) } }
     }
 
-    override fun iterator(): MutableIterator<T> {
-        val map = getter() ?: return mutableListOf<T>().iterator()
-        val iterator = map.values.iterator()
 
-        return object : MutableIterator<T> by iterator {
-            override fun remove() {
-                iterator.remove()
-                clearIfEmpty(map)
-            }
-        }
-    }
 
     override fun remove(element: T): Boolean {
         val map = getter() ?: return false
@@ -286,7 +297,9 @@ class LazyMridMap<T : Identifiable>(
             return false
 
         map.remove(element.mRID)
-        clearIfEmpty(map)
+        clearIfEmpty()
+
+        backfill?.clear(element)
 
         return true
     }
@@ -300,8 +313,7 @@ class LazyIndexedList<T>(
     val owner: Identifiable,
     val elementDescription: String,
     sortBy: ((T) -> Comparable<*>?)? = null
-) : LazyValidatedList<T>(getter, setter, null, sortBy),
-    IndexableMutableCollection<T> {
+) : LazyValidatedList<T>(getter, setter, null, sortBy) {
 
     fun add(index: Int, element: T) {
         val data = getter()

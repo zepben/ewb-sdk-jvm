@@ -120,7 +120,7 @@ class SynchronousMachine(mRID: String) : RotatingMachine(mRID) {
         message = "Use curves.remove(curve) instead.",
         replaceWith = ReplaceWith("curves.remove(curve)")
     )
-    fun removeCurve(curve: ReactiveCapabilityCurve?): Boolean = curves.remove(curve)
+    fun removeCurve(curve: ReactiveCapabilityCurve): Boolean = curves.remove(curve)
 
     @Deprecated(
         message = "Use curves.clear() instead.",

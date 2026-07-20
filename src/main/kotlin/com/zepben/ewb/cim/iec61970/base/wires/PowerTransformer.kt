@@ -125,13 +125,6 @@ class PowerTransformer(mRID: String) : ConductingEquipment(mRID) {
     fun getBaseVoltage(connectivityNode: ConnectivityNode): BaseVoltage? = getEnd(connectivityNode)?.baseVoltage
 
     private fun validateEnd(end: PowerTransformerEnd) {
-        if (end.powerTransformer == null)
-            end.powerTransformer = this
-
-        require(end.powerTransformer === this) {
-            "${end.typeNameAndMRID()} `powerTransformer` property references ${end.powerTransformer!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
-        }
-
         if (end.endNumber == 0)
             end.endNumber = ends.size + 1
         require(ends.getByEndNumber(end.endNumber) == null) { "Unable to add ${end.typeNameAndMRID()} to ${typeNameAndMRID()}. A ${getEnd(end.endNumber)!!.typeNameAndMRID()} already exists with endNumber ${end.endNumber}." }

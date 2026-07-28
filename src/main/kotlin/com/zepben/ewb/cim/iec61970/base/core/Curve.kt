@@ -9,7 +9,7 @@
 package com.zepben.ewb.cim.iec61970.base.core
 
 import com.zepben.ewb.boilerplate.collections.AbstractBackedList
-import com.zepben.ewb.boilerplate.collections.LazyCollection
+import com.zepben.ewb.boilerplate.collections.LazyList
 
 
 /**
@@ -22,7 +22,7 @@ abstract class Curve(mRID: String) : IdentifiedObject(mRID) {
     /**
      * The point data values that define this curve. The returned collection is read only, sorted by [CurveData.xValue] in ascending order.
      */
-    val data: AbstractBackedList<CurveData> get() = LazyCollection(
+    val data: AbstractBackedList<CurveData> get() = LazyList(
         { _data },
         { _data = it },
         validate = { validateData(it) },

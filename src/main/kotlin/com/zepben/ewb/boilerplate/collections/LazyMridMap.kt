@@ -12,7 +12,7 @@ import com.zepben.ewb.boilerplate.Backfill
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 
 
-class LazyMridMap<T : Identifiable, O : Identifiable>(
+open class LazyMridMap<T : Identifiable, O : Identifiable>(
     private val getter: () -> MutableMap<String, T>?,
     private val setter: (MutableMap<String, T>?) -> Unit,
     override val owner: O,

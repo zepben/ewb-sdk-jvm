@@ -8,37 +8,50 @@
 
 package com.zepben.ewb.boilerplate.collections
 
-import com.zepben.ewb.cim.iec61970.base.core.Identifiable
+open class LazyList<T>(
+    protected val getter: () -> MutableList<T>?,
+    protected val setter: (MutableList<T>?) -> Unit,
+    protected val validate: ((T) -> Unit)? = null,
+    protected val sortBy: ((T) -> Comparable<*>?)? = null
+) : AbstractBackedList<T>() {
 
-class LazyList<T>(
-    getter: () -> MutableList<T>?,
-    setter: (MutableList<T>?) -> Unit,
-    val owner: Identifiable,
-    val elementDescription: String,
-) : LazyCollection<T>(getter, setter) {
+    override fun getCollection(): MutableList<T> = getter() ?: mutableListOf()
 
-    fun add(index: Int, element: T) {
-        val data = getter()
-        require(index in 0..size) {
-            "Unable to add $elementDescription to ${owner.typeNameAndMRID()}. " +
-                "Sequence number $index is invalid. Expected a value between 0 and ${size}. " +
-                "Make sure you are adding the items in order and there are no gaps in the numbering."
+    private fun clearIfEmpty() {
+        if (getter()?.isEmpty() == true) {
+            setter(null)
         }
-        data
-            ?.add(index, element)
-            ?:setter(mutableListOf(element))
     }
 
-    override fun add(element: T): Boolean  {
-        add(size, element)
-        return true
+    override fun add(element: T): Boolean {
+        // If a custom validation method is defined, run it
+        validate?.invoke(element)
+
+        // Try to add the item to the backing list
+        // If the list is null (empty), instantiate it with the element present
+        val result = getter()?.add(element) ?: run {
+            setter(mutableListOf(element))
+            true
+        }
+
+        // On successful addition, sort the list if the sorting order is defined
+        if(result) {
+            sortBy?.let {
+                    selector -> getter()?.sortWith(compareBy(selector))
+            }
+        }
+
+        return result
     }
 
-    fun removeAt(index: Int): T? {
-        return if(index in 0..size) {
-            getter()?.removeAt(index)
-        } else
-            null
+    override val size: Int
+        get() = getter()?.size ?: 0
+
+
+    override fun clear() {
+        setter(null)
     }
+
+    override fun remove(element: T): Boolean = getter()?.remove(element).also { clearIfEmpty() } ?: false
 
 }

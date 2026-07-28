@@ -13,7 +13,7 @@ import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 interface MridCollection<T : Identifiable> : Collection<T> {
     val owner: Identifiable
     val elementDescription: String
-    val validate: ((T) -> Unit)?
+
 
     fun getByMrid(mRID: String): T?
 
@@ -26,8 +26,6 @@ interface MridCollection<T : Identifiable> : Collection<T> {
 
         return false
     }
-
-    fun add(element: T): Boolean
 
     fun remove(element: T): Boolean
 

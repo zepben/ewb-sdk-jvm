@@ -8,7 +8,7 @@
 
 package com.zepben.ewb.cim.iec61970.base.wires
 
-import com.zepben.ewb.boilerplate.collections.LazyCollection
+import com.zepben.ewb.boilerplate.collections.LazyList
 
 /**
  * Impedance and admittance parameters per unit length for n-wire unbalanced lines, in matrix form.
@@ -19,7 +19,7 @@ class PerLengthPhaseImpedance(mRID: String) : PerLengthImpedance(mRID) {
 
     private var _data: MutableList<PhaseImpedanceData>? = null
 
-    val data: PhaseImpedanceDataList get() = LazyCollection(
+    val data: PhaseImpedanceDataList get() = LazyList(
         { _data },
         { _data = it },
         { validateData(it) }
@@ -92,7 +92,7 @@ class PerLengthPhaseImpedance(mRID: String) : PerLengthImpedance(mRID) {
 
 }
 
-typealias PhaseImpedanceDataList = LazyCollection<PhaseImpedanceData>
+typealias PhaseImpedanceDataList = LazyList<PhaseImpedanceData>
 
 /**
  * Get the matrix entry for the corresponding to and from phases.

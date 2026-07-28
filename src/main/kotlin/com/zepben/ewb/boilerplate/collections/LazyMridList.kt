@@ -11,7 +11,7 @@ package com.zepben.ewb.boilerplate.collections
 import com.zepben.ewb.boilerplate.Backfill
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 
-class LazyMridList<T : Identifiable, O : Identifiable>(
+open class LazyMridList<T : Identifiable, O : Identifiable>(
     getter: () -> MutableList<T>?,
     setter: (MutableList<T>?) -> Unit,
     override val owner: O,
@@ -19,7 +19,7 @@ class LazyMridList<T : Identifiable, O : Identifiable>(
     val backfill: Backfill<T, O>? = null,
     validate: ((T) -> Unit)? = null,
     sortBy: ((T) -> Comparable<*>?)? = null
-) : LazyCollection<T>(
+) : LazyList<T>(
     getter, setter, validate, sortBy
 ), MridCollection<T> {
 

@@ -8,7 +8,7 @@
 
 package com.zepben.ewb.cim.extensions.iec61968.assetinfo
 
-import com.zepben.ewb.boilerplate.collections.LazyList
+import com.zepben.ewb.boilerplate.collections.LazyIndexList
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.iec61968.assets.AssetInfo
 import java.util.function.BiConsumer
@@ -33,7 +33,7 @@ class RelayInfo(mRID: String) : AssetInfo(mRID) {
     private var _recloseDelays: MutableList<Double>? = null
 
     @ZBEX
-    val recloseDelays: LazyList<Double> get() = LazyList(
+    val recloseDelays: LazyIndexList<Double> get() = LazyIndexList(
         { _recloseDelays },
         { _recloseDelays = it },
         this,

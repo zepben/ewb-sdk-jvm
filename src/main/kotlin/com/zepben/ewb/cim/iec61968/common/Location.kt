@@ -8,7 +8,7 @@
 
 package com.zepben.ewb.cim.iec61968.common
 
-import com.zepben.ewb.boilerplate.collections.LazyList
+import com.zepben.ewb.boilerplate.collections.LazyIndexList
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import java.util.function.BiConsumer
 
@@ -27,7 +27,7 @@ class Location(mRID: String) : IdentifiedObject(mRID) {
      * Sequence of [PositionPoint]s describing this location.
      * The returned collection is read only.
      */
-    val points: LazyList<PositionPoint> get() = LazyList(
+    val points: LazyIndexList<PositionPoint> get() = LazyIndexList(
         { _positionPoints },
         { _positionPoints = it },
         this,

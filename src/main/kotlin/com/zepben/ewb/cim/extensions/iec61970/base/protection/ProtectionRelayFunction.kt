@@ -8,7 +8,7 @@
 
 package com.zepben.ewb.cim.extensions.iec61970.base.protection
 
-import com.zepben.ewb.boilerplate.collections.LazyList
+import com.zepben.ewb.boilerplate.collections.LazyIndexList
 import com.zepben.ewb.boilerplate.collections.LazyMridList
 import com.zepben.ewb.boilerplate.collections.MridCollection
 import com.zepben.ewb.cim.extensions.ZBEX
@@ -66,7 +66,7 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
     private var _schemes: MutableList<ProtectionRelayScheme>? = null
 
     @ZBEX
-    val timeLimits: LazyList<Double> get() = LazyList(
+    val timeLimits: LazyIndexList<Double> get() = LazyIndexList(
         { _timeLimits },
         { _timeLimits = it },
         this,
@@ -74,7 +74,7 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
     )
 
     @ZBEX
-    val thresholds: LazyList<RelaySetting> get() = LazyList(
+    val thresholds: LazyIndexList<RelaySetting> get() = LazyIndexList(
         { _thresholds },
         { _thresholds = it },
         this,

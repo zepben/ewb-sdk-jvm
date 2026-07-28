@@ -28,6 +28,7 @@ class GeographicalRegion(mRID: String) : IdentifiedObject(mRID) {
     /**
      * Get the number of entries in the [SubGeographicalRegion] collection.
      */
+    fun numSubGeographicalRegions(): Int = _subGeographicalRegions?.size ?: 0
 
     /**
      * All sub-geographical regions within this geographical region.
@@ -35,25 +36,12 @@ class GeographicalRegion(mRID: String) : IdentifiedObject(mRID) {
      * @param mRID the mRID of the required [SubGeographicalRegion]
      * @return The [SubGeographicalRegion] with the specified [mRID] if it exists, otherwise null
      */
+    fun getSubGeographicalRegion(mRID: String): SubGeographicalRegion? = _subGeographicalRegions.getByMRID(mRID)
 
     /**
      * @param subGeographicalRegion The sub geographical region to associate within this geographical region.
      * @return A reference to this [GeographicalRegion] to allow fluent use.
      */
-
-    /**
-     * @param subGeographicalRegion The sub geographical region to disassociate from this geographical region.
-     * @return True if the subGeographicalRegion existed and was removed from this GeographicalRegion, false otherwise
-     */
-
-    /**
-     * @return A reference to this [GeographicalRegion] to allow fluent use.
-     */
-
-    fun numSubGeographicalRegions(): Int = _subGeographicalRegions?.size ?: 0
-
-    fun getSubGeographicalRegion(mRID: String): SubGeographicalRegion? = _subGeographicalRegions.getByMRID(mRID)
-
     fun addSubGeographicalRegion(subGeographicalRegion: SubGeographicalRegion): GeographicalRegion {
         if (validateReference(subGeographicalRegion, ::getSubGeographicalRegion, "A SubGeographicalRegion"))
             return this
@@ -71,14 +59,22 @@ class GeographicalRegion(mRID: String) : IdentifiedObject(mRID) {
         return this
     }
 
+    /**
+     * @param subGeographicalRegion The sub geographical region to disassociate from this geographical region.
+     * @return True if the subGeographicalRegion existed and was removed from this GeographicalRegion, false otherwise
+     */
     fun removeSubGeographicalRegion(subGeographicalRegion: SubGeographicalRegion): Boolean {
         val ret = _subGeographicalRegions.safeRemove(subGeographicalRegion)
         if (_subGeographicalRegions.isNullOrEmpty()) _subGeographicalRegions = null
         return ret
     }
 
+    /**
+     * @return A reference to this [GeographicalRegion] to allow fluent use.
+     */
     fun clearSubGeographicalRegions(): GeographicalRegion {
         _subGeographicalRegions = null
         return this
     }
+
 }

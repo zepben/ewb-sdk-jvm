@@ -28,34 +28,22 @@ class SubGeographicalRegion(mRID: String) : IdentifiedObject(mRID) {
     val substations: Collection<Substation> get() = _substations.asUnmodifiable()
 
     /**
+     * Get the number of entries in the [Substation] collection.
+     */
+    fun numSubstations(): Int = _substations?.size ?: 0
+
+    /**
      * The substations in this sub-geographical region.
      *
      * @param mRID the mRID of the required [Substation]
      * @return The [Substation] with the specified [mRID] if it exists, otherwise null
      */
+    fun getSubstation(mRID: String): Substation? = _substations.getByMRID(mRID)
 
     /**
      * @param substation the [Substation] to associate with this [SubGeographicalRegion].
      * @return A reference to this [SubGeographicalRegion] to allow fluent use.
      */
-
-    /**
-     * @param substation the [Substation] to disassociate with this [SubGeographicalRegion].
-     * @return true if the substation is disassociated.
-     */
-
-    /**
-     * Clear this [SubGeographicalRegion]'s [Substation]'s
-     * @return this [SubGeographicalRegion]
-     */
-
-    /**
-     * Get the number of entries in the [Substation] collection.
-     */
-    fun numSubstations(): Int = _substations?.size ?: 0
-
-    fun getSubstation(mRID: String): Substation? = _substations.getByMRID(mRID)
-
     fun addSubstation(substation: Substation): SubGeographicalRegion {
         if (validateReference(substation, ::getSubstation, "A Substation"))
             return this
@@ -73,12 +61,20 @@ class SubGeographicalRegion(mRID: String) : IdentifiedObject(mRID) {
         return this
     }
 
+    /**
+     * @param substation the [Substation] to disassociate with this [SubGeographicalRegion].
+     * @return true if the substation is disassociated.
+     */
     fun removeSubstation(substation: Substation): Boolean {
         val ret = _substations.safeRemove(substation)
         if (_substations.isNullOrEmpty()) _substations = null
         return ret
     }
 
+    /**
+     * Clear this [SubGeographicalRegion]'s [Substation]'s
+     * @return this [SubGeographicalRegion]
+     */
     fun clearSubstations(): SubGeographicalRegion {
         _substations = null
         return this

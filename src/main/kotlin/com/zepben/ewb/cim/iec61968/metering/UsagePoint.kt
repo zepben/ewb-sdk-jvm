@@ -56,6 +56,14 @@ class UsagePoint(mRID: String) : IdentifiedObject(mRID) {
     val equipment: Collection<Equipment> get() = _equipment.asUnmodifiable()
 
     /**
+     * All end devices at this usage point. The returned collection is read only.
+     */
+    val endDevices: Collection<EndDevice> get() = _endDevices.asUnmodifiable()
+
+    @ZBEX
+    val contacts: Collection<ContactDetails> get() = _contacts.asUnmodifiable()
+
+    /**
      * Get the number of entries in the [Equipment] collection.
      */
     fun numEquipment(): Int = _equipment?.size ?: 0
@@ -67,22 +75,6 @@ class UsagePoint(mRID: String) : IdentifiedObject(mRID) {
      * @return The [Equipment] with the specified [mRID] if it exists, otherwise null
      */
     fun getEquipment(mRID: String): Equipment? = _equipment?.getByMRID(mRID)
-
-    /**
-     * Add an [Equipment] to this [UsagePoint].
-     *
-     * @param equipment The [Equipment] to add.
-     * @return This [UsagePoint] for fluent use.
-     */
-    fun addEquipment(equipment: Equipment): UsagePoint {
-        if (validateReference(equipment, ::getEquipment, "An Equipment"))
-            return this
-
-        _equipment = _equipment ?: mutableListOf()
-        _equipment!!.add(equipment)
-
-        return this
-    }
 
     /**
      * Remove an [Equipment] from this [UsagePoint].
@@ -107,11 +99,6 @@ class UsagePoint(mRID: String) : IdentifiedObject(mRID) {
     }
 
     /**
-     * All end devices at this usage point. The returned collection is read only.
-     */
-    val endDevices: Collection<EndDevice> get() = _endDevices.asUnmodifiable()
-
-    /**
      * Get the number of entries in the [EndDevice] collection.
      */
     fun numEndDevices(): Int = _endDevices?.size ?: 0
@@ -123,22 +110,6 @@ class UsagePoint(mRID: String) : IdentifiedObject(mRID) {
      * @return The [EndDevice] with the specified [mRID] if it exists, otherwise null
      */
     fun getEndDevice(mRID: String): EndDevice? = _endDevices?.getByMRID(mRID)
-
-    /**
-     * Add an [EndDevice] to this [UsagePoint].
-     *
-     * @param endDevice The [EndDevice] to add.
-     * @return This [UsagePoint] for fluent use.
-     */
-    fun addEndDevice(endDevice: EndDevice): UsagePoint {
-        if (validateReference(endDevice, ::getEndDevice, "An EndDevice"))
-            return this
-
-        _endDevices = _endDevices ?: mutableListOf()
-        _endDevices!!.add(endDevice)
-
-        return this
-    }
 
     /**
      * Remove an [EndDevice] from this [UsagePoint].
@@ -162,8 +133,37 @@ class UsagePoint(mRID: String) : IdentifiedObject(mRID) {
         return this
     }
 
-    @ZBEX
-    val contacts: Collection<ContactDetails> get() = _contacts.asUnmodifiable()
+    /**
+     * Add an [Equipment] to this [UsagePoint].
+     *
+     * @param equipment The [Equipment] to add.
+     * @return This [UsagePoint] for fluent use.
+     */
+    fun addEquipment(equipment: Equipment): UsagePoint {
+        if (validateReference(equipment, ::getEquipment, "An Equipment"))
+            return this
+
+        _equipment = _equipment ?: mutableListOf()
+        _equipment!!.add(equipment)
+
+        return this
+    }
+
+    /**
+     * Add an [EndDevice] to this [UsagePoint].
+     *
+     * @param endDevice The [EndDevice] to add.
+     * @return This [UsagePoint] for fluent use.
+     */
+    fun addEndDevice(endDevice: EndDevice): UsagePoint {
+        if (validateReference(endDevice, ::getEndDevice, "An EndDevice"))
+            return this
+
+        _endDevices = _endDevices ?: mutableListOf()
+        _endDevices!!.add(endDevice)
+
+        return this
+    }
 
     /**
      * Get the number of entries in the [ContactDetails] collection.
@@ -177,7 +177,6 @@ class UsagePoint(mRID: String) : IdentifiedObject(mRID) {
      * @return The [ContactDetails] with the specified [id] if it exists, otherwise null
      */
     fun getContact(id: String): ContactDetails? = _contacts?.firstOrNull { it.id == id }
-
 
     /**
      * Add a [ContactDetails] to this [UsagePoint].

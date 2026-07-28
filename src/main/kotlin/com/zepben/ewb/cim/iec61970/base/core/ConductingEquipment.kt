@@ -40,6 +40,11 @@ abstract class ConductingEquipment(mRID: String) : Equipment(mRID) {
     val terminals: List<Terminal> get() = _terminals.asUnmodifiable()
 
     /**
+     * The maximum number of terminals that this conducting equipment can have.
+     */
+    open val maxTerminals: Int get() = Int.MAX_VALUE
+
+    /**
      * Get the number of entries in the [Terminal] collection.
      */
     fun numTerminals(): Int = _terminals.size
@@ -87,11 +92,6 @@ abstract class ConductingEquipment(mRID: String) : Equipment(mRID) {
 
         return this
     }
-
-    /**
-     * The maximum number of terminals that this conducting equipment can have.
-     */
-    open val maxTerminals: Int get() = Int.MAX_VALUE
 
     /**
      * Remove a [Terminal] from this [ConductingEquipment]. If the [terminal] is removed,

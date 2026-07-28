@@ -89,6 +89,43 @@ class PowerTransformer(mRID: String) : ConductingEquipment(mRID) {
     val ends: List<PowerTransformerEnd> get() = _powerTransformerEnds.asUnmodifiable()
 
     /**
+     * Get [BaseVoltage] of [PowerTransformerEnd] by its end number.
+     *
+     * @param endNumber the end number of the required [PowerTransformerEnd]
+     * @return The [BaseVoltage] of the [PowerTransformerEnd] with the specified 'endNumber' if it exists, otherwise null
+     */
+    fun getBaseVoltage(endNumber: Int): BaseVoltage? = getEnd(endNumber)?.baseVoltage
+
+    /**
+     * Get [BaseVoltage] of [PowerTransformerEnd] by its [Terminal].
+     *
+     * @param terminal the [Terminal] of the required [PowerTransformerEnd]
+     * @return The [BaseVoltage] of the [PowerTransformerEnd] with the specified 'terminal' if it exists, otherwise null
+     */
+    fun getBaseVoltage(terminal: Terminal): BaseVoltage? = getEnd(terminal)?.baseVoltage
+
+    /**
+     * Get [BaseVoltage] of [PowerTransformerEnd] by its [ConnectivityNode].
+     *
+     * @param connectivityNode the [ConnectivityNode] of the required [PowerTransformerEnd]
+     * @return The [BaseVoltage] of the [PowerTransformerEnd] with the specified 'connectivityNode' if it exists, otherwise null
+     */
+    fun getBaseVoltage(connectivityNode: ConnectivityNode): BaseVoltage? = getEnd(connectivityNode)?.baseVoltage
+
+    private fun validateEnd(end: PowerTransformerEnd): Boolean {
+        if (validateReference(end, ::getEnd, "A PowerTransformerEnd"))
+            return true
+
+        if (end.powerTransformer == null)
+            end.powerTransformer = this
+
+        require(end.powerTransformer === this) {
+            "${end.typeNameAndMRID()} `powerTransformer` property references ${end.powerTransformer!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
+        }
+        return false
+    }
+
+    /**
      * Get the number of entries in the [PowerTransformerEnd] collection.
      */
     fun numEnds(): Int = _powerTransformerEnds?.size ?: 0
@@ -125,30 +162,6 @@ class PowerTransformer(mRID: String) : ConductingEquipment(mRID) {
      */
     fun getEnd(connectivityNode: ConnectivityNode): PowerTransformerEnd? =
         _powerTransformerEnds?.firstOrNull { it.terminal?.connectivityNode == connectivityNode }
-
-    /**
-     * Get [BaseVoltage] of [PowerTransformerEnd] by its end number.
-     *
-     * @param endNumber the end number of the required [PowerTransformerEnd]
-     * @return The [BaseVoltage] of the [PowerTransformerEnd] with the specified 'endNumber' if it exists, otherwise null
-     */
-    fun getBaseVoltage(endNumber: Int): BaseVoltage? = getEnd(endNumber)?.baseVoltage
-
-    /**
-     * Get [BaseVoltage] of [PowerTransformerEnd] by its [Terminal].
-     *
-     * @param terminal the [Terminal] of the required [PowerTransformerEnd]
-     * @return The [BaseVoltage] of the [PowerTransformerEnd] with the specified 'terminal' if it exists, otherwise null
-     */
-    fun getBaseVoltage(terminal: Terminal): BaseVoltage? = getEnd(terminal)?.baseVoltage
-
-    /**
-     * Get [BaseVoltage] of [PowerTransformerEnd] by its [ConnectivityNode].
-     *
-     * @param connectivityNode the [ConnectivityNode] of the required [PowerTransformerEnd]
-     * @return The [BaseVoltage] of the [PowerTransformerEnd] with the specified 'connectivityNode' if it exists, otherwise null
-     */
-    fun getBaseVoltage(connectivityNode: ConnectivityNode): BaseVoltage? = getEnd(connectivityNode)?.baseVoltage
 
     /**
      * Add a [PowerTransformerEnd] to this [PowerTransformer]
@@ -193,18 +206,5 @@ class PowerTransformer(mRID: String) : ConductingEquipment(mRID) {
     fun clearEnds(): PowerTransformer {
         _powerTransformerEnds = null
         return this
-    }
-
-    private fun validateEnd(end: PowerTransformerEnd): Boolean {
-        if (validateReference(end, ::getEnd, "A PowerTransformerEnd"))
-            return true
-
-        if (end.powerTransformer == null)
-            end.powerTransformer = this
-
-        require(end.powerTransformer === this) {
-            "${end.typeNameAndMRID()} `powerTransformer` property references ${end.powerTransformer!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
-        }
-        return false
     }
 }

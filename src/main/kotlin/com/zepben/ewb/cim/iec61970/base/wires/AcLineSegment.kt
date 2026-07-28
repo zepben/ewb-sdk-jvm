@@ -54,6 +54,46 @@ class AcLineSegment(mRID: String) : Conductor(mRID) {
 
     val cuts: List<Cut> get() = _cuts.asUnmodifiable()
 
+    val clamps: List<Clamp> get() = _clamps.asUnmodifiable()
+
+    private fun validateCut(cut: Cut): Boolean {
+        if (validateReference(cut, ::getCut, "A Cut"))
+            return true
+
+        if (cut.acLineSegment == null)
+            cut.acLineSegment = this
+
+        require(cut.acLineSegment === this) {
+            "${cut.typeNameAndMRID()} `acLineSegment` property references ${cut.acLineSegment!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
+        }
+        return false
+    }
+
+    private fun validateClamp(clamp: Clamp): Boolean {
+        if (validateReference(clamp, ::getClamp, "A Clamp"))
+            return true
+
+        if (clamp.acLineSegment == null)
+            clamp.acLineSegment = this
+
+        require(clamp.acLineSegment === this) {
+            "${clamp.typeNameAndMRID()} `acLineSegment` property references ${clamp.acLineSegment!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
+        }
+        return false
+    }
+
+    /**
+     * The individual phase models for this AcLineSegment. The returned collection is read only.
+     */
+    val phases: Collection<AcLineSegmentPhase> get() = _phases.asUnmodifiable()
+
+    /**
+     * Retrieve the WireInfo associated with the requested [phase]. If no specific [WireInfo] is available for the given [phase], [AcLineSegment.assetInfo] will be returned.
+     *
+     * @param phase the phase to retrieve [WireInfo] for.
+     */
+    fun wireInfoForPhase(phase: SinglePhaseKind): WireInfo? = phases.find { it.phase == phase }?.assetInfo ?: assetInfo
+
     /**
      * Get the number of entries in the [Cut] collection.
      */
@@ -104,8 +144,6 @@ class AcLineSegment(mRID: String) : Conductor(mRID) {
         return this
     }
 
-    val clamps: List<Clamp> get() = _clamps.asUnmodifiable()
-
     /**
      * Get the number of entries in the [Clamp] collection.
      */
@@ -155,37 +193,6 @@ class AcLineSegment(mRID: String) : Conductor(mRID) {
         _clamps = null
         return this
     }
-
-    private fun validateCut(cut: Cut): Boolean {
-        if (validateReference(cut, ::getCut, "A Cut"))
-            return true
-
-        if (cut.acLineSegment == null)
-            cut.acLineSegment = this
-
-        require(cut.acLineSegment === this) {
-            "${cut.typeNameAndMRID()} `acLineSegment` property references ${cut.acLineSegment!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
-        }
-        return false
-    }
-
-    private fun validateClamp(clamp: Clamp): Boolean {
-        if (validateReference(clamp, ::getClamp, "A Clamp"))
-            return true
-
-        if (clamp.acLineSegment == null)
-            clamp.acLineSegment = this
-
-        require(clamp.acLineSegment === this) {
-            "${clamp.typeNameAndMRID()} `acLineSegment` property references ${clamp.acLineSegment!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
-        }
-        return false
-    }
-
-    /**
-     * The individual phase models for this AcLineSegment. The returned collection is read only.
-     */
-    val phases: Collection<AcLineSegmentPhase> get() = _phases.asUnmodifiable()
 
     /**
      * Get the number of entries in the [AcLineSegmentPhase] collection.
@@ -253,12 +260,5 @@ class AcLineSegment(mRID: String) : Conductor(mRID) {
         _phases = null
         return this
     }
-
-    /**
-     * Retrieve the WireInfo associated with the requested [phase]. If no specific [WireInfo] is available for the given [phase], [AcLineSegment.assetInfo] will be returned.
-     *
-     * @param phase the phase to retrieve [WireInfo] for.
-     */
-    fun wireInfoForPhase(phase: SinglePhaseKind): WireInfo? = phases.find { it.phase == phase }?.assetInfo ?: assetInfo
 
 }

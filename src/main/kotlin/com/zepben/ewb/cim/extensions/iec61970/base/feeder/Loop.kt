@@ -36,6 +36,20 @@ class Loop(mRID: String) : IdentifiedObject(mRID) {
     val circuits: List<Circuit> get() = _circuits.asUnmodifiable()
 
     /**
+     * [ZBEX] [Substation]s that are powered by this [Loop].
+     * The returned collection is read only.
+     */
+    @ZBEX
+    val substations: List<Substation> get() = _substations.asUnmodifiable()
+
+    /**
+     * [ZBEX] The [Substation]s that normally energize this [Loop].
+     * The returned collection is read only.
+     */
+    @ZBEX
+    val energizingSubstations: List<Substation> get() = _energizingSubstations.asUnmodifiable()
+
+    /**
      * Get the number of entries in the [circuits] collection.
      */
     fun numCircuits(): Int = _circuits?.size ?: 0
@@ -82,13 +96,6 @@ class Loop(mRID: String) : IdentifiedObject(mRID) {
     }
 
     /**
-     * [ZBEX] [Substation]s that are powered by this [Loop].
-     * The returned collection is read only.
-     */
-    @ZBEX
-    val substations: List<Substation> get() = _substations.asUnmodifiable()
-
-    /**
      * Get the number of entries in the [substations] collection.
      */
     fun numSubstations(): Int = _substations?.size ?: 0
@@ -133,13 +140,6 @@ class Loop(mRID: String) : IdentifiedObject(mRID) {
         _substations = null
         return this
     }
-
-    /**
-     * [ZBEX] The [Substation]s that normally energize this [Loop].
-     * The returned collection is read only.
-     */
-    @ZBEX
-    val energizingSubstations: List<Substation> get() = _energizingSubstations.asUnmodifiable()
 
     /**
      * Get the number of entries in the [energizingSubstations] collection.

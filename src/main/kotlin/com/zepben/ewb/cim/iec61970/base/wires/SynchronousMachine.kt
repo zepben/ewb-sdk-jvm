@@ -83,6 +83,18 @@ class SynchronousMachine(mRID: String) : RotatingMachine(mRID) {
     val curves: Collection<ReactiveCapabilityCurve> get() = _reactiveCapabilityCurves.asUnmodifiable()
 
     /**
+     * Remove a [ReactiveCapabilityCurve] for this [SynchronousMachine]
+     *
+     * @param curve the [ReactiveCapabilityCurve] to be removed from this [SynchronousMachine]
+     * @return true if [ReactiveCapabilityCurve] has been removed from this [SynchronousMachine]
+     */
+    fun removeCurve(curve: ReactiveCapabilityCurve?): Boolean {
+        val ret = _reactiveCapabilityCurves?.remove(curve) == true
+        if (_reactiveCapabilityCurves.isNullOrEmpty()) _reactiveCapabilityCurves = null
+        return ret
+    }
+
+    /**
      * Get the number of entries in the [ReactiveCapabilityCurve] collection.
      */
     fun numCurves(): Int = _reactiveCapabilityCurves?.size ?: 0
@@ -107,18 +119,6 @@ class SynchronousMachine(mRID: String) : RotatingMachine(mRID) {
         _reactiveCapabilityCurves = _reactiveCapabilityCurves.or(::mutableListOf) { add(rcc) }
 
         return this
-    }
-
-    /**
-     * Remove a [ReactiveCapabilityCurve] for this [SynchronousMachine]
-     *
-     * @param curve the [ReactiveCapabilityCurve] to be removed from this [SynchronousMachine]
-     * @return true if [ReactiveCapabilityCurve] has been removed from this [SynchronousMachine]
-     */
-    fun removeCurve(curve: ReactiveCapabilityCurve?): Boolean {
-        val ret = _reactiveCapabilityCurves?.remove(curve) == true
-        if (_reactiveCapabilityCurves.isNullOrEmpty()) _reactiveCapabilityCurves = null
-        return ret
     }
 
     /**

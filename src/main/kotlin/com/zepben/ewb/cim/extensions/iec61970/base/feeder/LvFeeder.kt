@@ -52,6 +52,41 @@ class LvFeeder(mRID: String) : EquipmentContainer(mRID) {
     val normalEnergizingFeeders: Collection<Feeder> get() = _normalEnergizingFeedersById?.values.asUnmodifiable()
 
     /**
+     * [ZBEX] The HV/MV feeders that currently energize this LV feeder. The returned collection is read only.
+     */
+    @ZBEX
+    val currentEnergizingFeeders: Collection<Feeder> get() = _currentEnergizingFeedersById?.values.asUnmodifiable()
+
+    /**
+     * Contained equipment using the current state of the network. The returned collection is read only.
+     */
+    override val currentEquipment: Collection<Equipment> get() = _currentEquipmentById?.values.asUnmodifiable()
+
+    /**
+     * Get the number of entries in the current [Equipment] collection.
+     */
+    override fun numCurrentEquipment(): Int = _currentEquipmentById?.size ?: 0
+
+    /**
+     * Contained equipment using the current state of the network.
+     *
+     * @param mRID the mRID of the required current [Equipment]
+     * @return The [Equipment] with the specified [mRID] if it exists, otherwise null
+     */
+    override fun getCurrentEquipment(mRID: String): Equipment? = _currentEquipmentById?.get(mRID)
+
+    /**
+     * Disassociate this [LvFeeder] from an [Equipment] in the current state of the network.
+     *
+     * @param equipment the equipment to disassociate with this LV feeder in the current state of the network.
+     */
+    override fun removeCurrentEquipment(equipment: Equipment): Boolean {
+        val ret = _currentEquipmentById?.remove(equipment.mRID)
+        if (_currentEquipmentById.isNullOrEmpty()) _currentEquipmentById = null
+        return ret != null
+    }
+
+    /**
      * Get the number of entries in the normal [Feeder] collection.
      */
     fun numNormalEnergizingFeeders(): Int = _normalEnergizingFeedersById?.size ?: 0
@@ -101,12 +136,6 @@ class LvFeeder(mRID: String) : EquipmentContainer(mRID) {
         _normalEnergizingFeedersById = null
         return this
     }
-
-    /**
-     * [ZBEX] The HV/MV feeders that currently energize this LV feeder. The returned collection is read only.
-     */
-    @ZBEX
-    val currentEnergizingFeeders: Collection<Feeder> get() = _currentEnergizingFeedersById?.values.asUnmodifiable()
 
     /**
      * Get the number of entries in the current [Feeder] collection.
@@ -160,24 +189,6 @@ class LvFeeder(mRID: String) : EquipmentContainer(mRID) {
     }
 
     /**
-     * Contained equipment using the current state of the network. The returned collection is read only.
-     */
-    override val currentEquipment: Collection<Equipment> get() = _currentEquipmentById?.values.asUnmodifiable()
-
-    /**
-     * Get the number of entries in the current [Equipment] collection.
-     */
-    override fun numCurrentEquipment(): Int = _currentEquipmentById?.size ?: 0
-
-    /**
-     * Contained equipment using the current state of the network.
-     *
-     * @param mRID the mRID of the required current [Equipment]
-     * @return The [Equipment] with the specified [mRID] if it exists, otherwise null
-     */
-    override fun getCurrentEquipment(mRID: String): Equipment? = _currentEquipmentById?.get(mRID)
-
-    /**
      * Associate this [LvFeeder] with an [Equipment] in the current state of the network.
      *
      * @param equipment the equipment to associate with this LV feeder in the current state of the network.
@@ -190,17 +201,6 @@ class LvFeeder(mRID: String) : EquipmentContainer(mRID) {
         _currentEquipmentById!!.putIfAbsent(equipment.mRID, equipment)
 
         return this
-    }
-
-    /**
-     * Disassociate this [LvFeeder] from an [Equipment] in the current state of the network.
-     *
-     * @param equipment the equipment to disassociate with this LV feeder in the current state of the network.
-     */
-    override fun removeCurrentEquipment(equipment: Equipment): Boolean {
-        val ret = _currentEquipmentById?.remove(equipment.mRID)
-        if (_currentEquipmentById.isNullOrEmpty()) _currentEquipmentById = null
-        return ret != null
     }
 
     /**

@@ -27,6 +27,51 @@ abstract class EquipmentContainer(mRID: String) : ConnectivityNodeContainer(mRID
     val equipment: Collection<Equipment> get() = _equipmentById?.values.asUnmodifiable()
 
     /**
+     * Convenience function to find all the normal [Feeder]'s of the [Equipment] associated with this [EquipmentContainer].
+     *
+     * @return the normal feeders for all associated feeders
+     */
+    fun normalFeeders(): Set<Feeder> {
+        val ret = mutableSetOf<Feeder>()
+        _equipmentById?.values?.forEach { equip -> ret.addAll(equip.normalFeeders) }
+        return ret
+    }
+
+    /**
+     * Convenience function to find all the current [Feeder]'s of the [Equipment] associated with this [EquipmentContainer].
+     *
+     * @return the current feeders for all associated feeders
+     */
+    fun currentFeeders(): Set<Feeder> {
+        val ret = mutableSetOf<Feeder>()
+        _equipmentById?.values?.forEach { equip -> ret.addAll(equip.currentFeeders) }
+        return ret
+    }
+
+    /**
+     * Contained equipment using the current state of the network. The returned collection is read only.
+     */
+    open val currentEquipment: Collection<Equipment> get() = equipment
+
+    /**
+     * Retrieve all terminals that are located on the edge of this EquipmentContainer. This is determined by any terminal that connects to another terminal on a
+     * ConductingEquipment that is not a member of this EquipmentContainer. This will explicitly exclude equipment with only one terminal that do not
+     * provide connectivity to the rest of the network.
+     *
+     * @param stateOperator The network state to operate on.
+     */
+    fun edgeTerminals(stateOperator: NetworkStateOperators = NetworkStateOperators.NORMAL): List<Terminal> =
+        stateOperator.getEquipment(this)
+            .asSequence()
+            .filterIsInstance<ConductingEquipment>()
+            .flatMap { it.terminals }
+            .flatMap { NetworkService.connectedTerminals(it) }
+            .filter { it.to?.getContainer(this.mRID) == null }
+            .map { it.fromTerminal }
+            .distinct()
+            .toList()
+
+    /**
      * Get the number of entries in the [Equipment] collection.
      */
     fun numEquipment(): Int = _equipmentById?.size ?: 0
@@ -70,33 +115,6 @@ abstract class EquipmentContainer(mRID: String) : ConnectivityNodeContainer(mRID
     }
 
     /**
-     * Convenience function to find all the normal [Feeder]'s of the [Equipment] associated with this [EquipmentContainer].
-     *
-     * @return the normal feeders for all associated feeders
-     */
-    fun normalFeeders(): Set<Feeder> {
-        val ret = mutableSetOf<Feeder>()
-        _equipmentById?.values?.forEach { equip -> ret.addAll(equip.normalFeeders) }
-        return ret
-    }
-
-    /**
-     * Convenience function to find all the current [Feeder]'s of the [Equipment] associated with this [EquipmentContainer].
-     *
-     * @return the current feeders for all associated feeders
-     */
-    fun currentFeeders(): Set<Feeder> {
-        val ret = mutableSetOf<Feeder>()
-        _equipmentById?.values?.forEach { equip -> ret.addAll(equip.currentFeeders) }
-        return ret
-    }
-
-    /**
-     * Contained equipment using the current state of the network. The returned collection is read only.
-     */
-    open val currentEquipment: Collection<Equipment> get() = equipment
-
-    /**
      * Get the number of entries in the current [Equipment] collection.
      */
     open fun numCurrentEquipment(): Int = numEquipment()
@@ -123,23 +141,5 @@ abstract class EquipmentContainer(mRID: String) : ConnectivityNodeContainer(mRID
      * Clear all Equipment associated with this [Feeder]
      */
     open fun clearCurrentEquipment(): EquipmentContainer = clearEquipment()
-
-    /**
-     * Retrieve all terminals that are located on the edge of this EquipmentContainer. This is determined by any terminal that connects to another terminal on a
-     * ConductingEquipment that is not a member of this EquipmentContainer. This will explicitly exclude equipment with only one terminal that do not
-     * provide connectivity to the rest of the network.
-     *
-     * @param stateOperator The network state to operate on.
-     */
-    fun edgeTerminals(stateOperator: NetworkStateOperators = NetworkStateOperators.NORMAL): List<Terminal> =
-        stateOperator.getEquipment(this)
-            .asSequence()
-            .filterIsInstance<ConductingEquipment>()
-            .flatMap { it.terminals }
-            .flatMap { NetworkService.connectedTerminals(it) }
-            .filter { it.to?.getContainer(this.mRID) == null }
-            .map { it.fromTerminal }
-            .distinct()
-            .toList()
 
 }

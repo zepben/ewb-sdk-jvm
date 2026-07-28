@@ -54,6 +54,23 @@ abstract class Equipment(mRID: String) : PowerSystemResource(mRID) {
     val containers: Collection<EquipmentContainer> get() = _equipmentContainers.asUnmodifiable()
 
     /**
+     * The equipment containers this equipment belongs to in the current network state. The returned collection is read only.
+     */
+    val currentContainers: Collection<EquipmentContainer> get() = _currentContainers.asUnmodifiable()
+
+    /**
+     * The usage points for this equipment. The returned collection is read only.
+     */
+    val usagePoints: List<UsagePoint> get() = _usagePoints.asUnmodifiable()
+
+    /**
+     *  [OperationalRestriction]'s that this equipment is associated with. The returned collection is read only.
+     */
+    val operationalRestrictions: Collection<OperationalRestriction> get() = _operationalRestrictions.asUnmodifiable()
+
+    private inline fun <reified T : EquipmentContainer> List<*>?.ofType(): List<T> = this?.filterIsInstance(T::class.java) ?: emptyList()
+
+    /**
      * Get the number of entries in the [EquipmentContainer] collection.
      */
     fun numContainers(): Int = _equipmentContainers?.size ?: 0
@@ -98,11 +115,6 @@ abstract class Equipment(mRID: String) : PowerSystemResource(mRID) {
         _equipmentContainers = null
         return this
     }
-
-    /**
-     * The equipment containers this equipment belongs to in the current network state. The returned collection is read only.
-     */
-    val currentContainers: Collection<EquipmentContainer> get() = _currentContainers.asUnmodifiable()
 
     /**
      * Get the number of entries in the current [EquipmentContainer] collection.
@@ -151,11 +163,6 @@ abstract class Equipment(mRID: String) : PowerSystemResource(mRID) {
     }
 
     /**
-     * The usage points for this equipment. The returned collection is read only.
-     */
-    val usagePoints: List<UsagePoint> get() = _usagePoints.asUnmodifiable()
-
-    /**
      * Get the number of entries in the [UsagePoint] collection.
      */
     fun numUsagePoints(): Int = _usagePoints?.size ?: 0
@@ -201,11 +208,6 @@ abstract class Equipment(mRID: String) : PowerSystemResource(mRID) {
         _usagePoints = null
         return this
     }
-
-    /**
-     *  [OperationalRestriction]'s that this equipment is associated with. The returned collection is read only.
-     */
-    val operationalRestrictions: Collection<OperationalRestriction> get() = _operationalRestrictions.asUnmodifiable()
 
     /**
      * Get the number of entries in the [OperationalRestriction] collection.
@@ -256,6 +258,4 @@ abstract class Equipment(mRID: String) : PowerSystemResource(mRID) {
         _operationalRestrictions = null
         return this
     }
-
-    private inline fun <reified T : EquipmentContainer> List<*>?.ofType(): List<T> = this?.filterIsInstance(T::class.java) ?: emptyList()
 }

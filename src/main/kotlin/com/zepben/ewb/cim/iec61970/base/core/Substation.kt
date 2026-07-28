@@ -35,6 +35,24 @@ class Substation(mRID: String) : EquipmentContainer(mRID) {
     val feeders: Collection<Feeder> get() = _normalEnergizedFeeders.asUnmodifiable()
 
     /**
+     * <no description from CIM>
+     * The returned collection is read only.
+     */
+    val loops: List<Loop> get() = _loops.asUnmodifiable()
+
+    /**
+     * <no description from CIM>
+     * The returned collection is read only.
+     */
+    val energizedLoops: List<Loop> get() = _energizedLoops.asUnmodifiable()
+
+    /**
+     * Simplification of the CIM association via Bay to [Circuit].
+     * The returned collection is read only.
+     */
+    val circuits: List<Circuit> get() = _circuits.asUnmodifiable()
+
+    /**
      * Get the number of entries in the [Feeder] collection.
      */
     fun numFeeders(): Int = _normalEnergizedFeeders?.size ?: 0
@@ -88,12 +106,6 @@ class Substation(mRID: String) : EquipmentContainer(mRID) {
     }
 
     /**
-     * <no description from CIM>
-     * The returned collection is read only.
-     */
-    val loops: List<Loop> get() = _loops.asUnmodifiable()
-
-    /**
      * Get the number of entries in the [loops] collection.
      */
     fun numLoops(): Int = _loops?.size ?: 0
@@ -140,12 +152,6 @@ class Substation(mRID: String) : EquipmentContainer(mRID) {
     }
 
     /**
-     * <no description from CIM>
-     * The returned collection is read only.
-     */
-    val energizedLoops: List<Loop> get() = _energizedLoops.asUnmodifiable()
-
-    /**
      * Get the number of entries in the [energizedLoops] collection.
      */
     fun numEnergizedLoops(): Int = _energizedLoops?.size ?: 0
@@ -190,12 +196,6 @@ class Substation(mRID: String) : EquipmentContainer(mRID) {
         _energizedLoops = null
         return this
     }
-
-    /**
-     * Simplification of the CIM association via Bay to [Circuit].
-     * The returned collection is read only.
-     */
-    val circuits: List<Circuit> get() = _circuits.asUnmodifiable()
 
     /**
      * Get the number of entries in the [circuits] collection.

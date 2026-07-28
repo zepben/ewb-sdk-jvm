@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Zeppelin Bend Pty Ltd
+ * Copyright 2026 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -11,8 +11,13 @@ package com.zepben.ewb.auth.server
 
 import com.auth0.jwt.interfaces.DecodedJWT
 import com.zepben.ewb.auth.common.StatusCode
+import org.slf4j.LoggerFactory
 
 object JWTAuthoriser {
+
+    private val logger = LoggerFactory.getLogger(javaClass)
+
+    private val claimChecks = listOf("permissions", "roles")
 
     /**
      * Authorise a JWT.
@@ -22,9 +27,8 @@ object JWTAuthoriser {
      * @param requiredClaim The claim to authorise.
      */
     @JvmStatic
-    fun authorise(token: DecodedJWT, requiredClaim: String): AuthResponse {
-        return authorise(token, setOf(requiredClaim))
-    }
+    fun authorise(token: DecodedJWT, requiredClaim: String): AuthResponse =
+        authorise(token, setOf(requiredClaim))
 
     /**
      * Authorise a JWT.
@@ -37,14 +41,19 @@ object JWTAuthoriser {
     fun authorise(token: DecodedJWT, requiredClaims: Set<String>): AuthResponse {
         if (requiredClaims.isEmpty())
             return AuthResponse(StatusCode.OK)
-        val permissions = run {
-            token.getClaim("permissions").asList(String::class.java) ?: token.getClaim("roles").asList(String::class.java) ?: emptyList()
-        }.toHashSet()
+
+        val permissions = claimChecks.firstNotNullOfOrNull {
+            token.getClaim(it).asList(String::class.java)
+        }.orEmpty().toSet()
+
         if (permissions.intersect(requiredClaims).size == requiredClaims.size)
             return AuthResponse(StatusCode.OK)
-        return AuthResponse(
-            StatusCode.UNAUTHENTICATED,
-            "Token was missing a required claim. Had [${permissions.joinToString(", ")}] but needed [${requiredClaims.joinToString(", ")}]",
-        )
+
+        if (logger.isDebugEnabled)
+            logger.debug("Token was missing a required claim. Had [${permissions.joinToString(", ")}] but needed [${requiredClaims.joinToString(", ")}]")
+
+        // NOTE: We deliberately drop the actual claims from the response to prevent security leaks to the client.
+        return AuthResponse(StatusCode.UNAUTHENTICATED, "Token was missing a required claim.")
     }
+
 }

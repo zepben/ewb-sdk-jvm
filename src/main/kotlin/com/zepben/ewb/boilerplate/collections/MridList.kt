@@ -6,10 +6,9 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.ewb.boilerplate
+package com.zepben.ewb.boilerplate.collections
 
-import com.zepben.ewb.boilerplate.collections.AbstractBackedList
-import com.zepben.ewb.boilerplate.collections.MridCollection
+import com.zepben.ewb.boilerplate.Backfill
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 
 open class MridList<T : Identifiable, O : Identifiable>(

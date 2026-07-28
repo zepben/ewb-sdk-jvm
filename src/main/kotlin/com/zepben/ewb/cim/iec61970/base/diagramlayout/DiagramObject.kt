@@ -8,7 +8,7 @@
 
 package com.zepben.ewb.cim.iec61970.base.diagramlayout
 
-import com.zepben.ewb.boilerplate.LazyIndexedList
+import com.zepben.ewb.boilerplate.collections.LazyList
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import java.util.function.BiConsumer
 
@@ -39,7 +39,7 @@ class DiagramObject(mRID: String) : IdentifiedObject(mRID) {
     /**
      * The points for this diagram object. The returned collection is read only.
      */
-    val points: LazyIndexedList<DiagramObjectPoint> get() = LazyIndexedList(
+    val points: LazyList<DiagramObjectPoint> get() = LazyList(
         { _diagramObjectPoints },
         { _diagramObjectPoints = it },
         this,

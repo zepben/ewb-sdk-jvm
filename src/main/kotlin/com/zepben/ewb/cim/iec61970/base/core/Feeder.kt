@@ -8,7 +8,7 @@
 
 package com.zepben.ewb.cim.iec61970.base.core
 
-import com.zepben.ewb.boilerplate.LazyMridMap
+import com.zepben.ewb.boilerplate.collections.LazyMridMap
 import com.zepben.ewb.boilerplate.collections.MridCollection
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder

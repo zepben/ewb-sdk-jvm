@@ -8,7 +8,7 @@
 
 package com.zepben.ewb.cim.iec61968.assetinfo
 
-import com.zepben.ewb.boilerplate.LazyMridList
+import com.zepben.ewb.boilerplate.collections.LazyMridList
 import com.zepben.ewb.boilerplate.collections.MridCollection
 import com.zepben.ewb.cim.iec61968.assets.AssetInfo
 import com.zepben.ewb.services.network.ResistanceReactance

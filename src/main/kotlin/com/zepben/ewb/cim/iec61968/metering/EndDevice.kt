@@ -8,7 +8,7 @@
 
 package com.zepben.ewb.cim.iec61968.metering
 
-import com.zepben.ewb.boilerplate.LazyMridList
+import com.zepben.ewb.boilerplate.collections.LazyMridList
 import com.zepben.ewb.boilerplate.collections.MridCollection
 import com.zepben.ewb.cim.iec61968.assets.AssetContainer
 import com.zepben.ewb.cim.iec61968.common.Location

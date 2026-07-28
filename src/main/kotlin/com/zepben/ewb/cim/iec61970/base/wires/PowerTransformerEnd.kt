@@ -8,7 +8,7 @@
 
 package com.zepben.ewb.cim.iec61970.base.wires
 
-import com.zepben.ewb.boilerplate.collections.LazyValidatedList
+import com.zepben.ewb.boilerplate.collections.LazyCollection
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.TransformerCoolingType
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.TransformerEndRatedS
@@ -102,7 +102,7 @@ class PowerTransformerEnd(mRID: String) : TransformerEnd(mRID) {
      * The returned collection is read only.
      */
     @ZBEX
-    val sRatings: LazyValidatedList<TransformerEndRatedS> get() = LazyValidatedList(
+    val sRatings: LazyCollection<TransformerEndRatedS> get() = LazyCollection(
         { _sRatings },
         { _sRatings = it },
         ::validateRating,
@@ -200,7 +200,7 @@ class PowerTransformerEnd(mRID: String) : TransformerEnd(mRID) {
 
 }
 
-typealias TransformerEndRatedSList = LazyValidatedList<TransformerEndRatedS>
+typealias TransformerEndRatedSList = LazyCollection<TransformerEndRatedS>
 
 fun TransformerEndRatedSList.add(
     ratedS: Int,

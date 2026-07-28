@@ -10,7 +10,7 @@ package com.zepben.ewb.cim.extensions.iec61970.base.protection
 
 import com.zepben.ewb.boilerplate.LazyIndexedList
 import com.zepben.ewb.boilerplate.LazyMridList
-import com.zepben.ewb.boilerplate.MridCollection
+import com.zepben.ewb.boilerplate.collections.MridCollection
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.extensions.iec61968.assetinfo.RelayInfo
 import com.zepben.ewb.cim.iec61970.base.auxiliaryequipment.Sensor

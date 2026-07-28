@@ -1,0 +1,40 @@
+/*
+ * Copyright 2026 Zeppelin Bend Pty Ltd
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+package com.zepben.ewb.boilerplate.collections
+
+abstract class AbstractBackedCollection<T> :
+    AbstractCollection<T>() {
+
+    protected abstract fun getCollection(): Collection<T>
+
+    abstract fun add(element: T): Boolean
+
+    fun addAll(elements: Collection<T>): Boolean = elements.all { add(it) }
+
+    abstract fun remove(element: T): Boolean
+
+    fun removeAll(elements: Collection<T>): Boolean = elements.all { remove(it) }
+
+    abstract fun clear()
+
+    override val size: Int
+        get() = getCollection().size
+
+    override fun iterator(): Iterator<T> =
+        getCollection().iterator()
+
+    override fun contains(element: T): Boolean =
+        getCollection().contains(element)
+
+    override fun containsAll(elements: Collection<T>): Boolean =
+        elements.all { contains(it) }
+
+    override fun isEmpty(): Boolean =
+        getCollection().isEmpty()
+}

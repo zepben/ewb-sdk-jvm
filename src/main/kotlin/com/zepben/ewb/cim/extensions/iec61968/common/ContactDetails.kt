@@ -8,8 +8,8 @@
 
 package com.zepben.ewb.cim.extensions.iec61968.common
 
-import com.zepben.ewb.boilerplate.AbstractBackedList
-import com.zepben.ewb.boilerplate.LazyValidatedList
+import com.zepben.ewb.boilerplate.collections.AbstractBackedList
+import com.zepben.ewb.boilerplate.collections.LazyValidatedList
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.iec61968.common.ElectronicAddress
 import com.zepben.ewb.cim.iec61968.common.StreetAddress

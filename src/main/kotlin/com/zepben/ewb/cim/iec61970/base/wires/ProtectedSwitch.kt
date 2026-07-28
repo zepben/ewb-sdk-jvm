@@ -9,7 +9,7 @@
 package com.zepben.ewb.cim.iec61970.base.wires
 
 import com.zepben.ewb.boilerplate.LazyMridList
-import com.zepben.ewb.boilerplate.MridCollection
+import com.zepben.ewb.boilerplate.collections.MridCollection
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelayFunction
 
 /**

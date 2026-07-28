@@ -8,7 +8,7 @@
 
 package com.zepben.ewb.cim.iec61970.base.wires
 
-import com.zepben.ewb.boilerplate.LazyValidatedList
+import com.zepben.ewb.boilerplate.collections.LazyValidatedList
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.TransformerCoolingType
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.TransformerEndRatedS

@@ -9,7 +9,7 @@
 package com.zepben.ewb.cim.extensions.iec61970.base.feeder
 
 import com.zepben.ewb.boilerplate.LazyMridMap
-import com.zepben.ewb.boilerplate.MridCollection
+import com.zepben.ewb.boilerplate.collections.MridCollection
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.iec61970.base.core.Equipment
 import com.zepben.ewb.cim.iec61970.base.core.EquipmentContainer

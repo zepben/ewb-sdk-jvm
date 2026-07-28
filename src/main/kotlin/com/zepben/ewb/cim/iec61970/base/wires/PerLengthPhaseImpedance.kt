@@ -8,7 +8,7 @@
 
 package com.zepben.ewb.cim.iec61970.base.wires
 
-import com.zepben.ewb.boilerplate.LazyValidatedList
+import com.zepben.ewb.boilerplate.collections.LazyValidatedList
 
 /**
  * Impedance and admittance parameters per unit length for n-wire unbalanced lines, in matrix form.

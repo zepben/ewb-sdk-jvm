@@ -9,7 +9,7 @@
 package com.zepben.ewb.cim.iec61970.base.core
 
 import com.zepben.ewb.boilerplate.LazyMridMap
-import com.zepben.ewb.boilerplate.MridCollection
+import com.zepben.ewb.boilerplate.collections.MridCollection
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.tracing.networktrace.operators.NetworkStateOperators
 

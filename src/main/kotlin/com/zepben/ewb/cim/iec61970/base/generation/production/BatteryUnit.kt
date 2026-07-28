@@ -97,4 +97,5 @@ class BatteryUnit(mRID: String) : PowerElectronicsUnit(mRID) {
         _batteryControls = null
         return this
     }
+
 }

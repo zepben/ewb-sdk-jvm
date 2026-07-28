@@ -141,4 +141,5 @@ abstract class EquipmentContainer(mRID: String) : ConnectivityNodeContainer(mRID
      * Clear all Equipment associated with this [Feeder]
      */
     open fun clearCurrentEquipment(): EquipmentContainer = clearEquipment()
+
 }

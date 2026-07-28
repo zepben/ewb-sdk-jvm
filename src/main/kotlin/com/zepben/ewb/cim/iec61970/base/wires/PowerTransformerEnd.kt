@@ -193,4 +193,5 @@ class PowerTransformerEnd(mRID: String) : TransformerEnd(mRID) {
         _sRatings = null
         return this
     }
+
 }

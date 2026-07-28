@@ -194,4 +194,5 @@ class LvSubstation(mRID: String) : EquipmentContainer(mRID) {
         _currentEnergizingFeedersById = null
         return this
     }
+
 }

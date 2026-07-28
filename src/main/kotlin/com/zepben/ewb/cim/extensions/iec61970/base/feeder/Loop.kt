@@ -186,4 +186,5 @@ class Loop(mRID: String) : IdentifiedObject(mRID) {
         _energizingSubstations = null
         return this
     }
+
 }

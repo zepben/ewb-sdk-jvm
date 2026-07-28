@@ -140,4 +140,5 @@ abstract class EndDevice(mRID: String) : AssetContainer(mRID) {
         _functions = null
         return this
     }
+
 }

@@ -80,4 +80,5 @@ class PerLengthPhaseImpedance(mRID: String) : PerLengthImpedance(mRID) {
         _data = null
         return this
     }
+
 }

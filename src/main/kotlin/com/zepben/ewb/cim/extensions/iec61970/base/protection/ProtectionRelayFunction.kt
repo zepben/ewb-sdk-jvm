@@ -417,6 +417,7 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
         _schemes = null
         return this
     }
+
 }
 
 /**

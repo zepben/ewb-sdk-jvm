@@ -128,4 +128,5 @@ class SynchronousMachine(mRID: String) : RotatingMachine(mRID) {
         _reactiveCapabilityCurves = null
         return this
     }
+
 }

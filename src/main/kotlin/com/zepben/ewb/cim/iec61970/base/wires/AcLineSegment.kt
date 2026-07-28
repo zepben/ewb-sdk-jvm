@@ -260,4 +260,5 @@ class AcLineSegment(mRID: String) : Conductor(mRID) {
         _phases = null
         return this
     }
+
 }

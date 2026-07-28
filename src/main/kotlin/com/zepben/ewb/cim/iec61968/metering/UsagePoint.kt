@@ -215,4 +215,5 @@ class UsagePoint(mRID: String) : IdentifiedObject(mRID) {
         _contacts = null
         return this
     }
+
 }

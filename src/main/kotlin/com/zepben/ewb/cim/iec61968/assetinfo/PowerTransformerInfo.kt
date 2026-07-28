@@ -82,4 +82,5 @@ class PowerTransformerInfo(mRID: String) : AssetInfo(mRID) {
         _transformerTankInfos = null
         return this
     }
+
 }

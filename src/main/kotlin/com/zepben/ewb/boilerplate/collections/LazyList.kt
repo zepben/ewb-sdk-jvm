@@ -6,17 +6,16 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.ewb.boilerplate
+package com.zepben.ewb.boilerplate.collections
 
-import com.zepben.ewb.boilerplate.collections.LazyValidatedList
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 
-class LazyIndexedList<T>(
+class LazyList<T>(
     val getter: () -> MutableList<T>?,
     val setter: (MutableList<T>?) -> Unit,
     val owner: Identifiable,
     val elementDescription: String,
-) : LazyValidatedList<T>(getter, setter, null, null) {
+) : LazyCollection<T>(getter, setter, null, null) {
 
     fun add(index: Int, element: T) {
         val data = getter()

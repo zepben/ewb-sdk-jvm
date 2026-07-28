@@ -8,7 +8,7 @@
 
 package com.zepben.ewb.boilerplate.collections
 
-open class LazyValidatedList<T>(
+open class LazyCollection<T>(
     private val getter: () -> MutableList<T>?,
     private val setter: (MutableList<T>?) -> Unit,
     private val validate: ((T) -> Unit)? = null,

@@ -8,7 +8,7 @@
 
 package com.zepben.ewb.cim.iec61970.base.core
 
-import com.zepben.ewb.boilerplate.MridList
+import com.zepben.ewb.boilerplate.collections.MridList
 import com.zepben.ewb.services.common.extensions.getByMRID
 
 /**

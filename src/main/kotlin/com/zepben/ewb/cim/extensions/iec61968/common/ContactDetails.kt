@@ -9,7 +9,7 @@
 package com.zepben.ewb.cim.extensions.iec61968.common
 
 import com.zepben.ewb.boilerplate.collections.AbstractBackedList
-import com.zepben.ewb.boilerplate.collections.LazyValidatedList
+import com.zepben.ewb.boilerplate.collections.LazyCollection
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.iec61968.common.ElectronicAddress
 import com.zepben.ewb.cim.iec61968.common.StreetAddress
@@ -70,12 +70,12 @@ class ContactDetails(
     private var _electronicAddresses: MutableList<ElectronicAddress>? = null
 
     val phoneNumbers: AbstractBackedList<TelephoneNumber>
-        get() = LazyValidatedList(
+        get() = LazyCollection(
         getter = { _phoneNumbers },
         setter = { _phoneNumbers = it },
     )
 
-    val electronicAddresses: AbstractBackedList<ElectronicAddress> get() = LazyValidatedList(
+    val electronicAddresses: AbstractBackedList<ElectronicAddress> get() = LazyCollection(
         getter = { _electronicAddresses },
         setter = { _electronicAddresses = it },
     )

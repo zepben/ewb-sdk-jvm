@@ -6,10 +6,9 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.ewb.boilerplate
+package com.zepben.ewb.boilerplate.collections
 
-import com.zepben.ewb.boilerplate.collections.LazyValidatedList
-import com.zepben.ewb.boilerplate.collections.MridCollection
+import com.zepben.ewb.boilerplate.Backfill
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 
 class LazyMridList<T : Identifiable, O : Identifiable>(
@@ -20,7 +19,7 @@ class LazyMridList<T : Identifiable, O : Identifiable>(
     val backfill: Backfill<T, O>? = null,
     validate: ((T) -> Unit)? = null,
     sortBy: ((T) -> Comparable<*>?)? = null
-) : LazyValidatedList<T>(
+) : LazyCollection<T>(
     getter, setter, validate, sortBy
 ), MridCollection<T> {
 

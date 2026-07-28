@@ -8,7 +8,7 @@
 
 package com.zepben.ewb.services.network.tracing.networktrace.operators
 
-import com.zepben.ewb.boilerplate.MridList
+import com.zepben.ewb.boilerplate.collections.MridList
 import com.zepben.ewb.cim.iec61970.base.core.Equipment
 import com.zepben.ewb.cim.iec61970.base.core.EquipmentContainer
 import com.zepben.testutils.junit.SystemLogExtension

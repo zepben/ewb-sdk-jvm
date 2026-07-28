@@ -35,6 +35,10 @@ class BatteryUnit(mRID: String) : PowerElectronicsUnit(mRID) {
     @ZBEX
     val controls: List<BatteryControl> get() = _batteryControls.asUnmodifiable()
 
+    private fun validateControl(control: BatteryControl): Boolean {
+        return validateReference(control, ::getControl, "A BatteryControl")
+    }
+
     /**
      * Get the number of entries in the [BatteryControl] collection.
      */
@@ -93,9 +97,4 @@ class BatteryUnit(mRID: String) : PowerElectronicsUnit(mRID) {
         _batteryControls = null
         return this
     }
-
-    private fun validateControl(control: BatteryControl): Boolean {
-        return validateReference(control, ::getControl, "A BatteryControl")
-    }
-
 }

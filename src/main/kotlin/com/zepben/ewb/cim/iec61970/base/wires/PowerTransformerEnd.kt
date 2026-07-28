@@ -104,6 +104,21 @@ class PowerTransformerEnd(mRID: String) : TransformerEnd(mRID) {
     val sRatings: List<TransformerEndRatedS> get() = _sRatings.asUnmodifiable()
 
     /**
+     * Get the [ResistanceReactance] for this [PowerTransformerEnd] from either:
+     * 1. directly assigned values or
+     * 2. the pre-calculated [starImpedance] or
+     * 3. from the datasheet information of the associated [powerTransformer]
+     *
+     * If the data is not complete in any of the above it will merge in the missing values from the subsequent sources.
+     */
+    override fun resistanceReactance(): ResistanceReactance =
+        ResistanceReactance(r, x, r0, x0).mergeIfIncomplete {
+            starImpedance?.resistanceReactance()
+        }.mergeIfIncomplete {
+            powerTransformer?.assetInfo?.resistanceReactance(endNumber)
+        }
+
+    /**
      * Find the first rating with the provided cooling type.
      *
      * @param coolingType The [TransformerCoolingType] to search for.
@@ -178,20 +193,4 @@ class PowerTransformerEnd(mRID: String) : TransformerEnd(mRID) {
         _sRatings = null
         return this
     }
-
-    /**
-     * Get the [ResistanceReactance] for this [PowerTransformerEnd] from either:
-     * 1. directly assigned values or
-     * 2. the pre-calculated [starImpedance] or
-     * 3. from the datasheet information of the associated [powerTransformer]
-     *
-     * If the data is not complete in any of the above it will merge in the missing values from the subsequent sources.
-     */
-    override fun resistanceReactance(): ResistanceReactance =
-        ResistanceReactance(r, x, r0, x0).mergeIfIncomplete {
-            starImpedance?.resistanceReactance()
-        }.mergeIfIncomplete {
-            powerTransformer?.assetInfo?.resistanceReactance(endNumber)
-        }
-
 }

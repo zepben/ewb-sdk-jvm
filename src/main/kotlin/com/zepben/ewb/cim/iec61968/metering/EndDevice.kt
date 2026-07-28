@@ -41,6 +41,12 @@ abstract class EndDevice(mRID: String) : AssetContainer(mRID) {
 
     val usagePoints: Collection<UsagePoint> get() = _usagePoints.asUnmodifiable()
 
+    val functions: List<EndDeviceFunction> get() = _functions.asUnmodifiable()
+
+    private fun validateFunction(function: EndDeviceFunction): Boolean {
+        return validateReference(function, ::getFunction, "A EndDeviceFunction")
+    }
+
     /**
      * Get the number of entries in the [UsagePoint] collection.
      */
@@ -86,8 +92,6 @@ abstract class EndDevice(mRID: String) : AssetContainer(mRID) {
         _usagePoints = null
         return this
     }
-
-    val functions: List<EndDeviceFunction> get() = _functions.asUnmodifiable()
 
     /**
      * Get the number of entries in the [EndDeviceFunction] collection.
@@ -136,9 +140,4 @@ abstract class EndDevice(mRID: String) : AssetContainer(mRID) {
         _functions = null
         return this
     }
-
-    private fun validateFunction(function: EndDeviceFunction): Boolean {
-        return validateReference(function, ::getFunction, "A EndDeviceFunction")
-    }
-
 }

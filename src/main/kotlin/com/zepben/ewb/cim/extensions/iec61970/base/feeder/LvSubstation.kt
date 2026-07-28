@@ -34,6 +34,20 @@ class LvSubstation(mRID: String) : EquipmentContainer(mRID) {
     @ZBEX
     val normalEnergizingFeeders: Collection<Feeder> get() = _normalEnergizingFeedersById?.values.asUnmodifiable()
 
+    @ZBEX
+    val normalEnergizedLvFeeders: Collection<LvFeeder> get() = _normalEnergizedLvFeedersById?.values.asUnmodifiable()
+
+    /**
+     * [ZBEX] The HV/MV feeders that currently energize this LV substation. The returned collection is read only.
+     */
+    @ZBEX
+    val currentEnergizingFeeders: Collection<Feeder> get() = _currentEnergizingFeedersById?.values.asUnmodifiable()
+
+    /**
+     * Retrieves all normally energized LvFeeders that represent low voltage network connected below a switch on the edge of this LvSubstation. This is all LvFeeders in the normalEnergizedLvFeeders that has a normalHeadTerminal attached to a Switch.
+     */
+    fun normalEnergizedLvSwitchFeeders(): List<LvFeeder> = normalEnergizedLvFeeders.filter { it.normalHeadTerminal?.conductingEquipment is Switch }
+
     /**
      * Get the number of entries in the normal [Feeder] collection.
      */
@@ -85,9 +99,6 @@ class LvSubstation(mRID: String) : EquipmentContainer(mRID) {
         return this
     }
 
-    @ZBEX
-    val normalEnergizedLvFeeders: Collection<LvFeeder> get() = _normalEnergizedLvFeedersById?.values.asUnmodifiable()
-
     /**
      * Get the number of entries in the normal [LvFeeder] collection.
      */
@@ -132,12 +143,6 @@ class LvSubstation(mRID: String) : EquipmentContainer(mRID) {
         _normalEnergizedLvFeedersById = null
         return this
     }
-
-    /**
-     * [ZBEX] The HV/MV feeders that currently energize this LV substation. The returned collection is read only.
-     */
-    @ZBEX
-    val currentEnergizingFeeders: Collection<Feeder> get() = _currentEnergizingFeedersById?.values.asUnmodifiable()
 
     /**
      * Get the number of entries in the current [Feeder] collection.
@@ -189,10 +194,4 @@ class LvSubstation(mRID: String) : EquipmentContainer(mRID) {
         _currentEnergizingFeedersById = null
         return this
     }
-
-    /**
-     * Retrieves all normally energized LvFeeders that represent low voltage network connected below a switch on the edge of this LvSubstation. This is all LvFeeders in the normalEnergizedLvFeeders that has a normalHeadTerminal attached to a Switch.
-     */
-    fun normalEnergizedLvSwitchFeeders(): List<LvFeeder> = normalEnergizedLvFeeders.filter { it.normalHeadTerminal?.conductingEquipment is Switch }
-
 }

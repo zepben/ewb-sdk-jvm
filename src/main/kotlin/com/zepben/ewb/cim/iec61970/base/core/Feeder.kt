@@ -58,6 +58,32 @@ class Feeder(mRID: String) : EquipmentContainer(mRID) {
     override fun getCurrentEquipment(mRID: String): Equipment? = _currentEquipmentById?.get(mRID)
 
     /**
+     * @param equipment the equipment to disassociate from this feeder in the current state of the network.
+     */
+    override fun removeCurrentEquipment(equipment: Equipment): Boolean {
+        val ret = _currentEquipmentById?.remove(equipment.mRID)
+        if (_currentEquipmentById.isNullOrEmpty()) _currentEquipmentById = null
+        return ret != null
+    }
+
+    /**
+     * The LV feeders that are normally energized by the feeder. The returned collection is read only.
+     */
+    val normalEnergizedLvFeeders: Collection<LvFeeder> get() = _normalEnergizedLvFeedersById?.values.asUnmodifiable()
+
+    /**
+     * The LV feeders that are currently energized by the feeder. The returned collection is read only.
+     */
+    @ZBEX
+    val currentEnergizedLvFeeders: Collection<LvFeeder> get() = _currentEnergizedLvFeedersById?.values.asUnmodifiable()
+
+    @ZBEX
+    val normalEnergizedLvSubstations: Collection<LvSubstation> get() = _normalEnergizedLvSubstationsById?.values.asUnmodifiable()
+
+    @ZBEX
+    val currentEnergizedLvSubstations: Collection<LvSubstation> get() = _currentEnergizedLvSubstationsById?.values.asUnmodifiable()
+
+    /**
      * @param equipment the equipment to associate with this feeder in the current state of the network.
      */
     override fun addCurrentEquipment(equipment: Equipment): Feeder {
@@ -71,26 +97,12 @@ class Feeder(mRID: String) : EquipmentContainer(mRID) {
     }
 
     /**
-     * @param equipment the equipment to disassociate from this feeder in the current state of the network.
-     */
-    override fun removeCurrentEquipment(equipment: Equipment): Boolean {
-        val ret = _currentEquipmentById?.remove(equipment.mRID)
-        if (_currentEquipmentById.isNullOrEmpty()) _currentEquipmentById = null
-        return ret != null
-    }
-
-    /**
      * Clear all Equipment associated with this [Feeder]
      */
     override fun clearCurrentEquipment(): Feeder {
         _currentEquipmentById = null
         return this
     }
-
-    /**
-     * The LV feeders that are normally energized by the feeder. The returned collection is read only.
-     */
-    val normalEnergizedLvFeeders: Collection<LvFeeder> get() = _normalEnergizedLvFeedersById?.values.asUnmodifiable()
 
     /**
      * Get the number of entries in the normal [LvFeeder] collection.
@@ -138,12 +150,6 @@ class Feeder(mRID: String) : EquipmentContainer(mRID) {
     }
 
     /**
-     * The LV feeders that are currently energized by the feeder. The returned collection is read only.
-     */
-    @ZBEX
-    val currentEnergizedLvFeeders: Collection<LvFeeder> get() = _currentEnergizedLvFeedersById?.values.asUnmodifiable()
-
-    /**
      * Get the number of entries in the current [LvFeeder] collection.
      */
     fun numCurrentEnergizedLvFeeders(): Int = _currentEnergizedLvFeedersById?.size ?: 0
@@ -187,9 +193,6 @@ class Feeder(mRID: String) : EquipmentContainer(mRID) {
         _currentEnergizedLvFeedersById = null
         return this
     }
-
-    @ZBEX
-    val normalEnergizedLvSubstations: Collection<LvSubstation> get() = _normalEnergizedLvSubstationsById?.values.asUnmodifiable()
 
     /**
      * Get the number of entries in the normal [LvSubstation] collection.
@@ -241,9 +244,6 @@ class Feeder(mRID: String) : EquipmentContainer(mRID) {
         _normalEnergizedLvSubstationsById = null
         return this
     }
-
-    @ZBEX
-    val currentEnergizedLvSubstations: Collection<LvSubstation> get() = _currentEnergizedLvSubstationsById?.values.asUnmodifiable()
 
     /**
      * Get the number of entries in the current [LvSubstation] collection.

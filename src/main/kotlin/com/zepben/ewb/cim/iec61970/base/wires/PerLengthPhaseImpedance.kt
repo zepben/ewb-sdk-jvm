@@ -22,14 +22,14 @@ class PerLengthPhaseImpedance(mRID: String) : PerLengthImpedance(mRID) {
     val data: List<PhaseImpedanceData> get() = _data.asUnmodifiable()
 
     /**
-     * Get the number of entries in the [PhaseImpedanceData] collection.
-     */
-    fun numData(): Int = _data?.size ?: 0
-
-    /**
      * Get only the diagonal elements of the matrix, i.e toPhase == fromPhase.
      */
     fun diagonal(): List<PhaseImpedanceData>? = _data?.filter { it.toPhase == it.fromPhase }
+
+    /**
+     * Get the number of entries in the [PhaseImpedanceData] collection.
+     */
+    fun numData(): Int = _data?.size ?: 0
 
     /**
      * Get the matrix entry for the corresponding to and from phases.
@@ -80,5 +80,4 @@ class PerLengthPhaseImpedance(mRID: String) : PerLengthImpedance(mRID) {
         _data = null
         return this
     }
-
 }

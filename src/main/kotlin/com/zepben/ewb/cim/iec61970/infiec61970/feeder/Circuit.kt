@@ -35,6 +35,12 @@ class Circuit(mRID: String) : Line(mRID) {
     val endTerminals: List<Terminal> get() = _endTerminals.asUnmodifiable()
 
     /**
+     * Simplification of the CIM association via Bay to [Substation].
+     * The returned collection is read only.
+     */
+    val endSubstations: List<Substation> get() = _endSubstations.asUnmodifiable()
+
+    /**
      * Get the number of entries in the [endTerminals] collection.
      */
     fun numEndTerminals(): Int = _endTerminals?.size ?: 0
@@ -79,12 +85,6 @@ class Circuit(mRID: String) : Line(mRID) {
         _endTerminals = null
         return this
     }
-
-    /**
-     * Simplification of the CIM association via Bay to [Substation].
-     * The returned collection is read only.
-     */
-    val endSubstations: List<Substation> get() = _endSubstations.asUnmodifiable()
 
     /**
      * Get the number of entries in the [endSubstations] collection.

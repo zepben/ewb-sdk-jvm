@@ -69,6 +69,18 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
     @ZBEX
     val timeLimits: List<Double> get() = _timeLimits.asUnmodifiable()
 
+    @ZBEX
+    val thresholds: List<RelaySetting> get() = _thresholds.asUnmodifiable()
+
+    @ZBEX
+    val protectedSwitches: Collection<ProtectedSwitch> get() = _protectedSwitches.asUnmodifiable()
+
+    @ZBEX
+    val sensors: Collection<Sensor> get() = _sensors.asUnmodifiable()
+
+    @ZBEX
+    val schemes: Collection<ProtectionRelayScheme> get() = _schemes.asUnmodifiable()
+
     /**
      * Returns the number of time limits for this [ProtectionRelayFunction]
      */
@@ -160,9 +172,6 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
         return this
     }
 
-    @ZBEX
-    val thresholds: List<RelaySetting> get() = _thresholds.asUnmodifiable()
-
     /**
      * Get the number of threshold [RelaySetting]s for this [ProtectionRelayFunction].
      *
@@ -250,9 +259,6 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
         return this
     }
 
-    @ZBEX
-    val protectedSwitches: Collection<ProtectedSwitch> get() = _protectedSwitches.asUnmodifiable()
-
     /**
      * Get the number of [ProtectedSwitch]es operated by this [ProtectionRelayFunction].
      *
@@ -305,9 +311,6 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
         _protectedSwitches = null
         return this
     }
-
-    @ZBEX
-    val sensors: Collection<Sensor> get() = _sensors.asUnmodifiable()
 
     /**
      * Get the number of [Sensor]s for this [ProtectionRelayFunction].
@@ -362,9 +365,6 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
         return this
     }
 
-    @ZBEX
-    val schemes: Collection<ProtectionRelayScheme> get() = _schemes.asUnmodifiable()
-
     /**
      * Get the number of [ProtectionRelayScheme]s this [ProtectionRelayFunction] operates under.
      *
@@ -417,7 +417,6 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
         _schemes = null
         return this
     }
-
 }
 
 /**

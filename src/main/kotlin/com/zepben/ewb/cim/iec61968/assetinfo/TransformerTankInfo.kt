@@ -32,6 +32,12 @@ class TransformerTankInfo(mRID: String) : AssetInfo(mRID) {
     val transformerEndInfos: List<TransformerEndInfo> get() = _transformerEndInfos.asUnmodifiable()
 
     /**
+     * Get the [ResistanceReactance] for the specified [endNumber] from the datasheet information.
+     */
+    fun resistanceReactance(endNumber: Int): ResistanceReactance? =
+        transformerEndInfos.firstOrNull { it.endNumber == endNumber }?.resistanceReactance()
+
+    /**
      * Get the number of entries in the [TransformerEndInfo] collection.
      */
     fun numTransformerEndInfos(): Int = _transformerEndInfos?.size ?: 0
@@ -80,11 +86,4 @@ class TransformerTankInfo(mRID: String) : AssetInfo(mRID) {
         _transformerEndInfos = null
         return this
     }
-
-    /**
-     * Get the [ResistanceReactance] for the specified [endNumber] from the datasheet information.
-     */
-    fun resistanceReactance(endNumber: Int): ResistanceReactance? =
-        transformerEndInfos.firstOrNull { it.endNumber == endNumber }?.resistanceReactance()
-
 }

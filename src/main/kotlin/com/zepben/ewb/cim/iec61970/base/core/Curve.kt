@@ -8,8 +8,8 @@
 
 package com.zepben.ewb.cim.iec61970.base.core
 
-import com.zepben.ewb.boilerplate.AbstractBackedList
-import com.zepben.ewb.boilerplate.LazyValidatedList
+import com.zepben.ewb.boilerplate.collections.AbstractBackedList
+import com.zepben.ewb.boilerplate.collections.LazyValidatedList
 
 
 /**

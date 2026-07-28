@@ -10,7 +10,7 @@ package com.zepben.ewb.cim.iec61970.base.core
 
 import com.zepben.ewb.boilerplate.Backfill
 import com.zepben.ewb.boilerplate.MridList
-import com.zepben.ewb.boilerplate.RefMridList
+import com.zepben.ewb.boilerplate.collections.MridCollection
 import com.zepben.ewb.services.common.extensions.asUnmodifiable
 
 
@@ -33,7 +33,7 @@ abstract class ConductingEquipment(mRID: String) : Equipment(mRID) {
             return baseVoltage?.nominalVoltage ?: 0
         }
 
-    internal val terminalsInternal: TerminalList get() = RefMridList(
+    internal val terminalsInternal: TerminalList get() = MridList(
         _terminals,
         this,
         "A Terminal",
@@ -149,7 +149,7 @@ abstract class ConductingEquipment(mRID: String) : Equipment(mRID) {
     // endregion
 }
 
-typealias TerminalList = MridList<Terminal>
+typealias TerminalList = MridCollection<Terminal>
 
 fun TerminalList.getByNumber(sequenceNumber: Int): Terminal? =
         firstOrNull { it.sequenceNumber == sequenceNumber }

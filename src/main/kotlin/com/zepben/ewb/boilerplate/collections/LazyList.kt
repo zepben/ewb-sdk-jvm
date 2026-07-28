@@ -11,11 +11,11 @@ package com.zepben.ewb.boilerplate.collections
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 
 class LazyList<T>(
-    val getter: () -> MutableList<T>?,
-    val setter: (MutableList<T>?) -> Unit,
+    getter: () -> MutableList<T>?,
+    setter: (MutableList<T>?) -> Unit,
     val owner: Identifiable,
     val elementDescription: String,
-) : LazyCollection<T>(getter, setter, null, null) {
+) : LazyCollection<T>(getter, setter) {
 
     fun add(index: Int, element: T) {
         val data = getter()

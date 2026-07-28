@@ -9,10 +9,10 @@
 package com.zepben.ewb.boilerplate.collections
 
 open class LazyCollection<T>(
-    private val getter: () -> MutableList<T>?,
-    private val setter: (MutableList<T>?) -> Unit,
-    private val validate: ((T) -> Unit)? = null,
-    private val sortBy: ((T) -> Comparable<*>?)? = null
+    protected val getter: () -> MutableList<T>?,
+    protected val setter: (MutableList<T>?) -> Unit,
+    protected val validate: ((T) -> Unit)? = null,
+    protected val sortBy: ((T) -> Comparable<*>?)? = null
 ) : AbstractBackedList<T>() {
 
     override fun getCollection(): MutableList<T> = getter() ?: mutableListOf()

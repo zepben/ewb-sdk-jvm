@@ -12,7 +12,7 @@ import com.zepben.ewb.boilerplate.Backfill
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 
 class LazyMridList<T : Identifiable, O : Identifiable>(
-    private val getter: () -> MutableList<T>?,
+    getter: () -> MutableList<T>?,
     setter: (MutableList<T>?) -> Unit,
     override val owner: O,
     override val elementDescription: String,

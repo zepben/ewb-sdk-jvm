@@ -60,10 +60,9 @@ class JWTAuthenticatorTest {
 
         authResp = authorise(successfulToken, "bacon")
         assertThat(authResp.statusCode, equalTo(StatusCode.UNAUTHENTICATED))
-        assertThat(
-            authResp.message,
-            equalTo("Token was missing a required claim. Had [read:network, read:ewb, write:metrics, write:network] but needed [bacon]")
-        )
+        assertThat(authResp.message, equalTo("Token was missing a required claim."))
+        // If we had debug logging turned on we could check to see if the old message is logged:
+        // "Token was missing a required claim. Had [read:network, read:ewb, write:metrics, write:network] but needed [bacon]"
 
         authResp = ta.authenticate("broken")
         assertThat(authResp.statusCode, equalTo(StatusCode.UNAUTHENTICATED))

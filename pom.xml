@@ -12,7 +12,7 @@
     <parent>
         <groupId>com.zepben.maven</groupId>
         <artifactId>evolve-super-pom</artifactId>
-        <version>0.50.0</version>
+        <version>0.51.0</version>
     </parent>
 
     <groupId>com.zepben</groupId>
@@ -75,12 +75,12 @@
         <dependency>
             <groupId>com.zepben</groupId>
             <artifactId>protobuf</artifactId>
-            <version>1.8.0b3</version>
+            <version>1.8.0b4</version>
         </dependency>
         <dependency>
             <groupId>com.zepben</groupId>
             <artifactId>vertx-utils</artifactId>
-            <version>2.0.0</version>
+            <version>2.1.0b1</version>
         </dependency>
 
         <!-- Kotlin -->

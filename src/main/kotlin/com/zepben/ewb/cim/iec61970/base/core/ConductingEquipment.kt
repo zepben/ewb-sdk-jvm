@@ -9,8 +9,7 @@
 package com.zepben.ewb.cim.iec61970.base.core
 
 import com.zepben.ewb.boilerplate.Backfill
-import com.zepben.ewb.boilerplate.collections.MridCollection
-import com.zepben.ewb.boilerplate.collections.MridList
+import com.zepben.ewb.boilerplate.relations.TerminalList
 import com.zepben.ewb.services.common.extensions.asUnmodifiable
 
 
@@ -33,18 +32,19 @@ abstract class ConductingEquipment(mRID: String) : Equipment(mRID) {
             return baseVoltage?.nominalVoltage ?: 0
         }
 
-    internal val terminalsInternal: TerminalList get() = MridList(
-        _terminals,
-        this,
-        "A Terminal",
-        backfill = Backfill(
-            { it._conductingEquipment },
-            { it, ce -> it._conductingEquipment = ce },
-            Terminal::conductingEquipment
-        ),
-        validate = { validateTerminal(it) },
-        sortBy = { it.sequenceNumber }
-    )
+    internal val terminalsInternal: TerminalList
+        get() = TerminalList(
+            _terminals,
+            this,
+            "A Terminal",
+            backfill = Backfill(
+                { it._conductingEquipment },
+                { it, ce -> it._conductingEquipment = ce },
+                Terminal::conductingEquipment
+            ),
+            validate = { validateTerminal(it) },
+            sortBy = { it.sequenceNumber }
+        )
 
     /**
      * Conducting equipment have terminals that may be connected to other conducting equipment terminals
@@ -147,9 +147,5 @@ abstract class ConductingEquipment(mRID: String) : Equipment(mRID) {
     // endregion
 
     // endregion
+
 }
-
-typealias TerminalList = MridCollection<Terminal>
-
-fun TerminalList.getByNumber(sequenceNumber: Int): Terminal? =
-        firstOrNull { it.sequenceNumber == sequenceNumber }

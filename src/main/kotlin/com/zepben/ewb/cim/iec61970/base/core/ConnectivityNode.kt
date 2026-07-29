@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.cim.iec61970.base.core
 
+import com.zepben.ewb.boilerplate.collections.MridCollection
 import com.zepben.ewb.boilerplate.collections.MridList
 import com.zepben.ewb.services.common.extensions.getByMRID
 
@@ -21,7 +22,7 @@ class ConnectivityNode(mRID: String) : IdentifiedObject(mRID) {
     /**
      * The terminals for this connectivity node. The collection is read only
      */
-    val terminals: TerminalList get() = MridList(
+    val terminals: MridCollection<Terminal> get() = MridList(
         _terminals,
         owner = this,
         elementDescription = "A Terminal"

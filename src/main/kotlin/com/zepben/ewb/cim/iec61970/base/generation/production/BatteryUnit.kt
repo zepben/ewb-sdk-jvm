@@ -8,8 +8,7 @@
 
 package com.zepben.ewb.cim.iec61970.base.generation.production
 
-import com.zepben.ewb.boilerplate.collections.LazyMridList
-import com.zepben.ewb.boilerplate.collections.MridCollection
+import com.zepben.ewb.boilerplate.relations.BatteryControlList
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.BatteryControl
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.BatteryControlMode
@@ -31,12 +30,13 @@ class BatteryUnit(mRID: String) : PowerElectronicsUnit(mRID) {
     private var _batteryControls: MutableList<BatteryControl>? = null
 
     @ZBEX
-    val controls: BatteryControlList get() = LazyMridList(
-        getter = { _batteryControls },
-        setter = { _batteryControls = it },
-        owner = this,
-        elementDescription = "A BatteryControl"
-    )
+    val controls: BatteryControlList
+        get() = BatteryControlList(
+            getter = { _batteryControls },
+            setter = { _batteryControls = it },
+            owner = this,
+            elementDescription = "A BatteryControl"
+        )
 
 
 
@@ -98,14 +98,5 @@ class BatteryUnit(mRID: String) : PowerElectronicsUnit(mRID) {
     // endregion
 
     // endregion
+
 }
-
-typealias BatteryControlList = MridCollection<BatteryControl>
-
-/**
- * Get a [BatteryControl] of this [BatteryUnit] by its [BatteryControl.controlMode]
- *
- * @param controlMode the control mode of the required [BatteryControl]
- * @return The [BatteryControl] with the specified [BatteryControlMode] if it exists, otherwise null
- */
-fun BatteryControlList.getByMode(controlMode: BatteryControlMode): BatteryControl? = firstOrNull { it.controlMode == controlMode }

@@ -27,6 +27,8 @@ interface MridCollection<T : Identifiable> : Collection<T> {
         return false
     }
 
+    fun add(element: T): Boolean
+
     fun remove(element: T): Boolean
 
     fun clear()

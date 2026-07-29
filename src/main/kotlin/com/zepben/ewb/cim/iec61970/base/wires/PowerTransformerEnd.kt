@@ -8,7 +8,7 @@
 
 package com.zepben.ewb.cim.iec61970.base.wires
 
-import com.zepben.ewb.boilerplate.collections.LazyList
+import com.zepben.ewb.boilerplate.relations.TransformerEndRatedSList
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.TransformerCoolingType
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.TransformerEndRatedS
@@ -102,13 +102,14 @@ class PowerTransformerEnd(mRID: String) : TransformerEnd(mRID) {
      * The returned collection is read only.
      */
     @ZBEX
-    val sRatings: LazyList<TransformerEndRatedS> get() = LazyList(
-        { _sRatings },
-        { _sRatings = it },
-        ::validateRating,
-        { -it.ratedS }
+    val sRatings: TransformerEndRatedSList
+        get() = TransformerEndRatedSList(
+            { _sRatings },
+            { _sRatings = it },
+            ::validateRating,
+            { -it.ratedS }
 
-    )
+        )
 
 
     private fun validateRating(rating: TransformerEndRatedS) {
@@ -199,25 +200,3 @@ class PowerTransformerEnd(mRID: String) : TransformerEnd(mRID) {
     // endregion
 
 }
-
-typealias TransformerEndRatedSList = LazyList<TransformerEndRatedS>
-
-fun TransformerEndRatedSList.add(
-    ratedS: Int,
-    coolingType: TransformerCoolingType = TransformerCoolingType.UNKNOWN,
-): Boolean = add(TransformerEndRatedS(coolingType, ratedS))
-
-fun TransformerEndRatedSList.getByCoolingType(coolingType: TransformerCoolingType): TransformerEndRatedS? = firstOrNull { it.coolingType == coolingType }
-
-
-/**
- * Remove the [TransformerEndRatedS] from the [sRatings] collection with a cooling type of [coolingType]
- *
- * @param coolingType The [TransformerCoolingType] to remove.
- * @return The [TransformerEndRatedS] that was removed, or null if none was removed.
- */
-fun TransformerEndRatedSList.removeByCoolingType(coolingType: TransformerCoolingType): TransformerEndRatedS? =
-    firstOrNull { it.coolingType == coolingType }?.also{
-        remove(it)
-    }
-

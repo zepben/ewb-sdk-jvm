@@ -11,6 +11,7 @@ package com.zepben.ewb.cim.iec61970.base.wires
 import com.zepben.ewb.boilerplate.Backfill
 import com.zepben.ewb.boilerplate.collections.LazyMridList
 import com.zepben.ewb.boilerplate.collections.MridCollection
+import com.zepben.ewb.boilerplate.relations.AcLineSegmentPhaseList
 import com.zepben.ewb.cim.iec61968.assetinfo.WireInfo
 
 /**
@@ -78,18 +79,19 @@ class AcLineSegment(mRID: String) : Conductor(mRID) {
     /**
      * The individual phase models for this AcLineSegment. The returned collection is read only.
      */
-    val phases: AcLineSegmentPhaseList get() = LazyMridList(
-        getter = { _phases },
-        setter = { _phases = it },
-        owner = this,
-        elementDescription = "An AcLineSegmentPhase",
-        backfill = Backfill(
-            { it.acLineSegment },
-            { it, acls -> it.acLineSegment = acls },
-            AcLineSegmentPhase::acLineSegment
-        ),
-        sortBy = { it.sequenceNumber }
-    )
+    val phases: AcLineSegmentPhaseList
+        get() = AcLineSegmentPhaseList(
+            getter = { _phases },
+            setter = { _phases = it },
+            owner = this,
+            elementDescription = "An AcLineSegmentPhase",
+            backfill = Backfill(
+                { it.acLineSegment },
+                { it, acls -> it.acLineSegment = acls },
+                AcLineSegmentPhase::acLineSegment
+            ),
+            sortBy = { it.sequenceNumber }
+        )
 
     /**
      * Retrieve the WireInfo associated with the requested [phase]. If no specific [WireInfo] is available for the given [phase], [AcLineSegment.assetInfo] will be returned.
@@ -232,14 +234,5 @@ class AcLineSegment(mRID: String) : Conductor(mRID) {
     // endregion
 
     // endregion
+
 }
-
-typealias AcLineSegmentPhaseList = MridCollection<AcLineSegmentPhase>
-
-/**
- * The individual phase models for an AcLineSegment.
- *
- * @param phase the phase of the required [AcLineSegmentPhase]
- * @return The [AcLineSegmentPhase] with the specified [phase] if it exists, otherwise null
- */
-fun AcLineSegmentPhaseList.getByPhase(phase: SinglePhaseKind): AcLineSegmentPhase? = firstOrNull { it.phase == phase }

@@ -8,7 +8,7 @@
 
 package com.zepben.ewb.cim.iec61970.base.wires
 
-import com.zepben.ewb.boilerplate.collections.LazyList
+import com.zepben.ewb.boilerplate.relations.PhaseImpedanceDataList
 
 /**
  * Impedance and admittance parameters per unit length for n-wire unbalanced lines, in matrix form.
@@ -19,11 +19,12 @@ class PerLengthPhaseImpedance(mRID: String) : PerLengthImpedance(mRID) {
 
     private var _data: MutableList<PhaseImpedanceData>? = null
 
-    val data: PhaseImpedanceDataList get() = LazyList(
-        { _data },
-        { _data = it },
-        { validateData(it) }
-    )
+    val data: PhaseImpedanceDataList
+        get() = PhaseImpedanceDataList(
+            { _data },
+            { _data = it },
+            { validateData(it) }
+        )
 
     fun validateData(phaseImpedanceData: PhaseImpedanceData) {
         require(
@@ -91,20 +92,3 @@ class PerLengthPhaseImpedance(mRID: String) : PerLengthImpedance(mRID) {
     // endregion
 
 }
-
-typealias PhaseImpedanceDataList = LazyList<PhaseImpedanceData>
-
-/**
- * Get the matrix entry for the corresponding to and from phases.
- *
- * @param fromPhase The "from" phase to lookup.
- * @param toPhase The "to" phase to lookup.
- * @return The matching [PhaseImpedanceData] or null if none was found.
- */
-fun PhaseImpedanceDataList.get(fromPhase: SinglePhaseKind, toPhase: SinglePhaseKind): PhaseImpedanceData? =
-    firstOrNull { it.fromPhase == fromPhase && it.toPhase == toPhase }
-
-/**
- * Get only the diagonal elements of the matrix, i.e toPhase == fromPhase.
- */
-fun PhaseImpedanceDataList.diagonal(): List<PhaseImpedanceData> = filter { it.toPhase == it.fromPhase }

@@ -9,7 +9,7 @@
 package com.zepben.ewb.cim.iec61970.base.wires
 
 import com.zepben.ewb.boilerplate.Backfill
-import com.zepben.ewb.boilerplate.collections.LazyMridList
+import com.zepben.ewb.boilerplate.relations.PowerTransformerEndList
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.VectorGroup
 import com.zepben.ewb.cim.iec61968.assetinfo.PowerTransformerInfo
 import com.zepben.ewb.cim.iec61968.infiec61968.infassetinfo.TransformerConstructionKind
@@ -85,19 +85,20 @@ class PowerTransformer(mRID: String) : ConductingEquipment(mRID) {
     /**
      * The PowerTransformerEnd's for this PowerTransformer. The returned collection is read only.
      */
-    val ends: PowerTransformerEndList get() = LazyMridList(
-        getter = { _powerTransformerEnds },
-        setter = {_powerTransformerEnds = it },
-        owner = this,
-        elementDescription = "A PowerTransformerEnd",
-        backfill = Backfill(
-            { it.powerTransformer },
-            { it, pt -> it.powerTransformer = pt },
-            PowerTransformerEnd::powerTransformer
-        ),
-        validate = { validateEnd(it) },
-        sortBy = { it.endNumber }
-    )
+    val ends: PowerTransformerEndList
+        get() = PowerTransformerEndList(
+            getter = { _powerTransformerEnds },
+            setter = { _powerTransformerEnds = it },
+            owner = this,
+            elementDescription = "A PowerTransformerEnd",
+            backfill = Backfill(
+                { it.powerTransformer },
+                { it, pt -> it.powerTransformer = pt },
+                PowerTransformerEnd::powerTransformer
+            ),
+            validate = { validateEnd(it) },
+            sortBy = { it.endNumber }
+        )
 
     /**
      * Get [BaseVoltage] of [PowerTransformerEnd] by its end number.
@@ -197,32 +198,3 @@ class PowerTransformer(mRID: String) : ConductingEquipment(mRID) {
     // endregion
 
 }
-
-typealias PowerTransformerEndList = LazyMridList<PowerTransformerEnd, PowerTransformer>
-
-/**
- * Get a [PowerTransformerEnd] by its [PowerTransformerEnd.endNumber]
- *
- * @param endNumber the end number of the required [PowerTransformerEnd]
- * @return The [PowerTransformerEnd] with the specified [endNumber] if it exists, otherwise null
- */
-fun PowerTransformerEndList.getByEndNumber(endNumber: Int): PowerTransformerEnd? =
-    firstOrNull { it.endNumber == endNumber }
-
-/**
- * Get a [PowerTransformerEnd] by its [PowerTransformerEnd.terminal]
- *
- * @param terminal the terminal of the required [PowerTransformerEnd]
- * @return The [PowerTransformerEnd] with the specified [terminal] if it exists, otherwise null
- */
-fun PowerTransformerEndList.getByTerminal(terminal: Terminal): PowerTransformerEnd? =
-    firstOrNull { it.terminal == terminal }
-
-/**
- * Get a [PowerTransformerEnd] by its [Terminal] [ConnectivityNode].
- *
- * @param connectivityNode the [ConnectivityNode] of the required [PowerTransformerEnd]
- * @return The [PowerTransformerEnd] with the specified [Terminal] if it exists, otherwise null
- */
-fun PowerTransformerEndList.getByNode(connectivityNode: ConnectivityNode): PowerTransformerEnd? =
-    firstOrNull { it.terminal?.connectivityNode == connectivityNode }

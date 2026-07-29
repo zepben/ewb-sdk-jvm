@@ -8,8 +8,7 @@
 
 package com.zepben.ewb.cim.iec61970.base.core
 
-import com.zepben.ewb.boilerplate.collections.AbstractBackedList
-import com.zepben.ewb.boilerplate.collections.LazyList
+import com.zepben.ewb.boilerplate.relations.CurveDataList
 
 
 /**
@@ -22,12 +21,13 @@ abstract class Curve(mRID: String) : IdentifiedObject(mRID) {
     /**
      * The point data values that define this curve. The returned collection is read only, sorted by [CurveData.xValue] in ascending order.
      */
-    val data: AbstractBackedList<CurveData> get() = LazyList(
-        { _data },
-        { _data = it },
-        validate = { validateData(it) },
-        sortBy = { it.xValue }
-    )
+    val data: CurveDataList
+        get() = CurveDataList(
+            { _data },
+            { _data = it },
+            validate = { validateData(it) },
+            sortBy = { it.xValue }
+        )
 
     private fun validateData(curveData: CurveData) {
         require(_data.isNullOrEmpty() || _data?.none { cd -> cd.xValue == curveData.xValue } == true) {
@@ -106,22 +106,5 @@ abstract class Curve(mRID: String) : IdentifiedObject(mRID) {
     // endregion
 
     // endregion
+
 }
-
-typealias CurveDataList = AbstractBackedList<CurveData>
-
-/**
- * Get point data values by its xValue.
- *
- * @param x xValue of requested data
- */
-fun CurveDataList.get(x: Float) = find { it.xValue == x }
-
-/**
- * Remove data point from the this [Curve].
- *
- * @property x xValue of the data point to be removed
- * @return true if data point was removed.
- */
-fun CurveDataList.removeAt(x: Float): Boolean =
-    firstOrNull { it.xValue == x }?.let { remove(it) } ?: false

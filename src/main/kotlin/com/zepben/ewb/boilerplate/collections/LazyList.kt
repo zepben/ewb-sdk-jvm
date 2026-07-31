@@ -8,6 +8,38 @@
 
 package com.zepben.ewb.boilerplate.collections
 
+
+/**
+ * A list-like wrapper backed by a nullable list.
+ *
+ * A backing value of `null` is exposed as an empty collection. The backing
+ * list is created when the first item is added and reset to `null` when
+ * the last item is removed or the collection is cleared.
+ *
+ * Example:
+ *
+ * ```kotlin
+ * class Container {
+ *     private var backingItems: MutableList<String>? = null
+ *
+ *     val items = LazyList(
+ *         getter = { backingItems },
+ *         setter = { backingItems = it },
+ *     )
+ * }
+ *
+ * val container = Container()
+ *
+ * check(container.items.isEmpty())
+ * check(container.backingItems == null)
+ *
+ * container.items.add("value")
+ * check(container.backingItems == mutableListOf("value"))
+ *
+ * container.items.clear()
+ * check(container.backingItems == null)
+ * ```
+ */
 open class LazyList<T>(
     protected val getter: () -> MutableList<T>?,
     protected val setter: (MutableList<T>?) -> Unit,

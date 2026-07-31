@@ -11,6 +11,13 @@ package com.zepben.ewb.boilerplate.collections
 import com.zepben.ewb.boilerplate.Backfill
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 
+
+/**
+ * A nullable-list implementation of [MridCollection].
+ *
+ * Inherits mRID lookup and uniqueness semantics from [MridCollection] and
+ * nullable backing-list behaviour from [LazyList].
+ */
 open class LazyMridList<T : Identifiable, O : Identifiable>(
     getter: () -> MutableList<T>?,
     setter: (MutableList<T>?) -> Unit,

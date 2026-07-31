@@ -10,6 +10,24 @@ package com.zepben.ewb.boilerplate.collections
 
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 
+
+/**
+ * A [LazyList] with index-based insertion and deletion.
+ *
+ * It retains the nullable backing-list behaviour of [LazyList],
+ * creating the backing list when an item is inserted and resetting it to
+ * `null` when the final item is deleted.
+ *
+ * Example:
+ *
+ * ```kotlin
+ * container.items.add(0, "value")
+ * check(container.backingItems == mutableListOf("value"))
+ *
+ * container.items.removeAt(0)
+ * check(container.backingItems == null)
+ * ```
+ */
 class LazyIndexList<T>(
     getter: () -> MutableList<T>?,
     setter: (MutableList<T>?) -> Unit,

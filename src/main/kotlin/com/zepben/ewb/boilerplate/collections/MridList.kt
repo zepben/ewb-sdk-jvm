@@ -11,6 +11,17 @@ package com.zepben.ewb.boilerplate.collections
 import com.zepben.ewb.boilerplate.Backfill
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 
+
+/**
+ * An mRID collection backed by a non-nullable list.
+ *
+ * Items are kept in insertion order and retrieved by mRID using a linear search.
+ * Adding enforces mRID uniqueness and can optionally apply backfill,
+ * validation, and sorting.
+ *
+ * Unlike [LazyMridList], clearing the collection leaves an empty backing list
+ * rather than resetting the backing field to `null`.
+ */
 open class MridList<T : Identifiable, O : Identifiable>(
     private val list: MutableList<T> = mutableListOf(),
     override val owner: O,

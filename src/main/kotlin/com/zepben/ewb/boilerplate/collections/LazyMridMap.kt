@@ -12,6 +12,26 @@ import com.zepben.ewb.boilerplate.Backfill
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 
 
+/**
+ * An mRID collection backed by a nullable map.
+ *
+ * Items are stored by their `mRID`, while iteration exposes the map values.
+ * A backing value of `null` is treated as an empty collection. The map is
+ * created when the first item is added and reset to `null` when the collection
+ * becomes empty.
+ *
+ * Example:
+ *
+ * ```kotlin
+ * container.items.add(item)
+ *
+ * check(container.backingItems == mutableMapOf(item.mRID to item))
+ * check(container.items.getByMrid(item.mRID) === item)
+ *
+ * container.items.remove(item)
+ * check(container.backingItems == null)
+ * ```
+ */
 open class LazyMridMap<T : Identifiable, O : Identifiable>(
     private val getter: () -> MutableMap<String, T>?,
     private val setter: (MutableMap<String, T>?) -> Unit,

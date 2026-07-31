@@ -10,6 +10,12 @@ package com.zepben.ewb.boilerplate.collections
 
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 
+
+/**
+ * A collection of objects identified by a unique `mRID`.
+ *
+ * Provides lookup by mRID and rejects distinct objects with duplicate mRIDs.
+ */
 interface MridCollection<T : Identifiable> : Collection<T> {
     val owner: Identifiable
     val elementDescription: String

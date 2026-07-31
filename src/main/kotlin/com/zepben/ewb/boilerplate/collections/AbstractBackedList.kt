@@ -8,6 +8,14 @@
 
 package com.zepben.ewb.boilerplate.collections
 
+
+/**
+ * An [AbstractBackedCollection] with sequence-style indexed access.
+ *
+ * Integer indexes return individual items and ranges return lists.
+ *
+ * Mutation is still not unordered.
+ */
 abstract class AbstractBackedList<T> :
     AbstractBackedCollection<T>(),
     List<T> {

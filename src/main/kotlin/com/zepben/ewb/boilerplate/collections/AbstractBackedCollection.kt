@@ -8,6 +8,15 @@
 
 package com.zepben.ewb.boilerplate.collections
 
+
+/**
+ * A mutable collection interface whose contents are stored elsewhere.
+ *
+ * Mutation is unordered, providing [add] and [remove] but not indexed access
+ *
+ * Implementations provide the current contents through [getCollection]
+ * and define how mutation affects the backing storage.
+ */
 abstract class AbstractBackedCollection<T> :
     AbstractCollection<T>() {
 

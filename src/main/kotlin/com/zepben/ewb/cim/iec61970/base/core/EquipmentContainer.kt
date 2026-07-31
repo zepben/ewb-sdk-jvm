@@ -32,11 +32,6 @@ abstract class EquipmentContainer(mRID: String) : ConnectivityNodeContainer(mRID
     )
 
     /**
-     * Contained equipment using the current state of the network. The returned collection is read only.
-     */
-    open val currentEquipment: MridCollection<Equipment> get() = equipment
-
-    /**
      * Convenience function to find all the normal [Feeder]'s of the [Equipment] associated with this [EquipmentContainer].
      *
      * @return the normal feeders for all associated feeders
@@ -57,6 +52,11 @@ abstract class EquipmentContainer(mRID: String) : ConnectivityNodeContainer(mRID
         equipment.forEach { equip -> ret.addAll(equip.currentFeeders) }
         return ret
     }
+
+    /**
+     * Contained equipment using the current state of the network. The returned collection is read only.
+     */
+    open val currentEquipment: MridCollection<Equipment> get() = equipment
 
     /**
      * Retrieve all terminals that are located on the edge of this EquipmentContainer. This is determined by any terminal that connects to another terminal on a

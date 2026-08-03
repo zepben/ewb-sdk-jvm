@@ -25,6 +25,15 @@
   * `EnumMapper`
 * You can now provide an option `fromMridOverride` to `resolveOrDeferReference`, allowing for manipulation of the objects mRID. e.g. removing `-` from the front
   of variant mRID's.
+* Added tables `TableDataQualityIssues`, `TableDataQualityIssueCategories`, `TableDataQualityIssueAssets`, and `TableDataQualityIssueCallouts` to the metrics database.
+* Using `MetricsDatabaseWriter`, a `DataQualityIssue`, `DataQualityIssueCategory`, associated assets, and `DataQualityIssueCallout` may be saved to the metrics database.
+* Added new classes:
+  * `DataQualityIssue` - severity is now an integer, added priority (nullable integer) and callouts (list of callout IDs).
+  * `DataQualityIssueCategory`
+  * `DataQualityIssueCallout` - represents a callout annotation attached to an issue, following the ednar Callout pattern.
+* Added new enum:
+  * `DataQualityIssueStatus` - values: `CREATED`, `IN_PROGRESS`, `BLOCKED`, `RESOLVED`.
+
 
 ### Enhancements
 * `EwbDataFilePaths` can now exposes its path generators, so you can generate a path without needing to resolve the database.

@@ -28,6 +28,9 @@ class MetricsDatabaseTables internal constructor(
             TableJobSources(),
             TableNetworkContainerMetrics(),
             TableVariantMetrics(),
+            TableDataQualityIssueCategories(),
+            TableDataQualityIssues(),
+            TableDataQualityIssueAssets(),
+            TableDataQualityIssueCallouts(),
         )
-
 }

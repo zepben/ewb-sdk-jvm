@@ -11,6 +11,10 @@ package com.zepben.ewb.database.sql.metrics
 import com.zepben.ewb.database.sql.common.tables.TableVersion
 import com.zepben.ewb.database.sql.initialisers.NoOpDatabaseInitialiser
 import com.zepben.ewb.metrics.IngestionJob
+import com.zepben.ewb.metrics.dataquality.DataQualityIssue
+import com.zepben.ewb.metrics.dataquality.DataQualityIssueCallout
+import com.zepben.ewb.metrics.dataquality.DataQualityIssueCategory
+import com.zepben.ewb.metrics.dataquality.DataQualityIssueStatus
 import com.zepben.ewb.metrics.variants.VariantMetrics
 import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.every
@@ -23,6 +27,7 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.api.io.TempDir
 import java.nio.file.Path
 import java.sql.Connection
+import java.time.Instant
 import java.util.*
 import kotlin.io.path.createFile
 import kotlin.io.path.exists
@@ -63,6 +68,10 @@ internal class MetricsDatabaseWriterTest {
     private val writer = mockk<MetricsWriter> {
         every { write(any<IngestionJob>()) } returns true
         every { write(any<VariantMetrics>()) } returns true
+        every { write(any<DataQualityIssueCategory>()) } returns true
+        every { write(any<DataQualityIssue>()) } returns true
+        every { writeAsset(any(), any()) } returns true
+        every { write(any<DataQualityIssueCallout>()) } returns true
     }
 
     @Test
@@ -163,5 +172,99 @@ internal class MetricsDatabaseWriterTest {
         assertThat("Job ID file shouldn't exist after just writing variant metrics", modelPath.resolve("$uuid.${JOB_ID_FILE_EXTENSION}").notExists())
 
         verify { writer.write(variantMetrics) }
+    }
+
+    @Test
+    internal fun `callsWriter for DataQualityIssueCategory`() {
+        val category = DataQualityIssueCategory(
+            id = uuid.toString(),
+            name = "Missing Data",
+        )
+
+        val result = MetricsDatabaseWriter(
+            tables,
+            connectionyStuff,
+            modelPath = null,
+            createMetricsWriter = { writer }
+        ).write(category)
+
+        assertThat("Should have written successfully", result)
+
+        verify { writer.write(category) }
+    }
+
+    @Test
+    internal fun `callsWriter for DataQualityIssue`() {
+        val issue = DataQualityIssue(
+            id = uuid.toString(),
+            status = DataQualityIssueStatus.CREATED,
+            createdAt = Instant.EPOCH.toString(),
+            createdBy = String(),
+            updatedAt = Instant.EPOCH.toString(),
+            updatedBy = String(),
+            networkModelCreatedAgainst = "model-123",
+            name = "Bad connectivity",
+            description = "Disconnected segment",
+            associatedAssets = listOf("asset-001"),
+            annotationGeoJson = """{"type":"Point"}""",
+            categoryId = UUID.randomUUID().toString(),
+            severity = 2,
+            priority = 1
+        )
+
+        val result = MetricsDatabaseWriter(
+            tables,
+            connectionyStuff,
+            modelPath = null,
+            createMetricsWriter = { writer }
+        ).write(issue)
+
+        assertThat("Should have written successfully", result)
+
+        verify { writer.write(issue) }
+    }
+
+    @Test
+    internal fun `callsWriter for DataQualityIssueAsset`() {
+        val issueId = uuid.toString()
+        val assetMrid = "asset-001"
+
+        val result = MetricsDatabaseWriter(
+            tables,
+            connectionyStuff,
+            modelPath = null,
+            createMetricsWriter = { writer }
+        ).writeAsset(issueId, assetMrid)
+
+        assertThat("Should have written successfully", result)
+
+        verify { writer.writeAsset(issueId, assetMrid) }
+    }
+
+    @Test
+    internal fun `callsWriter for DataQualityIssueCallout`() {
+        val callout = DataQualityIssueCallout(
+            id = uuid.toString(),
+            dataQualityIssueId = UUID.randomUUID().toString(),
+            longitude = 144.9,
+            latitude = -37.8,
+            positionX = 50.0,
+            positionY = 25.0,
+            width = 200.0,
+            height = 100.0,
+            label = "A",
+            colour = "#FF0000"
+        )
+
+        val result = MetricsDatabaseWriter(
+            tables,
+            connectionyStuff,
+            modelPath = null,
+            createMetricsWriter = { writer }
+        ).write(callout)
+
+        assertThat("Should have written successfully", result)
+
+        verify { writer.write(callout) }
     }
 }

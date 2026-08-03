@@ -9,6 +9,7 @@
 package com.zepben.ewb.database.sql.metrics
 
 import com.zepben.ewb.metrics.*
+import com.zepben.ewb.metrics.dataquality.*
 import com.zepben.ewb.metrics.variants.VariantMetricEntry
 import com.zepben.ewb.metrics.variants.VariantMetricKind
 import com.zepben.ewb.metrics.variants.VariantMetrics
@@ -43,6 +44,10 @@ internal class MetricsWriterTest {
         every { writeSource(any(), any<JobSource>()) } returns true
         every { writeMetric(any(), any<NetworkMetric>()) } returns true
         every { writeVariantMetricEntry(any(), any(), any(), any(), any<VariantMetricEntry>()) } returns true
+        every { writeDataQualityIssueCategory(any()) } returns true
+        every { writeDataQualityIssue(any()) } returns true
+        every { writeDataQualityIssueAsset(any(), any()) } returns true
+        every { writeDataQualityIssueCallout(any()) } returns true
     }
     private val metricsWriter = MetricsWriter(mockk(), metricsEntryWriter)
 
@@ -144,5 +149,73 @@ internal class MetricsWriterTest {
                 variantMetrics.metrics[1]
             )
         }
+    }
+
+    @Test
+    internal fun `passes data quality issue category through to the metrics entry writer`() {
+        val category = DataQualityIssueCategory(
+            id = UUID.randomUUID().toString(),
+            name = "Missing Data",
+            description = "Data is absent from the network model"
+        )
+
+        metricsWriter.write(category)
+
+        verify(exactly = 1) { metricsEntryWriter.writeDataQualityIssueCategory(category) }
+    }
+
+    @Test
+    internal fun `passes data quality issue through to the metrics entry writer`() {
+        val issue = DataQualityIssue(
+            id = UUID.randomUUID().toString(),
+            status = DataQualityIssueStatus.CREATED,
+            createdAt = Instant.EPOCH.toString(),
+            createdBy = String(),
+            updatedAt = Instant.EPOCH.toString(),
+            updatedBy = String(),
+            networkModelCreatedAgainst = String(),
+            name = "Bad connectivity",
+            description = "Disconnected segment found",
+            associatedAssets = listOf("asset-001"),
+            annotationGeoJson = """{"type":"Point","coordinates":[144.9,-37.8]}""",
+            categoryId = UUID.randomUUID().toString(),
+            severity = 2,
+            priority = 1
+        )
+
+        metricsWriter.write(issue)
+
+        verify(exactly = 1) { metricsEntryWriter.writeDataQualityIssue(issue) }
+    }
+
+    @Test
+    internal fun `passes data quality issue asset through to the metrics entry writer`() {
+        val issueId = UUID.randomUUID().toString()
+        val assetMrid = "asset-002"
+
+        metricsWriter.writeAsset(issueId, assetMrid)
+
+        verify(exactly = 1) { metricsEntryWriter.writeDataQualityIssueAsset(issueId, assetMrid) }
+    }
+
+    @Test
+    internal fun `passes data quality issue callout through to the metrics entry writer`() {
+        val callout = DataQualityIssueCallout(
+            id = UUID.randomUUID().toString(),
+            dataQualityIssueId = UUID.randomUUID().toString(),
+            longitude = 144.9,
+            latitude = -37.8,
+            positionX = 50.0,
+            positionY = 25.0,
+            width = 200.0,
+            height = 100.0,
+            label = "A",
+            description = null,
+            colour = "#FF0000"
+        )
+
+        metricsWriter.write(callout)
+
+        verify(exactly = 1) { metricsEntryWriter.writeDataQualityIssueCallout(callout) }
     }
 }

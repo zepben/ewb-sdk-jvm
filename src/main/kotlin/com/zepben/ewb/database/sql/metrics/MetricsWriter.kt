@@ -10,6 +10,9 @@ package com.zepben.ewb.database.sql.metrics
 
 import com.zepben.ewb.database.sql.common.BaseCollectionWriter
 import com.zepben.ewb.metrics.IngestionJob
+import com.zepben.ewb.metrics.dataquality.DataQualityIssue
+import com.zepben.ewb.metrics.dataquality.DataQualityIssueCallout
+import com.zepben.ewb.metrics.dataquality.DataQualityIssueCategory
 import com.zepben.ewb.metrics.variants.VariantMetrics
 
 /**
@@ -47,4 +50,16 @@ internal class MetricsWriter(
         ) { metricEntry, e ->
             logger.error("Failed to write metric entry $metricEntry: ${e.message}")
         }
+
+    fun write(category: DataQualityIssueCategory): Boolean =
+        writer.writeDataQualityIssueCategory(category)
+
+    fun write(issue: DataQualityIssue): Boolean =
+        writer.writeDataQualityIssue(issue)
+
+    fun writeAsset(issueId: String, assetMrid: String): Boolean =
+        writer.writeDataQualityIssueAsset(issueId, assetMrid)
+
+    fun write(callout: DataQualityIssueCallout): Boolean =
+        writer.writeDataQualityIssueCallout(callout)
 }

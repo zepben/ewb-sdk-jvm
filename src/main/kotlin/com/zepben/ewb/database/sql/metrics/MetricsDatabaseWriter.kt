@@ -12,6 +12,9 @@ import com.zepben.ewb.database.sql.common.BaseDatabaseWriter
 import com.zepben.ewb.database.sql.initialisers.DatabaseInitialiser
 import com.zepben.ewb.database.sql.initialisers.NoOpDatabaseInitialiser
 import com.zepben.ewb.metrics.IngestionJob
+import com.zepben.ewb.metrics.dataquality.DataQualityIssue
+import com.zepben.ewb.metrics.dataquality.DataQualityIssueCallout
+import com.zepben.ewb.metrics.dataquality.DataQualityIssueCategory
 import com.zepben.ewb.metrics.variants.VariantMetrics
 import java.io.IOException
 import java.nio.file.Path
@@ -66,6 +69,39 @@ class MetricsDatabaseWriter internal constructor(
      * @return true if the [VariantMetrics] was successfully written, otherwise false.
      */
     fun write(variantMetrics: VariantMetrics): Boolean = connectAndWrite { createMetricsWriter(databaseTables).write(variantMetrics) }
+
+    /**
+     * Write a data quality issue category.
+     *
+     * @param category The [DataQualityIssueCategory] to write.
+     * @return true if the [category] was successfully written, otherwise false.
+     */
+    fun write(category: DataQualityIssueCategory): Boolean = connectAndWrite { createMetricsWriter(databaseTables).write(category) }
+
+    /**
+     * Write a data quality issue.
+     *
+     * @param issue The [DataQualityIssue] to write.
+     * @return true if the [issue] was successfully written, otherwise false.
+     */
+    fun write(issue: DataQualityIssue): Boolean = connectAndWrite { createMetricsWriter(databaseTables).write(issue) }
+
+    /**
+     * Write an asset association for a data quality issue.
+     *
+     * @param issueId The parent issue ID.
+     * @param assetMrid The mRID of the associated asset.
+     * @return true if written successfully, otherwise false.
+     */
+    fun writeAsset(issueId: String, assetMrid: String): Boolean = connectAndWrite { createMetricsWriter(databaseTables).writeAsset(issueId, assetMrid) }
+
+    /**
+     * Write a callout for a data quality issue.
+     *
+     * @param callout The [DataQualityIssueCallout] to write.
+     * @return true if the [callout] was successfully written, otherwise false.
+     */
+    fun write(callout: DataQualityIssueCallout): Boolean = connectAndWrite { createMetricsWriter(databaseTables).write(callout) }
 
     private fun createJobIdFile(job: IngestionJob): Boolean {
         if (modelPath == null) return true

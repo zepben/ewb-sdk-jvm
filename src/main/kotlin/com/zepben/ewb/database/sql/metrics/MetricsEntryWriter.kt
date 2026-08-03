@@ -9,12 +9,13 @@
 package com.zepben.ewb.database.sql.metrics
 
 import com.zepben.ewb.database.sql.common.BaseEntryWriter
+import com.zepben.ewb.database.sql.extensions.setNullableInt
 import com.zepben.ewb.database.sql.extensions.setNullableString
-import com.zepben.ewb.database.sql.metrics.tables.TableJobSources
-import com.zepben.ewb.database.sql.metrics.tables.TableJobs
-import com.zepben.ewb.database.sql.metrics.tables.TableNetworkContainerMetrics
-import com.zepben.ewb.database.sql.metrics.tables.TableVariantMetrics
+import com.zepben.ewb.database.sql.metrics.tables.*
 import com.zepben.ewb.metrics.*
+import com.zepben.ewb.metrics.dataquality.DataQualityIssue
+import com.zepben.ewb.metrics.dataquality.DataQualityIssueCallout
+import com.zepben.ewb.metrics.dataquality.DataQualityIssueCategory
 import com.zepben.ewb.metrics.variants.VariantMetricEntry
 import kotlinx.serialization.json.Json
 import java.sql.Timestamp
@@ -143,5 +144,95 @@ internal class MetricsEntryWriter(
         insert.setString(table.METADATA.queryIndex, jsonMapper.encodeToString(variantMetricEntry.metadata))
 
         return insert.tryExecuteSingleUpdate("variant metric")
+    }
+
+    /**
+     * Write a [DataQualityIssueCategory] to the `data_quality_issue_categories` table.
+     *
+     * @param category The [DataQualityIssueCategory] to write.
+     * @return true if the [category] was written successfully.
+     */
+    fun writeDataQualityIssueCategory(category: DataQualityIssueCategory): Boolean {
+        val table = databaseTables.getTable<TableDataQualityIssueCategories>()
+        val insert = databaseTables.getInsert<TableDataQualityIssueCategories>()
+
+        insert.setObject(table.ID.queryIndex, UUID.fromString(category.id))
+        insert.setString(table.NAME.queryIndex, category.name)
+        insert.setNullableString(table.DESCRIPTION.queryIndex, category.description)
+
+        return insert.tryExecuteSingleUpdate("data quality issue category")
+    }
+
+    /**
+     * Write a [DataQualityIssue] to the `data_quality_issues` table.
+     *
+     * @param issue The [DataQualityIssue] to write.
+     * @return true if the [issue] was written successfully.
+     */
+    fun writeDataQualityIssue(issue: DataQualityIssue): Boolean {
+        val table = databaseTables.getTable<TableDataQualityIssues>()
+        val insert = databaseTables.getInsert<TableDataQualityIssues>()
+
+        insert.setObject(table.ID.queryIndex, UUID.fromString(issue.id))
+        insert.setString(table.STATUS.queryIndex, issue.status.name)
+        insert.setTimestamp(table.CREATED_AT.queryIndex, Timestamp.valueOf(issue.createdAt.replace("T", " ")))
+        insert.setString(table.CREATED_BY.queryIndex, issue.createdBy)
+        insert.setTimestamp(table.UPDATED_AT.queryIndex, Timestamp.valueOf(issue.updatedAt.replace("T", " ")))
+        insert.setString(table.UPDATED_BY.queryIndex, issue.updatedBy)
+        insert.setString(table.NETWORK_MODEL_CREATED_AGAINST.queryIndex, issue.networkModelCreatedAgainst)
+        insert.setNullableString(table.NETWORK_MODEL_RESOLVED_AGAINST.queryIndex, issue.networkModelResolvedAgainst)
+        insert.setString(table.NAME.queryIndex, issue.name)
+        insert.setString(table.DESCRIPTION.queryIndex, issue.description)
+        insert.setNullableString(table.SUGGESTED_RESOLUTION.queryIndex, issue.suggestedResolution)
+        insert.setString(table.ANNOTATION_GEO_JSON.queryIndex, issue.annotationGeoJson)
+        insert.setObject(table.CATEGORY.queryIndex, UUID.fromString(issue.categoryId))
+        insert.setNullableString(table.EXTERNAL_REFERENCE.queryIndex, issue.externalReference)
+        insert.setInt(table.SEVERITY.queryIndex, issue.severity)
+        insert.setInt(table.PRIORITY.queryIndex, issue.priority)
+
+        return insert.tryExecuteSingleUpdate("data quality issue")
+    }
+
+    /**
+     * Write an asset association row to the `data_quality_issue_assets` table.
+     *
+     * @param issueId The parent issue ID.
+     * @param assetMrid The mRID of the associated asset.
+     * @return true if the row was written successfully.
+     */
+    fun writeDataQualityIssueAsset(issueId: String, assetMrid: String): Boolean {
+        val table = databaseTables.getTable<TableDataQualityIssueAssets>()
+        val insert = databaseTables.getInsert<TableDataQualityIssueAssets>()
+
+        insert.setObject(table.ID.queryIndex, UUID.randomUUID())
+        insert.setObject(table.DATA_QUALITY_ISSUE_ID.queryIndex, UUID.fromString(issueId))
+        insert.setString(table.ASSET_MRID.queryIndex, assetMrid)
+
+        return insert.tryExecuteSingleUpdate("data quality issue asset")
+    }
+
+    /**
+     * Write a [DataQualityIssueCallout] to the `data_quality_issue_callouts` table.
+     *
+     * @param callout The [DataQualityIssueCallout] to write.
+     * @return true if the [callout] was written successfully.
+     */
+    fun writeDataQualityIssueCallout(callout: DataQualityIssueCallout): Boolean {
+        val table = databaseTables.getTable<TableDataQualityIssueCallouts>()
+        val insert = databaseTables.getInsert<TableDataQualityIssueCallouts>()
+
+        insert.setObject(table.ID.queryIndex, UUID.fromString(callout.id))
+        insert.setObject(table.DATA_QUALITY_ISSUE_ID.queryIndex, UUID.fromString(callout.dataQualityIssueId))
+        insert.setDouble(table.LONGITUDE.queryIndex, callout.longitude)
+        insert.setDouble(table.LATITUDE.queryIndex, callout.latitude)
+        insert.setDouble(table.POSITION_X.queryIndex, callout.positionX)
+        insert.setDouble(table.POSITION_Y.queryIndex, callout.positionY)
+        insert.setDouble(table.WIDTH.queryIndex, callout.width)
+        insert.setDouble(table.HEIGHT.queryIndex, callout.height)
+        insert.setNullableString(table.LABEL.queryIndex, callout.label)
+        insert.setNullableString(table.DESCRIPTION.queryIndex, callout.description)
+        insert.setString(table.COLOUR.queryIndex, callout.colour)
+
+        return insert.tryExecuteSingleUpdate("data quality issue callout")
     }
 }

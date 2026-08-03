@@ -25,6 +25,16 @@
 
 ### New Features
 * Adds `compareRunTime` to `NetworkServiceComparatorOptions` to allow the users to ignore variables/references that are only populated during EWB spin up.
+* Adds `VariantService` to hold variants related objects
+* Adds Variant related objects 
+  * `NetworkModelProjectStage`
+  * `ChangeSet`
+  * `ChangeSetMember`
+  * `ObjectCreation`
+  * `ObjectModification`
+  * `ObjectDeletion`
+  * `NetworkModelProject`
+* Added `ChangeSetDatabaseReader` for reading in variant sqlite from a backend storage 
 
 ### Enhancements
 * `Terminal` can now update its `conductingEquipment` as long as there is no back reference. If you want to reassign a terminal,

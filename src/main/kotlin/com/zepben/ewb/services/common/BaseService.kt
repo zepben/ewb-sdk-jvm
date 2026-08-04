@@ -373,17 +373,17 @@ abstract class BaseService(
                     reverseResolver.resolve(to, from)
 
                     // Clean up any reverse unresolved references now that the reference has been resolved
-                    (fromMridOverride?: from.mRID).let { fromMrid ->
+                    (fromMridOverride ?: from.mRID).let { fromMrid ->
                         unresolvedReferencesTo[fromMrid]?.apply {
                             removeIf { it.toMrid == fromMrid && it.resolver == reverseResolver }
                             if (isEmpty())
-                                unresolvedReferencesTo.remove(fromMrid )
+                                unresolvedReferencesTo.remove(fromMrid)
                         }
-                    unresolvedReferencesFrom[to.mRID]?.apply {
-                        removeIf { it.toMrid == fromMrid && it.resolver == reverseResolver }
-                        if (isEmpty())
-                            unresolvedReferencesFrom.remove(to.mRID)
-                    }
+                        unresolvedReferencesFrom[to.mRID]?.apply {
+                            removeIf { it.toMrid == fromMrid && it.resolver == reverseResolver }
+                            if (isEmpty())
+                                unresolvedReferencesFrom.remove(to.mRID)
+                        }
                     }
                 }
                 true

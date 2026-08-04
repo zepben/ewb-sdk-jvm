@@ -1,4 +1,20 @@
 # Zepben EWB SDK changelog
+## [1.14.0] - UNRELEASED
+### Breaking Changes
+* None.
+
+### New Features
+* None.
+
+### Enhancements
+* None.
+
+### Fixes
+* None.
+
+### Notes
+* None.
+
 ## [1.13.0] - 2026-08-04
 ### Breaking Changes
 * Deprecated `NetworkServiceComparatorOptions.Builder`. This will be removed in a future release.

@@ -1,0 +1,404 @@
+---
+id: sdk-protection
+title: Protection Relays
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+## Protection Relay Functions, Schemes, and Systems
+
+Each protection relay in the CIM model is implemented in a `ProtectionRelayFunction`, which is composed of a collection of `Sensor`s, thresholds that determine
+the conditions that activate the relay, the time limits for each condition before activation, and the `ProtectedSwitch`es to open when the relay is activated.
+
+`ProtectionRelayFunction`s may be grouped into `ProtectionRelayScheme`s, each of which belong to a `ProtectionRelaySystem`. A `ProtectionRelaySystem` is a
+physical piece of equipment containing a suite of `ProtectionRelayFunction`s, such as a circuit breaker panel. They typically comprise two schemes: main and
+failsafe.
+
+Here is a contrived example of such a system modelled using the Evolve SDK:
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+import com.zepben.ewb.cim.iec61970.base.auxiliaryequipment.CurrentTransformer;
+import com.zepben.ewb.cim.iec61970.base.domain.UnitSymbol;
+import com.zepben.ewb.cim.iec61970.base.protection.CurrentRelay;
+import com.zepben.ewb.cim.iec61970.base.protection.ProtectionRelayScheme;
+import com.zepben.ewb.cim.iec61970.base.protection.ProtectionRelaySystem;
+import com.zepben.ewb.cim.iec61970.base.protection.RelaySetting;
+import com.zepben.ewb.cim.iec61970.base.wires.Breaker;
+
+class ProtectionExample {
+    public static void main(String[] args) {
+        // Breakers for stove, bathroom, and washer are for individual outlets,
+        // whereas the failsafe breaker can disconnect all appliances from power.
+        Breaker stoveBreaker = new Breaker("stoveBreaker");
+        Breaker bathroomBreaker = new Breaker("bathroomBreaker");
+        Breaker washerBreaker = new Breaker("washerBreaker");
+        Breaker failsafeBreaker = new Breaker("failsafeBreaker");
+
+        CurrentTransformer stoveCT = new CurrentTransformer("stoveCT");
+        CurrentTransformer bathroomCT = new CurrentTransformer("bathroomCT");
+        CurrentTransformer washerCT = new CurrentTransformer("washerCT");
+        CurrentTransformer failsafeCT = new CurrentTransformer("failsafeCT");
+
+        CurrentRelay stoveCR = new CurrentRelay("stoveCR");
+        stoveCR.addProtectedSwitch(stoveBreaker);
+        stoveBreaker.addRelayFunction(stoveCR);
+        stoveCR.addSensor(stoveCT);
+        stoveCT.addRelayFunction(stoveCR);
+        stoveCR.addThreshold(new RelaySetting(UnitSymbol.A, 50));
+        stoveCR.addTimeLimit(0.5);
+
+        CurrentRelay bathroomCR = new CurrentRelay("bathroomCR");
+        bathroomCR.addProtectedSwitch(bathroomBreaker);
+        bathroomBreaker.addRelayFunction(bathroomCR);
+        bathroomCR.addSensor(bathroomCT);
+        bathroomCT.addRelayFunction(bathroomCR);
+        bathroomCR.addThreshold(new RelaySetting(UnitSymbol.A, 20));
+        bathroomCR.addTimeLimit(0.1);
+
+        CurrentRelay washerCR = new CurrentRelay("washerCR");
+        washerCR.addProtectedSwitch(washerBreaker);
+        washerBreaker.addRelayFunction(washerCR);
+        washerCR.addSensor(washerCT);
+        washerCT.addRelayFunction(washerCR);
+        washerCR.addThreshold(new RelaySetting(UnitSymbol.A, 20));
+        washerCR.addTimeLimit(0.5);
+
+        CurrentRelay failsafeCR = new CurrentRelay("failsafeCR");
+        failsafeCR.addProtectedSwitch(failsafeBreaker);
+        failsafeBreaker.addRelayFunction(failsafeCR);
+        failsafeCR.addSensor(failsafeCT);
+        failsafeCT.addRelayFunction(failsafeCR);
+        failsafeCR.addThreshold(new RelaySetting(UnitSymbol.A, 90));
+        failsafeCR.addTimeLimit(1.0);
+
+        ProtectionRelayScheme mainScheme = new ProtectionRelayScheme("mainScheme");
+        mainScheme.addFunction(stoveCR);
+        mainScheme.addFunction(bathroomCR);
+        mainScheme.addFunction(washerCR);
+        stoveCR.addScheme(mainScheme);
+        bathroomCR.addScheme(mainScheme);
+        washerCR.addScheme(mainScheme);
+
+        ProtectionRelayScheme failsafeScheme = new ProtectionRelayScheme("failsafe");
+        failsafeScheme.addFunction(failsafeCR);
+        failsafeCR.addScheme(failsafeScheme);
+
+        ProtectionRelaySystem system = new ProtectionRelaySystem("system");
+        system.addScheme(mainScheme);
+        system.addScheme(failsafeScheme);
+        mainScheme.setSystem(system);
+        failsafeScheme.setSystem(system);
+    }
+}
+```
+
+</TabItem>
+
+<TabItem value="kotlin">
+
+```kotlin
+import com.zepben.ewb.cim.iec61970.base.auxiliaryequipment.CurrentTransformer
+import com.zepben.ewb.cim.iec61970.base.domain.UnitSymbol
+import com.zepben.ewb.cim.iec61970.base.protection.CurrentRelay
+import com.zepben.ewb.cim.iec61970.base.protection.ProtectionRelayScheme
+import com.zepben.ewb.cim.iec61970.base.protection.ProtectionRelaySystem
+import com.zepben.ewb.cim.iec61970.base.protection.RelaySetting
+import com.zepben.ewb.cim.iec61970.base.wires.Breaker
+
+fun main() {
+    // Breakers for stove, bathroom, and washer are for individual outlets,
+    // whereas the failsafe breaker can disconnect all appliances from power.
+    val stoveBreaker = Breaker("stoveBreaker")
+    val bathroomBreaker = Breaker("bathroomBreaker")
+    val washerBreaker = Breaker("washerBreaker")
+    val failsafeBreaker = Breaker("failsafeBreaker")
+
+    val stoveCT = CurrentTransformer("stoveCT")
+    val bathroomCT = CurrentTransformer("bathroomCT")
+    val washerCT = CurrentTransformer("washerCT")
+    val failsafeCT = CurrentTransformer("failsafeCT")
+
+    val stoveCR = CurrentRelay("stoveCR").apply {
+        addProtectedSwitch(stoveBreaker)
+        addSensor(stoveCT)
+        addThreshold(RelaySetting(UnitSymbol.A, 50.0))
+        addTimeLimit(0.5)
+    }.also {
+        stoveBreaker.addRelayFunction(it)
+        stoveCT.addRelayFunction(it)
+    }
+
+    val bathroomCR = CurrentRelay("bathroomCR").apply {
+        addProtectedSwitch(bathroomBreaker)
+        addSensor(bathroomCT)
+        addThreshold(RelaySetting(UnitSymbol.A, 50.0))
+        addTimeLimit(0.5)
+    }.also {
+        bathroomBreaker.addRelayFunction(it)
+        bathroomCT.addRelayFunction(it)
+    }
+
+    val washerCR = CurrentRelay("washerCR").apply {
+        addProtectedSwitch(washerBreaker)
+        addSensor(washerCT)
+        addThreshold(RelaySetting(UnitSymbol.A, 50.0))
+        addTimeLimit(0.5)
+    }.also {
+        washerBreaker.addRelayFunction(it)
+        washerCT.addRelayFunction(it)
+    }
+
+    val failsafeCR = CurrentRelay("failsafeCR").apply {
+        addProtectedSwitch(failsafeBreaker)
+        addSensor(failsafeCT)
+        addThreshold(RelaySetting(UnitSymbol.A, 50.0))
+        addTimeLimit(0.5)
+    }.also {
+        failsafeBreaker.addRelayFunction(it)
+        failsafeCT.addRelayFunction(it)
+    }
+
+    val mainScheme = ProtectionRelayScheme("main").apply {
+        addFunction(stoveCR)
+        addFunction(bathroomCR)
+        addFunction(washerCR)
+    }.also {
+        stoveCR.addScheme(it)
+        bathroomCR.addScheme(it)
+        washerCR.addScheme(it)
+    }
+
+    val failsafeScheme = ProtectionRelayScheme("failsafe").apply {
+        addFunction(failsafeCR)
+    }.also {
+        failsafeCR.addScheme(it)
+    }
+
+    val system = ProtectionRelaySystem("system").apply {
+        addScheme(mainScheme)
+        addScheme(failsafeScheme)
+    }.also {
+        mainScheme.system = it
+        failsafeScheme.system = it
+    }
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+For brevity, this example excludes modelling of connectivity between the sensors and breakers.
+
+## Grounds and Ground Disconnectors
+
+To aid in modelling protection systems, our network data model also supports explicit modelling of grounds and ground disconnectors:
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject;
+import com.zepben.ewb.cim.iec61970.base.core.Terminal;
+import com.zepben.ewb.cim.iec61970.base.wires.Ground;
+import com.zepben.ewb.cim.iec61970.base.wires.GroundDisconnector;
+import com.zepben.ewb.cim.iec61970.base.wires.Junction;
+import com.zepben.ewb.services.network.NetworkService;
+
+class GroundExample {
+    public static void main(String[] args) {
+        // junction --- ground disconnector --- ground
+        NetworkService networkService = new NetworkService();
+
+        Ground ground = new Ground("ground");
+        Terminal groundTerminal = new Terminal("ground-t1");
+        ground.addTerminal(groundTerminal);
+
+        GroundDisconnector gd = new GroundDisconnector("gd");
+        Terminal gdTerminal1 = new Terminal("gd-t1");
+        Terminal gdTerminal2 = new Terminal("gd-t2");
+        gd.addTerminal(gdTerminal1);
+        gd.addTerminal(gdTerminal2);
+
+        Junction junction = new Junction("junction");
+        Terminal junctionTerminal = new Terminal("junction-t1");
+        junction.addTerminal(junctionTerminal);
+
+        networkService.connect(junctionTerminal, gdTerminal1);
+        networkService.connect(gdTerminal2, groundTerminal);
+
+        for (IdentifiedObject io: new IdentifiedObject[]{ground, groundTerminal, gd, gdTerminal1, gdTerminal2, junctionTerminal}) {
+            networkService.tryAdd(io);
+        }
+    }
+}
+```
+
+</TabItem>
+
+<TabItem value="kotlin">
+
+```kotlin
+import com.zepben.ewb.cim.iec61970.base.core.Terminal
+import com.zepben.ewb.cim.iec61970.base.wires.Ground
+import com.zepben.ewb.cim.iec61970.base.wires.GroundDisconnector
+import com.zepben.ewb.cim.iec61970.base.wires.Junction
+import com.zepben.ewb.services.network.NetworkService
+
+fun main() {
+    // junction --- ground disconnector --- ground
+    val networkService = NetworkService()
+
+    val groundTerminal = Terminal("ground-t1")
+    val ground = Ground("ground").apply { addTerminal(groundTerminal) }
+
+    val gdTerminal1 = Terminal("gd-t1")
+    val gdTerminal2 = Terminal("gd-t2")
+    val gd = GroundDisconnector("gd").apply { addTerminal(gdTerminal1); addTerminal(gdTerminal2) }
+
+    val junctionTerminal = Terminal("junction-t1")
+    val junction = Junction("junction").apply { addTerminal(junctionTerminal) }
+
+    networkService.connect(junctionTerminal, gdTerminal1)
+    networkService.connect(gdTerminal2, groundTerminal)
+    for (io in sequenceOf(ground, groundTerminal, gd, gdTerminal1, gdTerminal2, junctionTerminal)) {
+        networkService.tryAdd(io)
+    }
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+## Series Compensators
+The Evolve SDK also supports modelling series compensators, which are series capacitors and reactors or an AC transmission line without charging susceptance.
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject;
+import com.zepben.ewb.cim.iec61970.base.core.Terminal;
+import com.zepben.ewb.cim.iec61970.base.wires.AcLineSegment;
+import com.zepben.ewb.cim.iec61970.base.wires.SeriesCompensator;
+import com.zepben.ewb.services.network.NetworkService;
+
+class SeriesCompensatorExample {
+    public static void main(String[] args) {
+        // AC line 1 --- series compensator -- AC line 2
+        NetworkService networkService = new NetworkService();
+
+        AcLineSegment acls1 = new AcLineSegment("acls1");
+        Terminal acls1Terminal1 = new Terminal("acls1-t1");
+        Terminal acls1Terminal2 = new Terminal("acls1-t2");
+        acls1.addTerminal(acls1Terminal1);
+        acls1.addTerminal(acls1Terminal2);
+
+        AcLineSegment acls2 = new AcLineSegment("acls2");
+        Terminal acls2Terminal1 = new Terminal("acls2-t1");
+        Terminal acls2Terminal2 = new Terminal("acls2-t2");
+        acls2.addTerminal(acls2Terminal1);
+        acls2.addTerminal(acls2Terminal2);
+
+        SeriesCompensator sc = new SeriesCompensator("sc");
+        // dummy (likely unrealistic) values
+        sc.setR(1.0);
+        sc.setR0(1.5);
+        sc.setX(123.0);
+        sc.setX0(125.0);
+        sc.setVaristorVoltageThreshold(10);
+        sc.setVaristorRatedCurrent(5);
+        Terminal scTerminal1 = new Terminal("sc-t1");
+        Terminal scTerminal2 = new Terminal("sc-t2");
+        sc.addTerminal(scTerminal1);
+        sc.addTerminal(scTerminal2);
+
+        networkService.connect(acls1Terminal2, scTerminal1);
+        networkService.connect(scTerminal2, acls2Terminal1);
+
+        for (IdentifiedObject io: new IdentifiedObject[]{
+            acls1, acls1Terminal1, acls1Terminal2, acls2, acls2Terminal1, acls2Terminal2, sc, scTerminal1, scTerminal2
+        }) {
+            networkService.tryAdd(io);
+        }
+    }
+}
+```
+
+</TabItem>
+
+<TabItem value="kotlin">
+
+```kotlin
+import com.zepben.ewb.cim.iec61970.base.core.Terminal
+import com.zepben.ewb.cim.iec61970.base.wires.AcLineSegment
+import com.zepben.ewb.cim.iec61970.base.wires.SeriesCompensator
+import com.zepben.ewb.services.network.NetworkService
+
+fun main() {
+    // AC line 1 --- series compensator -- AC line 2
+    val networkService = NetworkService()
+
+    val acls1Terminal1 = Terminal("acls1-t1")
+    val acls1Terminal2 = Terminal("acls1-t2")
+    val acls1 = AcLineSegment("acls1").apply {
+        addTerminal(acls1Terminal1)
+        addTerminal(acls1Terminal2)
+    }
+
+    val acls2Terminal1 = Terminal("acls2-t1")
+    val acls2Terminal2 = Terminal("acls2-t2")
+    val acls2 = AcLineSegment("acls2").apply {
+        addTerminal(acls2Terminal1)
+        addTerminal(acls2Terminal2)
+    }
+
+    val scTerminal1 = Terminal("sc-t1")
+    val scTerminal2 = Terminal("sc-t2")
+    val sc = SeriesCompensator("sc").apply {
+        // dummy (likely unrealistic) values
+        r = 1.0
+        r0 = 1.5
+        x = 123.0
+        x0 = 125.0
+        varistorVoltageThreshold = 10
+        varistorRatedCurrent = 5
+        addTerminal(scTerminal1)
+        addTerminal(scTerminal2)
+    }
+
+    networkService.connect(acls1Terminal2, scTerminal1)
+    networkService.connect(scTerminal2, acls2Terminal1)
+
+    for (io in sequenceOf(acls1, acls1Terminal1, acls1Terminal2, acls2, acls2Terminal1, acls2Terminal2, sc, scTerminal1, scTerminal2)) {
+        networkService.tryAdd(io)
+    }
+}
+```
+
+</TabItem>
+
+</Tabs>

@@ -583,8 +583,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
         apply {
             compareEquipment()
 
-            if (options.compareRunTime)
-                compareIdReferences(ConductingEquipment::baseVoltage)
+            compareIdReferences(ConductingEquipment::baseVoltage)
             if (options.compareTerminals)
                 compareIndexedIdReferenceCollections(ConductingEquipment::terminals)
         }
@@ -1328,10 +1327,8 @@ class NetworkServiceComparator @JvmOverloads constructor(
         apply {
             compareIdentifiedObject()
 
-            if (options.compareRunTime)
-                compareIdReferences(TransformerEnd::baseVoltage)
             compareValues(TransformerEnd::grounded, TransformerEnd::rGround, TransformerEnd::xGround, TransformerEnd::endNumber)
-            compareIdReferences(TransformerEnd::ratioTapChanger, TransformerEnd::terminal, TransformerEnd::starImpedance)
+            compareIdReferences(TransformerEnd::baseVoltage, TransformerEnd::ratioTapChanger, TransformerEnd::terminal, TransformerEnd::starImpedance)
         }
 
     private fun compareTransformerStarImpedance(

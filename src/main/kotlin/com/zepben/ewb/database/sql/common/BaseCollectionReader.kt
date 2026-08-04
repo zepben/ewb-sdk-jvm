@@ -8,7 +8,6 @@
 
 package com.zepben.ewb.database.sql.common
 
-import com.zepben.ewb.cim.iec61970.base.domain.UnitSymbol
 import com.zepben.ewb.database.sql.common.tables.SqlTable
 import com.zepben.ewb.database.sql.extensions.executeConfiguredQuery
 import org.slf4j.Logger

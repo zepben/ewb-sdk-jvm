@@ -140,8 +140,15 @@ interface EwbDataFilePaths {
     fun getAvailableVariantsFor(date: LocalDate = LocalDate.now()): List<String> {
         return enumerateDescendants("$date/$VARIANTS_PATH")
             .asSequence()
-            .filter { it.parent?.parent?.fileName.toString() == VARIANTS_PATH }
-            .map { it.parent?.fileName.toString() }
+            .mapNotNull {
+                // GIS extractor doesn't have a variant service file at the 2 parents level.
+                when {
+                    it.parent?.parent?.fileName.toString() == VARIANTS_PATH  -> it.parent?.fileName.toString()
+                    it.parent?.parent?.parent?.fileName.toString() == VARIANTS_PATH -> it.parent?.parent?.fileName.toString()
+                    else -> null
+                }
+            }
+            .distinct()
             .sorted()
             .toList()
     }

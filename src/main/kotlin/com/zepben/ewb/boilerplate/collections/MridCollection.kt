@@ -20,7 +20,9 @@ interface MridCollection<T : Identifiable> : Collection<T> {
     val owner: Identifiable
     val elementDescription: String
 
-
+    /**
+     *
+     */
     fun getByMrid(mRID: String): T?
 
     fun canAddByMrid(element: T): Boolean {

@@ -42,8 +42,9 @@ abstract class AbstractBackedCollection<T> :
         getCollection().contains(element)
 
     override fun containsAll(elements: Collection<T>): Boolean =
-        elements.all { contains(it) }
+        getCollection().containsAll(elements)
 
     override fun isEmpty(): Boolean =
         getCollection().isEmpty()
 }
+

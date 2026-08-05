@@ -75,6 +75,9 @@ open class LazyMridMap<T : Identifiable, O : Identifiable>(
     override fun contains(element: T): Boolean =
         getter()?.get(element.mRID) === element
 
+    override fun containsAll(elements: Collection<T>): Boolean =
+        elements.all { contains(it) }
+
     override fun clear() {
         val old = getCollection()
         setter(null)

@@ -46,11 +46,15 @@ open class LazyMridList<T : Identifiable, O : Identifiable>(
         return super.add(element)
     }
 
-    override fun remove(element: T): Boolean =
-        super.remove(element).also { backfill?.clear(element) }
+    override fun remove(element: T): Boolean {
+        val removed =  super.remove(element)
+        if (removed)
+            backfill?.clear(element)
+        return removed
+    }
 
     override fun clear() {
-        val old = getter() ?: emptyList<T>()
+        val old = getter() ?: emptyList()
         super.clear()
         backfill?.also { old.forEach { backfill.clear(it) } }
     }

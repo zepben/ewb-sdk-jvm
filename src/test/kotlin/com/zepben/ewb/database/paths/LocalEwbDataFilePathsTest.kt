@@ -31,6 +31,9 @@ class LocalEwbDataFilePathsTest {
         val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
     }
 
+    @TempDir
+    lateinit var basePath: Path
+
     private val today = LocalDate.now()
     private val baseDir = Paths.get("/some/path/to/ewb/data")
 
@@ -332,9 +335,6 @@ class LocalEwbDataFilePathsTest {
             assertThat(ewbPaths.findClosest(it, maxDaysToSearch = 3), equalTo(t2))
         }
     }
-
-    @TempDir
-    lateinit var basePath: Path
 
     @Test
     internal fun `only folders under variants are included`() {

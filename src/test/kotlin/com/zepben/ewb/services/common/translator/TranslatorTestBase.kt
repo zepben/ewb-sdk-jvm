@@ -96,13 +96,12 @@ internal abstract class TranslatorTestBase<S : BaseService>(
                 }
             }.toSet()
 
-            // TODO: Uncomment and fix
-//            fail(
-//                "The number of items being validated did not match the number of items written to the database. Did you forget to validate an item, " +
-//                    "or to exclude the table if it was an association or array data?" +
-//                    formatValidationError("Unexpected", actual - expectedWithoutSuffixes) +
-//                    formatValidationError("Missing", expected - actualWithSuffixes)
-//            )
+            fail(
+                "The number of items being validated did not match the number of items written to the database. Did you forget to validate an item, " +
+                    "or to exclude the table if it was an association or array data?" +
+                    formatValidationError("Unexpected", actual - expectedWithoutSuffixes) +
+                    formatValidationError("Missing", expected - actualWithSuffixes),
+            )
         }
 
         validationInfo.forEach {

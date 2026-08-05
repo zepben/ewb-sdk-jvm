@@ -41,6 +41,8 @@ class LocalEwbDataFilePathsTest {
     private val exists = mockk<(Path) -> Boolean>().also { every { it(any()) } returns true }
     private val listFiles = mockk<(Path) -> Iterator<Path>>().also {
         every { it(any()) } answers {
+            // We now list files relative to subpaths inside the base path, rather than filtering them, so only return the ones in
+            // the requested subpath.
             descendants.filter { d -> firstArg<Path>().toString() in d.toString() }.iterator()
         }
     }
@@ -145,7 +147,7 @@ class LocalEwbDataFilePathsTest {
 
         // Files for 2 days ago.
         DatabaseType.entries.filter { it.perDate }.forEach {
-            descendants.add(Path.of(baseDir.toString(), twoDaysAgo.toString(), "${twoDaysAgo}-${it.fileDescriptor}.sqlite"))
+            descendants.add(resolvePathOf(twoDaysAgo.toString(), "${twoDaysAgo}-${it.fileDescriptor}.sqlite"))
         }
 
         validateClosest(twoDaysAgo)
@@ -192,8 +194,6 @@ class LocalEwbDataFilePathsTest {
         // Should find two days ago as it doesn't search forward by default.
         assertThat(ewbPaths.findClosest(DatabaseType.NETWORK_MODEL), equalTo(twoDaysAgo))
     }
-
-    fun resolvePathOf(vararg paths: String): Path = Path.of(baseDir.toString(), *paths)
 
     @Test
     internal fun `getAvailableDatesFor accepts date types`() {
@@ -495,6 +495,9 @@ class LocalEwbDataFilePathsTest {
 
         verify { listFiles(baseDir) }
     }
+
+    // We now enumerate paths relative to paths inside the base path, so all our dependants need to be resolved against it.
+    private fun resolvePathOf(vararg paths: String): Path = Path.of(baseDir.toString(), *paths)
 
     private fun Path.datedPath(date: LocalDate, name: String): Path =
         resolve(date.toString()).resolve("$date-$name.sqlite")

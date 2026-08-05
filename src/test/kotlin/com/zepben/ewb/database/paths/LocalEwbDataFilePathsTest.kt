@@ -14,8 +14,8 @@ import io.mockk.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.api.io.TempDir
 import java.nio.file.Files
 import java.nio.file.Path
@@ -209,20 +209,21 @@ class LocalEwbDataFilePathsTest {
             Path.of("2001-02-03", "network-model.sqlite"),
             Path.of("2032-05-07", "network-model.sqlite"),
             Path.of("2009-05-09", "network-model.sqlite"),
-            Path.of("2009-05-08", "network-model.sqlite")
+            Path.of("2009-05-08", "network-model.sqlite"),
         )
 
         every { listFiles(baseDir) } answers { directories.iterator() }
 
         assertThat(
-            ewbPaths.getAvailableDatesFor(DatabaseType.NETWORK_MODEL), equalTo(
+            ewbPaths.getAvailableDatesFor(DatabaseType.NETWORK_MODEL),
+            equalTo(
                 listOf(
                     LocalDate.parse("2001-02-03"),
                     LocalDate.parse("2009-05-08"),
                     LocalDate.parse("2009-05-09"),
                     LocalDate.parse("2032-05-07"),
-                )
-            )
+                ),
+            ),
         )
     }
 
@@ -233,8 +234,8 @@ class LocalEwbDataFilePathsTest {
                 Path.of(today.toString(), "${today}-network-model.sqlite"),
                 Path.of(today.toString(), "${today}-customer.sqlite"),
                 Path.of("results-cache.sqlite"),
-                Path.of("weather-readings.sqlite")
-            )
+                Path.of("weather-readings.sqlite"),
+            ),
         )
 
         val result = ewbPaths.enumerateDescendants()
@@ -254,7 +255,8 @@ class LocalEwbDataFilePathsTest {
     @Test
     internal fun `resolves variant databases`() {
         fun DatabaseType.toVariantPath(variant: String, version: VariantContents) =
-            baseDir.resolve(today.toString()).resolve(EwbDataFilePaths.VARIANTS_PATH).resolve(variant).resolve(version.subDirectory).resolve("$today-$fileDescriptor.sqlite")
+            baseDir.resolve(today.toString()).resolve(EwbDataFilePaths.VARIANTS_PATH).resolve(variant).resolve(version.subDirectory)
+                .resolve("$today-$fileDescriptor.sqlite")
 
         VariantContents.entries.forEach { content ->
             DatabaseType.entries.forEach { type ->
@@ -274,6 +276,39 @@ class LocalEwbDataFilePathsTest {
                 }
             }
         }
+    }
+
+    @Test
+    internal fun `can request variants for a day`() {
+        val yesterday = today.minusDays(1)
+
+        fun addVariant(variant: String, vararg dates: LocalDate) {
+            dates.forEach { date ->
+                descendants += listOf(
+                    // TODO REMOVE THIS vvvvvvvvvv
+                    // This is what the current GIS extractor calls for creating the PROPOSED etc variants
+                    // it uses. This needs to still be supported, with any changes requiring update actions
+                    // to move files in the existing ewb data directory so we don't end up with old dates
+                    // that can't be loaded.
+                    // TODO REMOVE THIS ^^^^^^^^^^
+                    ewbPaths.resolve(DatabaseType.NETWORK_MODEL, date, variant),
+                    ewbPaths.resolve(DatabaseType.CUSTOMER, date, variant),
+                    ewbPaths.resolve(DatabaseType.DIAGRAM, date, variant),
+                )
+            }
+        }
+
+        addVariant("my-variant-1", yesterday)
+        addVariant("my-variant-2", yesterday, today)
+        addVariant("my-variant-3", today)
+
+        assertThat(ewbPaths.getAvailableVariantsFor(yesterday), contains("my-variant-1", "my-variant-2"))
+
+        // No date will default to today.
+        assertThat(ewbPaths.getAvailableVariantsFor(), contains("my-variant-2", "my-variant-3"))
+
+        // Should return an empty list if there are no variants for the specified date.
+        assertThat(ewbPaths.getAvailableVariantsFor(today.minusDays(2)), empty())
     }
 
     @Test
@@ -300,6 +335,15 @@ class LocalEwbDataFilePathsTest {
 
     @TempDir
     lateinit var basePath: Path
+
+    @Test
+    internal fun `only folders under variants are included`() {
+        val yesterday = today.minusDays(1)
+
+        descendants.add(Path.of(yesterday.toString(), "not-variant", "my-variant-1"))
+
+        assertThat(ewbPaths.getAvailableVariantsFor(yesterday), empty())
+    }
 
     @Test
     internal fun `getAvailableVariants and enumerateDescendants correctly apply prefix`() {

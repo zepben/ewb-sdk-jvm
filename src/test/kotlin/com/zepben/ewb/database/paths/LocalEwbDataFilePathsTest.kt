@@ -254,8 +254,8 @@ class LocalEwbDataFilePathsTest {
 
     @Test
     internal fun `resolves variant databases`() {
-        fun DatabaseType.toVariantPath(variant: String, version: VariantContents) =
-            baseDir.resolve(today.toString()).resolve(EwbDataFilePaths.VARIANTS_PATH).resolve(variant).resolve(version.subDirectory)
+        fun DatabaseType.toVariantPath(variant: String, content: VariantContents) =
+            baseDir.resolve(today.toString()).resolve(EwbDataFilePaths.VARIANTS_PATH).resolve(variant).resolve(content.subDirectory)
                 .resolve("$today-$fileDescriptor.sqlite")
 
         VariantContents.entries.forEach { content ->

@@ -15,7 +15,6 @@ import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
 
 internal class ConductingEquipmentTest {
@@ -98,7 +97,7 @@ internal class ConductingEquipmentTest {
             ConductingEquipment::addTerminal,
             ConductingEquipment::removeTerminal,
             ConductingEquipment::clearTerminals,
-            Terminal::sequenceNumber
+            Terminal::sequenceNumber,
         )
     }
 
@@ -159,7 +158,7 @@ internal class ConductingEquipmentTest {
         }
 
         ce.addTerminal(Terminal(generateId()))
-        assertThrows<IllegalStateException> { ce.addTerminal(Terminal(generateId())) }
+        expect { ce.addTerminal(Terminal(generateId())) }.toThrow<IllegalStateException>()
     }
 
     @Test

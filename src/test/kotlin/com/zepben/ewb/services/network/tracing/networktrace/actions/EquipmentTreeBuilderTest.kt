@@ -18,6 +18,7 @@ import com.zepben.ewb.services.network.tracing.networktrace.conditions.Condition
 import com.zepben.ewb.services.network.tracing.networktrace.run
 import com.zepben.ewb.services.network.tracing.traversal.StepContext
 import com.zepben.ewb.testing.TestNetworkBuilder
+import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.every
 import io.mockk.justRun
@@ -26,7 +27,6 @@ import io.mockk.verify
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
 import java.util.*
 
@@ -40,7 +40,7 @@ internal class EquipmentTreeBuilderTest {
     @Test
     fun `accessing leaves when not calculated throws exception`() {
         val builder = EquipmentTreeBuilder()
-        assertThrows<IllegalArgumentException> { builder.leaves }
+        expect { builder.leaves }.toThrow<IllegalArgumentException>()
     }
 
     @Test
@@ -69,8 +69,8 @@ internal class EquipmentTreeBuilderTest {
                 "acLineSegment15",
                 "acLineSegment12",
                 "acLineSegment11",
-                "j13"
-            )
+                "j13",
+            ),
         )
 
     }
@@ -275,7 +275,7 @@ internal class EquipmentTreeBuilderTest {
         treeNode: TreeNode<ConductingEquipment>,
         asset: ConductingEquipment?,
         parent: ConductingEquipment?,
-        children: Array<ConductingEquipment?>
+        children: Array<ConductingEquipment?>,
     ) {
         assertThat(treeNode.identifiedObject, equalTo(asset))
 

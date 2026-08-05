@@ -16,6 +16,7 @@ import com.zepben.ewb.streaming.data.*
 import com.zepben.protobuf.ns.SetCurrentStatesRequest
 import com.zepben.protobuf.ns.SetCurrentStatesResponse
 import com.zepben.protobuf.ns.UpdateNetworkStateServiceGrpc
+import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
@@ -29,7 +30,6 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.Rule
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CountDownLatch
@@ -58,14 +58,15 @@ internal class UpdateNetworkStateServiceTest {
     private val setCurrentStatesReturns = listOf(
         BatchSuccessful(1),
         BatchFailure(
-            1, true, listOf(
+            1, true,
+            listOf(
                 StateEventUnknownMrid("event id", "we couldn't find it"),
                 StateEventDuplicateMrid("event id", "you have already used it"),
                 StateEventInvalidMrid("event id", "it is for the wrong type"),
                 StateEventUnsupportedPhasing("event id", "we don't support un-ganged yet"),
-                StateEventUnsupportedMrid("event id", "you found the right type of thing, but we still can't help you")
-            )
-        )
+                StateEventUnsupportedMrid("event id", "you found the right type of thing, but we still can't help you"),
+            ),
+        ),
     )
     private val onSetCurrentStates = mockk<(batchId: Long, events: List<CurrentStateEvent>) -> CompletableFuture<SetCurrentStatesStatus>>().also {
         every { it(capture(batchIdSlot), capture(eventsSlot)) } returnsMany setCurrentStatesReturns.map { r -> CompletableFuture.completedFuture(r) }
@@ -91,15 +92,17 @@ internal class UpdateNetworkStateServiceTest {
     private val timeStamp = Timestamp.newBuilder().apply { seconds = 1 }.build()
     private val request = SetCurrentStatesRequest.newBuilder().apply {
         messageId = 1
-        addEvent(PBCurrentStateEvent.newBuilder().apply {
-            eventId = "event id"
-            timestamp = timeStamp
-            switch = PBSwitchStateEvent.newBuilder().apply {
-                mrid = "mr id"
-                action = PBSwitchAction.SWITCH_ACTION_OPEN
-                phases = PBPhaseCode.PHASE_CODE_ABCN
-            }.build()
-        }.build())
+        addEvent(
+            PBCurrentStateEvent.newBuilder().apply {
+                eventId = "event id"
+                timestamp = timeStamp
+                switch = PBSwitchStateEvent.newBuilder().apply {
+                    mrid = "mr id"
+                    action = PBSwitchAction.SWITCH_ACTION_OPEN
+                    phases = PBPhaseCode.PHASE_CODE_ABCN
+                }.build()
+            }.build(),
+        )
     }.build()
 
     @Test
@@ -110,13 +113,14 @@ internal class UpdateNetworkStateServiceTest {
             response.failure.apply {
                 assertThat(partialFailure, equalTo(true))
                 assertThat(
-                    failedList.map { it.reasonCase }, contains(
+                    failedList.map { it.reasonCase },
+                    contains(
                         PBStateEventFailure.ReasonCase.UNKNOWNMRID,
                         PBStateEventFailure.ReasonCase.DUPLICATEMRID,
                         PBStateEventFailure.ReasonCase.INVALIDMRID,
                         PBStateEventFailure.ReasonCase.UNSUPPORTEDPHASING,
-                        PBStateEventFailure.ReasonCase.UNSUPPORTEDMRID
-                    )
+                        PBStateEventFailure.ReasonCase.UNSUPPORTEDMRID,
+                    ),
                 )
             }
         }
@@ -151,8 +155,8 @@ internal class UpdateNetworkStateServiceTest {
 
     @Test
     internal fun `constructor parameter timeout must be greater than 0`() {
-        assertThrows<IllegalArgumentException> { UpdateNetworkStateService(onSetCurrentStates, timeout = 0) }
-        assertThrows<IllegalArgumentException> { UpdateNetworkStateService(onSetCurrentStates, timeout = -1) }
+        expect { UpdateNetworkStateService(onSetCurrentStates, timeout = 0) }.toThrow<IllegalArgumentException>()
+        expect { UpdateNetworkStateService(onSetCurrentStates, timeout = -1) }.toThrow<IllegalArgumentException>()
     }
 
     @Test

@@ -11,12 +11,12 @@ package com.zepben.ewb.streaming.data
 import com.google.protobuf.Timestamp
 import com.zepben.ewb.cim.iec61970.base.core.PhaseCode
 import com.zepben.ewb.services.common.translator.toLocalDateTime
+import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
 import com.zepben.protobuf.cim.iec61970.base.core.PhaseCode as PBPhaseCode
 import com.zepben.protobuf.ns.data.AddCutEvent as PBAddCutEvent
@@ -46,9 +46,9 @@ internal class CurrentStateEventTest {
 
     @Test
     internal fun `CurrentStateEvent from protobuf throws UnsupportedException for classes other than switch`() {
-        assertThrows<UnsupportedOperationException> {
+        expect {
             CurrentStateEvent.fromPb(PBCurrentStateEvent.newBuilder().build())
-        }
+        }.toThrow<UnsupportedOperationException>()
     }
 
     @Test

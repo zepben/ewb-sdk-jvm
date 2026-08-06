@@ -58,7 +58,8 @@ internal class UpdateNetworkStateServiceTest {
     private val setCurrentStatesReturns = listOf(
         BatchSuccessful(1),
         BatchFailure(
-            1, true,
+            1,
+            true,
             listOf(
                 StateEventUnknownMrid("event id", "we couldn't find it"),
                 StateEventDuplicateMrid("event id", "you have already used it"),

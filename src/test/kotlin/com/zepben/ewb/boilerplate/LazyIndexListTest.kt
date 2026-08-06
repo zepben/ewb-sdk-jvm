@@ -83,15 +83,18 @@ internal class LazyIndexListTest {
     }
 
     @Test
-    internal fun `removeAt returns null for an invalid index`() {
+    internal fun `removeAt rejects an invalid index`() {
         var backing: MutableList<Feeder>? = null
         val list = LazyIndexList({ backing }, { backing = it }, Feeder("owner"), "a Feeder")
 
-        assertThat(list.removeAt(0), nullValue())
-        assertThat(list.removeAt(-1), nullValue())
+        assertThrows<IndexOutOfBoundsException> { list.removeAt(0) }
+        assertThrows<IndexOutOfBoundsException> { list.removeAt(-1) }
+        assertThat(list.removeAtOrNull(0), nullValue())
+        assertThat(list.removeAtOrNull(-1), nullValue())
 
         backing = mutableListOf(Feeder("a"))
-        assertThat(list.removeAt(1), nullValue())
+        assertThrows<IndexOutOfBoundsException> { list.removeAt(1) }
+        assertThat(list.removeAtOrNull(1), nullValue())
     }
 
     @Test
@@ -102,5 +105,54 @@ internal class LazyIndexListTest {
 
         assertThat(list.removeAt(0), sameInstance(feeder))
         assertThat(backing, nullValue())
+    }
+
+    @Test
+    internal fun `indexed addAll and set mutate the backing list`() {
+        val a = Feeder("a")
+        val b = Feeder("b")
+        val c = Feeder("c")
+        var backing: MutableList<Feeder>? = null
+        val list = LazyIndexList({ backing }, { backing = it }, Feeder("owner"), "a Feeder")
+
+        assertThat(list.addAll(0, listOf(a, c)), equalTo(true))
+        assertThat(list.set(1, b), sameInstance(c))
+
+        assertThat(backing, contains(a, b))
+    }
+
+    @Test
+    internal fun `set rejects non-existing indexes before changing backing`() {
+        val a = Feeder("a")
+        var backing: MutableList<Feeder>? = mutableListOf(a)
+        val list = LazyIndexList({ backing }, { backing = it }, Feeder("owner"), "a Feeder")
+
+        assertThrows<IllegalArgumentException> { list.set(-1, Feeder("negative")) }
+        assertThrows<IllegalArgumentException> { list.set(1, Feeder("end")) }
+
+        assertThat(backing, contains(a))
+    }
+
+    @Test
+    internal fun `mutable list iterator creates and clears backing`() {
+        var backing: MutableList<Feeder>? = null
+        val list = LazyIndexList({ backing }, { backing = it }, Feeder("owner"), "a Feeder")
+        val feeder = Feeder("a")
+        val iterator = list.listIterator()
+
+        iterator.add(feeder)
+        assertThat(backing, contains(feeder))
+
+        assertThat(iterator.previous(), sameInstance(feeder))
+        iterator.remove()
+        assertThat(backing, nullValue())
+    }
+
+    @Test
+    internal fun `subList is unsupported`() {
+        var backing: MutableList<Feeder>? = mutableListOf(Feeder("a"), Feeder("b"))
+        val list = LazyIndexList({ backing }, { backing = it }, Feeder("owner"), "a Feeder")
+
+        assertThrows<UnsupportedOperationException> { list.subList(0, 2) }
     }
 }

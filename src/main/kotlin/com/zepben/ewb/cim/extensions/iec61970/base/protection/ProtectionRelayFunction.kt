@@ -70,7 +70,7 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
         { _timeLimits },
         { _timeLimits = it },
         this,
-        "Double"
+        "A Double"
     )
 
     @ZBEX
@@ -78,7 +78,7 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
         { _thresholds },
         { _thresholds = it },
         this,
-        "RelaySetting"
+        "A RelaySetting"
     )
 
     @ZBEX
@@ -161,10 +161,10 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
     fun removeTimeLimit(timeLimit: Double): Boolean = timeLimits.remove(timeLimit)
 
     @Deprecated(
-        message = "Use timeLimits.removeAt(index) instead.",
-        replaceWith = ReplaceWith("timeLimits.removeAt(index)")
+        message = "Use timeLimits.removeAtOrNull(index) instead.",
+        replaceWith = ReplaceWith("timeLimits.removeAtOrNull(index)")
     )
-    fun removeTimeLimitAt(index: Int): Double? = timeLimits.removeAt(index)
+    fun removeTimeLimitAt(index: Int): Double? = timeLimits.removeAtOrNull(index)
 
     @Deprecated(
         message = "Use timeLimits.clear() instead.",
@@ -212,10 +212,10 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
     fun removeThreshold(threshold: RelaySetting): Boolean = thresholds.remove(threshold)
 
     @Deprecated(
-        message = "Use thresholds.removeAt(sequenceNumber) instead.",
-        replaceWith = ReplaceWith("thresholds.removeAt(sequenceNumber)")
+        message = "Use thresholds.removeAtOrNull(sequenceNumber) instead.",
+        replaceWith = ReplaceWith("thresholds.removeAtOrNull(sequenceNumber)")
     )
-    fun removeThreshold(sequenceNumber: Int): RelaySetting? = thresholds.removeAt(sequenceNumber)
+    fun removeThreshold(sequenceNumber: Int): RelaySetting? = thresholds.removeAtOrNull(sequenceNumber)
 
     @Deprecated(
         message = "Use thresholds.clear() instead.",

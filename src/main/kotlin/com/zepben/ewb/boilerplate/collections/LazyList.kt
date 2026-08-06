@@ -51,7 +51,7 @@ open class LazyList<T>(
     override fun getCollection(): MutableList<T> = getter() ?: mutableListOf()
 
     /** Resets an empty backing list to `null`. */
-    private fun clearIfEmpty() {
+    protected fun clearIfEmpty() {
         if (getter()?.isEmpty() == true) {
             setter(null)
         }

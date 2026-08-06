@@ -43,7 +43,7 @@ class DiagramObject(mRID: String) : IdentifiedObject(mRID) {
         { _diagramObjectPoints },
         { _diagramObjectPoints = it },
         this,
-        "DiagramObjectPoint"
+        "A DiagramObjectPoint"
     )
 
 
@@ -98,10 +98,10 @@ class DiagramObject(mRID: String) : IdentifiedObject(mRID) {
     fun removePoint(diagramObjectPoint: DiagramObjectPoint): Boolean = points.remove(diagramObjectPoint)
 
     @Deprecated(
-        message = "Use points.removeAt(sequenceNumber) instead.",
-        replaceWith = ReplaceWith("points.removeAt(sequenceNumber)")
+        message = "Use points.removeAtOrNull(sequenceNumber) instead.",
+        replaceWith = ReplaceWith("points.removeAtOrNull(sequenceNumber)")
     )
-    fun removePoint(sequenceNumber: Int): DiagramObjectPoint? = points.removeAt(sequenceNumber)
+    fun removePoint(sequenceNumber: Int): DiagramObjectPoint? = points.removeAtOrNull(sequenceNumber)
 
     @Deprecated(
         message = "Use points.clear() instead.",

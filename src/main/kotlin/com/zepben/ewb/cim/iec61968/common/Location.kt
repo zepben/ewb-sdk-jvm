@@ -31,7 +31,7 @@ class Location(mRID: String) : IdentifiedObject(mRID) {
         { _positionPoints },
         { _positionPoints = it },
         this,
-        "PositionPoint"
+        "A PositionPoint"
     )
 
     // region deprecated list boilerplate
@@ -83,10 +83,10 @@ class Location(mRID: String) : IdentifiedObject(mRID) {
     fun removePoint(positionPoint: PositionPoint): Boolean = points.remove(positionPoint)
 
     @Deprecated(
-        message = "Use points.removeAt(sequenceNumber) instead.",
-        replaceWith = ReplaceWith("points.removeAt(sequenceNumber)")
+        message = "Use points.removeAtOrNull(sequenceNumber) instead.",
+        replaceWith = ReplaceWith("points.removeAtOrNull(sequenceNumber)")
     )
-    fun removePoint(sequenceNumber: Int): PositionPoint? = points.removeAt(sequenceNumber)
+    fun removePoint(sequenceNumber: Int): PositionPoint? = points.removeAtOrNull(sequenceNumber)
 
     @Deprecated(
         message = "Use points.clear() instead.",

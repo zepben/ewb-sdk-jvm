@@ -11,6 +11,8 @@ package com.zepben.ewb.boilerplate.collections
 /**
  * A mutable collection whose contents are stored elsewhere.
  *
+ * Elements must be non-null.
+ *
  * Implementations provide the current mutable contents through [getCollection].
  * Element validation and the add lifecycle are centralised here, with hooks for
  * specialised acceptance checks, preparation, storage, and post-add work.
@@ -87,22 +89,22 @@ abstract class AbstractBackedCollection<T>(
 }
 
 /** A mutable iterator that reports removed elements. */
-private class CallbackMutableIterator<T>(
-    private val delegate: MutableIterator<T>,
+internal open class CallbackMutableIterator<T>(
+    protected val delegate: MutableIterator<T>,
     private val afterRemove: (T) -> Unit
 ) : MutableIterator<T> by delegate {
 
     /** Wraps the current element, including nullable values. */
-    private class Current<T>(val element: T)
+    protected class Current<T>(val element: T)
 
-    private var current: Current<T>? = null
+    protected var current: Current<T>? = null
 
     /** Returns and records the next element. */
     override fun next(): T = delegate.next().also { current = Current(it) }
 
     /** Removes the current element and invokes the callback. */
     override fun remove() {
-        val removed = checkNotNull(current) { "remove() called before next()" }
+        val removed = checkNotNull(current) { "remove() called without a current element" }
         delegate.remove()
         current = null
         afterRemove(removed.element)

@@ -187,22 +187,4 @@ internal class AbstractBackedCollectionTest {
         assertThat(collection.presentAfterRemove, contains(false))
     }
 
-    @Test
-    internal fun `mutable iterator removes a nullable element and invokes cleanup`() {
-        val backing = mutableListOf<String?>(null)
-        val removed = mutableListOf<String?>()
-        val collection = object : AbstractBackedCollection<String?>() {
-            override fun getCollection(): MutableCollection<String?> = backing
-            override fun postRemove(element: String?) {
-                removed.add(element)
-            }
-        }
-        val iterator = collection.iterator()
-
-        assertThat(iterator.next(), nullValue())
-        iterator.remove()
-
-        assertThat(backing, empty())
-        assertThat(removed, contains(nullValue()))
-    }
 }

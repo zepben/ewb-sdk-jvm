@@ -37,7 +37,7 @@ class RelayInfo(mRID: String) : AssetInfo(mRID) {
         { _recloseDelays },
         { _recloseDelays = it },
         this,
-        "Double"
+        "A Double"
     )
 
 
@@ -97,10 +97,10 @@ class RelayInfo(mRID: String) : AssetInfo(mRID) {
     fun removeDelay(delay: Double): Boolean = recloseDelays.remove(delay)
 
     @Deprecated(
-        message = "Use recloseDelays.removeAt(index) instead.",
-        replaceWith = ReplaceWith("recloseDelays.removeAt(index)")
+        message = "Use recloseDelays.removeAtOrNull(index) instead.",
+        replaceWith = ReplaceWith("recloseDelays.removeAtOrNull(index)")
     )
-    fun removeDelayAt(index: Int): Double? = recloseDelays.removeAt(index)
+    fun removeDelayAt(index: Int): Double? = recloseDelays.removeAtOrNull(index)
 
     @Deprecated(
         message = "Use recloseDelays.clear() instead.",

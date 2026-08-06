@@ -108,9 +108,8 @@ class UsagePoint(mRID: String) : IdentifiedObject(mRID) {
         message = "Use equipment.clear() instead.",
         replaceWith = ReplaceWith("equipment.clear()")
     )
-    fun clearEquipment(): UsagePoint {
+    fun clearEquipment(): UsagePoint = apply {
         equipment.clear()
-        return this
     }
 
     // endregion
@@ -139,27 +138,24 @@ class UsagePoint(mRID: String) : IdentifiedObject(mRID) {
         message = "Use endDevices.clear() instead.",
         replaceWith = ReplaceWith("endDevices.clear()")
     )
-    fun clearEndDevices(): UsagePoint {
+    fun clearEndDevices(): UsagePoint = apply {
         endDevices.clear()
-        return this
     }
 
     @Deprecated(
         message = "Use this.equipment.add(equipment) instead.",
         replaceWith = ReplaceWith("also { it.equipment.add(equipment) }")
     )
-    fun addEquipment(equipment: Equipment): UsagePoint {
+    fun addEquipment(equipment: Equipment): UsagePoint = apply {
         this.equipment.add(equipment)
-        return this
     }
 
     @Deprecated(
         message = "Use endDevices.add(endDevice) instead.",
         replaceWith = ReplaceWith("also { it.endDevices.add(endDevice) }")
     )
-    fun addEndDevice(endDevice: EndDevice): UsagePoint {
+    fun addEndDevice(endDevice: EndDevice): UsagePoint = apply {
         endDevices.add(endDevice)
-        return this
     }
 
     // endregion
@@ -182,9 +178,8 @@ class UsagePoint(mRID: String) : IdentifiedObject(mRID) {
         message = "Use contacts.add(contact) instead.",
         replaceWith = ReplaceWith("also { it.contacts.add(contact) }")
     )
-    fun addContact(contact: ContactDetails): UsagePoint {
+    fun addContact(contact: ContactDetails): UsagePoint = apply {
         contacts.add(contact)
-        return this
     }
 
     @Deprecated(
@@ -197,9 +192,8 @@ class UsagePoint(mRID: String) : IdentifiedObject(mRID) {
         message = "Use contacts.clear() instead.",
         replaceWith = ReplaceWith("also { it.contacts.clear() }")
     )
-    fun clearContacts(): UsagePoint {
+    fun clearContacts(): UsagePoint = apply {
         contacts.clear()
-        return this
     }
 
     // endregion

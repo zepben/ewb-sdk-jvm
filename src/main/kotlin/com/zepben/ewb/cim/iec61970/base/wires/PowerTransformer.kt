@@ -173,9 +173,8 @@ class PowerTransformer(mRID: String) : ConductingEquipment(mRID) {
         message = "Use ends.add(end) instead.",
         replaceWith = ReplaceWith("also { it.ends.add(end) }")
     )
-    fun addEnd(end: PowerTransformerEnd): PowerTransformer {
+    fun addEnd(end: PowerTransformerEnd): PowerTransformer = apply {
         ends.add(end)
-        return this
     }
 
     @Deprecated(
@@ -188,9 +187,8 @@ class PowerTransformer(mRID: String) : ConductingEquipment(mRID) {
         message = "Use ends.clear() instead.",
         replaceWith = ReplaceWith("ends.clear()")
     )
-    fun clearEnds(): PowerTransformer {
+    fun clearEnds(): PowerTransformer = apply {
         ends.clear()
-        return this
     }
 
     // endregion

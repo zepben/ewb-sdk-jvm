@@ -74,9 +74,8 @@ class Circuit(mRID: String) : Line(mRID) {
         message = "Use endTerminals.add(endTerminal) instead.",
         replaceWith = ReplaceWith("also { it.endTerminals.add(endTerminal) }")
     )
-    fun addEndTerminal(endTerminal: Terminal): Circuit {
+    fun addEndTerminal(endTerminal: Terminal): Circuit = apply {
         endTerminals.add(endTerminal)
-        return this
     }
 
     @Deprecated(
@@ -89,9 +88,8 @@ class Circuit(mRID: String) : Line(mRID) {
         message = "Use endTerminals.clear() instead.",
         replaceWith = ReplaceWith("endTerminals.clear()")
     )
-    fun clearEndTerminals(): Circuit {
+    fun clearEndTerminals(): Circuit = apply {
         endTerminals.clear()
-        return this
     }
 
     // endregion
@@ -114,9 +112,8 @@ class Circuit(mRID: String) : Line(mRID) {
         message = "Use endSubstations.add(substation) instead.",
         replaceWith = ReplaceWith("also { it.endSubstations.add(substation) }")
     )
-    fun addEndSubstation(substation: Substation): Circuit {
+    fun addEndSubstation(substation: Substation): Circuit = apply {
         endSubstations.add(substation)
-        return this
     }
 
     @Deprecated(
@@ -129,9 +126,8 @@ class Circuit(mRID: String) : Line(mRID) {
         message = "Use endSubstations.clear() instead.",
         replaceWith = ReplaceWith("endSubstations.clear()")
     )
-    fun clearEndSubstations(): Circuit {
+    fun clearEndSubstations(): Circuit = apply {
         endSubstations.clear()
-        return this
     }
 
     // endregion

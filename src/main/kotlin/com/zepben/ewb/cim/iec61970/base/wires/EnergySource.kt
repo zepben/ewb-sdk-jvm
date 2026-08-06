@@ -120,9 +120,8 @@ class EnergySource(mRID: String) : EnergyConnection(mRID) {
         message = "Use phases.add(phase) instead.",
         replaceWith = ReplaceWith("also { it.phases.add(phase) }")
     )
-    fun addPhase(phase: EnergySourcePhase): EnergySource {
+    fun addPhase(phase: EnergySourcePhase): EnergySource = apply {
         phases.add(phase)
-        return this
     }
 
     @Deprecated(
@@ -135,9 +134,8 @@ class EnergySource(mRID: String) : EnergyConnection(mRID) {
         message = "Use phases.clear() instead.",
         replaceWith = ReplaceWith("phases.clear()")
     )
-    fun clearPhases(): EnergySource {
+    fun clearPhases(): EnergySource = apply {
         phases.clear()
-        return this
     }
 
     // endregion

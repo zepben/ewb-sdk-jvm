@@ -150,9 +150,8 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
         message = "Use timeLimits.addAll(timeLimits.asList()) instead.",
         replaceWith = ReplaceWith("also { it.timeLimits.addAll(timeLimits.asList()) }")
     )
-    fun addTimeLimits(vararg timeLimits: Double): ProtectionRelayFunction {
+    fun addTimeLimits(vararg timeLimits: Double): ProtectionRelayFunction = apply {
         this.timeLimits.addAll(timeLimits.asList())
-        return this
     }
 
     @Deprecated(
@@ -171,9 +170,8 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
         message = "Use timeLimits.clear() instead.",
         replaceWith = ReplaceWith("also { it.timeLimits.clear() }")
     )
-    fun clearTimeLimits(): ProtectionRelayFunction {
+    fun clearTimeLimits(): ProtectionRelayFunction = apply {
         timeLimits.clear()
-        return this
     }
 
     // endregion
@@ -203,9 +201,8 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
         replaceWith = ReplaceWith("also { it.thresholds.add(sequenceNumber, threshold) }")
     )
     @JvmOverloads
-    fun addThreshold(threshold: RelaySetting, sequenceNumber: Int = numThresholds()): ProtectionRelayFunction {
+    fun addThreshold(threshold: RelaySetting, sequenceNumber: Int = numThresholds()): ProtectionRelayFunction = apply {
         thresholds.add(sequenceNumber, threshold)
-        return this
     }
 
     @Deprecated(
@@ -224,9 +221,8 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
         message = "Use thresholds.clear() instead.",
         replaceWith = ReplaceWith("also { it.thresholds.clear() }")
     )
-    fun clearThresholds(): ProtectionRelayFunction {
+    fun clearThresholds(): ProtectionRelayFunction = apply {
         thresholds.clear()
-        return this
     }
 
     // endregion
@@ -249,9 +245,8 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
         message = "Use protectedSwitches.add(protectedSwitch) instead.",
         replaceWith = ReplaceWith("also { it.protectedSwitches.add(protectedSwitch) }")
     )
-    fun addProtectedSwitch(protectedSwitch: ProtectedSwitch): ProtectionRelayFunction {
+    fun addProtectedSwitch(protectedSwitch: ProtectedSwitch): ProtectionRelayFunction = apply {
         protectedSwitches.add(protectedSwitch)
-        return this
     }
 
     @Deprecated(
@@ -264,9 +259,8 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
         message = "Use protectedSwitches.clear() instead.",
         replaceWith = ReplaceWith("protectedSwitches.clear()")
     )
-    fun clearProtectedSwitches(): ProtectionRelayFunction {
+    fun clearProtectedSwitches(): ProtectionRelayFunction = apply {
         protectedSwitches.clear()
-        return this
     }
 
     // endregion
@@ -289,9 +283,8 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
         message = "Use sensors.add(sensor) instead.",
         replaceWith = ReplaceWith("also { it.sensors.add(sensor) }")
     )
-    fun addSensor(sensor: Sensor): ProtectionRelayFunction {
+    fun addSensor(sensor: Sensor): ProtectionRelayFunction = apply {
         sensors.add(sensor)
-        return this
     }
 
     @Deprecated(
@@ -304,9 +297,8 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
         message = "Use sensors.clear() instead.",
         replaceWith = ReplaceWith("sensors.clear()")
     )
-    fun clearSensors(): ProtectionRelayFunction {
+    fun clearSensors(): ProtectionRelayFunction = apply {
         sensors.clear()
-        return this
     }
 
     // endregion
@@ -329,9 +321,8 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
         message = "Use schemes.add(scheme) instead.",
         replaceWith = ReplaceWith("also { it.schemes.add(scheme) }")
     )
-    fun addScheme(scheme: ProtectionRelayScheme): ProtectionRelayFunction {
+    fun addScheme(scheme: ProtectionRelayScheme): ProtectionRelayFunction = apply {
         schemes.add(scheme)
-        return this
     }
 
     @Deprecated(
@@ -344,9 +335,8 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
         message = "Use schemes.clear() instead.",
         replaceWith = ReplaceWith("schemes.clear()")
     )
-    fun clearSchemes(): ProtectionRelayFunction {
+    fun clearSchemes(): ProtectionRelayFunction = apply {
         schemes.clear()
-        return this
     }
 
     // endregion

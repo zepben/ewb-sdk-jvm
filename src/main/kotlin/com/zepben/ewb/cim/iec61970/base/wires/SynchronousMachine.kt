@@ -111,9 +111,8 @@ class SynchronousMachine(mRID: String) : RotatingMachine(mRID) {
         message = "Use curves.add(rcc) instead.",
         replaceWith = ReplaceWith("also { it.curves.add(rcc) }")
     )
-    fun addCurve(rcc: ReactiveCapabilityCurve): SynchronousMachine {
+    fun addCurve(rcc: ReactiveCapabilityCurve): SynchronousMachine = apply {
         curves.add(rcc)
-        return this
     }
 
     @Deprecated(
@@ -126,9 +125,8 @@ class SynchronousMachine(mRID: String) : RotatingMachine(mRID) {
         message = "Use curves.clear() instead.",
         replaceWith = ReplaceWith("curves.clear()")
     )
-    fun clearCurve(): SynchronousMachine {
+    fun clearCurve(): SynchronousMachine = apply {
         curves.clear()
-        return this
     }
 
     // endregion

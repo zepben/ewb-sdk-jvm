@@ -67,9 +67,8 @@ class PerLengthPhaseImpedance(mRID: String) : PerLengthImpedance(mRID) {
         message = "Use data.add(phaseImpedanceData) instead.",
         replaceWith = ReplaceWith("also { it.data.add(phaseImpedanceData) }")
     )
-    fun addData(phaseImpedanceData: PhaseImpedanceData): PerLengthPhaseImpedance {
+    fun addData(phaseImpedanceData: PhaseImpedanceData): PerLengthPhaseImpedance = apply {
         data.add(phaseImpedanceData)
-        return this
     }
 
     @Deprecated(
@@ -82,9 +81,8 @@ class PerLengthPhaseImpedance(mRID: String) : PerLengthImpedance(mRID) {
         message = "Use data.clear() instead.",
         replaceWith = ReplaceWith("data.clear()")
     )
-    fun clearData(): PerLengthPhaseImpedance {
+    fun clearData(): PerLengthPhaseImpedance = apply {
         data.clear()
-        return this
     }
 
     // endregion

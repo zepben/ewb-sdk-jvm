@@ -76,9 +76,8 @@ class RelayInfo(mRID: String) : AssetInfo(mRID) {
     fun addDelay(
         delay: Double,
         sequenceNumber: Int = numDelays(),
-    ): RelayInfo {
+    ): RelayInfo = apply {
         recloseDelays.add(sequenceNumber, delay)
-        return this
     }
 
     @Deprecated(
@@ -87,9 +86,8 @@ class RelayInfo(mRID: String) : AssetInfo(mRID) {
     )
     fun addDelays(
         vararg delays: Double,
-    ): RelayInfo {
+    ): RelayInfo = apply {
         recloseDelays.addAll(delays.asList())
-        return this
     }
 
     @Deprecated(
@@ -108,9 +106,8 @@ class RelayInfo(mRID: String) : AssetInfo(mRID) {
         message = "Use recloseDelays.clear() instead.",
         replaceWith = ReplaceWith("also { it.recloseDelays.clear() }")
     )
-    fun clearDelays(): RelayInfo {
+    fun clearDelays(): RelayInfo = apply {
         recloseDelays.clear()
-        return this
     }
 
     // endregion

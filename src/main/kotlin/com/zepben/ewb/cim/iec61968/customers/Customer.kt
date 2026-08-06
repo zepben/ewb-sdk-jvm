@@ -67,9 +67,8 @@ class Customer(mRID: String) : OrganisationRole(mRID) {
         message = "Use agreements.add(customerAgreement) instead.",
         replaceWith = ReplaceWith("also { it.agreements.add(customerAgreement) }")
     )
-    fun addAgreement(customerAgreement: CustomerAgreement): Customer {
+    fun addAgreement(customerAgreement: CustomerAgreement): Customer = apply {
         agreements.add(customerAgreement)
-        return this
     }
 
     @Deprecated(
@@ -82,9 +81,8 @@ class Customer(mRID: String) : OrganisationRole(mRID) {
         message = "Use agreements.clear() instead.",
         replaceWith = ReplaceWith("agreements.clear()")
     )
-    fun clearAgreements(): Customer {
+    fun clearAgreements(): Customer = apply {
         agreements.clear()
-        return this
     }
 
     // endregion

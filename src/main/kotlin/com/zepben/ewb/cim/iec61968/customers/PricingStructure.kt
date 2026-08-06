@@ -59,9 +59,8 @@ class PricingStructure(mRID: String) : Document(mRID) {
         message = "Use tariffs.add(tariff) instead.",
         replaceWith = ReplaceWith("also { it.tariffs.add(tariff) }")
     )
-    fun addTariff(tariff: Tariff): PricingStructure {
+    fun addTariff(tariff: Tariff): PricingStructure = apply {
         tariffs.add(tariff)
-        return this
     }
 
     @Deprecated(
@@ -74,9 +73,8 @@ class PricingStructure(mRID: String) : Document(mRID) {
         message = "Use tariffs.clear() instead.",
         replaceWith = ReplaceWith("tariffs.clear()")
     )
-    fun clearTariffs(): PricingStructure {
+    fun clearTariffs(): PricingStructure = apply {
         tariffs.clear()
-        return this
     }
 
     // endregion

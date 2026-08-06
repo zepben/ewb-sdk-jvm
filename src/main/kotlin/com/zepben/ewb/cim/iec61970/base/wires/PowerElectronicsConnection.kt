@@ -263,9 +263,8 @@ class PowerElectronicsConnection(mRID: String) : RegulatingCondEq(mRID) {
         message = "Use units.add(unit) instead.",
         replaceWith = ReplaceWith("also { it.units.add(unit) }")
     )
-    fun addUnit(unit: PowerElectronicsUnit): PowerElectronicsConnection {
+    fun addUnit(unit: PowerElectronicsUnit): PowerElectronicsConnection = apply {
         units.add(unit)
-        return this
     }
 
     @Deprecated(
@@ -278,9 +277,8 @@ class PowerElectronicsConnection(mRID: String) : RegulatingCondEq(mRID) {
         message = "Use units.clear() instead.",
         replaceWith = ReplaceWith("units.clear()")
     )
-    fun clearUnits(): PowerElectronicsConnection {
+    fun clearUnits(): PowerElectronicsConnection = apply {
         units.clear()
-        return this
     }
 
     // endregion
@@ -303,9 +301,8 @@ class PowerElectronicsConnection(mRID: String) : RegulatingCondEq(mRID) {
         message = "Use phases.add(phase) instead.",
         replaceWith = ReplaceWith("also { it.phases.add(phase) }")
     )
-    fun addPhase(phase: PowerElectronicsConnectionPhase): PowerElectronicsConnection {
+    fun addPhase(phase: PowerElectronicsConnectionPhase): PowerElectronicsConnection = apply {
         phases.add(phase)
-        return this
     }
 
     @Deprecated(
@@ -318,9 +315,8 @@ class PowerElectronicsConnection(mRID: String) : RegulatingCondEq(mRID) {
         message = "Use phases.clear() instead.",
         replaceWith = ReplaceWith("phases.clear()")
     )
-    fun clearPhases(): PowerElectronicsConnection {
+    fun clearPhases(): PowerElectronicsConnection = apply {
         phases.clear()
-        return this
     }
 
     // endregion

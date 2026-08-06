@@ -65,9 +65,8 @@ class Diagram(mRID: String) : IdentifiedObject(mRID) {
         message = "Use diagramObjects.add(diagramObject) instead.",
         replaceWith = ReplaceWith("also { it.diagramObjects.add(diagramObject) }")
     )
-    fun addDiagramObject(diagramObject: DiagramObject): Diagram {
+    fun addDiagramObject(diagramObject: DiagramObject): Diagram = apply {
         diagramObjects.add(diagramObject)
-        return this
     }
 
     @Deprecated(
@@ -81,9 +80,8 @@ class Diagram(mRID: String) : IdentifiedObject(mRID) {
         message = "Use diagramObjects.clear() instead.",
         replaceWith = ReplaceWith("also { it.diagramObjects.clear() }")
     )
-    fun clearDiagramObjects(): Diagram {
+    fun clearDiagramObjects(): Diagram = apply {
         diagramObjects.clear()
-        return this
     }
 
     // endregion

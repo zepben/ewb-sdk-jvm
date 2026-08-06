@@ -75,9 +75,8 @@ class BatteryUnit(mRID: String) : PowerElectronicsUnit(mRID) {
         message = "Use controls.add(control) instead.",
         replaceWith = ReplaceWith("also { it.controls.add(control) }")
     )
-    fun addControl(control: BatteryControl): BatteryUnit {
+    fun addControl(control: BatteryControl): BatteryUnit = apply {
         controls.add(control)
-        return this
     }
 
     @Deprecated(
@@ -90,9 +89,8 @@ class BatteryUnit(mRID: String) : PowerElectronicsUnit(mRID) {
         message = "Use controls.clear() instead.",
         replaceWith = ReplaceWith("controls.clear()")
     )
-    fun clearControls(): BatteryUnit {
+    fun clearControls(): BatteryUnit = apply {
         controls.clear()
-        return this
     }
 
     // endregion

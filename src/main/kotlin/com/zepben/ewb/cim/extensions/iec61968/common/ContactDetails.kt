@@ -142,9 +142,8 @@ class ContactDetails(
         message = "Use phoneNumbers.add(phoneNumber) instead.",
         replaceWith = ReplaceWith("also { it.phoneNumbers.add(phoneNumber) }")
     )
-    fun addPhoneNumber(phoneNumber: TelephoneNumber): ContactDetails {
+    fun addPhoneNumber(phoneNumber: TelephoneNumber): ContactDetails = apply {
         phoneNumbers.add(phoneNumber)
-        return this
     }
 
     @Deprecated(
@@ -157,9 +156,8 @@ class ContactDetails(
         message = "Use phoneNumbers.clear() instead.",
         replaceWith = ReplaceWith("phoneNumbers.clear()")
     )
-    fun clearPhoneNumbers(): ContactDetails {
+    fun clearPhoneNumbers(): ContactDetails = apply {
         phoneNumbers.clear()
-        return this
     }
 
     // endregion
@@ -176,9 +174,8 @@ class ContactDetails(
         message = "Use electronicAddresses.add(electronicAddress) instead.",
         replaceWith = ReplaceWith("also { it.electronicAddresses.add(electronicAddress) }")
     )
-    fun addElectronicAddress(electronicAddress: ElectronicAddress): ContactDetails {
+    fun addElectronicAddress(electronicAddress: ElectronicAddress): ContactDetails = apply {
         electronicAddresses.add(electronicAddress)
-        return this
     }
 
     @Deprecated(
@@ -191,9 +188,8 @@ class ContactDetails(
         message = "Use electronicAddresses.clear() instead.",
         replaceWith = ReplaceWith("electronicAddresses.clear()")
     )
-    fun clearElectronicAddresses(): ContactDetails {
+    fun clearElectronicAddresses(): ContactDetails = apply {
         electronicAddresses.clear()
-        return this
     }
 
     // endregion

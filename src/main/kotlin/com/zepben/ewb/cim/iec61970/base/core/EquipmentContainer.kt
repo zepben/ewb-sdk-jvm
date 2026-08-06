@@ -99,9 +99,8 @@ abstract class EquipmentContainer(mRID: String) : ConnectivityNodeContainer(mRID
         message = "Use equipment.add(equipment) instead.",
         replaceWith = ReplaceWith("also { it.equipment.add(equipment) }")
     )
-    fun addEquipment(equipment: Equipment): EquipmentContainer {
+    fun addEquipment(equipment: Equipment): EquipmentContainer = apply {
         this.equipment.add(equipment)
-        return this
     }
 
     @Deprecated(
@@ -115,9 +114,8 @@ abstract class EquipmentContainer(mRID: String) : ConnectivityNodeContainer(mRID
         message = "Use equipment.clear() instead.",
         replaceWith = ReplaceWith("also { it.equipment.clear() }")
     )
-    fun clearEquipment(): EquipmentContainer {
+    fun clearEquipment(): EquipmentContainer = apply {
         equipment.clear()
-        return this
     }
 
 
@@ -137,9 +135,8 @@ abstract class EquipmentContainer(mRID: String) : ConnectivityNodeContainer(mRID
         message = "Use currentEquipment.add(currentEquipment) instead.",
         replaceWith = ReplaceWith("also { it.currentEquipment.add(currentEquipment) }")
     )
-    open fun addCurrentEquipment(equipment: Equipment): EquipmentContainer {
+    open fun addCurrentEquipment(equipment: Equipment): EquipmentContainer = apply {
         currentEquipment.add(equipment)
-        return this
     }
 
     @Deprecated(
@@ -153,9 +150,8 @@ abstract class EquipmentContainer(mRID: String) : ConnectivityNodeContainer(mRID
         message = "Use currentEquipment.clear() instead.",
         replaceWith = ReplaceWith("also { it.currentEquipment.clear() }")
     )
-    open fun clearCurrentEquipment(): EquipmentContainer {
+    open fun clearCurrentEquipment(): EquipmentContainer = apply {
         currentEquipment.clear()
-        return this
     }
 
     // endregion

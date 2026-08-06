@@ -62,9 +62,8 @@ class SubGeographicalRegion(mRID: String) : IdentifiedObject(mRID) {
         message = "Use substations.add(substation) instead.",
         replaceWith = ReplaceWith("also { it.substations.add(substation) }")
     )
-    fun addSubstation(substation: Substation): SubGeographicalRegion {
+    fun addSubstation(substation: Substation): SubGeographicalRegion = apply {
         substations.add(substation)
-        return this
     }
 
     @Deprecated(
@@ -77,9 +76,8 @@ class SubGeographicalRegion(mRID: String) : IdentifiedObject(mRID) {
         message = "Use substations.clear() instead.",
         replaceWith = ReplaceWith("substations.clear()")
     )
-    fun clearSubstations(): SubGeographicalRegion {
+    fun clearSubstations(): SubGeographicalRegion = apply {
         substations.clear()
-        return this
     }
 
     // endregion

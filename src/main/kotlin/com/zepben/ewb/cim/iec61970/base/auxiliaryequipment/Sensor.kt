@@ -56,9 +56,8 @@ abstract class Sensor(mRID: String) : AuxiliaryEquipment(mRID) {
         message = "Use relayFunctions.add(protectionRelayFunction) instead.",
         replaceWith = ReplaceWith("also { it.relayFunctions.add(protectionRelayFunction) }")
     )
-    fun addRelayFunction(protectionRelayFunction: ProtectionRelayFunction): Sensor {
+    fun addRelayFunction(protectionRelayFunction: ProtectionRelayFunction): Sensor = apply {
         relayFunctions.add(protectionRelayFunction)
-        return this
     }
 
     @Deprecated(
@@ -71,9 +70,8 @@ abstract class Sensor(mRID: String) : AuxiliaryEquipment(mRID) {
         message = "Use relayFunctions.clear() instead.",
         replaceWith = ReplaceWith("relayFunctions.clear()")
     )
-    fun clearRelayFunctions(): Sensor {
+    fun clearRelayFunctions(): Sensor = apply {
         relayFunctions.clear()
-        return this
     }
 
     // endregion

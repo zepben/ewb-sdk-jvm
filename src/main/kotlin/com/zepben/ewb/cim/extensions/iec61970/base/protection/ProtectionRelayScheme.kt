@@ -63,9 +63,8 @@ class ProtectionRelayScheme(mRID: String) : IdentifiedObject(mRID) {
         message = "Use functions.add(function) instead.",
         replaceWith = ReplaceWith("also { it.functions.add(function) }")
     )
-    fun addFunction(function: ProtectionRelayFunction): ProtectionRelayScheme {
+    fun addFunction(function: ProtectionRelayFunction): ProtectionRelayScheme = apply {
         functions.add(function)
-        return this
     }
 
     @Deprecated(
@@ -78,9 +77,8 @@ class ProtectionRelayScheme(mRID: String) : IdentifiedObject(mRID) {
         message = "Use functions.clear() instead.",
         replaceWith = ReplaceWith("functions.clear()")
     )
-    fun clearFunctions(): ProtectionRelayScheme {
+    fun clearFunctions(): ProtectionRelayScheme = apply {
         functions.clear()
-        return this
     }
 
     // endregion

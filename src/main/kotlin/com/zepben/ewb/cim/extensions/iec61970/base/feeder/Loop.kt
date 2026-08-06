@@ -88,9 +88,8 @@ class Loop(mRID: String) : IdentifiedObject(mRID) {
         message = "Use circuits.add(circuit) instead.",
         replaceWith = ReplaceWith("also { it.circuits.add(circuit) }")
     )
-    fun addCircuit(circuit: Circuit): Loop {
+    fun addCircuit(circuit: Circuit): Loop = apply {
         circuits.add(circuit)
-        return this
     }
 
     @Deprecated(
@@ -103,9 +102,8 @@ class Loop(mRID: String) : IdentifiedObject(mRID) {
         message = "Use circuits.clear() instead.",
         replaceWith = ReplaceWith("circuits.clear()")
     )
-    fun clearCircuits(): Loop {
+    fun clearCircuits(): Loop = apply {
         circuits.clear()
-        return this
     }
 
     // endregion
@@ -128,9 +126,8 @@ class Loop(mRID: String) : IdentifiedObject(mRID) {
         message = "Use substations.add(substation) instead.",
         replaceWith = ReplaceWith("also { it.substations.add(substation) }")
     )
-    fun addSubstation(substation: Substation): Loop {
+    fun addSubstation(substation: Substation): Loop = apply {
         substations.add(substation)
-        return this
     }
 
     @Deprecated(
@@ -143,9 +140,8 @@ class Loop(mRID: String) : IdentifiedObject(mRID) {
         message = "Use substations.clear() instead.",
         replaceWith = ReplaceWith("substations.clear()")
     )
-    fun clearSubstations(): Loop {
+    fun clearSubstations(): Loop = apply {
         substations.clear()
-        return this
     }
 
     // endregion
@@ -168,9 +164,8 @@ class Loop(mRID: String) : IdentifiedObject(mRID) {
         message = "Use energizingSubstations.add(substation) instead.",
         replaceWith = ReplaceWith("also { it.energizingSubstations.add(substation) }")
     )
-    fun addEnergizingSubstation(substation: Substation): Loop {
+    fun addEnergizingSubstation(substation: Substation): Loop = apply {
         energizingSubstations.add(substation)
-        return this
     }
 
     @Deprecated(
@@ -183,9 +178,8 @@ class Loop(mRID: String) : IdentifiedObject(mRID) {
         message = "Use energizingSubstations.clear() instead.",
         replaceWith = ReplaceWith("energizingSubstations.clear()")
     )
-    fun clearEnergizingSubstations(): Loop {
+    fun clearEnergizingSubstations(): Loop = apply {
         energizingSubstations.clear()
-        return this
     }
 
     // endregion

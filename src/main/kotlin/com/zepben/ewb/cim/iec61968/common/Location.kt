@@ -72,9 +72,8 @@ class Location(mRID: String) : IdentifiedObject(mRID) {
         replaceWith = ReplaceWith("also { it.points.add(sequenceNumber, positionPoint) }")
     )
     @JvmOverloads
-    fun addPoint(positionPoint: PositionPoint, sequenceNumber: Int = numPoints()): Location {
+    fun addPoint(positionPoint: PositionPoint, sequenceNumber: Int = numPoints()): Location = apply {
         points.add(sequenceNumber, positionPoint)
-        return this
     }
 
     @Deprecated(
@@ -93,9 +92,8 @@ class Location(mRID: String) : IdentifiedObject(mRID) {
         message = "Use points.clear() instead.",
         replaceWith = ReplaceWith("also { it.points.clear() }")
     )
-    fun clearPoints(): Location {
+    fun clearPoints(): Location = apply {
         points.clear()
-        return this
     }
 
     // endregion

@@ -8,35 +8,43 @@
 
 package com.zepben.ewb.boilerplate.collections
 
-
 /**
- * A mutable collection interface whose contents are stored elsewhere.
+ * A mutable collection whose contents are stored elsewhere.
  *
- * Mutation is unordered, providing [add] and [remove] but not indexed access
+ * Implementations provide the current mutable contents through [getCollection]
+ * and define how elements are added. Individual removal, bulk removal and
+ * retention are supplied by [AbstractMutableCollection] through [iterator].
  *
- * Implementations provide the current contents through [getCollection]
- * and define how mutation affects the backing storage.
+ * [postRemove] is invoked after every individual removal, including removals
+ * made through a mutable iterator. [clear] clears the backing storage directly,
+ * avoiding repeated removal bookkeeping when bulk cleanup is unnecessary.
  */
 abstract class AbstractBackedCollection<T> :
-    AbstractCollection<T>() {
+    AbstractMutableCollection<T>() {
 
-    protected abstract fun getCollection(): Collection<T>
+    protected abstract fun getCollection(): MutableCollection<T>
 
-    abstract fun add(element: T): Boolean
+    abstract override fun add(element: T): Boolean
 
-    fun addAll(elements: Collection<T>): Boolean = elements.all { add(it) }
+    protected open fun postRemove(element: T) = Unit
 
-    abstract fun remove(element: T): Boolean
+    protected open fun clearCollection(collection: MutableCollection<T>) {
+        collection.clear()
+    }
 
-    fun removeAll(elements: Collection<T>): Boolean = elements.all { remove(it) }
+    protected open fun clearAndCopy(collection: MutableCollection<T>): Collection<T> {
+        val elements = collection.toList()
+        clearCollection(collection)
+        return elements
+    }
 
-    abstract fun clear()
+    final override fun iterator(): MutableIterator<T> =
+        CallbackMutableIterator(getCollection().iterator(), ::postRemove)
 
-    override val size: Int
+    final override val size: Int
         get() = getCollection().size
 
-    override fun iterator(): Iterator<T> =
-        getCollection().iterator()
+    override fun clear() = clearCollection(getCollection())
 
     override fun contains(element: T): Boolean =
         getCollection().contains(element)
@@ -48,3 +56,21 @@ abstract class AbstractBackedCollection<T> :
         getCollection().isEmpty()
 }
 
+private class CallbackMutableIterator<T>(
+    private val delegate: MutableIterator<T>,
+    private val afterRemove: (T) -> Unit
+) : MutableIterator<T> by delegate {
+
+    private class Current<T>(val element: T)
+
+    private var current: Current<T>? = null
+
+    override fun next(): T = delegate.next().also { current = Current(it) }
+
+    override fun remove() {
+        val removed = checkNotNull(current) { "remove() called before next()" }
+        delegate.remove()
+        current = null
+        afterRemove(removed.element)
+    }
+}

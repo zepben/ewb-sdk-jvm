@@ -10,19 +10,29 @@ package com.zepben.ewb.boilerplate
 
 import com.zepben.ewb.boilerplate.collections.MridCollection
 import com.zepben.ewb.cim.iec61970.base.core.Feeder
+import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.extension.RegisterExtension
 
 internal class MridCollectionTest {
 
-    private class TestMridCollection : ArrayList<Feeder>(), MridCollection<Feeder> {
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
+
+    private class TestMridCollection : MridCollection<Feeder>() {
+        private val backing = mutableListOf<Feeder>()
+
         override val owner = Feeder("owner")
         override val elementDescription = "A Feeder"
-        override fun getByMrid(mRID: String): Feeder? = firstOrNull { it.mRID == mRID }
-        override fun canAddByMrid(element: Feeder): Boolean = super<MridCollection>.canAddByMrid(element)
-        override fun add(element: Feeder): Boolean = if (canAddByMrid(element)) super.add(element) else false
+        override fun getCollection(): MutableCollection<Feeder> = backing
+        override fun getByMrid(mRID: String): Feeder? = backing.firstOrNull { it.mRID == mRID }
+        override fun add(element: Feeder): Boolean = if (canAddByMrid(element)) backing.add(element) else false
     }
 
     @Test

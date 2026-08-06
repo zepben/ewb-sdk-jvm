@@ -14,13 +14,14 @@ package com.zepben.ewb.boilerplate.collections
  *
  * Integer indexes return individual items and ranges return lists.
  *
- * Mutation is still not unordered.
+ * Collection mutation remains unordered; indexed mutation is only exposed by
+ * specialisations such as [LazyIndexList].
  */
 abstract class AbstractBackedList<T> :
     AbstractBackedCollection<T>(),
     List<T> {
 
-    abstract override fun getCollection(): List<T>
+    abstract override fun getCollection(): MutableList<T>
 
     override fun get(index: Int): T =
         getCollection()[index]
@@ -39,4 +40,5 @@ abstract class AbstractBackedList<T> :
 
     override fun subList(fromIndex: Int, toIndex: Int): List<T> =
         getCollection().subList(fromIndex, toIndex)
+
 }

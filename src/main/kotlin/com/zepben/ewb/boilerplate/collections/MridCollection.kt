@@ -8,22 +8,22 @@
 
 package com.zepben.ewb.boilerplate.collections
 
+import com.zepben.ewb.boilerplate.Backfill
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 
-
 /**
- * A collection of objects identified by a unique `mRID`.
+ * Base collection for objects identified by a unique `mRID`.
  *
  * Provides lookup by mRID and rejects distinct objects with duplicate mRIDs.
  */
-interface MridCollection<T : Identifiable> : Collection<T> {
-    val owner: Identifiable
-    val elementDescription: String
+abstract class MridCollection<T : Identifiable> : AbstractBackedCollection<T>() {
+    abstract val owner: Identifiable
+    abstract val elementDescription: String
 
-    /**
-     *
-     */
-    fun getByMrid(mRID: String): T?
+    open val backfill: Backfill<T, *>? = null
+
+    /** Returns the element with [mRID], or `null` when it is not present. */
+    abstract fun getByMrid(mRID: String): T?
 
     fun canAddByMrid(element: T): Boolean {
         val existing = getByMrid(element.mRID) ?: return true
@@ -35,10 +35,12 @@ interface MridCollection<T : Identifiable> : Collection<T> {
         return false
     }
 
-    fun add(element: T): Boolean
+    override fun postRemove(element: T) {
+        backfill?.clear(element)
+    }
 
-    fun remove(element: T): Boolean
-
-    fun clear()
-
+    override fun clear() {
+        val activeBackfill = backfill ?: return super.clear()
+        clearAndCopy(getCollection()).forEach(activeBackfill::clear)
+    }
 }

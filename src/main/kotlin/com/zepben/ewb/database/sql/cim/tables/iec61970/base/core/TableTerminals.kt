@@ -33,6 +33,9 @@ class TableTerminals : TableAcDcTerminals() {
     val SEQUENCE_NUMBER: Column = Column(++columnIndex, "sequence_number", Column.Type.INTEGER, NOT_NULL)
     val CONNECTIVITY_NODE_MRID: Column = Column(++columnIndex, "connectivity_node_mrid", Column.Type.STRING, NULL)
     val PHASES: Column = Column(++columnIndex, "phases", Column.Type.STRING, NOT_NULL)
+
+    // Point of this is to allow directions to be used in variants, which only need to support current network for now. If they
+    // need to consider current state in the future we will need to add a `CURRENT_FEEDER_DIRECTION` column.
     val NORMAL_FEEDER_DIRECTION: Column = Column(++columnIndex, "normal_feeder_direction", Column.Type.STRING, NULL)
 
     override val name: String = "terminals"

@@ -55,9 +55,8 @@ abstract class ProtectedSwitch(mRID: String) : Switch(mRID) {
         message = "Use relayFunctions.add(relayFunction) instead.",
         replaceWith = ReplaceWith("also { it.relayFunctions.add(relayFunction) }")
     )
-    fun addRelayFunction(relayFunction: ProtectionRelayFunction): ProtectedSwitch {
+    fun addRelayFunction(relayFunction: ProtectionRelayFunction): ProtectedSwitch = apply {
         relayFunctions.add(relayFunction)
-        return this
     }
 
     @Deprecated(
@@ -70,9 +69,8 @@ abstract class ProtectedSwitch(mRID: String) : Switch(mRID) {
         message = "Use relayFunctions.clear() instead.",
         replaceWith = ReplaceWith("relayFunctions.clear()")
     )
-    fun clearRelayFunctions(): ProtectedSwitch {
+    fun clearRelayFunctions(): ProtectedSwitch = apply {
         relayFunctions.clear()
-        return this
     }
 
     // endregion

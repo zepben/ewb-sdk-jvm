@@ -103,9 +103,8 @@ class LvFeeder(mRID: String) : EquipmentContainer(mRID) {
         message = "Use normalEnergizingFeeders.add(feeder) instead.",
         replaceWith = ReplaceWith("also { it.normalEnergizingFeeders.add(feeder) }")
     )
-    fun addNormalEnergizingFeeder(feeder: Feeder): LvFeeder {
+    fun addNormalEnergizingFeeder(feeder: Feeder): LvFeeder = apply {
         normalEnergizingFeeders.add(feeder)
-        return this
     }
 
     @Deprecated(
@@ -122,9 +121,8 @@ class LvFeeder(mRID: String) : EquipmentContainer(mRID) {
         message = "Use normalEnergizingFeeders.clear() instead.",
         replaceWith = ReplaceWith("also { it.normalEnergizingFeeders.clear() }")
     )
-    fun clearNormalEnergizingFeeders(): LvFeeder {
+    fun clearNormalEnergizingFeeders(): LvFeeder = apply {
         normalEnergizingFeeders.clear()
-        return this
     }
 
 
@@ -145,9 +143,8 @@ class LvFeeder(mRID: String) : EquipmentContainer(mRID) {
         message = "Use currentEnergizingFeeders.add(feeder) instead.",
         replaceWith = ReplaceWith("also { it.currentEnergizingFeeders.add(feeder) }")
     )
-    fun addCurrentEnergizingFeeder(feeder: Feeder): LvFeeder {
+    fun addCurrentEnergizingFeeder(feeder: Feeder): LvFeeder = apply {
         currentEnergizingFeeders.add(feeder)
-        return this
     }
 
     @Deprecated(
@@ -161,9 +158,8 @@ class LvFeeder(mRID: String) : EquipmentContainer(mRID) {
         message = "Use currentEnergizingFeeders.clear() instead.",
         replaceWith = ReplaceWith("also { it.currentEnergizingFeeders.clear() }")
     )
-    fun clearCurrentEnergizingFeeders(): LvFeeder {
+    fun clearCurrentEnergizingFeeders(): LvFeeder = apply {
         currentEnergizingFeeders.clear()
-        return this
     }
 
 

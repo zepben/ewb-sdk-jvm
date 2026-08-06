@@ -76,9 +76,8 @@ abstract class EndDevice(mRID: String) : AssetContainer(mRID) {
         message = "Use usagePoints.add(usagePoint) instead.",
         replaceWith = ReplaceWith("also { it.usagePoints.add(usagePoint) }")
     )
-    fun addUsagePoint(usagePoint: UsagePoint): EndDevice {
+    fun addUsagePoint(usagePoint: UsagePoint): EndDevice = apply {
         usagePoints.add(usagePoint)
-        return this
     }
 
     @Deprecated(
@@ -91,9 +90,8 @@ abstract class EndDevice(mRID: String) : AssetContainer(mRID) {
         message = "Use usagePoints.clear() instead.",
         replaceWith = ReplaceWith("usagePoints.clear()")
     )
-    fun clearUsagePoints(): EndDevice {
+    fun clearUsagePoints(): EndDevice = apply {
         usagePoints.clear()
-        return this
     }
 
     // endregion
@@ -116,9 +114,8 @@ abstract class EndDevice(mRID: String) : AssetContainer(mRID) {
         message = "Use functions.add(function) instead.",
         replaceWith = ReplaceWith("also { it.functions.add(function) }")
     )
-    fun addFunction(function: EndDeviceFunction): EndDevice {
+    fun addFunction(function: EndDeviceFunction): EndDevice = apply {
         functions.add(function)
-        return this
     }
 
     @Deprecated(
@@ -131,9 +128,8 @@ abstract class EndDevice(mRID: String) : AssetContainer(mRID) {
         message = "Use functions.clear() instead.",
         replaceWith = ReplaceWith("functions.clear()")
     )
-    fun clearFunctions(): EndDevice {
+    fun clearFunctions(): EndDevice = apply {
         functions.clear()
-        return this
     }
 
     // endregion

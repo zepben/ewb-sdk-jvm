@@ -59,9 +59,8 @@ class Pole(mRID: String) : Structure(mRID) {
         message = "Use streetlights.add(streetlight) instead.",
         replaceWith = ReplaceWith("also { it.streetlights.add(streetlight) }")
     )
-    fun addStreetlight(streetlight: Streetlight): Pole {
+    fun addStreetlight(streetlight: Streetlight): Pole = apply {
         streetlights.add(streetlight)
-        return this
     }
 
     @Deprecated(
@@ -74,9 +73,8 @@ class Pole(mRID: String) : Structure(mRID) {
         message = "Use streetlights.clear() instead.",
         replaceWith = ReplaceWith("streetlights.clear()")
     )
-    fun clearStreetlights(): Pole {
+    fun clearStreetlights(): Pole = apply {
         streetlights.clear()
-        return this
     }
 
     // endregion

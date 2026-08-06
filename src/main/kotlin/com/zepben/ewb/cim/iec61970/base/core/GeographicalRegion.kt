@@ -60,9 +60,8 @@ class GeographicalRegion(mRID: String) : IdentifiedObject(mRID) {
         message = "Use subGeographicalRegions.add(subGeographicalRegion) instead.",
         replaceWith = ReplaceWith("also { it.subGeographicalRegions.add(subGeographicalRegion) }")
     )
-    fun addSubGeographicalRegion(subGeographicalRegion: SubGeographicalRegion): GeographicalRegion {
+    fun addSubGeographicalRegion(subGeographicalRegion: SubGeographicalRegion): GeographicalRegion = apply {
         subGeographicalRegions.add(subGeographicalRegion)
-        return this
     }
 
     @Deprecated(
@@ -75,9 +74,8 @@ class GeographicalRegion(mRID: String) : IdentifiedObject(mRID) {
         message = "Use subGeographicalRegions.clear() instead.",
         replaceWith = ReplaceWith("subGeographicalRegions.clear()")
     )
-    fun clearSubGeographicalRegions(): GeographicalRegion {
+    fun clearSubGeographicalRegions(): GeographicalRegion = apply {
         subGeographicalRegions.clear()
-        return this
     }
 
     // endregion

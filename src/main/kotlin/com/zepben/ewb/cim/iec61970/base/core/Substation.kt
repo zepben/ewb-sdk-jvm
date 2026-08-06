@@ -101,9 +101,8 @@ class Substation(mRID: String) : EquipmentContainer(mRID) {
         message = "Use feeders.add(feeder) instead.",
         replaceWith = ReplaceWith("also { it.feeders.add(feeder) }")
     )
-    fun addFeeder(feeder: Feeder): Substation {
+    fun addFeeder(feeder: Feeder): Substation = apply {
         feeders.add(feeder)
-        return this
     }
 
     @Deprecated(
@@ -116,9 +115,8 @@ class Substation(mRID: String) : EquipmentContainer(mRID) {
         message = "Use feeders.clear() instead.",
         replaceWith = ReplaceWith("feeders.clear()")
     )
-    fun clearFeeders(): Substation {
+    fun clearFeeders(): Substation = apply {
         feeders.clear()
-        return this
     }
 
     // endregion
@@ -141,9 +139,8 @@ class Substation(mRID: String) : EquipmentContainer(mRID) {
         message = "Use loops.add(loop) instead.",
         replaceWith = ReplaceWith("also { it.loops.add(loop) }")
     )
-    fun addLoop(loop: Loop): Substation {
+    fun addLoop(loop: Loop): Substation = apply {
         loops.add(loop)
-        return this
     }
 
     @Deprecated(
@@ -156,9 +153,8 @@ class Substation(mRID: String) : EquipmentContainer(mRID) {
         message = "Use loops.clear() instead.",
         replaceWith = ReplaceWith("loops.clear()")
     )
-    fun clearLoops(): Substation {
+    fun clearLoops(): Substation = apply {
         loops.clear()
-        return this
     }
 
     // endregion
@@ -181,9 +177,8 @@ class Substation(mRID: String) : EquipmentContainer(mRID) {
         message = "Use energizedLoops.add(loop) instead.",
         replaceWith = ReplaceWith("also { it.energizedLoops.add(loop) }")
     )
-    fun addEnergizedLoop(loop: Loop): Substation {
+    fun addEnergizedLoop(loop: Loop): Substation = apply {
         energizedLoops.add(loop)
-        return this
     }
 
     @Deprecated(
@@ -196,9 +191,8 @@ class Substation(mRID: String) : EquipmentContainer(mRID) {
         message = "Use energizedLoops.clear() instead.",
         replaceWith = ReplaceWith("energizedLoops.clear()")
     )
-    fun clearEnergizedLoops(): Substation {
+    fun clearEnergizedLoops(): Substation = apply {
         energizedLoops.clear()
-        return this
     }
 
     // endregion
@@ -221,9 +215,8 @@ class Substation(mRID: String) : EquipmentContainer(mRID) {
         message = "Use circuits.add(circuit) instead.",
         replaceWith = ReplaceWith("also { it.circuits.add(circuit) }")
     )
-    fun addCircuit(circuit: Circuit): Substation {
+    fun addCircuit(circuit: Circuit): Substation = apply {
         circuits.add(circuit)
-        return this
     }
 
     @Deprecated(
@@ -236,9 +229,8 @@ class Substation(mRID: String) : EquipmentContainer(mRID) {
         message = "Use circuits.clear() instead.",
         replaceWith = ReplaceWith("circuits.clear()")
     )
-    fun clearCircuits(): Substation {
+    fun clearCircuits(): Substation = apply {
         circuits.clear()
-        return this
     }
 
     // endregion

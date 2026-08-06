@@ -68,18 +68,16 @@ abstract class Curve(mRID: String) : IdentifiedObject(mRID) {
         message = "Use data.add(CurveData(x, y1, y2, y3)) instead.",
         replaceWith = ReplaceWith("also { it.data.add(CurveData(x, y1, y2, y3)) }")
     )
-    fun addData(x: Float, y1: Float, y2: Float? = null, y3: Float? = null): Curve {
+    fun addData(x: Float, y1: Float, y2: Float? = null, y3: Float? = null): Curve = apply {
         data.add(CurveData(x, y1, y2, y3))
-        return this
     }
 
     @Deprecated(
         message = "Use data.add(curveData) instead.",
         replaceWith = ReplaceWith("also { it.data.add(curveData) }")
     )
-    fun addData(curveData: CurveData): Curve {
+    fun addData(curveData: CurveData): Curve = apply {
         data.add(curveData)
-        return this
     }
 
     @Deprecated(
@@ -98,9 +96,8 @@ abstract class Curve(mRID: String) : IdentifiedObject(mRID) {
         message = "Use data.clear() instead.",
         replaceWith = ReplaceWith("also { it.data.clear() }")
     )
-    fun clearData(): Curve {
+    fun clearData(): Curve = apply {
         data.clear()
-        return this
     }
 
     // endregion

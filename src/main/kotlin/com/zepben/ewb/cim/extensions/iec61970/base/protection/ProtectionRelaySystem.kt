@@ -63,9 +63,8 @@ class ProtectionRelaySystem(mRID: String) : Equipment(mRID) {
         message = "Use schemes.add(scheme) instead.",
         replaceWith = ReplaceWith("also { it.schemes.add(scheme) }")
     )
-    fun addScheme( scheme: ProtectionRelayScheme, ): ProtectionRelaySystem {
+    fun addScheme( scheme: ProtectionRelayScheme, ): ProtectionRelaySystem = apply {
         schemes.add(scheme)
-        return this
     }
 
     @Deprecated(
@@ -78,9 +77,8 @@ class ProtectionRelaySystem(mRID: String) : Equipment(mRID) {
         message = "Use schemes.clear() instead.",
         replaceWith = ReplaceWith("schemes.clear()")
     )
-    fun clearSchemes(): ProtectionRelaySystem {
+    fun clearSchemes(): ProtectionRelaySystem = apply {
         schemes.clear()
-        return this
     }
 
     // endregion

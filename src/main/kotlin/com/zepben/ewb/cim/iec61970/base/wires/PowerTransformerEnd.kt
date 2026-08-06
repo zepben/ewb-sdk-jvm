@@ -160,18 +160,16 @@ class PowerTransformerEnd(mRID: String) : TransformerEnd(mRID) {
     fun addRating(
         ratedS: Int,
         coolingType: TransformerCoolingType = TransformerCoolingType.UNKNOWN,
-    ): PowerTransformerEnd {
+    ): PowerTransformerEnd = apply {
         sRatings.add(ratedS, coolingType)
-        return this
     }
 
     @Deprecated(
         message = "Use sRatings.add(rating) instead.",
         replaceWith = ReplaceWith("also { it.sRatings.add(rating) }")
     )
-    fun addRating(rating: TransformerEndRatedS): PowerTransformerEnd {
+    fun addRating(rating: TransformerEndRatedS): PowerTransformerEnd = apply {
         sRatings.add(rating)
-        return this
     }
 
     @Deprecated(
@@ -190,9 +188,8 @@ class PowerTransformerEnd(mRID: String) : TransformerEnd(mRID) {
         message = "Use sRatings.clear() instead.",
         replaceWith = ReplaceWith("also { it.sRatings.clear() }")
     )
-    fun clearRatings(): PowerTransformerEnd {
+    fun clearRatings(): PowerTransformerEnd = apply {
         sRatings.clear()
-        return this
     }
 
     // endregion

@@ -118,9 +118,8 @@ abstract class RegulatingControl(mRID: String) : PowerSystemResource(mRID) {
         message = "Use regulatingCondEqs.add(regulatingCondEq) instead.",
         replaceWith = ReplaceWith("also { it.regulatingCondEqs.add(regulatingCondEq) }")
     )
-    fun addRegulatingCondEq(regulatingCondEq: RegulatingCondEq): RegulatingControl {
+    fun addRegulatingCondEq(regulatingCondEq: RegulatingCondEq): RegulatingControl = apply {
         regulatingCondEqs.add(regulatingCondEq)
-        return this
     }
 
     @Deprecated(
@@ -133,9 +132,8 @@ abstract class RegulatingControl(mRID: String) : PowerSystemResource(mRID) {
         message = "Use regulatingCondEqs.clear() instead.",
         replaceWith = ReplaceWith("regulatingCondEqs.clear()")
     )
-    fun clearRegulatingCondEqs(): RegulatingControl {
+    fun clearRegulatingCondEqs(): RegulatingControl = apply {
         regulatingCondEqs.clear()
-        return this
     }
 
     // endregion

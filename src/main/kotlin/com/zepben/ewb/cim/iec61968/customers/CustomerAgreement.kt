@@ -64,9 +64,8 @@ class CustomerAgreement(mRID: String) : Agreement(mRID) {
         message = "Use pricingStructures.add(pricingStructure) instead.",
         replaceWith = ReplaceWith("also { it.pricingStructures.add(pricingStructure) }")
     )
-    fun addPricingStructure(pricingStructure: PricingStructure): CustomerAgreement {
+    fun addPricingStructure(pricingStructure: PricingStructure): CustomerAgreement = apply {
         pricingStructures.add(pricingStructure)
-        return this
     }
 
     @Deprecated(
@@ -79,9 +78,8 @@ class CustomerAgreement(mRID: String) : Agreement(mRID) {
         message = "Use pricingStructures.clear() instead.",
         replaceWith = ReplaceWith("pricingStructures.clear()")
     )
-    fun clearPricingStructures(): CustomerAgreement {
+    fun clearPricingStructures(): CustomerAgreement = apply {
         pricingStructures.clear()
-        return this
     }
 
     // endregion

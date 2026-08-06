@@ -87,9 +87,8 @@ class DiagramObject(mRID: String) : IdentifiedObject(mRID) {
         replaceWith = ReplaceWith("also { it.points.add(sequenceNumber, diagramObjectPoint) }")
     )
     @JvmOverloads
-    fun addPoint(diagramObjectPoint: DiagramObjectPoint, sequenceNumber: Int = numPoints()): DiagramObject {
+    fun addPoint(diagramObjectPoint: DiagramObjectPoint, sequenceNumber: Int = numPoints()): DiagramObject = apply {
         points.add(sequenceNumber, diagramObjectPoint)
-        return this
     }
 
     @Deprecated(
@@ -108,9 +107,8 @@ class DiagramObject(mRID: String) : IdentifiedObject(mRID) {
         message = "Use points.clear() instead.",
         replaceWith = ReplaceWith("also { it.points.clear() }")
     )
-    fun clearPoints(): DiagramObject {
+    fun clearPoints(): DiagramObject = apply {
         points.clear()
-        return this
     }
 
     // endregion

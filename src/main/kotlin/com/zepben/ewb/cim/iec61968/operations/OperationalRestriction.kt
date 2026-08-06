@@ -63,9 +63,8 @@ class OperationalRestriction(mRID: String) : Document(mRID) {
         message = "Use this.equipment.add(equipment) instead.",
         replaceWith = ReplaceWith("also { it.equipment.add(equipment) }")
     )
-    fun addEquipment(equipment: Equipment): OperationalRestriction {
+    fun addEquipment(equipment: Equipment): OperationalRestriction = apply {
         this.equipment.add(equipment)
-        return this
     }
 
     @Deprecated(
@@ -78,9 +77,8 @@ class OperationalRestriction(mRID: String) : Document(mRID) {
         message = "Use equipment.clear() instead.",
         replaceWith = ReplaceWith("equipment.clear()")
     )
-    fun clearEquipment(): OperationalRestriction {
+    fun clearEquipment(): OperationalRestriction = apply {
         equipment.clear()
-        return this
     }
 
     // endregion

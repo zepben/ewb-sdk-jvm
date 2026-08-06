@@ -123,9 +123,8 @@ abstract class ConductingEquipment(mRID: String) : Equipment(mRID) {
         message = "Use terminalsInternal.addInternal(terminal) instead.",
         replaceWith = ReplaceWith("also { it.terminalsInternal.addInternal(terminal) }")
     )
-    fun addTerminal(terminal: Terminal): ConductingEquipment {
+    fun addTerminal(terminal: Terminal): ConductingEquipment = apply {
         terminalsInternal.add(terminal)
-        return this
     }
 
     @Deprecated(
@@ -139,9 +138,8 @@ abstract class ConductingEquipment(mRID: String) : Equipment(mRID) {
         message = "Use terminalsInternal.clear() instead.",
         replaceWith = ReplaceWith("also { it.terminalsInternal.clear() }")
     )
-    fun clearTerminals(): ConductingEquipment {
+    fun clearTerminals(): ConductingEquipment = apply {
         terminalsInternal.clear()
-        return this
     }
 
     // endregion

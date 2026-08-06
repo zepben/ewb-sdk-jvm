@@ -76,9 +76,8 @@ abstract class Asset(mRID: String) : IdentifiedObject(mRID) {
         message = "Use organisationRoles.add(organisationRole) instead.",
         replaceWith = ReplaceWith("also { it.organisationRoles.add(organisationRole) }")
     )
-    fun addOrganisationRole(organisationRole: AssetOrganisationRole): Asset {
+    fun addOrganisationRole(organisationRole: AssetOrganisationRole): Asset = apply {
         organisationRoles.add(organisationRole)
-        return this
     }
 
     @Deprecated(
@@ -91,9 +90,8 @@ abstract class Asset(mRID: String) : IdentifiedObject(mRID) {
         message = "Use organisationRoles.clear() instead.",
         replaceWith = ReplaceWith("organisationRoles.clear()")
     )
-    fun clearOrganisationRoles(): Asset {
+    fun clearOrganisationRoles(): Asset = apply {
         organisationRoles.clear()
-        return this
     }
 
     // endregion
@@ -116,9 +114,8 @@ abstract class Asset(mRID: String) : IdentifiedObject(mRID) {
         message = "Use powerSystemResources.add(powerSystemResource) instead.",
         replaceWith = ReplaceWith("also { it.powerSystemResources.add(powerSystemResource) }")
     )
-    fun addPowerSystemResource(powerSystemResource: PowerSystemResource): Asset {
+    fun addPowerSystemResource(powerSystemResource: PowerSystemResource): Asset = apply {
         powerSystemResources.add(powerSystemResource)
-        return this
     }
 
     @Deprecated(
@@ -131,9 +128,8 @@ abstract class Asset(mRID: String) : IdentifiedObject(mRID) {
         message = "Use powerSystemResources.clear() instead.",
         replaceWith = ReplaceWith("powerSystemResources.clear()")
     )
-    fun clearPowerSystemResources(): Asset {
+    fun clearPowerSystemResources(): Asset = apply {
         powerSystemResources.clear()
-        return this
     }
 
     // endregion

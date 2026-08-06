@@ -71,9 +71,8 @@ abstract class PowerSystemResource(mRID: String) : IdentifiedObject(mRID) {
         message = "Use assets.add(asset) instead.",
         replaceWith = ReplaceWith("also { it.assets.add(asset) }")
     )
-    fun addAsset(asset: Asset): PowerSystemResource {
+    fun addAsset(asset: Asset): PowerSystemResource = apply {
         assets.add(asset)
-        return this
     }
 
     @Deprecated(
@@ -86,9 +85,8 @@ abstract class PowerSystemResource(mRID: String) : IdentifiedObject(mRID) {
         message = "Use assets.clear() instead.",
         replaceWith = ReplaceWith("assets.clear()")
     )
-    fun clearAssets(): PowerSystemResource {
+    fun clearAssets(): PowerSystemResource = apply {
         assets.clear()
-        return this
     }
 
     // endregion

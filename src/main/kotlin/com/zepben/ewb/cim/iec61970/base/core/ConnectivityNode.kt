@@ -53,9 +53,8 @@ class ConnectivityNode(mRID: String) : IdentifiedObject(mRID) {
         message = "Use terminals.add(terminal) instead.",
         replaceWith = ReplaceWith("also { it.terminals.add(terminal) }")
     )
-    fun addTerminal(terminal: Terminal): ConnectivityNode {
+    fun addTerminal(terminal: Terminal): ConnectivityNode = apply {
         terminals.add(terminal)
-        return this
     }
 
     @Deprecated(
@@ -68,9 +67,8 @@ class ConnectivityNode(mRID: String) : IdentifiedObject(mRID) {
         message = "Use terminals.clear() instead.",
         replaceWith = ReplaceWith("terminals.clear()")
     )
-    fun clearTerminals(): ConnectivityNode {
+    fun clearTerminals(): ConnectivityNode = apply {
         terminals.clear()
-        return this
     }
 
     // endregion

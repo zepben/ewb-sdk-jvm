@@ -46,6 +46,9 @@ abstract class MridCollection<T : Identifiable>(
      */
     @Suppress("UNCHECKED_CAST")
     override fun add(element: T): Boolean {
+        // NOTE: All downstream implementations of this are typed properly,
+        //          ensuring nothing blows up. The lack of backfill typing
+        //          is intended to ease the use of MridCollection as type for public lists
         if (!canAddByMrid(element))
             return false
         // Concrete collections expose matching owner/backfill types, but the

@@ -65,9 +65,8 @@ class TransformerTankInfo(mRID: String) : AssetInfo(mRID) {
         message = "Use transformerEndInfos.add(transformerEndInfo) instead.",
         replaceWith = ReplaceWith("also { it.transformerEndInfos.add(transformerEndInfo) }")
     )
-    fun addTransformerEndInfo(transformerEndInfo: TransformerEndInfo): TransformerTankInfo {
+    fun addTransformerEndInfo(transformerEndInfo: TransformerEndInfo): TransformerTankInfo = apply {
         transformerEndInfos.add(transformerEndInfo)
-        return this
     }
 
     @Deprecated(
@@ -80,9 +79,8 @@ class TransformerTankInfo(mRID: String) : AssetInfo(mRID) {
         message = "Use transformerEndInfos.clear() instead.",
         replaceWith = ReplaceWith("transformerEndInfos.clear()")
     )
-    fun clearTransformerEndInfos(): TransformerTankInfo {
+    fun clearTransformerEndInfos(): TransformerTankInfo = apply {
         transformerEndInfos.clear()
-        return this
     }
 
     // endregion

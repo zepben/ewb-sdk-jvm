@@ -125,9 +125,8 @@ class AcLineSegment(mRID: String) : Conductor(mRID) {
         message = "Use cuts.add(cut) instead.",
         replaceWith = ReplaceWith("also { it.cuts.add(cut) }")
     )
-    fun addCut(cut: Cut): AcLineSegment {
+    fun addCut(cut: Cut): AcLineSegment = apply {
         cuts.add(cut)
-        return this
     }
 
     @Deprecated(
@@ -140,9 +139,8 @@ class AcLineSegment(mRID: String) : Conductor(mRID) {
         message = "Use cuts.clear() instead.",
         replaceWith = ReplaceWith("cuts.clear()")
     )
-    fun clearCuts(): AcLineSegment {
+    fun clearCuts(): AcLineSegment = apply {
         cuts.clear()
-        return this
     }
 
     // endregion
@@ -165,9 +163,8 @@ class AcLineSegment(mRID: String) : Conductor(mRID) {
         message = "Use clamps.add(clamp) instead.",
         replaceWith = ReplaceWith("also { it.clamps.add(clamp) }")
     )
-    fun addClamp(clamp: Clamp): AcLineSegment {
+    fun addClamp(clamp: Clamp): AcLineSegment = apply {
         clamps.add(clamp)
-        return this
     }
 
     @Deprecated(
@@ -180,9 +177,8 @@ class AcLineSegment(mRID: String) : Conductor(mRID) {
         message = "Use clamps.clear() instead.",
         replaceWith = ReplaceWith("clamps.clear()")
     )
-    fun clearClamps(): AcLineSegment {
+    fun clearClamps(): AcLineSegment = apply {
         clamps.clear()
-        return this
     }
 
     // endregion
@@ -211,9 +207,8 @@ class AcLineSegment(mRID: String) : Conductor(mRID) {
         message = "Use phases.add(phase) instead.",
         replaceWith = ReplaceWith("also { it.phases.add(phase) }")
     )
-    fun addPhase(phase: AcLineSegmentPhase): AcLineSegment {
+    fun addPhase(phase: AcLineSegmentPhase): AcLineSegment = apply {
         phases.add(phase)
-        return this
     }
 
     @Deprecated(
@@ -226,9 +221,8 @@ class AcLineSegment(mRID: String) : Conductor(mRID) {
         message = "Use phases.clear() instead.",
         replaceWith = ReplaceWith("phases.clear()")
     )
-    fun clearPhases(): AcLineSegment {
+    fun clearPhases(): AcLineSegment = apply {
         phases.clear()
-        return this
     }
 
     // endregion

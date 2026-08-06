@@ -114,9 +114,8 @@ abstract class Equipment(mRID: String) : PowerSystemResource(mRID) {
         message = "Use containers.add(equipmentContainer) instead.",
         replaceWith = ReplaceWith("also { it.containers.add(equipmentContainer) }")
     )
-    fun addContainer(equipmentContainer: EquipmentContainer): Equipment {
+    fun addContainer(equipmentContainer: EquipmentContainer): Equipment = apply {
         containers.add(equipmentContainer)
-        return this
     }
 
     @Deprecated(
@@ -129,9 +128,8 @@ abstract class Equipment(mRID: String) : PowerSystemResource(mRID) {
         message = "Use containers.clear() instead.",
         replaceWith = ReplaceWith("containers.clear()")
     )
-    fun clearContainers(): Equipment {
+    fun clearContainers(): Equipment = apply {
         containers.clear()
-        return this
     }
 
     // endregion
@@ -154,9 +152,8 @@ abstract class Equipment(mRID: String) : PowerSystemResource(mRID) {
         message = "Use currentContainers.add(equipmentContainer) instead.",
         replaceWith = ReplaceWith("also { it.currentContainers.add(equipmentContainer) }")
     )
-    fun addCurrentContainer(equipmentContainer: EquipmentContainer): Equipment {
+    fun addCurrentContainer(equipmentContainer: EquipmentContainer): Equipment = apply {
         currentContainers.add(equipmentContainer)
-        return this
     }
 
     @Deprecated(
@@ -169,9 +166,8 @@ abstract class Equipment(mRID: String) : PowerSystemResource(mRID) {
         message = "Use currentContainers.clear() instead.",
         replaceWith = ReplaceWith("currentContainers.clear()")
     )
-    fun clearCurrentContainers(): Equipment {
+    fun clearCurrentContainers(): Equipment = apply {
         currentContainers.clear()
-        return this
     }
 
     // endregion
@@ -194,9 +190,8 @@ abstract class Equipment(mRID: String) : PowerSystemResource(mRID) {
         message = "Use usagePoints.add(usagePoint) instead.",
         replaceWith = ReplaceWith("also { it.usagePoints.add(usagePoint) }")
     )
-    fun addUsagePoint(usagePoint: UsagePoint): Equipment {
+    fun addUsagePoint(usagePoint: UsagePoint): Equipment = apply {
         usagePoints.add(usagePoint)
-        return this
     }
 
     @Deprecated(
@@ -209,9 +204,8 @@ abstract class Equipment(mRID: String) : PowerSystemResource(mRID) {
         message = "Use usagePoints.clear() instead.",
         replaceWith = ReplaceWith("usagePoints.clear()")
     )
-    fun clearUsagePoints(): Equipment {
+    fun clearUsagePoints(): Equipment = apply {
         usagePoints.clear()
-        return this
     }
 
     // endregion
@@ -234,9 +228,8 @@ abstract class Equipment(mRID: String) : PowerSystemResource(mRID) {
         message = "Use operationalRestrictions.add(restriction) instead.",
         replaceWith = ReplaceWith("also { it.operationalRestrictions.add(restriction) }")
     )
-    fun addOperationalRestriction(restriction: OperationalRestriction): Equipment {
+    fun addOperationalRestriction(restriction: OperationalRestriction): Equipment = apply {
         operationalRestrictions.add(restriction)
-        return this
     }
 
     @Deprecated(
@@ -249,9 +242,8 @@ abstract class Equipment(mRID: String) : PowerSystemResource(mRID) {
         message = "Use operationalRestrictions.clear() instead.",
         replaceWith = ReplaceWith("operationalRestrictions.clear()")
     )
-    fun clearOperationalRestrictions(): Equipment {
+    fun clearOperationalRestrictions(): Equipment = apply {
         operationalRestrictions.clear()
-        return this
     }
 
     // endregion

@@ -25,12 +25,27 @@ internal class AbstractBackedListTest {
         val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
     }
 
-    private class TestList(private val backing: MutableList<Feeder>) : AbstractBackedList<Feeder>() {
+    private class TestList(
+        private val backing: MutableList<Feeder>,
+        sortBy: ((Feeder) -> Comparable<*>?)? = null,
+    ) : AbstractBackedList<Feeder>(sortBy = sortBy) {
         override fun getCollection(): MutableList<Feeder> = backing
-        override fun add(element: Feeder): Boolean = backing.add(element)
         override fun remove(element: Feeder): Boolean = backing.remove(element)
     }
 
+    @Test
+    internal fun `successful additions sort the backing list`() {
+        val a = Feeder("a")
+        val b = Feeder("b")
+        val list = TestList(mutableListOf(), Feeder::mRID)
+
+        list.add(b)
+        list.add(a)
+
+        assertThat(list, contains(a, b))
+    }
+
+    @Suppress("KotlinConstantConditions")
     @Test
     internal fun `get returns item at index and rejects an out of range index`() {
         val a = Feeder("a")

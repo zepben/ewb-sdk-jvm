@@ -38,44 +38,44 @@ open class LazyMridMap<T : Identifiable, O : Identifiable>(
     override val owner: O,
     override val elementDescription: String,
     override val backfill: Backfill<T, O>? = null,
-    private val validate: ((T) -> Unit)? = null
-) : MridCollection<T>() {
+    validate: ((T) -> Unit)? = null
+) : MridCollection<T>(validate) {
 
+    /** Resets an empty backing map to `null`. */
     private fun clearIfEmpty() {
         if (getter()?.isEmpty() == true)
             setter(null)
     }
 
+    /** Returns the element with [mRID], or `null`. */
     override fun getByMrid(mRID: String): T? =
         getter()?.get(mRID)
 
+    /** Returns the map values, or an unbound empty collection when absent. */
     override fun getCollection(): MutableCollection<T> =
         getter()?.values ?: mutableListOf()
 
-    override fun add(element: T): Boolean {
-        // Check for mRID collisions.
-        // If element is already present, skip.
-        // If another element shares mRID, error.
-        if (!canAddByMrid(element))
-            return false
-
-        backfill?.apply(owner, element)
-
-        // If a custom validation method is defined, run it.
-        validate?.invoke(element)
-
+    /**
+     * Adds [element] by mRID, creating the backing map if needed.
+     *
+     * This hook performs storage; mRID check, backfill, and validation are inherited.
+     */
+    override fun addRaw(element: T): Boolean {
         val map = getter() ?: hashMapOf<String, T>().also(setter)
 
         map[element.mRID] = element
         return true
     }
 
+    /** Returns whether [element] is stored under its mRID. */
     override fun contains(element: T): Boolean =
         getter()?.get(element.mRID) === element
 
+    /** Returns whether every element is stored under its mRID. */
     override fun containsAll(elements: Collection<T>): Boolean =
         elements.all { contains(it) }
 
+    /** Removes [element] only when the stored instance matches. */
     override fun remove(element: T): Boolean {
         val map = getter() ?: return false
         val existing = map[element.mRID]
@@ -89,15 +89,18 @@ open class LazyMridMap<T : Identifiable, O : Identifiable>(
         return true
     }
 
+    /** Resets an empty map and clears backfill. */
     override fun postRemove(element: T) {
         clearIfEmpty()
         super.postRemove(element)
     }
 
+    /** Resets the backing map to `null`. */
     override fun clearCollection(collection: MutableCollection<T>) {
         setter(null)
     }
 
+    /** Resets the backing map and returns its former values. */
     override fun clearAndCopy(collection: MutableCollection<T>): Collection<T> {
         setter(null)
         return collection

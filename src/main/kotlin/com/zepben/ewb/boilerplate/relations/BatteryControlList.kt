@@ -14,6 +14,7 @@ import com.zepben.ewb.cim.extensions.iec61970.base.wires.BatteryControl
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.BatteryControlMode
 import com.zepben.ewb.cim.iec61970.base.generation.production.BatteryUnit
 
+/** A list of [BatteryControl] for a given [BatteryUnit]. */
 class BatteryControlList(
     getter: () -> MutableList<BatteryControl>?,
     setter: (MutableList<BatteryControl>?) -> Unit,

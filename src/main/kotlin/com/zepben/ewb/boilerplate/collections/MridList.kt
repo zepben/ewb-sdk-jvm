@@ -27,31 +27,15 @@ open class MridList<T : Identifiable, O : Identifiable>(
     override val owner: O,
     override val elementDescription: String,
     override val backfill: Backfill<T, O>? = null,
-    private val validate: ((T) -> Unit)? = null,
-    private val sortBy: ((T) -> Comparable<*>?)? = null,
-) : AbstractMridList<T>() {
+    validate: ((T) -> Unit)? = null,
+    sortBy: ((T) -> Comparable<*>?)? = null,
+) : AbstractMridList<T>(validate, sortBy) {
 
+    /** Returns the backing list. */
     override fun getCollection(): MutableList<T> = list
 
+    /** Returns the element with [mRID], or `null`. */
     override fun getByMrid(mRID: String): T? =
         list.firstOrNull { it.mRID == mRID }
-
-    override fun add(element: T): Boolean {
-        // If element is already present, skip.
-        // If another element shares mRID, error.
-        if (!canAddByMrid(element))
-            return false
-
-        backfill?.apply(owner, element)
-
-        validate?.invoke(element)
-
-        val result = list.add(element)
-
-        if (result)
-            sortBy?.let { selector -> list.sortWith(compareBy(selector)) }
-
-        return result
-    }
 
 }

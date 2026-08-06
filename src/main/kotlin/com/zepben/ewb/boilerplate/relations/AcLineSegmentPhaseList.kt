@@ -14,6 +14,7 @@ import com.zepben.ewb.cim.iec61970.base.wires.AcLineSegment
 import com.zepben.ewb.cim.iec61970.base.wires.AcLineSegmentPhase
 import com.zepben.ewb.cim.iec61970.base.wires.SinglePhaseKind
 
+/** A list of [AcLineSegmentPhase] for a given [AcLineSegment]. */
 class AcLineSegmentPhaseList(
     getter: () -> MutableList<AcLineSegmentPhase>?,
     setter: (MutableList<AcLineSegmentPhase>?) -> Unit,

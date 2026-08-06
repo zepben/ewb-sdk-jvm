@@ -32,7 +32,6 @@ internal class MridCollectionTest {
         override val elementDescription = "A Feeder"
         override fun getCollection(): MutableCollection<Feeder> = backing
         override fun getByMrid(mRID: String): Feeder? = backing.firstOrNull { it.mRID == mRID }
-        override fun add(element: Feeder): Boolean = if (canAddByMrid(element)) backing.add(element) else false
     }
 
     @Test

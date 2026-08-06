@@ -40,6 +40,9 @@ internal class MridListTest {
 
         assertThat(list.getByMrid("a"), sameInstance(feeder))
         assertThat(list.getByMrid("missing"), nullValue())
+        assertThat(list["a"], sameInstance(feeder))
+        assertThat(list["missing"], nullValue())
+        assertThat(list[0], sameInstance(feeder))
         assertThat(list.toList(), contains(feeder))
     }
 

@@ -246,7 +246,7 @@ internal class PrivateCollectionValidator {
                         .toThrow<IllegalArgumentException>()
                         .withMessage(
                             Pattern.compile(
-                                "Unable to add ${other4.javaClass.simpleName} to ${it.typeNameAndMRID()}. " +
+                                "An? ${other4.javaClass.simpleName} could not be added to ${it.typeNameAndMRID()}. " +
                                     "\\w* number 5 is invalid. Expected a value between 0 and ${num(it)}. " +
                                     "Make sure you are adding the items in order and there are no gaps in the numbering."
                             )

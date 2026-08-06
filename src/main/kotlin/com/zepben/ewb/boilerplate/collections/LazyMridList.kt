@@ -55,7 +55,7 @@ open class LazyMridList<T : Identifiable, O : Identifiable>(
     }
 
     /** Resets the backing list to `null`. */
-    override fun clearCollection(collection: MutableCollection<T>) {
+    override fun clearRaw(collection: MutableCollection<T>) {
         setter(null)
     }
 

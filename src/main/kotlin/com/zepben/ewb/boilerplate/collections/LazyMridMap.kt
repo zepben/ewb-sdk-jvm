@@ -96,7 +96,7 @@ open class LazyMridMap<T : Identifiable, O : Identifiable>(
     }
 
     /** Resets the backing map to `null`. */
-    override fun clearCollection(collection: MutableCollection<T>) {
+    override fun clearRaw(collection: MutableCollection<T>) {
         setter(null)
     }
 

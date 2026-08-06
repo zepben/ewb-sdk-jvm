@@ -72,7 +72,7 @@ open class LazyList<T>(
     override fun postRemove(element: T) = clearIfEmpty()
 
     /** Resets the backing list to `null`. */
-    override fun clearCollection(collection: MutableCollection<T>) {
+    override fun clearRaw(collection: MutableCollection<T>) {
         setter(null)
     }
 

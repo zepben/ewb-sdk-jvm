@@ -37,9 +37,9 @@ open class LazyMridMap<T : Identifiable, O : Identifiable>(
     private val setter: (MutableMap<String, T>?) -> Unit,
     override val owner: O,
     override val elementDescription: String,
-    val backfill: Backfill<T, O>? = null,
+    override val backfill: Backfill<T, O>? = null,
     private val validate: ((T) -> Unit)? = null
-) : AbstractBackedCollection<T>(), MridCollection<T> {
+) : MridCollection<T>() {
 
     private fun clearIfEmpty() {
         if (getter()?.isEmpty() == true)
@@ -49,9 +49,8 @@ open class LazyMridMap<T : Identifiable, O : Identifiable>(
     override fun getByMrid(mRID: String): T? =
         getter()?.get(mRID)
 
-    override fun getCollection(): Collection<T> =
-        getter()?.values ?: emptyList()
-
+    override fun getCollection(): MutableCollection<T> =
+        getter()?.values ?: mutableListOf()
 
     override fun add(element: T): Boolean {
         // Check for mRID collisions.
@@ -71,35 +70,36 @@ open class LazyMridMap<T : Identifiable, O : Identifiable>(
         return true
     }
 
-
     override fun contains(element: T): Boolean =
         getter()?.get(element.mRID) === element
 
     override fun containsAll(elements: Collection<T>): Boolean =
         elements.all { contains(it) }
 
-    override fun clear() {
-        val old = getCollection()
-        setter(null)
-        backfill?.also { old.forEach { backfill.clear(it) } }
-    }
-
-
-
     override fun remove(element: T): Boolean {
         val map = getter() ?: return false
         val existing = map[element.mRID]
 
-        if (existing != element)
+        if (existing !== element)
             return false
 
         map.remove(element.mRID)
-        clearIfEmpty()
-
-        backfill?.clear(element)
+        postRemove(element)
 
         return true
     }
+
+    override fun postRemove(element: T) {
+        clearIfEmpty()
+        super.postRemove(element)
+    }
+
+    override fun clearCollection(collection: MutableCollection<T>) {
+        setter(null)
+    }
+
+    override fun clearAndCopy(collection: MutableCollection<T>): Collection<T> {
+        setter(null)
+        return collection
+    }
 }
-
-

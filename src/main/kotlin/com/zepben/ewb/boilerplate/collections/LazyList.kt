@@ -76,14 +76,10 @@ open class LazyList<T>(
         return result
     }
 
-    override val size: Int
-        get() = getter()?.size ?: 0
+    override fun postRemove(element: T) = clearIfEmpty()
 
-
-    override fun clear() {
+    override fun clearCollection(collection: MutableCollection<T>) {
         setter(null)
     }
-
-    override fun remove(element: T): Boolean = getter()?.remove(element).also { clearIfEmpty() } ?: false
 
 }

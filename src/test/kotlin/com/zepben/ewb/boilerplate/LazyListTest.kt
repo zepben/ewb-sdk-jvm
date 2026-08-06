@@ -10,12 +10,20 @@ package com.zepben.ewb.boilerplate
 
 import com.zepben.ewb.boilerplate.collections.LazyList
 import com.zepben.ewb.cim.iec61970.base.core.Feeder
+import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.extension.RegisterExtension
 
 internal class LazyListTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     @Test
     internal fun `null backing is exposed as an empty list without being created`() {
@@ -112,5 +120,9 @@ internal class LazyListTest {
 
         assertThat(backing, nullValue())
         assertThat(list.toString(), equalTo("[]"))
+
+        backing = mutableListOf()
+        list.clear()
+        assertThat(backing, nullValue())
     }
 }

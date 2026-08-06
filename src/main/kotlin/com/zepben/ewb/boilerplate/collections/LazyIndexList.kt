@@ -53,13 +53,10 @@ class LazyIndexList<T>(
     }
 
     fun removeAt(index: Int): T? {
-        val removed = if(index in indices) {
-            getter()?.removeAt(index)
-        } else
-            null
-        if(isEmpty())
-            clear()
-        return removed
+        if (index !in indices)
+            return null
+
+        return getter()!!.removeAt(index).also(::postRemove)
     }
 
 }

@@ -26,13 +26,12 @@ open class MridList<T : Identifiable, O : Identifiable>(
     private val list: MutableList<T> = mutableListOf(),
     override val owner: O,
     override val elementDescription: String,
-    val backfill: Backfill<T, O>? = null,
+    override val backfill: Backfill<T, O>? = null,
     private val validate: ((T) -> Unit)? = null,
     private val sortBy: ((T) -> Comparable<*>?)? = null,
-) : AbstractBackedList<T>(), MridCollection<T> {
+) : AbstractMridList<T>() {
 
-
-    override fun getCollection(): List<T> = list
+    override fun getCollection(): MutableList<T> = list
 
     override fun getByMrid(mRID: String): T? =
         list.firstOrNull { it.mRID == mRID }
@@ -53,21 +52,6 @@ open class MridList<T : Identifiable, O : Identifiable>(
             sortBy?.let { selector -> list.sortWith(compareBy(selector)) }
 
         return result
-    }
-
-
-    override fun remove(element: T): Boolean {
-        val result = list.remove(element)
-        if (result)
-            backfill?.clear(element)
-        return result
-    }
-
-
-    override fun clear() {
-        val old = list.toList()
-        list.clear()
-        backfill?.also { old.forEach { backfill.clear(it) } }
     }
 
 }

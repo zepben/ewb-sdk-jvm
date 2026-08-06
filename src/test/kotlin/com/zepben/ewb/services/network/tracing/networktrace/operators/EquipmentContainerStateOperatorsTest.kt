@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.services.network.tracing.networktrace.operators
 
+import com.zepben.ewb.boilerplate.collections.MridCollection
 import com.zepben.ewb.boilerplate.collections.MridList
 import com.zepben.ewb.cim.iec61970.base.core.Equipment
 import com.zepben.ewb.cim.iec61970.base.core.EquipmentContainer
@@ -19,7 +20,6 @@ import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import kotlin.reflect.KProperty1
 
 internal class EquipmentContainerStateOperatorsTest {
 
@@ -34,47 +34,31 @@ internal class EquipmentContainerStateOperatorsTest {
 
     @Test
     fun getEquipment() {
-        fun test(operators: EquipmentContainerStateOperators, equipmentProp: KProperty1<EquipmentContainer, Collection<Equipment>>) {
-            val equipment1 = mockk<Equipment>()
-            val equipment2 = mockk<Equipment>()
-            val equipment = MridList(
-                mutableListOf(equipment1, equipment2),
-                object : EquipmentContainer("Test") {},
-                "Test Equipment")
-            val container = mockk<EquipmentContainer>()
-            every { equipmentProp.get(container) } returns equipment
-
-            val result = operators.getEquipment(container)
-
-            assertThat(result.toList(), equalTo(equipment))
-            verify { equipmentProp.get(container) }
+        val container = object : EquipmentContainer("container") {
+            override val currentEquipment: MridCollection<Equipment> =
+                MridList(owner = this, elementDescription = "Test Equipment")
         }
+        val normalEquipment = object : Equipment("normal") {}
+        val currentEquipment = object : Equipment("current") {}
 
-        test(normal, EquipmentContainer::equipment)
-        test(current, EquipmentContainer::currentEquipment)
+        container.equipment.add(normalEquipment)
+        container.currentEquipment.add(currentEquipment)
+
+        assertThat(normal.getEquipment(container).toList(), equalTo(listOf(normalEquipment)))
+        assertThat(current.getEquipment(container).toList(), equalTo(listOf(currentEquipment)))
     }
 
     @Test
     fun getContainers() {
-        fun test(operators: EquipmentContainerStateOperators, containersProp: KProperty1<Equipment, Collection<EquipmentContainer>>) {
-            val container1 = mockk<EquipmentContainer>()
-            val container2 = mockk<EquipmentContainer>()
-            val containers = MridList(
-                mutableListOf(container1, container2),
-                object : Equipment("Test") {},
-                "Test EquipmentContainer"
-                )
-            val equipment = mockk<Equipment>()
-            every { containersProp.get(equipment) } returns containers
+        val equipment = object : Equipment("equipment") {}
+        val normalContainer = object : EquipmentContainer("normal") {}
+        val currentContainer = object : EquipmentContainer("current") {}
 
-            val result = operators.getContainers(equipment)
+        equipment.containers.add(normalContainer)
+        equipment.currentContainers.add(currentContainer)
 
-            assertThat(result, equalTo(containers))
-            verify { containersProp.get(equipment) }
-        }
-
-        test(normal, Equipment::containers)
-        test(current, Equipment::currentContainers)
+        assertThat(normal.getContainers(equipment).toList(), equalTo(listOf(normalContainer)))
+        assertThat(current.getContainers(equipment).toList(), equalTo(listOf(currentContainer)))
     }
 
     @Test

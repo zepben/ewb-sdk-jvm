@@ -10,21 +10,33 @@ package com.zepben.ewb.boilerplate
 
 import com.zepben.ewb.boilerplate.collections.AbstractBackedCollection
 import com.zepben.ewb.cim.iec61970.base.core.Feeder
+import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 
 internal class AbstractBackedCollectionTest {
 
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
+
     private class TestCollection(
         val backing: MutableList<Feeder> = mutableListOf(),
-        private val addAction: ((Feeder) -> Boolean)? = null,
-        private val removeAction: ((Feeder) -> Boolean)? = null
+        private val addAction: ((Feeder) -> Boolean)? = null
     ) : AbstractBackedCollection<Feeder>() {
-        override fun getCollection(): Collection<Feeder> = backing
+        val removed = mutableListOf<Feeder>()
+        val presentAfterRemove = mutableListOf<Boolean>()
+
+        override fun getCollection(): MutableCollection<Feeder> = backing
         override fun add(element: Feeder): Boolean = addAction?.invoke(element) ?: backing.add(element)
-        override fun remove(element: Feeder): Boolean = removeAction?.invoke(element) ?: backing.remove(element)
-        override fun clear() = backing.clear()
+        override fun postRemove(element: Feeder) {
+            removed.add(element)
+            presentAfterRemove.add(backing.contains(element))
+        }
     }
 
     @Test
@@ -41,12 +53,12 @@ internal class AbstractBackedCollectionTest {
     internal fun `addAll accepts an empty collection`() {
         val collection = TestCollection()
 
-        assertThat(collection.addAll(emptyList()), equalTo(true))
+        assertThat(collection.addAll(emptyList()), equalTo(false))
         assertThat(collection, empty())
     }
 
     @Test
-    internal fun `addAll stops and reports false when an add fails`() {
+    internal fun `addAll continues after an add reports false`() {
         val attempted = mutableListOf<Feeder>()
         val collection = TestCollection(addAction = {
             attempted.add(it)
@@ -56,8 +68,8 @@ internal class AbstractBackedCollectionTest {
         val b = Feeder("b")
         val c = Feeder("c")
 
-        assertThat(collection.addAll(listOf(a, b, c)), equalTo(false))
-        assertThat(attempted, contains(a, b))
+        assertThat(collection.addAll(listOf(a, b, c)), equalTo(true))
+        assertThat(attempted, contains(a, b, c))
     }
 
     @Test
@@ -69,22 +81,30 @@ internal class AbstractBackedCollectionTest {
 
         assertThat(collection.removeAll(listOf(a, c)), equalTo(true))
         assertThat(collection, contains(b))
-        assertThat(collection.removeAll(emptyList()), equalTo(true))
+        assertThat(collection.removed, contains(a, c))
+        assertThat(collection.presentAfterRemove, contains(false, false))
+        assertThat(collection.removeAll(emptyList()), equalTo(false))
     }
 
     @Test
-    internal fun `removeAll stops and reports false when a remove fails`() {
-        val attempted = mutableListOf<Feeder>()
-        val collection = TestCollection(removeAction = {
-            attempted.add(it)
-            it.mRID != "b"
-        })
+    internal fun `retainAll removes unmatched elements through the cleanup callback`() {
         val a = Feeder("a")
         val b = Feeder("b")
         val c = Feeder("c")
+        val collection = TestCollection(mutableListOf(a, b, c))
 
-        assertThat(collection.removeAll(listOf(a, b, c)), equalTo(false))
-        assertThat(attempted, contains(a, b))
+        assertThat(collection.retainAll(listOf(b)), equalTo(true))
+
+        assertThat(collection, contains(b))
+        assertThat(collection.removed, contains(a, c))
+    }
+
+    @Test
+    internal fun `failed remove does not invoke removal cleanup`() {
+        val collection = TestCollection(mutableListOf(Feeder("a")))
+
+        assertThat(collection.remove(Feeder("missing")), equalTo(false))
+        assertThat(collection.removed, empty())
     }
 
     @Test
@@ -122,11 +142,28 @@ internal class AbstractBackedCollectionTest {
 
     @Test
     internal fun `clear empties the backing collection`() {
-        val collection = TestCollection(mutableListOf(Feeder("a")))
+        val feeder = Feeder("a")
+        val collection = TestCollection(mutableListOf(feeder))
 
         collection.clear()
 
         assertThat(collection.backing, empty())
         assertThat(collection, empty())
+        assertThat(collection.removed, empty())
+    }
+
+    @Test
+    internal fun `mutable iterator removes from backing and invokes cleanup`() {
+        val a = Feeder("a")
+        val b = Feeder("b")
+        val collection = TestCollection(mutableListOf(a, b))
+        val iterator = collection.iterator()
+
+        assertThat(iterator.next(), sameInstance(a))
+        iterator.remove()
+
+        assertThat(collection, contains(b))
+        assertThat(collection.removed, contains(a))
+        assertThat(collection.presentAfterRemove, contains(false))
     }
 }

@@ -13,12 +13,20 @@ import com.zepben.ewb.boilerplate.collections.LazyMridMap
 import com.zepben.ewb.boilerplate.collections.MridCollection
 import com.zepben.ewb.boilerplate.collections.MridList
 import com.zepben.ewb.cim.iec61970.base.core.Feeder
+import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.extension.RegisterExtension
 
 internal class MridCollectionsParityTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     private fun collections(): List<MridCollection<Feeder>> {
         var listBacking: MutableList<Feeder>? = null

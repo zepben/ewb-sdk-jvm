@@ -11,12 +11,20 @@ package com.zepben.ewb.boilerplate
 import com.zepben.ewb.boilerplate.collections.LazyMridList
 import com.zepben.ewb.cim.iec61970.base.core.Feeder
 import com.zepben.ewb.cim.iec61970.base.core.Substation
+import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.extension.RegisterExtension
 
 internal class LazyMridListTest {
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
 
     private fun backfill() = Backfill<Feeder, Substation>(
         Feeder::normalEnergizingSubstation,

@@ -16,19 +16,19 @@ import com.zepben.ewb.cim.iec61970.base.core.Identifiable
  * A nullable-list implementation of [MridCollection].
  *
  * Inherits mRID lookup and uniqueness semantics from [MridCollection] and
- * nullable backing-list behaviour from [LazyList].
+ * exposes list-style indexed reads through [AbstractMridList].
  */
 open class LazyMridList<T : Identifiable, O : Identifiable>(
-    getter: () -> MutableList<T>?,
-    setter: (MutableList<T>?) -> Unit,
+    private val getter: () -> MutableList<T>?,
+    private val setter: (MutableList<T>?) -> Unit,
     override val owner: O,
     override val elementDescription: String,
-    val backfill: Backfill<T, O>? = null,
-    validate: ((T) -> Unit)? = null,
-    sortBy: ((T) -> Comparable<*>?)? = null
-) : LazyList<T>(
-    getter, setter, validate, sortBy
-), MridCollection<T> {
+    override val backfill: Backfill<T, O>? = null,
+    private val validate: ((T) -> Unit)? = null,
+    private val sortBy: ((T) -> Comparable<*>?)? = null
+) : AbstractMridList<T>() {
+
+    override fun getCollection(): MutableList<T> = getter() ?: mutableListOf()
 
     override fun getByMrid(mRID: String): T? {
         return getter()?.firstOrNull { it.mRID == mRID }
@@ -43,20 +43,31 @@ open class LazyMridList<T : Identifiable, O : Identifiable>(
 
         backfill?.apply(owner, element)
 
-        return super.add(element)
+        validate?.invoke(element)
+
+        val result = getter()?.add(element) ?: run {
+            setter(mutableListOf(element))
+            true
+        }
+
+        if (result)
+            sortBy?.let { selector -> getter()?.sortWith(compareBy(selector)) }
+
+        return result
     }
 
-    override fun remove(element: T): Boolean {
-        val removed =  super.remove(element)
-        if (removed)
-            backfill?.clear(element)
-        return removed
+    override fun postRemove(element: T) {
+        super.postRemove(element)
+        if (getter()?.isEmpty() == true)
+            setter(null)
     }
 
-    override fun clear() {
-        val old = getter() ?: emptyList()
-        super.clear()
-        backfill?.also { old.forEach { backfill.clear(it) } }
+    override fun clearCollection(collection: MutableCollection<T>) {
+        setter(null)
     }
 
+    override fun clearAndCopy(collection: MutableCollection<T>): Collection<T> {
+        setter(null)
+        return collection
+    }
 }

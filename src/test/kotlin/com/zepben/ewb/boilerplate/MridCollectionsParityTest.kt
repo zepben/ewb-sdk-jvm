@@ -49,7 +49,9 @@ internal class MridCollectionsParityTest {
             assertThat(collection.add(b), equalTo(true))
             assertThat(collection.add(a), equalTo(false))
             assertThat(collection.getByMrid("a"), sameInstance(a))
+            assertThat(collection["a"], sameInstance(a))
             assertThat(collection.getByMrid("missing"), nullValue())
+            assertThat(collection["missing"], nullValue())
             assertThrows<IllegalArgumentException> { collection.add(Feeder("a")) }
             assertThat(collection.size, equalTo(2))
 

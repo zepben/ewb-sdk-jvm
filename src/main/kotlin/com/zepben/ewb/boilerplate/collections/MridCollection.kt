@@ -32,7 +32,7 @@ abstract class MridCollection<T : Identifiable>(
     operator fun get(mRID: String): T? = getByMrid(mRID)
 
     /** Accepts a new mRID, ignores the same instance, and rejects collisions. */
-    fun canAddByMrid(element: T): Boolean {
+    protected fun canAddByMrid(element: T): Boolean {
         val existing = getByMrid(element.mRID) ?: return true
 
         require(existing === element) {

@@ -54,14 +54,14 @@ abstract class AbstractBackedCollection<T>(
     protected open fun postRemove(element: T) = Unit
 
     /** Clears [collection]. */
-    protected open fun clearCollection(collection: MutableCollection<T>) {
+    protected open fun clearRaw(collection: MutableCollection<T>) {
         collection.clear()
     }
 
     /** Clears [collection] and returns its former elements. */
     protected open fun clearAndCopy(collection: MutableCollection<T>): Collection<T> {
         val elements = collection.toList()
-        clearCollection(collection)
+        clearRaw(collection)
         return elements
     }
 
@@ -73,7 +73,7 @@ abstract class AbstractBackedCollection<T>(
         get() = getCollection().size
 
     /** Clears the backing collection. */
-    override fun clear() = clearCollection(getCollection())
+    override fun clear() = clearRaw(getCollection())
 
     /** Returns whether the backing collection contains [element]. */
     override fun contains(element: T): Boolean =
@@ -91,7 +91,7 @@ abstract class AbstractBackedCollection<T>(
 /** A mutable iterator that reports removed elements. */
 internal open class CallbackMutableIterator<T>(
     protected val delegate: MutableIterator<T>,
-    private val afterRemove: (T) -> Unit
+    private val postRemove: (T) -> Unit
 ) : MutableIterator<T> by delegate {
 
     /** Wraps the current element, including nullable values. */
@@ -104,9 +104,9 @@ internal open class CallbackMutableIterator<T>(
 
     /** Removes the current element and invokes the callback. */
     override fun remove() {
-        val removed = checkNotNull(current) { "remove() called without a current element" }
+        val removed = checkNotNull(current) { "iterator.remove() called without a current element" }
         delegate.remove()
         current = null
-        afterRemove(removed.element)
+        postRemove(removed.element)
     }
 }

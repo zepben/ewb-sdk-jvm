@@ -1,13 +1,33 @@
 # Zepben EWB SDK changelog
 ## [1.14.0] - UNRELEASED
 ### Breaking Changes
-* None.
+* `EwbDataFilePaths` has the following breaking changes:
+  * You must provide the variant content type in order to support more than simple "add only" variants.
+  * The `enumerateDescendants` function now takes an optional `prefix` string.
 
 ### New Features
-* None.
+* Adds `VariantService` to hold variants related objects.
+* Adds Variant related objects:
+  * `NetworkModelProjectStage`
+  * `ChangeSet`
+  * `ChangeSetMember`
+  * `ObjectCreation`
+  * `ObjectModification`
+  * `ObjectDeletion`
+  * `NetworkModelProject`
+* Added `ChangeSetDatabaseReader` for reading in variant sqlite from a backend storage.
+* Added `getChangeSetObjects` for existing gRPC services, and added new variant gRPC capabilities.
+* Updated `EwbDataFilePaths` to support full-featured variants, rather than simple "add only" variants.
+* The normal feeder direction for a `Terminal` is now saved to the database if available.
+* The following have been promoted to the public API:
+  * `PreparedStatement` extensions.
+  * `ResultSet` extensions.
+  * `EnumMapper`
+* You can now provide an option `fromMridOverride` to `resolveOrDeferReference`, allowing for manipulation of the objects mRID. e.g. removing `-` from the front
+  of variant mRID's.
 
 ### Enhancements
-* None.
+* `EwbDataFilePaths` can now exposes its path generators, so you can generate a path without needing to resolve the database.
 
 ### Fixes
 * None.
@@ -25,20 +45,10 @@
 
 ### New Features
 * Adds `compareRunTime` to `NetworkServiceComparatorOptions` to allow the users to ignore variables/references that are only populated during EWB spin up.
-* Adds `VariantService` to hold variants related objects
-* Adds Variant related objects 
-  * `NetworkModelProjectStage`
-  * `ChangeSet`
-  * `ChangeSetMember`
-  * `ObjectCreation`
-  * `ObjectModification`
-  * `ObjectDeletion`
-  * `NetworkModelProject`
-* Added `ChangeSetDatabaseReader` for reading in variant sqlite from a backend storage 
 
 ### Enhancements
-* `Terminal` can now update its `conductingEquipment` as long as there is no back reference. If you want to reassign a terminal,
-  first remove the terminal from associated conducting equipment, then add the terminal to new conducting equipment.
+* `Terminal` can now update its `conductingEquipment` as long as there is no back reference. If you want to reassign a terminal, first remove the terminal from
+  associated conducting equipment, then add the terminal to new conducting equipment.
 
 ### Fixes
 * None.
@@ -274,8 +284,7 @@
 ## [1.3.0] - 2025-12-23
 ### Breaking Changes
 * You must now provide an `mRID` for all `IdentifiedObject` instances, the auto-generated default `mRID` has been removed. The helper function
-  `generateId()` has been added which can be used to auto-generate a UUID. Note this is discouraged for production use, and reproducible mRIDs
-  are preferred.
+  `generateId()` has been added which can be used to auto-generate a UUID. Note this is discouraged for production use, and reproducible mRIDs are preferred.
 
 ### New Features
 * Added new classes to the model:
@@ -631,18 +640,18 @@
 * Added missing `@JvmOverloads` annotations to the `TestNetworkBuilder`.
 * Fixes from ewb-conn-jvm 0.12.1:
   * JWTAuthenticator will now handle JwkExceptions and return 403 Unauthenticated responses.
-  * JWTAuthenticator will now pass through unhandled exceptions to the caller rather than wrapping them in 500 errors.
-    Exceptions now need to be handled by the caller of `authenticate()`.
+  * JWTAuthenticator will now pass through unhandled exceptions to the caller rather than wrapping them in 500 errors. Exceptions now need to be handled by the
+    caller of `authenticate()`.
 
 ### Notes
 * None.
 
 ## [0.25.0] - 2025-03-05
 ### Breaking Changes
-* Traversal / Tracing API has been completely rewritten. `Traversal` has a different public API and `BranchRecursiveTraversal` no longer exists.
-  All traces that used to be used via the `Tracing.*` factory functions should be migrated to use the new `NetworkTrace` class instantiated from the factory
-  functions in `com.zepben.evolve.services.network.tracing.networktrace.Tracing`. The `NetworkTrace` should cover all existing use cases while being easier to
-  use and read. See the documentation for usage details.
+* Traversal / Tracing API has been completely rewritten. `Traversal` has a different public API and `BranchRecursiveTraversal` no longer exists. All traces that
+  used to be used via the `Tracing.*` factory functions should be migrated to use the new `NetworkTrace` class instantiated from the factory functions in
+  `com.zepben.evolve.services.network.tracing.networktrace.Tracing`. The `NetworkTrace` should cover all existing use cases while being easier to use and read.
+  See the documentation for usage details.
 * `SetDirection` now correctly applies the `BOTH` direction on all parts of the loop again, so if you were relying on the broken intermediate state, you will
   need to update your code.
 * `RemovePhases` now stops at open points like the `SetPhases` counterpart. If you were relying on the bug to remove phases through open points you will now
@@ -660,8 +669,8 @@
 * The following change have been made to `Column`:
   * Its package has changed from `com.zepben.evolve.database.sqlite.cim.tables` to `com.zepben.evolve.database.sql`.
   * Its constructor is now internal.
-* All references to the following have been renamed in `com.zepben.evolve.database`. This includes full or partial copies in the names of functions,
-  parameters and descriptions/documentation:
+* All references to the following have been renamed in `com.zepben.evolve.database`. This includes full or partial copies in the names of functions, parameters
+  and descriptions/documentation:
   * `save` has been renamed to `write`, so the writers now write, rather than save.
   * `load` has been renamed to `read`, so the readers now read, rather than load.
 * Database readers and writers no longer have the container of the data they will read/write passed to the constructor. They now have this passed to the `read`
@@ -778,8 +787,7 @@
     terminals are oriented towards the line segment terminals with the same sequence number. Hence the cut terminal with sequence number equal to 1 is oriented
     to the line segment's terminal with sequence number equal to 1. The cut terminals also act as connection points for jumpers and other equipment, e.g. a
     mobile generator. To enable this, connectivity nodes are placed at the cut terminals. Once the connectivity nodes are in place any conducting equipment can
-    be connected at them.
-    __NOT CURRENTLY FULLY SUPPORTED BY TRACING__
+    be connected at them. __NOT CURRENTLY FULLY SUPPORTED BY TRACING__
   * `EndDeviceFunction`, the function performed by an end device such as a meter, communication equipment, controllers, etc.
   * `PanDemandResponseFunction`, a new class which contains `EndDeviceFunctionKind` and the identity of the `ControlledAppliance` of this function.
   * `PerLengthPhaseImpedance`, a new class used for representing the impedance of individual wires on an AcLineSegment.
@@ -868,8 +876,8 @@
 ### Enhancements
 * Added feature list in documentation.
 * Changed `NetworkContainerMetrics` to a delegate type to assist in writing metrics creators:
-  * `NetworkContainerMetrics::plus(key: String, amount: Number)`: Increases a metric by a certain value. If the metric doesn't exist yet, it is
-    automatically created and set to zero before being increased. A negative value may be used for `amount` to decrease the metric.
+  * `NetworkContainerMetrics::plus(key: String, amount: Number)`: Increases a metric by a certain value. If the metric doesn't exist yet, it is automatically
+    created and set to zero before being increased. A negative value may be used for `amount` to decrease the metric.
   * `NetworkContainerMetrics::inc(key: String)`: Equivalent to `NetworkContainerMetrics.plus(key, 1.0)`
   * `NetworkContainerMetrics::set(key: String, value: Int)`: Allows setting a metric using an integer rather than a double-precision float:
     ```
@@ -920,8 +928,8 @@
 
 ### Enhancements
 
-* Added `designTemperature` and `designRating` to `Conductor` to capture limitations in the conductor based on the
-  network design and physical surrounds of the conductor.
+* Added `designTemperature` and `designRating` to `Conductor` to capture limitations in the conductor based on the network design and physical surrounds of the
+  conductor.
 
 ### Fixes
 
@@ -988,15 +996,12 @@
 * Updated to super-pom version 0.34.x.
 * Hosting capacity LoadShape protobuf now supports reactive power values.
 * `IdentifiedObject.addName` has been refactored to take in a `NameType` and a `String`. This is doing the same thing under the hood as previous `addName()`
-  function,
-  but simplifies the input by lowering the amount of objects that needed to be created prior to adding names.
-  Example usage change:
+  function, but simplifies the input by lowering the amount of objects that needed to be created prior to adding names. Example usage change:
   `obj.addName(nameType, "name", obj))` or `obj.addName(nameType.getOrAddName("name", obj))` becomes `obj.addName(nameType, "name")`
-* `addName()`/`removeName()` related function for both `IdentifiedObject` and `NameType` will now also perform the same function on the other object type.
-  i.e. Removing a name from the identified object will remove it from the name type and vice versa. Same interaction is also applied to adding a name.
+* `addName()`/`removeName()` related function for both `IdentifiedObject` and `NameType` will now also perform the same function on the other object type. i.e.
+  Removing a name from the identified object will remove it from the name type and vice versa. Same interaction is also applied to adding a name.
 * Removed `ProtectionEquipment`.
-* Change of inheritance: `CurrentRelay` &rarr; `ProtectionEquipment`.
-  becomes `CurrentRelay` &rarr; `ProtectionRelayFunction`.
+* Change of inheritance: `CurrentRelay` &rarr; `ProtectionEquipment`. becomes `CurrentRelay` &rarr; `ProtectionRelayFunction`.
 * Removed symmetric relation `ProtectionEquipment` &harr; `ProtectedSwitch`.
 * Renamed `CurrentRelayInfo` to `RelayInfo`.
   * The override `assetInfo: RelayInfo?` has been moved from `CurrentRelay` to its new parent class, `ProtectionRelayFunction`.
@@ -1028,17 +1033,14 @@
 * Added new classes and fields to support advanced modelling of protection relays:
   * `SeriesCompensator`: A series capacitor or reactor or an AC transmission line without charging susceptance.
   * `Ground`: A point where the system is grounded used for connecting conducting equipment to ground.
-  * `GroundDisconnector`: A manually operated or motor operated mechanical switching device used for isolating a circuit
-    or equipment from ground.
-  * `ProtectionRelayScheme`: A scheme that a group of relay functions implement. For example, typically schemes are
-    primary and secondary, or main and failsafe.
+  * `GroundDisconnector`: A manually operated or motor operated mechanical switching device used for isolating a circuit or equipment from ground.
+  * `ProtectionRelayScheme`: A scheme that a group of relay functions implement. For example, typically schemes are primary and secondary, or main and failsafe.
   * `ProtectionRelayFunction`: A function that a relay implements to protect equipment.
   * `ProtectionRelaySystem`: A relay system for controlling `ProtectedSwitch`es.
   * `RelaySetting`: The threshold settings for a given relay.
   * `VoltageRelay`: A device that detects when the voltage in an AC circuit reaches a preset voltage.
-  * `DistanceRelay`: A protective device used in power systems that measures the impedance of a transmission line to
-    determine the distance to a fault, and initiates circuit breaker tripping to isolate the faulty
-    section and safeguard the power system.
+  * `DistanceRelay`: A protective device used in power systems that measures the impedance of a transmission line to determine the distance to a fault, and
+    initiates circuit breaker tripping to isolate the faulty section and safeguard the power system.
   * `RelayInfo.recloseFast`: True if recloseDelays are associated with a fast Curve, False otherwise.
   * `RegulatingControl.ratedCurrent`: The rated current of associated CT in amps for a RegulatingControl.
 
@@ -1158,8 +1160,8 @@
 * Improved logging when saving a database.
 * The `TestNetworkBuilder` has been enhanced with the following features:
   * You can now set the ID's without having to create a customer 'other' creator.
-  * Added Kotlin wrappers for `.fromOther` and `.toOther` that allow you to pass a class type rather than a creator. e.g. `.toOther<Fuse>()` instead
-    of `.toOther(::Fuse)` or `.toOther( { Fuse(it) } )`.
+  * Added Kotlin wrappers for `.fromOther` and `.toOther` that allow you to pass a class type rather than a creator. e.g. `.toOther<Fuse>()` instead of
+    `.toOther(::Fuse)` or `.toOther( { Fuse(it) } )`.
   * Added inbuilt support for `PowerElectronicsConnection` and `EnergyConsumer`
   * The `to*` and `connect` functions can specify the connectivity node mRID to use. This will only be used if the terminals are not already connected.
 * Added `+` and `-` operators to `PhaseCode` and `SinglePhaseKind`.
@@ -1235,11 +1237,10 @@
     * `Ratio`: Fraction specified explicitly with a numerator and denominator, which can be used to calculate the quotient.
   * In `com.zepben.evolve.cim.iec61970.base.auxiliaryequipment`:
     * `CurrentTransformer`: Instrument transformer used to measure electrical qualities of the circuit that is being protected and/or monitored.
-    * `PotentialTransformer`: Instrument transformer (also known as Voltage Transformer) used to measure electrical qualities of the circuit that
-      is being protected and/or monitored.
+    * `PotentialTransformer`: Instrument transformer (also known as Voltage Transformer) used to measure electrical qualities of the circuit that is being
+      protected and/or monitored.
     * `PotentialTransformerKind`: The construction kind of the potential transformer. (Enum)
-    * `Sensor`: This class describes devices that transform a measured quantity into signals that can be presented at displays,
-      used in control or be recorded.
+    * `Sensor`: This class describes devices that transform a measured quantity into signals that can be presented at displays, used in control or be recorded.
 * Added `PowerTransformer().getEnd(Terminal)`, which gets a `PowerTransformerEnd` by the `Terminal` it's connected to.
 * Added the following functions to `ConnectedEquipmentTrace` for creating traces that work on `ConductingEquipment`, and ignore phase connectivity, instead
   considering things to be connected if they share a `ConnectivityNode`:
@@ -1256,8 +1257,8 @@
   * `RecloseSequence`: A reclose sequence (open and close) is defined for each possible reclosure of a breaker.
   * `ProtectionKind`: The kind of protection being provided by this protection equipment.
   * `ProtectedSwitch::breakingCapacity`: The maximum fault current in amps a breaking device can break safely under prescribed conditions of use.
-  * `Switch::ratedCurrent`: The maximum continuous current carrying capacity in amps governed by the device material and construction.
-    The attribute shall be a positive value.
+  * `Switch::ratedCurrent`: The maximum continuous current carrying capacity in amps governed by the device material and construction. The attribute shall be a
+    positive value.
   * `Breaker::inTransitTime`: The transition time from open to close in seconds.
 
 ### Enhancements

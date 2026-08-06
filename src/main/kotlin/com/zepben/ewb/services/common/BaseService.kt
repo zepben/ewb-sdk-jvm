@@ -353,6 +353,9 @@ abstract class BaseService(
      *
      * @param boundResolver The [BoundReferenceResolver] to use to resolve the reference.
      * @param toMrid The mRID of the object being referenced.
+     * @param fromMridOverride A string that can be used instead of the actual mRID of the `from` item. In most cases, this
+     * should be left as `null`. The use case is when you have a modified version of the mRID, like variants where the
+     * mRID might be prefixed with `-`.
      * @return true if the reference was resolved, otherwise false if it has been deferred.
      */
     fun <T : Identifiable, R : Identifiable> resolveOrDeferReference(

@@ -35,6 +35,11 @@ class LazyIndexList<T>(
     val elementDescription: String,
 ) : LazyList<T>(getter, setter) {
 
+    /**
+     * Adds [element] at [index] when the index is valid, creating the backing list if needed.
+     *
+     * This overload performs storage only: no mRID check, validation, backfill, or sorting.
+     */
     fun add(index: Int, element: T) {
         val data = getter()
         require(index in 0..size) {
@@ -47,11 +52,7 @@ class LazyIndexList<T>(
             ?:setter(mutableListOf(element))
     }
 
-    override fun add(element: T): Boolean  {
-        add(size, element)
-        return true
-    }
-
+    /** Removes and returns the element at [index], or `null` if absent. */
     fun removeAt(index: Int): T? {
         if (index !in indices)
             return null

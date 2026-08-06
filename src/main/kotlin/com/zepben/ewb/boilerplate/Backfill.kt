@@ -11,11 +11,13 @@ package com.zepben.ewb.boilerplate
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import kotlin.reflect.KMutableProperty1
 
+/** Maintains an element's reference to its owning object. */
 class Backfill<T : Identifiable, O : Identifiable>(
     val getter: (T) -> Identifiable?,
     val setter: (T, O?) -> Unit,
     val backfillProp: KMutableProperty1<T, O?>,
 ) {
+    /** Sets or verifies [element]'s reference to [owner]. */
     fun apply(owner: O, element: T) {
         if (getter(element) == null)
             setter(element, owner)
@@ -26,6 +28,7 @@ class Backfill<T : Identifiable, O : Identifiable>(
         }
     }
 
+    /** Clears the owner reference on [element]. */
     fun clear(element: T) {
         setter(element, null)
     }

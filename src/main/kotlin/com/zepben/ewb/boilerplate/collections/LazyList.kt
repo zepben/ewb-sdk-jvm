@@ -43,41 +43,35 @@ package com.zepben.ewb.boilerplate.collections
 open class LazyList<T>(
     protected val getter: () -> MutableList<T>?,
     protected val setter: (MutableList<T>?) -> Unit,
-    protected val validate: ((T) -> Unit)? = null,
-    protected val sortBy: ((T) -> Comparable<*>?)? = null
-) : AbstractBackedList<T>() {
+    validate: ((T) -> Unit)? = null,
+    sortBy: ((T) -> Comparable<*>?)? = null
+) : AbstractBackedList<T>(validate, sortBy) {
 
+    /** Returns the backing list, or an unbound empty list when absent. */
     override fun getCollection(): MutableList<T> = getter() ?: mutableListOf()
 
+    /** Resets an empty backing list to `null`. */
     private fun clearIfEmpty() {
         if (getter()?.isEmpty() == true) {
             setter(null)
         }
     }
 
-    override fun add(element: T): Boolean {
-        // If a custom validation method is defined, run it
-        validate?.invoke(element)
-
-        // Try to add the item to the backing list
-        // If the list is null (empty), instantiate it with the element present
-        val result = getter()?.add(element) ?: run {
+    /**
+     * Adds [element] to the backing list, creating it if needed.
+     *
+     * This hook performs storage; validation and optional sorting are inherited.
+     */
+    override fun addRaw(element: T): Boolean =
+        getter()?.add(element) ?: run {
             setter(mutableListOf(element))
             true
         }
 
-        // On successful addition, sort the list if the sorting order is defined
-        if(result) {
-            sortBy?.let {
-                    selector -> getter()?.sortWith(compareBy(selector))
-            }
-        }
-
-        return result
-    }
-
+    /** Resets the backing list after its last element is removed. */
     override fun postRemove(element: T) = clearIfEmpty()
 
+    /** Resets the backing list to `null`. */
     override fun clearCollection(collection: MutableCollection<T>) {
         setter(null)
     }

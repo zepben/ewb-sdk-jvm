@@ -9,9 +9,11 @@
 package com.zepben.ewb.boilerplate.relations
 
 import com.zepben.ewb.boilerplate.collections.LazyList
+import com.zepben.ewb.cim.iec61970.base.wires.PerLengthPhaseImpedance
 import com.zepben.ewb.cim.iec61970.base.wires.PhaseImpedanceData
 import com.zepben.ewb.cim.iec61970.base.wires.SinglePhaseKind
 
+/** A list of [PhaseImpedanceData] for a given [PerLengthPhaseImpedance]. */
 class PhaseImpedanceDataList(
     getter: () -> MutableList<PhaseImpedanceData>?,
     setter: (MutableList<PhaseImpedanceData>?) -> Unit,

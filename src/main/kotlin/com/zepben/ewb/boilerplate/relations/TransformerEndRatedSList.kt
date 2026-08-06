@@ -11,7 +11,9 @@ package com.zepben.ewb.boilerplate.relations
 import com.zepben.ewb.boilerplate.collections.LazyList
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.TransformerCoolingType
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.TransformerEndRatedS
+import com.zepben.ewb.cim.iec61970.base.wires.PowerTransformerEnd
 
+/** A list of [TransformerEndRatedS] for a given [PowerTransformerEnd]. */
 class TransformerEndRatedSList(
     getter: () -> MutableList<TransformerEndRatedS>?,
     setter: (MutableList<TransformerEndRatedS>?) -> Unit,
@@ -24,16 +26,22 @@ class TransformerEndRatedSList(
     sortBy = sortBy
 ) {
 
+    /**
+     * Adds a rated-power entry when inherited validation and storage accept it.
+     *
+     * This overload delegates validation, storage, and optional sorting.
+     */
     fun add(
         ratedS: Int,
         coolingType: TransformerCoolingType = TransformerCoolingType.UNKNOWN,
     ): Boolean = add(TransformerEndRatedS(coolingType, ratedS))
 
+    /** Returns the entry for [coolingType], or `null`. */
     fun getByCoolingType(coolingType: TransformerCoolingType): TransformerEndRatedS? = firstOrNull { it.coolingType == coolingType }
 
 
     /**
-     * Remove the [TransformerEndRatedS] from the [sRatings] collection with a cooling type of [coolingType]
+     * Remove the [TransformerEndRatedS] from the `sRatings` collection with a cooling type of [coolingType]
      *
      * @param coolingType The [TransformerCoolingType] to remove.
      * @return The [TransformerEndRatedS] that was removed, or null if none was removed.

@@ -24,48 +24,42 @@ open class LazyMridList<T : Identifiable, O : Identifiable>(
     override val owner: O,
     override val elementDescription: String,
     override val backfill: Backfill<T, O>? = null,
-    private val validate: ((T) -> Unit)? = null,
-    private val sortBy: ((T) -> Comparable<*>?)? = null
-) : AbstractMridList<T>() {
+    validate: ((T) -> Unit)? = null,
+    sortBy: ((T) -> Comparable<*>?)? = null
+) : AbstractMridList<T>(validate, sortBy) {
 
+    /** Returns the backing list, or an unbound empty list when absent. */
     override fun getCollection(): MutableList<T> = getter() ?: mutableListOf()
 
+    /** Returns the element with [mRID], or `null`. */
     override fun getByMrid(mRID: String): T? {
         return getter()?.firstOrNull { it.mRID == mRID }
     }
 
-    override fun add(element: T): Boolean {
-        // Check for mRID collisions
-        // If element is already present, skip;
-        // If another element shares mRID, error
-        if (!canAddByMrid(element))
-            return false
-
-        backfill?.apply(owner, element)
-
-        validate?.invoke(element)
-
-        val result = getter()?.add(element) ?: run {
+    /**
+     * Adds [element] to the backing list, creating it if needed.
+     *
+     * This hook performs storage; mRID check, backfill, validation, and optional sorting are inherited.
+     */
+    override fun addRaw(element: T): Boolean =
+        getter()?.add(element) ?: run {
             setter(mutableListOf(element))
             true
         }
 
-        if (result)
-            sortBy?.let { selector -> getter()?.sortWith(compareBy(selector)) }
-
-        return result
-    }
-
+    /** Clears backfill and resets an empty backing list. */
     override fun postRemove(element: T) {
         super.postRemove(element)
         if (getter()?.isEmpty() == true)
             setter(null)
     }
 
+    /** Resets the backing list to `null`. */
     override fun clearCollection(collection: MutableCollection<T>) {
         setter(null)
     }
 
+    /** Resets the backing list and returns its former elements. */
     override fun clearAndCopy(collection: MutableCollection<T>): Collection<T> {
         setter(null)
         return collection

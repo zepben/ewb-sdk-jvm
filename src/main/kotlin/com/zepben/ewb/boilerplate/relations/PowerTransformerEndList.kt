@@ -15,6 +15,7 @@ import com.zepben.ewb.cim.iec61970.base.core.Terminal
 import com.zepben.ewb.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.ewb.cim.iec61970.base.wires.PowerTransformerEnd
 
+/** A list of [PowerTransformerEnd] for a given [PowerTransformer]. */
 class PowerTransformerEndList(
     getter: () -> MutableList<PowerTransformerEnd>?,
     setter: (MutableList<PowerTransformerEnd>?) -> Unit,

@@ -12,32 +12,52 @@ package com.zepben.ewb.boilerplate.collections
 /**
  * An [AbstractBackedCollection] with sequence-style indexed access.
  *
- * Integer indexes return individual items and ranges return lists.
- *
- * Collection mutation remains unordered; indexed mutation is only exposed by
- * specialisations such as [LazyIndexList].
+ * Integer indexes return individual items and ranges return lists. When a sort
+ * selector is supplied, successful additions reorder the backing list.
+ * Indexed mutation is only exposed by specialisations such as [LazyIndexList].
  */
-abstract class AbstractBackedList<T> :
-    AbstractBackedCollection<T>(),
+abstract class AbstractBackedList<T>(
+    validate: ((T) -> Unit)? = null,
+    private val sortBy: ((T) -> Comparable<*>?)? = null,
+) :
+    AbstractBackedCollection<T>(validate),
     List<T> {
 
+    /** Returns the current backing list. */
     abstract override fun getCollection(): MutableList<T>
 
+    /**
+     * Adds [element] when validation and backing storage accept it.
+     *
+     * This override performs validation, storage, and optional sorting, but no mRID check or backfill.
+     */
+    override fun add(element: T): Boolean {
+        val added = super.add(element)
+        sortBy?.let { getCollection().sortWith(compareBy(it)) }
+        return added
+    }
+
+    /** Returns the element at [index]. */
     override fun get(index: Int): T =
         getCollection()[index]
 
+    /** Returns the first index of [element]. */
     override fun indexOf(element: T): Int =
         getCollection().indexOf(element)
 
+    /** Returns the last index of [element]. */
     override fun lastIndexOf(element: T): Int =
         getCollection().lastIndexOf(element)
 
+    /** Returns a list iterator at the start. */
     override fun listIterator(): ListIterator<T> =
         getCollection().listIterator()
 
+    /** Returns a list iterator at [index]. */
     override fun listIterator(index: Int): ListIterator<T> =
         getCollection().listIterator(index)
 
+    /** Returns the requested backing-list view. */
     override fun subList(fromIndex: Int, toIndex: Int): List<T> =
         getCollection().subList(fromIndex, toIndex)
 

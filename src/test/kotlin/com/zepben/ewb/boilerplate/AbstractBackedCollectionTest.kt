@@ -14,6 +14,7 @@ import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
 
 internal class AbstractBackedCollectionTest {
@@ -26,17 +27,36 @@ internal class AbstractBackedCollectionTest {
 
     private class TestCollection(
         val backing: MutableList<Feeder> = mutableListOf(),
-        private val addAction: ((Feeder) -> Boolean)? = null
-    ) : AbstractBackedCollection<Feeder>() {
+        private val addAction: ((Feeder) -> Boolean)? = null,
+        validate: ((Feeder) -> Unit)? = null,
+    ) : AbstractBackedCollection<Feeder>(validate) {
         val removed = mutableListOf<Feeder>()
         val presentAfterRemove = mutableListOf<Boolean>()
 
         override fun getCollection(): MutableCollection<Feeder> = backing
-        override fun add(element: Feeder): Boolean = addAction?.invoke(element) ?: backing.add(element)
+        override fun addRaw(element: Feeder): Boolean = addAction?.invoke(element) ?: backing.add(element)
         override fun postRemove(element: Feeder) {
             removed.add(element)
             presentAfterRemove.add(backing.contains(element))
         }
+    }
+
+    @Test
+    internal fun `validation runs before storage insertion`() {
+        val rejected = Feeder("rejected")
+        var insertionAttempted = false
+        val collection = TestCollection(
+            addAction = {
+                insertionAttempted = true
+                true
+            },
+            validate = { require(it !== rejected) },
+        )
+
+        assertThrows<IllegalArgumentException> { collection.add(rejected) }
+
+        assertThat(insertionAttempted, equalTo(false))
+        assertThat(collection, empty())
     }
 
     @Test

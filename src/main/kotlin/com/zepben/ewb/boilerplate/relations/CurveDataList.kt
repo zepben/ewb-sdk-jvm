@@ -9,8 +9,10 @@
 package com.zepben.ewb.boilerplate.relations
 
 import com.zepben.ewb.boilerplate.collections.LazyList
+import com.zepben.ewb.cim.iec61970.base.core.Curve
 import com.zepben.ewb.cim.iec61970.base.core.CurveData
 
+/** A list of [CurveData] for a given [Curve]. */
 class CurveDataList(
     getter: () -> MutableList<CurveData>?,
     setter: (MutableList<CurveData>?) -> Unit,
@@ -31,9 +33,9 @@ class CurveDataList(
     fun get(x: Float) = find { it.xValue == x }
 
     /**
-     * Remove data point from the this [com.zepben.ewb.cim.iec61970.base.core.Curve].
+     * Remove data point from the this [Curve].
      *
-     * @property x xValue of the data point to be removed
+     * @param x xValue of the data point to be removed
      * @return true if data point was removed.
      */
     fun removeAt(x: Float): Boolean =

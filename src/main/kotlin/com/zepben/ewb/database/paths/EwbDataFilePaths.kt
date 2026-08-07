@@ -112,6 +112,32 @@ interface EwbDataFilePaths {
     }
 
     /**
+     * A helper to check if variant files exist before attempting to access them. This can be used to prevent
+     * excess errors being logged when files that aren't required are missing.
+     *
+     * @param type The [DatabaseType] to use for the database [Path].
+     * @param date The [LocalDate] to use for the database [Path].
+     * @param variant The name of the variant containing the database.
+     * @param variantContents The relevant content for the desired [type].
+     * @return `true` if the [Path] to the [DatabaseType] database file for the [variant] exists in the current descendants.
+     */
+    fun exists(type: DatabaseType, date: LocalDate, variant: String, variantContents: VariantContents): Boolean {
+        require(type.perDate) { "type must have its perDate set to true to use this method." }
+        require(variantContents.types.contains(type)) {
+            "type must be compatible with variantContents. Compatible options for ${variantContents.name}: ${
+                variantContents.types.joinToString(
+                    ",",
+                )
+            }"
+        }
+
+        val target = date.toDatedVariantPath(type, variant, variantContents)
+        return enumerateDescendants("$date/$VARIANTS_PATH")
+            .asSequence()
+            .any { it == target }
+    }
+
+    /**
      * Find available databases specified by [DatabaseType] in data path.
      *
      * @param type The type of database to search for.

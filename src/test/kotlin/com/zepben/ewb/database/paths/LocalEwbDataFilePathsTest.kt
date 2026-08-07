@@ -42,8 +42,8 @@ class LocalEwbDataFilePathsTest {
     private val listFiles = mockk<(Path) -> Iterator<Path>>().also {
         every { it(any()) } answers {
             // We now list files relative to subpaths inside the base path, rather than filtering them, so only return the ones in
-            // the requested subpath.
-            descendants.filter { d -> firstArg<Path>().toString() in d.toString() }.iterator()
+            // the requested subpath. We need to resolve the descendant agaisnt the base dir to cater for the local file strucutre.
+            descendants.filter { d -> firstArg<Path>().toString() in baseDir.resolve(d).toString() }.iterator()
         }
     }
     private val descendants = mutableListOf<Path>()
@@ -129,7 +129,7 @@ class LocalEwbDataFilePathsTest {
     internal fun `finds specified date if it exists`() {
         // Files for today.
         DatabaseType.entries.filter { it.perDate }.forEach {
-            descendants.add(resolvePathOf(today.toString(), "${today}-${it.fileDescriptor}.sqlite"))
+            descendants.add(Path.of(today.toString(), "${today}-${it.fileDescriptor}.sqlite"))
         }
         validateClosest(today)
 
@@ -147,7 +147,7 @@ class LocalEwbDataFilePathsTest {
 
         // Files for 2 days ago.
         DatabaseType.entries.filter { it.perDate }.forEach {
-            descendants.add(resolvePathOf(twoDaysAgo.toString(), "${twoDaysAgo}-${it.fileDescriptor}.sqlite"))
+            descendants.add(Path.of(twoDaysAgo.toString(), "${twoDaysAgo}-${it.fileDescriptor}.sqlite"))
         }
 
         validateClosest(twoDaysAgo)
@@ -173,8 +173,8 @@ class LocalEwbDataFilePathsTest {
 
         // Files for 2 days from now and 3 days ago.
         DatabaseType.entries.filter { it.perDate }.forEach {
-            descendants.add(resolvePathOf(twoDaysFromNow.toString(), "${twoDaysFromNow}-${it.fileDescriptor}.sqlite"))
-            descendants.add(resolvePathOf(threeDaysAgo.toString(), "${threeDaysAgo}-${it.fileDescriptor}.sqlite"))
+            descendants.add(Path.of(twoDaysFromNow.toString(), "${twoDaysFromNow}-${it.fileDescriptor}.sqlite"))
+            descendants.add(Path.of(threeDaysAgo.toString(), "${threeDaysAgo}-${it.fileDescriptor}.sqlite"))
         }
 
         validateClosest(twoDaysFromNow, searchForwards = true)
@@ -187,8 +187,8 @@ class LocalEwbDataFilePathsTest {
 
         // Files for tomorrow and 2 days ago.
         DatabaseType.entries.filter { it.perDate }.forEach {
-            descendants.add(resolvePathOf(twoDaysAgo.toString(), "${twoDaysAgo}-${it.fileDescriptor}.sqlite"))
-            descendants.add(resolvePathOf(tomorrow.toString(), "${tomorrow}-${it.fileDescriptor}.sqlite"))
+            descendants.add(Path.of(twoDaysAgo.toString(), "${twoDaysAgo}-${it.fileDescriptor}.sqlite"))
+            descendants.add(Path.of(tomorrow.toString(), "${tomorrow}-${it.fileDescriptor}.sqlite"))
         }
 
         // Should find two days ago as it doesn't search forward by default.
@@ -239,10 +239,10 @@ class LocalEwbDataFilePathsTest {
     internal fun enumerateDescendants() {
         descendants.addAll(
             listOf(
-                resolvePathOf(today.toString(), "${today}-network-model.sqlite"),
-                resolvePathOf(today.toString(), "${today}-customer.sqlite"),
-                resolvePathOf("results-cache.sqlite"),
-                resolvePathOf("weather-readings.sqlite"),
+                Path.of(today.toString(), "${today}-network-model.sqlite"),
+                Path.of(today.toString(), "${today}-customer.sqlite"),
+                Path.of("results-cache.sqlite"),
+                Path.of("weather-readings.sqlite"),
             ),
         )
 
@@ -290,12 +290,13 @@ class LocalEwbDataFilePathsTest {
     internal fun `can request variants for a day`() {
         val yesterday = today.minusDays(1)
 
+        // GIS extractor variants don't have files at the top level, so make a mix of different styles.
         descendants += listOf(
-            resolvePathOf(yesterday.toString(), EwbDataFilePaths.VARIANTS_PATH, "my-variant-1", "new", "dodgyfile.test"),
-            resolvePathOf(yesterday.toString(), EwbDataFilePaths.VARIANTS_PATH, "my-variant-2", "dodgyfile.test"), // GIS extractor variants won't have file at this level
+            Path.of(yesterday.toString(), EwbDataFilePaths.VARIANTS_PATH, "my-variant-1", "new", "something.sqlite"),
+            Path.of(yesterday.toString(), EwbDataFilePaths.VARIANTS_PATH, "my-variant-2", "something.sqlite"),
 
-            resolvePathOf(today.toString(), EwbDataFilePaths.VARIANTS_PATH, "my-variant-2", "new", "dodgyfile.test"),
-            resolvePathOf(today.toString(), EwbDataFilePaths.VARIANTS_PATH, "my-variant-3", "dodgyfile.test"), // GIS extractor variants won't have file at this level
+            Path.of(today.toString(), EwbDataFilePaths.VARIANTS_PATH, "my-variant-2", "new", "something.sqlite"),
+            Path.of(today.toString(), EwbDataFilePaths.VARIANTS_PATH, "my-variant-3", "something.sqlite"),
         )
 
         assertThat(ewbPaths.getAvailableVariantsFor(yesterday), contains("my-variant-1", "my-variant-2"))
@@ -313,7 +314,7 @@ class LocalEwbDataFilePathsTest {
         val t2 = today.minusDays(2)
 
         DatabaseType.entries.filter { it.perDate }.forEach {
-            descendants.add(resolvePathOf(t1.toString(), EwbDataFilePaths.VARIANTS_PATH, "my-variant", "${t1}-${it.fileDescriptor}.sqlite"))
+            descendants.add(Path.of(t1.toString(), EwbDataFilePaths.VARIANTS_PATH, "my-variant", "${t1}-${it.fileDescriptor}.sqlite"))
         }
 
         DatabaseType.entries.filter { it.perDate }.forEach {
@@ -321,12 +322,34 @@ class LocalEwbDataFilePathsTest {
         }
 
         DatabaseType.entries.filter { it.perDate }.forEach {
-            descendants.add(resolvePathOf(t2.toString(), "${t2}-${it.fileDescriptor}.sqlite"))
+            descendants.add(Path.of(t2.toString(), "${t2}-${it.fileDescriptor}.sqlite"))
         }
 
         DatabaseType.entries.filter { it.perDate }.forEach {
             assertThat(ewbPaths.findClosest(it, maxDaysToSearch = 3), equalTo(t2))
         }
+    }
+
+    @Test
+    internal fun `can check if a variant file exists`() {
+        val yesterday = today.minusDays(1)
+        descendants += listOf(
+            ewbPaths.getDatedVariantPath(DatabaseType.VARIANT, yesterday, "my-variant", VariantContents.CHANGESET),
+            ewbPaths.getDatedVariantPath(DatabaseType.NETWORK_MODEL, yesterday, "my-variant", VariantContents.CREATIONS_MODIFICATIONS),
+            ewbPaths.getDatedVariantPath(DatabaseType.DIAGRAM, yesterday, "my-variant", VariantContents.DELETIONS_REVERSEMODIFICATIONS),
+
+            ewbPaths.getDatedVariantPath(DatabaseType.NETWORK_MODEL, today, "my-variant", VariantContents.CREATIONS_MODIFICATIONS),
+        )
+
+        assertThat("should exist", ewbPaths.exists(DatabaseType.VARIANT, yesterday, "my-variant", VariantContents.CHANGESET))
+        assertThat("should exist", ewbPaths.exists(DatabaseType.NETWORK_MODEL, yesterday, "my-variant", VariantContents.CREATIONS_MODIFICATIONS))
+        assertThat("should exist", ewbPaths.exists(DatabaseType.DIAGRAM, yesterday, "my-variant", VariantContents.DELETIONS_REVERSEMODIFICATIONS))
+
+        assertThat("should exist", ewbPaths.exists(DatabaseType.NETWORK_MODEL, today, "my-variant", VariantContents.CREATIONS_MODIFICATIONS))
+
+        assertThat("shouldn't exist", !ewbPaths.exists(DatabaseType.DIAGRAM, yesterday, "my-variant", VariantContents.CREATIONS_MODIFICATIONS))
+        assertThat("shouldn't exist", !ewbPaths.exists(DatabaseType.VARIANT, today, "my-variant", VariantContents.CHANGESET))
+        assertThat("shouldn't exist", !ewbPaths.exists(DatabaseType.DIAGRAM, today, "my-variant", VariantContents.DELETIONS_REVERSEMODIFICATIONS))
     }
 
     @Test
@@ -495,9 +518,6 @@ class LocalEwbDataFilePathsTest {
 
         verify { listFiles(baseDir) }
     }
-
-    // We now enumerate paths relative to paths inside the base path, so all our dependants need to be resolved against it.
-    private fun resolvePathOf(vararg paths: String): Path = Path.of(baseDir.toString(), *paths)
 
     private fun Path.datedPath(date: LocalDate, name: String): Path =
         resolve(date.toString()).resolve("$date-$name.sqlite")

@@ -46,6 +46,7 @@ import com.zepben.ewb.cim.iec61970.base.scada.RemoteSource
 import com.zepben.ewb.cim.iec61970.base.wires.*
 import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.ewb.database.sql.cim.CimDatabaseSchemaTest
+import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.common.Resolvers
 import com.zepben.ewb.services.common.testdata.SchemaServices
 import com.zepben.ewb.services.common.testdata.fillFieldsCommon
@@ -54,6 +55,7 @@ import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.NetworkServiceComparator
 import com.zepben.ewb.services.network.testdata.*
 import com.zepben.ewb.services.network.testdata.stupid.StupidlyLargeNetwork
+import com.zepben.ewb.services.network.tracing.feeder.FeederDirection
 import com.zepben.ewb.testing.TestNetworkBuilder
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
@@ -68,7 +70,16 @@ import java.nio.file.Paths
 import java.sql.Connection
 import java.sql.DriverManager
 
-class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkDatabaseWriter, NetworkDatabaseReader, NetworkServiceComparator>() {
+class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<
+    NetworkService,
+    NetworkDatabaseWriter,
+    NetworkDatabaseReader,
+    NetworkServiceComparator,
+    IdentifiedObject,
+    >(
+    describeObject = IdentifiedObject::typeNameAndMRID,
+    addToService = BaseService::tryAdd,
+) {
 
     companion object {
         @JvmField
@@ -89,7 +100,7 @@ class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkD
     override fun createIdentifiable(): Identifiable = Junction(generateId())
 
     @Test
-    @Disabled
+    @Disabled("Not a real test. Run individually to read an actual file.")
     fun readRealFile() {
         systemErr.unmute()
 
@@ -120,7 +131,7 @@ class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkD
 
         assertThat(
             systemErr.log,
-            containsString("External grid source 'primary source' [primary_source] has been assigned to the following feeders: normal [f1], current [f2]")
+            containsString("External grid source 'primary source' [primary_source] has been assigned to the following feeders: normal [f1], current [f2]"),
         )
     }
 
@@ -244,10 +255,12 @@ class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkD
 
         validateSchema(SchemaServices.networkServicesOf(::BaseVoltage, BaseVoltage::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::ConnectivityNode, ConnectivityNode::fillFields))
-        validateSchema(SchemaServices.networkServicesOf(::Feeder, Feeder::fillFields).also {
-            it.assignEquipmentToFeeders()
-            it.setFeederDirections()
-        })
+        validateSchema(
+            SchemaServices.networkServicesOf(::Feeder, Feeder::fillFields).also {
+                it.assignEquipmentToFeeders()
+                it.setFeederDirections()
+            },
+        )
         validateSchema(SchemaServices.networkServicesOf(::GeographicalRegion, GeographicalRegion::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::SubGeographicalRegion, SubGeographicalRegion::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::Substation, Substation::fillFields))
@@ -336,6 +349,18 @@ class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkD
     }
 
     @Test
+    internal fun `can store normal terminal direction`() {
+        // This needs a separate test as we can now store the runtime "normal feeder direction", which isn't tested above.
+        FeederDirection.entries.forEach { direction ->
+            validateSchema(
+                SchemaServices.networkServicesOf(::Terminal) { terminal, service, bool ->
+                    terminal.fillFields(service, bool).apply { normalFeederDirection = direction }
+                },
+            )
+        }
+    }
+
+    @Test
     internal fun `test Name and NameType schema`() {
         validateSchema(SchemaServices.createNameTestService<NetworkService, Junction>())
     }
@@ -376,7 +401,7 @@ class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkD
             assertThat(
                 "Expected a default street address as blank parts should have been removed during the database read",
                 readService.get<Location>("loc1")!!.mainAddress,
-                equalTo(StreetAddress())
+                equalTo(StreetAddress()),
             )
         }
     }
@@ -389,7 +414,7 @@ class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkD
             add(
                 Location(mRID = "loc1").apply {
                     mainAddress = emptys
-                }
+                },
             )
         }
 
@@ -397,7 +422,7 @@ class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkD
             assertThat(
                 "Expected a street address with all empty strings for every property",
                 readService.get<Location>("loc1")!!.mainAddress,
-                equalTo(emptys)
+                equalTo(emptys),
             )
         }
     }

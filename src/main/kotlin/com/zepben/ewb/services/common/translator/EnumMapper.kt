@@ -13,7 +13,7 @@ import kotlin.enums.EnumEntries
 /**
  * A class for mapping between CIM and protobuf variants of the same Enum.
  */
-internal class EnumMapper<TCimEnum : Enum<TCimEnum>, TPbEnum : Enum<TPbEnum>>(
+class EnumMapper<TCimEnum : Enum<TCimEnum>, TPbEnum : Enum<TPbEnum>>(
     cimEnumEntries: EnumEntries<TCimEnum>,
     pbEnumEntries: EnumEntries<TPbEnum>,
 ) {

@@ -97,7 +97,7 @@ class ContactDetails(
     override fun hashCode(): Int {
         var result = isPrimary?.hashCode() ?: 0
 
-        result = 31 * result + id.hashCode()
+        result = 31 * result + mRID.hashCode()
         result = 31 * result + (contactAddress?.hashCode() ?: 0)
         result = 31 * result + (contactType?.hashCode() ?: 0)
         result = 31 * result + (firstName?.hashCode() ?: 0)

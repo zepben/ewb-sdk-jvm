@@ -19,13 +19,13 @@ import com.zepben.ewb.services.network.tracing.feeder.FeederDirection
 import com.zepben.ewb.services.network.tracing.feeder.FeederDirection.*
 import com.zepben.ewb.services.network.tracing.networktrace.NetworkTraceStep
 import com.zepben.ewb.services.network.tracing.networktrace.operators.NetworkStateOperators
+import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.every
 import io.mockk.mockk
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
 
 class DirectionConditionTest {
@@ -184,7 +184,7 @@ class DirectionConditionTest {
 
     @Test
     fun `does not support connector conditions`() {
-        assertThrows<IllegalArgumentException> { DirectionCondition<Unit>(CONNECTOR, NetworkStateOperators.NORMAL) }
+        expect { DirectionCondition<Unit>(CONNECTOR, NetworkStateOperators.NORMAL) }.toThrow<IllegalArgumentException>()
     }
 
     private infix fun Triple<FeederDirection, FeederDirection, Boolean>.terminalShouldQueue(expected: Boolean) {

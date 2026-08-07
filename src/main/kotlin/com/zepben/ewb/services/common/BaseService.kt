@@ -353,11 +353,15 @@ abstract class BaseService(
      *
      * @param boundResolver The [BoundReferenceResolver] to use to resolve the reference.
      * @param toMrid The mRID of the object being referenced.
+     * @param fromMridOverride A string that can be used instead of the actual mRID of the `from` item. In most cases, this
+     * should be left as `null`. The use case is when you have a modified version of the mRID, like variants where the
+     * mRID might be prefixed with `-`.
      * @return true if the reference was resolved, otherwise false if it has been deferred.
      */
     fun <T : Identifiable, R : Identifiable> resolveOrDeferReference(
         boundResolver: BoundReferenceResolver<T, R>,
         toMrid: String?,
+        fromMridOverride: String? = null,
     ): Boolean {
         if (toMrid.isNullOrEmpty()) {
             return true
@@ -372,15 +376,17 @@ abstract class BaseService(
                     reverseResolver.resolve(to, from)
 
                     // Clean up any reverse unresolved references now that the reference has been resolved
-                    unresolvedReferencesTo[from.mRID]?.apply {
-                        removeIf { it.toMrid == from.mRID && it.resolver == reverseResolver }
-                        if (isEmpty())
-                            unresolvedReferencesTo.remove(from.mRID)
-                    }
-                    unresolvedReferencesFrom[to.mRID]?.apply {
-                        removeIf { it.toMrid == from.mRID && it.resolver == reverseResolver }
-                        if (isEmpty())
-                            unresolvedReferencesFrom.remove(to.mRID)
+                    (fromMridOverride ?: from.mRID).let { fromMrid ->
+                        unresolvedReferencesTo[fromMrid]?.apply {
+                            removeIf { it.toMrid == fromMrid && it.resolver == reverseResolver }
+                            if (isEmpty())
+                                unresolvedReferencesTo.remove(fromMrid)
+                        }
+                        unresolvedReferencesFrom[to.mRID]?.apply {
+                            removeIf { it.toMrid == fromMrid && it.resolver == reverseResolver }
+                            if (isEmpty())
+                                unresolvedReferencesFrom.remove(to.mRID)
+                        }
                     }
                 }
                 true
@@ -388,7 +394,7 @@ abstract class BaseService(
                 @Suppress("UNCHECKED_CAST")
                 val ur = UnresolvedReference(from, toMrid, resolver, reverseResolver) as UnresolvedReference<Identifiable, Identifiable>
                 unresolvedReferencesTo.getOrPut(toMrid) { mutableSetOf() }.add(ur)
-                unresolvedReferencesFrom.getOrPut(from.mRID) { mutableSetOf() }.add(ur)
+                unresolvedReferencesFrom.getOrPut(fromMridOverride ?: from.mRID) { mutableSetOf() }.add(ur)
                 false
             }
         } catch (ex: ClassCastException) {

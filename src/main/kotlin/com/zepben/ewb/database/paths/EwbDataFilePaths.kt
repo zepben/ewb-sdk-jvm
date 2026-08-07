@@ -13,6 +13,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.LocalDate
 import kotlin.io.path.name
+import kotlin.io.path.nameWithoutExtension
 
 /**
  * Provides paths to all the various data files / folders used by EWB.
@@ -34,16 +35,23 @@ interface EwbDataFilePaths {
 
     /**
      * Resolves the [Path] to the database file for the specified [DatabaseType] that has
-     * [DatabaseType.perDate] set to true and the specified [LocalDate], within the [variant].
+     * [DatabaseType.perDate] set to true and the specified [LocalDate], within the [variant], for the specified [variantContents].
+     *
+     * ChangeSet content is split into two separate databases for each supported [DatabaseType], with targets of ObjectCreations and ObjectModifications going
+     * to one database, and targets of ObjectDeletions and ObjectReverseModifications going to another. This is to avoid conflicting IDs between the two
+     * databases.
+     * The ChangeSet and it's associated ObjectCreation, ObjectDeletion, and ObjectModifications will be contained in a single [DatabaseType.VARIANT] database.
      *
      * @param type The [DatabaseType] to use for the database [Path].
      * @param date The [LocalDate] to use for the database [Path].
      * @param variant The name of the variant containing the database.
+     * @param variantContents The relevant content for the desired [type].
      * @return The [Path] to the [DatabaseType] database file for the [variant].
      */
-    fun resolve(type: DatabaseType, date: LocalDate, variant: String): Path {
+    fun resolve(type: DatabaseType, date: LocalDate, variant: String, variantContents: VariantContents): Path {
         require(type.perDate) { "type must have its perDate set to true to use this method." }
-        return resolveDatabase(date.toDatedVariantPath(type, variant))
+        require(variantContents.types.contains(type)) { "type must be compatible with variantContents. Compatible options for ${variantContents.name}: ${variantContents.types.joinToString(",")}" }
+        return resolveDatabase(date.toDatedVariantPath(type, variant, variantContents))
     }
 
     /**
@@ -104,6 +112,32 @@ interface EwbDataFilePaths {
     }
 
     /**
+     * A helper to check if variant files exist before attempting to access them. This can be used to prevent
+     * excess errors being logged when files that aren't required are missing.
+     *
+     * @param type The [DatabaseType] to use for the database [Path].
+     * @param date The [LocalDate] to use for the database [Path].
+     * @param variant The name of the variant containing the database.
+     * @param variantContents The relevant content for the desired [type].
+     * @return `true` if the [Path] to the [DatabaseType] database file for the [variant] exists in the current descendants.
+     */
+    fun exists(type: DatabaseType, date: LocalDate, variant: String, variantContents: VariantContents): Boolean {
+        require(type.perDate) { "type must have its perDate set to true to use this method." }
+        require(variantContents.types.contains(type)) {
+            "type must be compatible with variantContents. Compatible options for ${variantContents.name}: ${
+                variantContents.types.joinToString(
+                    ",",
+                )
+            }"
+        }
+
+        val target = date.toDatedVariantPath(type, variant, variantContents)
+        return enumerateDescendants("$date/$VARIANTS_PATH")
+            .asSequence()
+            .any { it == target }
+    }
+
+    /**
      * Find available databases specified by [DatabaseType] in data path.
      *
      * @param type The type of database to search for.
@@ -130,11 +164,17 @@ interface EwbDataFilePaths {
      * @return list of variant names that exist in the data path for the specified [date].
      */
     fun getAvailableVariantsFor(date: LocalDate = LocalDate.now()): List<String> {
-        return enumerateDescendants()
+        return enumerateDescendants("$date/$VARIANTS_PATH")
             .asSequence()
-            .filter { it.parent?.fileName.toString().lowercase() == VARIANTS_PATH }
-            .filter { it.parent?.parent?.fileName.toString() == date.toString() }
-            .map { it.fileName.toString() }
+            .mapNotNull {
+                // GIS extractor doesn't have a variant service file at the 2 parents level.
+                when {
+                    it.parent?.parent?.fileName.toString() == VARIANTS_PATH  -> it.parent?.fileName.toString()
+                    it.parent?.parent?.parent?.fileName.toString() == VARIANTS_PATH -> it.parent?.parent?.fileName.toString()
+                    else -> null
+                }
+            }
+            .distinct()
             .sorted()
             .toList()
     }
@@ -144,7 +184,7 @@ interface EwbDataFilePaths {
      *
      * @return collection of child items.
      */
-    fun enumerateDescendants(): Iterator<Path>
+    fun enumerateDescendants(prefix: String? = null): Iterator<Path>
 
     /**
      * Resolves the database in the specified source [Path].
@@ -153,6 +193,65 @@ interface EwbDataFilePaths {
      * @return [Path] to the local database file.
      */
     fun resolveDatabase(path: Path): Path
+
+    /**
+     * Generate a file path for a given date and type.
+     *
+     * @param type The [DatabaseType] to use for the database [Path].
+     * @param date The [LocalDate] to use for the database [Path].
+     */
+    fun getDatedPath(type: DatabaseType, date: LocalDate): Path = date.toDatedPath(type)
+
+    /**
+     * Generate a file path for a given date, variant, and the contents of that variant.
+     *
+     * @param type The [DatabaseType] to use for the database [Path].
+     * @param date The [LocalDate] to use for the database [Path].
+     * @param variant The name of the variant containing the database.
+     * @param variantContents The relevant content for the desired [type].
+     * @return The [Path] to the [DatabaseType] database file for the [variant].
+     */
+    fun getDatedVariantPath(type: DatabaseType, date: LocalDate, variant: String, variantContents: VariantContents): Path =
+        date.toDatedVariantPath(type, variant, variantContents)
+
+    /**
+     * Parses a dated variant [path] into its constituent components.
+     *
+     * This is the inverse of [getDatedVariantPath].
+     *
+     * Expected path formats:
+     * - `{date}/variants/{variant}/{subDirectory}/{date}-{databaseName}` (when [VariantContents.subDirectory] is non-empty)
+     * - `{date}/variants/{variant}/{date}-{databaseName}` (when [VariantContents.subDirectory] is empty)
+     *
+     * @param path The path to parse.
+     * @return A [DatedVariantPathComponents] containing the extracted [DatabaseType], [LocalDate], variant name, and [VariantContents].
+     * @throws IllegalArgumentException If the path does not match the expected format.
+     */
+    fun parseDatedVariantPath(path: Path): DatedVariantPathComponents {
+        val pathComponents = path.toList()
+
+        val variantContents = when (pathComponents.size) {
+            4 ->  VariantContents.CHANGESET
+            5 -> {
+                val subDir = pathComponents[3].toString()
+                VariantContents.entries.firstOrNull { it.subDirectory == subDir }
+                    ?: throw IllegalArgumentException("Invalid path. There is no `VariantContent` for the sub directory `$subDir`.")
+            }
+
+            else -> throw IllegalArgumentException("Invalid path. Make sure the path is correct by using `getDatedVariantPath`.")
+        }
+        val fileName = path.nameWithoutExtension
+        val dateStr = pathComponents[0].toString()
+        val type = variantContents.types.firstOrNull { fileName == "$dateStr-${it.fileDescriptor}" }
+            ?: throw IllegalArgumentException("Invalid path. There is no `DatabaseType` for the file name `$fileName`.")
+
+        return DatedVariantPathComponents(
+            type = type,
+            date = LocalDate.parse(dateStr),
+            variant = pathComponents[2].toString(),
+            variantContents = variantContents,
+        )
+    }
 
     /**
      * Check if a database [Path] of the specified [DatabaseType] and [LocalDate] exists.
@@ -169,8 +268,8 @@ interface EwbDataFilePaths {
     private fun LocalDate.toDatedPath(type: DatabaseType): Path =
         toString().let { dateStr -> Paths.get(dateStr).resolve("$dateStr-${type.databaseName}") }
 
-    private fun LocalDate.toDatedVariantPath(type: DatabaseType, variant: String): Path =
-        toString().let { dateStr -> Paths.get(dateStr).resolve(VARIANTS_PATH).resolve(variant).resolve("$dateStr-${type.databaseName}") }
+    private fun LocalDate.toDatedVariantPath(type: DatabaseType, variant: String, variantContents: VariantContents): Path =
+        toString().let { dateStr -> Paths.get(dateStr).resolve(VARIANTS_PATH).resolve(variant).resolve(variantContents.subDirectory).resolve("$dateStr-${type.databaseName}") }
 
     private val DatabaseType.databaseName: String get() = "$fileDescriptor.sqlite"
 

@@ -1438,6 +1438,7 @@ class NetworkCimWriter(
         insert.setInt(table.SEQUENCE_NUMBER.queryIndex, terminal.sequenceNumber)
         insert.setNullableString(table.CONNECTIVITY_NODE_MRID.queryIndex, terminal.connectivityNodeId)
         insert.setNullableString(table.PHASES.queryIndex, terminal.phases.name)
+        insert.setNullableString(table.NORMAL_FEEDER_DIRECTION.queryIndex, terminal.normalFeederDirection.name)
 
         return writeAcDcTerminal(table, insert, terminal, "terminal")
     }

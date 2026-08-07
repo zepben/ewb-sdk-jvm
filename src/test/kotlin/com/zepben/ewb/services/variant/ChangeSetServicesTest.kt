@@ -13,6 +13,7 @@ import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectCreation
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectDeletion
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectModification
+import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -78,5 +79,21 @@ class ChangeSetServicesTest {
         assertThat(obj.targetObjectMRID, equalTo(io.mRID))
         assertThat(obj.changeSet, equalTo(cs))
         assertThat(services.get(obj), equalTo(io))
+    }
+
+    @Test
+    internal fun `errors on missing changes set or members`() {
+        val member = ObjectCreation().apply {
+            targetObjectMRID = "id"
+            changeSet = ChangeSet("cs1")
+        }
+
+        expect { ChangeSetServices(changeSet = null)[member] }
+            .toThrow<IllegalStateException>()
+            .withMessage("You must have a change set to access its members")
+
+        expect { ChangeSetServices(ChangeSet("cs2"))[member] }
+            .toThrow<IllegalArgumentException>()
+            .withMessage("ObjectCreation cs1_id must be present in ChangeSet cs2")
     }
 }

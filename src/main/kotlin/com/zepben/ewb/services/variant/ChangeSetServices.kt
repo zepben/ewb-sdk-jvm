@@ -18,7 +18,10 @@ import com.zepben.ewb.services.diagram.DiagramService
 import com.zepben.ewb.services.network.NetworkService
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KVisibility
-import kotlin.reflect.full.*
+import kotlin.reflect.full.createType
+import kotlin.reflect.full.isSubtypeOf
+import kotlin.reflect.full.memberProperties
+import kotlin.reflect.full.starProjectedType
 
 
 /**
@@ -35,7 +38,7 @@ import kotlin.reflect.full.*
  * @param originalCustomerService Contains the ObjectDeletion and ObjectReverseModifications to the CustomerService.
  */
 class ChangeSetServices(
-    val changeSet: ChangeSet,
+    val changeSet: ChangeSet?,
     val newNetworkService: NetworkService = NetworkService(),
     val originalNetworkService: NetworkService = NetworkService(),
     val newDiagramService: DiagramService = DiagramService(),
@@ -45,7 +48,8 @@ class ChangeSetServices(
 )
 {
 
-    fun get(changeSetMember: ChangeSetMember): Identifiable {
+    operator fun get(changeSetMember: ChangeSetMember): Identifiable {
+        check(changeSet != null) { "You must have a change set to access its members" }
         require(changeSet.getMember(changeSetMember.targetObjectMRID) != null) { "${changeSetMember.typeNameAndMRID()} must be present in ${changeSet.typeNameAndMRID()}" }
         return when (changeSetMember) {
             is ObjectCreation,

@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.boilerplate.collections
 
+
 /**
  * A mutable collection whose contents are stored elsewhere.
  *
@@ -86,6 +87,7 @@ abstract class AbstractBackedCollection<T>(
     /** Returns whether the backing collection is empty. */
     override fun isEmpty(): Boolean =
         getCollection().isEmpty()
+
 }
 
 /** A mutable iterator that reports removed elements. */
@@ -109,4 +111,5 @@ internal open class CallbackMutableIterator<T>(
         current = null
         postRemove(removed.element)
     }
+
 }

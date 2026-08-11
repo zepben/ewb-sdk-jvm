@@ -13,6 +13,7 @@ import com.zepben.ewb.cim.extensions.iec61970.base.wires.TransformerCoolingType
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.TransformerEndRatedS
 import com.zepben.ewb.cim.iec61970.base.wires.PowerTransformerEnd
 
+
 /** A list of [TransformerEndRatedS] for a given [PowerTransformerEnd]. */
 class TransformerEndRatedSList(
     getter: () -> MutableList<TransformerEndRatedS>?,
@@ -38,7 +39,6 @@ class TransformerEndRatedSList(
 
     /** Returns the entry for [coolingType], or `null`. */
     fun getByCoolingType(coolingType: TransformerCoolingType): TransformerEndRatedS? = firstOrNull { it.coolingType == coolingType }
-
 
     /**
      * Remove the [TransformerEndRatedS] from the `sRatings` collection with a cooling type of [coolingType]

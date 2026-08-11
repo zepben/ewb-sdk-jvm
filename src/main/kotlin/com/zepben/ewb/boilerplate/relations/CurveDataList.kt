@@ -12,6 +12,7 @@ import com.zepben.ewb.boilerplate.collections.LazyList
 import com.zepben.ewb.cim.iec61970.base.core.Curve
 import com.zepben.ewb.cim.iec61970.base.core.CurveData
 
+
 /** A list of [CurveData] for a given [Curve]. */
 class CurveDataList(
     getter: () -> MutableList<CurveData>?,

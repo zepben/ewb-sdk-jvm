@@ -13,6 +13,7 @@ import com.zepben.ewb.boilerplate.collections.MridList
 import com.zepben.ewb.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.ewb.cim.iec61970.base.core.Terminal
 
+
 /** A list of [Terminal] for a given [ConductingEquipment]. */
 class TerminalList(
     list: MutableList<Terminal> = mutableListOf(),
@@ -33,4 +34,5 @@ class TerminalList(
     /** Returns the terminal with [sequenceNumber], or `null`. */
     fun getByNumber(sequenceNumber: Int): Terminal? =
         firstOrNull { it.sequenceNumber == sequenceNumber }
+
 }

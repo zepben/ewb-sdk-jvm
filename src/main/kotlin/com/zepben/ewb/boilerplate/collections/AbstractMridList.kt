@@ -10,6 +10,7 @@ package com.zepben.ewb.boilerplate.collections
 
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 
+
 /**
  * List-shaped specialisation of [MridCollection].
  *
@@ -55,4 +56,5 @@ abstract class AbstractMridList<T : Identifiable>(
     /** Returns the requested backing-list view. */
     override fun subList(fromIndex: Int, toIndex: Int): List<T> =
         getCollection().subList(fromIndex, toIndex)
+
 }

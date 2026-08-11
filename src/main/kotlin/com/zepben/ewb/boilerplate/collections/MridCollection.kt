@@ -11,6 +11,7 @@ package com.zepben.ewb.boilerplate.collections
 import com.zepben.ewb.boilerplate.Backfill
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 
+
 /**
  * Base collection for objects identified by a unique `mRID`.
  *
@@ -20,6 +21,7 @@ import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 abstract class MridCollection<T : Identifiable>(
     validate: ((T) -> Unit)? = null,
 ) : AbstractBackedCollection<T>(validate) {
+
     abstract val owner: Identifiable
     abstract val elementDescription: String
 
@@ -70,4 +72,5 @@ abstract class MridCollection<T : Identifiable>(
         val activeBackfill = backfill ?: return super.clear()
         clearAndCopy(getCollection()).forEach(activeBackfill::clear)
     }
+
 }

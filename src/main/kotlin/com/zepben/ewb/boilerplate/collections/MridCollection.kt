@@ -8,7 +8,6 @@
 
 package com.zepben.ewb.boilerplate.collections
 
-import com.zepben.ewb.boilerplate.Backfill
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 
 
@@ -25,7 +24,6 @@ abstract class MridCollection<T : Identifiable>(
     abstract val owner: Identifiable
     abstract val elementDescription: String
 
-    open val backfill: Backfill<T, *>? = null
 
     /** Returns the element with [mRID], or `null` when it is not present. */
     abstract fun getByMrid(mRID: String): T?
@@ -49,28 +47,10 @@ abstract class MridCollection<T : Identifiable>(
      *
      * This override performs the mRID check, backfill, validation, and storage, but no sorting.
      */
-    @Suppress("UNCHECKED_CAST")
     override fun add(element: T): Boolean {
-        // NOTE: All downstream implementations of this are typed properly,
-        //          ensuring nothing blows up. The lack of backfill typing
-        //          is intended to ease the use of MridCollection as type for public lists
         if (!canAddByMrid(element))
             return false
-        // Concrete collections expose matching owner/backfill types, but the
-        // public MridCollection API intentionally erases the owner type.
-        (backfill as Backfill<T, Identifiable>?)?.apply(owner, element)
         return super.add(element)
-    }
-
-    /** Clears [element]'s backfill after removal. */
-    override fun postRemove(element: T) {
-        backfill?.clear(element)
-    }
-
-    /** Clears the collection and all backfilled references. */
-    override fun clear() {
-        val activeBackfill = backfill ?: return super.clear()
-        clearAndCopy(getCollection()).forEach(activeBackfill::clear)
     }
 
 }

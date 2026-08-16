@@ -29,7 +29,7 @@ open class MridList<T : Identifiable, O : Identifiable>(
     override val backfill: Backfill<T, O>? = null,
     validate: ((T) -> Unit)? = null,
     sortBy: ((T) -> Comparable<*>?)? = null,
-) : AbstractMridList<T>(validate, sortBy) {
+) : AbstractMridList<T, O>(validate, sortBy) {
 
     /** Returns the backing list. */
     override fun getCollection(): MutableList<T> = list

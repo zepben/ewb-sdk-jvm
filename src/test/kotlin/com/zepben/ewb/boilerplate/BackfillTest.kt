@@ -25,7 +25,7 @@ internal class BackfillTest {
         val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
     }
 
-    private val backfill = Backfill<Feeder, Substation>(
+    private val backfill = Backfill(
         Feeder::normalEnergizingSubstation,
         { feeder, substation -> feeder.normalEnergizingSubstation = substation },
         Feeder::normalEnergizingSubstation
@@ -36,7 +36,7 @@ internal class BackfillTest {
         val owner = Substation("owner")
         val feeder = Feeder("feeder")
 
-        backfill.apply(owner, feeder)
+        backfill.set(feeder, owner)
 
         assertThat(feeder.normalEnergizingSubstation, sameInstance(owner))
         assertThat(backfill.backfillProp, equalTo(Feeder::normalEnergizingSubstation))
@@ -47,8 +47,8 @@ internal class BackfillTest {
         val owner = Substation("owner")
         val feeder = Feeder("feeder").apply { normalEnergizingSubstation = owner }
 
-        backfill.apply(owner, feeder)
-        assertThrows<IllegalArgumentException> { backfill.apply(Substation("other"), feeder) }
+        backfill.set(feeder, owner)
+        assertThrows<IllegalArgumentException> { backfill.set(feeder, Substation("other")) }
         assertThat(feeder.normalEnergizingSubstation, sameInstance(owner))
     }
 
@@ -56,13 +56,13 @@ internal class BackfillTest {
     internal fun `apply rejects an element when its back reference cannot be set`() {
         val owner = Substation("owner")
         val feeder = Feeder("feeder")
-        val ineffectiveBackfill = Backfill<Feeder, Substation>(
+        val ineffectiveBackfill = Backfill(
             Feeder::normalEnergizingSubstation,
             { _, _ -> },
             Feeder::normalEnergizingSubstation
         )
 
-        assertThrows<IllegalArgumentException> { ineffectiveBackfill.apply(owner, feeder) }
+        assertThrows<IllegalArgumentException> { ineffectiveBackfill.set(feeder, owner) }
         assertThat(feeder.normalEnergizingSubstation, nullValue())
     }
 

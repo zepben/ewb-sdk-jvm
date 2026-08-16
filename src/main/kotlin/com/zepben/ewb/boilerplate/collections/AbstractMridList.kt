@@ -19,10 +19,10 @@ import com.zepben.ewb.cim.iec61970.base.core.Identifiable
  * downstream mRID list implementations do not duplicate list delegation or
  * sorting behaviour.
  */
-abstract class AbstractMridList<T : Identifiable>(
+abstract class AbstractMridList<T : Identifiable, O: Identifiable>(
     validate: ((T) -> Unit)? = null,
     private val sortBy: ((T) -> Comparable<*>?)? = null,
-) : MridCollection<T>(validate), List<T> {
+) : MridBackfillCollection<T, O>(validate), List<T> {
 
     /** Returns the current backing list. */
     abstract override fun getCollection(): MutableList<T>

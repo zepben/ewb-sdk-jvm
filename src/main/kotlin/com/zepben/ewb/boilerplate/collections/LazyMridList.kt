@@ -26,7 +26,7 @@ open class LazyMridList<T : Identifiable, O : Identifiable>(
     override val backfill: Backfill<T, O>? = null,
     validate: ((T) -> Unit)? = null,
     sortBy: ((T) -> Comparable<*>?)? = null
-) : AbstractMridList<T>(validate, sortBy) {
+) : AbstractMridList<T, O>(validate, sortBy) {
 
     /** Returns the backing list, or an unbound empty list when absent. */
     override fun getCollection(): MutableList<T> = getter() ?: mutableListOf()

@@ -14,13 +14,13 @@ import kotlin.reflect.KMutableProperty1
 
 /** Maintains an element's reference to its owning object. */
 class Backfill<T : Identifiable, O : Identifiable>(
-    val getter: (T) -> Identifiable?,
+    val getter: (T) -> O?,
     val setter: (T, O?) -> Unit,
     val backfillProp: KMutableProperty1<T, O?>,
 ) {
 
     /** Sets or verifies [element]'s reference to [owner]. */
-    fun apply(owner: O, element: T) {
+    fun set(element: T, owner: O) {
         if (getter(element) == null)
             setter(element, owner)
 

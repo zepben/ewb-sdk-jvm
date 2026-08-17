@@ -28,7 +28,6 @@ abstract class MridCollection<T : Identifiable>(
     /** Returns the element with [mRID], or `null` when it is not present. */
     abstract fun getByMrid(mRID: String): T?
 
-    /** Returns the element with [mRID], or `null` when it is not present. */
     operator fun get(mRID: String): T? = getByMrid(mRID)
 
     /** Accepts a new mRID, ignores the same instance, and rejects collisions. */

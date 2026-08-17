@@ -11,6 +11,15 @@ package com.zepben.ewb.boilerplate.collections
 import com.zepben.ewb.boilerplate.Backfill
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 
+
+/**
+ * Adds setting typed backref on elements to [MridCollection]
+ *
+ * NOTE: This class can be inlined with [MridCollection].
+ *      It is only distinct because [MridCollection] is used for typing,
+ *      and we do not want to set the owner type explicitly. This separation lets
+ *      us type things as ``MridList<Item>`` and have the owner type inferred from constructor arguments.
+ */
 abstract class MridBackfillCollection<T : Identifiable, O: Identifiable>(
     validate: ((T) -> Unit)? = null,
 ): MridCollection<T>(validate) {

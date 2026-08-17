@@ -31,10 +31,8 @@ open class MridList<T : Identifiable, O : Identifiable>(
     sortBy: ((T) -> Comparable<*>?)? = null,
 ) : AbstractMridList<T, O>(validate, sortBy) {
 
-    /** Returns the backing list. */
     override fun getCollection(): MutableList<T> = list
 
-    /** Returns the element with [mRID], or `null`. */
     override fun getByMrid(mRID: String): T? =
         list.firstOrNull { it.mRID == mRID }
 

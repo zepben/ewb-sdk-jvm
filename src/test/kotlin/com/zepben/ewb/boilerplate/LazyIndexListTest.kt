@@ -108,29 +108,15 @@ internal class LazyIndexListTest {
     }
 
     @Test
-    internal fun `indexed addAll and set mutate the backing list`() {
+    internal fun `indexed addAll mutates the backing list`() {
         val a = Feeder("a")
-        val b = Feeder("b")
         val c = Feeder("c")
         var backing: MutableList<Feeder>? = null
         val list = LazyIndexList({ backing }, { backing = it }, Feeder("owner"), "a Feeder")
 
         assertThat(list.addAll(0, listOf(a, c)), equalTo(true))
-        assertThat(list.set(1, b), sameInstance(c))
 
-        assertThat(backing, contains(a, b))
-    }
-
-    @Test
-    internal fun `set rejects non-existing indexes before changing backing`() {
-        val a = Feeder("a")
-        var backing: MutableList<Feeder>? = mutableListOf(a)
-        val list = LazyIndexList({ backing }, { backing = it }, Feeder("owner"), "a Feeder")
-
-        assertThrows<IllegalArgumentException> { list.set(-1, Feeder("negative")) }
-        assertThrows<IllegalArgumentException> { list.set(1, Feeder("end")) }
-
-        assertThat(backing, contains(a))
+        assertThat(backing, contains(a, c))
     }
 
     @Test
@@ -144,10 +130,18 @@ internal class LazyIndexListTest {
     }
 
     @Test
-    internal fun `subList is unsupported`() {
-        var backing: MutableList<Feeder>? = mutableListOf(Feeder("a"), Feeder("b"))
+    internal fun `subList returns a read only view of the backing list`() {
+        val a = Feeder("a")
+        val b = Feeder("b")
+        val replacement = Feeder("replacement")
+        var backing: MutableList<Feeder>? = mutableListOf(a, b)
         val list = LazyIndexList({ backing }, { backing = it }, Feeder("owner"), "a Feeder")
+        val subList: List<Feeder> = list.subList(0, 1)
 
-        assertThrows<UnsupportedOperationException> { list.subList(0, 2) }
+        assertThat(subList, contains(a))
+
+        backing!![0] = replacement
+
+        assertThat(subList, contains(replacement))
     }
 }

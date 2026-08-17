@@ -47,7 +47,6 @@ open class LazyMridMap<T : Identifiable, O : Identifiable>(
             setter(null)
     }
 
-    /** Returns the element with [mRID], or `null`. */
     override fun getByMrid(mRID: String): T? =
         getter()?.get(mRID)
 

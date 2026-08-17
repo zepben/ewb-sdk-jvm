@@ -36,7 +36,6 @@ open class LazyMridList<T : Identifiable, O : Identifiable>(
     /** Returns the backing list, or an unbound empty list when absent. */
     override fun getCollection(): MutableList<T> = getter() ?: mutableListOf()
 
-    /** Returns the element with [mRID], or `null`. */
     override fun getByMrid(mRID: String): T? {
         return getter()?.firstOrNull { it.mRID == mRID }
     }

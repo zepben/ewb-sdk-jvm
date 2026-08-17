@@ -6,35 +6,28 @@ not instantiate them directly or expose properties typed as them.
 
 ## Collection classes
 
-- *[AbstractBackedCollection](#abstract-backed-collection)* — extends
-  `AbstractMutableCollection<T>`
-  - *[AbstractBackedList](#abstract-backed-list)*
-    - [LazyList](#lazy-list)
-      - [LazyIndexList](#lazy-index-list)
-  - [MridCollection](#mrid-collection)
-    - *[MridBackfillCollection](#mrid-backfill-collection)*
-      - *[AbstractMridList](#abstract-mrid-list)* — also implements `List<T>`
-        - [LazyMridList](#lazy-mrid-list)
-        - [MridList](#mrid-list)
-      - [LazyMridMap](#lazy-mrid-map)
-
-## Iterator classes
-
-- [VolatileIterator](#volatile-iterator) — implements `MutableIterator<T>`
-  - [CallbackMutableIterator](#callback-mutable-iterator)
-
-## Nested implementation classes
-
-- [CallbackMutableIterator](#callback-mutable-iterator)
-  - [CallbackMutableIterator.Current](#callback-mutable-iterator-current)
+- *[AbstractBackedCollection](#abstract-backed-collection)* ([code](./AbstractBackedCollection.kt#L22)) — implements
+  `ArcCollection<T>`
+  - *[AbstractBackedList](#abstract-backed-list)* ([code](./AbstractBackedList.kt#L19))
+    - [LazyList](#lazy-list) ([code](./LazyList.kt#L48))
+      - [LazyIndexList](#lazy-index-list) ([code](./LazyIndexList.kt#L36))
+  - [MridCollection](#mrid-collection) ([code](./MridCollection.kt#L20))
+    - *[MridBackfillCollection](#mrid-backfill-collection)* ([code](./MridBackfillCollection.kt#L23))
+      - *[AbstractMridList](#abstract-mrid-list)* ([code](./AbstractMridList.kt#L22)) — also implements `List<T>`
+        - [LazyMridList](#lazy-mrid-list) ([code](./LazyMridList.kt#L26))
+        - [MridList](#mrid-list) ([code](./MridList.kt#L25))
+      - [LazyMridMap](#lazy-mrid-map) ([code](./LazyMridMap.kt#L35))
 
 <a id="abstract-backed-collection"></a>
 
 ## AbstractBackedCollection
 
-Centralises `MutableCollection` delegation for contents stored elsewhere. It
-applies optional validation during addition and provides storage and removal
-hooks used by the specialised collection branches.
+Implements the narrow `ArcCollection` contract for contents stored elsewhere.
+It exposes add, remove, and clear mutation, returns a read-only iterator, and
+provides validation, storage, and post-removal cleanup hooks for specialised
+branches. Its default `remove` uses the backing collection's mutable iterator;
+storage-specific branches may override it when they preserve the same cleanup
+lifecycle.
 
 <a id="abstract-backed-list"></a>
 
@@ -42,7 +35,7 @@ hooks used by the specialised collection branches.
 
 Adds indexed reads and optional sorting to `AbstractBackedCollection`. It
 implements the lightweight `ArcList` interface, which combines the `add`,
-`remove`, and `clear` operations of `MutableCollection` with the indexed reads
+`remove`, and `clear` operations of `ArcCollection` with the indexed reads
 of `List` without exposing the indexed mutation contract of `MutableList`.
 
 <a id="lazy-list"></a>
@@ -110,27 +103,3 @@ same lookup, uniqueness, backfill, validation, and sorting lifecycle as
 Stores elements in a nullable map keyed by mRID and exposes the map values as
 a collection. It uses identity-aware membership and removal, and resets the
 backing map to `null` when empty.
-
-<a id="volatile-iterator"></a>
-
-## VolatileIterator
-
-Is the public iterator type returned by `AbstractBackedCollection`. Traversal
-is ordinary, but `remove` is deprecated because an iterator can remain attached
-to an old backing instance after nullable storage is replaced.
-
-<a id="callback-mutable-iterator"></a>
-
-## CallbackMutableIterator
-
-Wraps a backing mutable iterator and invokes collection-specific cleanup after
-a successful iterator removal. It is internal and is instantiated by
-`AbstractBackedCollection.iterator()`.
-
-<a id="callback-mutable-iterator-current"></a>
-
-## CallbackMutableIterator.Current
-
-Holds the most recently returned element so `CallbackMutableIterator` can pass
-the removed value to its cleanup callback, including when that value is
-`null`.

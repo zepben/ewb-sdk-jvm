@@ -22,7 +22,7 @@ import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 abstract class AbstractMridList<T : Identifiable, O: Identifiable>(
     validate: ((T) -> Unit)? = null,
     private val sortBy: ((T) -> Comparable<*>?)? = null,
-) : MridBackfillCollection<T, O>(validate), List<T> {
+) : MridBackfillCollection<T, O>(validate), ArcList<T> {
 
     abstract override fun getCollection(): MutableList<T>
 

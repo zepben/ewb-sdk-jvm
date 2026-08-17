@@ -81,13 +81,13 @@ class RelayInfo(mRID: String) : AssetInfo(mRID) {
     }
 
     @Deprecated(
-        message = "Use recloseDelays.addAll(delays.asList()) instead.",
-        replaceWith = ReplaceWith("also { it.recloseDelays.addAll(delays.asList()) }")
+        message = "Use recloseDelays.addAll(recloseDelays.size, delays.asList()) instead.",
+        replaceWith = ReplaceWith("also{ delays.forEach { delay -> it.recloseDelays.add(delay) } }")
     )
     fun addDelays(
         vararg delays: Double,
     ): RelayInfo = apply {
-        recloseDelays.addAll(delays.asList())
+        delays.forEach { recloseDelays.add(it) }
     }
 
     @Deprecated(

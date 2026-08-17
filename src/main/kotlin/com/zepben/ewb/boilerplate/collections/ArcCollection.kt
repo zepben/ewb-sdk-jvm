@@ -9,8 +9,8 @@
 package com.zepben.ewb.boilerplate.collections
 
 /**
- * Lightweight interface for an indexable mutable collection that does not support
- * indexed assignment
+ * Lightweight interface for a partly mutable collection that does not support
+ * bulk mutation (addAll, removeAll, retainAll).
  *
  * Arc stands for Add, Remove, Clear.
  *
@@ -26,5 +26,16 @@ package com.zepben.ewb.boilerplate.collections
  *     items[0] = "replacement"
  * }
  * ```
+ *
+ * NOTE: This could implement MutableCollection, but error behaviour on methods such as addAll would be ambiguous.
+ * There is no issue with implementing addAll downstream, but it is left up to the user to make things more transparent.
  */
-interface ArcList<T> : ArcCollection<T>, List<T>
+interface ArcCollection<T> : Collection<T> {
+
+    fun add(element: T): Boolean
+
+    fun remove(element: T): Boolean
+
+    fun clear()
+
+}

@@ -10,22 +10,19 @@ package com.zepben.ewb.boilerplate.collections
 
 
 /**
- * A mutable collection whose contents are stored elsewhere.
+ * An [ArcCollection] whose contents are stored elsewhere.
  *
  * Implementations provide the current mutable contents through [getCollection].
  * Element validation and the add lifecycle are centralised here, with hooks for
  * specialised acceptance checks, preparation, storage, and post-add work.
- * Individual removal, bulk removal and retention are supplied by
- * [AbstractMutableCollection] through [iterator].
- *
- * [postRemove] is invoked after every individual removal, including removals
- * made through a mutable iterator. [clear] clears the backing storage directly,
- * avoiding repeated removal bookkeeping when bulk cleanup is unnecessary.
+ * [postRemove] is invoked after every successful individual removal. [clear]
+ * clears the backing storage directly, avoiding repeated removal bookkeeping
+ * when bulk cleanup is unnecessary.
  */
 abstract class AbstractBackedCollection<T>(
     private val validate: ((T) -> Unit)? = null,
 ) :
-    AbstractMutableCollection<T>() {
+    ArcCollection<T> {
 
     /** Returns the current backing collection. */
     protected abstract fun getCollection(): MutableCollection<T>
@@ -64,15 +61,14 @@ abstract class AbstractBackedCollection<T>(
         return elements
     }
 
-    /**
-     * Returns an iterator over the current backing collection.
-     *
-     * An iterator remains attached to the backing instance that existed when it
-     * was created. Lazy implementations may later replace that instance when
-     * their backing storage transitions between empty and populated states.
-     */
-    final override fun iterator(): VolatileIterator<T> =
-        CallbackMutableIterator(getCollection().iterator(), ::postRemove)
+    /** Returns a traversal-only iterator over the current backing collection. */
+    final override fun iterator(): Iterator<T> {
+        val delegate = getCollection().iterator()
+        return object : Iterator<T> {
+            override fun hasNext(): Boolean = delegate.hasNext()
+            override fun next(): T = delegate.next()
+        }
+    }
 
     final override val size: Int
         get() = getCollection().size
@@ -88,44 +84,21 @@ abstract class AbstractBackedCollection<T>(
     override fun isEmpty(): Boolean =
         getCollection().isEmpty()
 
-}
+    override fun toString(): String =
+        getCollection().toString()
 
-/**
- * A mutable iterator that may become detached from replaceable backing storage.
- *
- * Traversal-only iterator. Misses concurrent modification issues when list is empty.
- * Make sure you retrieve an up-to-date iterator after any modifications to the collection.
- */
-abstract class VolatileIterator<T> : MutableIterator<T> {
+    override fun remove(element: T): Boolean {
+        val iterator = getCollection().iterator()
+        while (iterator.hasNext()) {
+            val stored = iterator.next()
+            if (stored == element) {
+                iterator.remove()
+                postRemove(stored)
+                return true
+            }
+        }
 
-    @Deprecated(
-        "Removing through this iterator may detach it from replaceable backing storage. " +
-            "Remove through the collection and fetch a new iterator instance"
-    )
-    abstract override fun remove()
-}
-
-/** A mutable iterator that reports removed elements. */
-internal open class CallbackMutableIterator<T>(
-    protected val delegate: MutableIterator<T>,
-    private val postRemove: (T) -> Unit
-) : VolatileIterator<T>() {
-
-    /** Wraps the current element, including nullable values. */
-    protected class Current<T>(val element: T)
-
-    protected var current: Current<T>? = null
-
-    override fun hasNext(): Boolean = delegate.hasNext()
-
-    override fun next(): T = delegate.next().also { current = Current(it) }
-
-    @Suppress("OVERRIDE_DEPRECATION")
-    override fun remove() {
-        val removed = checkNotNull(current) { "iterator.remove() called without a current element" }
-        delegate.remove()
-        current = null
-        postRemove(removed.element)
+        return false
     }
 
 }

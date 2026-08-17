@@ -30,7 +30,6 @@ internal class AbstractBackedListTest {
         sortBy: ((Feeder) -> Comparable<*>?)? = null,
     ) : AbstractBackedList<Feeder>(sortBy = sortBy) {
         override fun getCollection(): MutableList<Feeder> = backing
-        override fun remove(element: Feeder): Boolean = backing.remove(element)
     }
 
     @Test

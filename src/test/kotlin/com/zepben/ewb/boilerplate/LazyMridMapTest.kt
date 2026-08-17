@@ -9,6 +9,7 @@
 package com.zepben.ewb.boilerplate
 
 import com.zepben.ewb.boilerplate.collections.LazyMridMap
+import com.zepben.ewb.boilerplate.collections.MridCollection
 import com.zepben.ewb.cim.iec61970.base.core.Feeder
 import com.zepben.ewb.cim.iec61970.base.core.Substation
 import com.zepben.testutils.junit.SystemLogExtension
@@ -35,7 +36,9 @@ internal class LazyMridMapTest {
     @Test
     internal fun `null backing is exposed as an empty collection`() {
         var backing: MutableMap<String, Feeder>? = null
-        val map = LazyMridMap({ backing }, { backing = it }, Feeder("owner"), "A Feeder")
+        val map: MridCollection<Feeder> = LazyMridMap(
+            { backing }, { backing = it }, Feeder("owner"), "A Feeder"
+        )
 
         assertThat(map.size, equalTo(0))
         assertThat(map.isEmpty(), equalTo(true))
@@ -47,7 +50,9 @@ internal class LazyMridMapTest {
     @Test
     internal fun `add creates a map keyed by mrid and adds to an existing map`() {
         var backing: MutableMap<String, Feeder>? = null
-        val map = LazyMridMap({ backing }, { backing = it }, Feeder("owner"), "A Feeder")
+        val map: MridCollection<Feeder> = LazyMridMap(
+            { backing }, { backing = it }, Feeder("owner"), "A Feeder"
+        )
         val a = Feeder("a")
         val b = Feeder("b")
 
@@ -100,7 +105,9 @@ internal class LazyMridMapTest {
         val a = Feeder("a")
         val b = Feeder("b")
         var backing: MutableMap<String, Feeder>? = mutableMapOf("a" to a, "b" to b)
-        val map = LazyMridMap({ backing }, { backing = it }, Feeder("owner"), "A Feeder")
+        val map: MridCollection<Feeder> = LazyMridMap(
+            { backing }, { backing = it }, Feeder("owner"), "A Feeder"
+        )
 
         assertThat(map.remove(Feeder("a")), equalTo(false))
         assertThat(map.remove(a), equalTo(true))
@@ -115,7 +122,9 @@ internal class LazyMridMapTest {
         val stored = Feeder("a").apply { normalEnergizingSubstation = owner }
         val collision = Feeder("a").apply { normalEnergizingSubstation = owner }
         var backing: MutableMap<String, Feeder>? = mutableMapOf("a" to stored)
-        val map = LazyMridMap({ backing }, { backing = it }, owner, "A Feeder", backfill())
+        val map: MridCollection<Feeder> = LazyMridMap(
+            { backing }, { backing = it }, owner, "A Feeder", backfill()
+        )
 
         assertThat(map.remove(collision), equalTo(false))
         assertThat(collision.normalEnergizingSubstation, sameInstance(owner))

@@ -147,11 +147,11 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
     }
 
     @Deprecated(
-        message = "Use timeLimits.addAll(timeLimits.asList()) instead.",
-        replaceWith = ReplaceWith("also { it.timeLimits.addAll(timeLimits.asList()) }")
+        message = "Use timeLimits.addAll(timeLimits.size, timeLimits.asList()) instead.",
+        replaceWith = ReplaceWith("also { timeLimits.forEach { timeLimit -> it.timeLimits.add(timeLimit) } }")
     )
     fun addTimeLimits(vararg timeLimits: Double): ProtectionRelayFunction = apply {
-        this.timeLimits.addAll(timeLimits.asList())
+        timeLimits.forEach { this.timeLimits.add(it) }
     }
 
     @Deprecated(

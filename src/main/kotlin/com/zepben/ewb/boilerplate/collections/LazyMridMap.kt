@@ -83,7 +83,7 @@ open class LazyMridMap<T : Identifiable, O : Identifiable>(
             return false
 
         map.remove(element.mRID)
-        postRemove(element)
+        postRemove(existing)
 
         return true
     }

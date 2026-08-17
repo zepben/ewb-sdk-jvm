@@ -12,12 +12,17 @@ import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 
 
 /**
- * A mutable [LazyList] with index-based access, insertion, replacement, and deletion.
+ * A [LazyList] with explicit index-based insertion, replacement, and deletion.
  *
  * It retains the nullable backing-list behaviour of [LazyList],
  * creating the backing list when an item is inserted and resetting it to
  * `null` when the final item is deleted. Sublists are unsupported because
  * they cannot follow replacement of the nullable backing list.
+ *
+ * This class deliberately does not implement [MutableList]. Indexed mutation
+ * is exposed by its own methods without promising mutable list iterators or
+ * mutable sublist views, neither of which can reliably follow backing-list
+ * replacement.
  *
  * Example:
  *
@@ -34,7 +39,7 @@ class LazyIndexList<T : Any>(
     setter: (MutableList<T>?) -> Unit,
     val owner: Identifiable,
     val elementDescription: String,
-) : LazyList<T>(getter, setter), MutableList<T> {
+) : LazyList<T>(getter, setter) {
 
     /** Requires [index] to identify an element, or the end when [allowEnd] is set. */
     private fun validateIndex(index: Int, allowEnd: Boolean) {
@@ -52,7 +57,7 @@ class LazyIndexList<T : Any>(
      *
      * This overload performs storage only: no mRID check, validation, backfill, or sorting.
      */
-    override fun add(index: Int, element: T) {
+    fun add(index: Int, element: T) {
         val data = getter()
         validateIndex(index, allowEnd = true)
         data
@@ -61,7 +66,7 @@ class LazyIndexList<T : Any>(
     }
 
     /** Adds [elements] at [index], creating the backing list if needed. */
-    override fun addAll(index: Int, elements: Collection<T>): Boolean {
+    fun addAll(index: Int, elements: Collection<T>): Boolean {
         validateIndex(index, allowEnd = true)
 
         if (elements.isEmpty())
@@ -74,7 +79,7 @@ class LazyIndexList<T : Any>(
     }
 
     /** Removes and returns the element at [index]. */
-    override fun removeAt(index: Int): T =
+    fun removeAt(index: Int): T =
         getCollection().removeAt(index).also(::postRemove)
 
     /** Removes and returns the element at [index], or `null` if absent. */
@@ -82,60 +87,13 @@ class LazyIndexList<T : Any>(
         if (index in indices) removeAt(index) else null
 
     /** Replaces and returns the element at [index]. */
-    override fun set(index: Int, element: T): T {
+    operator fun set(index: Int, element: T): T {
         validateIndex(index, allowEnd = false)
         return getCollection().set(index, element)
     }
 
-    /** Returns a mutable list iterator at the start. */
-    override fun listIterator(): MutableListIterator<T> =
-        listIterator(0)
-
-    /** Returns a mutable list iterator at [index]. */
-    override fun listIterator(index: Int): MutableListIterator<T> {
-        val data = getter() ?: mutableListOf()
-        return CallbackMutableListIterator(
-            data.listIterator(index),
-            ::postRemove
-        ){
-            if (getter() == null)
-                setter(data)
-        }
-    }
-
     /** Rejects sublists because they cannot follow nullable backing-list replacement. */
-    override fun subList(fromIndex: Int, toIndex: Int): MutableList<T> =
+    override fun subList(fromIndex: Int, toIndex: Int): List<T> =
         throw UnsupportedOperationException("LazyIndexList does not support sublists")
-
-}
-
-/** A list iterator that reports removals and additions. */
-private class CallbackMutableListIterator<T>(
-    private val listDelegate: MutableListIterator<T>,
-    afterRemove: (T) -> Unit,
-    private val afterAdd: () -> Unit,
-) : CallbackMutableIterator<T>(listDelegate, afterRemove), MutableListIterator<T> {
-
-    /** Adds [element] and invokes the callback. */
-    override fun add(element: T) {
-        listDelegate.add(element)
-        current = null
-        afterAdd()
-    }
-
-    /** Checks whether a previous element exists. */
-    override fun hasPrevious(): Boolean = listDelegate.hasPrevious()
-
-    /** Checks the next element index. */
-    override fun nextIndex(): Int = listDelegate.nextIndex()
-
-    /** Checks and records the previous element. */
-    override fun previous(): T = listDelegate.previous().also { current = Current(it) }
-
-    /** Checks the previous element index. */
-    override fun previousIndex(): Int = listDelegate.previousIndex()
-
-    /** Replaces the current element with [element]. */
-    override fun set(element: T) = listDelegate.set(element)
 
 }

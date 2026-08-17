@@ -16,6 +16,11 @@ package com.zepben.ewb.boilerplate.collections
  * list is created when the first item is added and reset to `null` when
  * the last item is removed or the collection is cleared.
  *
+ * Iterators remain attached to the backing list present when they are created.
+ * If the backing field transitions between `null` and a list while an iterator
+ * is retained, that iterator does not follow the replacement list. Obtain a new
+ * iterator after mutating this collection through another reference.
+ *
  * Example:
  *
  * ```kotlin

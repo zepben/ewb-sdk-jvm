@@ -17,6 +17,11 @@ import com.zepben.ewb.cim.iec61970.base.core.Identifiable
  *
  * Inherits mRID lookup and uniqueness semantics from [MridCollection] and
  * exposes list-style indexed reads through [AbstractMridList].
+ *
+ * Iterators remain attached to the backing list present when they are created.
+ * If the backing field transitions between `null` and a list while an iterator
+ * is retained, that iterator does not follow the replacement list. Obtain a new
+ * iterator after mutating this collection through another reference.
  */
 open class LazyMridList<T : Identifiable, O : Identifiable>(
     private val getter: () -> MutableList<T>?,

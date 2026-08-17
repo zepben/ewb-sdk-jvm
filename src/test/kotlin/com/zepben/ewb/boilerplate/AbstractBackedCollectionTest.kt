@@ -172,6 +172,7 @@ internal class AbstractBackedCollectionTest {
         assertThat(collection.removed, empty())
     }
 
+    @Suppress("DEPRECATION")
     @Test
     internal fun `mutable iterator removes from backing and invokes cleanup`() {
         val a = Feeder("a")

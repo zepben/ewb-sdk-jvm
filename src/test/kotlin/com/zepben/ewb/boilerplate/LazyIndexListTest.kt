@@ -134,18 +134,13 @@ internal class LazyIndexListTest {
     }
 
     @Test
-    internal fun `mutable list iterator creates and clears backing`() {
-        var backing: MutableList<Feeder>? = null
+    internal fun `exposes a read only list iterator`() {
+        val a = Feeder("a")
+        var backing: MutableList<Feeder>? = mutableListOf(a)
         val list = LazyIndexList({ backing }, { backing = it }, Feeder("owner"), "a Feeder")
-        val feeder = Feeder("a")
-        val iterator = list.listIterator()
+        val iterator: ListIterator<Feeder> = list.listIterator()
 
-        iterator.add(feeder)
-        assertThat(backing, contains(feeder))
-
-        assertThat(iterator.previous(), sameInstance(feeder))
-        iterator.remove()
-        assertThat(backing, nullValue())
+        assertThat(iterator.next(), sameInstance(a))
     }
 
     @Test

@@ -66,8 +66,14 @@ abstract class AbstractBackedCollection<T>(
         return elements
     }
 
-    /** Returns a mutable iterator that invokes removal cleanup. */
-    final override fun iterator(): MutableIterator<T> =
+    /**
+     * Returns an iterator over the current backing collection.
+     *
+     * An iterator remains attached to the backing instance that existed when it
+     * was created. Lazy implementations may later replace that instance when
+     * their backing storage transitions between empty and populated states.
+     */
+    final override fun iterator(): VolatileIterator<T> =
         CallbackMutableIterator(getCollection().iterator(), ::postRemove)
 
     final override val size: Int
@@ -90,21 +96,41 @@ abstract class AbstractBackedCollection<T>(
 
 }
 
+/**
+ * A mutable iterator that may become detached from replaceable backing storage.
+ *
+ * Ordinary traversal is unaffected. Removing through the iterator is
+ * discouraged because a lazy collection may detach an empty backing collection
+ * and later create another one, leaving this iterator attached to the former
+ * instance.
+ */
+abstract class VolatileIterator<T> : MutableIterator<T> {
+
+    @Deprecated(
+        "Removing through this iterator may detach it from replaceable backing storage. " +
+            "Prefer removing through the collection."
+    )
+    abstract override fun remove()
+}
+
 /** A mutable iterator that reports removed elements. */
 internal open class CallbackMutableIterator<T>(
     protected val delegate: MutableIterator<T>,
     private val postRemove: (T) -> Unit
-) : MutableIterator<T> by delegate {
+) : VolatileIterator<T>() {
 
     /** Wraps the current element, including nullable values. */
     protected class Current<T>(val element: T)
 
     protected var current: Current<T>? = null
 
+    override fun hasNext(): Boolean = delegate.hasNext()
+
     /** Returns and records the next element. */
     override fun next(): T = delegate.next().also { current = Current(it) }
 
     /** Removes the current element and invokes the callback. */
+    @Suppress("OVERRIDE_DEPRECATION")
     override fun remove() {
         val removed = checkNotNull(current) { "iterator.remove() called without a current element" }
         delegate.remove()

@@ -21,7 +21,7 @@ abstract class AbstractBackedList<T>(
     private val sortBy: ((T) -> Comparable<*>?)? = null,
 ) :
     AbstractBackedCollection<T>(validate),
-    List<T> {
+    ArcList<T> {
 
     abstract override fun getCollection(): MutableList<T>
 

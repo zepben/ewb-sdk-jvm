@@ -8,7 +8,7 @@
 
 package com.zepben.ewb.cim.extensions.iec61968.common
 
-import com.zepben.ewb.boilerplate.collections.AbstractBackedList
+import com.zepben.ewb.boilerplate.collections.ArcList
 import com.zepben.ewb.boilerplate.collections.LazyList
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.iec61968.common.ElectronicAddress
@@ -69,13 +69,13 @@ class ContactDetails(
     @ZBEX
     private var _electronicAddresses: MutableList<ElectronicAddress>? = null
 
-    val phoneNumbers: AbstractBackedList<TelephoneNumber>
+    val phoneNumbers: ArcList<TelephoneNumber>
         get() = LazyList(
         getter = { _phoneNumbers },
         setter = { _phoneNumbers = it },
     )
 
-    val electronicAddresses: AbstractBackedList<ElectronicAddress> get() = LazyList(
+    val electronicAddresses: ArcList<ElectronicAddress> get() = LazyList(
         getter = { _electronicAddresses },
         setter = { _electronicAddresses = it },
     )

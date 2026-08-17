@@ -50,6 +50,11 @@ class LazyIndexList<T : Any>(
         }
     }
 
+    override fun add(element: T): Boolean {
+        add(size, element)
+        return true
+    }
+
     /**
      * Adds [element] at [index] when the index is valid, creating the backing list if needed.
      *
@@ -61,19 +66,6 @@ class LazyIndexList<T : Any>(
         data
             ?.add(index, element)
             ?: setter(mutableListOf(element))
-    }
-
-    /** Adds [elements] at [index], creating the backing list if needed. */
-    fun addAll(index: Int, elements: Collection<T>): Boolean {
-        validateIndex(index)
-
-        if (elements.isEmpty())
-            return false
-
-        return getter()?.addAll(index, elements) ?: run {
-            setter(elements.toMutableList())
-            true
-        }
     }
 
     fun removeAt(index: Int): T =

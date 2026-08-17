@@ -108,18 +108,6 @@ internal class LazyIndexListTest {
     }
 
     @Test
-    internal fun `indexed addAll mutates the backing list`() {
-        val a = Feeder("a")
-        val c = Feeder("c")
-        var backing: MutableList<Feeder>? = null
-        val list = LazyIndexList({ backing }, { backing = it }, Feeder("owner"), "a Feeder")
-
-        assertThat(list.addAll(0, listOf(a, c)), equalTo(true))
-
-        assertThat(backing, contains(a, c))
-    }
-
-    @Test
     internal fun `exposes a read only list iterator`() {
         val a = Feeder("a")
         var backing: MutableList<Feeder>? = mutableListOf(a)

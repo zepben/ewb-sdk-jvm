@@ -60,71 +60,22 @@ internal class AbstractBackedCollectionTest {
     }
 
     @Test
-    internal fun `addAll adds every element in order`() {
-        val collection = TestCollection()
-        val a = Feeder("a")
-        val b = Feeder("b")
-
-        assertThat(collection.addAll(listOf(a, b)), equalTo(true))
-        assertThat(collection.toList(), contains(a, b))
-    }
-
-    @Test
-    internal fun `addAll accepts an empty collection`() {
-        val collection = TestCollection()
-
-        assertThat(collection.addAll(emptyList()), equalTo(false))
-        assertThat(collection, empty())
-    }
-
-    @Test
-    internal fun `addAll continues after an add reports false`() {
-        val attempted = mutableListOf<Feeder>()
-        val collection = TestCollection(addAction = {
-            attempted.add(it)
-            it.mRID != "b"
-        })
-        val a = Feeder("a")
-        val b = Feeder("b")
-        val c = Feeder("c")
-
-        assertThat(collection.addAll(listOf(a, b, c)), equalTo(true))
-        assertThat(attempted, contains(a, b, c))
-    }
-
-    @Test
-    internal fun `removeAll removes every element in order`() {
-        val a = Feeder("a")
-        val b = Feeder("b")
-        val c = Feeder("c")
-        val collection = TestCollection(mutableListOf(a, b, c))
-
-        assertThat(collection.removeAll(listOf(a, c)), equalTo(true))
-        assertThat(collection, contains(b))
-        assertThat(collection.removed, contains(a, c))
-        assertThat(collection.presentAfterRemove, contains(false, false))
-        assertThat(collection.removeAll(emptyList()), equalTo(false))
-    }
-
-    @Test
-    internal fun `retainAll removes unmatched elements through the cleanup callback`() {
-        val a = Feeder("a")
-        val b = Feeder("b")
-        val c = Feeder("c")
-        val collection = TestCollection(mutableListOf(a, b, c))
-
-        assertThat(collection.retainAll(listOf(b)), equalTo(true))
-
-        assertThat(collection, contains(b))
-        assertThat(collection.removed, contains(a, c))
-    }
-
-    @Test
     internal fun `failed remove does not invoke removal cleanup`() {
         val collection = TestCollection(mutableListOf(Feeder("a")))
 
         assertThat(collection.remove(Feeder("missing")), equalTo(false))
         assertThat(collection.removed, empty())
+    }
+
+    @Test
+    internal fun `successful remove invokes cleanup with the stored element`() {
+        val feeder = Feeder("a")
+        val collection = TestCollection(mutableListOf(feeder))
+
+        assertThat(collection.remove(feeder), equalTo(true))
+        assertThat(collection, empty())
+        assertThat(collection.removed, contains(feeder))
+        assertThat(collection.presentAfterRemove, contains(false))
     }
 
     @Test
@@ -172,20 +123,16 @@ internal class AbstractBackedCollectionTest {
         assertThat(collection.removed, empty())
     }
 
-    @Suppress("DEPRECATION")
     @Test
-    internal fun `mutable iterator removes from backing and invokes cleanup`() {
+    internal fun `iterator exposes read only traversal`() {
         val a = Feeder("a")
         val b = Feeder("b")
         val collection = TestCollection(mutableListOf(a, b))
-        val iterator = collection.iterator()
+        val iterator: Iterator<Feeder> = collection.iterator()
 
         assertThat(iterator.next(), sameInstance(a))
-        iterator.remove()
-
-        assertThat(collection, contains(b))
-        assertThat(collection.removed, contains(a))
-        assertThat(collection.presentAfterRemove, contains(false))
+        assertThat(iterator.next(), sameInstance(b))
+        assertThat(iterator.hasNext(), equalTo(false))
     }
 
 }

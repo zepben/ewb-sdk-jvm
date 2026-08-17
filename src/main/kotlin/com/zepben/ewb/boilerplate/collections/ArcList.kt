@@ -27,4 +27,4 @@ package com.zepben.ewb.boilerplate.collections
  * }
  * ```
  */
-interface ArcList<T> : MutableCollection<T>, List<T>
+interface ArcList<T> : ArcCollection<T>, List<T>

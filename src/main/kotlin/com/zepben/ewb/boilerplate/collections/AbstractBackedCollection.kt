@@ -62,13 +62,8 @@ abstract class AbstractBackedCollection<T>(
     }
 
     /** Returns a traversal-only iterator over the current backing collection. */
-    final override fun iterator(): Iterator<T> {
-        val delegate = getCollection().iterator()
-        return object : Iterator<T> {
-            override fun hasNext(): Boolean = delegate.hasNext()
-            override fun next(): T = delegate.next()
-        }
-    }
+    // NOTE: This could be unsafely cast to mutable or used in Java, it could have desync issues.
+    final override fun iterator(): Iterator<T> = getCollection().iterator()
 
     final override val size: Int
         get() = getCollection().size

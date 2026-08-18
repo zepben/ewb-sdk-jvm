@@ -56,12 +56,6 @@ class Location(mRID: String) : IdentifiedObject(mRID) {
     fun getPoint(sequenceNumber: Int): PositionPoint? = points.getOrNull(sequenceNumber)
 
     @Deprecated(
-        message = "Use points.getOrNull(sequenceNumber) instead.",
-        replaceWith = ReplaceWith("points.getOrNull(sequenceNumber)")
-    )
-    operator fun get(sequenceNumber: Int): PositionPoint? = getPoint(sequenceNumber)
-
-    @Deprecated(
         message = "Use points.forEachIndexed(action::accept) instead.",
         replaceWith = ReplaceWith("points.forEachIndexed(action::accept)")
     )

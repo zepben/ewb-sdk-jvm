@@ -96,6 +96,12 @@ class SynchronousMachine(mRID: String) : RotatingMachine(mRID) {
     // region curves boilerplate
 
     @Deprecated(
+        message = "Use curves.remove(curve) instead.",
+        replaceWith = ReplaceWith("curves.remove(curve)")
+    )
+    fun removeCurve(curve: ReactiveCapabilityCurve): Boolean = curves.remove(curve)
+
+    @Deprecated(
         message = "Use curves.size instead.",
         replaceWith = ReplaceWith("curves.size")
     )
@@ -114,12 +120,6 @@ class SynchronousMachine(mRID: String) : RotatingMachine(mRID) {
     fun addCurve(rcc: ReactiveCapabilityCurve): SynchronousMachine = apply {
         curves.add(rcc)
     }
-
-    @Deprecated(
-        message = "Use curves.remove(curve) instead.",
-        replaceWith = ReplaceWith("curves.remove(curve)")
-    )
-    fun removeCurve(curve: ReactiveCapabilityCurve): Boolean = curves.remove(curve)
 
     @Deprecated(
         message = "Use curves.clear() instead.",

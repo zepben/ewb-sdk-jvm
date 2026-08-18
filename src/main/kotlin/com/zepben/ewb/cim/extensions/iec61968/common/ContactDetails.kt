@@ -132,64 +132,120 @@ class ContactDetails(
 
     // region phoneNumbers boilerplate
 
+    /**
+     * Get the number of entries in the [TelephoneNumber] collection.
+     */
     @Deprecated(
         message = "Use phoneNumbers.size instead.",
         replaceWith = ReplaceWith("phoneNumbers.size")
     )
-    fun numPhoneNumbers(): Int = phoneNumbers.size
+    fun numPhoneNumbers(): Int = _phoneNumbers?.size ?: 0
 
+    /**
+     * Add an [TelephoneNumber] to this [ContactDetails].
+     *
+     * @param phoneNumber The [TelephoneNumber] to add.
+     * @return This [ContactDetails] for fluent use.
+     */
     @Deprecated(
         message = "Use phoneNumbers.add(phoneNumber) instead.",
         replaceWith = ReplaceWith("also { it.phoneNumbers.add(phoneNumber) }")
     )
-    fun addPhoneNumber(phoneNumber: TelephoneNumber): ContactDetails = apply {
-        phoneNumbers.add(phoneNumber)
+    fun addPhoneNumber(phoneNumber: TelephoneNumber): ContactDetails {
+        _phoneNumbers = _phoneNumbers ?: mutableListOf()
+        _phoneNumbers!!.add(phoneNumber)
+
+        return this
     }
 
+    /**
+     * Remove an [TelephoneNumber] from this [ContactDetails].
+     *
+     * @param phoneNumber The [TelephoneNumber] to remove.
+     * @return true if the [TelephoneNumber] was removed.
+     */
     @Deprecated(
         message = "Use phoneNumbers.remove(phoneNumber) instead.",
         replaceWith = ReplaceWith("phoneNumbers.remove(phoneNumber)")
     )
-    fun removePhoneNumber(phoneNumber: TelephoneNumber): Boolean = phoneNumbers.remove(phoneNumber)
+    fun removePhoneNumber(phoneNumber: TelephoneNumber): Boolean {
+        val ret = _phoneNumbers?.remove(phoneNumber) == true
+        if (_phoneNumbers.isNullOrEmpty()) _phoneNumbers = null
+        return ret
+    }
 
+    /**
+     * Clear all [TelephoneNumber]'s from this [ContactDetails].
+     *
+     * @return This [ContactDetails] for fluent use.
+     */
     @Deprecated(
         message = "Use phoneNumbers.clear() instead.",
         replaceWith = ReplaceWith("phoneNumbers.clear()")
     )
-    fun clearPhoneNumbers(): ContactDetails = apply {
-        phoneNumbers.clear()
+    fun clearPhoneNumbers(): ContactDetails {
+        _phoneNumbers = null
+        return this
     }
 
     // endregion
 
     // region electronicAddresses boilerplate
 
+    /**
+     * Get the number of entries in the [ElectronicAddress] collection.
+     */
     @Deprecated(
         message = "Use electronicAddresses.size instead.",
         replaceWith = ReplaceWith("electronicAddresses.size")
     )
-    fun numElectronicAddresses(): Int = electronicAddresses.size
+    fun numElectronicAddresses(): Int = _electronicAddresses?.size ?: 0
 
+    /**
+     * Add an [ElectronicAddress] to this [ContactDetails].
+     *
+     * @param electronicAddress The [ElectronicAddress] to add.
+     * @return This [ContactDetails] for fluent use.
+     */
     @Deprecated(
         message = "Use electronicAddresses.add(electronicAddress) instead.",
         replaceWith = ReplaceWith("also { it.electronicAddresses.add(electronicAddress) }")
     )
-    fun addElectronicAddress(electronicAddress: ElectronicAddress): ContactDetails = apply {
-        electronicAddresses.add(electronicAddress)
+    fun addElectronicAddress(electronicAddress: ElectronicAddress): ContactDetails {
+        _electronicAddresses = _electronicAddresses ?: mutableListOf()
+        _electronicAddresses!!.add(electronicAddress)
+
+        return this
     }
 
+    /**
+     * Remove an [ElectronicAddress] from this [ContactDetails].
+     *
+     * @param electronicAddress The [ElectronicAddress] to remove.
+     * @return true if the [ElectronicAddress] was removed.
+     */
     @Deprecated(
         message = "Use electronicAddresses.remove(electronicAddress) instead.",
         replaceWith = ReplaceWith("electronicAddresses.remove(electronicAddress)")
     )
-    fun removeElectronicAddress(electronicAddress: ElectronicAddress): Boolean = electronicAddresses.remove(electronicAddress)
+    fun removeElectronicAddress(electronicAddress: ElectronicAddress): Boolean {
+        val ret = _electronicAddresses?.remove(electronicAddress) == true
+        if (_electronicAddresses.isNullOrEmpty()) _electronicAddresses = null
+        return ret
+    }
 
+    /**
+     * Clear all [ElectronicAddress]'s from this [ContactDetails].
+     *
+     * @return This [ContactDetails] for fluent use.
+     */
     @Deprecated(
         message = "Use electronicAddresses.clear() instead.",
         replaceWith = ReplaceWith("electronicAddresses.clear()")
     )
-    fun clearElectronicAddresses(): ContactDetails = apply {
-        electronicAddresses.clear()
+    fun clearElectronicAddresses(): ContactDetails {
+        _electronicAddresses = null
+        return this
     }
 
     // endregion

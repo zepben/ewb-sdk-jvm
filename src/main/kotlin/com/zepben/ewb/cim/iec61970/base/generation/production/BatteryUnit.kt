@@ -12,6 +12,9 @@ import com.zepben.ewb.boilerplate.relations.BatteryControlList
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.BatteryControl
 import com.zepben.ewb.cim.extensions.iec61970.base.wires.BatteryControlMode
+import com.zepben.ewb.services.common.extensions.getByMRID
+import com.zepben.ewb.services.common.extensions.safeRemove
+import com.zepben.ewb.services.common.extensions.validateReference
 
 /**
  * An electrochemical energy storage device.
@@ -38,8 +41,6 @@ class BatteryUnit(mRID: String) : PowerElectronicsUnit(mRID) {
             elementDescription = "A BatteryControl"
         )
 
-
-
     // region deprecated list boilerplate
     //
     // ("region/endregion" is an IntelliJ feature letting you hide the entire thing)
@@ -49,6 +50,11 @@ class BatteryUnit(mRID: String) : PowerElectronicsUnit(mRID) {
 
     // region controls boilerplate
 
+    @Deprecated("Helper for a deprecated function")
+    private fun validateControl(control: BatteryControl): Boolean {
+        return validateReference(control, ::getControl, "A BatteryControl")
+    }
+
     //
     // NOTE: This is called `numBatteryControls` because `numControls` is already used by `PowerSystemResource`.
     //
@@ -56,41 +62,78 @@ class BatteryUnit(mRID: String) : PowerElectronicsUnit(mRID) {
         message = "Use controls.size instead.",
         replaceWith = ReplaceWith("controls.size")
     )
-    fun numBatteryControls(): Int = controls.size
+    fun numBatteryControls(): Int = _batteryControls?.size ?: 0
 
+    /**
+     * Get a [BatteryControl] of this [BatteryUnit] by its [BatteryControl.mRID]
+     *
+     * @param mRID the mRID of the required [BatteryControl]
+     * @return The [BatteryControl] with the specified [mRID] if it exists, otherwise null
+     */
     @Deprecated(
         message = "Use controls.getByMRID(mRID) instead.",
         replaceWith = ReplaceWith("controls.getByMRID(mRID)")
     )
-    fun getControl(mRID: String): BatteryControl? = controls.getByMrid(mRID)
+    fun getControl(mRID: String): BatteryControl? = _batteryControls.getByMRID(mRID)
 
+    /**
+     * Get a [BatteryControl] of this [BatteryUnit] by its [BatteryControl.controlMode]
+     *
+     * @param controlMode the control mode of the required [BatteryControl]
+     * @return The [BatteryControl] with the specified [BatteryControlMode] if it exists, otherwise null
+     */
     @Deprecated(
         message = "Use controls.getByMode(controlMode) instead.",
         replaceWith = ReplaceWith("controls.getByMode(controlMode)")
     )
-    fun getControl(controlMode: BatteryControlMode): BatteryControl? = controls.getByMode(controlMode)
+    fun getControl(controlMode: BatteryControlMode): BatteryControl? = _batteryControls?.firstOrNull { it.controlMode == controlMode }
 
 
+    /**
+     * Add a [BatteryControl] for this [BatteryUnit]
+     *
+     * @throws IllegalStateException if the [BatteryControl] references another [BatteryUnit]
+     * @param control the [BatteryControl] to be added to this [BatteryUnit]
+     *
+     * @return This [BatteryUnit] for fluent use
+     */
     @Deprecated(
         message = "Use controls.add(control) instead.",
         replaceWith = ReplaceWith("also { it.controls.add(control) }")
     )
-    fun addControl(control: BatteryControl): BatteryUnit = apply {
-        controls.add(control)
+    fun addControl(control: BatteryControl): BatteryUnit {
+        if (validateControl(control)) return this
+
+        _batteryControls = _batteryControls.or(::mutableListOf) { add(control) }
+
+        return this
     }
 
+    /**
+     * @param control the [BatteryControl] to disassociate with this battery unit.
+     * @return true if the [BatteryControl] is disassociated.
+     */
     @Deprecated(
         message = "Use controls.remove(control) instead.",
         replaceWith = ReplaceWith("controls.remove(control)")
     )
-    fun removeControl(control: BatteryControl): Boolean = controls.remove(control)
+    fun removeControl(control: BatteryControl): Boolean {
+        val ret = _batteryControls.safeRemove(control)
+        if (_batteryControls.isNullOrEmpty()) _batteryControls = null
+        return ret
+    }
 
+    /**
+     * Clear all [BatteryControl]'s attached to this [BatteryUnit].
+     * @return This [BatteryUnit] for fluent use.
+     */
     @Deprecated(
         message = "Use controls.clear() instead.",
         replaceWith = ReplaceWith("controls.clear()")
     )
-    fun clearControls(): BatteryUnit = apply {
-        controls.clear()
+    fun clearControls(): BatteryUnit {
+        _batteryControls = null
+        return this
     }
 
     // endregion

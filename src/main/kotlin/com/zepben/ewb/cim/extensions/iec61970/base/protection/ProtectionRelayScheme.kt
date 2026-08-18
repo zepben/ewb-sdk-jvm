@@ -12,6 +12,9 @@ import com.zepben.ewb.boilerplate.collections.LazyMridList
 import com.zepben.ewb.boilerplate.collections.MridCollection
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.ewb.services.common.extensions.getByMRID
+import com.zepben.ewb.services.common.extensions.safeRemove
+import com.zepben.ewb.services.common.extensions.validateReference
 
 /**
  * [ZBEX] This extension is in-line with the CIM working group for replacing the `protection` package, can be replaced when the working
@@ -47,38 +50,77 @@ class ProtectionRelayScheme(mRID: String) : IdentifiedObject(mRID) {
 
     // region functions boilerplate
 
+    /**
+     * Get the number of [ProtectionRelayFunction]s operated as a part of this [ProtectionRelayScheme].
+     *
+     * @return The number of [ProtectionRelayFunction]s operated as a part of this [ProtectionRelayScheme].
+     */
     @Deprecated(
         message = "Use functions.size instead.",
         replaceWith = ReplaceWith("functions.size")
     )
-    fun numFunctions(): Int = functions.size
+    fun numFunctions(): Int = _functions?.size ?: 0
 
+    /**
+     * Get a [ProtectionRelayFunction] operated as a part of this [ProtectionRelayScheme] by its mRID.
+     *
+     * @param mRID The mRID of the desired [ProtectionRelayFunction]
+     * @return The [ProtectionRelayFunction] with the specified [mRID] if it exists, otherwise null
+     */
     @Deprecated(
         message = "Use functions.getByMRID(mRID) instead.",
         replaceWith = ReplaceWith("functions.getByMRID(mRID)")
     )
-    fun getFunction(mRID: String): ProtectionRelayFunction? = functions.getByMrid(mRID)
+    fun getFunction(mRID: String): ProtectionRelayFunction? = _functions?.getByMRID(mRID)
 
+    /**
+     * Associate a [ProtectionRelayFunction] with this [ProtectionRelayScheme].
+     *
+     * @param function The [ProtectionRelayFunction] to associate with this [ProtectionRelayScheme].
+     * @return A reference to this [ProtectionRelayScheme] for fluent use.
+     */
     @Deprecated(
         message = "Use functions.add(function) instead.",
         replaceWith = ReplaceWith("also { it.functions.add(function) }")
     )
-    fun addFunction(function: ProtectionRelayFunction): ProtectionRelayScheme = apply {
-        functions.add(function)
+    fun addFunction(function: ProtectionRelayFunction): ProtectionRelayScheme {
+        if (validateReference(function, ::getFunction, "A ProtectionRelayFunction"))
+            return this
+
+        _functions = _functions ?: mutableListOf()
+        _functions!!.add(function)
+
+        return this
     }
 
+    /**
+     * Disassociate a [ProtectionRelayFunction] from this [ProtectionRelayScheme].
+     *
+     * @param function The [ProtectionRelayFunction] to disassociate from this [ProtectionRelayScheme].
+     * @return true if the [ProtectionRelayFunction] was disassociated.
+     */
     @Deprecated(
         message = "Use functions.remove(function) instead.",
         replaceWith = ReplaceWith("functions.remove(function)")
     )
-    fun removeFunction(function: ProtectionRelayFunction): Boolean = functions.remove(function)
+    fun removeFunction(function: ProtectionRelayFunction): Boolean {
+        val ret = _functions.safeRemove(function)
+        if (_functions.isNullOrEmpty()) _functions = null
+        return ret
+    }
 
+    /**
+     * Disassociate all [ProtectionRelayFunction]s from this [ProtectionRelayScheme].
+     *
+     * @return A reference to this [ProtectionRelayScheme] for fluent use.
+     */
     @Deprecated(
         message = "Use functions.clear() instead.",
         replaceWith = ReplaceWith("functions.clear()")
     )
-    fun clearFunctions(): ProtectionRelayScheme = apply {
-        functions.clear()
+    fun clearFunctions(): ProtectionRelayScheme {
+        _functions = null
+        return this
     }
 
     // endregion

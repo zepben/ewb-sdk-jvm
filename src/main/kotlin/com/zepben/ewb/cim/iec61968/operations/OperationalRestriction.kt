@@ -12,6 +12,7 @@ import com.zepben.ewb.boilerplate.collections.LazyMridList
 import com.zepben.ewb.boilerplate.collections.MridCollection
 import com.zepben.ewb.cim.iec61968.common.Document
 import com.zepben.ewb.cim.iec61970.base.core.Equipment
+import com.zepben.ewb.services.common.extensions.validateReference
 
 /**
  * A document that can be associated with equipment to describe any sort of restrictions compared with the
@@ -47,38 +48,75 @@ class OperationalRestriction(mRID: String) : Document(mRID) {
 
     // region equipment boilerplate
 
+    /**
+     * Get the number of entries in the [Equipment] collection.
+     */
     @Deprecated(
         message = "Use equipment.size instead.",
         replaceWith = ReplaceWith("equipment.size")
     )
-    fun numEquipment(): Int = equipment.size
+    fun numEquipment(): Int = _equipment?.size ?: 0
 
+    /**
+     * All equipments to which this restriction applies.
+     *
+     * @param mRID the mRID of the required [Equipment]
+     * @return The [Equipment] with the specified [mRID] if it exists, otherwise null
+     */
     @Deprecated(
         message = "Use equipment.getByMRID(mRID) instead.",
         replaceWith = ReplaceWith("equipment.getByMRID(mRID)")
     )
-    fun getEquipment(mRID: String): Equipment? = equipment.getByMrid(mRID)
+    fun getEquipment(mRID: String): Equipment? = _equipment?.firstOrNull { it.mRID == mRID }
 
+    /**
+     * Add equipment to which this restriction applies.
+     *
+     * @param equipment the equipment to add.
+     * @return A reference to this [OperationalRestriction] to allow fluent use.
+     */
     @Deprecated(
         message = "Use this.equipment.add(equipment) instead.",
         replaceWith = ReplaceWith("also { it.equipment.add(equipment) }")
     )
-    fun addEquipment(equipment: Equipment): OperationalRestriction = apply {
-        this.equipment.add(equipment)
+    fun addEquipment(equipment: Equipment): OperationalRestriction {
+        if (validateReference(equipment, ::getEquipment, "An Equipment"))
+            return this
+
+        _equipment = _equipment ?: mutableListOf()
+        _equipment!!.add(equipment)
+
+        return this
     }
 
+    /**
+     * Remove equipment already associated with this restriction.
+     *
+     * @param equipment The equipment tor remove.
+     * @return true if [equipment] is removed from the collection.
+     */
     @Deprecated(
         message = "Use this.equipment.remove(equipment) instead.",
         replaceWith = ReplaceWith("this.equipment.remove(equipment)")
     )
-    fun removeEquipment(equipment: Equipment): Boolean = this.equipment.remove(equipment)
+    fun removeEquipment(equipment: Equipment): Boolean {
+        val ret = _equipment?.remove(equipment) == true
+        if (_equipment.isNullOrEmpty()) _equipment = null
+        return ret
+    }
 
+    /**
+     * Clear the collection of equipment to which this restriction applies.
+     *
+     * @return A reference to this [OperationalRestriction] to allow fluent use.
+     */
     @Deprecated(
         message = "Use equipment.clear() instead.",
         replaceWith = ReplaceWith("equipment.clear()")
     )
-    fun clearEquipment(): OperationalRestriction = apply {
-        equipment.clear()
+    fun clearEquipment(): OperationalRestriction {
+        _equipment = null
+        return this
     }
 
     // endregion

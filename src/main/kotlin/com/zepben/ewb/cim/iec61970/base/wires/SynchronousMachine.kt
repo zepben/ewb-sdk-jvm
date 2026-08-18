@@ -10,6 +10,8 @@ package com.zepben.ewb.cim.iec61970.base.wires
 
 import com.zepben.ewb.boilerplate.collections.LazyMridList
 import com.zepben.ewb.boilerplate.collections.MridCollection
+import com.zepben.ewb.services.common.extensions.getByMRID
+import com.zepben.ewb.services.common.extensions.validateReference
 
 /**
  * An electromechanical device that operates with shaft rotating synchronously with the network. It is a single machine operating either as a generator or
@@ -95,38 +97,71 @@ class SynchronousMachine(mRID: String) : RotatingMachine(mRID) {
 
     // region curves boilerplate
 
+    /**
+     * Remove a [ReactiveCapabilityCurve] for this [SynchronousMachine]
+     *
+     * @param curve the [ReactiveCapabilityCurve] to be removed from this [SynchronousMachine]
+     * @return true if [ReactiveCapabilityCurve] has been removed from this [SynchronousMachine]
+     */
     @Deprecated(
         message = "Use curves.remove(curve) instead.",
         replaceWith = ReplaceWith("curves.remove(curve)")
     )
-    fun removeCurve(curve: ReactiveCapabilityCurve): Boolean = curves.remove(curve)
+    fun removeCurve(curve: ReactiveCapabilityCurve?): Boolean {
+        val ret = _reactiveCapabilityCurves?.remove(curve) == true
+        if (_reactiveCapabilityCurves.isNullOrEmpty()) _reactiveCapabilityCurves = null
+        return ret
+    }
 
+    /**
+     * Get the number of entries in the [ReactiveCapabilityCurve] collection.
+     */
     @Deprecated(
         message = "Use curves.size instead.",
         replaceWith = ReplaceWith("curves.size")
     )
-    fun numCurves(): Int = curves.size
+    fun numCurves(): Int = _reactiveCapabilityCurves?.size ?: 0
 
+    /**
+     * The individual [ReactiveCapabilityCurve] for this [SynchronousMachine]
+     *
+     * @param mRID the mRID of the required [ReactiveCapabilityCurve]
+     * @return The [ReactiveCapabilityCurve] with the specified [mRID] if it exists, otherwise null
+     */
     @Deprecated(
         message = "Use curves.getByMRID(mRID) instead.",
         replaceWith = ReplaceWith("curves.getByMRID(mRID)")
     )
-    fun getCurve(mRID: String): ReactiveCapabilityCurve? = curves.getByMrid(mRID)
+    fun getCurve(mRID: String): ReactiveCapabilityCurve? = _reactiveCapabilityCurves?.getByMRID(mRID)
 
+    /**
+     * Add a [ReactiveCapabilityCurve] for this [SynchronousMachine]
+     *
+     * @param rcc the [ReactiveCapabilityCurve] to be added from this [SynchronousMachine]
+     */
     @Deprecated(
         message = "Use curves.add(rcc) instead.",
         replaceWith = ReplaceWith("also { it.curves.add(rcc) }")
     )
-    fun addCurve(rcc: ReactiveCapabilityCurve): SynchronousMachine = apply {
-        curves.add(rcc)
+    fun addCurve(rcc: ReactiveCapabilityCurve): SynchronousMachine {
+        if (validateReference(rcc, ::getCurve, "A ReactiveCapabilityCurve"))
+            return this
+
+        _reactiveCapabilityCurves = _reactiveCapabilityCurves.or(::mutableListOf) { add(rcc) }
+
+        return this
     }
 
+    /**
+     * Clear all [ReactiveCapabilityCurve] for this [SynchronousMachine].
+     */
     @Deprecated(
         message = "Use curves.clear() instead.",
         replaceWith = ReplaceWith("curves.clear()")
     )
-    fun clearCurve(): SynchronousMachine = apply {
-        curves.clear()
+    fun clearCurve(): SynchronousMachine {
+        _reactiveCapabilityCurves = null
+        return this
     }
 
     // endregion

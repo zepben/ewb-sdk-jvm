@@ -141,18 +141,35 @@ class PowerTransformerEnd(mRID: String) : TransformerEnd(mRID) {
 
     // region sRatings boilerplate
 
+    /**
+     * Find the first rating with the provided cooling type.
+     *
+     * @param coolingType The [TransformerCoolingType] to search for.
+     * @return The [TransformerEndRatedS] for the given [coolingType], or `null` if there were no ratings for that type.
+     */
     @Deprecated(
         message = "Use sRatings.getByCoolingType(coolingType) instead.",
         replaceWith = ReplaceWith("sRatings.getByCoolingType(coolingType)")
     )
-    fun getRating(coolingType: TransformerCoolingType): TransformerEndRatedS? = sRatings.getByCoolingType(coolingType)
+    fun getRating(coolingType: TransformerCoolingType): TransformerEndRatedS? = _sRatings?.find { it.coolingType == coolingType }
 
+    /**
+     * The number of ratings.
+     */
     @Deprecated(
         message = "Use sRatings.size instead.",
         replaceWith = ReplaceWith("sRatings.size")
     )
-    fun numRatings(): Int = sRatings.size
+    fun numRatings(): Int = _sRatings?.size ?: 0
 
+    /**
+     * Add a normal apparent power rating for this PowerTransformerEnd.
+     * The ratings in the underlying collection will be sorted by [ratedS] in descending order.
+     *
+     * @param ratedS The normal apparent power rating to set.
+     * @param coolingType The cooling type used for this rating, defaults to [TransformerCoolingType.UNKNOWN]
+     * @throws IllegalArgumentException if a rating for the provided [coolingType] already exists for this PowerTransformerEnd.
+     */
     @Deprecated(
         message = "Use sRatings.add(ratedS, coolingType) instead.",
         replaceWith = ReplaceWith("also { it.sRatings.add(ratedS, coolingType) }")
@@ -160,36 +177,72 @@ class PowerTransformerEnd(mRID: String) : TransformerEnd(mRID) {
     fun addRating(
         ratedS: Int,
         coolingType: TransformerCoolingType = TransformerCoolingType.UNKNOWN,
-    ): PowerTransformerEnd = apply {
-        sRatings.add(ratedS, coolingType)
+    ): PowerTransformerEnd {
+        if (_sRatings?.any { r -> r.coolingType == coolingType } == true)
+            throw IllegalArgumentException("A rating for coolingType ${coolingType.name} already exists, please remove it first.")
+
+        _sRatings = _sRatings ?: mutableListOf()
+        _sRatings!!.add(TransformerEndRatedS(coolingType, ratedS))
+        _sRatings!!.sortByDescending { it.ratedS }
+
+        return this
     }
 
+    /**
+     * Add a [TransformerEndRatedS] to this [PowerTransformerEnd].
+     *
+     * @param rating The [TransformerEndRatedS] to add.
+     * @return This [PowerTransformerEnd] for fluent use.
+     */
     @Deprecated(
         message = "Use sRatings.add(rating) instead.",
         replaceWith = ReplaceWith("also { it.sRatings.add(rating) }")
     )
-    fun addRating(rating: TransformerEndRatedS): PowerTransformerEnd = apply {
-        sRatings.add(rating)
-    }
+    fun addRating(rating: TransformerEndRatedS): PowerTransformerEnd = addRating(rating.ratedS, rating.coolingType)
 
+    /**
+     * Remove [rating] from the [sRatings] collection.
+     *
+     * @param rating The [TransformerEndRatedS] to remove.
+     * @return true if [rating] was removed.
+     */
     @Deprecated(
         message = "Use sRatings.remove(rating) instead.",
         replaceWith = ReplaceWith("sRatings.remove(rating)")
     )
-    fun removeRating(rating: TransformerEndRatedS): Boolean = sRatings.remove(rating)
+    fun removeRating(rating: TransformerEndRatedS): Boolean {
+        val ret = _sRatings?.remove(rating) == true
+        if (_sRatings.isNullOrEmpty()) _sRatings = null
+        return ret
+    }
 
+    /**
+     * Remove the [TransformerEndRatedS] from the [sRatings] collection with a cooling type of [coolingType]
+     *
+     * @param coolingType The [TransformerCoolingType] to remove.
+     * @return The [TransformerEndRatedS] that was removed, or null if none was removed.
+     */
     @Deprecated(
         message = "Use sRatings.removeByCoolingType(coolingType) instead.",
         replaceWith = ReplaceWith("sRatings.removeByCoolingType(coolingType)")
     )
-    fun removeRating(coolingType: TransformerCoolingType): TransformerEndRatedS? = sRatings.removeByCoolingType(coolingType)
+    fun removeRating(coolingType: TransformerCoolingType): TransformerEndRatedS? {
+        val r = _sRatings?.find { it.coolingType == coolingType }
+        _sRatings?.remove(r)
+        if (_sRatings.isNullOrEmpty()) _sRatings = null
+        return r
+    }
 
+    /**
+     * Clear the [sRatings] for this end.
+     */
     @Deprecated(
         message = "Use sRatings.clear() instead.",
         replaceWith = ReplaceWith("also { it.sRatings.clear() }")
     )
-    fun clearRatings(): PowerTransformerEnd = apply {
-        sRatings.clear()
+    fun clearRatings(): PowerTransformerEnd {
+        _sRatings = null
+        return this
     }
 
     // endregion

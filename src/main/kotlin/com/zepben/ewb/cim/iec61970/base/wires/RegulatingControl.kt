@@ -14,6 +14,8 @@ import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.iec61970.base.core.PhaseCode
 import com.zepben.ewb.cim.iec61970.base.core.PowerSystemResource
 import com.zepben.ewb.cim.iec61970.base.core.Terminal
+import com.zepben.ewb.services.common.extensions.getByMRID
+import com.zepben.ewb.services.common.extensions.validateReference
 
 /**
  * Specifies a set of equipment that works together to control a power system quantity such as voltage or flow.
@@ -102,38 +104,71 @@ abstract class RegulatingControl(mRID: String) : PowerSystemResource(mRID) {
 
     // region regulatingCondEqs boilerplate
 
+    /**
+     * Get the number of entries in the [RegulatingCondEq] collection.
+     */
     @Deprecated(
         message = "Use regulatingCondEqs.size instead.",
         replaceWith = ReplaceWith("regulatingCondEqs.size")
     )
-    fun numRegulatingCondEqs(): Int = regulatingCondEqs.size
+    fun numRegulatingCondEqs(): Int = _regulatingCondEqs?.size ?: 0
 
+    /**
+     * [RegulatingCondEq]'s controlled by this [RegulatingControl].
+     *
+     * @param mRID the mRID of the required [RegulatingCondEq]
+     * @return The [RegulatingCondEq] with the specified [mRID] if it exists, otherwise null
+     */
     @Deprecated(
         message = "Use regulatingCondEqs.getByMRID(mRID) instead.",
         replaceWith = ReplaceWith("regulatingCondEqs.getByMRID(mRID)")
     )
-    fun getRegulatingCondEq(mRID: String): RegulatingCondEq? = regulatingCondEqs.getByMrid(mRID)
+    fun getRegulatingCondEq(mRID: String): RegulatingCondEq? = _regulatingCondEqs.getByMRID(mRID)
 
+    /**
+     * @param regulatingCondEq the regulating conducting equipment controlled by this [RegulatingControl].
+     * @return true if the regulating conducting equipment is associated.
+     * @return A reference to this [RegulatingControl] to allow fluent use.
+     */
     @Deprecated(
         message = "Use regulatingCondEqs.add(regulatingCondEq) instead.",
         replaceWith = ReplaceWith("also { it.regulatingCondEqs.add(regulatingCondEq) }")
     )
-    fun addRegulatingCondEq(regulatingCondEq: RegulatingCondEq): RegulatingControl = apply {
-        regulatingCondEqs.add(regulatingCondEq)
+    fun addRegulatingCondEq(regulatingCondEq: RegulatingCondEq): RegulatingControl {
+        if (validateReference(regulatingCondEq, ::getRegulatingCondEq, "A RegulatingCondEq"))
+            return this
+
+        _regulatingCondEqs = _regulatingCondEqs ?: mutableListOf()
+        _regulatingCondEqs!!.add(regulatingCondEq)
+
+        return this
     }
 
+    /**
+     * @param regulatingCondEq the regulating conducting equipment to disassociate from this [RegulatingControl].
+     * @return this [RegulatingControl]
+     */
     @Deprecated(
         message = "Use regulatingCondEqs.remove(regulatingCondEq) instead.",
         replaceWith = ReplaceWith("regulatingCondEqs.remove(regulatingCondEq)")
     )
-    fun removeRegulatingCondEq(regulatingCondEq: RegulatingCondEq): Boolean = regulatingCondEqs.remove(regulatingCondEq)
+    fun removeRegulatingCondEq(regulatingCondEq: RegulatingCondEq): Boolean {
+        val ret = _regulatingCondEqs?.remove(regulatingCondEq) == true
+        if (_regulatingCondEqs.isNullOrEmpty()) _regulatingCondEqs = null
+        return ret
+    }
 
+    /**
+     * Clear this [RegulatingControl]'s associated [RegulatingCondEq]'s
+     * @return this [RegulatingControl]
+     */
     @Deprecated(
         message = "Use regulatingCondEqs.clear() instead.",
         replaceWith = ReplaceWith("regulatingCondEqs.clear()")
     )
-    fun clearRegulatingCondEqs(): RegulatingControl = apply {
-        regulatingCondEqs.clear()
+    fun clearRegulatingCondEqs(): RegulatingControl {
+        _regulatingCondEqs = null
+        return this
     }
 
     // endregion

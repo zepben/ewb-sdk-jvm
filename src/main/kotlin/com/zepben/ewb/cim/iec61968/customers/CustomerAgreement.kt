@@ -11,6 +11,8 @@ package com.zepben.ewb.cim.iec61968.customers
 import com.zepben.ewb.boilerplate.collections.LazyMridList
 import com.zepben.ewb.boilerplate.collections.MridCollection
 import com.zepben.ewb.cim.iec61968.common.Agreement
+import com.zepben.ewb.services.common.extensions.getByMRID
+import com.zepben.ewb.services.common.extensions.validateReference
 
 /**
  * Agreement between the customer and the service supplier to pay for service at a specific service location. It
@@ -48,38 +50,75 @@ class CustomerAgreement(mRID: String) : Agreement(mRID) {
 
     // region pricingStructures boilerplate
 
+    /**
+     * Get the number of entries in the [PricingStructure] collection.
+     */
     @Deprecated(
         message = "Use pricingStructures.size instead.",
         replaceWith = ReplaceWith("pricingStructures.size")
     )
-    fun numPricingStructures(): Int = pricingStructures.size
+    fun numPricingStructures(): Int = _pricingStructures?.size ?: 0
 
+    /**
+     * All pricing structures applicable to this customer agreement.
+     *
+     * @param mRID the mRID of the required [PricingStructure]
+     * @return The [PricingStructure] with the specified [mRID] if it exists, otherwise null
+     */
     @Deprecated(
         message = "Use pricingStructures.getByMRID(mRID) instead.",
         replaceWith = ReplaceWith("pricingStructures.getByMRID(mRID)")
     )
-    fun getPricingStructure(mRID: String): PricingStructure? = pricingStructures.getByMrid(mRID)
+    fun getPricingStructure(mRID: String): PricingStructure? = _pricingStructures?.getByMRID(mRID)
 
+    /**
+     * Add a [PricingStructure] to this [CustomerAgreement].
+     *
+     * @param pricingStructure The [PricingStructure] to add.
+     * @return This [CustomerAgreement] for fluent use.
+     */
     @Deprecated(
         message = "Use pricingStructures.add(pricingStructure) instead.",
         replaceWith = ReplaceWith("also { it.pricingStructures.add(pricingStructure) }")
     )
-    fun addPricingStructure(pricingStructure: PricingStructure): CustomerAgreement = apply {
-        pricingStructures.add(pricingStructure)
+    fun addPricingStructure(pricingStructure: PricingStructure): CustomerAgreement {
+        if (validateReference(pricingStructure, ::getPricingStructure, "A PricingStructure"))
+            return this
+
+        _pricingStructures = _pricingStructures ?: mutableListOf()
+        _pricingStructures!!.add(pricingStructure)
+
+        return this
     }
 
+    /**
+     * Remove a [PricingStructure] from this [CustomerAgreement].
+     *
+     * @param pricingStructure The [PricingStructure] to remove.
+     * @return true if [pricingStructure] is removed from the collection.
+     */
     @Deprecated(
         message = "Use pricingStructures.remove(pricingStructure) instead.",
         replaceWith = ReplaceWith("pricingStructures.remove(pricingStructure)")
     )
-    fun removePricingStructure(pricingStructure: PricingStructure): Boolean = pricingStructures.remove(pricingStructure)
+    fun removePricingStructure(pricingStructure: PricingStructure): Boolean {
+        val ret = _pricingStructures?.remove(pricingStructure) == true
+        if (_pricingStructures.isNullOrEmpty()) _pricingStructures = null
+        return ret
+    }
 
+    /**
+     * Clear all [PricingStructure]'s from this [CustomerAgreement].
+     *
+     * @return This [CustomerAgreement] for fluent use.
+     */
     @Deprecated(
         message = "Use pricingStructures.clear() instead.",
         replaceWith = ReplaceWith("pricingStructures.clear()")
     )
-    fun clearPricingStructures(): CustomerAgreement = apply {
-        pricingStructures.clear()
+    fun clearPricingStructures(): CustomerAgreement {
+        _pricingStructures = null
+        return this
     }
 
     // endregion

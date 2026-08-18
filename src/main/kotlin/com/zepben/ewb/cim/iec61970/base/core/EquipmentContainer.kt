@@ -10,6 +10,7 @@ package com.zepben.ewb.cim.iec61970.base.core
 
 import com.zepben.ewb.boilerplate.collections.LazyMridMap
 import com.zepben.ewb.boilerplate.collections.MridCollection
+import com.zepben.ewb.services.common.extensions.validateReference
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.tracing.networktrace.operators.NetworkStateOperators
 
@@ -83,76 +84,117 @@ abstract class EquipmentContainer(mRID: String) : ConnectivityNodeContainer(mRID
     // It will be removed eventually.
     // Every single method simply forwards the call to the corresponding dict.
 
+    /**
+     * Get the number of entries in the [Equipment] collection.
+     */
     @Deprecated(
         message = "Use equipment.size instead.",
         replaceWith = ReplaceWith("equipment.size")
     )
-    fun numEquipment(): Int = equipment.size
+    fun numEquipment(): Int = _equipmentById?.size ?: 0
 
+    /**
+     * Contained equipment.
+     *
+     * @param mRID the mRID of the required [Equipment]
+     * @return The [Equipment] with the specified [mRID] if it exists, otherwise null
+     */
     @Deprecated(
         message = "Use equipment.getByMrid(mRID) instead.",
         replaceWith = ReplaceWith("equipment.getByMrid(mRID)")
     )
-    fun getEquipment(mRID: String): Equipment? = equipment.getByMrid(mRID)
+    fun getEquipment(mRID: String): Equipment? = _equipmentById?.get(mRID)
 
+    /**
+     * @param equipment the equipment to associate with this equipment container.
+     */
     @Deprecated(
         message = "Use equipment.add(equipment) instead.",
         replaceWith = ReplaceWith("also { it.equipment.add(equipment) }")
     )
-    fun addEquipment(equipment: Equipment): EquipmentContainer = apply {
-        this.equipment.add(equipment)
+    fun addEquipment(equipment: Equipment): EquipmentContainer {
+        if (validateReference(equipment, ::getEquipment, "An Equipment"))
+            return this
+
+        _equipmentById = _equipmentById ?: mutableMapOf()
+        _equipmentById!![equipment.mRID] = equipment
+
+        return this
     }
 
+    /**
+     * @param equipment the equipment to disassociate from this equipment container.
+     */
     @Deprecated(
         message = "Use equipment.remove(equipment) instead.",
         replaceWith = ReplaceWith("equipment.remove(equipment)")
     )
-    fun removeEquipment(equipment: Equipment): Boolean =
-        this.equipment.remove(equipment)
+    fun removeEquipment(equipment: Equipment): Boolean {
+        val ret = _equipmentById?.remove(equipment.mRID) != null
+        if (_equipmentById.isNullOrEmpty()) _equipmentById = null
+        return ret
+    }
 
+    /**
+     * Clear all Equipment associated with this [EquipmentContainer]
+     */
     @Deprecated(
         message = "Use equipment.clear() instead.",
         replaceWith = ReplaceWith("also { it.equipment.clear() }")
     )
-    fun clearEquipment(): EquipmentContainer = apply {
-        equipment.clear()
+    fun clearEquipment(): EquipmentContainer {
+        _equipmentById = null
+        return this
     }
 
 
+    /**
+     * Get the number of entries in the current [Equipment] collection.
+     */
     @Deprecated(
         message = "Use currentEquipment.size instead.",
         replaceWith = ReplaceWith("currentEquipment.size")
     )
-    open fun numCurrentEquipment(): Int = currentEquipment.size
+    open fun numCurrentEquipment(): Int = numEquipment()
 
+    /**
+     * Contained equipment using the current state of the network.
+     *
+     * @param mRID the mRID of the required current [Equipment]
+     * @return The [Equipment] with the specified [mRID] if it exists, otherwise null
+     */
     @Deprecated(
         message = "Use currentEquipment.getByMrid(mRID) instead.",
         replaceWith = ReplaceWith("currentEquipment.getByMrid(mRID)")
     )
-    open fun getCurrentEquipment(mRID: String): Equipment? = currentEquipment.getByMrid(mRID)
+    open fun getCurrentEquipment(mRID: String): Equipment? = getEquipment(mRID)
 
+    /**
+     * @param equipment the equipment to associate with this equipment container in the current state of the network.
+     */
     @Deprecated(
         message = "Use currentEquipment.add(currentEquipment) instead.",
         replaceWith = ReplaceWith("also { it.currentEquipment.add(currentEquipment) }")
     )
-    open fun addCurrentEquipment(equipment: Equipment): EquipmentContainer = apply {
-        currentEquipment.add(equipment)
-    }
+    open fun addCurrentEquipment(equipment: Equipment): EquipmentContainer = addEquipment(equipment)
 
+    /**
+     * @param equipment the equipment to disassociate from this equipment container in the current state of the network.
+     */
     @Deprecated(
         message = "Use currentEquipment.remove(currentEquipment) instead.",
         replaceWith = ReplaceWith("currentEquipment.remove(currentEquipment)")
     )
-    open fun removeCurrentEquipment(equipment: Equipment): Boolean =
-        currentEquipment.remove(equipment)
+    open fun removeCurrentEquipment(equipment: Equipment): Boolean = removeEquipment(equipment)
 
+    /**
+     * Clear all Equipment associated with this [Feeder]
+     */
     @Deprecated(
         message = "Use currentEquipment.clear() instead.",
         replaceWith = ReplaceWith("also { it.currentEquipment.clear() }")
     )
-    open fun clearCurrentEquipment(): EquipmentContainer = apply {
-        currentEquipment.clear()
-    }
+    open fun clearCurrentEquipment(): EquipmentContainer = clearEquipment()
 
     // endregion
 

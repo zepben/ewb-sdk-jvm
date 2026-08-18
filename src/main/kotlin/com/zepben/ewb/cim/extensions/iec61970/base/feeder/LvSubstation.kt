@@ -14,6 +14,7 @@ import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.iec61970.base.core.EquipmentContainer
 import com.zepben.ewb.cim.iec61970.base.core.Feeder
 import com.zepben.ewb.cim.iec61970.base.wires.Switch
+import com.zepben.ewb.services.common.extensions.validateReference
 
 /**
  * [ZBEX] A collection of equipment for purposes other than generation or utilization, through which electric energy in bulk is passed for the distribution of energy to low voltage network.
@@ -72,116 +73,217 @@ class LvSubstation(mRID: String) : EquipmentContainer(mRID) {
 
     // region normalEnergizingFeeders boilerplate
 
+    /**
+     * Get the number of entries in the normal [Feeder] collection.
+     */
     @Deprecated(
         message = "Use normalEnergizingFeeders.size instead.",
         replaceWith = ReplaceWith("normalEnergizingFeeders.size")
     )
-    fun numNormalEnergizingFeeders(): Int = normalEnergizingFeeders.size
+    fun numNormalEnergizingFeeders(): Int = _normalEnergizingFeedersById?.size ?: 0
 
+    /**
+     * Energizing feeder using the normal state of the network.
+     *
+     * @param mRID the mRID of the required normal [Feeder]
+     * @return The [Feeder] with the specified [mRID] if it exists, otherwise null
+     */
     @Deprecated(
         message = "Use normalEnergizingFeeders.getByMrid(mRID) instead.",
         replaceWith = ReplaceWith("normalEnergizingFeeders.getByMrid(mRID)")
     )
-    fun getNormalEnergizingFeeder(mRID: String): Feeder? = normalEnergizingFeeders.getByMrid(mRID)
+    fun getNormalEnergizingFeeder(mRID: String): Feeder? = _normalEnergizingFeedersById?.get(mRID)
 
+    /**
+     * Associate this [LvSubstation] with a [Feeder] in the normal state of the network.
+     *
+     * @param feeder the HV/MV feeder to associate with this [LvSubstation] in the normal state of the network.
+     * @return This [LvSubstation] for fluent use.
+     */
     @Deprecated(
         message = "Use normalEnergizingFeeders.add(feeder) instead.",
         replaceWith = ReplaceWith("also { it.normalEnergizingFeeders.add(feeder) }")
     )
-    fun addNormalEnergizingFeeder(feeder: Feeder): LvSubstation = apply {
-        normalEnergizingFeeders.add(feeder)
+    fun addNormalEnergizingFeeder(feeder: Feeder): LvSubstation {
+        if (validateReference(feeder, ::getNormalEnergizingFeeder, "A Feeder"))
+            return this
+
+        _normalEnergizingFeedersById = _normalEnergizingFeedersById ?: mutableMapOf()
+        _normalEnergizingFeedersById!!.putIfAbsent(feeder.mRID, feeder)
+
+        return this
     }
 
+    /**
+     * Disassociate this [LvSubstation] from a [Feeder] in the normal state of the network.
+     *
+     * @param feeder the HV/MV feeder to disassociate from this [LvSubstation] in the normal state of the network.
+     * @return true if a matching feeder is removed from the collection.
+     */
     @Deprecated(
         message = "Use normalEnergizingFeeders.remove(feeder) instead.",
         replaceWith = ReplaceWith("normalEnergizingFeeders.remove(feeder)")
     )
-    fun removeNormalEnergizingFeeder(feeder: Feeder): Boolean =
+    fun removeNormalEnergizingFeeder(feeder: Feeder): Boolean {
+        val ret = _normalEnergizingFeedersById?.remove(feeder.mRID)
+        if (_normalEnergizingFeedersById.isNullOrEmpty()) _normalEnergizingFeedersById = null
+        return ret != null
+    }
 
     // endregion
 
-        normalEnergizingFeeders.remove(feeder)
-
+    /**
+     * Clear all [Feeder]'s associated with this [LvSubstation] in the normal state of the network.
+     *
+     * @return This [LvSubstation] for fluent use.
+     */
     @Deprecated(
         message = "Use normalEnergizingFeeders.clear() instead.",
         replaceWith = ReplaceWith("also { it.normalEnergizingFeeders.clear() }")
     )
-    fun clearNormalEnergizingFeeders(): LvSubstation = apply {
-        normalEnergizingFeeders.clear()
+    fun clearNormalEnergizingFeeders(): LvSubstation {
+        _normalEnergizingFeedersById = null
+        return this
     }
 
 
 
+    /**
+     * Get the number of entries in the normal [LvFeeder] collection.
+     */
     @Deprecated(
         message = "Use normalEnergizedLvFeeders.size instead.",
         replaceWith = ReplaceWith("normalEnergizedLvFeeders.size")
     )
-    fun numNormalEnergizedLvFeeders(): Int = normalEnergizedLvFeeders.size
+    fun numNormalEnergizedLvFeeders(): Int = _normalEnergizedLvFeedersById?.size ?: 0
 
+    /**
+     * Retrieve an energized [LvFeeder] using the normal state of the network.
+     *
+     * @param mRID the mRID of the required normal [LvFeeder]
+     * @return The [LvFeeder] with the specified [mRID] if it exists, otherwise null
+     */
     @Deprecated(
         message = "Use normalEnergizedLvFeeders.getByMrid(mRID) instead.",
         replaceWith = ReplaceWith("normalEnergizedLvFeeders.getByMrid(mRID)")
     )
-    fun getNormalEnergizedLvFeeder(mRID: String): LvFeeder? = normalEnergizedLvFeeders.getByMrid(mRID)
+    fun getNormalEnergizedLvFeeder(mRID: String): LvFeeder? = _normalEnergizedLvFeedersById?.get(mRID)
 
+    /**
+     * @param lvFeeder the [LvFeeder] to associate with this feeder in the normal state of the network.
+     */
     @Deprecated(
         message = "Use normalEnergizedLvFeeders.add(lvFeeder) instead.",
         replaceWith = ReplaceWith("also { it.normalEnergizedLvFeeders.add(lvFeeder) }")
     )
-    fun addNormalEnergizedLvFeeder(lvFeeder: LvFeeder): LvSubstation = apply {
-        normalEnergizedLvFeeders.add(lvFeeder)
+    fun addNormalEnergizedLvFeeder(lvFeeder: LvFeeder): LvSubstation {
+        if (validateReference(lvFeeder, ::getNormalEnergizedLvFeeder, "An LvFeeder"))
+            return this
+
+        _normalEnergizedLvFeedersById = _normalEnergizedLvFeedersById ?: mutableMapOf()
+        _normalEnergizedLvFeedersById!!.putIfAbsent(lvFeeder.mRID, lvFeeder)
+
+        return this
     }
 
+    /**
+     * @param lvFeeder the [LvFeeder] to disassociate from this HV/MV feeder in the normal state of the network.
+     */
     @Deprecated(
         message = "Use normalEnergizedLvFeeders.remove(lvFeeder) instead.",
         replaceWith = ReplaceWith("normalEnergizedLvFeeders.remove(lvFeeder)")
     )
-    fun removeNormalEnergizedLvFeeder(lvFeeder: LvFeeder): Boolean =
-        normalEnergizedLvFeeders.remove(lvFeeder)
+    fun removeNormalEnergizedLvFeeder(lvFeeder: LvFeeder): Boolean {
+        val ret = _normalEnergizedLvFeedersById?.remove(lvFeeder.mRID)
+        if (_normalEnergizedLvFeedersById.isNullOrEmpty()) _normalEnergizedLvFeedersById = null
+        return ret != null
+    }
 
+    /**
+     * Clear all [LvFeeder]'s associated with this [LvSubstation] in the normal state of the network.
+     *
+     * @return This [LvSubstation] for fluent use.
+     */
     @Deprecated(
         message = "Use normalEnergizedLvFeeders.clear() instead.",
         replaceWith = ReplaceWith("also { it.normalEnergizedLvFeeders.clear() }")
     )
-    fun clearNormalEnergizedLvFeeders(): LvSubstation = apply {
-        normalEnergizedLvFeeders.clear()
+    fun clearNormalEnergizedLvFeeders(): LvSubstation {
+        _normalEnergizedLvFeedersById = null
+        return this
     }
 
 
 
+    /**
+     * Get the number of entries in the current [Feeder] collection.
+     */
     @Deprecated(
         message = "Use currentEnergizingFeeders.size instead.",
         replaceWith = ReplaceWith("currentEnergizingFeeders.size")
     )
-    fun numCurrentEnergizingFeeders(): Int = currentEnergizingFeeders.size
+    fun numCurrentEnergizingFeeders(): Int = _currentEnergizingFeedersById?.size ?: 0
 
+    /**
+     * Retrieve an energizing feeder using the current state of the network.
+     *
+     * @param mRID the mRID of the required current [Feeder]
+     * @return The [Feeder] with the specified [mRID] if it exists, otherwise null
+     */
     @Deprecated(
         message = "Use currentEnergizingFeeders.getByMrid(mRID) instead.",
         replaceWith = ReplaceWith("currentEnergizingFeeders.getByMrid(mRID)")
     )
-    fun getCurrentEnergizingFeeder(mRID: String): Feeder? = currentEnergizingFeeders.getByMrid(mRID)
+    fun getCurrentEnergizingFeeder(mRID: String): Feeder? = _currentEnergizingFeedersById?.get(mRID)
 
+    /**
+     * Associate this [LvSubstation] with a [Feeder] in the current state of the network.
+     *
+     * @param feeder the HV/MV feeder to associate with this [LvSubstation] in the current state of the network.
+     * @return This [LvSubstation] for fluent use.
+     */
     @Deprecated(
         message = "Use currentEnergizingFeeders.add(feeder) instead.",
         replaceWith = ReplaceWith("also { it.currentEnergizingFeeders.add(feeder) }")
     )
-    fun addCurrentEnergizingFeeder(feeder: Feeder): LvSubstation = apply {
-        currentEnergizingFeeders.add(feeder)
+    fun addCurrentEnergizingFeeder(feeder: Feeder): LvSubstation {
+        if (validateReference(feeder, ::getCurrentEnergizingFeeder, "A Feeder"))
+            return this
+
+        _currentEnergizingFeedersById = _currentEnergizingFeedersById ?: mutableMapOf()
+        _currentEnergizingFeedersById!!.putIfAbsent(feeder.mRID, feeder)
+
+        return this
     }
 
+    /**
+     * Disassociate this [LvSubstation] from a [Feeder] in the current state of the network.
+     *
+     * @param feeder the HV/MV feeder to disassociate from this LvSubstation the current state of the network.
+     * @return true if a matching feeder is removed from the collection.
+     */
     @Deprecated(
         message = "Use currentEnergizingFeeders.remove(feeder) instead.",
         replaceWith = ReplaceWith("currentEnergizingFeeders.remove(feeder)")
     )
-    fun removeCurrentEnergizingFeeder(feeder: Feeder): Boolean =
-        currentEnergizingFeeders.remove(feeder)
+    fun removeCurrentEnergizingFeeder(feeder: Feeder): Boolean {
+        val ret = _currentEnergizingFeedersById?.remove(feeder.mRID)
+        if (_currentEnergizingFeedersById.isNullOrEmpty()) _currentEnergizingFeedersById = null
+        return ret != null
+    }
 
+    /**
+     * Clear all [Feeder]'s associated with this [LvSubstation] in the current state of the network.
+     *
+     * @return This [LvSubstation] for fluent use.
+     */
     @Deprecated(
         message = "Use currentEnergizingFeeders.clear() instead.",
         replaceWith = ReplaceWith("also { it.currentEnergizingFeeders.clear() }")
     )
-    fun clearCurrentEnergizingFeeders(): LvSubstation = apply {
-        currentEnergizingFeeders.clear()
+    fun clearCurrentEnergizingFeeders(): LvSubstation {
+        _currentEnergizingFeedersById = null
+        return this
     }
 
     //endregion

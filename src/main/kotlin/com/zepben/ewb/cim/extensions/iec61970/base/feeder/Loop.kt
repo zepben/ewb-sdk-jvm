@@ -14,6 +14,8 @@ import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.core.Substation
 import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
+import com.zepben.ewb.services.common.extensions.getByMRID
+import com.zepben.ewb.services.common.extensions.validateReference
 
 /**
  * [ZBEX]
@@ -72,114 +74,210 @@ class Loop(mRID: String) : IdentifiedObject(mRID) {
 
     // region circuits boilerplate
 
+    /**
+     * Get the number of entries in the [circuits] collection.
+     */
     @Deprecated(
         message = "Use circuits.size instead.",
         replaceWith = ReplaceWith("circuits.size")
     )
-    fun numCircuits(): Int = circuits.size
+    fun numCircuits(): Int = _circuits?.size ?: 0
 
+    /**
+     * Retrieve a [Circuit] from the [circuits] collection.
+     *
+     * @param mRID the mRID of the required [Circuit]
+     * @return The [Circuit] with the specified [mRID] if it exists, otherwise null
+     */
     @Deprecated(
         message = "Use circuits.getByMRID(mRID) instead.",
         replaceWith = ReplaceWith("circuits.getByMRID(mRID)")
     )
-    fun getCircuit(mRID: String): Circuit? = circuits.getByMrid(mRID)
+    fun getCircuit(mRID: String): Circuit? = _circuits.getByMRID(mRID)
 
+    /**
+     * @param circuit the [Circuit] to associate with this [Loop].
+     * @return A reference to this [Loop] to allow fluent use.
+     */
     @Deprecated(
         message = "Use circuits.add(circuit) instead.",
         replaceWith = ReplaceWith("also { it.circuits.add(circuit) }")
     )
-    fun addCircuit(circuit: Circuit): Loop = apply {
-        circuits.add(circuit)
+    fun addCircuit(circuit: Circuit): Loop {
+        if (validateReference(circuit, ::getCircuit, "A Circuit"))
+            return this
+
+        _circuits = _circuits ?: mutableListOf()
+        _circuits!!.add(circuit)
+
+        return this
     }
 
+    /**
+     * @param circuit the [Circuit] to disassociate with this [Loop].
+     * @return `true` if [circuit] has been successfully removed; `false` if it was not present.
+     */
     @Deprecated(
         message = "Use circuits.remove(circuit) instead.",
         replaceWith = ReplaceWith("circuits.remove(circuit)")
     )
-    fun removeCircuit(circuit: Circuit): Boolean = circuits.remove(circuit)
+    fun removeCircuit(circuit: Circuit): Boolean {
+        val ret = _circuits?.remove(circuit) == true
+        if (_circuits.isNullOrEmpty()) _circuits = null
+        return ret
+    }
 
+    /**
+     * Clear this [Loop]'s associated [circuits].
+     * @return this [Loop]
+     */
     @Deprecated(
         message = "Use circuits.clear() instead.",
         replaceWith = ReplaceWith("circuits.clear()")
     )
-    fun clearCircuits(): Loop = apply {
-        circuits.clear()
+    fun clearCircuits(): Loop {
+        _circuits = null
+        return this
     }
 
     // endregion
 
     // region substations boilerplate
 
+    /**
+     * Get the number of entries in the [substations] collection.
+     */
     @Deprecated(
         message = "Use substations.size instead.",
         replaceWith = ReplaceWith("substations.size")
     )
-    fun numSubstations(): Int = substations.size
+    fun numSubstations(): Int = _substations?.size ?: 0
 
+    /**
+     * Retrieve a [Substation] that is powered by this [Loop].
+     *
+     * @param mRID the mRID of the required [Substation]
+     * @return The [Substation] with the specified [mRID] if it exists, otherwise null
+     */
     @Deprecated(
         message = "Use substations.getByMRID(mRID) instead.",
         replaceWith = ReplaceWith("substations.getByMRID(mRID)")
     )
-    fun getSubstation(mRID: String): Substation? = substations.getByMrid(mRID)
+    fun getSubstation(mRID: String): Substation? = _substations.getByMRID(mRID)
 
+    /**
+     * @param substation the [Substation] that is powered by this [Loop].
+     * @return A reference to this [Loop] to allow fluent use.
+     */
     @Deprecated(
         message = "Use substations.add(substation) instead.",
         replaceWith = ReplaceWith("also { it.substations.add(substation) }")
     )
-    fun addSubstation(substation: Substation): Loop = apply {
-        substations.add(substation)
+    fun addSubstation(substation: Substation): Loop {
+        if (validateReference(substation, ::getSubstation, "A Substation"))
+            return this
+
+        _substations = _substations ?: mutableListOf()
+        _substations!!.add(substation)
+
+        return this
     }
 
+    /**
+     * @param substation the [Substation] no longer powered by this [Loop].
+     * @return `true` if [substation] has been successfully removed; `false` if it was not present.
+     */
     @Deprecated(
         message = "Use substations.remove(substation) instead.",
         replaceWith = ReplaceWith("substations.remove(substation)")
     )
-    fun removeSubstation(substation: Substation): Boolean = substations.remove(substation)
+    fun removeSubstation(substation: Substation): Boolean {
+        val ret = _substations?.remove(substation) == true
+        if (_substations.isNullOrEmpty()) _substations = null
+        return ret
+    }
 
+    /**
+     * Clear this [Loop]'s associated [substations].
+     * @return this [Loop]
+     */
     @Deprecated(
         message = "Use substations.clear() instead.",
         replaceWith = ReplaceWith("substations.clear()")
     )
-    fun clearSubstations(): Loop = apply {
-        substations.clear()
+    fun clearSubstations(): Loop {
+        _substations = null
+        return this
     }
 
     // endregion
 
     // region energizingSubstations boilerplate
 
+    /**
+     * Get the number of entries in the [energizingSubstations] collection.
+     */
     @Deprecated(
         message = "Use energizingSubstations.size instead.",
         replaceWith = ReplaceWith("energizingSubstations.size")
     )
-    fun numEnergizingSubstations(): Int = energizingSubstations.size
+    fun numEnergizingSubstations(): Int = _energizingSubstations?.size ?: 0
 
+    /**
+     * Retrieve a [Substation] that is energizing this [Loop].
+     *
+     * @param mRID the mRID of the required [Substation]
+     * @return The [Substation] with the specified [mRID] if it exists, otherwise null
+     */
     @Deprecated(
         message = "Use energizingSubstations.getByMRID(mRID) instead.",
         replaceWith = ReplaceWith("energizingSubstations.getByMRID(mRID)")
     )
-    fun getEnergizingSubstation(mRID: String): Substation? = energizingSubstations.getByMrid(mRID)
+    fun getEnergizingSubstation(mRID: String): Substation? = _energizingSubstations.getByMRID(mRID)
 
+    /**
+     * @param substation the [Substation] that energizing this [Loop].
+     * @return A reference to this [Loop] to allow fluent use.
+     */
     @Deprecated(
         message = "Use energizingSubstations.add(substation) instead.",
         replaceWith = ReplaceWith("also { it.energizingSubstations.add(substation) }")
     )
-    fun addEnergizingSubstation(substation: Substation): Loop = apply {
-        energizingSubstations.add(substation)
+    fun addEnergizingSubstation(substation: Substation): Loop {
+        if (validateReference(substation, ::getEnergizingSubstation, "A Substation"))
+            return this
+
+        _energizingSubstations = _energizingSubstations ?: mutableListOf()
+        _energizingSubstations!!.add(substation)
+
+        return this
     }
 
+    /**
+     * @param substation the [Substation] that is no longer energizing this [Loop].
+     * @return `true` if [substation] has been successfully removed; `false` if it was not present.
+     */
     @Deprecated(
         message = "Use energizingSubstations.remove(substation) instead.",
         replaceWith = ReplaceWith("energizingSubstations.remove(substation)")
     )
-    fun removeEnergizingSubstation(substation: Substation): Boolean = energizingSubstations.remove(substation)
+    fun removeEnergizingSubstation(substation: Substation): Boolean {
+        val ret = _energizingSubstations?.remove(substation) == true
+        if (_energizingSubstations.isNullOrEmpty()) _energizingSubstations = null
+        return ret
+    }
 
+    /**
+     * Clear this [Loop]'s associated [energizingSubstations].
+     * @return this [Loop]
+     */
     @Deprecated(
         message = "Use energizingSubstations.clear() instead.",
         replaceWith = ReplaceWith("energizingSubstations.clear()")
     )
-    fun clearEnergizingSubstations(): Loop = apply {
-        energizingSubstations.clear()
+    fun clearEnergizingSubstations(): Loop {
+        _energizingSubstations = null
+        return this
     }
 
     // endregion

@@ -11,6 +11,8 @@ package com.zepben.ewb.cim.iec61970.base.core
 import com.zepben.ewb.boilerplate.Backfill
 import com.zepben.ewb.boilerplate.relations.TerminalList
 import com.zepben.ewb.services.common.extensions.asUnmodifiable
+import com.zepben.ewb.services.common.extensions.getByMRID
+import com.zepben.ewb.services.common.extensions.validateReference
 
 
 /**
@@ -42,7 +44,7 @@ abstract class ConductingEquipment(mRID: String) : Equipment(mRID) {
                 { it, ce -> it._conductingEquipment = ce },
                 Terminal::conductingEquipment
             ),
-            validate = { validateTerminal(it) },
+            validate = { validateTerminalIndex(it) },
             sortBy = { it.sequenceNumber }
         )
 
@@ -61,7 +63,7 @@ abstract class ConductingEquipment(mRID: String) : Equipment(mRID) {
      */
     open val maxTerminals: Int get() = Int.MAX_VALUE
 
-    private fun validateTerminal(terminal: Terminal) {
+    private fun validateTerminalIndex(terminal: Terminal) {
 
         check(numTerminals() < maxTerminals) {
             "Unable to add ${terminal.typeNameAndMRID()} to ${typeNameAndMRID()}. This conducting equipment already has the maximum number of terminals ($maxTerminals)."
@@ -101,45 +103,119 @@ abstract class ConductingEquipment(mRID: String) : Equipment(mRID) {
 
     // region terminals boilerplate
 
+    @Deprecated("Helper for a deprecated function")
+    private fun validateTerminal(terminal: Terminal): Boolean {
+        if (validateReference(terminal, ::getTerminal, "A Terminal"))
+            return true
+
+        if (terminal.conductingEquipment == null)
+            terminal._conductingEquipment = this
+
+        require(terminal.conductingEquipment === this) {
+            "${terminal.typeNameAndMRID()} `conductingEquipment` property references ${terminal.conductingEquipment!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
+        }
+        return false
+    }
+
+    /**
+     * Get the number of entries in the [Terminal] collection.
+     */
     @Deprecated(
         message = "Use terminalsInternal.size instead.",
         replaceWith = ReplaceWith("terminalsInternal.size")
     )
-    fun numTerminals(): Int = terminalsInternal.size
+    fun numTerminals(): Int = _terminals.size
 
+    /**
+     * Conducting equipment have terminals that may be connected to other conducting equipment terminals
+     * via connectivity nodes or topological nodes.
+     *
+     * @param mRID the mRID of the required [Terminal]
+     * @return The [Terminal] with the specified [mRID] if it exists, otherwise null
+     */
     @Deprecated(
         message = "Use terminalsInternal.getByMrid(mRID) instead.",
         replaceWith = ReplaceWith("terminalsInternal.getByMrid(mRID)")
     )
-    fun getTerminal(mRID: String): Terminal? = terminalsInternal.getByMrid(mRID)
+    fun getTerminal(mRID: String): Terminal? = _terminals.getByMRID(mRID)
 
+    /**
+     * Conducting equipment have terminals that may be connected to other conducting equipment terminals
+     * via connectivity nodes or topological nodes.
+     *
+     * @param sequenceNumber the sequence number of the required [Terminal]
+     * @return The [Terminal] with the specified [sequenceNumber] if it exists, otherwise null
+     */
     @Deprecated(
         message = "Use terminalsInternal.getByNumber(sequenceNumber) instead.",
         replaceWith = ReplaceWith("terminalsInternal.getByNumber(sequenceNumber)")
     )
-    fun getTerminal(sequenceNumber: Int): Terminal? = terminalsInternal.getByNumber(sequenceNumber)
+    fun getTerminal(sequenceNumber: Int): Terminal? = _terminals.firstOrNull { it.sequenceNumber == sequenceNumber }
 
+    /**
+     * Add a [Terminal] to this [ConductingEquipment]
+     *
+     * If [Terminal.sequenceNumber] is 0 [terminal] will receive a sequenceNumber of [numTerminals] + 1 when added.
+     * @throws IllegalArgumentException if the [Terminal] references another [ConductingEquipment] or if a [Terminal] with
+     *         the same sequenceNumber already exists.
+     * @throws IllegalStateException if [maxTerminals] has already been reached.
+     * @return This [ConductingEquipment] for fluent use
+     */
     @Deprecated(
         message = "Use terminalsInternal.addInternal(terminal) instead.",
         replaceWith = ReplaceWith("also { it.terminalsInternal.addInternal(terminal) }")
     )
-    fun addTerminal(terminal: Terminal): ConductingEquipment = apply {
-        terminalsInternal.add(terminal)
+    fun addTerminal(terminal: Terminal): ConductingEquipment {
+        if (validateTerminal(terminal)) return this
+
+        check(numTerminals() < maxTerminals) {
+            "Unable to add ${terminal.typeNameAndMRID()} to ${typeNameAndMRID()}. This conducting equipment already has the maximum number of terminals ($maxTerminals)."
+        }
+
+        if (terminal.sequenceNumber == 0)
+            terminal.sequenceNumber = numTerminals() + 1
+        require(getTerminal(terminal.sequenceNumber) == null) { "Unable to add ${terminal.typeNameAndMRID()} to ${typeNameAndMRID()}. A ${getTerminal(terminal.sequenceNumber)!!.typeNameAndMRID()} already exists with sequenceNumber ${terminal.sequenceNumber}." }
+
+        _terminals.add(terminal)
+        _terminals.sortBy { it.sequenceNumber }
+
+        return this
     }
 
+    /**
+     * Remove a [Terminal] from this [ConductingEquipment]. If the [terminal] is removed,
+     * the reverse link to this [ConductingEquipment] will also be cleared.
+     *
+     * @param terminal The [Terminal] to remove.
+     * @return true if [terminal] is removed from the collection.
+     */
     @Deprecated(
         message = "Use terminalsInternal.removeInternal(terminal) instead.",
         replaceWith = ReplaceWith("terminalsInternal.removeInternal(terminal)")
     )
-    fun removeTerminal(terminal: Terminal): Boolean =
-        terminalsInternal.remove(terminal)
+    fun removeTerminal(terminal: Terminal): Boolean = _terminals.remove(terminal).also { removed ->
+        if (removed)
+            terminal._conductingEquipment = null
+    }
 
+    /**
+     * Clear all [Terminal]'s from this [ConductingEquipment].
+     *
+     * @return This [ConductingEquipment] for fluent use.
+     */
     @Deprecated(
         message = "Use terminalsInternal.clear() instead.",
         replaceWith = ReplaceWith("also { it.terminalsInternal.clear() }")
     )
-    fun clearTerminals(): ConductingEquipment = apply {
-        terminalsInternal.clear()
+    fun clearTerminals(): ConductingEquipment {
+        //
+        // NOTE: We can only set the terminals `conductingEquiment` if it doesn't belong to the terminals list,
+        //       so we must clear our list of terminals before removing each terminals conducting equipemnt.
+        //
+        val toClearAssociation = _terminals.toList()
+        _terminals.clear()
+        toClearAssociation.forEach { terminal -> terminal._conductingEquipment = null }
+        return this
     }
 
     // endregion

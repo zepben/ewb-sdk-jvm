@@ -19,6 +19,8 @@ import com.zepben.ewb.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.ewb.cim.iec61970.base.core.ConnectivityNode
 import com.zepben.ewb.cim.iec61970.base.core.Terminal
 import com.zepben.ewb.services.common.extensions.getByMRID
+import com.zepben.ewb.services.common.extensions.safeRemove
+import com.zepben.ewb.services.common.extensions.validateReference
 
 /**
  * An electrical device consisting of  two or more coupled windings, with or without a magnetic core, for introducing mutual coupling
@@ -96,7 +98,7 @@ class PowerTransformer(mRID: String) : ConductingEquipment(mRID) {
                 { it, pt -> it.powerTransformer = pt },
                 PowerTransformerEnd::powerTransformer
             ),
-            validate = { validateEnd(it) },
+            validate = { validateEndNumber(it) },
             sortBy = { it.endNumber }
         )
 
@@ -124,7 +126,7 @@ class PowerTransformer(mRID: String) : ConductingEquipment(mRID) {
      */
     fun getBaseVoltage(connectivityNode: ConnectivityNode): BaseVoltage? = getEnd(connectivityNode)?.baseVoltage
 
-    private fun validateEnd(end: PowerTransformerEnd) {
+    private fun validateEndNumber(end: PowerTransformerEnd) {
         if (end.endNumber == 0)
             end.endNumber = ends.size + 1
         require(ends.getByEndNumber(end.endNumber) == null) { "Unable to add ${end.typeNameAndMRID()} to ${typeNameAndMRID()}. A ${getEnd(end.endNumber)!!.typeNameAndMRID()} already exists with endNumber ${end.endNumber}." }
@@ -139,56 +141,133 @@ class PowerTransformer(mRID: String) : ConductingEquipment(mRID) {
 
     // region ends boilerplate
 
+    @Deprecated("Helper for a deprecated function")
+    private fun validateEnd(end: PowerTransformerEnd): Boolean {
+        if (validateReference(end, ::getEnd, "A PowerTransformerEnd"))
+            return true
+
+        if (end.powerTransformer == null)
+            end.powerTransformer = this
+
+        require(end.powerTransformer === this) {
+            "${end.typeNameAndMRID()} `powerTransformer` property references ${end.powerTransformer!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
+        }
+        return false
+    }
+
+    /**
+     * Get the number of entries in the [PowerTransformerEnd] collection.
+     */
     @Deprecated(
         message = "Use ends.size instead.",
         replaceWith = ReplaceWith("ends.size")
     )
-    fun numEnds(): Int = ends.size
+    fun numEnds(): Int = _powerTransformerEnds?.size ?: 0
 
+    /**
+     * Get a [PowerTransformerEnd] of this [PowerTransformer] by its [PowerTransformerEnd.mRID]
+     *
+     * @param mRID the mRID of the required [PowerTransformerEnd]
+     * @return The [PowerTransformerEnd] with the specified [mRID] if it exists, otherwise null
+     */
     @Deprecated(
         message = "Use ends.getByMRID(mRID) instead.",
         replaceWith = ReplaceWith("ends.getByMRID(mRID)")
     )
-    fun getEnd(mRID: String): PowerTransformerEnd? = ends.getByMRID(mRID)
+    fun getEnd(mRID: String): PowerTransformerEnd? = _powerTransformerEnds.getByMRID(mRID)
 
+    /**
+     * Get a [PowerTransformerEnd] of this [PowerTransformer] by its [PowerTransformerEnd.endNumber]
+     *
+     * @param endNumber the end number of the required [PowerTransformerEnd]
+     * @return The [PowerTransformerEnd] with the specified [endNumber] if it exists, otherwise null
+     */
     @Deprecated(
         message = "Use ends.getByEndNumber(endNumber) instead.",
         replaceWith = ReplaceWith("ends.getByEndNumber(endNumber)")
     )
-    fun getEnd(endNumber: Int): PowerTransformerEnd? = ends.getByEndNumber(endNumber)
+    fun getEnd(endNumber: Int): PowerTransformerEnd? = _powerTransformerEnds?.firstOrNull { it.endNumber == endNumber }
 
+    /**
+     * Get a [PowerTransformerEnd] of this [PowerTransformer] by its [PowerTransformerEnd.terminal]
+     *
+     * @param terminal the terminal of the required [PowerTransformerEnd]
+     * @return The [PowerTransformerEnd] with the specified [terminal] if it exists, otherwise null
+     */
     @Deprecated(
         message = "Use ends.getByTerminal(terminal) instead.",
         replaceWith = ReplaceWith("ends.getByTerminal(terminal)")
     )
-    fun getEnd(terminal: Terminal): PowerTransformerEnd? = ends.getByTerminal(terminal)
+    fun getEnd(terminal: Terminal): PowerTransformerEnd? = _powerTransformerEnds?.firstOrNull { it.terminal == terminal }
 
+    /**
+     * Get a [PowerTransformerEnd] of this [PowerTransformer] by its [Terminal] [ConnectivityNode].
+     *
+     * @param connectivityNode the [ConnectivityNode] of the required [PowerTransformerEnd]
+     * @return The [PowerTransformerEnd] with the specified [Terminal] if it exists, otherwise null
+     */
     @Deprecated(
         message = "Use ends.getByNode(connectivityNode) instead.",
         replaceWith = ReplaceWith("ends.getByNode(connectivityNode)")
     )
-    fun getEnd(connectivityNode: ConnectivityNode): PowerTransformerEnd? = ends.getByNode(connectivityNode)
+    fun getEnd(connectivityNode: ConnectivityNode): PowerTransformerEnd? =
+        _powerTransformerEnds?.firstOrNull { it.terminal?.connectivityNode == connectivityNode }
 
+    /**
+     * Add a [PowerTransformerEnd] to this [PowerTransformer]
+     *
+     * If [PowerTransformerEnd.endNumber] is 0 [end] will receive an endNumber of [numEnds] + 1 when added.
+     * @throws IllegalStateException if the [PowerTransformerEnd] references another [PowerTransformer] or if a [PowerTransformerEnd] with
+     *         the same endNumber already exists.
+     * @return This [PowerTransformer] for fluent use
+     */
     @Deprecated(
         message = "Use ends.add(end) instead.",
         replaceWith = ReplaceWith("also { it.ends.add(end) }")
     )
-    fun addEnd(end: PowerTransformerEnd): PowerTransformer = apply {
-        ends.add(end)
+    fun addEnd(end: PowerTransformerEnd): PowerTransformer {
+        if (validateEnd(end)) return this
+
+        if (end.endNumber == 0)
+            end.endNumber = numEnds() + 1
+
+        require(getEnd(end.endNumber) == null) { "Unable to add ${end.typeNameAndMRID()} to ${typeNameAndMRID()}. A ${getEnd(end.endNumber)!!.typeNameAndMRID()} already exists with endNumber ${end.endNumber}." }
+
+        _powerTransformerEnds = _powerTransformerEnds ?: mutableListOf()
+        _powerTransformerEnds!!.add(end)
+        _powerTransformerEnds!!.sortBy { it.endNumber }
+
+        return this
     }
 
+    /**
+     * Remove a [PowerTransformerEnd] from this [PowerTransformer].
+     *
+     * @param end The [PowerTransformerEnd] to remove.
+     * @return true if [end] is removed from the collection.
+     */
     @Deprecated(
         message = "Use ends.remove(end) instead.",
         replaceWith = ReplaceWith("ends.remove(end)")
     )
-    fun removeEnd(end: PowerTransformerEnd): Boolean = ends.remove(end)
+    fun removeEnd(end: PowerTransformerEnd): Boolean {
+        val ret = _powerTransformerEnds.safeRemove(end)
+        if (_powerTransformerEnds.isNullOrEmpty()) _powerTransformerEnds = null
+        return ret
+    }
 
+    /**
+     * Clear all [PowerTransformerEnd]'s from this [PowerTransformer].
+     *
+     * @return This [PowerTransformer] for fluent use.
+     */
     @Deprecated(
         message = "Use ends.clear() instead.",
         replaceWith = ReplaceWith("ends.clear()")
     )
-    fun clearEnds(): PowerTransformer = apply {
-        ends.clear()
+    fun clearEnds(): PowerTransformer {
+        _powerTransformerEnds = null
+        return this
     }
 
     // endregion

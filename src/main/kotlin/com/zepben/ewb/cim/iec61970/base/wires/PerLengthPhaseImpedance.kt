@@ -51,38 +51,79 @@ class PerLengthPhaseImpedance(mRID: String) : PerLengthImpedance(mRID) {
 
     // region data boilerplate
 
+    /**
+     * Get the number of entries in the [PhaseImpedanceData] collection.
+     */
     @Deprecated(
         message = "Use data.size instead.",
         replaceWith = ReplaceWith("data.size")
     )
-    fun numData(): Int = data.size
+    fun numData(): Int = _data?.size ?: 0
 
+    /**
+     * Get the matrix entry for the corresponding to and from phases.
+     *
+     * @param fromPhase The "from" phase to lookup.
+     * @param toPhase The "to" phase to lookup.
+     * @return The matching [PhaseImpedanceData] or null if none was found.
+     */
     @Deprecated(
         message = "Use data.get(fromPhase, toPhase) instead.",
         replaceWith = ReplaceWith("data.get(fromPhase, toPhase)")
     )
-    fun getData(fromPhase: SinglePhaseKind, toPhase: SinglePhaseKind): PhaseImpedanceData? = data.get(fromPhase, toPhase)
+    fun getData(fromPhase: SinglePhaseKind, toPhase: SinglePhaseKind): PhaseImpedanceData? =
+        _data?.find { it.fromPhase == fromPhase && it.toPhase == toPhase }
 
+    /**
+     * Add a [PhaseImpedanceData] to this [PerLengthPhaseImpedance]
+     * @param phaseImpedanceData The [PhaseImpedanceData] to add
+     * @return This [PerLengthPhaseImpedance] for fluent use.
+     */
     @Deprecated(
         message = "Use data.add(phaseImpedanceData) instead.",
         replaceWith = ReplaceWith("also { it.data.add(phaseImpedanceData) }")
     )
-    fun addData(phaseImpedanceData: PhaseImpedanceData): PerLengthPhaseImpedance = apply {
-        data.add(phaseImpedanceData)
+    fun addData(phaseImpedanceData: PhaseImpedanceData): PerLengthPhaseImpedance {
+        require(
+            _data.isNullOrEmpty()
+                || _data?.none { pid -> pid.fromPhase == phaseImpedanceData.fromPhase && pid.toPhase == phaseImpedanceData.toPhase } == true,
+        ) {
+            "Unable to add PhaseImpedanceData to ${typeNameAndMRID()}. " +
+                "A PhaseImpedanceData with fromPhase ${phaseImpedanceData.fromPhase} and toPhase ${phaseImpedanceData.toPhase} already exists in " +
+                "this PerLengthPhaseImpedance."
+        }
+
+        _data = _data ?: mutableListOf()
+        _data!!.add(phaseImpedanceData)
+
+        return this
     }
 
+    /**
+     * Remove a [PhaseImpedanceData] from this [PerLengthPhaseImpedance]
+     * @param phaseImpedanceData The [PhaseImpedanceData] to remove.
+     * @return true if the [phaseImpedanceData] was removed.
+     */
     @Deprecated(
         message = "Use data.remove(phaseImpedanceData) instead.",
         replaceWith = ReplaceWith("data.remove(phaseImpedanceData)")
     )
-    fun removeData(phaseImpedanceData: PhaseImpedanceData): Boolean = data.remove(phaseImpedanceData)
+    fun removeData(phaseImpedanceData: PhaseImpedanceData): Boolean {
+        val ret = _data?.remove(phaseImpedanceData) == true
+        if (_data.isNullOrEmpty()) _data = null
+        return ret
+    }
 
+    /**
+     * Clear all [PhaseImpedanceData] from this [PerLengthPhaseImpedance]
+     */
     @Deprecated(
         message = "Use data.clear() instead.",
         replaceWith = ReplaceWith("data.clear()")
     )
-    fun clearData(): PerLengthPhaseImpedance = apply {
-        data.clear()
+    fun clearData(): PerLengthPhaseImpedance {
+        _data = null
+        return this
     }
 
     // endregion

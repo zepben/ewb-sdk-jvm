@@ -11,6 +11,8 @@ package com.zepben.ewb.cim.iec61970.base.wires
 import com.zepben.ewb.boilerplate.Backfill
 import com.zepben.ewb.boilerplate.collections.LazyMridList
 import com.zepben.ewb.boilerplate.collections.MridCollection
+import com.zepben.ewb.services.common.extensions.getByMRID
+import com.zepben.ewb.services.common.extensions.validateReference
 
 /**
  * A generic equivalent for an energy supplier on a transmission or distribution voltage level.
@@ -104,38 +106,82 @@ class EnergySource(mRID: String) : EnergyConnection(mRID) {
 
     // region phases boilerplate
 
+    /**
+     * Get the number of entries in the [EnergySourcePhase] collection.
+     */
     @Deprecated(
         message = "Use phases.size instead.",
         replaceWith = ReplaceWith("phases.size")
     )
-    fun numPhases(): Int = phases.size
+    fun numPhases(): Int = _energySourcePhases?.size ?: 0
 
+    /**
+     * The individual phase information of the energy source.
+     *
+     * @param mRID the mRID of the required [EnergySourcePhase]
+     * @return The [EnergySourcePhase] with the specified [mRID] if it exists, otherwise null
+     */
     @Deprecated(
         message = "Use phases.getByMRID(mRID) instead.",
         replaceWith = ReplaceWith("phases.getByMRID(mRID)")
     )
-    fun getPhase(mRID: String): EnergySourcePhase? = phases.getByMrid(mRID)
+    fun getPhase(mRID: String): EnergySourcePhase? = _energySourcePhases?.getByMRID(mRID)
 
+    /**
+     * Add an [EnergySourcePhase] to this [EnergySource].
+     *
+     * @param [phase] The [EnergySourcePhase] to add.
+     * @return This [EnergySource] for fluent use.
+     */
     @Deprecated(
         message = "Use phases.add(phase) instead.",
         replaceWith = ReplaceWith("also { it.phases.add(phase) }")
     )
-    fun addPhase(phase: EnergySourcePhase): EnergySource = apply {
-        phases.add(phase)
+    fun addPhase(phase: EnergySourcePhase): EnergySource {
+        if (validateReference(phase, ::getPhase, "An EnergySourcePhase"))
+            return this
+
+        if (phase.energySource == null)
+            phase.energySource = this
+
+        require(phase.energySource === this) {
+            "${phase.typeNameAndMRID()} `energySource` property references ${phase.energySource!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
+        }
+
+        _energySourcePhases = _energySourcePhases ?: mutableListOf()
+        _energySourcePhases!!.add(phase)
+
+        return this
     }
 
+    /**
+     * Remove an [EnergySourcePhase] from this [EnergySource].
+     *
+     * @param [phase] The [EnergySourcePhase] to remove.
+     * @return true if [[phase]] is removed from the collection.
+     */
     @Deprecated(
         message = "Use phases.remove(phase) instead.",
         replaceWith = ReplaceWith("phases.remove(phase)")
     )
-    fun removePhase(phase: EnergySourcePhase): Boolean = phases.remove(phase)
+    fun removePhase(phase: EnergySourcePhase): Boolean {
+        val ret = _energySourcePhases?.remove(phase) == true
+        if (_energySourcePhases.isNullOrEmpty()) _energySourcePhases = null
+        return ret
+    }
 
+    /**
+     * Clear all [EnergySourcePhase]'s from this [EnergySource].
+     *
+     * @return This [EnergySource] for fluent use.
+     */
     @Deprecated(
         message = "Use phases.clear() instead.",
         replaceWith = ReplaceWith("phases.clear()")
     )
-    fun clearPhases(): EnergySource = apply {
-        phases.clear()
+    fun clearPhases(): EnergySource {
+        _energySourcePhases = null
+        return this
     }
 
     // endregion

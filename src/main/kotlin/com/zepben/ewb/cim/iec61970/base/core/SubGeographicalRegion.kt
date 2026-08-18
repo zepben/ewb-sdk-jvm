@@ -11,6 +11,9 @@ package com.zepben.ewb.cim.iec61970.base.core
 import com.zepben.ewb.boilerplate.Backfill
 import com.zepben.ewb.boilerplate.collections.LazyMridList
 import com.zepben.ewb.boilerplate.collections.MridCollection
+import com.zepben.ewb.services.common.extensions.getByMRID
+import com.zepben.ewb.services.common.extensions.safeRemove
+import com.zepben.ewb.services.common.extensions.validateReference
 
 /**
  * A subset of a geographical region of a power system network model.
@@ -46,38 +49,77 @@ class SubGeographicalRegion(mRID: String) : IdentifiedObject(mRID) {
 
     // region substations boilerplate
 
+    /**
+     * Get the number of entries in the [Substation] collection.
+     */
     @Deprecated(
         message = "Use substations.size instead.",
         replaceWith = ReplaceWith("substations.size")
     )
-    fun numSubstations(): Int = substations.size
+    fun numSubstations(): Int = _substations?.size ?: 0
 
+    /**
+     * The substations in this sub-geographical region.
+     *
+     * @param mRID the mRID of the required [Substation]
+     * @return The [Substation] with the specified [mRID] if it exists, otherwise null
+     */
     @Deprecated(
         message = "Use substations.getByMRID(mRID) instead.",
         replaceWith = ReplaceWith("substations.getByMRID(mRID)")
     )
-    fun getSubstation(mRID: String): Substation? = substations.getByMrid(mRID)
+    fun getSubstation(mRID: String): Substation? = _substations.getByMRID(mRID)
 
+    /**
+     * @param substation the [Substation] to associate with this [SubGeographicalRegion].
+     * @return A reference to this [SubGeographicalRegion] to allow fluent use.
+     */
     @Deprecated(
         message = "Use substations.add(substation) instead.",
         replaceWith = ReplaceWith("also { it.substations.add(substation) }")
     )
-    fun addSubstation(substation: Substation): SubGeographicalRegion = apply {
-        substations.add(substation)
+    fun addSubstation(substation: Substation): SubGeographicalRegion {
+        if (validateReference(substation, ::getSubstation, "A Substation"))
+            return this
+
+        if (substation.subGeographicalRegion == null)
+            substation.subGeographicalRegion = this
+
+        require(substation.subGeographicalRegion === this) {
+            "${substation.typeNameAndMRID()} `subGeographicalRegion` property references ${substation.subGeographicalRegion!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
+        }
+
+        _substations = _substations ?: mutableListOf()
+        _substations!!.add(substation)
+
+        return this
     }
 
+    /**
+     * @param substation the [Substation] to disassociate with this [SubGeographicalRegion].
+     * @return true if the substation is disassociated.
+     */
     @Deprecated(
         message = "Use substations.remove(substation) instead.",
         replaceWith = ReplaceWith("substations.remove(substation)")
     )
-    fun removeSubstation(substation: Substation): Boolean = substations.remove(substation)
+    fun removeSubstation(substation: Substation): Boolean {
+        val ret = _substations.safeRemove(substation)
+        if (_substations.isNullOrEmpty()) _substations = null
+        return ret
+    }
 
+    /**
+     * Clear this [SubGeographicalRegion]'s [Substation]'s
+     * @return this [SubGeographicalRegion]
+     */
     @Deprecated(
         message = "Use substations.clear() instead.",
         replaceWith = ReplaceWith("substations.clear()")
     )
-    fun clearSubstations(): SubGeographicalRegion = apply {
-        substations.clear()
+    fun clearSubstations(): SubGeographicalRegion {
+        _substations = null
+        return this
     }
 
     // endregion

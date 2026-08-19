@@ -108,6 +108,25 @@ internal class LazyMridListTest {
     }
 
     @Test
+    internal fun `list views delegate to the backing list`() {
+        val a = Feeder("a")
+        val b = Feeder("b")
+        val c = Feeder("c")
+        var backing: MutableList<Feeder>? = mutableListOf(a, b, c)
+        val list = LazyMridList(
+            { backing }, { backing = it }, Feeder("owner"), "A Feeder"
+        )
+
+        assertThat(list.indexOf(b), equalTo(1))
+        assertThat(list.lastIndexOf(b), equalTo(1))
+        assertThat(list.listIterator().asSequence().toList(), contains(a, b, c))
+
+        val iterator = list.listIterator(1)
+        assertThat(iterator.previous(), sameInstance(a))
+        assertThat(list.subList(1, 3), contains(b, c))
+    }
+
+    @Test
     internal fun `remove releases the back reference and nulls empty backing`() {
         val owner = Substation("owner")
         val feeder = Feeder("a").apply { normalEnergizingSubstation = owner }

@@ -28,9 +28,12 @@ internal class LazyIndexListTest {
     @Test
     internal fun `add to an empty list creates the backing list`() {
         var backing: MutableList<Feeder>? = null
-        val list = LazyIndexList({ backing }, { backing = it }, Feeder("owner"), "a Feeder")
+        val owner = Feeder("owner")
+        val list = LazyIndexList({ backing }, { backing = it }, owner, "a Feeder")
         val feeder = Feeder("a")
 
+        assertThat(list.owner, sameInstance(owner))
+        assertThat(list.elementDescription, equalTo("a Feeder"))
         list.add(0, feeder)
 
         assertThat(backing, contains(feeder))
@@ -79,6 +82,17 @@ internal class LazyIndexListTest {
         val list = LazyIndexList({ backing }, { backing = it }, Feeder("owner"), "a Feeder")
 
         assertThat(list.removeAt(0), sameInstance(a))
+        assertThat(backing, contains(b))
+    }
+
+    @Test
+    internal fun `removeAtOrNull returns and removes an item at a valid index`() {
+        val a = Feeder("a")
+        val b = Feeder("b")
+        var backing: MutableList<Feeder>? = mutableListOf(a, b)
+        val list = LazyIndexList({ backing }, { backing = it }, Feeder("owner"), "a Feeder")
+
+        assertThat(list.removeAtOrNull(0), sameInstance(a))
         assertThat(backing, contains(b))
     }
 

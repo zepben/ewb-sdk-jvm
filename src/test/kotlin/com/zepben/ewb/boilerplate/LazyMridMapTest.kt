@@ -67,6 +67,22 @@ internal class LazyMridMapTest {
     }
 
     @Test
+    internal fun `containsAll uses mrid identity against the concrete map`() {
+        val a = Feeder("a")
+        val b = Feeder("b")
+        var backing: MutableMap<String, Feeder>? = null
+        val map = LazyMridMap(
+            { backing }, { backing = it }, Feeder("owner"), "A Feeder"
+        )
+
+        assertThat(map.containsAll(listOf(a)), equalTo(false))
+
+        backing = mutableMapOf("a" to a, "b" to b)
+        assertThat(map.containsAll(listOf(a, b)), equalTo(true))
+        assertThat(map.containsAll(listOf(a, Feeder("b"))), equalTo(false))
+    }
+
+    @Test
     internal fun `backfill runs before validation`() {
         val owner = Substation("owner")
         var backing: MutableMap<String, Feeder>? = null
@@ -131,6 +147,27 @@ internal class LazyMridMapTest {
         assertThat(stored.normalEnergizingSubstation, sameInstance(owner))
 
         assertThat(map.remove(stored), equalTo(true))
+        assertThat(stored.normalEnergizingSubstation, nullValue())
+    }
+
+    @Test
+    internal fun `concrete remove handles absent backing collisions and successful removal`() {
+        val owner = Substation("owner")
+        val stored = Feeder("a").apply { normalEnergizingSubstation = owner }
+        val collision = Feeder("a").apply { normalEnergizingSubstation = owner }
+        var backing: MutableMap<String, Feeder>? = null
+        val map = LazyMridMap(
+            { backing }, { backing = it }, owner, "A Feeder", backfill()
+        )
+
+        assertThat(map.remove(stored), equalTo(false))
+
+        backing = mutableMapOf("a" to stored)
+        assertThat(map.remove(collision), equalTo(false))
+        assertThat(stored.normalEnergizingSubstation, sameInstance(owner))
+
+        assertThat(map.remove(stored), equalTo(true))
+        assertThat(backing, nullValue())
         assertThat(stored.normalEnergizingSubstation, nullValue())
     }
 

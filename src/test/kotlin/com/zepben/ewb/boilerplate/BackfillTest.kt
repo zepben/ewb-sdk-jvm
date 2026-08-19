@@ -32,6 +32,16 @@ internal class BackfillTest {
     )
 
     @Test
+    internal fun `exposes the configured getter and setter`() {
+        val owner = Substation("owner")
+        val feeder = Feeder("feeder")
+
+        assertThat(backfill.getter(feeder), nullValue())
+        backfill.setter(feeder, owner)
+        assertThat(backfill.getter(feeder), sameInstance(owner))
+    }
+
+    @Test
     internal fun `apply sets a missing back reference`() {
         val owner = Substation("owner")
         val feeder = Feeder("feeder")

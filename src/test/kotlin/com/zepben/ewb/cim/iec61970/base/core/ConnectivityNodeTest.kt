@@ -30,6 +30,11 @@ internal class ConnectivityNodeTest {
 
     @Test
     internal fun terminals() {
+        PrivateCollectionValidator.validateArcCollection(
+            ::ConnectivityNode,
+            ::Terminal,
+            ConnectivityNode::terminals,
+        )
         PrivateCollectionValidator.validateUnordered(
             ::ConnectivityNode,
             ::Terminal,

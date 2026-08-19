@@ -36,6 +36,21 @@ internal class CurveTest {
     internal fun curveData() {
         // NOTE: We test the curve data collection with "unordered" even though it is actually sorted since the "index" of this collection is the
         //       xValue which is a float and acts like a key. We will run a separate test to check the ordering and additional `addData` call.
+        PrivateCollectionValidator.validateUnidentifiedArcCollection(
+            { object : Curve(it) {} },
+            { CurveData(it + 0.1f, it + 0.2f, it + 0.3f, it + 0.4f) },
+            Curve::data,
+        )
+        PrivateCollectionValidator.validateCollectionValidation(
+            { object : Curve("collection-validation") {}.data },
+            { CurveData(1f, 2f) },
+            { it.copy(y1Value = 3f) },
+        )
+        PrivateCollectionValidator.validateCollectionSorting(
+            { object : Curve("collection-sorting") {}.data },
+            { CurveData(it.toFloat(), it.toFloat()) },
+            CurveData::xValue,
+        )
         PrivateCollectionValidator.validateUnordered(
             { object : Curve(it) {} },
             { CurveData(it + 0.1f, it + 0.2f, it + 0.3f, it + 0.4f) },

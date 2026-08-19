@@ -55,6 +55,11 @@ internal class DiagramObjectTest {
 
     @Test
     internal fun diagramObjectPoints() {
+        PrivateCollectionValidator.validateUnidentifiedArcCollection(
+            ::DiagramObject,
+            { DiagramObjectPoint(it.toDouble(), it.toDouble()) },
+            DiagramObject::points,
+        )
         PrivateCollectionValidator.validateOrdered(
             ::DiagramObject,
             { DiagramObjectPoint(it.toDouble(), it.toDouble()) },

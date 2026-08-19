@@ -35,6 +35,11 @@ internal class EquipmentContainerTest {
 
     @Test
     internal fun equipment() {
+        PrivateCollectionValidator.validateArcCollection(
+            { id -> object : EquipmentContainer(id) {} },
+            { id -> object : Equipment(id) {} },
+            EquipmentContainer::equipment,
+        )
         PrivateCollectionValidator.validateUnordered(
             { id -> object : EquipmentContainer(id) {} },
             { id -> object : Equipment(id) {} },
@@ -49,6 +54,11 @@ internal class EquipmentContainerTest {
 
     @Test
     internal fun currentEquipment() {
+        PrivateCollectionValidator.validateArcCollection(
+            { id -> object : EquipmentContainer(id) {} },
+            { id -> object : Equipment(id) {} },
+            EquipmentContainer::currentEquipment,
+        )
         PrivateCollectionValidator.validateUnordered(
             { id -> object : EquipmentContainer(id) {} },
             { id -> object : Equipment(id) {} },

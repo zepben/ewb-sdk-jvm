@@ -55,6 +55,11 @@ internal class LvFeederTest {
 
     @Test
     internal fun normalEnergizingFeeders() {
+        PrivateCollectionValidator.validateArcCollection(
+            ::LvFeeder,
+            ::Feeder,
+            LvFeeder::normalEnergizingFeeders,
+        )
         PrivateCollectionValidator.validateUnordered(
             ::LvFeeder,
             ::Feeder,
@@ -69,6 +74,11 @@ internal class LvFeederTest {
 
     @Test
     internal fun currentEnergizingFeeders() {
+        PrivateCollectionValidator.validateArcCollection(
+            ::LvFeeder,
+            ::Feeder,
+            LvFeeder::currentEnergizingFeeders,
+        )
         PrivateCollectionValidator.validateUnordered(
             ::LvFeeder,
             ::Feeder,
@@ -83,6 +93,11 @@ internal class LvFeederTest {
 
     @Test
     internal fun currentEquipment() {
+        PrivateCollectionValidator.validateArcCollection(
+            ::LvFeeder,
+            { id -> object : Equipment(id) {} },
+            LvFeeder::currentEquipment,
+        )
         PrivateCollectionValidator.validateUnordered(
             ::LvFeeder,
             { id -> object : Equipment(id) {} },

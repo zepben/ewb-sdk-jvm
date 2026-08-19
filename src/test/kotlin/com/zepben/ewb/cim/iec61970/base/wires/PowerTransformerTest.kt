@@ -64,6 +64,21 @@ internal class PowerTransformerTest {
 
     @Test
     internal fun powerTransformerEnds() {
+        PrivateCollectionValidator.validateArcCollection(
+            ::PowerTransformer,
+            ::PowerTransformerEnd,
+            PowerTransformer::ends,
+        )
+        PrivateCollectionValidator.validateCollectionValidation(
+            { PowerTransformer("collection-validation").ends },
+            { PowerTransformerEnd("valid").apply { endNumber = 1 } },
+            { PowerTransformerEnd("invalid").apply { endNumber = it.endNumber } },
+        )
+        PrivateCollectionValidator.validateCollectionSorting(
+            { PowerTransformer("collection-sorting").ends },
+            { PowerTransformerEnd(it.toString()).apply { endNumber = it } },
+            PowerTransformerEnd::endNumber,
+        )
         PrivateCollectionValidator.validateOrdered(
             ::PowerTransformer,
             { id, en -> PowerTransformerEnd(id).apply { endNumber = en } },

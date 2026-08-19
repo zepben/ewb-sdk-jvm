@@ -8,7 +8,10 @@
 
 package com.zepben.ewb.utils
 
+import com.zepben.ewb.boilerplate.collections.ArcCollection
+import com.zepben.ewb.boilerplate.collections.MridCollection
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
+import com.zepben.ewb.utils.PrivateCollectionValidator.Companion.validateArcCollection
 import com.zepben.testutils.exception.ExpectException.Companion.expect
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -19,6 +22,104 @@ import kotlin.reflect.KMutableProperty1
 internal class PrivateCollectionValidator {
 
     companion object {
+
+        /**
+         * Validate the main functionality of an [ArcCollection] instance.
+         */
+        internal fun <T, U : Identifiable> validateArcCollection(
+            createIt: (String) -> T,
+            createOther: (String) -> U,
+            getAll: (T) -> MridCollection<U>,
+        ) {
+            validateArcCollection(
+                { getAll(createIt("collection")) },
+                { createOther("item") },
+            )
+            validateMridCollection(
+                { getAll(createIt("collection")) },
+                createOther,
+            )
+        }
+
+        /** Variant of [validateArcCollection] for value objects created from an integer key or index. */
+        internal fun <T, U> validateUnidentifiedArcCollection(
+            createIt: (String) -> T,
+            createOther: (Int) -> U,
+            getAll: (T) -> ArcCollection<U>,
+        ) = validateArcCollection(
+            { getAll(createIt("collection")) },
+            { createOther(1) },
+        )
+
+        private fun <U> validateArcCollection(
+            createCollection: () -> ArcCollection<U>,
+            createOther: () -> U,
+        ) {
+            val collection = createCollection()
+            val other = createOther()
+
+            assertThat(collection, empty())
+            assertThat(collection.add(other), equalTo(true))
+            assertThat(collection, contains(other))
+            assertThat(collection.remove(other), equalTo(true))
+            assertThat(collection, empty())
+
+            assertThat(collection.add(other), equalTo(true))
+            collection.clear()
+            assertThat(collection, empty())
+        }
+
+        private fun <U : Identifiable> validateMridCollection(
+            createCollection: () -> MridCollection<U>,
+            createOther: (String) -> U,
+        ) {
+            val collection = createCollection()
+            val other = createOther("item")
+            val duplicate = createOther("item")
+
+            assertThat(collection, empty())
+            assertThat(collection.add(other), equalTo(true))
+            assertThat(collection.getByMrid(other.mRID), sameInstance(other))
+            assertThat(collection.add(other), equalTo(false))
+            expect { collection.add(duplicate) }
+                .toThrow<IllegalArgumentException>()
+            assertThat(collection, contains(sameInstance(other)))
+        }
+
+        /** Validate a collection's custom validator after a valid element establishes the collection context. */
+        internal fun <U> validateCollectionValidation(
+            createCollection: () -> ArcCollection<U>,
+            createValid: () -> U,
+            createInvalid: (U) -> U,
+        ) {
+            val collection = createCollection()
+            val valid = createValid()
+
+            assertThat(collection.add(valid), equalTo(true))
+            expect { collection.add(createInvalid(valid)) }
+                .toThrow<IllegalArgumentException>()
+            assertThat(collection, contains(valid))
+        }
+
+        /** Validate that collection-native adds apply the collection's configured sort order. */
+        internal fun <U> validateCollectionSorting(
+            createCollection: () -> ArcCollection<U>,
+            createOrdered: (Int) -> U,
+            expectedOrdering: (U) -> Comparable<*>,
+        ) {
+            val collection = createCollection()
+            var unsorted = listOf(
+                createOrdered(2),
+                createOrdered(1),
+                createOrdered(3),
+            )
+
+            val expected = unsorted.sortedWith(compareBy(expectedOrdering))
+
+            if(unsorted != expected) { unsorted = unsorted.reversed() }
+            unsorted.forEach { assertThat(collection.add(it), equalTo(true)) }
+            assertOrdered(collection, expected)
+        }
 
         /**
          * Validate the internal collection for an associated [Identifiable] that has no order significance.

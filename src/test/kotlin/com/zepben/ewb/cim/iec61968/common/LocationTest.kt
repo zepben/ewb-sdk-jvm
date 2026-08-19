@@ -43,6 +43,11 @@ internal class LocationTest {
 
     @Test
     internal fun positionPoints() {
+        PrivateCollectionValidator.validateUnidentifiedArcCollection(
+            ::Location,
+            { PositionPoint(it.toDouble(), it.toDouble()) },
+            Location::points,
+        )
         PrivateCollectionValidator.validateOrdered(
             ::Location,
             { PositionPoint(it.toDouble(), it.toDouble()) },

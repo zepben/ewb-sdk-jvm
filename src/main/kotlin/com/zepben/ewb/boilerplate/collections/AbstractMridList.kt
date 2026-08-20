@@ -8,11 +8,12 @@
 
 package com.zepben.ewb.boilerplate.collections
 
+import com.zepben.ewb.boilerplate.collections.interfaces.MridList
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 
 
 /**
- * List-shaped specialisation of [MridCollection].
+ * List-shaped specialisation of [AbstractMridCollection].
  *
  * Kotlin only permits one concrete superclass. This class represents the
  * deliberate intersection of the mRID collection and backed-list branches so
@@ -22,7 +23,7 @@ import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 abstract class AbstractMridList<T : Identifiable, O: Identifiable>(
     validate: ((T) -> Unit)? = null,
     private val sortBy: ((T) -> Comparable<*>?)? = null,
-) : MridBackfillCollection<T, O>(validate), ArcList<T> {
+) : AbstractMridCollection<T, O>(validate), MridList<T> {
 
     abstract override fun getCollection(): MutableList<T>
 

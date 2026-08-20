@@ -8,7 +8,7 @@
 
 package com.zepben.ewb.boilerplate
 
-import com.zepben.ewb.boilerplate.collections.MridCollection
+import com.zepben.ewb.boilerplate.collections.AbstractMridCollection
 import com.zepben.ewb.cim.iec61970.base.core.Feeder
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
 
-internal class MridCollectionTest {
+internal class AbstractMridCollectionTest {
 
     companion object {
         @JvmField
@@ -25,13 +25,24 @@ internal class MridCollectionTest {
         val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
     }
 
-    private class TestMridCollection : MridCollection<Feeder>() {
+    private class TestMridCollection : AbstractMridCollection<Feeder, Feeder>() {
         private val backing = mutableListOf<Feeder>()
 
         override val owner = Feeder("owner")
         override val elementDescription = "A Feeder"
         override fun getCollection(): MutableCollection<Feeder> = backing
         override fun getByMrid(mRID: String): Feeder? = backing.firstOrNull { it.mRID == mRID }
+    }
+
+    @Test
+    internal fun `defaults to no backfill`() {
+        val feeder = Feeder("feeder")
+        val collection = TestMridCollection()
+
+        assertThat(collection.backfill, nullValue())
+        assertThat(collection.add(feeder), equalTo(true))
+        collection.clear()
+        assertThat(collection, empty())
     }
 
     @Test

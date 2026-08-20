@@ -8,27 +8,30 @@
 
 package com.zepben.ewb.boilerplate.collections
 
+import com.zepben.ewb.boilerplate.Backfill
+import com.zepben.ewb.boilerplate.collections.interfaces.MridCollection
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 
 
 /**
  * Base collection for objects identified by a unique `mRID`.
  *
- * Provides lookup by mRID and prepares additions by enforcing mRID uniqueness
- * and applying optional backfill before base collection validation.
+ * Provides lookup by mRID, enforces mRID uniqueness, and maintains an optional
+ * typed back-reference from each element to the collection owner.
  */
-abstract class MridCollection<T : Identifiable>(
+abstract class AbstractMridCollection<T : Identifiable, O : Identifiable>(
     validate: ((T) -> Unit)? = null,
-) : AbstractBackedCollection<T>(validate) {
+) : AbstractBackedCollection<T>(validate), MridCollection<T> {
 
-    abstract val owner: Identifiable
+    abstract val owner: O
     abstract val elementDescription: String
+    open val backfill: Backfill<T, O>? = null
 
 
     /** Returns the element with [mRID], or `null` when it is not present. */
-    abstract fun getByMrid(mRID: String): T?
+    abstract override fun getByMrid(mRID: String): T?
 
-    operator fun get(mRID: String): T? = getByMrid(mRID)
+    override operator fun get(mRID: String): T? = getByMrid(mRID)
 
     /** Accepts a new mRID, ignores the same instance, and rejects collisions. */
     protected fun canAddByMrid(element: T): Boolean {
@@ -49,7 +52,20 @@ abstract class MridCollection<T : Identifiable>(
     override fun add(element: T): Boolean {
         if (!canAddByMrid(element))
             return false
+
+        backfill?.set(element, owner)
         return super.add(element)
+    }
+
+    /** Clears [element]'s backfill after removal. */
+    override fun postRemove(element: T) {
+        backfill?.clear(element)
+    }
+
+    /** Clears the collection and all backfilled references. */
+    override fun clear() {
+        val activeBackfill = backfill ?: return super.clear()
+        clearAndCopy(getCollection()).forEach(activeBackfill::clear)
     }
 
 }

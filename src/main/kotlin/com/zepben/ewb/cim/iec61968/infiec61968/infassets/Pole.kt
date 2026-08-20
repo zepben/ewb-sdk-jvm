@@ -9,7 +9,7 @@
 package com.zepben.ewb.cim.iec61968.infiec61968.infassets
 
 import com.zepben.ewb.boilerplate.collections.LazyMridList
-import com.zepben.ewb.boilerplate.collections.MridCollection
+import com.zepben.ewb.boilerplate.collections.interfaces.MridCollection
 import com.zepben.ewb.cim.iec61968.assets.Streetlight
 import com.zepben.ewb.cim.iec61968.assets.Structure
 import com.zepben.ewb.services.common.extensions.getByMRID

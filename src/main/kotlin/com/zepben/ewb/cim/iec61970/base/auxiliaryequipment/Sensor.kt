@@ -9,7 +9,7 @@
 package com.zepben.ewb.cim.iec61970.base.auxiliaryequipment
 
 import com.zepben.ewb.boilerplate.collections.LazyMridList
-import com.zepben.ewb.boilerplate.collections.MridCollection
+import com.zepben.ewb.boilerplate.collections.interfaces.MridCollection
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelayFunction
 import com.zepben.ewb.services.common.extensions.getByMRID

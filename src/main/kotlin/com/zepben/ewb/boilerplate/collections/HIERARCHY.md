@@ -1,26 +1,152 @@
 # Collection hierarchy
 
 This package provides collection views over backing fields used by the CIM
-model. Italicised names are structural bridge classes: production code does
-not instantiate them directly or expose properties typed as them.
+model. Public collection capabilities are declared as interfaces under
+`collections.interfaces`; storage, validation, mRID uniqueness, backfill, and
+sorting are supplied by the abstract and concrete classes under `collections`.
 
-## Collection classes
+The interface split lets CIM properties expose either collection-shaped or
+list-shaped behavior without exposing the backfill owner type `O`. Italicised
+class names below are structural implementation classes and are not normally
+constructed directly.
 
-- *[AbstractBackedCollection](#abstract-backed-collection)* ([code](./AbstractBackedCollection.kt#L22)) — implements
-  `ArcCollection<T>`
-  - *[AbstractBackedList](#abstract-backed-list)* ([code](./AbstractBackedList.kt#L19))
-    - [LazyList](#lazy-list) ([code](./LazyList.kt#L48))
-      - [LazyIndexList](#lazy-index-list) ([code](./LazyIndexList.kt#L36))
-  - [MridCollection](#mrid-collection) ([code](./MridCollection.kt#L20))
-    - *[MridBackfillCollection](#mrid-backfill-collection)* ([code](./MridBackfillCollection.kt#L23))
-      - *[AbstractMridList](#abstract-mrid-list)* ([code](./AbstractMridList.kt#L22)) — also implements `List<T>`
-        - [LazyMridList](#lazy-mrid-list) ([code](./LazyMridList.kt#L26))
-        - [MridList](#mrid-list) ([code](./MridList.kt#L25))
-      - [LazyMridMap](#lazy-mrid-map) ([code](./LazyMridMap.kt#L35))
+## Interfaces
+
+```text
+      (Collection<T>)
+                \
+        ArcCollection<T>       (List<T>)
+                /       \       /
+MridCollection<T>       ArcList<T>
+                \       /
+                MridList<T>
+```
+
+`MridList<T>` is the intersection of the two capability branches: it has mRID
+lookup from `MridCollection<T>` and indexed, read-only list access from
+`ArcList<T>`. None of the public interfaces carries the implementation-only
+backfill owner type `O`.
+
+| Interface | Source | Adds |
+|---|---|---|
+| `ArcCollection<T>` | [interfaces/ArcCollection.kt](./interfaces/ArcCollection.kt) | `add`, `remove`, and `clear` over Kotlin's read-only `Collection<T>` |
+| `ArcList<T>` | [interfaces/ArcList.kt](./interfaces/ArcList.kt) | Read-only `List<T>` access in addition to the ARC mutations |
+| `MridCollection<T>` | [interfaces/MridCollection.kt](./interfaces/MridCollection.kt) | `getByMrid` and string-index lookup for `Identifiable` elements |
+| `MridList<T>` | [interfaces/MridList.kt](./interfaces/MridList.kt) | Combines `MridCollection<T>` and `ArcList<T>` |
+
+The implementation source for each interface begins at the following class:
+
+```text
+ArcCollection<T>   <- AbstractBackedCollection<T>
+ArcList<T>         <- AbstractBackedList<T>
+MridCollection<T>  <- AbstractMridCollection<T, O>
+MridList<T>        <- AbstractMridList<T, O>
+```
+
+`AbstractMridList` also inherits the `MridCollection` implementation through
+`AbstractMridCollection`; it does not duplicate the mRID lifecycle.
+
+## Implementation classes
+
+```text
+*AbstractBackedCollection<T>*                    [ArcCollection<T>]
+|-- *AbstractBackedList<T>*                      [ArcList<T>]
+|   `-- LazyList<T>
+|       `-- LazyIndexList<T>
+`-- *AbstractMridCollection<T, O>*               [MridCollection<T>]
+    |-- *AbstractMridList<T, O>*                 [MridList<T>]
+    |   |-- LazyMridList<T, O>
+    |   `-- BackedMridList<T, O>
+    `-- LazyMridMap<T, O>
+```
+
+The class sources are:
+
+- *[AbstractBackedCollection](#abstract-backed-collection)*
+  ([code](./AbstractBackedCollection.kt))
+  - *[AbstractBackedList](#abstract-backed-list)*
+    ([code](./AbstractBackedList.kt))
+    - [LazyList](#lazy-list) ([code](./LazyList.kt))
+      - [LazyIndexList](#lazy-index-list) ([code](./LazyIndexList.kt))
+- *[AbstractMridCollection](#abstract-mrid-collection)*
+  ([code](./AbstractMridCollection.kt))
+  - *[AbstractMridList](#abstract-mrid-list)*
+    ([code](./AbstractMridList.kt))
+    - [LazyMridList](#lazy-mrid-list) ([code](./LazyMridList.kt))
+    - [BackedMridList](#backed-mrid-list) ([code](./BackedMridList.kt))
+  - [LazyMridMap](#lazy-mrid-map) ([code](./LazyMridMap.kt))
+
+## Public exposure
+
+CIM properties should normally be typed by capability rather than by storage:
+
+- use `ArcCollection<T>` for ARC mutation without indexing or mRID lookup;
+- use `ArcList<T>` when indexed reads must remain visible;
+- use `MridCollection<T>` for mRID-aware relationships without a list
+  contract; and
+- use `MridList<T>` when the relationship is both mRID-aware and list-shaped.
+
+The concrete getter may still construct `LazyMridList<T, O>`,
+`BackedMridList<T, O>`, or `LazyMridMap<T, O>`. Constructor inference obtains
+`O` from the owner/backfill arguments, while the public interface hides it.
 
 <a id="abstract-backed-collection"></a>
 
-## AbstractBackedCollection
+## Implementation classes
+
+These are all the options you have of implementing collections in a CIM class.
+Which exact class to chose depends on the desired memory layout, eg lists vs
+nullable lists vs nullable maps.
+
+### LazyList
+
+Adapts a nullable mutable-list field. A `null` field is observed as an empty
+list, storage is created on the first addition, and the field returns to `null`
+when the collection becomes empty.
+
+<a id="lazy-index-list"></a>
+
+### LazyIndexList
+
+Extends `LazyList` with explicit indexed insertion and removal without
+implementing `MutableList`. Its inherited `subList` is a read-only backed view,
+with the usual unspecified behavior after structural changes to the base list.
+
+<a id="abstract-mrid-collection"></a>
+
+### LazyMridList
+
+Stores mRID-identified elements in a nullable list while supporting typed
+backfill, validation, lookup, and optional sorting. It creates backing storage
+on first addition and resets it to `null` after the final removal or a clear.
+
+It can be exposed as either `MridCollection<T>` or `MridList<T>`, depending on
+whether a particular CIM property promises indexed access.
+
+<a id="backed-mrid-list"></a>
+
+### BackedMridList
+
+Stores mRID-identified elements in a non-null mutable list. It provides the
+same lookup, uniqueness, backfill, validation, sorting, and `MridList<T>`
+capabilities as `LazyMridList`, but retains an empty backing list after
+clearing.
+
+<a id="lazy-mrid-map"></a>
+
+### LazyMridMap
+
+Stores elements in a nullable map keyed by mRID and exposes the map values as
+a `MridCollection<T>`. It uses identity-aware membership and removal, does not
+implement `MridList<T>`, and resets the backing map to `null` when empty.
+
+## Abstract classes
+
+These are the abstract classes underpinning the above implementation classes,
+implementing shared functionality. *Do not use these classes* unless you are
+implementing new collections in this package.
+
+### AbstractBackedCollection
 
 Implements the narrow `ArcCollection` contract for contents stored elsewhere.
 It exposes add, remove, and clear mutation, returns a read-only iterator, and
@@ -31,75 +157,34 @@ lifecycle.
 
 <a id="abstract-backed-list"></a>
 
-## AbstractBackedList
+### AbstractBackedList
 
 Adds indexed reads and optional sorting to `AbstractBackedCollection`. It
-implements the lightweight `ArcList` interface, which combines the `add`,
-`remove`, and `clear` operations of `ArcCollection` with the indexed reads
+implements `ArcList`, which combines the ARC operations with the indexed reads
 of `List` without exposing the indexed mutation contract of `MutableList`.
 
 <a id="lazy-list"></a>
 
-## LazyList
+### AbstractMridCollection
 
-Adapts a nullable mutable-list field. A `null` field is observed as an empty
-list, storage is created on the first addition, and the field returns to `null`
-when the collection becomes empty.
+Implements the public `MridCollection<T>` interface. It adds lookup,
+identity-based mRID uniqueness enforcement, and the typed owner/backfill
+lifecycle for `Identifiable` elements while leaving the concrete list or map
+storage strategy to subclasses.
 
-<a id="lazy-index-list"></a>
-
-## LazyIndexList
-
-Extends `LazyList` with explicit indexed insertion and removal without
-implementing `MutableList`. Its inherited `subList` is a read-only backed view,
-with the usual unspecified behaviour after structural changes to the base
-list.
-
-<a id="mrid-collection"></a>
-
-## MridCollection
-
-Adds lookup and uniqueness enforcement for `Identifiable` elements keyed by
-mRID. This is the common public type exposed by many CIM model properties,
-regardless of the concrete list or map storage used underneath.
-
-<a id="mrid-backfill-collection"></a>
-
-## MridBackfillCollection
-
-Introduces the owner type and typed backfill lifecycle between
-`MridCollection` and its backfill-aware implementations. Keeping this concern
-in an intermediate class avoids adding an otherwise irrelevant owner type to
-the widely used `MridCollection<T>` API.
+The interface is the common public type used by collection-shaped CIM
+properties. The abstract class carries owner type `O`, owns the shared mRID
+and backfill mutation lifecycle, and is not intended to be the exposed
+property type. Keeping `O` on the implementation class preserves typed
+backfill without leaking it through `MridCollection<T>` or `MridList<T>`.
 
 <a id="abstract-mrid-list"></a>
 
-## AbstractMridList
+### AbstractMridList
 
-Combines the mRID/backfill branch with read-only `List` access and optional
-sorting. It exists to share this intersection between the nullable and
-non-null list implementations.
+Extends `AbstractMridCollection<T, O>` with the public `MridList<T>` interface
+and optional sorting. It shares list delegation between nullable and non-null
+list implementations while keeping owner type `O` internal to the
+implementation.
 
 <a id="lazy-mrid-list"></a>
-
-## LazyMridList
-
-Stores mRID-identified elements in a nullable list while supporting typed
-backfill, validation, lookup, and optional sorting. It creates backing storage
-on first addition and resets it to `null` after the final removal or a clear.
-
-<a id="mrid-list"></a>
-
-## MridList
-
-Stores mRID-identified elements in a non-null mutable list. It provides the
-same lookup, uniqueness, backfill, validation, and sorting lifecycle as
-`LazyMridList`, but retains an empty backing list after clearing.
-
-<a id="lazy-mrid-map"></a>
-
-## LazyMridMap
-
-Stores elements in a nullable map keyed by mRID and exposes the map values as
-a collection. It uses identity-aware membership and removal, and resets the
-backing map to `null` when empty.

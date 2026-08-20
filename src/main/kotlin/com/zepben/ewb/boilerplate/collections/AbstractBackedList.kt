@@ -8,6 +8,8 @@
 
 package com.zepben.ewb.boilerplate.collections
 
+import com.zepben.ewb.boilerplate.collections.interfaces.ArcList
+
 
 /**
  * An [AbstractBackedCollection] with sequence-style indexed access.

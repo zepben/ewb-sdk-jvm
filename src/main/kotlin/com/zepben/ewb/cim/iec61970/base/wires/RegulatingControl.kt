@@ -9,7 +9,7 @@
 package com.zepben.ewb.cim.iec61970.base.wires
 
 import com.zepben.ewb.boilerplate.collections.LazyMridList
-import com.zepben.ewb.boilerplate.collections.MridCollection
+import com.zepben.ewb.boilerplate.collections.interfaces.MridList
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.iec61970.base.core.PhaseCode
 import com.zepben.ewb.cim.iec61970.base.core.PowerSystemResource
@@ -88,7 +88,7 @@ abstract class RegulatingControl(mRID: String) : PowerSystemResource(mRID) {
 
     private var _regulatingCondEqs: MutableList<RegulatingCondEq>? = null
 
-    val regulatingCondEqs: MridCollection<RegulatingCondEq> get() = LazyMridList(
+    val regulatingCondEqs: MridList<RegulatingCondEq> get() = LazyMridList(
         getter = { _regulatingCondEqs },
         setter = { _regulatingCondEqs = it },
         owner = this,

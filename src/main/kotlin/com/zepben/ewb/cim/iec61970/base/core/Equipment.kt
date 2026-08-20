@@ -9,7 +9,8 @@
 package com.zepben.ewb.cim.iec61970.base.core
 
 import com.zepben.ewb.boilerplate.collections.LazyMridList
-import com.zepben.ewb.boilerplate.collections.MridCollection
+import com.zepben.ewb.boilerplate.collections.interfaces.MridCollection
+import com.zepben.ewb.boilerplate.collections.interfaces.MridList
 import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvSubstation
@@ -72,7 +73,7 @@ abstract class Equipment(mRID: String) : PowerSystemResource(mRID) {
     /**
      * The usage points for this equipment. The returned collection is read only.
      */
-    val usagePoints: MridCollection<UsagePoint> get() = LazyMridList(
+    val usagePoints: MridList<UsagePoint> get() = LazyMridList(
         getter = { _usagePoints },
         setter = { _usagePoints = it },
         owner = this,

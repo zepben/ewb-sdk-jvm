@@ -8,8 +8,8 @@
 
 package com.zepben.ewb.cim.extensions.iec61968.common
 
-import com.zepben.ewb.boilerplate.collections.ArcList
 import com.zepben.ewb.boilerplate.collections.LazyList
+import com.zepben.ewb.boilerplate.collections.interfaces.ArcList
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.iec61968.common.ElectronicAddress
 import com.zepben.ewb.cim.iec61968.common.StreetAddress

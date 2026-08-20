@@ -13,9 +13,9 @@ import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 
 
 /**
- * A nullable-list implementation of [MridCollection].
+ * A nullable-list implementation of [AbstractMridCollection].
  *
- * Inherits mRID lookup and uniqueness semantics from [MridCollection] and
+ * Inherits mRID lookup and uniqueness semantics from [AbstractMridCollection] and
  * exposes list-style indexed reads through [AbstractMridList].
  *
  * Iterators remain attached to the backing list present when they are created.

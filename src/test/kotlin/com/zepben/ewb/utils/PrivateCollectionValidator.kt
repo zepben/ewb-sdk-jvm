@@ -8,8 +8,8 @@
 
 package com.zepben.ewb.utils
 
-import com.zepben.ewb.boilerplate.collections.ArcCollection
-import com.zepben.ewb.boilerplate.collections.MridCollection
+import com.zepben.ewb.boilerplate.collections.interfaces.ArcCollection
+import com.zepben.ewb.boilerplate.collections.interfaces.MridCollection
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.utils.PrivateCollectionValidator.Companion.validateArcCollection
 import com.zepben.testutils.exception.ExpectException.Companion.expect

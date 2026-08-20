@@ -9,7 +9,8 @@
 package com.zepben.ewb.cim.iec61968.metering
 
 import com.zepben.ewb.boilerplate.collections.LazyMridList
-import com.zepben.ewb.boilerplate.collections.MridCollection
+import com.zepben.ewb.boilerplate.collections.interfaces.MridCollection
+import com.zepben.ewb.boilerplate.collections.interfaces.MridList
 import com.zepben.ewb.cim.iec61968.assets.AssetContainer
 import com.zepben.ewb.cim.iec61968.common.Location
 import com.zepben.ewb.services.common.extensions.getByMRID
@@ -47,7 +48,7 @@ abstract class EndDevice(mRID: String) : AssetContainer(mRID) {
         elementDescription = "A UsagePoint"
     )
 
-    val functions: MridCollection<EndDeviceFunction> get() = LazyMridList(
+    val functions: MridList<EndDeviceFunction> get() = LazyMridList(
         getter = { _functions },
         setter = { _functions = it },
         owner = this,

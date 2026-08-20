@@ -10,7 +10,7 @@ package com.zepben.ewb.cim.iec61970.base.diagramlayout
 
 import com.zepben.ewb.boilerplate.Backfill
 import com.zepben.ewb.boilerplate.collections.LazyMridMap
-import com.zepben.ewb.boilerplate.collections.MridCollection
+import com.zepben.ewb.boilerplate.collections.interfaces.MridCollection
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.services.common.extensions.validateReference
 

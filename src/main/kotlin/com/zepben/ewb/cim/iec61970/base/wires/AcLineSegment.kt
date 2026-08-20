@@ -10,7 +10,7 @@ package com.zepben.ewb.cim.iec61970.base.wires
 
 import com.zepben.ewb.boilerplate.Backfill
 import com.zepben.ewb.boilerplate.collections.LazyMridList
-import com.zepben.ewb.boilerplate.collections.MridCollection
+import com.zepben.ewb.boilerplate.collections.interfaces.MridList
 import com.zepben.ewb.boilerplate.relations.AcLineSegmentPhaseList
 import com.zepben.ewb.cim.iec61968.assetinfo.WireInfo
 import com.zepben.ewb.services.common.extensions.getByMRID
@@ -55,7 +55,7 @@ class AcLineSegment(mRID: String) : Conductor(mRID) {
             perLengthImpedance = it
         }
 
-    val cuts: MridCollection<Cut> get() = LazyMridList(
+    val cuts: MridList<Cut> get() = LazyMridList(
         getter = { _cuts },
         setter = { _cuts = it },
         owner = this,
@@ -67,7 +67,7 @@ class AcLineSegment(mRID: String) : Conductor(mRID) {
         )
     )
 
-    val clamps: MridCollection<Clamp> get() = LazyMridList(
+    val clamps: MridList<Clamp> get() = LazyMridList(
         getter = { _clamps },
         setter = { _clamps = it },
         owner = this,

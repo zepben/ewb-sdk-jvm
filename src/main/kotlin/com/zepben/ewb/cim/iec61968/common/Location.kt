@@ -162,4 +162,8 @@ class Location(mRID: String) : IdentifiedObject(mRID) {
  *
  * @param action The action to perform on each [PositionPoint]
  */
+@Deprecated(
+    message = "Use points.forEachIndexed(action::accept) instead.",
+    replaceWith = ReplaceWith("points.forEachIndexed(action::accept)")
+)
 fun Location.forEachPoint(action: (sequenceNumber: Int, point: PositionPoint) -> Unit): Unit = forEachPoint(BiConsumer(action))

@@ -12,6 +12,11 @@ constructed directly.
 
 ## Interfaces
 
+Note: ARC stands for Add, Remove, Clear - the only mutation methods allowed in these collections.
+The full mutability of `MutableCollection` is not exposed because of the excessive amount of logic
+associated with the ARC methods - functionality like `addAll` would create ambiguity and is thus left
+up to the user.
+
 ```mermaid
 flowchart TB
     Collection --> ArcCollection

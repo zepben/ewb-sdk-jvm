@@ -71,7 +71,7 @@ abstract class ConductingEquipment(mRID: String) : Equipment(mRID) {
 
         if (terminal.sequenceNumber == 0)
             terminal.sequenceNumber = numTerminals() + 1
-        require(terminalsInternal.getByNumber(terminal.sequenceNumber) == null) { "Unable to add ${terminal.typeNameAndMRID()} to ${typeNameAndMRID()}. A ${getTerminal(terminal.sequenceNumber)!!.typeNameAndMRID()} already exists with sequenceNumber ${terminal.sequenceNumber}." }
+        require(terminalsInternal.getBySequenceNumber(terminal.sequenceNumber) == null) { "Unable to add ${terminal.typeNameAndMRID()} to ${typeNameAndMRID()}. A ${getTerminal(terminal.sequenceNumber)!!.typeNameAndMRID()} already exists with sequenceNumber ${terminal.sequenceNumber}." }
 
     }
 
@@ -79,19 +79,19 @@ abstract class ConductingEquipment(mRID: String) : Equipment(mRID) {
      * Helper to get the first terminal for a [ConductingEquipment]. Will throw a [NullPointerException] if the terminal does not exist, so only call it
      * when you know the terminal will be there.
      */
-    val t1: Terminal get() = terminalsInternal.getByNumber(1)!!
+    val t1: Terminal get() = terminalsInternal.getBySequenceNumber(1)!!
 
     /**
      * Helper to get the second terminal for a [ConductingEquipment]. Will throw a [NullPointerException] if the terminal does not exist, so only call it
      * when you know the terminal will be there.
      */
-    val t2: Terminal get() = terminalsInternal.getByNumber(2)!!
+    val t2: Terminal get() = terminalsInternal.getBySequenceNumber(2)!!
 
     /**
      * Helper to get the third terminal for a [ConductingEquipment]. Will throw a [NullPointerException] if the terminal does not exist, so only call it
      * when you know the terminal will be there.
      */
-    val t3: Terminal get() = terminalsInternal.getByNumber(3)!!
+    val t3: Terminal get() = terminalsInternal.getBySequenceNumber(3)!!
 
 
     // region deprecated list boilerplate

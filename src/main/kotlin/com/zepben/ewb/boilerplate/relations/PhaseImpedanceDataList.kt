@@ -34,7 +34,7 @@ class PhaseImpedanceDataList(
      * @param toPhase The "to" phase to lookup.
      * @return The matching [PhaseImpedanceData] or null if none was found.
      */
-    fun get(fromPhase: SinglePhaseKind, toPhase: SinglePhaseKind): PhaseImpedanceData? =
+    operator fun get(fromPhase: SinglePhaseKind, toPhase: SinglePhaseKind): PhaseImpedanceData? =
         firstOrNull { it.fromPhase == fromPhase && it.toPhase == toPhase }
 
     /**

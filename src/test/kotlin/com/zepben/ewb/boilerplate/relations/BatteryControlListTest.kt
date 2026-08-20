@@ -38,8 +38,8 @@ internal class BatteryControlListTest {
             "A BatteryControl",
         )
 
-        assertThat(controls.getByMode(BatteryControlMode.time), sameInstance(time))
-        assertThat(controls.getByMode(BatteryControlMode.UNKNOWN), nullValue())
+        assertThat(controls.get(BatteryControlMode.time), sameInstance(time))
+        assertThat(controls.get(BatteryControlMode.UNKNOWN), nullValue())
     }
 
 }

@@ -38,8 +38,8 @@ internal class AcLineSegmentPhaseListTest {
             "An AcLineSegmentPhase",
         )
 
-        assertThat(phases.getByPhase(SinglePhaseKind.B), sameInstance(phaseB))
-        assertThat(phases.getByPhase(SinglePhaseKind.C), nullValue())
+        assertThat(phases.get(SinglePhaseKind.B), sameInstance(phaseB))
+        assertThat(phases.get(SinglePhaseKind.C), nullValue())
     }
 
 }

@@ -52,10 +52,10 @@ internal class PowerTransformerEndListTest {
 
         assertThat(ends.getByEndNumber(3), sameInstance(target))
         assertThat(ends.getByEndNumber(4), nullValue())
-        assertThat(ends.getByTerminal(targetTerminal), sameInstance(target))
-        assertThat(ends.getByTerminal(Terminal("missing-terminal")), nullValue())
-        assertThat(ends.getByNode(targetNode), sameInstance(target))
-        assertThat(ends.getByNode(ConnectivityNode("missing-node")), nullValue())
+        assertThat(ends.get(targetTerminal), sameInstance(target))
+        assertThat(ends.get(Terminal("missing-terminal")), nullValue())
+        assertThat(ends.get(targetNode), sameInstance(target))
+        assertThat(ends.get(ConnectivityNode("missing-node")), nullValue())
     }
 
 }

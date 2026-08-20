@@ -50,7 +50,7 @@ class PowerTransformerEndList(
      * @param terminal the terminal of the required [PowerTransformerEnd]
      * @return The [PowerTransformerEnd] with the specified [terminal] if it exists, otherwise null
      */
-    fun getByTerminal(terminal: Terminal): PowerTransformerEnd? =
+    operator fun get(terminal: Terminal): PowerTransformerEnd? =
         firstOrNull { it.terminal == terminal }
 
     /**
@@ -59,7 +59,7 @@ class PowerTransformerEndList(
      * @param connectivityNode the [ConnectivityNode] of the required [PowerTransformerEnd]
      * @return The [PowerTransformerEnd] with the specified [Terminal] if it exists, otherwise null
      */
-    fun getByNode(connectivityNode: ConnectivityNode): PowerTransformerEnd? =
+    operator fun get(connectivityNode: ConnectivityNode): PowerTransformerEnd? =
         firstOrNull { it.terminal?.connectivityNode == connectivityNode }
 
 }

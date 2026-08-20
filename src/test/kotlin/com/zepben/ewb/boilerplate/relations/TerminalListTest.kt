@@ -36,8 +36,8 @@ internal class TerminalListTest {
         terminals.add(first)
         terminals.add(second)
 
-        assertThat(terminals.getByNumber(2), sameInstance(second))
-        assertThat(terminals.getByNumber(3), nullValue())
+        assertThat(terminals.getBySequenceNumber(2), sameInstance(second))
+        assertThat(terminals.getBySequenceNumber(3), nullValue())
     }
 
 }

@@ -186,4 +186,8 @@ class RelayInfo(mRID: String) : AssetInfo(mRID) {
  *
  * @param action The action to perform on each reclose delay ([Double])
  */
+@Deprecated(
+    message = "Use recloseDelays.forEachIndexed(action::accept) instead.",
+    replaceWith = ReplaceWith("recloseDelays.forEachIndexed(action::accept)")
+)
 fun RelayInfo.forEachDelay(action: (sequenceNumber: Int, delay: Double) -> Unit): Unit = forEachDelay(BiConsumer(action))

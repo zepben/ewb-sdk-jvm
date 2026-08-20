@@ -600,6 +600,10 @@ abstract class ProtectionRelayFunction(mRID: String) : PowerSystemResource(mRID)
  *
  * @param action The action to perform on each time limit
  */
+@Deprecated(
+    message = "Use timeLimits.forEachIndexed(action::accept) instead.",
+    replaceWith = ReplaceWith("timeLimits.forEachIndexed(action::accept)")
+)
 fun ProtectionRelayFunction.forEachTimeLimits(action: (sequenceNumber: Int, timeLimit: Double) -> Unit): Unit = forEachTimeLimit(BiConsumer(action))
 
 /**
@@ -607,4 +611,8 @@ fun ProtectionRelayFunction.forEachTimeLimits(action: (sequenceNumber: Int, time
  *
  * @param action The action to perform on each threshold
  */
+@Deprecated(
+    message = "Use thresholds.forEachIndexed(action::accept) instead.",
+    replaceWith = ReplaceWith("thresholds.forEachIndexed(action::accept)")
+)
 fun ProtectionRelayFunction.forEachThreshold(action: (sequenceNumber: Int, threshold: RelaySetting) -> Unit): Unit = forEachThreshold(BiConsumer(action))

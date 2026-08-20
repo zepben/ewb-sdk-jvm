@@ -179,4 +179,8 @@ class DiagramObject(mRID: String) : IdentifiedObject(mRID) {
     // endregion
 }
 
+@Deprecated(
+    message = "Use points.forEachIndexed(action::accept) instead.",
+    replaceWith = ReplaceWith("points.forEachIndexed(action::accept)")
+)
 fun DiagramObject.forEachPoint(action: (sequenceNumber: Int, point: DiagramObjectPoint) -> Unit): Unit = forEachPoint(BiConsumer(action))

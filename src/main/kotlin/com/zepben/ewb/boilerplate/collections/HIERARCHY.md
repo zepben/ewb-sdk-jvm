@@ -12,14 +12,14 @@ constructed directly.
 
 ## Interfaces
 
-```text
-      (Collection<T>)
-                \
-        ArcCollection<T>       (List<T>)
-                /       \       /
-MridCollection<T>       ArcList<T>
-                \       /
-                MridList<T>
+```mermaid
+flowchart TB
+    Collection --> ArcCollection
+    List --> ArcList
+    ArcCollection --> ArcList
+    ArcCollection --> MridCollection
+    ArcList --> MridList
+    MridCollection --> MridList
 ```
 
 `MridList<T>` is the intersection of the two capability branches: it has mRID
@@ -47,18 +47,6 @@ MridList<T>        <- AbstractMridList<T, O>
 `AbstractMridCollection`; it does not duplicate the mRID lifecycle.
 
 ## Implementation classes
-
-```text
-*AbstractBackedCollection<T>*                    [ArcCollection<T>]
-|-- *AbstractBackedList<T>*                      [ArcList<T>]
-|   `-- LazyList<T>
-|       `-- LazyIndexList<T>
-`-- *AbstractMridCollection<T, O>*               [MridCollection<T>]
-    |-- *AbstractMridList<T, O>*                 [MridList<T>]
-    |   |-- LazyMridList<T, O>
-    |   `-- BackedMridList<T, O>
-    `-- LazyMridMap<T, O>
-```
 
 The class sources are:
 

@@ -31,8 +31,8 @@ internal class TransformerEndRatedSListTest {
 
         assertThat(ratings.add(100), equalTo(true))
         assertThat(ratings.add(200, TransformerCoolingType.KNAF), equalTo(true))
-        assertThat(ratings.getByCoolingType(TransformerCoolingType.UNKNOWN)?.ratedS, equalTo(100))
-        assertThat(ratings.getByCoolingType(TransformerCoolingType.KNAF)?.ratedS, equalTo(200))
+        assertThat(ratings.get(TransformerCoolingType.UNKNOWN)?.ratedS, equalTo(100))
+        assertThat(ratings.get(TransformerCoolingType.KNAF)?.ratedS, equalTo(200))
     }
 
     @Test
@@ -41,7 +41,7 @@ internal class TransformerEndRatedSListTest {
         val ratings = TransformerEndRatedSList({ backing }, { backing = it })
         ratings.add(100, TransformerCoolingType.KFWF)
 
-        assertThat(ratings.getByCoolingType(TransformerCoolingType.KNAF), nullValue())
+        assertThat(ratings.get(TransformerCoolingType.KNAF), nullValue())
     }
 
     @Test
@@ -54,9 +54,9 @@ internal class TransformerEndRatedSListTest {
         val removed = ratings.removeByCoolingType(TransformerCoolingType.KNAF)
 
         assertThat(removed?.ratedS, equalTo(200))
-        assertThat(ratings.getByCoolingType(TransformerCoolingType.KNAF), nullValue())
+        assertThat(ratings.get(TransformerCoolingType.KNAF), nullValue())
         assertThat(ratings.removeByCoolingType(TransformerCoolingType.KNAF), nullValue())
-        assertThat(ratings.getByCoolingType(TransformerCoolingType.KFWF), sameInstance(backing?.single()))
+        assertThat(ratings.get(TransformerCoolingType.KFWF), sameInstance(backing?.single()))
     }
 
 }

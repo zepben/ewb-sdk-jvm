@@ -32,7 +32,7 @@ class TerminalList(
 ) {
 
     /** Returns the terminal with [sequenceNumber], or `null`. */
-    fun getByNumber(sequenceNumber: Int): Terminal? =
+    fun getBySequenceNumber(sequenceNumber: Int): Terminal? =
         firstOrNull { it.sequenceNumber == sequenceNumber }
 
 }

@@ -31,7 +31,7 @@ class CurveDataList(
      *
      * @param x xValue of requested data
      */
-    fun get(x: Float) = find { it.xValue == x }
+    operator fun get(x: Float) = find { it.xValue == x }
 
     /**
      * Remove data point from the this [Curve].

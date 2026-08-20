@@ -40,7 +40,7 @@ class AcLineSegmentPhaseList(
      * @param phase the phase of the required [AcLineSegmentPhase]
      * @return The [AcLineSegmentPhase] with the specified [phase] if it exists, otherwise null
      */
-    fun getByPhase(
+    operator fun get(
         phase: SinglePhaseKind,
     ): AcLineSegmentPhase? =
         firstOrNull { it.phase == phase }

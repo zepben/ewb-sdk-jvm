@@ -40,6 +40,6 @@ class BatteryControlList(
      * @param controlMode the control mode of the required [BatteryControl]
      * @return The [BatteryControl] with the specified [BatteryControlMode] if it exists, otherwise null
      */
-    fun getByMode(controlMode: BatteryControlMode): BatteryControl? = firstOrNull { it.controlMode == controlMode }
+    operator fun get(controlMode: BatteryControlMode): BatteryControl? = firstOrNull { it.controlMode == controlMode }
 
 }

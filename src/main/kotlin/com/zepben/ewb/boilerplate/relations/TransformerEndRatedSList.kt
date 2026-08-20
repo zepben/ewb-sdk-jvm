@@ -38,7 +38,7 @@ class TransformerEndRatedSList(
     ): Boolean = add(TransformerEndRatedS(coolingType, ratedS))
 
     /** Returns the entry for [coolingType], or `null`. */
-    fun getByCoolingType(coolingType: TransformerCoolingType): TransformerEndRatedS? = firstOrNull { it.coolingType == coolingType }
+    operator fun get(coolingType: TransformerCoolingType): TransformerEndRatedS? = firstOrNull { it.coolingType == coolingType }
 
     /**
      * Remove the [TransformerEndRatedS] from the `sRatings` collection with a cooling type of [coolingType]

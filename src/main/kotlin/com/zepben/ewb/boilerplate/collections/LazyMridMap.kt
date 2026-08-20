@@ -39,7 +39,7 @@ open class LazyMridMap<T : Identifiable, O : Identifiable>(
     override val elementDescription: String,
     override val backfill: Backfill<T, O>? = null,
     validate: ((T) -> Unit)? = null
-) : MridBackfillCollection<T, O>(validate) {
+) : AbstractMridCollection<T, O>(validate) {
 
     /** Resets an empty backing map to `null`. */
     private fun clearIfEmpty() {

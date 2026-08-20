@@ -8,9 +8,11 @@
 
 package com.zepben.ewb.boilerplate.collections
 
+import com.zepben.ewb.boilerplate.collections.interfaces.ArcCollection
+
 
 /**
- * An [ArcCollection] whose contents are stored elsewhere.
+ * An [com.zepben.ewb.boilerplate.collections.interfaces.ArcCollection] whose contents are stored elsewhere.
  *
  * Implementations provide the current mutable contents through [getCollection].
  * Element validation and the add lifecycle are centralised here, with hooks for

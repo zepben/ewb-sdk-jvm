@@ -9,7 +9,7 @@
 package com.zepben.ewb.boilerplate.relations
 
 import com.zepben.ewb.boilerplate.Backfill
-import com.zepben.ewb.boilerplate.collections.MridList
+import com.zepben.ewb.boilerplate.collections.BackedMridList
 import com.zepben.ewb.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.ewb.cim.iec61970.base.core.Terminal
 
@@ -22,7 +22,7 @@ class TerminalList(
     backfill: Backfill<Terminal, ConductingEquipment>? = null,
     validate: ((Terminal) -> Unit)? = null,
     sortBy: ((Terminal) -> Comparable<*>?)? = null,
-) : MridList<Terminal, ConductingEquipment>(
+) : BackedMridList<Terminal, ConductingEquipment>(
     list = list,
     owner = owner,
     elementDescription = elementDescription,

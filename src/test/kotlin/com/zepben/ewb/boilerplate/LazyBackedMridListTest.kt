@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
 
-internal class LazyMridListTest {
+internal class LazyBackedMridListTest {
 
     companion object {
         @JvmField

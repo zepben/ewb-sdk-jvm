@@ -10,7 +10,8 @@ package com.zepben.ewb.cim.iec61970.base.core
 
 import com.zepben.ewb.boilerplate.Backfill
 import com.zepben.ewb.boilerplate.collections.LazyMridList
-import com.zepben.ewb.boilerplate.collections.MridCollection
+import com.zepben.ewb.boilerplate.collections.interfaces.MridCollection
+import com.zepben.ewb.boilerplate.collections.interfaces.MridList
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.ewb.services.common.extensions.getByMRID
@@ -50,7 +51,7 @@ class Substation(mRID: String) : EquipmentContainer(mRID) {
      * <no description from CIM>
      * The returned collection is read only.
      */
-    val loops: MridCollection<Loop> get() = LazyMridList(
+    val loops: MridList<Loop> get() = LazyMridList(
         getter = { _loops },
         setter = { _loops = it },
         owner = this,
@@ -61,7 +62,7 @@ class Substation(mRID: String) : EquipmentContainer(mRID) {
      * <no description from CIM>
      * The returned collection is read only.
      */
-    val energizedLoops: MridCollection<Loop> get() = LazyMridList(
+    val energizedLoops: MridList<Loop> get() = LazyMridList(
         getter = { _energizedLoops },
         setter = { _energizedLoops = it },
         owner = this,
@@ -72,7 +73,7 @@ class Substation(mRID: String) : EquipmentContainer(mRID) {
      * Simplification of the CIM association via Bay to [Circuit].
      * The returned collection is read only.
      */
-    val circuits: MridCollection<Circuit> get() = LazyMridList(
+    val circuits: MridList<Circuit> get() = LazyMridList(
         getter = { _circuits },
         setter = { _circuits = it },
         owner = this,

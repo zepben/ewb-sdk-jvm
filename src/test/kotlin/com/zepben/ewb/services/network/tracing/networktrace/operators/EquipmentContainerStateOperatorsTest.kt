@@ -8,8 +8,8 @@
 
 package com.zepben.ewb.services.network.tracing.networktrace.operators
 
-import com.zepben.ewb.boilerplate.collections.MridCollection
-import com.zepben.ewb.boilerplate.collections.MridList
+import com.zepben.ewb.boilerplate.collections.BackedMridList
+import com.zepben.ewb.boilerplate.collections.interfaces.MridCollection
 import com.zepben.ewb.cim.iec61970.base.core.Equipment
 import com.zepben.ewb.cim.iec61970.base.core.EquipmentContainer
 import com.zepben.testutils.junit.SystemLogExtension
@@ -36,7 +36,7 @@ internal class EquipmentContainerStateOperatorsTest {
     fun getEquipment() {
         val container = object : EquipmentContainer("container") {
             override val currentEquipment: MridCollection<Equipment> =
-                MridList(owner = this, elementDescription = "Test Equipment")
+                BackedMridList(owner = this, elementDescription = "Test Equipment")
         }
         val normalEquipment = object : Equipment("normal") {}
         val currentEquipment = object : Equipment("current") {}

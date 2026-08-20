@@ -9,7 +9,7 @@
 package com.zepben.ewb.boilerplate
 
 import com.zepben.ewb.boilerplate.collections.LazyMridMap
-import com.zepben.ewb.boilerplate.collections.MridCollection
+import com.zepben.ewb.boilerplate.collections.interfaces.MridCollection
 import com.zepben.ewb.cim.iec61970.base.core.Feeder
 import com.zepben.ewb.cim.iec61970.base.core.Substation
 import com.zepben.testutils.junit.SystemLogExtension

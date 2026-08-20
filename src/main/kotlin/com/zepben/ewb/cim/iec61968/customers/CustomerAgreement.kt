@@ -9,7 +9,7 @@
 package com.zepben.ewb.cim.iec61968.customers
 
 import com.zepben.ewb.boilerplate.collections.LazyMridList
-import com.zepben.ewb.boilerplate.collections.MridCollection
+import com.zepben.ewb.boilerplate.collections.interfaces.MridCollection
 import com.zepben.ewb.cim.iec61968.common.Agreement
 import com.zepben.ewb.services.common.extensions.getByMRID
 import com.zepben.ewb.services.common.extensions.validateReference

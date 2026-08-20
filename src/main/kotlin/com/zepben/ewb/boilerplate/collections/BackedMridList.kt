@@ -22,7 +22,7 @@ import com.zepben.ewb.cim.iec61970.base.core.Identifiable
  * Unlike [LazyMridList], clearing the collection leaves an empty backing list
  * rather than resetting the backing field to `null`.
  */
-open class MridList<T : Identifiable, O : Identifiable>(
+open class BackedMridList<T : Identifiable, O : Identifiable>(
     private val list: MutableList<T> = mutableListOf(),
     override val owner: O,
     override val elementDescription: String,

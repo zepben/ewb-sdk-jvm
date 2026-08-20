@@ -8,10 +8,10 @@
 
 package com.zepben.ewb.boilerplate
 
+import com.zepben.ewb.boilerplate.collections.BackedMridList
 import com.zepben.ewb.boilerplate.collections.LazyMridList
 import com.zepben.ewb.boilerplate.collections.LazyMridMap
-import com.zepben.ewb.boilerplate.collections.MridCollection
-import com.zepben.ewb.boilerplate.collections.MridList
+import com.zepben.ewb.boilerplate.collections.interfaces.MridCollection
 import com.zepben.ewb.cim.iec61970.base.core.Feeder
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
 
-internal class MridCollectionsParityTest {
+internal class AbstractMridCollectionsParityTest {
 
     companion object {
         @JvmField
@@ -34,7 +34,7 @@ internal class MridCollectionsParityTest {
         return listOf(
             LazyMridList({ listBacking }, { listBacking = it }, Feeder("list-owner"), "A Feeder"),
             LazyMridMap({ mapBacking }, { mapBacking = it }, Feeder("map-owner"), "A Feeder"),
-            MridList(owner = Feeder("eager-owner"), elementDescription = "A Feeder")
+            BackedMridList(owner = Feeder("eager-owner"), elementDescription = "A Feeder")
         )
     }
 

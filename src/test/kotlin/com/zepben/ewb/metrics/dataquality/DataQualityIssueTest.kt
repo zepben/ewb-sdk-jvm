@@ -64,7 +64,7 @@ internal class DataQualityIssueTest {
         assertThat(issue.externalReference, nullValue())
         assertThat(issue.severity, equalTo(2))
         assertThat(issue.priority, equalTo(1))
-        assertThat(issue.callouts, nullValue())
+        assertThat(issue.callouts, equalTo(emptyList()))
     }
 
     @Test

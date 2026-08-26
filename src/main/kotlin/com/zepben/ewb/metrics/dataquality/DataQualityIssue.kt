@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.metrics.dataquality
 
+import kotlin.time.Instant
 import kotlinx.serialization.Serializable
 
 /**
@@ -15,9 +16,9 @@ import kotlinx.serialization.Serializable
  *
  * @property id Unique identifier for the issue.
  * @property status Current lifecycle status of the issue.
- * @property createdAt Timestamp when the issue was created.
+ * @property createdAt When the issue was created.
  * @property createdBy Identifier of the user who created the issue.
- * @property updatedAt Timestamp when the issue was last updated.
+ * @property updatedAt When the issue was last updated.
  * @property updatedBy Identifier of the user who last updated the issue.
  * @property networkModelCreatedAgainst Identifier of the network model the issue was raised against.
  * @property networkModelResolvedAgainst Identifier of the network model the issue was resolved against, if any.
@@ -36,9 +37,9 @@ import kotlinx.serialization.Serializable
 data class DataQualityIssue(
     val id: String,
     val status: DataQualityIssueStatus,
-    val createdAt: String,
+    val createdAt: Instant,
     val createdBy: String,
-    val updatedAt: String,
+    val updatedAt: Instant,
     val updatedBy: String,
     val networkModelCreatedAgainst: String,
     val networkModelResolvedAgainst: String? = null,

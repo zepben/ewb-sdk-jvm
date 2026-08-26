@@ -54,12 +54,12 @@ internal class MetricsWriter(
     fun write(category: DataQualityIssueCategory): Boolean =
         writer.writeDataQualityIssueCategory(category)
 
-    fun write(issue: DataQualityIssue): Boolean =
-        writer.writeDataQualityIssue(issue)
-
-    fun writeAsset(issueId: String, assetMrid: String): Boolean =
-        writer.writeDataQualityIssueAsset(issueId, assetMrid)
-
-    fun write(callout: DataQualityIssueCallout): Boolean =
-        writer.writeDataQualityIssueCallout(callout)
+    fun write(issue: DataQualityIssue, callouts: List<DataQualityIssueCallout> = emptyList()): Boolean =
+        writer.writeDataQualityIssue(issue) and
+            writeEach(issue.associatedAssets, { writer.writeDataQualityIssueAsset(issue.id, it) }) { asset, e ->
+                logger.error("Failed to write data quality issue asset $asset: ${e.message}")
+            } and
+            writeEach(callouts, { writer.writeDataQualityIssueCallout(it) }) { callout, e ->
+                logger.error("Failed to write data quality issue callout $callout: ${e.message}")
+            }
 }

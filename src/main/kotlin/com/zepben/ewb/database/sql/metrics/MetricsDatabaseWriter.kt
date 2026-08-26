@@ -79,29 +79,15 @@ class MetricsDatabaseWriter internal constructor(
     fun write(category: DataQualityIssueCategory): Boolean = connectAndWrite { createMetricsWriter(databaseTables).write(category) }
 
     /**
-     * Write a data quality issue.
+     * Write a data quality issue along with its associated assets and callouts.
      *
-     * @param issue The [DataQualityIssue] to write.
-     * @return true if the [issue] was successfully written, otherwise false.
+     * @param issue The [DataQualityIssue] to write. Associated assets from [DataQualityIssue.associatedAssets] are written automatically.
+     * @param callouts The [DataQualityIssueCallout]s to write alongside the issue.
+     * @return true if the issue and all related data were successfully written, otherwise false.
      */
-    fun write(issue: DataQualityIssue): Boolean = connectAndWrite { createMetricsWriter(databaseTables).write(issue) }
-
-    /**
-     * Write an asset association for a data quality issue.
-     *
-     * @param issueId The parent issue ID.
-     * @param assetMrid The mRID of the associated asset.
-     * @return true if written successfully, otherwise false.
-     */
-    fun writeAsset(issueId: String, assetMrid: String): Boolean = connectAndWrite { createMetricsWriter(databaseTables).writeAsset(issueId, assetMrid) }
-
-    /**
-     * Write a callout for a data quality issue.
-     *
-     * @param callout The [DataQualityIssueCallout] to write.
-     * @return true if the [callout] was successfully written, otherwise false.
-     */
-    fun write(callout: DataQualityIssueCallout): Boolean = connectAndWrite { createMetricsWriter(databaseTables).write(callout) }
+    @JvmOverloads
+    fun write(issue: DataQualityIssue, callouts: List<DataQualityIssueCallout> = emptyList()): Boolean =
+        connectAndWrite { createMetricsWriter(databaseTables).write(issue, callouts) }
 
     private fun createJobIdFile(job: IngestionJob): Boolean {
         if (modelPath == null) return true

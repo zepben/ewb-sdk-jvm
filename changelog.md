@@ -28,7 +28,7 @@
 * Added tables `TableDataQualityIssues`, `TableDataQualityIssueCategories`, `TableDataQualityIssueAssets`, and `TableDataQualityIssueCallouts` to the metrics database.
 * Using `MetricsDatabaseWriter`, a `DataQualityIssue`, `DataQualityIssueCategory`, associated assets, and `DataQualityIssueCallout` may be saved to the metrics database.
 * Added new classes:
-  * `DataQualityIssue` - severity is now an integer, added priority (nullable integer) and callouts (list of callout IDs).
+  * `DataQualityIssue` - severity is an integer, priority is a required integer, callouts is a list of callout IDs (empty by default).
   * `DataQualityIssueCategory`
   * `DataQualityIssueCallout` - represents a callout annotation attached to an issue, following the ednar Callout pattern.
 * Added new enum:

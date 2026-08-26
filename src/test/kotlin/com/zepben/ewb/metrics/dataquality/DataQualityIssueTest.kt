@@ -9,12 +9,12 @@
 package com.zepben.ewb.metrics.dataquality
 
 import com.zepben.testutils.junit.SystemLogExtension
+import kotlin.time.Instant
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import java.time.Instant
 import java.util.*
 
 internal class DataQualityIssueTest {
@@ -30,12 +30,13 @@ internal class DataQualityIssueTest {
 
     @Test
     internal fun constructorCoverage() {
+        val epoch = Instant.fromEpochMilliseconds(0)
         val issue = DataQualityIssue(
             id = uuid.toString(),
             status = DataQualityIssueStatus.CREATED,
-            createdAt = Instant.EPOCH.toString(),
+            createdAt = epoch,
             createdBy = String(),
-            updatedAt = Instant.EPOCH.toString(),
+            updatedAt = epoch,
             updatedBy = String(),
             networkModelCreatedAgainst = String(),
             name = "Bad connectivity",
@@ -49,9 +50,9 @@ internal class DataQualityIssueTest {
 
         assertThat(issue.id, equalTo(uuid.toString()))
         assertThat(issue.status, equalTo(DataQualityIssueStatus.CREATED))
-        assertThat(issue.createdAt, equalTo(Instant.EPOCH.toString()))
+        assertThat(issue.createdAt, equalTo(epoch))
         assertThat(issue.createdBy, equalTo(String()))
-        assertThat(issue.updatedAt, equalTo(Instant.EPOCH.toString()))
+        assertThat(issue.updatedAt, equalTo(epoch))
         assertThat(issue.updatedBy, equalTo(String()))
         assertThat(issue.networkModelCreatedAgainst, equalTo(String()))
         assertThat(issue.networkModelResolvedAgainst, nullValue())
@@ -69,12 +70,13 @@ internal class DataQualityIssueTest {
 
     @Test
     internal fun `optional fields can be set`() {
+        val epoch = Instant.fromEpochMilliseconds(0)
         val issue = DataQualityIssue(
             id = uuid.toString(),
             status = DataQualityIssueStatus.RESOLVED,
-            createdAt = Instant.EPOCH.toString(),
+            createdAt = epoch,
             createdBy = String(),
-            updatedAt = Instant.EPOCH.toString(),
+            updatedAt = epoch,
             updatedBy = String(),
             networkModelCreatedAgainst = String(),
             networkModelResolvedAgainst = "2026-01-02",

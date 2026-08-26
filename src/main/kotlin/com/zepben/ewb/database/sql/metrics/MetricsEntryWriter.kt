@@ -175,9 +175,9 @@ internal class MetricsEntryWriter(
 
         insert.setObject(table.ID.queryIndex, UUID.fromString(issue.id))
         insert.setString(table.STATUS.queryIndex, issue.status.name)
-        insert.setTimestamp(table.CREATED_AT.queryIndex, Timestamp.valueOf(issue.createdAt.replace("T", " ")))
+        insert.setTimestamp(table.CREATED_AT.queryIndex, Timestamp(issue.createdAt.toEpochMilliseconds()))
         insert.setString(table.CREATED_BY.queryIndex, issue.createdBy)
-        insert.setTimestamp(table.UPDATED_AT.queryIndex, Timestamp.valueOf(issue.updatedAt.replace("T", " ")))
+        insert.setTimestamp(table.UPDATED_AT.queryIndex, Timestamp(issue.updatedAt.toEpochMilliseconds()))
         insert.setString(table.UPDATED_BY.queryIndex, issue.updatedBy)
         insert.setString(table.NETWORK_MODEL_CREATED_AGAINST.queryIndex, issue.networkModelCreatedAgainst)
         insert.setNullableString(table.NETWORK_MODEL_RESOLVED_AGAINST.queryIndex, issue.networkModelResolvedAgainst)

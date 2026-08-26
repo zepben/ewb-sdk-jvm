@@ -165,13 +165,27 @@ internal class MetricsWriterTest {
     }
 
     @Test
-    internal fun `passes data quality issue through to the metrics entry writer`() {
-        val issue = DataQualityIssue(
+    internal fun `writes data quality issue with assets and callouts in one call`() {
+        val issueId = UUID.randomUUID().toString()
+        val callout = DataQualityIssueCallout(
             id = UUID.randomUUID().toString(),
+            dataQualityIssueId = issueId,
+            longitude = 144.9,
+            latitude = -37.8,
+            positionX = 50.0,
+            positionY = 25.0,
+            width = 200.0,
+            height = 100.0,
+            label = "A",
+            description = null,
+            colour = "#FF0000"
+        )
+        val issue = DataQualityIssue(
+            id = issueId,
             status = DataQualityIssueStatus.CREATED,
-            createdAt = Instant.EPOCH.toString(),
+            createdAt = kotlin.time.Instant.fromEpochMilliseconds(0),
             createdBy = String(),
-            updatedAt = Instant.EPOCH.toString(),
+            updatedAt = kotlin.time.Instant.fromEpochMilliseconds(0),
             updatedBy = String(),
             networkModelCreatedAgainst = String(),
             name = "Bad connectivity",
@@ -183,39 +197,10 @@ internal class MetricsWriterTest {
             priority = 1
         )
 
-        metricsWriter.write(issue)
+        metricsWriter.write(issue, listOf(callout))
 
         verify(exactly = 1) { metricsEntryWriter.writeDataQualityIssue(issue) }
-    }
-
-    @Test
-    internal fun `passes data quality issue asset through to the metrics entry writer`() {
-        val issueId = UUID.randomUUID().toString()
-        val assetMrid = "asset-002"
-
-        metricsWriter.writeAsset(issueId, assetMrid)
-
-        verify(exactly = 1) { metricsEntryWriter.writeDataQualityIssueAsset(issueId, assetMrid) }
-    }
-
-    @Test
-    internal fun `passes data quality issue callout through to the metrics entry writer`() {
-        val callout = DataQualityIssueCallout(
-            id = UUID.randomUUID().toString(),
-            dataQualityIssueId = UUID.randomUUID().toString(),
-            longitude = 144.9,
-            latitude = -37.8,
-            positionX = 50.0,
-            positionY = 25.0,
-            width = 200.0,
-            height = 100.0,
-            label = "A",
-            description = null,
-            colour = "#FF0000"
-        )
-
-        metricsWriter.write(callout)
-
+        verify(exactly = 1) { metricsEntryWriter.writeDataQualityIssueAsset(issueId, "asset-001") }
         verify(exactly = 1) { metricsEntryWriter.writeDataQualityIssueCallout(callout) }
     }
 }

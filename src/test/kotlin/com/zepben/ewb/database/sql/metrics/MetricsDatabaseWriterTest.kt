@@ -69,9 +69,7 @@ internal class MetricsDatabaseWriterTest {
         every { write(any<IngestionJob>()) } returns true
         every { write(any<VariantMetrics>()) } returns true
         every { write(any<DataQualityIssueCategory>()) } returns true
-        every { write(any<DataQualityIssue>()) } returns true
-        every { writeAsset(any(), any()) } returns true
-        every { write(any<DataQualityIssueCallout>()) } returns true
+        every { write(any<DataQualityIssue>(), any()) } returns true
     }
 
     @Test
@@ -194,13 +192,13 @@ internal class MetricsDatabaseWriterTest {
     }
 
     @Test
-    internal fun `callsWriter for DataQualityIssue`() {
+    internal fun `callsWriter for DataQualityIssue with callouts`() {
         val issue = DataQualityIssue(
             id = uuid.toString(),
             status = DataQualityIssueStatus.CREATED,
-            createdAt = Instant.EPOCH.toString(),
+            createdAt = kotlin.time.Instant.fromEpochMilliseconds(0),
             createdBy = String(),
-            updatedAt = Instant.EPOCH.toString(),
+            updatedAt = kotlin.time.Instant.fromEpochMilliseconds(0),
             updatedBy = String(),
             networkModelCreatedAgainst = "model-123",
             name = "Bad connectivity",
@@ -212,40 +210,9 @@ internal class MetricsDatabaseWriterTest {
             priority = 1
         )
 
-        val result = MetricsDatabaseWriter(
-            tables,
-            connectionyStuff,
-            modelPath = null,
-            createMetricsWriter = { writer }
-        ).write(issue)
-
-        assertThat("Should have written successfully", result)
-
-        verify { writer.write(issue) }
-    }
-
-    @Test
-    internal fun `callsWriter for DataQualityIssueAsset`() {
-        val issueId = uuid.toString()
-        val assetMrid = "asset-001"
-
-        val result = MetricsDatabaseWriter(
-            tables,
-            connectionyStuff,
-            modelPath = null,
-            createMetricsWriter = { writer }
-        ).writeAsset(issueId, assetMrid)
-
-        assertThat("Should have written successfully", result)
-
-        verify { writer.writeAsset(issueId, assetMrid) }
-    }
-
-    @Test
-    internal fun `callsWriter for DataQualityIssueCallout`() {
         val callout = DataQualityIssueCallout(
-            id = uuid.toString(),
-            dataQualityIssueId = UUID.randomUUID().toString(),
+            id = UUID.randomUUID().toString(),
+            dataQualityIssueId = issue.id,
             longitude = 144.9,
             latitude = -37.8,
             positionX = 50.0,
@@ -261,10 +228,10 @@ internal class MetricsDatabaseWriterTest {
             connectionyStuff,
             modelPath = null,
             createMetricsWriter = { writer }
-        ).write(callout)
+        ).write(issue, listOf(callout))
 
         assertThat("Should have written successfully", result)
 
-        verify { writer.write(callout) }
+        verify { writer.write(issue, listOf(callout)) }
     }
 }

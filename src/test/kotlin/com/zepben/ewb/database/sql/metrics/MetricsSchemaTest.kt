@@ -176,9 +176,9 @@ internal class MetricsSchemaTest {
         val issue = DataQualityIssue(
             id = issueId.toString(),
             status = DataQualityIssueStatus.CREATED,
-            createdAt = "1970-01-01T00:00:00",
+            createdAt = kotlin.time.Instant.fromEpochMilliseconds(0),
             createdBy = String(),
-            updatedAt = "1970-01-01T00:00:00",
+            updatedAt = kotlin.time.Instant.fromEpochMilliseconds(0),
             updatedBy = String(),
             networkModelCreatedAgainst = String(),
             name = "Bad connectivity",
@@ -208,27 +208,15 @@ internal class MetricsSchemaTest {
     }
 
     @Test
-    internal fun `writes data quality issue asset`() {
+    internal fun `writes data quality issue with assets and callouts`() {
         val issueId = UUID.randomUUID()
-
-        val result = MetricsDatabaseWriter(::getConnection).writeAsset(issueId.toString(), "asset-mrid-001")
-        assertThat("Asset should have been written", result)
-
-        getConnection().use { conn ->
-            conn.createStatement().use { stmt ->
-                stmt.executeQuery("SELECT data_quality_issue_id, asset_mrid FROM data_quality_issue_assets").use { rs ->
-                    assertThat("Row should exist", rs.next())
-                    assertThat(rs.getObject(1), equalTo(issueId as Any))
-                    assertThat(rs.getString(2), equalTo("asset-mrid-001"))
-                }
-            }
-        }
-    }
-
-    @Test
-    internal fun `writes data quality issue callout`() {
+        val categoryId = UUID.randomUUID()
         val calloutId = UUID.randomUUID()
-        val issueId = UUID.randomUUID()
+
+        MetricsDatabaseWriter(::getConnection).write(
+            DataQualityIssueCategory(id = categoryId.toString(), name = "Test")
+        )
+
         val callout = DataQualityIssueCallout(
             id = calloutId.toString(),
             dataQualityIssueId = issueId.toString(),
@@ -243,13 +231,37 @@ internal class MetricsSchemaTest {
             colour = "#FF0000"
         )
 
-        val result = MetricsDatabaseWriter(::getConnection).write(callout)
-        assertThat("Callout should have been written", result)
+        val issue = DataQualityIssue(
+            id = issueId.toString(),
+            status = DataQualityIssueStatus.CREATED,
+            createdAt = kotlin.time.Instant.fromEpochMilliseconds(0),
+            createdBy = String(),
+            updatedAt = kotlin.time.Instant.fromEpochMilliseconds(0),
+            updatedBy = String(),
+            networkModelCreatedAgainst = String(),
+            name = "Bad connectivity",
+            description = "Disconnected segment found",
+            associatedAssets = listOf("asset-mrid-001"),
+            annotationGeoJson = """{"type":"Point"}""",
+            categoryId = categoryId.toString(),
+            severity = 2,
+            priority = 1
+        )
+
+        val result = MetricsDatabaseWriter(::getConnection).write(issue, listOf(callout))
+        assertThat("Issue with assets and callouts should have been written", result)
 
         getConnection().use { conn ->
             conn.createStatement().use { stmt ->
+                stmt.executeQuery("SELECT data_quality_issue_id, asset_mrid FROM data_quality_issue_assets").use { rs ->
+                    assertThat("Asset row should exist", rs.next())
+                    assertThat(rs.getObject(1), equalTo(issueId as Any))
+                    assertThat(rs.getString(2), equalTo("asset-mrid-001"))
+                }
+            }
+            conn.createStatement().use { stmt ->
                 stmt.executeQuery("SELECT id, data_quality_issue_id, longitude, latitude, label, colour FROM data_quality_issue_callouts").use { rs ->
-                    assertThat("Row should exist", rs.next())
+                    assertThat("Callout row should exist", rs.next())
                     assertThat(rs.getObject(1), equalTo(calloutId as Any))
                     assertThat(rs.getObject(2), equalTo(issueId as Any))
                     assertThat(rs.getDouble(3), equalTo(144.9))
@@ -263,8 +275,14 @@ internal class MetricsSchemaTest {
 
     @Test
     internal fun `writes data quality issue callout with null optional fields`() {
-        val calloutId = UUID.randomUUID()
         val issueId = UUID.randomUUID()
+        val categoryId = UUID.randomUUID()
+        val calloutId = UUID.randomUUID()
+
+        MetricsDatabaseWriter(::getConnection).write(
+            DataQualityIssueCategory(id = categoryId.toString(), name = "Test")
+        )
+
         val callout = DataQualityIssueCallout(
             id = calloutId.toString(),
             dataQualityIssueId = issueId.toString(),
@@ -277,7 +295,24 @@ internal class MetricsSchemaTest {
             colour = "#00FF00"
         )
 
-        val result = MetricsDatabaseWriter(::getConnection).write(callout)
+        val issue = DataQualityIssue(
+            id = issueId.toString(),
+            status = DataQualityIssueStatus.CREATED,
+            createdAt = kotlin.time.Instant.fromEpochMilliseconds(0),
+            createdBy = String(),
+            updatedAt = kotlin.time.Instant.fromEpochMilliseconds(0),
+            updatedBy = String(),
+            networkModelCreatedAgainst = String(),
+            name = "Test issue",
+            description = "For null callout fields",
+            associatedAssets = emptyList(),
+            annotationGeoJson = """{"type":"Point"}""",
+            categoryId = categoryId.toString(),
+            severity = 1,
+            priority = 1
+        )
+
+        val result = MetricsDatabaseWriter(::getConnection).write(issue, listOf(callout))
         assertThat("Callout should have been written", result)
 
         getConnection().use { conn ->

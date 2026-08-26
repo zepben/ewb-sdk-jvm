@@ -11,8 +11,7 @@ package com.zepben.ewb.metrics.dataquality
 import com.zepben.testutils.junit.SystemLogExtension
 import kotlin.time.Instant
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.nullValue
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import java.util.*
@@ -89,12 +88,18 @@ internal class DataQualityIssueTest {
             externalReference = "NAR-100",
             severity = 3,
             priority = 2,
-            callouts = listOf("callout-1", "callout-2")
+            callouts = listOf(
+                DataQualityIssueCallout(
+                    id = UUID.randomUUID().toString(), dataQualityIssueId = uuid.toString(),
+                    longitude = 144.9, latitude = -37.8, positionX = 50.0, positionY = 25.0,
+                    width = 200.0, height = 100.0, colour = "#FF0000"
+                )
+            )
         )
 
         assertThat(issue.networkModelResolvedAgainst, equalTo("2026-01-02"))
         assertThat(issue.suggestedResolution, equalTo("Re-import from source"))
         assertThat(issue.externalReference, equalTo("NAR-100"))
-        assertThat(issue.callouts, equalTo(listOf("callout-1", "callout-2")))
+        assertThat(issue.callouts, hasSize(1))
     }
 }

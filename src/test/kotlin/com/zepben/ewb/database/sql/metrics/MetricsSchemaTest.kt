@@ -245,10 +245,11 @@ internal class MetricsSchemaTest {
             annotationGeoJson = """{"type":"Point"}""",
             categoryId = categoryId.toString(),
             severity = 2,
-            priority = 1
+            priority = 1,
+            callouts = listOf(callout)
         )
 
-        val result = MetricsDatabaseWriter(::getConnection).write(issue, listOf(callout))
+        val result = MetricsDatabaseWriter(::getConnection).write(issue)
         assertThat("Issue with assets and callouts should have been written", result)
 
         getConnection().use { conn ->
@@ -309,10 +310,11 @@ internal class MetricsSchemaTest {
             annotationGeoJson = """{"type":"Point"}""",
             categoryId = categoryId.toString(),
             severity = 1,
-            priority = 1
+            priority = 1,
+            callouts = listOf(callout)
         )
 
-        val result = MetricsDatabaseWriter(::getConnection).write(issue, listOf(callout))
+        val result = MetricsDatabaseWriter(::getConnection).write(issue)
         assertThat("Callout should have been written", result)
 
         getConnection().use { conn ->

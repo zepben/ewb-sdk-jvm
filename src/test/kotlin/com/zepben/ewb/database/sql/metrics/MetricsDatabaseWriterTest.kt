@@ -69,7 +69,7 @@ internal class MetricsDatabaseWriterTest {
         every { write(any<IngestionJob>()) } returns true
         every { write(any<VariantMetrics>()) } returns true
         every { write(any<DataQualityIssueCategory>()) } returns true
-        every { write(any<DataQualityIssue>(), any()) } returns true
+        every { write(any<DataQualityIssue>()) } returns true
     }
 
     @Test
@@ -193,6 +193,19 @@ internal class MetricsDatabaseWriterTest {
 
     @Test
     internal fun `callsWriter for DataQualityIssue with callouts`() {
+        val callout = DataQualityIssueCallout(
+            id = UUID.randomUUID().toString(),
+            dataQualityIssueId = uuid.toString(),
+            longitude = 144.9,
+            latitude = -37.8,
+            positionX = 50.0,
+            positionY = 25.0,
+            width = 200.0,
+            height = 100.0,
+            label = "A",
+            colour = "#FF0000"
+        )
+
         val issue = DataQualityIssue(
             id = uuid.toString(),
             status = DataQualityIssueStatus.CREATED,
@@ -207,20 +220,8 @@ internal class MetricsDatabaseWriterTest {
             annotationGeoJson = """{"type":"Point"}""",
             categoryId = UUID.randomUUID().toString(),
             severity = 2,
-            priority = 1
-        )
-
-        val callout = DataQualityIssueCallout(
-            id = UUID.randomUUID().toString(),
-            dataQualityIssueId = issue.id,
-            longitude = 144.9,
-            latitude = -37.8,
-            positionX = 50.0,
-            positionY = 25.0,
-            width = 200.0,
-            height = 100.0,
-            label = "A",
-            colour = "#FF0000"
+            priority = 1,
+            callouts = listOf(callout)
         )
 
         val result = MetricsDatabaseWriter(
@@ -228,10 +229,10 @@ internal class MetricsDatabaseWriterTest {
             connectionyStuff,
             modelPath = null,
             createMetricsWriter = { writer }
-        ).write(issue, listOf(callout))
+        ).write(issue)
 
         assertThat("Should have written successfully", result)
 
-        verify { writer.write(issue, listOf(callout)) }
+        verify { writer.write(issue) }
     }
 }

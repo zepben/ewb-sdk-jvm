@@ -13,7 +13,6 @@ import com.zepben.ewb.database.sql.initialisers.DatabaseInitialiser
 import com.zepben.ewb.database.sql.initialisers.NoOpDatabaseInitialiser
 import com.zepben.ewb.metrics.IngestionJob
 import com.zepben.ewb.metrics.dataquality.DataQualityIssue
-import com.zepben.ewb.metrics.dataquality.DataQualityIssueCallout
 import com.zepben.ewb.metrics.dataquality.DataQualityIssueCategory
 import com.zepben.ewb.metrics.variants.VariantMetrics
 import java.io.IOException
@@ -80,14 +79,13 @@ class MetricsDatabaseWriter internal constructor(
 
     /**
      * Write a data quality issue along with its associated assets and callouts.
+     * Assets are taken from [DataQualityIssue.associatedAssets] and callouts from [DataQualityIssue.callouts].
      *
-     * @param issue The [DataQualityIssue] to write. Associated assets from [DataQualityIssue.associatedAssets] are written automatically.
-     * @param callouts The [DataQualityIssueCallout]s to write alongside the issue.
+     * @param issue The [DataQualityIssue] to write.
      * @return true if the issue and all related data were successfully written, otherwise false.
      */
-    @JvmOverloads
-    fun write(issue: DataQualityIssue, callouts: List<DataQualityIssueCallout> = emptyList()): Boolean =
-        connectAndWrite { createMetricsWriter(databaseTables).write(issue, callouts) }
+    fun write(issue: DataQualityIssue): Boolean =
+        connectAndWrite { createMetricsWriter(databaseTables).write(issue) }
 
     private fun createJobIdFile(job: IngestionJob): Boolean {
         if (modelPath == null) return true

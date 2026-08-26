@@ -11,7 +11,6 @@ package com.zepben.ewb.database.sql.metrics
 import com.zepben.ewb.database.sql.common.BaseCollectionWriter
 import com.zepben.ewb.metrics.IngestionJob
 import com.zepben.ewb.metrics.dataquality.DataQualityIssue
-import com.zepben.ewb.metrics.dataquality.DataQualityIssueCallout
 import com.zepben.ewb.metrics.dataquality.DataQualityIssueCategory
 import com.zepben.ewb.metrics.variants.VariantMetrics
 
@@ -54,12 +53,12 @@ internal class MetricsWriter(
     fun write(category: DataQualityIssueCategory): Boolean =
         writer.writeDataQualityIssueCategory(category)
 
-    fun write(issue: DataQualityIssue, callouts: List<DataQualityIssueCallout> = emptyList()): Boolean =
+    fun write(issue: DataQualityIssue): Boolean =
         writer.writeDataQualityIssue(issue) and
             writeEach(issue.associatedAssets, { writer.writeDataQualityIssueAsset(issue.id, it) }) { asset, e ->
                 logger.error("Failed to write data quality issue asset $asset: ${e.message}")
             } and
-            writeEach(callouts, { writer.writeDataQualityIssueCallout(it) }) { callout, e ->
+            writeEach(issue.callouts, { writer.writeDataQualityIssueCallout(it) }) { callout, e ->
                 logger.error("Failed to write data quality issue callout $callout: ${e.message}")
             }
 }

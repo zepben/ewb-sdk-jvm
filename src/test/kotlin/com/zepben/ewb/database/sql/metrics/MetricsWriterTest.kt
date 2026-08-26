@@ -46,7 +46,7 @@ internal class MetricsWriterTest {
         every { writeVariantMetricEntry(any(), any(), any(), any(), any<VariantMetricEntry>()) } returns true
         every { writeDataQualityIssueCategory(any()) } returns true
         every { writeDataQualityIssue(any()) } returns true
-        every { writeDataQualityIssueAsset(any(), any()) } returns true
+        every { writeDataQualityIssueAsset(any(), any<String>()) } returns true
         every { writeDataQualityIssueCallout(any()) } returns true
     }
     private val metricsWriter = MetricsWriter(mockk(), metricsEntryWriter)
@@ -194,10 +194,11 @@ internal class MetricsWriterTest {
             annotationGeoJson = """{"type":"Point","coordinates":[144.9,-37.8]}""",
             categoryId = UUID.randomUUID().toString(),
             severity = 2,
-            priority = 1
+            priority = 1,
+            callouts = listOf(callout)
         )
 
-        metricsWriter.write(issue, listOf(callout))
+        metricsWriter.write(issue)
 
         verify(exactly = 1) { metricsEntryWriter.writeDataQualityIssue(issue) }
         verify(exactly = 1) { metricsEntryWriter.writeDataQualityIssueAsset(issueId, "asset-001") }

@@ -31,7 +31,7 @@ import kotlinx.serialization.Serializable
  * @property externalReference Optional external reference such as a ticket ID.
  * @property severity Numeric severity level of the issue.
  * @property priority Numeric priority of the issue.
- * @property callouts List of callout IDs associated with the issue, empty if none.
+ * @property callouts Callout annotations associated with the issue, empty if none.
  */
 @Serializable
 data class DataQualityIssue(
@@ -52,5 +52,5 @@ data class DataQualityIssue(
     val externalReference: String? = null,
     val severity: Int,
     val priority: Int,
-    val callouts: List<String> = emptyList(),
+    val callouts: List<DataQualityIssueCallout> = emptyList(),
 )

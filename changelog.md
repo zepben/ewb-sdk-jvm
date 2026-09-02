@@ -1,4 +1,20 @@
 # Zepben EWB SDK changelog
+## [1.15.0] - UNRELEASED
+### Breaking Changes
+* None.
+
+### New Features
+* None.
+
+### Enhancements
+* None.
+
+### Fixes
+* None.
+
+### Notes
+* None.
+
 ## [1.14.0] - 2026-09-02
 ### Breaking Changes
 * `EwbDataFilePaths` has the following breaking changes:

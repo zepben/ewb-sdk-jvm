@@ -1,5 +1,5 @@
 # Zepben EWB SDK changelog
-## [1.14.0] - UNRELEASED
+## [1.14.0] - 2026-09-02
 ### Breaking Changes
 * `EwbDataFilePaths` has the following breaking changes:
   * You must provide the variant content type in order to support more than simple "add only" variants.

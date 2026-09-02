@@ -1,0 +1,170 @@
+---
+id: sdk-metrics
+title: Ingestion Jobs and Metrics
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+## Record-Keeping
+
+It's often useful to have a record of previous runs of a data ingestor. For this reason, the Evolve SDK supports the ability to save the following information
+about each run:
+
+* Metadata:
+    * Timestamp of when the run started
+    * A short description of the source data (e.g. "ExampleEnergy full HV/LV 2024-01-02 cut")
+    * The name of the application used to process the source data (e.g. "example-energy-ingestor")
+    * The version of the application used to process the source data (e.g. "0.12.0")
+* For each data source used (e.g. files) for the run:
+    * The name of the data source (e.g. "ABC_feeder.xml")
+    * Timestamp of when the data source was exported
+    * The SHA-256 of the data source's contents, if applicable
+* Network container metrics:
+    * A network container may either be the entire network processed in a run, or a section of the network (geographical region, subgeographical region,
+      substation, feeder, or LV feeder).
+    * For each network container, any number of metrics may be recorded. Each metric may have an arbitrary string name and a numeric value.
+
+The above information is captured in an in-memory model named `IngestionJob`. an `IngestionJob` with metadata may be saved to a "metrics" database using the
+`MetricsDatabaseWriter`.
+
+## Ingestion Job Model
+
+The following is an example of creating, populating, and saving an `IngestionJob` object to a metrics database.
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+import com.zepben.ewb.cim.iec61970.base.core.Feeder;
+import com.zepben.ewb.database.postgres.metrics.MetricsDatabaseWriter;
+import com.zepben.ewb.metrics.IngestionJob;
+import com.zepben.ewb.metrics.IngestionMetadata;
+import com.zepben.ewb.metrics.TotalNetworkContainer;
+
+import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.time.Instant;
+import java.util.UUID;
+
+import static com.zepben.ewb.metrics.NetworkContainerKt.networkContainer;
+
+public class IngestionJobExample {
+    public static void main(String[] args) throws NoSuchAlgorithmException {
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+
+        // This would normally be inside a NetworkService, but it is created here for this example.
+        Feeder feeder = new Feeder("abc-feeder");
+        feeder.setName("ABC feeder");
+
+        IngestionJob ingestionJob = new IngestionJob(
+            UUID.randomUUID(),
+            new IngestionMetadata(
+                Instant.now(),
+                "ExampleEnergy full HV/LV 2024-01-02 cut",
+                "example-energy-ingestor",
+                "0.12.0"
+            )
+        );
+
+        // Sources and network metrics are "automaps", which populate default values for new keys as they are accessed.
+        ingestionJob.getSources().get("ABC_feeder.xml").setTimestamp(Instant.parse("2020-01-02T10:30:00.00Z"));
+        ingestionJob.getSources().get("ABC_feeder.xml").setFileHash(digest.digest("file contents".getBytes()));
+        ingestionJob.getNetworkMetrics().get(TotalNetworkContainer.INSTANCE).put("total cable length", 123.45);
+        ingestionJob.getNetworkMetrics().get(networkContainer(feeder)).put("total cable length", 12.345);
+        ingestionJob.getNetworkMetrics().get(networkContainer(feeder, true)).put("total cable length", 123.45);
+
+        MetricsDatabaseWriter metricsDatabaseWriter = new MetricsDatabaseWriter(
+            // Factory function for connections to the database to write to.
+            IngestionJobExample::getMetricsConnection,
+            // Optional: Folder containing files for the model exported by the ingestion job. The network, customer, and diagram databases should be located here.
+            //           This, along with any missing parent directories, will be created by the `write` method if it is missing.
+            Path.of("path/to/model")
+        );
+        if (metricsDatabaseWriter.write(ingestionJob)) {
+            System.out.println("Ingestion job saved successfully");
+        } else {
+            System.out.println("Ingestion job could not be saved successfully");
+        }
+    }
+
+    private static Connection getMetricsConnection() {
+        try {
+            // Change JDBC URL, username, and password as needed.
+            return DriverManager.getConnection("jdbc:postgresql://localhost:5432/metrics", "username", "password");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+}
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+import com.zepben.ewb.cim.iec61970.base.core.Feeder
+import com.zepben.ewb.database.postgres.metrics.MetricsDatabaseWriter
+import com.zepben.ewb.metrics.IngestionJob
+import com.zepben.ewb.metrics.IngestionMetadata
+import com.zepben.ewb.metrics.TotalNetworkContainer
+import com.zepben.ewb.metrics.toNetworkContainer
+import java.nio.file.Path
+import java.security.MessageDigest
+import java.sql.DriverManager
+import java.time.Instant
+import java.util.*
+
+// This would normally be inside a NetworkService, but it is created here for this example.
+val feeder = Feeder("abc-feeder").apply { name = "ABC Feeder" }
+
+val ingestionJob = IngestionJob(
+    UUID.randomUUID(),
+    IngestionMetadata(
+        startTime = Instant.now(),
+        source = "ExampleEnergy full HV/LV 2024-01-02 cut",
+        application = "example-energy-ingestor",
+        applicationVersion = "0.12.0"
+    )
+).apply {
+    // Sources and network metrics are "automaps", which populate default values for new keys as they are accessed.
+    sources["ABC_feeder.xml"].timestamp = Instant.parse("2020-01-02T10:30:00.00Z")
+    sources["ABC_feeder.xml"].fileHash = MessageDigest.getInstance("SHA-256").digest("file contents".toByteArray())
+    networkMetrics[TotalNetworkContainer]["total cable length"] = 123.45
+    networkMetrics[feeder.toNetworkContainer()]["total cable length"] = 12.345
+    networkMetrics[feeder.toNetworkContainer(includeDownstream = true)]["total cable length"] = 123.45
+}
+
+fun main() {
+    val metricsDatabaseWriter = MetricsDatabaseWriter(
+        // Factory function for connections to the database to write to. Change JDBC URL, username, and password as needed.
+        { DriverManager.getConnection("jdbc:postgresql://localhost:5432/metrics", "username", "password") },
+        // Optional: Folder containing files for the model exported by the ingestion job. The network, customer, and diagram databases should be located here.
+        //           This, along with any missing parent directories, will be created by the `write` method if it is missing.
+        Path.of("path/to/model")
+    )
+    if (metricsDatabaseWriter.write(ingestionJob)) {
+        println("Ingestion job saved successfully")
+    } else {
+        println("Ingestion job could not be saved successfully")
+    }
+}
+```
+
+</TabItem>
+</Tabs>
+
+Each job in a metrics database should have a unique UUID. If you attempt to save a job to an existing database, it will be added to it rather than replacing the
+entire database. Additionally, calling `save()` will create a file named using the UUID of the job at the path of the model, if one is provided upon
+constructing the `MetricsDatabaseWriter`.

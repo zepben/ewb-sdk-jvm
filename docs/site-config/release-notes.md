@@ -2,6 +2,7 @@
 
 | Version         | Released            |
 |-----------------|---------------------|
+|[1.14.0](#1140)| `02 September 2026` |
 |[1.13.0](#1130)| `04 August 2026` |
 |[1.12.0](#1120)| `21 May 2026` |
 |[1.11.1](#1111)| `07 May 2026` |
@@ -53,6 +54,45 @@
 ---
 
 NOTE: This library is not yet stable, and breaking changes should be expected until a 1.0.0 release.
+
+---
+
+## [1.14.0]
+
+### Breaking Changes
+* `EwbDataFilePaths` has the following breaking changes:
+  * You must provide the variant content type in order to support more than simple "add only" variants.
+  * The `enumerateDescendants` function now takes an optional `prefix` string.
+
+### New Features
+* Adds `VariantService` to hold variants related objects.
+* Adds Variant related objects:
+  * `NetworkModelProjectStage`
+  * `ChangeSet`
+  * `ChangeSetMember`
+  * `ObjectCreation`
+  * `ObjectModification`
+  * `ObjectDeletion`
+  * `NetworkModelProject`
+* Added `ChangeSetDatabaseReader` for reading in variant sqlite from a backend storage.
+* Added `getChangeSetObjects` for existing gRPC services, and added new variant gRPC capabilities.
+* Updated `EwbDataFilePaths` to support full-featured variants, rather than simple "add only" variants.
+* The normal feeder direction for a `Terminal` is now saved to the database if available.
+* The following have been promoted to the public API:
+  * `PreparedStatement` extensions.
+  * `ResultSet` extensions.
+  * `EnumMapper`
+* You can now provide an option `fromMridOverride` to `resolveOrDeferReference`, allowing for manipulation of the objects mRID. e.g. removing `-` from the front
+  of variant mRID's.
+
+### Enhancements
+* `EwbDataFilePaths` can now exposes its path generators, so you can generate a path without needing to resolve the database.
+
+### Fixes
+* None.
+
+### Notes
+* None.
 
 ---
 

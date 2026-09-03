@@ -61,6 +61,11 @@ internal class AcLineSegmentTest {
 
     @Test
     internal fun cuts() {
+        PrivateCollectionValidator.validateArcCollection(
+            { id -> AcLineSegment(id) },
+            { id -> Cut(id) },
+            AcLineSegment::cuts,
+        )
         PrivateCollectionValidator.validateUnordered(
             { id -> AcLineSegment(id) },
             { id -> Cut(id) },
@@ -86,6 +91,11 @@ internal class AcLineSegmentTest {
 
     @Test
     internal fun clamps() {
+        PrivateCollectionValidator.validateArcCollection(
+            { id -> AcLineSegment(id) },
+            { id -> Clamp(id) },
+            AcLineSegment::clamps,
+        )
         PrivateCollectionValidator.validateUnordered(
             { id -> AcLineSegment(id) },
             { id -> Clamp(id) },
@@ -128,6 +138,16 @@ internal class AcLineSegmentTest {
 
     @Test
     internal fun acLineSegmentPhases() {
+        PrivateCollectionValidator.validateArcCollection(
+            ::AcLineSegment,
+            ::AcLineSegmentPhase,
+            AcLineSegment::phases,
+        )
+        PrivateCollectionValidator.validateCollectionSorting(
+            { AcLineSegment("collection-sorting").phases },
+            { AcLineSegmentPhase(it.toString()).apply { sequenceNumber = it } },
+            { it.sequenceNumber!! },
+        )
         PrivateCollectionValidator.validateUnordered(
             ::AcLineSegment,
             ::AcLineSegmentPhase,

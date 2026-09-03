@@ -214,6 +214,11 @@ internal class PowerElectronicsConnectionTest {
 
     @Test
     internal fun powerElectronicsConnectionUnits() {
+        PrivateCollectionValidator.validateArcCollection(
+            ::PowerElectronicsConnection,
+            { id -> object : PowerElectronicsUnit(id) {} },
+            PowerElectronicsConnection::units,
+        )
         PrivateCollectionValidator.validateUnordered(
             ::PowerElectronicsConnection,
             { id -> object : PowerElectronicsUnit(id) {} },
@@ -228,6 +233,11 @@ internal class PowerElectronicsConnectionTest {
 
     @Test
     internal fun powerElectronicsConnectionPhases() {
+        PrivateCollectionValidator.validateArcCollection(
+            ::PowerElectronicsConnection,
+            ::PowerElectronicsConnectionPhase,
+            PowerElectronicsConnection::phases,
+        )
         PrivateCollectionValidator.validateUnordered(
             ::PowerElectronicsConnection,
             ::PowerElectronicsConnectionPhase,

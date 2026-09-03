@@ -84,6 +84,11 @@ internal class SynchronousMachineTest {
 
     @Test
     internal fun curves() {
+        PrivateCollectionValidator.validateArcCollection(
+            ::SynchronousMachine,
+            ::ReactiveCapabilityCurve,
+            SynchronousMachine::curves,
+        )
         PrivateCollectionValidator.validateUnordered(
             ::SynchronousMachine,
             ::ReactiveCapabilityCurve,

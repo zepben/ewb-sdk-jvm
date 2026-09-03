@@ -59,9 +59,8 @@ abstract class Switch(mRID: String) : ConductingEquipment(mRID) {
      * @return this [Switch]
      */
     @JvmOverloads
-    fun setNormallyOpen(isNormallyOpen: Boolean, phase: SinglePhaseKind? = null): Switch {
+    fun setNormallyOpen(isNormallyOpen: Boolean, phase: SinglePhaseKind? = null): Switch = apply {
         normalOpen = calculateOpenState(normalOpen, isNormallyOpen, phase)
-        return this
     }
 
     /**
@@ -70,9 +69,8 @@ abstract class Switch(mRID: String) : ConductingEquipment(mRID) {
      * @return this [Switch]
      */
     @JvmOverloads
-    fun setOpen(isOpen: Boolean, phase: SinglePhaseKind? = null): Switch {
+    fun setOpen(isOpen: Boolean, phase: SinglePhaseKind? = null): Switch = apply {
         open = calculateOpenState(open, isOpen, phase)
-        return this
     }
 
     private fun checkIsOpen(currentState: Int, phase: SinglePhaseKind?): Boolean =

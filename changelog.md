@@ -10,7 +10,7 @@
 * None.
 
 ### Fixes
-* None.
+* fixed quadratic lookup in `compareIdReferenceCollection` in `com/zepben/ewb/services/common/PropertyComparers.kt`.
 
 ### Notes
 * None.

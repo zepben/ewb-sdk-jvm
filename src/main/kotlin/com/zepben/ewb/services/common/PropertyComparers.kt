@@ -105,7 +105,7 @@ fun <T : Identifiable> compareIdReferenceCollection(source: Collection<T>, targe
     val differences = ObjectCollectionDifference()
 
     // Build a set of target mRIDs once so membership is O(1) instead of a linear find per source item (O(N*M)).
-    val targetMRIDs = targetCollection.mapTo(mutableSetOf()) { it.mRID }
+    val targetMRIDs = target.mapTo(mutableSetOf()) { it.mRID }
 
     val sourceMRIDs = mutableSetOf<String>()
     source.forEach { sourceIdObj ->

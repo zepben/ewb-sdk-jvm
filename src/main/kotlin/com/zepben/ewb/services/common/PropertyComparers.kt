@@ -104,11 +104,13 @@ fun <T, R : Identifiable> KProperty1<in T, Collection<R>>.compareIdReferenceColl
 fun <T : Identifiable> compareIdReferenceCollection(source: Collection<T>, target: Collection<T>): ObjectCollectionDifference? {
     val differences = ObjectCollectionDifference()
 
+    // Build a set of target mRIDs once so membership is O(1) instead of a linear find per source item (O(N*M)).
+    val targetMRIDs = targetCollection.mapTo(mutableSetOf()) { it.mRID }
+
     val sourceMRIDs = mutableSetOf<String>()
     source.forEach { sourceIdObj ->
         sourceMRIDs.add(sourceIdObj.mRID)
-        val targetIdObj = target.find { it.mRID == sourceIdObj.mRID }
-        if (targetIdObj == null) {
+        if (!targetMRIDs.contains(sourceIdObj.mRID)) {
             differences.missingFromTarget.add(sourceIdObj)
         }
     }

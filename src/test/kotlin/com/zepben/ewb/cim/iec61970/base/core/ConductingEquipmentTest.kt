@@ -87,6 +87,21 @@ internal class ConductingEquipmentTest {
 
     @Test
     internal fun terminals() {
+        PrivateCollectionValidator.validateArcCollection(
+            { id -> object : ConductingEquipment(id) {} },
+            ::Terminal,
+            ConductingEquipment::terminalsInternal,
+        )
+        PrivateCollectionValidator.validateCollectionValidation(
+            { object : ConductingEquipment("collection-validation") {}.terminalsInternal },
+            { Terminal("valid").apply { sequenceNumber = 1 } },
+            { Terminal("invalid").apply { sequenceNumber = it.sequenceNumber } },
+        )
+        PrivateCollectionValidator.validateCollectionSorting(
+            { object : ConductingEquipment("collection-sorting") {}.terminalsInternal },
+            { Terminal(it.toString()).apply { sequenceNumber = it } },
+            Terminal::sequenceNumber,
+        )
         PrivateCollectionValidator.validateOrdered(
             { id -> object : ConductingEquipment(id) {} },
             { id, sn -> Terminal(id).apply { sequenceNumber = sn } },

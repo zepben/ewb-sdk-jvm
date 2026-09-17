@@ -8,7 +8,9 @@
 
 package com.zepben.ewb.cim.iec61970.base.core
 
-import com.zepben.ewb.services.common.extensions.asUnmodifiable
+import com.zepben.ewb.boilerplate.Backfill
+import com.zepben.ewb.boilerplate.collections.LazyMridList
+import com.zepben.ewb.boilerplate.collections.interfaces.MridCollection
 import com.zepben.ewb.services.common.extensions.getByMRID
 import com.zepben.ewb.services.common.extensions.safeRemove
 import com.zepben.ewb.services.common.extensions.validateReference
@@ -25,11 +27,35 @@ class SubGeographicalRegion(mRID: String) : IdentifiedObject(mRID) {
     /**
      * All substations belonging to this sub geographical region. The returned collection is read only.
      */
-    val substations: Collection<Substation> get() = _substations.asUnmodifiable()
+    val substations: MridCollection<Substation> get() = LazyMridList(
+        getter = { _substations },
+        setter = { _substations = it },
+        owner = this,
+        elementDescription = "A Substation",
+        backfill = Backfill(
+            { it.subGeographicalRegion },
+            { it, subgeo -> it.subGeographicalRegion = subgeo },
+            Substation::subGeographicalRegion
+        )
+    )
+
+
+    // region deprecated list boilerplate
+    //
+    // ("region/endregion" is an IntelliJ feature letting you hide the entire thing)
+    // This boilerplate exists solely to enable backwards compatibility.
+    // It will be removed eventually.
+    // Every single method simply forwards the call to the corresponding list.
+
+    // region substations boilerplate
 
     /**
      * Get the number of entries in the [Substation] collection.
      */
+    @Deprecated(
+        message = "Use substations.size instead.",
+        replaceWith = ReplaceWith("substations.size")
+    )
     fun numSubstations(): Int = _substations?.size ?: 0
 
     /**
@@ -38,12 +64,20 @@ class SubGeographicalRegion(mRID: String) : IdentifiedObject(mRID) {
      * @param mRID the mRID of the required [Substation]
      * @return The [Substation] with the specified [mRID] if it exists, otherwise null
      */
+    @Deprecated(
+        message = "Use substations.getByMRID(mRID) instead.",
+        replaceWith = ReplaceWith("substations.getByMRID(mRID)")
+    )
     fun getSubstation(mRID: String): Substation? = _substations.getByMRID(mRID)
 
     /**
      * @param substation the [Substation] to associate with this [SubGeographicalRegion].
      * @return A reference to this [SubGeographicalRegion] to allow fluent use.
      */
+    @Deprecated(
+        message = "Use substations.add(substation) instead.",
+        replaceWith = ReplaceWith("also { it.substations.add(substation) }")
+    )
     fun addSubstation(substation: Substation): SubGeographicalRegion {
         if (validateReference(substation, ::getSubstation, "A Substation"))
             return this
@@ -65,6 +99,10 @@ class SubGeographicalRegion(mRID: String) : IdentifiedObject(mRID) {
      * @param substation the [Substation] to disassociate with this [SubGeographicalRegion].
      * @return true if the substation is disassociated.
      */
+    @Deprecated(
+        message = "Use substations.remove(substation) instead.",
+        replaceWith = ReplaceWith("substations.remove(substation)")
+    )
     fun removeSubstation(substation: Substation): Boolean {
         val ret = _substations.safeRemove(substation)
         if (_substations.isNullOrEmpty()) _substations = null
@@ -75,8 +113,16 @@ class SubGeographicalRegion(mRID: String) : IdentifiedObject(mRID) {
      * Clear this [SubGeographicalRegion]'s [Substation]'s
      * @return this [SubGeographicalRegion]
      */
+    @Deprecated(
+        message = "Use substations.clear() instead.",
+        replaceWith = ReplaceWith("substations.clear()")
+    )
     fun clearSubstations(): SubGeographicalRegion {
         _substations = null
         return this
     }
+
+    // endregion
+
+    // endregion
 }

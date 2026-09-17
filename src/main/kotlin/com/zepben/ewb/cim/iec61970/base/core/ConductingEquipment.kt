@@ -8,9 +8,12 @@
 
 package com.zepben.ewb.cim.iec61970.base.core
 
+import com.zepben.ewb.boilerplate.Backfill
+import com.zepben.ewb.boilerplate.relations.TerminalList
 import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import com.zepben.ewb.services.common.extensions.getByMRID
 import com.zepben.ewb.services.common.extensions.validateReference
+
 
 /**
  * The parts of the AC power system that are designed to carry current or that are conductively connected through terminals.
@@ -31,22 +34,96 @@ abstract class ConductingEquipment(mRID: String) : Equipment(mRID) {
             return baseVoltage?.nominalVoltage ?: 0
         }
 
+    internal val terminalsInternal: TerminalList
+        get() = TerminalList(
+            _terminals,
+            this,
+            "A Terminal",
+            backfill = Backfill(
+                { it._conductingEquipment },
+                { it, ce -> it._conductingEquipment = ce },
+                Terminal::conductingEquipment
+            ),
+            validate = { validateTerminalIndex(it) },
+            sortBy = { it.sequenceNumber }
+        )
+
     /**
      * Conducting equipment have terminals that may be connected to other conducting equipment terminals
      * via connectivity nodes or topological nodes.
      *
      * The returned collection is read only.
      */
-    val terminals: List<Terminal> get() = _terminals.asUnmodifiable()
+     val terminals: List<Terminal> = _terminals.asUnmodifiable()
+
+
 
     /**
      * The maximum number of terminals that this conducting equipment can have.
      */
     open val maxTerminals: Int get() = Int.MAX_VALUE
 
+    private fun validateTerminalIndex(terminal: Terminal) {
+
+        check(numTerminals() < maxTerminals) {
+            "Unable to add ${terminal.typeNameAndMRID()} to ${typeNameAndMRID()}. This conducting equipment already has the maximum number of terminals ($maxTerminals)."
+        }
+
+        if (terminal.sequenceNumber == 0)
+            terminal.sequenceNumber = numTerminals() + 1
+        require(terminalsInternal.getBySequenceNumber(terminal.sequenceNumber) == null) { "Unable to add ${terminal.typeNameAndMRID()} to ${typeNameAndMRID()}. A ${getTerminal(terminal.sequenceNumber)!!.typeNameAndMRID()} already exists with sequenceNumber ${terminal.sequenceNumber}." }
+
+    }
+
+    /**
+     * Helper to get the first terminal for a [ConductingEquipment]. Will throw a [NullPointerException] if the terminal does not exist, so only call it
+     * when you know the terminal will be there.
+     */
+    val t1: Terminal get() = terminalsInternal.getBySequenceNumber(1)!!
+
+    /**
+     * Helper to get the second terminal for a [ConductingEquipment]. Will throw a [NullPointerException] if the terminal does not exist, so only call it
+     * when you know the terminal will be there.
+     */
+    val t2: Terminal get() = terminalsInternal.getBySequenceNumber(2)!!
+
+    /**
+     * Helper to get the third terminal for a [ConductingEquipment]. Will throw a [NullPointerException] if the terminal does not exist, so only call it
+     * when you know the terminal will be there.
+     */
+    val t3: Terminal get() = terminalsInternal.getBySequenceNumber(3)!!
+
+
+    // region deprecated list boilerplate
+    //
+    // ("region/endregion" is an IntelliJ feature letting you hide the entire thing)
+    // This boilerplate exists solely to enable backwards compatibility.
+    // It will be removed eventually.
+    // Every single method simply forwards the call to the corresponding list.
+
+    // region terminals boilerplate
+
+    @Deprecated("Helper for a deprecated function")
+    private fun validateTerminal(terminal: Terminal): Boolean {
+        if (validateReference(terminal, ::getTerminal, "A Terminal"))
+            return true
+
+        if (terminal.conductingEquipment == null)
+            terminal._conductingEquipment = this
+
+        require(terminal.conductingEquipment === this) {
+            "${terminal.typeNameAndMRID()} `conductingEquipment` property references ${terminal.conductingEquipment!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
+        }
+        return false
+    }
+
     /**
      * Get the number of entries in the [Terminal] collection.
      */
+    @Deprecated(
+        message = "Use terminalsInternal.size instead.",
+        replaceWith = ReplaceWith("terminalsInternal.size")
+    )
     fun numTerminals(): Int = _terminals.size
 
     /**
@@ -56,6 +133,10 @@ abstract class ConductingEquipment(mRID: String) : Equipment(mRID) {
      * @param mRID the mRID of the required [Terminal]
      * @return The [Terminal] with the specified [mRID] if it exists, otherwise null
      */
+    @Deprecated(
+        message = "Use terminalsInternal.getByMrid(mRID) instead.",
+        replaceWith = ReplaceWith("terminalsInternal.getByMrid(mRID)")
+    )
     fun getTerminal(mRID: String): Terminal? = _terminals.getByMRID(mRID)
 
     /**
@@ -65,6 +146,10 @@ abstract class ConductingEquipment(mRID: String) : Equipment(mRID) {
      * @param sequenceNumber the sequence number of the required [Terminal]
      * @return The [Terminal] with the specified [sequenceNumber] if it exists, otherwise null
      */
+    @Deprecated(
+        message = "Use terminalsInternal.getByNumber(sequenceNumber) instead.",
+        replaceWith = ReplaceWith("terminalsInternal.getByNumber(sequenceNumber)")
+    )
     fun getTerminal(sequenceNumber: Int): Terminal? = _terminals.firstOrNull { it.sequenceNumber == sequenceNumber }
 
     /**
@@ -76,6 +161,10 @@ abstract class ConductingEquipment(mRID: String) : Equipment(mRID) {
      * @throws IllegalStateException if [maxTerminals] has already been reached.
      * @return This [ConductingEquipment] for fluent use
      */
+    @Deprecated(
+        message = "Use terminalsInternal.addInternal(terminal) instead.",
+        replaceWith = ReplaceWith("also { it.terminalsInternal.addInternal(terminal) }")
+    )
     fun addTerminal(terminal: Terminal): ConductingEquipment {
         if (validateTerminal(terminal)) return this
 
@@ -100,6 +189,10 @@ abstract class ConductingEquipment(mRID: String) : Equipment(mRID) {
      * @param terminal The [Terminal] to remove.
      * @return true if [terminal] is removed from the collection.
      */
+    @Deprecated(
+        message = "Use terminalsInternal.removeInternal(terminal) instead.",
+        replaceWith = ReplaceWith("terminalsInternal.removeInternal(terminal)")
+    )
     fun removeTerminal(terminal: Terminal): Boolean = _terminals.remove(terminal).also { removed ->
         if (removed)
             terminal._conductingEquipment = null
@@ -110,6 +203,10 @@ abstract class ConductingEquipment(mRID: String) : Equipment(mRID) {
      *
      * @return This [ConductingEquipment] for fluent use.
      */
+    @Deprecated(
+        message = "Use terminalsInternal.clear() instead.",
+        replaceWith = ReplaceWith("also { it.terminalsInternal.clear() }")
+    )
     fun clearTerminals(): ConductingEquipment {
         //
         // NOTE: We can only set the terminals `conductingEquiment` if it doesn't belong to the terminals list,
@@ -121,35 +218,8 @@ abstract class ConductingEquipment(mRID: String) : Equipment(mRID) {
         return this
     }
 
-    private fun validateTerminal(terminal: Terminal): Boolean {
-        if (validateReference(terminal, ::getTerminal, "A Terminal"))
-            return true
+    // endregion
 
-        if (terminal.conductingEquipment == null)
-            terminal._conductingEquipment = this
-
-        require(terminal.conductingEquipment === this) {
-            "${terminal.typeNameAndMRID()} `conductingEquipment` property references ${terminal.conductingEquipment!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
-        }
-        return false
-    }
-
-    /**
-     * Helper to get the first terminal for a [ConductingEquipment]. Will throw a [NullPointerException] if the terminal does not exist, so only call it
-     * when you know the terminal will be there.
-     */
-    val t1: Terminal get() = getTerminal(1)!!
-
-    /**
-     * Helper to get the second terminal for a [ConductingEquipment]. Will throw a [NullPointerException] if the terminal does not exist, so only call it
-     * when you know the terminal will be there.
-     */
-    val t2: Terminal get() = getTerminal(2)!!
-
-    /**
-     * Helper to get the third terminal for a [ConductingEquipment]. Will throw a [NullPointerException] if the terminal does not exist, so only call it
-     * when you know the terminal will be there.
-     */
-    val t3: Terminal get() = getTerminal(3)!!
+    // endregion
 
 }

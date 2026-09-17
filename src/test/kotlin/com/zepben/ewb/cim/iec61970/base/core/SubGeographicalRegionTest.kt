@@ -44,6 +44,11 @@ internal class SubGeographicalRegionTest {
 
     @Test
     internal fun substations() {
+        PrivateCollectionValidator.validateArcCollection(
+            ::SubGeographicalRegion,
+            ::Substation,
+            SubGeographicalRegion::substations,
+        )
         PrivateCollectionValidator.validateUnordered(
             ::SubGeographicalRegion,
             ::Substation,

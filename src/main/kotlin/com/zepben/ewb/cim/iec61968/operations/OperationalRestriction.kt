@@ -8,9 +8,10 @@
 
 package com.zepben.ewb.cim.iec61968.operations
 
+import com.zepben.ewb.boilerplate.collections.LazyMridList
+import com.zepben.ewb.boilerplate.collections.interfaces.MridCollection
 import com.zepben.ewb.cim.iec61968.common.Document
 import com.zepben.ewb.cim.iec61970.base.core.Equipment
-import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import com.zepben.ewb.services.common.extensions.validateReference
 
 /**
@@ -31,11 +32,29 @@ class OperationalRestriction(mRID: String) : Document(mRID) {
     /**
      * All equipment to which this restriction applies. The returned collection is read only.
      */
-    val equipment: Collection<Equipment> get() = _equipment.asUnmodifiable()
+    val equipment: MridCollection<Equipment> get() = LazyMridList(
+        getter = { _equipment },
+        setter = { _equipment = it },
+        owner = this,
+        elementDescription = "An Equipment",
+    )
+
+    // region deprecated list boilerplate
+    //
+    // ("region/endregion" is an IntelliJ feature letting you hide the entire thing)
+    // This boilerplate exists solely to enable backwards compatibility.
+    // It will be removed eventually.
+    // Every single method simply forwards the call to the corresponding list.
+
+    // region equipment boilerplate
 
     /**
      * Get the number of entries in the [Equipment] collection.
      */
+    @Deprecated(
+        message = "Use equipment.size instead.",
+        replaceWith = ReplaceWith("equipment.size")
+    )
     fun numEquipment(): Int = _equipment?.size ?: 0
 
     /**
@@ -44,6 +63,10 @@ class OperationalRestriction(mRID: String) : Document(mRID) {
      * @param mRID the mRID of the required [Equipment]
      * @return The [Equipment] with the specified [mRID] if it exists, otherwise null
      */
+    @Deprecated(
+        message = "Use equipment.getByMRID(mRID) instead.",
+        replaceWith = ReplaceWith("equipment.getByMRID(mRID)")
+    )
     fun getEquipment(mRID: String): Equipment? = _equipment?.firstOrNull { it.mRID == mRID }
 
     /**
@@ -52,6 +75,10 @@ class OperationalRestriction(mRID: String) : Document(mRID) {
      * @param equipment the equipment to add.
      * @return A reference to this [OperationalRestriction] to allow fluent use.
      */
+    @Deprecated(
+        message = "Use this.equipment.add(equipment) instead.",
+        replaceWith = ReplaceWith("also { it.equipment.add(equipment) }")
+    )
     fun addEquipment(equipment: Equipment): OperationalRestriction {
         if (validateReference(equipment, ::getEquipment, "An Equipment"))
             return this
@@ -68,6 +95,10 @@ class OperationalRestriction(mRID: String) : Document(mRID) {
      * @param equipment The equipment tor remove.
      * @return true if [equipment] is removed from the collection.
      */
+    @Deprecated(
+        message = "Use this.equipment.remove(equipment) instead.",
+        replaceWith = ReplaceWith("this.equipment.remove(equipment)")
+    )
     fun removeEquipment(equipment: Equipment): Boolean {
         val ret = _equipment?.remove(equipment) == true
         if (_equipment.isNullOrEmpty()) _equipment = null
@@ -79,9 +110,16 @@ class OperationalRestriction(mRID: String) : Document(mRID) {
      *
      * @return A reference to this [OperationalRestriction] to allow fluent use.
      */
+    @Deprecated(
+        message = "Use equipment.clear() instead.",
+        replaceWith = ReplaceWith("equipment.clear()")
+    )
     fun clearEquipment(): OperationalRestriction {
         _equipment = null
         return this
     }
 
+    // endregion
+
+    // endregion
 }

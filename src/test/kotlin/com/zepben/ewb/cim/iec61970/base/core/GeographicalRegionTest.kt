@@ -30,6 +30,11 @@ internal class GeographicalRegionTest {
 
     @Test
     internal fun subGeographicalRegions() {
+        PrivateCollectionValidator.validateArcCollection(
+            ::GeographicalRegion,
+            ::SubGeographicalRegion,
+            GeographicalRegion::subGeographicalRegions,
+        )
         PrivateCollectionValidator.validateUnordered(
             ::GeographicalRegion,
             ::SubGeographicalRegion,

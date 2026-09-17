@@ -43,6 +43,11 @@ internal class PoleTest {
 
     @Test
     internal fun streetlights() {
+        PrivateCollectionValidator.validateArcCollection(
+            ::Pole,
+            ::Streetlight,
+            Pole::streetlights,
+        )
         PrivateCollectionValidator.validateUnordered(
             ::Pole,
             ::Streetlight,

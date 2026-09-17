@@ -8,8 +8,8 @@
 
 package com.zepben.ewb.cim.iec61968.common
 
+import com.zepben.ewb.boilerplate.collections.LazyIndexList
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
-import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import java.util.function.BiConsumer
 
 /**
@@ -27,11 +27,29 @@ class Location(mRID: String) : IdentifiedObject(mRID) {
      * Sequence of [PositionPoint]s describing this location.
      * The returned collection is read only.
      */
-    val points: List<PositionPoint> get() = _positionPoints.asUnmodifiable()
+    val points: LazyIndexList<PositionPoint> get() = LazyIndexList(
+        { _positionPoints },
+        { _positionPoints = it },
+        this,
+        "A PositionPoint"
+    )
+
+    // region deprecated list boilerplate
+    //
+    // ("region/endregion" is an IntelliJ feature letting you hide the entire thing)
+    // This boilerplate exists solely to enable backwards compatibility.
+    // It will be removed eventually.
+    // Every single method simply forwards the call to the corresponding list.
+
+    // region points boilerplate
 
     /**
      * Get the number of entries in the [PositionPoint] collection.
      */
+    @Deprecated(
+        message = "Use points.size instead.",
+        replaceWith = ReplaceWith("points.size")
+    )
     fun numPoints(): Int = _positionPoints?.size ?: 0
 
     /**
@@ -40,6 +58,10 @@ class Location(mRID: String) : IdentifiedObject(mRID) {
      * @param sequenceNumber the sequence number of the required [PositionPoint]
      * @return The [PositionPoint] with the specified [sequenceNumber] if it exists, otherwise null
      */
+    @Deprecated(
+        message = "Use points.getOrNull(sequenceNumber) instead.",
+        replaceWith = ReplaceWith("points.getOrNull(sequenceNumber)")
+    )
     fun getPoint(sequenceNumber: Int): PositionPoint? = _positionPoints?.getOrNull(sequenceNumber)
 
     /**
@@ -47,6 +69,10 @@ class Location(mRID: String) : IdentifiedObject(mRID) {
      *
      * @param action The action to perform on each [PositionPoint]
      */
+    @Deprecated(
+        message = "Use points.forEachIndexed(action::accept) instead.",
+        replaceWith = ReplaceWith("points.forEachIndexed(action::accept)")
+    )
     fun forEachPoint(action: BiConsumer<Int, PositionPoint>) {
         _positionPoints?.forEachIndexed(action::accept)
     }
@@ -56,6 +82,10 @@ class Location(mRID: String) : IdentifiedObject(mRID) {
      * @param positionPoint The [PositionPoint] to add
      * @param sequenceNumber The sequence number of the [PositionPoint].
      */
+    @Deprecated(
+        message = "Use points.add(sequenceNumber, positionPoint) instead.",
+        replaceWith = ReplaceWith("also { it.points.add(sequenceNumber, positionPoint) }")
+    )
     @JvmOverloads
     fun addPoint(positionPoint: PositionPoint, sequenceNumber: Int = numPoints()): Location {
         require(sequenceNumber in 0..(numPoints())) {
@@ -75,6 +105,10 @@ class Location(mRID: String) : IdentifiedObject(mRID) {
      * @param positionPoint The [PositionPoint] to remove.
      * @return true if the [PositionPoint] was removed.
      */
+    @Deprecated(
+        message = "Use points.remove(positionPoint) instead.",
+        replaceWith = ReplaceWith("points.remove(positionPoint)")
+    )
     fun removePoint(positionPoint: PositionPoint): Boolean {
         val ret = _positionPoints?.remove(positionPoint) == true
         if (_positionPoints.isNullOrEmpty()) _positionPoints = null
@@ -89,6 +123,10 @@ class Location(mRID: String) : IdentifiedObject(mRID) {
      * @param sequenceNumber The sequence number of the [PositionPoint] to remove.
      * @return the [PositionPoint] that was removed, or null if there was no [PositionPoint] for the given [sequenceNumber].
      */
+    @Deprecated(
+        message = "Use points.removeAtOrNull(sequenceNumber) instead.",
+        replaceWith = ReplaceWith("points.removeAtOrNull(sequenceNumber)")
+    )
     fun removePoint(sequenceNumber: Int): PositionPoint? {
         _positionPoints?.apply {
             if (sequenceNumber >= size)
@@ -105,10 +143,18 @@ class Location(mRID: String) : IdentifiedObject(mRID) {
     /**
      * Clear all [PositionPoint]'s from this [Location]
      */
+    @Deprecated(
+        message = "Use points.clear() instead.",
+        replaceWith = ReplaceWith("also { it.points.clear() }")
+    )
     fun clearPoints(): Location {
         _positionPoints = null
         return this
     }
+
+    // endregion
+
+    // endregion
 }
 
 /**
@@ -116,4 +162,8 @@ class Location(mRID: String) : IdentifiedObject(mRID) {
  *
  * @param action The action to perform on each [PositionPoint]
  */
+@Deprecated(
+    message = "Use points.forEachIndexed(action::accept) instead.",
+    replaceWith = ReplaceWith("points.forEachIndexed(action::accept)")
+)
 fun Location.forEachPoint(action: (sequenceNumber: Int, point: PositionPoint) -> Unit): Unit = forEachPoint(BiConsumer(action))

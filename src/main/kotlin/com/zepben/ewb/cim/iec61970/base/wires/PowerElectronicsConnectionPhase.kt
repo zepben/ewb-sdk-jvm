@@ -25,8 +25,9 @@ class PowerElectronicsConnectionPhase(mRID: String) : PowerSystemResource(mRID) 
 
     var powerElectronicsConnection: PowerElectronicsConnection? = null
         set(value) {
-            field =
+            field = value?.run {
                 if (field == null || field === value) value else throw IllegalStateException("powerElectronicsConnection has already been set to $field. Cannot set this field again")
+            }
         }
 
     var p: Double? = null

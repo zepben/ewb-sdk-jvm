@@ -10,7 +10,8 @@
 * None.
 
 ### Fixes
-* fixed quadratic lookup in `compareIdReferenceCollection` in `com/zepben/ewb/services/common/PropertyComparers.kt`.
+* Fixed quadratic lookup in `compareIdReferenceCollection` in `com/zepben/ewb/services/common/PropertyComparers.kt`.
+* Fixed exception handling on database version checking if the version table doesn't exist.
 
 ### Notes
 * None.

@@ -90,23 +90,19 @@ abstract class CimDatabaseReader<TTables : CimDatabaseTables, TService : BaseSer
             false
         }
 
-    private fun beforeRead(): Boolean =
-        try {
-            val versionTable = databaseTables.getTable<TableVersion>()
-            val supportedVersion = versionTable.supportedVersion
-            val version = versionTable.getVersion(connection)
+    private fun beforeRead(): Boolean {
+        val versionTable = databaseTables.getTable<TableVersion>()
+        val supportedVersion = versionTable.supportedVersion
+        val version = versionTable.getVersion(connection)
 
-            if (version == supportedVersion) {
-                logger.info("Reading from database version v$version")
-                true
-            } else {
-                logger.error(formatVersionError(version, supportedVersion))
-                false
-            }
-        } catch (e: Exception) {
-            logger.error("Failed to connect to the database for reading: " + e.message, e)
+        return if (version == supportedVersion) {
+            logger.info("Reading from database version v$version")
+            true
+        } else {
+            logger.error(formatVersionError(version, supportedVersion))
             false
         }
+    }
 
     private fun readService(service: TService) =
         createMetadataReader(databaseTables, connection).read(service.metadata) and

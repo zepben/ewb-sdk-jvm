@@ -84,7 +84,7 @@ internal class CimDatabaseReaderTest {
         every { connection.prepareStatement(any()) } throws Exception("Test Error")
 
         assertThat("Should not have read", !reader.read(service))
-        assertThat(systemErr.log, containsString("Failed to connect to the database for reading: Test Error"))
+        assertThat(systemErr.log, containsString("Failed to read the version number from the selected database. Are you sure it is a EWB database?"))
 
         verify { connection.prepareStatement(any()) }
         confirmVerified(connection, metadataReader, serviceReader)

@@ -36,13 +36,13 @@ class TableVersion(
      */
     @Throws(SQLException::class)
     fun getVersion(connection: Connection): Int? =
-        connection.prepareStatement(selectSql).use { statement ->
-            runCatching {
+        runCatching {
+            connection.prepareStatement(selectSql).use { statement ->
                 statement.executeConfiguredQuery().use { results ->
                     results.next()
                     results.getInt(VERSION.queryIndex)
                 }
-            }.getOrNull()
-        }
+            }
+        }.getOrNull()
 
 }

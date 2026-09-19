@@ -122,10 +122,9 @@ class LocalEwbDataFilePathsTest {
         validateClosest(today)
 
         // Should return null without checking a file as they are not date based, even if the file exists.
-        validateClosest(DatabaseType.ENERGY_READINGS_INDEX, null)
-        validateClosest(DatabaseType.LOAD_AGGREGATOR_METERS_BY_DATE, null)
-        validateClosest(DatabaseType.WEATHER_READING, null)
-        validateClosest(DatabaseType.RESULTS_CACHE, null)
+        DatabaseType.entries.filterNot { it.perDate }.forEach {
+            validateClosest(it, null)
+        }
     }
 
     @Test

@@ -4,13 +4,16 @@
 * None.
 
 ### New Features
-* None.
+* Added a deprecated `AGGREGATION_INDEX` file path type (yes you read that correctly). This is being used for functionality that is intended for removal in the
+  medium term, so shouldn't be propagated beyond the initial scope. If, for some unforeseen reason, this functionality is deemed appropriate for future use,
+  this deprecation should be removed.
 
 ### Enhancements
 * None.
 
 ### Fixes
-* None.
+* Fixed quadratic lookup in `compareIdReferenceCollection` in `com/zepben/ewb/services/common/PropertyComparers.kt`.
+* Fixed exception handling on database version checking if the version table doesn't exist.
 
 ### Notes
 * None.

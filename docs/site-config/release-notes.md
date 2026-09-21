@@ -2,6 +2,7 @@
 
 | Version         | Released            |
 |-----------------|---------------------|
+|[1.15.0](#1150)| `21 September 2026` |
 |[1.14.0](#1140)| `02 September 2026` |
 |[1.13.0](#1130)| `04 August 2026` |
 |[1.12.0](#1120)| `21 May 2026` |
@@ -54,6 +55,28 @@
 ---
 
 NOTE: This library is not yet stable, and breaking changes should be expected until a 1.0.0 release.
+
+---
+
+## [1.15.0]
+
+### Breaking Changes
+* None.
+
+### New Features
+* Added a deprecated `AGGREGATION_INDEX` file path type (yes you read that correctly). This is being used for functionality that is intended for removal in the
+  medium term, so shouldn't be propagated beyond the initial scope. If, for some unforeseen reason, this functionality is deemed appropriate for future use,
+  this deprecation should be removed.
+
+### Enhancements
+* None.
+
+### Fixes
+* Fixed quadratic lookup in `compareIdReferenceCollection` in `com/zepben/ewb/services/common/PropertyComparers.kt`.
+* Fixed exception handling on database version checking if the version table doesn't exist.
+
+### Notes
+* None.
 
 ---
 

@@ -1,5 +1,5 @@
 # Zepben EWB SDK changelog
-## [1.12.1] - UNRELEASED
+## [1.12.1] - 2026-09-21
 ### Breaking Changes
 * None.
 

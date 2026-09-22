@@ -8,9 +8,11 @@
 
 package com.zepben.ewb.cim.iec61970.base.wires
 
+import com.zepben.ewb.boilerplate.Backfill
+import com.zepben.ewb.boilerplate.collections.LazyMridList
+import com.zepben.ewb.boilerplate.collections.interfaces.MridCollection
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.iec61970.base.generation.production.PowerElectronicsUnit
-import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import com.zepben.ewb.services.common.extensions.getByMRID
 import com.zepben.ewb.services.common.extensions.validateReference
 
@@ -207,17 +209,53 @@ class PowerElectronicsConnection(mRID: String) : RegulatingCondEq(mRID) {
     /**
      * The units for this power electronics connection. The returned collection is read only.
      */
-    val units: Collection<PowerElectronicsUnit> get() = _powerElectronicsUnits.asUnmodifiable()
+    val units: MridCollection<PowerElectronicsUnit> get() = LazyMridList(
+        getter = { _powerElectronicsUnits },
+        setter = { _powerElectronicsUnits = it },
+        owner = this,
+        elementDescription = "A PowerElectronicsUnit",
+    )
 
     /**
      * The phases for this power electronics connection. The returned collection is read only.
      */
-    val phases: Collection<PowerElectronicsConnectionPhase> get() = _powerElectronicsConnectionPhases.asUnmodifiable()
+    val phases: MridCollection<PowerElectronicsConnectionPhase> get() = LazyMridList(
+        getter = { _powerElectronicsConnectionPhases },
+        setter = { _powerElectronicsConnectionPhases = it },
+        owner = this,
+        elementDescription = "A PowerElectronicsConnectionPhase",
+        backfill = Backfill(
+            { it.powerElectronicsConnection },
+            { it, pec -> it.powerElectronicsConnection = pec },
+            PowerElectronicsConnectionPhase::powerElectronicsConnection
+        )
+    )
 
+    private fun validatePhase(phase: PowerElectronicsConnectionPhase) {
+        if (phase.powerElectronicsConnection == null)
+            phase.powerElectronicsConnection = this
+
+        require(phase.powerElectronicsConnection === this) {
+            "${phase.typeNameAndMRID()} `powerElectronicsConnection` property references ${phase.powerElectronicsConnection!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
+        }
+    }
+
+    // region deprecated list boilerplate
+    //
+    // ("region/endregion" is an IntelliJ feature letting you hide the entire thing)
+    // This boilerplate exists solely to enable backwards compatibility.
+    // It will be removed eventually.
+    // Every single method simply forwards the call to the corresponding list.
+
+    // region units boilerplate
 
     /**
      * Get the number of entries in the [PowerElectronicsUnit] collection.
      */
+    @Deprecated(
+        message = "Use units.size instead.",
+        replaceWith = ReplaceWith("units.size")
+    )
     fun numUnits(): Int = _powerElectronicsUnits?.size ?: 0
 
     /**
@@ -226,6 +264,10 @@ class PowerElectronicsConnection(mRID: String) : RegulatingCondEq(mRID) {
      * @param mRID the mRID of the required [PowerElectronicsUnit]
      * @return The [PowerElectronicsUnit] with the specified [mRID] if it exists, otherwise null
      */
+    @Deprecated(
+        message = "Use units.getByMRID(mRID) instead.",
+        replaceWith = ReplaceWith("units.getByMRID(mRID)")
+    )
     fun getUnit(mRID: String): PowerElectronicsUnit? = _powerElectronicsUnits?.getByMRID(mRID)
 
     /**
@@ -234,6 +276,10 @@ class PowerElectronicsConnection(mRID: String) : RegulatingCondEq(mRID) {
      * @param unit The [PowerElectronicsUnit] to add.
      * @return This [PowerElectronicsConnection] for fluent use.
      */
+    @Deprecated(
+        message = "Use units.add(unit) instead.",
+        replaceWith = ReplaceWith("also { it.units.add(unit) }")
+    )
     fun addUnit(unit: PowerElectronicsUnit): PowerElectronicsConnection {
         if (validateReference(unit, ::getUnit, "An PowerElectronicsUnit"))
             return this
@@ -250,6 +296,10 @@ class PowerElectronicsConnection(mRID: String) : RegulatingCondEq(mRID) {
      * @param unit The [PowerElectronicsUnit] to remove.
      * @return true if [unit] is removed from the collection.
      */
+    @Deprecated(
+        message = "Use units.remove(unit) instead.",
+        replaceWith = ReplaceWith("units.remove(unit)")
+    )
     fun removeUnit(unit: PowerElectronicsUnit): Boolean {
         val ret = _powerElectronicsUnits?.remove(unit) == true
         if (_powerElectronicsUnits.isNullOrEmpty()) _powerElectronicsUnits = null
@@ -261,14 +311,26 @@ class PowerElectronicsConnection(mRID: String) : RegulatingCondEq(mRID) {
      *
      * @return This [PowerElectronicsConnection] for fluent use.
      */
+    @Deprecated(
+        message = "Use units.clear() instead.",
+        replaceWith = ReplaceWith("units.clear()")
+    )
     fun clearUnits(): PowerElectronicsConnection {
         _powerElectronicsUnits = null
         return this
     }
 
+    // endregion
+
+    // region phases boilerplate
+
     /**
      * Get the number of entries in the [PowerElectronicsConnectionPhase] collection.
      */
+    @Deprecated(
+        message = "Use phases.size instead.",
+        replaceWith = ReplaceWith("phases.size")
+    )
     fun numPhases(): Int = _powerElectronicsConnectionPhases?.size ?: 0
 
     /**
@@ -277,6 +339,10 @@ class PowerElectronicsConnection(mRID: String) : RegulatingCondEq(mRID) {
      * @param mRID the mRID of the required [PowerElectronicsConnectionPhase]
      * @return The [PowerElectronicsConnectionPhase] with the specified [mRID] if it exists, otherwise null
      */
+    @Deprecated(
+        message = "Use phases.getByMRID(mRID) instead.",
+        replaceWith = ReplaceWith("phases.getByMRID(mRID)")
+    )
     fun getPhase(mRID: String): PowerElectronicsConnectionPhase? = _powerElectronicsConnectionPhases?.getByMRID(mRID)
 
     /**
@@ -285,6 +351,10 @@ class PowerElectronicsConnection(mRID: String) : RegulatingCondEq(mRID) {
      * @param phase The [PowerElectronicsConnectionPhase] to add.
      * @return This [PowerElectronicsConnection] for fluent use.
      */
+    @Deprecated(
+        message = "Use phases.add(phase) instead.",
+        replaceWith = ReplaceWith("also { it.phases.add(phase) }")
+    )
     fun addPhase(phase: PowerElectronicsConnectionPhase): PowerElectronicsConnection {
         if (validateReference(phase, ::getPhase, "An PowerElectronicsConnectionPhase"))
             return this
@@ -308,6 +378,10 @@ class PowerElectronicsConnection(mRID: String) : RegulatingCondEq(mRID) {
      * @param phase The [PowerElectronicsConnectionPhase] to remove.
      * @return true if [phase] is removed from the collection.
      */
+    @Deprecated(
+        message = "Use phases.remove(phase) instead.",
+        replaceWith = ReplaceWith("phases.remove(phase)")
+    )
     fun removePhase(phase: PowerElectronicsConnectionPhase): Boolean {
         val ret = _powerElectronicsConnectionPhases?.remove(phase) == true
         if (_powerElectronicsConnectionPhases.isNullOrEmpty()) _powerElectronicsConnectionPhases = null
@@ -319,9 +393,16 @@ class PowerElectronicsConnection(mRID: String) : RegulatingCondEq(mRID) {
      *
      * @return This [PowerElectronicsConnection] for fluent use.
      */
+    @Deprecated(
+        message = "Use phases.clear() instead.",
+        replaceWith = ReplaceWith("phases.clear()")
+    )
     fun clearPhases(): PowerElectronicsConnection {
         _powerElectronicsConnectionPhases = null
         return this
     }
 
+    // endregion
+
+    // endregion
 }

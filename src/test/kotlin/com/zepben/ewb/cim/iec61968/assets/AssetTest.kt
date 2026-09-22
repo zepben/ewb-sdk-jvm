@@ -46,6 +46,11 @@ internal class AssetTest {
 
     @Test
     internal fun organisationRoles() {
+        PrivateCollectionValidator.validateArcCollection(
+            { id -> object : Asset(id) {} },
+            { id -> object : AssetOrganisationRole(id) {} },
+            Asset::organisationRoles,
+        )
         PrivateCollectionValidator.validateUnordered(
             { id -> object : Asset(id) {} },
             { id -> object : AssetOrganisationRole(id) {} },
@@ -60,6 +65,11 @@ internal class AssetTest {
 
     @Test
     internal fun powerSystemResources() {
+        PrivateCollectionValidator.validateArcCollection(
+            { id -> object : Asset(id) {} },
+            { id -> object : PowerSystemResource(id) {} },
+            Asset::powerSystemResources,
+        )
         PrivateCollectionValidator.validateUnordered(
             { id -> object : Asset(id) {} },
             { id -> object : PowerSystemResource(id) {} },

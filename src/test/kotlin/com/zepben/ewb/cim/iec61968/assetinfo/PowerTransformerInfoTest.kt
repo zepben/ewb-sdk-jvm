@@ -36,6 +36,11 @@ internal class PowerTransformerInfoTest {
 
     @Test
     internal fun transformerTankInfo() {
+        PrivateCollectionValidator.validateArcCollection(
+            ::PowerTransformerInfo,
+            ::TransformerTankInfo,
+            PowerTransformerInfo::transformerTankInfos,
+        )
         PrivateCollectionValidator.validateUnordered(
             ::PowerTransformerInfo,
             ::TransformerTankInfo,

@@ -28,8 +28,9 @@ class AcLineSegmentPhase(mRID: String) : PowerSystemResource(mRID) {
 
     var acLineSegment: AcLineSegment? = null
         set(value) {
-            field =
+            field = value?.run {
                 if (field == null || field === value) value else throw IllegalStateException("acLineSegment has already been set to $field. Cannot set this field again")
+            }
         }
 
     override var assetInfo: WireInfo? = null

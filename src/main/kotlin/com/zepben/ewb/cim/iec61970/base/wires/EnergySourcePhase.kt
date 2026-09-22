@@ -22,8 +22,9 @@ class EnergySourcePhase(mRID: String) : PowerSystemResource(mRID) {
 
     var energySource: EnergySource? = null
         set(value) {
-            field =
+            field = value?.run{
                 if (field == null || field === value) value else throw IllegalStateException("energySource has already been set to $field. Cannot set this field again")
+            }
         }
 
     var phase: SinglePhaseKind = SinglePhaseKind.X

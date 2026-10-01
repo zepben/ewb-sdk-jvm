@@ -108,7 +108,7 @@ internal class EquipmentTreeBuilderTest {
             .run(headJunction)
 
         assertThat(builder.leaves, hasSize(2))
-        assertThat(builder.leaves.map { it.identifiedObject.mRID }.toSet(), equalTo(setOf("b8")))
+        assertThat(builder.leaves.map { it.identifiedObject.mRID }.distinct(), contains("b8"))
         assertThat(builder.leaves.map { it.identifiedObject.mRID }, not(hasItem("j2")))
     }
 

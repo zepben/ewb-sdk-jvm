@@ -48,6 +48,11 @@ internal class TransformerTankInfoTest {
 
     @Test
     internal fun transformerEndInfo() {
+        PrivateCollectionValidator.validateArcCollection(
+            ::TransformerTankInfo,
+            ::TransformerEndInfo,
+            TransformerTankInfo::transformerEndInfos,
+        )
         PrivateCollectionValidator.validateUnordered(
             ::TransformerTankInfo,
             ::TransformerEndInfo,

@@ -45,6 +45,11 @@ internal class PricingStructureTest {
 
     @Test
     internal fun tariffs() {
+        PrivateCollectionValidator.validateArcCollection(
+            ::PricingStructure,
+            ::Tariff,
+            PricingStructure::tariffs,
+        )
         PrivateCollectionValidator.validateUnordered(
             ::PricingStructure,
             ::Tariff,

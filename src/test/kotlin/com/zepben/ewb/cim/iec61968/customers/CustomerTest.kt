@@ -63,6 +63,11 @@ internal class CustomerTest {
 
     @Test
     internal fun customerAgreements() {
+        PrivateCollectionValidator.validateArcCollection(
+            ::Customer,
+            ::CustomerAgreement,
+            Customer::agreements,
+        )
         PrivateCollectionValidator.validateUnordered(
             ::Customer,
             ::CustomerAgreement,

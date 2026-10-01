@@ -57,6 +57,11 @@ internal class UsagePointTest {
 
     @Test
     internal fun endDevices() {
+        PrivateCollectionValidator.validateArcCollection(
+            ::UsagePoint,
+            { id -> object : EndDevice(id) {} },
+            UsagePoint::endDevices,
+        )
         PrivateCollectionValidator.validateUnordered(
             ::UsagePoint,
             { id -> object : EndDevice(id) {} },
@@ -71,6 +76,11 @@ internal class UsagePointTest {
 
     @Test
     internal fun equipment() {
+        PrivateCollectionValidator.validateArcCollection(
+            ::UsagePoint,
+            { id -> object : Equipment(id) {} },
+            UsagePoint::equipment,
+        )
         PrivateCollectionValidator.validateUnordered(
             ::UsagePoint,
             { id -> object : Equipment(id) {} },
@@ -85,6 +95,11 @@ internal class UsagePointTest {
 
     @Test
     internal fun contacts() {
+        PrivateCollectionValidator.validateArcCollection(
+            ::UsagePoint,
+            { id -> ContactDetails(id) },
+            UsagePoint::contacts,
+        )
         PrivateCollectionValidator.validateUnordered(
             ::UsagePoint,
             { id -> ContactDetails(id) },

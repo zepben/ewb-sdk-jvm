@@ -54,6 +54,11 @@ internal class EquipmentTest {
 
     @Test
     internal fun equipmentContainers() {
+        PrivateCollectionValidator.validateArcCollection(
+            { id -> object : Equipment(id) {} },
+            { id -> object : EquipmentContainer(id) {} },
+            Equipment::containers,
+        )
         PrivateCollectionValidator.validateUnordered(
             { id -> object : Equipment(id) {} },
             { id -> object : EquipmentContainer(id) {} },
@@ -68,6 +73,11 @@ internal class EquipmentTest {
 
     @Test
     internal fun usagePoints() {
+        PrivateCollectionValidator.validateArcCollection(
+            { id -> object : Equipment(id) {} },
+            ::UsagePoint,
+            Equipment::usagePoints,
+        )
         PrivateCollectionValidator.validateUnordered(
             { id -> object : Equipment(id) {} },
             ::UsagePoint,
@@ -82,6 +92,11 @@ internal class EquipmentTest {
 
     @Test
     internal fun operationalRestrictions() {
+        PrivateCollectionValidator.validateArcCollection(
+            { id -> object : Equipment(id) {} },
+            ::OperationalRestriction,
+            Equipment::operationalRestrictions,
+        )
         PrivateCollectionValidator.validateUnordered(
             { id -> object : Equipment(id) {} },
             ::OperationalRestriction,
@@ -96,6 +111,11 @@ internal class EquipmentTest {
 
     @Test
     internal fun currentContainers() {
+        PrivateCollectionValidator.validateArcCollection(
+            { id -> object : Equipment(id) {} },
+            { id -> object : EquipmentContainer(id) {} },
+            Equipment::currentContainers,
+        )
         PrivateCollectionValidator.validateUnordered(
             { id -> object : Equipment(id) {} },
             { id -> object : EquipmentContainer(id) {} },

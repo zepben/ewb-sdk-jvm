@@ -8,8 +8,8 @@
 
 package com.zepben.ewb.cim.iec61970.base.diagramlayout
 
+import com.zepben.ewb.boilerplate.collections.LazyIndexList
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
-import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import java.util.function.BiConsumer
 
 /**
@@ -26,8 +26,9 @@ class DiagramObject(mRID: String) : IdentifiedObject(mRID) {
 
     var diagram: Diagram? = null
         set(value) {
-            field =
+            field = value?.run {
                 if (field == null || field === value) value else throw IllegalStateException("diagram has already been set to $field. Cannot set this field again")
+            }
         }
 
     var identifiedObjectMRID: String? = null
@@ -38,22 +39,51 @@ class DiagramObject(mRID: String) : IdentifiedObject(mRID) {
     /**
      * The points for this diagram object. The returned collection is read only.
      */
-    val points: List<DiagramObjectPoint> get() = _diagramObjectPoints.asUnmodifiable()
+    val points: LazyIndexList<DiagramObjectPoint> get() = LazyIndexList(
+        { _diagramObjectPoints },
+        { _diagramObjectPoints = it },
+        this,
+        "A DiagramObjectPoint"
+    )
+
+
+
+
+    // region deprecated list boilerplate
+    //
+    // ("region/endregion" is an IntelliJ feature letting you hide the entire thing)
+    // This boilerplate exists solely to enable backwards compatibility.
+    // It will be removed eventually.
+    // Every single method simply forwards the call to the corresponding list.
+
+    // region points boilerplate
 
     /**
      * Get a count of the [DiagramObjectPoint]'s associated with this [DiagramObject]
      */
+    @Deprecated(
+        message = "Use points.size instead.",
+        replaceWith = ReplaceWith("points.size")
+    )
     fun numPoints(): Int = _diagramObjectPoints?.size ?: 0
 
     /**
      * A diagram object can have 0 or more points to reflect its layout position, routing
      * (for polylines) or boundary (for polygons). Index in the list corresponds to the sequence number
      */
+    @Deprecated(
+        message = "Use points.getOrNull(sequenceNumber) instead.",
+        replaceWith = ReplaceWith("points.getOrNull(sequenceNumber)")
+    )
     fun getPoint(sequenceNumber: Int): DiagramObjectPoint? = _diagramObjectPoints?.getOrNull(sequenceNumber)
 
     /**
      * Get a [DiagramObjectPoint] by its sequenceNumber relative to this [DiagramObject]
      */
+    @Deprecated(
+        message = "Use points.getOrNull(sequenceNumber) instead.",
+        replaceWith = ReplaceWith("points.getOrNull(sequenceNumber)")
+    )
     operator fun get(sequenceNumber: Int): DiagramObjectPoint? = getPoint(sequenceNumber)
 
     /**
@@ -61,6 +91,10 @@ class DiagramObject(mRID: String) : IdentifiedObject(mRID) {
      *
      * @param action The action to perform on each [DiagramObjectPoint]
      */
+    @Deprecated(
+        message = "Use points.forEachIndexed(action::accept) instead.",
+        replaceWith = ReplaceWith("points.forEachIndexed(action::accept)")
+    )
     fun forEachPoint(action: BiConsumer<Int, DiagramObjectPoint>) {
         _diagramObjectPoints?.forEachIndexed(action::accept)
     }
@@ -70,6 +104,10 @@ class DiagramObject(mRID: String) : IdentifiedObject(mRID) {
      * @param diagramObjectPoint The [DiagramObjectPoint] to add
      * @param sequenceNumber The sequence number of the [DiagramObjectPoint].
      */
+    @Deprecated(
+        message = "Use points.add(sequenceNumber, diagramObjectPoint) instead.",
+        replaceWith = ReplaceWith("also { it.points.add(sequenceNumber, diagramObjectPoint) }")
+    )
     @JvmOverloads
     fun addPoint(diagramObjectPoint: DiagramObjectPoint, sequenceNumber: Int = numPoints()): DiagramObject {
         require(sequenceNumber in 0..(numPoints())) {
@@ -89,6 +127,10 @@ class DiagramObject(mRID: String) : IdentifiedObject(mRID) {
      * @param diagramObjectPoint The [DiagramObjectPoint] to remove.
      * @return true if the [DiagramObjectPoint] was removed.
      */
+    @Deprecated(
+        message = "Use points.remove(diagramObjectPoint) instead.",
+        replaceWith = ReplaceWith("points.remove(diagramObjectPoint)")
+    )
     fun removePoint(diagramObjectPoint: DiagramObjectPoint): Boolean {
         val ret = _diagramObjectPoints?.remove(diagramObjectPoint) == true
         if (_diagramObjectPoints.isNullOrEmpty()) _diagramObjectPoints = null
@@ -103,6 +145,10 @@ class DiagramObject(mRID: String) : IdentifiedObject(mRID) {
      * @param sequenceNumber The sequence number of the [DiagramObjectPoint] to remove.
      * @return the [DiagramObjectPoint] that was removed, or null if there was no [DiagramObjectPoint] for the given [sequenceNumber].
      */
+    @Deprecated(
+        message = "Use points.removeAtOrNull(sequenceNumber) instead.",
+        replaceWith = ReplaceWith("points.removeAtOrNull(sequenceNumber)")
+    )
     fun removePoint(sequenceNumber: Int): DiagramObjectPoint? {
         _diagramObjectPoints?.apply {
             if (sequenceNumber >= size)
@@ -119,15 +165,22 @@ class DiagramObject(mRID: String) : IdentifiedObject(mRID) {
     /**
      * Clear all [DiagramObjectPoint]'s from this [DiagramObject]
      */
+    @Deprecated(
+        message = "Use points.clear() instead.",
+        replaceWith = ReplaceWith("also { it.points.clear() }")
+    )
     fun clearPoints(): DiagramObject {
         _diagramObjectPoints = null
         return this
     }
+
+    // endregion
+
+    // endregion
 }
 
-/**
- * Performs the given [action] on each element.
- *
- * @param action The action to perform on each [DiagramObjectPoint]
- */
+@Deprecated(
+    message = "Use points.forEachIndexed(action::accept) instead.",
+    replaceWith = ReplaceWith("points.forEachIndexed(action::accept)")
+)
 fun DiagramObject.forEachPoint(action: (sequenceNumber: Int, point: DiagramObjectPoint) -> Unit): Unit = forEachPoint(BiConsumer(action))

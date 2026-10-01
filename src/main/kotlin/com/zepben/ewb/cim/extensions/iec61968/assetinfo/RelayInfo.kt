@@ -8,9 +8,9 @@
 
 package com.zepben.ewb.cim.extensions.iec61968.assetinfo
 
+import com.zepben.ewb.boilerplate.collections.LazyIndexList
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.iec61968.assets.AssetInfo
-import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import java.util.function.BiConsumer
 
 /**
@@ -33,11 +33,30 @@ class RelayInfo(mRID: String) : AssetInfo(mRID) {
     private var _recloseDelays: MutableList<Double>? = null
 
     @ZBEX
-    val recloseDelays: List<Double> get() = _recloseDelays.asUnmodifiable()
+    val recloseDelays: LazyIndexList<Double> get() = LazyIndexList(
+        { _recloseDelays },
+        { _recloseDelays = it },
+        this,
+        "A Double"
+    )
+
+
+    // region deprecated list boilerplate
+    //
+    // ("region/endregion" is an IntelliJ feature letting you hide the entire thing)
+    // This boilerplate exists solely to enable backwards compatibility.
+    // It will be removed eventually.
+    // Every single method simply forwards the call to the corresponding list.
+
+    // region recloseDelays boilerplate
 
     /**
      * Returns the number of reclose delays for this [RelayInfo]
      */
+    @Deprecated(
+        message = "Use recloseDelays.size instead.",
+        replaceWith = ReplaceWith("recloseDelays.size")
+    )
     fun numDelays(): Int = _recloseDelays?.size ?: 0
 
     /**
@@ -46,6 +65,10 @@ class RelayInfo(mRID: String) : AssetInfo(mRID) {
      * @param sequenceNumber the index of the reclose delay.
      * @return the reclose delay at [sequenceNumber] if it exists, otherwise null.
      */
+    @Deprecated(
+        message = "Use recloseDelays.getOrNull(sequenceNumber) instead.",
+        replaceWith = ReplaceWith("recloseDelays.getOrNull(sequenceNumber)")
+    )
     fun getDelay(sequenceNumber: Int): Double? = _recloseDelays?.getOrNull(sequenceNumber)
 
     /**
@@ -53,6 +76,10 @@ class RelayInfo(mRID: String) : AssetInfo(mRID) {
      *
      * @param action The action to perform on each reclose delay ([Double])
      */
+    @Deprecated(
+        message = "Use recloseDelays.forEachIndexed(action::accept) instead.",
+        replaceWith = ReplaceWith("recloseDelays.forEachIndexed(action::accept)")
+    )
     fun forEachDelay(action: BiConsumer<Int, Double>) {
         _recloseDelays?.forEachIndexed(action::accept)
     }
@@ -63,6 +90,10 @@ class RelayInfo(mRID: String) : AssetInfo(mRID) {
      * @param sequenceNumber The index into the list to add the delay at. Defaults to the end of the list.
      * @return This [RelayInfo] for fluent use.
      */
+    @Deprecated(
+        message = "Use recloseDelays.add(sequenceNumber, delay) instead.",
+        replaceWith = ReplaceWith("also { it.recloseDelays.add(sequenceNumber, delay) }")
+    )
     @JvmOverloads
     fun addDelay(
         delay: Double,
@@ -85,6 +116,10 @@ class RelayInfo(mRID: String) : AssetInfo(mRID) {
      * @param delays The delays in seconds to add.
      * @return This [RelayInfo] for fluent use.
      */
+    @Deprecated(
+        message = "Use recloseDelays.addAll(recloseDelays.size, delays.asList()) instead.",
+        replaceWith = ReplaceWith("also{ delays.forEach { delay -> it.recloseDelays.add(delay) } }")
+    )
     fun addDelays(
         vararg delays: Double,
     ): RelayInfo {
@@ -101,6 +136,10 @@ class RelayInfo(mRID: String) : AssetInfo(mRID) {
      * @param delay The value of the delay to remove.
      * @return true if a delay was removed, false otherwise.
      */
+    @Deprecated(
+        message = "Use recloseDelays.remove(delay) instead.",
+        replaceWith = ReplaceWith("recloseDelays.remove(delay)")
+    )
     fun removeDelay(delay: Double): Boolean {
         val ret = _recloseDelays?.remove(delay) == true
         if (_recloseDelays.isNullOrEmpty()) _recloseDelays = null
@@ -112,6 +151,10 @@ class RelayInfo(mRID: String) : AssetInfo(mRID) {
      * @param index The index of the delay to remove.
      * @return The delay that was removed, or null if no delay was present at [index].
      */
+    @Deprecated(
+        message = "Use recloseDelays.removeAtOrNull(index) instead.",
+        replaceWith = ReplaceWith("recloseDelays.removeAtOrNull(index)")
+    )
     fun removeDelayAt(index: Int): Double? {
         if (index >= numDelays()) return null
         val ret = _recloseDelays?.removeAt(index)
@@ -123,10 +166,18 @@ class RelayInfo(mRID: String) : AssetInfo(mRID) {
      * Clear [recloseDelays].
      * @return This [RelayInfo] for fluent use.
      */
+    @Deprecated(
+        message = "Use recloseDelays.clear() instead.",
+        replaceWith = ReplaceWith("also { it.recloseDelays.clear() }")
+    )
     fun clearDelays(): RelayInfo {
         _recloseDelays = null
         return this
     }
+
+    // endregion
+
+    // endregion
 
 }
 
@@ -135,4 +186,8 @@ class RelayInfo(mRID: String) : AssetInfo(mRID) {
  *
  * @param action The action to perform on each reclose delay ([Double])
  */
+@Deprecated(
+    message = "Use recloseDelays.forEachIndexed(action::accept) instead.",
+    replaceWith = ReplaceWith("recloseDelays.forEachIndexed(action::accept)")
+)
 fun RelayInfo.forEachDelay(action: (sequenceNumber: Int, delay: Double) -> Unit): Unit = forEachDelay(BiConsumer(action))

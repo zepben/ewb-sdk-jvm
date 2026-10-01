@@ -36,6 +36,11 @@ class LvSubstationTest {
 
     @Test
     internal fun normalEnergizedLvFeeders() {
+        PrivateCollectionValidator.validateArcCollection(
+            ::LvSubstation,
+            ::LvFeeder,
+            LvSubstation::normalEnergizedLvFeeders,
+        )
         PrivateCollectionValidator.validateUnordered(
             ::LvSubstation,
             ::LvFeeder,
@@ -50,6 +55,11 @@ class LvSubstationTest {
 
     @Test
     internal fun normalEnergizingFeeders() {
+        PrivateCollectionValidator.validateArcCollection(
+            ::LvSubstation,
+            ::Feeder,
+            LvSubstation::normalEnergizingFeeders,
+        )
         PrivateCollectionValidator.validateUnordered(
             ::LvSubstation,
             ::Feeder,
@@ -64,6 +74,11 @@ class LvSubstationTest {
 
     @Test
     internal fun currentEnergizingFeeders() {
+        PrivateCollectionValidator.validateArcCollection(
+            ::LvSubstation,
+            ::Feeder,
+            LvSubstation::currentEnergizingFeeders,
+        )
         PrivateCollectionValidator.validateUnordered(
             ::LvSubstation,
             ::Feeder,

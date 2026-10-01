@@ -45,6 +45,11 @@ internal class DiagramTest {
 
     @Test
     internal fun diagramObjects() {
+        PrivateCollectionValidator.validateArcCollection(
+            ::Diagram,
+            ::DiagramObject,
+            Diagram::diagramObjects,
+        )
         PrivateCollectionValidator.validateUnordered(
             ::Diagram,
             ::DiagramObject,

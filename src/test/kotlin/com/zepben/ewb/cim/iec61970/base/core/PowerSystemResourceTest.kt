@@ -54,6 +54,11 @@ internal class PowerSystemResourceTest {
 
     @Test
     internal fun assets() {
+        PrivateCollectionValidator.validateArcCollection(
+            { id -> object : PowerSystemResource(id) {} },
+            { id -> object : Asset(id) {} },
+            PowerSystemResource::assets,
+        )
         PrivateCollectionValidator.validateUnordered(
             { id -> object : PowerSystemResource(id) {} },
             { id -> object : Asset(id) {} },

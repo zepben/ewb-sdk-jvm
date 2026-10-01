@@ -68,6 +68,11 @@ internal class RegulatingControlTest {
 
     @Test
     internal fun regulatingCondEqs() {
+        PrivateCollectionValidator.validateArcCollection(
+            { id -> object : RegulatingControl(id) {} },
+            { id -> object : RegulatingCondEq(id) {} },
+            RegulatingControl::regulatingCondEqs,
+        )
         PrivateCollectionValidator.validateUnordered(
             { id -> object : RegulatingControl(id) {} },
             { id -> object : RegulatingCondEq(id) {} },

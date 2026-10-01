@@ -57,7 +57,7 @@ class EquipmentTreeBuilder(calculateLeaves: Boolean? = false) : StepActionWithCo
                 _leaves.add(it)  // add this node to _leaves as it has no children
             else
                 _leaves.remove(it)
-            it.parent?.let ( _leaves::remove )  // this nodes parent now has a child, it's not a leaf anymore
+            it.parent?.let(_leaves::remove)  // this node's parent now has a child, it's not a leaf anymore
         }
     }
 

@@ -10,7 +10,7 @@
 * None.
 
 ### Fixes
-* None.
+* EquipmentTreeBuilder no longer overwrites existing leaves with children.
 
 ### Notes
 * None.

@@ -24,7 +24,7 @@ private typealias EquipmentTreeNode = TreeNode<ConductingEquipment>
  */
 class EquipmentTreeBuilder(calculateLeaves: Boolean? = false) : StepActionWithContextValue<NetworkTraceStep<*>, EquipmentTreeNode> {
     private val _roots: MutableMap<ConductingEquipment, EquipmentTreeNode> = mutableMapOf()
-    private val _leaves: MutableList<EquipmentTreeNode> = mutableListOf()
+    private val _leaves: MutableSet<EquipmentTreeNode> = mutableSetOf()
     private val _calculateLeaves: Boolean = calculateLeaves ?: false
 
     /**
@@ -53,10 +53,11 @@ class EquipmentTreeBuilder(calculateLeaves: Boolean? = false) : StepActionWithCo
         currentNode.parent?.addChild(currentNode)
 
         currentNode.takeIf { _calculateLeaves }?.let {
-            _leaves.add(it) // add this node to _leaves as it has no children
-            it.parent?.let { parent ->
-                _leaves.remove(parent) // this nodes parent now has a child, it's not a leaf anymore
-            }
+            if (currentNode.children.isEmpty())
+                _leaves.add(it)  // add this node to _leaves as it has no children
+            else
+                _leaves.remove(it)
+            it.parent?.let ( _leaves::remove )  // this nodes parent now has a child, it's not a leaf anymore
         }
     }
 

@@ -52,12 +52,10 @@ class EquipmentTreeBuilder(calculateLeaves: Boolean? = false) : StepActionWithCo
         val currentNode = context.value
         currentNode.parent?.addChild(currentNode)
 
-        currentNode.takeIf { _calculateLeaves }?.let {
+        if (_calculateLeaves) {
             if (currentNode.children.isEmpty())
-                _leaves.add(it)  // add this node to _leaves as it has no children
-            else
-                _leaves.remove(it)
-            it.parent?.let(_leaves::remove)  // this node's parent now has a child, it's not a leaf anymore
+                _leaves.add(currentNode)  // add this node to _leaves as it has no children
+            currentNode.parent?.let(_leaves::remove)  // this node's parent now has a child, it's not a leaf anymore
         }
     }
 

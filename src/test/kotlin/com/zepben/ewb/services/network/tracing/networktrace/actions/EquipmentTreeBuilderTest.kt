@@ -80,20 +80,20 @@ internal class EquipmentTreeBuilderTest {
     @Test
     fun `test both sides of an open switch are added as leaves without adding the branching equipment`() {
         val n = TestNetworkBuilder()
-            .fromJunction(numTerminals = 1)
-            .toAcls()
-            .toJunction(numTerminals = 3)
-            .toAcls()
-            .toJunction()
-            .toAcls()
-            .toJunction()
-            .toAcls()
-            .toBreaker(isOpen = true, isNormallyOpen = true)
-            .toAcls()
-            .toJunction()
-            .toAcls()
-            .toJunction()
-            .toAcls()
+            .fromJunction(numTerminals = 1) // j0
+            .toAcls() // c1
+            .toJunction(numTerminals = 3) // j2
+            .toAcls() // c3
+            .toJunction() // j4
+            .toAcls() // c5
+            .toJunction() // j6
+            .toAcls() // c7
+            .toBreaker(isOpen = true, isNormallyOpen = true) // b8
+            .toAcls() // c9
+            .toJunction() // j10
+            .toAcls() // c11
+            .toJunction() // j12
+            .toAcls() // c13
             .connect("c13", "j2", 2, 3)
             .network
 

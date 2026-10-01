@@ -10,7 +10,7 @@
 * None.
 
 ### Fixes
-* None.
+* Fixed `EquipmentTreeBuilder` leaf calculation so nodes that later gain children are no longer reported as leaves.
 
 ### Notes
 * None.

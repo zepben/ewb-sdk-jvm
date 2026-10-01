@@ -13,8 +13,10 @@ import com.zepben.ewb.services.network.testdata.LoopingNetwork
 import com.zepben.ewb.services.network.testdata.addFeederDirections
 import com.zepben.ewb.services.network.tracing.feeder.DirectionLogger
 import com.zepben.ewb.services.network.tracing.networktrace.NetworkTraceStep
+import com.zepben.ewb.services.network.tracing.networktrace.NetworkTraceActionType
 import com.zepben.ewb.services.network.tracing.networktrace.Tracing
 import com.zepben.ewb.services.network.tracing.networktrace.conditions.Conditions.downstream
+import com.zepben.ewb.services.network.tracing.networktrace.conditions.Conditions.stopAtOpen
 import com.zepben.ewb.services.network.tracing.networktrace.run
 import com.zepben.ewb.services.network.tracing.traversal.StepContext
 import com.zepben.ewb.testing.TestNetworkBuilder
@@ -73,6 +75,41 @@ internal class EquipmentTreeBuilderTest {
             ),
         )
 
+    }
+
+    @Test
+    fun `test both sides of an open switch are added as leaves without adding the branching equipment`() {
+        val n = TestNetworkBuilder()
+            .fromJunction(numTerminals = 1) // j0
+            .toAcls() // c1
+            .toJunction(numTerminals = 3) // j2
+            .toAcls() // c3
+            .toJunction() // j4
+            .toAcls() // c5
+            .toJunction() // j6
+            .toAcls() // c7
+            .toBreaker(isOpen = true, isNormallyOpen = true) // b8
+            .toAcls() // c9
+            .toJunction() // j10
+            .toAcls() // c11
+            .toJunction() // j12
+            .toAcls() // c13
+            .connect("c13", "j2", 2, 3)
+            .network
+
+        val headJunction = n.get<ConductingEquipment>("j0")!!
+        Tracing.setDirection().run(headJunction.t1)
+
+        val builder = EquipmentTreeBuilder(calculateLeaves = true)
+        Tracing.networkTrace(actionStepType = NetworkTraceActionType.ALL_STEPS)
+            .addCondition { downstream() }
+            .addStepAction(builder)
+            .addCondition { stopAtOpen() }
+            .run(headJunction)
+
+        assertThat(builder.leaves, hasSize(2))
+        assertThat(builder.leaves.map { it.identifiedObject.mRID }.distinct(), contains("b8"))
+        assertThat(builder.leaves.map { it.identifiedObject.mRID }, not(hasItem("j2")))
     }
 
     @Test

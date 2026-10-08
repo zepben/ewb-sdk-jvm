@@ -81,6 +81,7 @@ open class Services @ZepbenExperimental constructor(
             ?: diagramService.get(T::class, mRID)
             ?: customerService.get(T::class, mRID)
             ?: customerDiagramService.get(T::class, mRID)
+            ?: variantService.get(T::class, mRID)
     }
 
     /**
@@ -91,6 +92,6 @@ open class Services @ZepbenExperimental constructor(
      */
     @OptIn(ZepbenExperimental::class)
     fun which(mRID: String): BaseService? {
-        return networkService.takeIf { it.contains(mRID) } ?: diagramService.takeIf { it.contains(mRID) } ?: customerService.takeIf { it.contains(mRID) } ?: customerDiagramService.takeIf { it.contains(mRID) }
+        return networkService.takeIf { it.contains(mRID) } ?: diagramService.takeIf { it.contains(mRID) } ?: customerService.takeIf { it.contains(mRID) } ?: customerDiagramService.takeIf { it.contains(mRID) } ?: variantService.takeIf { it.contains(mRID) }
     }
 }

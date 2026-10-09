@@ -49,7 +49,7 @@ class DiagramConsumerClient(
     @JvmOverloads
     constructor(channel: Channel, callCredentials: CallCredentials? = null) :
         this(
-            DiagramConsumerGrpc.newStub(channel).withExecutor(Executors.newSingleThreadExecutor()).apply { callCredentials?.let { withCallCredentials(it) } },
+            DiagramConsumerGrpc.newStub(channel).withExecutor(GrpcExecutorFactory.create("diagram-consumer")).apply { callCredentials?.let { withCallCredentials(it) } },
         )
 
     /**

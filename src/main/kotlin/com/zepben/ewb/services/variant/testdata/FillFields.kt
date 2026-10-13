@@ -51,11 +51,11 @@ fun NetworkModelProjectComponent.fillFields(service: VariantService, includeRunt
     (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
 
     created = Clock.System.now().minus(10, DateTimeUnit.SECOND).toJavaInstant()
+    updated = Clock.System.now().minus(5, DateTimeUnit.SECOND).toJavaInstant()
     closed = Clock.System.now().toJavaInstant()
 
     parent = NetworkModelProject("parent-project").also { it.addChild(this); service.add(it) }
 
-    // TODO
     return this
 }
 
@@ -78,6 +78,7 @@ fun NetworkModelProjectStage.fillFields(service: VariantService, includeRuntime:
     confidenceLevel = 10
     baseModelVersion = "2025-10-12"
     lastConflictCheckedAt = Clock.System.now().minus(20000, DateTimeUnit.SECOND).toJavaInstant()
+    commissionedDate = Clock.System.now().plus(200000, DateTimeUnit.HOUR).toJavaInstant()
     userComments = "Dodgy network, probably dont use this in production..."
     changeSet = ChangeSet(generateId()).also {
         service.add(it)
@@ -104,6 +105,8 @@ fun ChangeSet.fillFields(service: VariantService, includeRuntime: Boolean = true
     networkModelProjectStage = NetworkModelProjectStage(generateId()).also { it.changeSet = this; service.add(it) }
 
     addMember(ObjectCreation().also { it.changeSet = this; it.targetObjectMRID = "creation"; service.add(it) })
+    addMember(ObjectModification().also { it.changeSet = this; it.targetObjectMRID = "modification"; service.add(it) })
+    addMember(ObjectDeletion().also { it.changeSet = this; it.targetObjectMRID = "deletion"; service.add(it) })
 
     return this
 }

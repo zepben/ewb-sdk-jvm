@@ -101,7 +101,7 @@ class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<
 
     @Test
     @Disabled("Not a real test. Run individually to read an actual file.")
-    fun readRealFile() {
+    internal fun readRealFile() {
         systemErr.unmute()
 
         // Put the name of the database you want to read in src/test/resources/test-network-database.txt

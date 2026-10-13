@@ -15,21 +15,13 @@ import com.zepben.ewb.services.network.NetworkService
 class NetworkFillFieldsTest : BaseFillFieldsTest(NetworkService(), Class.forName("${NetworkFillFieldsTest::class.java.packageName}.FillFieldsKt")) {
 
     override val ignoredProperties: Set<String> = setOf(
-        "maxTerminals",         // read-only overriden by implementation
+        "maxTerminals",         // read-only overridden by implementation
         "baseVoltageValue",     // calculated non-nullable. baseVoltage is checked anyway
         "inService",            // default is true
         "normallyInService",    // default is true
         "t3",
 
-        // eq containers - Circuit was set as equipment container
-        "currentLvFeeders",
-        "normalFeeders",
-        "normalLvFeeders",
-        "sites",
-        "substations",
-        "normalLvSubstations",
-
-        // t2
+        // t2 - maxTerminals=1
         "BusbarSection.t2",
         "Clamp.t2",
 
@@ -67,14 +59,8 @@ class NetworkFillFieldsTest : BaseFillFieldsTest(NetworkService(), Class.forName
         "Clamp.assetInfo",
         "BusbarSection.assetInfo",
 
-        // Breaker
-        "Breaker.isFeederHeadBreaker", // derived from substations
-        "Breaker.isSubstationBreaker", // derived from normalFeeders
-
         // AcLineSegment
-        "AcLineSegment.perLengthPhaseImpedance", // derived from perLengthImpedance
+        "AcLineSegment.perLengthPhaseImpedance", // perLengthSequenceImpedance was set
 
-        // PowerTransformer
-        "PowerTransformer.primaryVoltage", // derived from baseVoltage/end baseVoltage
     )
 }

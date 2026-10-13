@@ -873,12 +873,32 @@ fun Equipment.fillFields(service: NetworkService, includeRuntime: Boolean = true
             it.addEquipment(this)
             service.add(it)
         })
+        addContainer(Site(generateId()).also {
+            it.addEquipment(this)
+            service.add(it)
+        })
+        addContainer(Substation(generateId()).also {
+            it.addEquipment(this)
+            service.add(it)
+        })
+        addContainer(LvSubstation(generateId()).also {
+            it.addEquipment(this)
+            service.add(it)
+        })
 
         if (includeRuntime) {
-            addCurrentContainer(Feeder(generateId()).also {
+            Feeder(generateId()).also {
                 it.addEquipment(this)
                 service.add(it)
-            })
+                addContainer(it)
+                addCurrentContainer(it)
+            }
+            LvFeeder(generateId()).also {
+                it.addEquipment(this)
+                service.add(it)
+                addContainer(it)
+                addCurrentContainer(it)
+            }
         }
     }
 
@@ -1251,6 +1271,7 @@ fun Breaker.fillFields(service: NetworkService, includeRuntime: Boolean = true):
     (this as ProtectedSwitch).fillFields(service, includeRuntime)
 
     inTransitTime = 1.1
+    normalFeeders.firstOrNull()?.normalHeadTerminal = terminals.firstOrNull()
 
     return this
 }
@@ -1587,6 +1608,7 @@ fun PowerTransformer.fillFields(service: NetworkService, includeRuntime: Boolean
 
     repeat(2) {
         addEnd(PowerTransformerEnd(generateId()).also {
+            it.baseVoltage = BaseVoltage(generateId()).also { service.add(it) }
             it.powerTransformer = this
             service.add(it)
         })

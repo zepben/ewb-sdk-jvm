@@ -66,20 +66,20 @@ abstract class BaseFillFieldsTest(val service: Any, val clazz: Class<*>) {
             val value = try {
                 prop.getter.call(root)
             } catch (e: Exception) {
-                issues += "$key ${e.message}"
+                issues += "${prop.name} ${e.message}"
                 continue
             }
 
             when {
-                value == null -> issues += "$key is null"
+                value == null -> issues += "${prop.name} is null"
                 // nullable: default is null, so any non-null value (0, "", false, empty collection, first enum) is valid
                 prop.returnType.isMarkedNullable -> continue
-                value is String && value.isEmpty() -> issues += "$key is empty string"
-                value is Boolean && !value -> issues += "$key is false (default)"
-                value is Int && (value == 0 || value == Int.MAX_VALUE) -> issues += "$key is default/sentinel int"
-                value is Double && (value == 0.0 || value.isNaN()) -> issues += "$key is default double"
-                value is Enum<*> && value.name.startsWith("UNKNOWN") -> issues += "$key is ${value.name}"
-                value is Collection<*> && value.isEmpty() -> issues += "$key is empty collection"
+                value is String && value.isEmpty() -> issues += "${prop.name} is empty string"
+                value is Boolean && !value -> issues += "${prop.name} is false (default)"
+                value is Int && (value == 0 || value == Int.MAX_VALUE) -> issues += "${prop.name} is default/sentinel int"
+                value is Double && (value == 0.0 || value.isNaN()) -> issues += "${prop.name} is default double"
+                value is Enum<*> && value.name.startsWith("UNKNOWN") -> issues += "${prop.name} is ${value.name}"
+                value is Collection<*> && value.isEmpty() -> issues += "${prop.name} is empty collection"
                 // anything else (a CIM object reference, a populated collection, etc.) is considered populated
             }
         }

@@ -21,7 +21,7 @@ class NetworkFillFieldsTest : BaseFillFieldsTest(NetworkService(), Class.forName
         "normallyInService",    // default is true
         "t3",
 
-        // eq containers
+        // eq containers - Circuit was set as equipment container
         "currentLvFeeders",
         "normalFeeders",
         "normalLvFeeders",
@@ -68,28 +68,13 @@ class NetworkFillFieldsTest : BaseFillFieldsTest(NetworkService(), Class.forName
         "BusbarSection.assetInfo",
 
         // Breaker
-        "Breaker.isFeederHeadBreaker",
-        "Breaker.isSubstationBreaker",
+        "Breaker.isFeederHeadBreaker", // derived from substations
+        "Breaker.isSubstationBreaker", // derived from normalFeeders
 
         // AcLineSegment
-        "AcLineSegment.perLengthPhaseImpedance",
-
-        // PowerElectronicsConnection
-        "PowerElectronicsConnection.phases",
-        "PowerElectronicsConnection.units",
+        "AcLineSegment.perLengthPhaseImpedance", // derived from perLengthImpedance
 
         // PowerTransformer
-        "PowerTransformer.primaryVoltage",
-
-        // ProtectionRelaySystem
-        "ProtectionRelaySystem.assets",
-        "ProtectionRelaySystem.commissionedDate",
-        "ProtectionRelaySystem.containers",
-        "ProtectionRelaySystem.currentContainers",
-        "ProtectionRelaySystem.currentFeeders",
-        "ProtectionRelaySystem.location",
-        "ProtectionRelaySystem.numControls",
-        "ProtectionRelaySystem.operationalRestrictions",
-        "ProtectionRelaySystem.usagePoints",
+        "PowerTransformer.primaryVoltage", // derived from baseVoltage/end baseVoltage
     )
 }

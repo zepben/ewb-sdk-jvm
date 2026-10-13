@@ -40,6 +40,7 @@ import com.zepben.ewb.cim.iec61970.base.core.*
 import com.zepben.ewb.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.ewb.cim.iec61970.base.generation.production.BatteryUnit
 import com.zepben.ewb.cim.iec61970.base.generation.production.PhotoVoltaicUnit
+import com.zepben.ewb.cim.iec61970.base.generation.production.PowerElectronicsUnit
 import com.zepben.ewb.cim.iec61970.base.generation.production.PowerElectronicsWindUnit
 import com.zepben.ewb.cim.iec61970.base.meas.*
 import com.zepben.ewb.cim.iec61970.base.protection.CurrentRelay
@@ -316,6 +317,7 @@ internal class NetworkTranslatorTest : TranslatorTestBase<NetworkService>(
         Sensor::class.java to { CurrentTransformer(it) },
         TransformerEnd::class.java to { PowerTransformerEnd(it) },
         WireInfo::class.java to { OverheadWireInfo(it) },
+        PowerElectronicsUnit::class.java to { BatteryUnit(it) }
     )
 
     override val excludedTables =

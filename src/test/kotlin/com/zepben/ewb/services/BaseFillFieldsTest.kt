@@ -10,6 +10,7 @@ package com.zepben.ewb.services
 
 import com.zepben.ewb.services.common.testdata.generateId
 import com.zepben.testutils.junit.SystemLogExtension
+import org.hamcrest.CoreMatchers.hasItems
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.empty
 import org.junit.jupiter.api.Test
@@ -24,6 +25,22 @@ abstract class BaseFillFieldsTest(val service: Any, val clazz: Class<*>) {
         @JvmField
         @RegisterExtension
         val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    }
+
+    @Test
+    internal fun `surface objects without fillFields`() {
+        assertThat("Every concrete type accepted by `${service::class.simpleName}.add` must have a `fillFields` extension in `${clazz.simpleName}` or a `fillFieldsCommon` extension in `FillFieldsCommonKt`. Add a filler for the missing type reported below.",
+            clazz.getFillFieldParameterTypes("fillFields") +
+                Class.forName("com.zepben.ewb.services.common.testdata.FillFieldsCommonKt")
+                    .getFillFieldParameterTypes("fillFieldsCommon"),
+            hasItems(
+                *service::class.java.methods
+                    .filter { it.name == "add" }
+                    .map { it.parameterTypes[0] }
+                    .filter { !Modifier.isAbstract(it.modifiers) }
+                    .toTypedArray()
+            )
+        )
     }
 
     @Test
@@ -52,6 +69,11 @@ abstract class BaseFillFieldsTest(val service: Any, val clazz: Class<*>) {
                     it, empty())
             }
     }
+
+    private fun Class<*>.getFillFieldParameterTypes(methodName: String) = methods
+        .filter { it.name == methodName }
+        .map { it.parameterTypes[0] }
+        .filter { !Modifier.isAbstract(it.modifiers) }
 
     private fun findUnpopulated(
         root: Any

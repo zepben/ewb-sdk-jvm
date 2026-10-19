@@ -30,9 +30,9 @@ open class Services @ZepbenExperimental constructor(
     val networkService: NetworkService = NetworkService(),
     val diagramService: DiagramService = DiagramService(),
     val customerService: CustomerService = CustomerService(),
+    val variantService: VariantService = VariantService(),
     // TODO: Create task to implement customerDiagramService in the database reading, at which point ZepbenExperimental can be removed.
     @property:ZepbenExperimental open val customerDiagramService: DiagramService,    // NOTE: Do not use unless you know better. Talk to Anthony/Kurt.
-    val variantService: VariantService = VariantService(),
 ) {
 
     @OptIn(ZepbenExperimental::class)
@@ -40,7 +40,8 @@ open class Services @ZepbenExperimental constructor(
         networkService: NetworkService = NetworkService(),
         diagramService: DiagramService = DiagramService(),
         customerService: CustomerService = CustomerService(),
-    ): this(networkService, diagramService, customerService, DiagramService())
+        variantService: VariantService = VariantService()
+    ): this(networkService, diagramService, customerService, variantService, DiagramService())
 
     /**
      * Accessor of the [networkService] to allow for destructuring.

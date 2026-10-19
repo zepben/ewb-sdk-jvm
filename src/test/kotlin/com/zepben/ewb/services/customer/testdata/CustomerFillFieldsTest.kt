@@ -6,9 +6,9 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.ewb.services.diagram.testdata
+package com.zepben.ewb.services.customer.testdata
 
 import com.zepben.ewb.services.BaseFillFieldsTest
-import com.zepben.ewb.services.diagram.DiagramService
+import com.zepben.ewb.services.customer.CustomerService
 
-class DiagramFillFieldTest: BaseFillFieldsTest(DiagramService(), Class.forName("${DiagramFillFieldTest::class.java.packageName}.FillFieldsKt"))
+class CustomerFillFieldsTest: BaseFillFieldsTest(CustomerService(), Class.forName("${CustomerFillFieldsTest::class.java.packageName}.FillFieldsKt"))

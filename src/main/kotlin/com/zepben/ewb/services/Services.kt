@@ -60,7 +60,7 @@ open class Services @ZepbenExperimental constructor(
     /**
      * Accessor of the [variantService] to allow for destructuring.
      */
-    operator fun component4(): VariantService = variantService
+    open operator fun component4(): VariantService = variantService
 
     /**
      * Accessor of the [customerDiagramService] to allow for destructuring.
@@ -68,7 +68,7 @@ open class Services @ZepbenExperimental constructor(
     @OptIn(ZepbenExperimental::class)
     open operator fun component5(): DiagramService = customerDiagramService
 
-    /*
+    /**
      * Check all available services for [mRID].
      *
      * @param mRID The [IdentifiedObject] with this [mRID] to retrieve.
@@ -92,6 +92,10 @@ open class Services @ZepbenExperimental constructor(
      */
     @OptIn(ZepbenExperimental::class)
     fun which(mRID: String): BaseService? {
-        return networkService.takeIf { it.contains(mRID) } ?: diagramService.takeIf { it.contains(mRID) } ?: customerService.takeIf { it.contains(mRID) } ?: customerDiagramService.takeIf { it.contains(mRID) } ?: variantService.takeIf { it.contains(mRID) }
+        return networkService.takeIf { it.contains(mRID) }
+            ?: diagramService.takeIf { it.contains(mRID) }
+            ?: customerService.takeIf { it.contains(mRID) }
+            ?: customerDiagramService.takeIf { it.contains(mRID) }
+            ?: variantService.takeIf { it.contains(mRID) }
     }
 }

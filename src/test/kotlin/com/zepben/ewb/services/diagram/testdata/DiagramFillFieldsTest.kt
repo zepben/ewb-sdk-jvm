@@ -6,9 +6,9 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.ewb.services.measurement.testdata
+package com.zepben.ewb.services.diagram.testdata
 
 import com.zepben.ewb.services.BaseFillFieldsTest
-import com.zepben.ewb.services.measurement.MeasurementService
+import com.zepben.ewb.services.diagram.DiagramService
 
-class MeasurementFillFieldTest: BaseFillFieldsTest(MeasurementService(), Class.forName("${MeasurementFillFieldTest::class.java.packageName}.FillFieldsKt"))
+class DiagramFillFieldsTest: BaseFillFieldsTest(DiagramService(), Class.forName("${DiagramFillFieldsTest::class.java.packageName}.FillFieldsKt"))

@@ -10,7 +10,6 @@ package com.zepben.ewb.services
 
 import com.zepben.ewb.annotations.ZepbenExperimental
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
-import com.zepben.ewb.cim.iec61970.base.core.NameType
 import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.customer.CustomerService
 import com.zepben.ewb.services.diagram.DiagramService

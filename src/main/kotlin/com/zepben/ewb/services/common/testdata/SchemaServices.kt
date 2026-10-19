@@ -18,12 +18,15 @@ import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.core.NameType
 import com.zepben.ewb.cim.iec61970.base.domain.DateTimeInterval
 import com.zepben.ewb.cim.iec61970.base.wires.*
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSetMember
 import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.common.meta.DataSource
 import com.zepben.ewb.services.common.meta.MetadataCollection
 import com.zepben.ewb.services.customer.CustomerService
 import com.zepben.ewb.services.diagram.DiagramService
 import com.zepben.ewb.services.network.NetworkService
+import com.zepben.ewb.services.variant.VariantService
 import java.time.Instant
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KVisibility
@@ -87,6 +90,20 @@ object SchemaServices {
             networkService.tryAdd(factory("emptyNotNull").also { fillRequired(networkService, it); fillEmptys(it) })
         }
 
+    fun <T : IdentifiedObject> variantServicesOf(factory: (mRID: String) -> T, filler: (T, VariantService, Boolean) -> T): VariantService =
+        VariantService().also { variantService ->
+            variantService.tryAdd(factory("empty"))
+            variantService.tryAdd(filler(factory("filled"), variantService, false))
+            variantService.tryAdd(factory("emptyNotNull").also { fillEmptys(it) })
+        }
+
+    fun variantServicesOfChangeSets(factory: (mRID: String) -> ChangeSet, filler: (ChangeSet, VariantService, Boolean) -> ChangeSet): VariantService =
+        VariantService().also { variantService ->
+            variantService.add(factory("empty"))
+            variantService.add(filler(factory("filled"), variantService, false))
+            variantService.add(factory("emptyNotNull").also { fillEmptys(it) })
+        }
+
     private fun fillRequired(service: NetworkService, io: IdentifiedObject) {
         when (io) {
             is EnergyConsumerPhase -> {
@@ -105,6 +122,12 @@ object SchemaServices {
         }
     }
 
+    fun fillRequired(io: Identifiable) {
+        if (io is ChangeSetMember) {
+            io.changeSet = ChangeSet(generateId()); io.targetObjectMRID = "member"
+        }
+    }
+
     /**
      * This functionality was created because there were a few strings that weren't nullable, and we were treating "" as null.
      * We then converted them to nullable and wanted to ensure that nothing got broken by writing/reading these from the DB/protos.
@@ -112,8 +135,8 @@ object SchemaServices {
      * Will create an 'empty' type like a default constructor, but any nullable string property will be
      * created with an empty string (""), and any nullable boolean will be created with false etc.
      *
-     * Any exception in setting the value to the empty value means there are constraints in place, and the old null
-     * replacements won't be an issue, so can safely be ignored.
+     * Properties whose setters reject the empty value (e.g. range-checked values) must be given a valid value in
+     * [findKnownNonEmpty], otherwise the setter exception will be thrown.
      */
     fun fillEmptys(io: Identifiable) {
         io::class.memberProperties
@@ -155,12 +178,7 @@ object SchemaServices {
                     else -> throw IllegalStateException("INTERNAL ERROR: You forgot to add an empty value mapper for ${prop.returnType} - used by ${io::class.simpleName}.${prop.name}")
                 }
 
-//                try {
                 prop.setter.call(io, value)
-//                } catch (_: Exception) {
-//                    // Any exception in setting the value to the empty value means there are constraints in place, and the old null
-//                    // replacements won't be an issue, so can safely be ignored.
-//                }
             }
     }
 

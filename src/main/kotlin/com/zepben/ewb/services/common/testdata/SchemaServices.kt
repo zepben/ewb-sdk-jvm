@@ -13,6 +13,7 @@ import com.zepben.ewb.cim.iec61968.common.StreetDetail
 import com.zepben.ewb.cim.iec61968.common.TownDetail
 import com.zepben.ewb.cim.iec61968.infiec61968.infcommon.Ratio
 import com.zepben.ewb.cim.iec61968.metering.ControlledAppliance
+import com.zepben.ewb.cim.iec61970.base.core.Identifiable
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.ewb.cim.iec61970.base.core.NameType
 import com.zepben.ewb.cim.iec61970.base.domain.DateTimeInterval
@@ -114,7 +115,7 @@ object SchemaServices {
      * Any exception in setting the value to the empty value means there are constraints in place, and the old null
      * replacements won't be an issue, so can safely be ignored.
      */
-    fun fillEmptys(io: IdentifiedObject) {
+    fun fillEmptys(io: Identifiable) {
         io::class.memberProperties
             .filter { it.visibility == KVisibility.PUBLIC }
             .filter { it.returnType.isMarkedNullable }
@@ -130,7 +131,7 @@ object SchemaServices {
                     prop.isNullableOf<Float>() -> 0.0f
                     prop.isNullableOf<Double>() -> 0.0
                     // We don't need to worry about references to other objects, they are covered by `filled`.
-                    prop.isNullableOf<IdentifiedObject>() -> null
+                    prop.isNullableOf<Identifiable>() -> null
                     prop.isNullableOf<ControlledAppliance>() -> ControlledAppliance(0)
                     prop.isNullableOf<DateTimeInterval>() -> DateTimeInterval(Instant.ofEpochSecond(0), Instant.ofEpochSecond(1))
                     prop.isNullableOf<Instant>() -> Instant.ofEpochSecond(0)
@@ -166,11 +167,11 @@ object SchemaServices {
     private inline fun <reified T> KMutableProperty<*>.isNullableOf(): Boolean =
         returnType.withNullability(false).isSubtypeOf(T::class.createType())
 
-    private fun KMutableProperty<*>.findKnownNonEmpty(io: IdentifiedObject): Any? {
+    private fun KMutableProperty<*>.findKnownNonEmpty(io: Identifiable): Any? {
         return tryPowerElectronicsConnectionNonEmpty(io)
     }
 
-    private fun KMutableProperty<*>.tryPowerElectronicsConnectionNonEmpty(io: IdentifiedObject): Any? =
+    private fun KMutableProperty<*>.tryPowerElectronicsConnectionNonEmpty(io: Identifiable): Any? =
         when (io) {
             is PowerElectronicsConnection -> {
                 when (name) {

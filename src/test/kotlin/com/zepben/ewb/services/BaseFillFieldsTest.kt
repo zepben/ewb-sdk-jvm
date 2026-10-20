@@ -20,6 +20,7 @@ import kotlin.reflect.KVisibility
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.kotlinFunction
 
+// can't use BaseService here bec measurement service does not inherit
 abstract class BaseFillFieldsTest(val service: Any, val clazz: Class<*>) {
     companion object {
         @JvmField

@@ -69,22 +69,6 @@ open class Services @ZepbenExperimental constructor(
     open operator fun component5(): DiagramService = customerDiagramService
 
     /**
-     * Check all available services for [mRID].
-     *
-     * @param mRID The [IdentifiedObject] with this [mRID] to retrieve.
-     * @return The [IdentifiedObject], or null if a matching [IdentifiedObject] could not be found in any service.
-     * @throws ClassCastException if the [IdentifiedObject] exists but is not of the specified type [T].
-     */
-    @OptIn(ZepbenExperimental::class)
-    inline operator fun <reified T : IdentifiedObject> get(mRID: String?): T? {
-        return networkService.get(T::class, mRID)
-            ?: diagramService.get(T::class, mRID)
-            ?: customerService.get(T::class, mRID)
-            ?: customerDiagramService.get(T::class, mRID)
-            ?: variantService.get(T::class, mRID)
-    }
-
-    /**
      * Retrieve all services that contain an [IdentifiedObject] with the given [mRID].
      *
      * @param mRID The [IdentifiedObject] with this [mRID] to look for.

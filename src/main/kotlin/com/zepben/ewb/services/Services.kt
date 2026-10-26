@@ -39,8 +39,8 @@ open class Services @ZepbenExperimental constructor(
         networkService: NetworkService = NetworkService(),
         diagramService: DiagramService = DiagramService(),
         customerService: CustomerService = CustomerService(),
-        variantService: VariantService = VariantService()
-    ): this(networkService, diagramService, customerService, variantService, DiagramService())
+        variantService: VariantService = VariantService(),
+    ) : this(networkService, diagramService, customerService, variantService, DiagramService())
 
     /**
      * Accessor of the [networkService] to allow for destructuring.
@@ -85,17 +85,17 @@ open class Services @ZepbenExperimental constructor(
     }
 
     /**
-     * Retrieve the service that contains a particular [IdentifiedObject] with the given [mRID].
+     * Retrieve all services that contain an [IdentifiedObject] with the given [mRID].
      *
      * @param mRID The [IdentifiedObject] with this [mRID] to look for.
-     * @return The relevant service, or null if a matching [IdentifiedObject] could not be found in any service.
+     * @return The services containing a matching [IdentifiedObject], or an empty list if it could not be found in any service.
      */
     @OptIn(ZepbenExperimental::class)
-    fun which(mRID: String): BaseService? {
-        return networkService.takeIf { it.contains(mRID) }
-            ?: diagramService.takeIf { it.contains(mRID) }
-            ?: customerService.takeIf { it.contains(mRID) }
-            ?: customerDiagramService.takeIf { it.contains(mRID) }
-            ?: variantService.takeIf { it.contains(mRID) }
-    }
+    fun whichAll(mRID: String): List<BaseService> = listOfNotNull(
+        networkService.takeIf { it.contains(mRID) },
+        diagramService.takeIf { it.contains(mRID) },
+        customerService.takeIf { it.contains(mRID) },
+        customerDiagramService.takeIf { it.contains(mRID) },
+        variantService.takeIf { it.contains(mRID) },
+    )
 }

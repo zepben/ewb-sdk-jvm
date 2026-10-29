@@ -889,12 +889,14 @@ fun Equipment.fillFields(service: NetworkService, includeRuntime: Boolean = true
         if (includeRuntime) {
             Feeder(generateId()).also {
                 it.addEquipment(this)
+                it.addCurrentEquipment(this)
                 service.add(it)
                 addContainer(it)
                 addCurrentContainer(it)
             }
             LvFeeder(generateId()).also {
                 it.addEquipment(this)
+                it.addCurrentEquipment(this)
                 service.add(it)
                 addContainer(it)
                 addCurrentContainer(it)

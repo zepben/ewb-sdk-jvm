@@ -39,6 +39,7 @@ fun NetworkModelProject.fillFields(service: VariantService, includeRuntime: Bool
     if (includeRuntime) {
         for (i in 0..1) {
             addChild(NetworkModelProjectStage("$mRID-child-$i").also {
+                it.parent = this
                 service.add(it)
             })
         }

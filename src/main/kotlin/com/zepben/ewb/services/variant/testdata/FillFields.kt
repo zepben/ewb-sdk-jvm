@@ -67,8 +67,14 @@ fun NetworkModelProjectComponent.fillFields(service: VariantService, includeRunt
 fun AnnotatedProjectDependency.fillFields(service: VariantService, includeRuntime: Boolean = true): AnnotatedProjectDependency {
     (this as Identifiable).fillFieldsCommon(service, includeRuntime)
     dependencyType = DependencyKind.mutuallyExclusive
-    dependencyDependentOnStage = NetworkModelProjectStage(generateId()).also { service.add(it) }
-    dependencyDependingStage = NetworkModelProjectStage(generateId()).also { service.add(it) }
+    dependencyDependentOnStage = NetworkModelProjectStage(generateId()).also {
+        it.addDependency(this)
+        service.add(it)
+    }
+    dependencyDependingStage = NetworkModelProjectStage(generateId()).also {
+        it.addDependency(this)
+        service.add(it)
+    }
 
     return this
 }
@@ -88,8 +94,16 @@ fun NetworkModelProjectStage.fillFields(service: VariantService, includeRuntime:
 
     val dependingStage = NetworkModelProjectStage(generateId()).also { service.add(it) }
     val dependentStage = NetworkModelProjectStage(generateId()).also { service.add(it) }
-    addDependency(AnnotatedProjectDependency(generateId()).also { it.dependencyDependingStage = this; it.dependencyDependentOnStage = dependentStage })
-    addDependency(AnnotatedProjectDependency(generateId()).also { it.dependencyDependentOnStage = this; it.dependencyDependingStage = dependingStage })
+    addDependency(AnnotatedProjectDependency(generateId()).also {
+        it.dependencyDependingStage = this
+        it.dependencyDependentOnStage = dependentStage
+        dependentStage.addDependency(it)
+    })
+    addDependency(AnnotatedProjectDependency(generateId()).also {
+        it.dependencyDependentOnStage = this
+        it.dependencyDependingStage = dependingStage
+        dependingStage.addDependency(it)
+    })
 
     addContainer(generateId())
 

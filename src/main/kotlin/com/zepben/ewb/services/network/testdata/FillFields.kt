@@ -339,7 +339,7 @@ fun ProtectionRelayScheme.fillFields(service: NetworkService, includeRuntime: Bo
 }
 
 fun ProtectionRelaySystem.fillFields(service: NetworkService, includeRuntime: Boolean = true): ProtectionRelaySystem {
-    (this as Equipment).fillFieldsCommon(service, includeRuntime)
+    (this as Equipment).fillFields(service, includeRuntime)
 
     protectionKind = ProtectionKind.DISTANCE
 
@@ -873,12 +873,34 @@ fun Equipment.fillFields(service: NetworkService, includeRuntime: Boolean = true
             it.addEquipment(this)
             service.add(it)
         })
+        addContainer(Site(generateId()).also {
+            it.addEquipment(this)
+            service.add(it)
+        })
+        addContainer(Substation(generateId()).also {
+            it.addEquipment(this)
+            service.add(it)
+        })
+        addContainer(LvSubstation(generateId()).also {
+            it.addEquipment(this)
+            service.add(it)
+        })
 
         if (includeRuntime) {
-            addCurrentContainer(Feeder(generateId()).also {
+            Feeder(generateId()).also {
                 it.addEquipment(this)
+                it.addCurrentEquipment(this)
                 service.add(it)
-            })
+                addContainer(it)
+                addCurrentContainer(it)
+            }
+            LvFeeder(generateId()).also {
+                it.addEquipment(this)
+                it.addCurrentEquipment(this)
+                service.add(it)
+                addContainer(it)
+                addCurrentContainer(it)
+            }
         }
     }
 
@@ -1020,8 +1042,7 @@ fun Substation.fillFields(service: NetworkService, includeRuntime: Boolean = tru
 fun Terminal.fillFields(service: NetworkService, includeRuntime: Boolean = true): Terminal {
     (this as AcDcTerminal).fillFields(service, includeRuntime)
 
-    _conductingEquipment = Junction(generateId()).also { service.add(it) }
-    conductingEquipment?.addTerminal(this)
+    Junction(generateId()).also { service.add(it) }.addTerminal(this)
 
     phases = PhaseCode.X
     sequenceNumber = 1
@@ -1252,6 +1273,7 @@ fun Breaker.fillFields(service: NetworkService, includeRuntime: Boolean = true):
     (this as ProtectedSwitch).fillFields(service, includeRuntime)
 
     inTransitTime = 1.1
+    normalFeeders.firstOrNull()?.normalHeadTerminal = terminals.firstOrNull()
 
     return this
 }
@@ -1551,6 +1573,14 @@ fun PowerElectronicsConnection.fillFields(service: NetworkService, includeRuntim
     invVarRespQAtV4 = -0.6f
     invReactivePowerMode = false
     invFixReactivePower = -1.0f
+    addUnit(BatteryUnit(generateId()).also {
+        it.powerElectronicsConnection = this
+        service.add(it)
+    })
+    addPhase(PowerElectronicsConnectionPhase(generateId()).also {
+        it.powerElectronicsConnection = this
+        service.add(it)
+    })
 
     return this
 }
@@ -1580,6 +1610,7 @@ fun PowerTransformer.fillFields(service: NetworkService, includeRuntime: Boolean
 
     repeat(2) {
         addEnd(PowerTransformerEnd(generateId()).also {
+            it.baseVoltage = BaseVoltage(generateId()).also { service.add(it) }
             it.powerTransformer = this
             service.add(it)
         })

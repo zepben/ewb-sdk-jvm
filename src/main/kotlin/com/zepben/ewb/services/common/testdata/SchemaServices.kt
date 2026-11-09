@@ -49,8 +49,7 @@ object SchemaServices {
                 throw IllegalArgumentException("Class should have a single mRID constructor: ${IO::class}", ex)
             }.apply {
                 addName(nameType, "name1")
-            }.also {
-                tryAdd(it)
+                tryAdd(this)
             }
 
             NameType("typeNullDescription").also {
@@ -95,7 +94,7 @@ object SchemaServices {
         VariantService().also { variantService ->
             variantService.tryAdd(factory("empty"))
             variantService.tryAdd(filler(factory("filled"), variantService, false))
-            variantService.tryAdd(factory("emptyNotNull").also { fillEmptys(it)})
+            variantService.tryAdd(factory("emptyNotNull").also { fillEmptys(it) })
         }
 
     fun variantServicesOfChangeSets(factory: (mRID: String) -> ChangeSet, filler: (ChangeSet, VariantService, Boolean) -> ChangeSet): VariantService =
@@ -105,7 +104,7 @@ object SchemaServices {
             variantService.add(factory("emptyNotNull").also { fillEmptys(it) })
         }
 
-    private fun fillRequired(service: NetworkService, io: Any) {
+    private fun fillRequired(service: NetworkService, io: IdentifiedObject) {
         when (io) {
             is EnergyConsumerPhase -> {
                 io.energyConsumer = EnergyConsumer(generateId()).also {
@@ -136,12 +135,11 @@ object SchemaServices {
      * Will create an 'empty' type like a default constructor, but any nullable string property will be
      * created with an empty string (""), and any nullable boolean will be created with false etc.
      *
-     * Any exception in setting the value to the empty value means there are constraints in place, and the old null
-     * replacements won't be an issue, so can safely be ignored.
+     * Properties whose setters reject the empty value (e.g. range-checked values) must be given a valid value in
+     * [findKnownNonEmpty], otherwise the setter exception will be thrown.
      */
-    fun fillEmptys(io: Any) {
+    fun fillEmptys(io: Identifiable) {
         io::class.memberProperties
-            .asSequence()
             .filter { it.visibility == KVisibility.PUBLIC }
             .filter { it.returnType.isMarkedNullable }
             .filterNot { it.name.uppercase().endsWith("MRID") } // Ignore identifiedObjectMRID, customerMRID, etc
@@ -176,6 +174,7 @@ object SchemaServices {
                             buildingNumber = ""
                         ),
                     )
+
                     else -> throw IllegalStateException("INTERNAL ERROR: You forgot to add an empty value mapper for ${prop.returnType} - used by ${io::class.simpleName}.${prop.name}")
                 }
 
@@ -186,11 +185,11 @@ object SchemaServices {
     private inline fun <reified T> KMutableProperty<*>.isNullableOf(): Boolean =
         returnType.withNullability(false).isSubtypeOf(T::class.createType())
 
-    private fun KMutableProperty<*>.findKnownNonEmpty(io: Any): Any? {
+    private fun KMutableProperty<*>.findKnownNonEmpty(io: Identifiable): Any? {
         return tryPowerElectronicsConnectionNonEmpty(io)
     }
 
-    private fun KMutableProperty<*>.tryPowerElectronicsConnectionNonEmpty(io: Any): Any? =
+    private fun KMutableProperty<*>.tryPowerElectronicsConnectionNonEmpty(io: Identifiable): Any? =
         when (io) {
             is PowerElectronicsConnection -> {
                 when (name) {

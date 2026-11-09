@@ -8,6 +8,7 @@
 
 package com.zepben.ewb.cim.iec61970.base.core
 
+import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.services.network.tracing.feeder.FeederDirection
 import com.zepben.ewb.services.network.tracing.phases.PhaseStatus
 import java.lang.ref.WeakReference
@@ -22,8 +23,8 @@ import java.lang.ref.WeakReference
  * @property sequenceNumber The orientation of the terminal connections for a multiple terminal conducting equipment.
  *                          The sequence numbering starts with 1 and additional terminals should follow in increasing order.
  *                          The first terminal is the "starting point" for a two terminal branch.
- * @property normalFeederDirection Stores the direction of the feeder head relative to this [Terminal] in the normal state of the network.
- * @property currentFeederDirection Stores the direction of the feeder head relative to this [Terminal] in the current state of the network.
+ * @property normalFeederDirection [ZBEX] Stores the direction of the feeder head relative to this [Terminal] in the normal state of the network.
+ * @property currentFeederDirection [ZBEX] Stores the direction of the feeder head relative to this [Terminal] in the current state of the network.
  * @property connectivityNode The [ConnectivityNode] this [Terminal] is connected to, or `null` if this [Terminal] is disconnected.
  */
 class Terminal(mRID: String) : AcDcTerminal(mRID) {
@@ -51,7 +52,9 @@ class Terminal(mRID: String) : AcDcTerminal(mRID) {
     var phases: PhaseCode = PhaseCode.ABC
     var sequenceNumber: Int = 0
 
+    @ZBEX
     var normalFeederDirection: FeederDirection = FeederDirection.NONE
+    @ZBEX
     var currentFeederDirection: FeederDirection = FeederDirection.NONE
 
     // The reference to the connectivity node is weak so if a Network object goes out of scope, holding a single conducting equipment
@@ -77,17 +80,19 @@ class Terminal(mRID: String) : AcDcTerminal(mRID) {
     val isConnected: Boolean; get() = connectivityNode != null
 
     /**
-     * The status of phases as traced for the normal state of the network
+     * [ZBEX] The status of phases as traced for the normal state of the network
      *
      * @return the [PhaseStatus] for the terminal in the normal state of the network.
      */
+    @ZBEX
     val normalPhases: PhaseStatus = PhaseStatus(this)
 
     /**
-     * The status of phases as traced for the current state of the network
+     * [ZBEX] The status of phases as traced for the current state of the network
      *
      * @return the [PhaseStatus] for the terminal in the current state of the network.
      */
+    @ZBEX
     val currentPhases: PhaseStatus = PhaseStatus(this)
 
     /**

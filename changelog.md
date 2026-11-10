@@ -7,7 +7,7 @@
 * None.
 
 ### Enhancements
-* None.
+* Threads created by this library now follow the convention `ewb-sdk-X`.
 
 ### Fixes
 * Fixed `EquipmentTreeBuilder` leaf calculation so nodes that later gain children are no longer reported as leaves.

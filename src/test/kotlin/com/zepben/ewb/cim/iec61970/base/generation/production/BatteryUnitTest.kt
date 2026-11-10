@@ -55,6 +55,11 @@ internal class BatteryUnitTest {
 
     @Test
     internal fun batteryControls() {
+        PrivateCollectionValidator.validateArcCollection(
+            ::BatteryUnit,
+            ::BatteryControl,
+            BatteryUnit::controls,
+        )
         PrivateCollectionValidator.validateUnordered(
             ::BatteryUnit,
             ::BatteryControl,

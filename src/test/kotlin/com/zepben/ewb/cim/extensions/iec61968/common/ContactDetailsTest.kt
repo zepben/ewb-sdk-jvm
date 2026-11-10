@@ -73,6 +73,11 @@ class ContactDetailsTest {
 
     @Test
     internal fun phoneNumbers() {
+        PrivateCollectionValidator.validateUnidentifiedArcCollection(
+            ::ContactDetails,
+            { TelephoneNumber(localNumber = it.toString()) },
+            ContactDetails::phoneNumbers,
+        )
         PrivateCollectionValidator.validateUnordered(
             ::ContactDetails,
             { TelephoneNumber(localNumber = it.toString()) },
@@ -89,6 +94,11 @@ class ContactDetailsTest {
 
     @Test
     internal fun electronicAddresses() {
+        PrivateCollectionValidator.validateUnidentifiedArcCollection(
+            ::ContactDetails,
+            { ElectronicAddress(email1 = it.toString()) },
+            ContactDetails::electronicAddresses,
+        )
         PrivateCollectionValidator.validateUnordered(
             ::ContactDetails,
             { ElectronicAddress(email1 = it.toString()) },

@@ -8,7 +8,9 @@
 
 package com.zepben.ewb.cim.iec61970.base.wires
 
-import com.zepben.ewb.services.common.extensions.asUnmodifiable
+import com.zepben.ewb.boilerplate.Backfill
+import com.zepben.ewb.boilerplate.collections.LazyMridList
+import com.zepben.ewb.boilerplate.collections.interfaces.MridCollection
 import com.zepben.ewb.services.common.extensions.getByMRID
 import com.zepben.ewb.services.common.extensions.validateReference
 
@@ -82,11 +84,35 @@ class EnergySource(mRID: String) : EnergyConnection(mRID) {
     /**
      * The phases for this energy source. The returned collection is read only.
      */
-    val phases: Collection<EnergySourcePhase> get() = _energySourcePhases.asUnmodifiable()
+    val phases: MridCollection<EnergySourcePhase> get() = LazyMridList(
+        getter = { _energySourcePhases },
+        setter = { _energySourcePhases = it },
+        owner = this,
+        elementDescription = "An EnergySourcePhase",
+        backfill = Backfill(
+            { it.energySource },
+            { it, es -> it.energySource = es },
+            EnergySourcePhase::energySource
+        )
+    )
+
+
+    // region deprecated list boilerplate
+    //
+    // ("region/endregion" is an IntelliJ feature letting you hide the entire thing)
+    // This boilerplate exists solely to enable backwards compatibility.
+    // It will be removed eventually.
+    // Every single method simply forwards the call to the corresponding list.
+
+    // region phases boilerplate
 
     /**
      * Get the number of entries in the [EnergySourcePhase] collection.
      */
+    @Deprecated(
+        message = "Use phases.size instead.",
+        replaceWith = ReplaceWith("phases.size")
+    )
     fun numPhases(): Int = _energySourcePhases?.size ?: 0
 
     /**
@@ -95,6 +121,10 @@ class EnergySource(mRID: String) : EnergyConnection(mRID) {
      * @param mRID the mRID of the required [EnergySourcePhase]
      * @return The [EnergySourcePhase] with the specified [mRID] if it exists, otherwise null
      */
+    @Deprecated(
+        message = "Use phases.getByMRID(mRID) instead.",
+        replaceWith = ReplaceWith("phases.getByMRID(mRID)")
+    )
     fun getPhase(mRID: String): EnergySourcePhase? = _energySourcePhases?.getByMRID(mRID)
 
     /**
@@ -103,6 +133,10 @@ class EnergySource(mRID: String) : EnergyConnection(mRID) {
      * @param [phase] The [EnergySourcePhase] to add.
      * @return This [EnergySource] for fluent use.
      */
+    @Deprecated(
+        message = "Use phases.add(phase) instead.",
+        replaceWith = ReplaceWith("also { it.phases.add(phase) }")
+    )
     fun addPhase(phase: EnergySourcePhase): EnergySource {
         if (validateReference(phase, ::getPhase, "An EnergySourcePhase"))
             return this
@@ -126,6 +160,10 @@ class EnergySource(mRID: String) : EnergyConnection(mRID) {
      * @param [phase] The [EnergySourcePhase] to remove.
      * @return true if [[phase]] is removed from the collection.
      */
+    @Deprecated(
+        message = "Use phases.remove(phase) instead.",
+        replaceWith = ReplaceWith("phases.remove(phase)")
+    )
     fun removePhase(phase: EnergySourcePhase): Boolean {
         val ret = _energySourcePhases?.remove(phase) == true
         if (_energySourcePhases.isNullOrEmpty()) _energySourcePhases = null
@@ -137,9 +175,16 @@ class EnergySource(mRID: String) : EnergyConnection(mRID) {
      *
      * @return This [EnergySource] for fluent use.
      */
+    @Deprecated(
+        message = "Use phases.clear() instead.",
+        replaceWith = ReplaceWith("phases.clear()")
+    )
     fun clearPhases(): EnergySource {
         _energySourcePhases = null
         return this
     }
 
+    // endregion
+
+    // endregion
 }

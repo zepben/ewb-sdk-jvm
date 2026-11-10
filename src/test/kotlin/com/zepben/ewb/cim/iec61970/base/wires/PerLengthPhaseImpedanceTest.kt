@@ -37,6 +37,17 @@ internal class PerLengthPhaseImpedanceTest {
             override fun toString(): String = "fromPhase $fromPhase and toPhase $toPhase"
         }
 
+        PrivateCollectionValidator.validateUnidentifiedArcCollection(
+            ::PerLengthPhaseImpedance,
+            { PhaseImpedanceData(SinglePhaseKind[it], SinglePhaseKind[it + 1], it.toDouble()) },
+            PerLengthPhaseImpedance::data,
+        )
+        PrivateCollectionValidator.validateCollectionValidation(
+            { PerLengthPhaseImpedance("collection-validation").data },
+            { PhaseImpedanceData(SinglePhaseKind.A, SinglePhaseKind.B, 1.0) },
+            { it.copy(b = 2.0) },
+        )
+
         PrivateCollectionValidator.validateUnordered(
             ::PerLengthPhaseImpedance,
             { PhaseImpedanceData(SinglePhaseKind[it], SinglePhaseKind[it + 1], it.toDouble()) },

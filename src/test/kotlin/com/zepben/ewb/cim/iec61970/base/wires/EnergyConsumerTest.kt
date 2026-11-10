@@ -61,6 +61,11 @@ internal class EnergyConsumerTest {
 
     @Test
     internal fun energyConsumerPhases() {
+        PrivateCollectionValidator.validateArcCollection(
+            ::EnergyConsumer,
+            ::EnergyConsumerPhase,
+            EnergyConsumer::phases,
+        )
         PrivateCollectionValidator.validateUnordered(
             ::EnergyConsumer,
             ::EnergyConsumerPhase,

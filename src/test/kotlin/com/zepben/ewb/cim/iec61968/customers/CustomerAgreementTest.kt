@@ -44,6 +44,11 @@ internal class CustomerAgreementTest {
 
     @Test
     internal fun pricingStructures() {
+        PrivateCollectionValidator.validateArcCollection(
+            ::CustomerAgreement,
+            ::PricingStructure,
+            CustomerAgreement::pricingStructures,
+        )
         PrivateCollectionValidator.validateUnordered(
             ::CustomerAgreement,
             ::PricingStructure,

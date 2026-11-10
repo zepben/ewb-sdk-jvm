@@ -44,6 +44,11 @@ internal class ProtectionRelaySystemTest {
 
     @Test
     internal fun schemes() {
+        PrivateCollectionValidator.validateArcCollection(
+            ::ProtectionRelaySystem,
+            ::ProtectionRelayScheme,
+            ProtectionRelaySystem::schemes,
+        )
         PrivateCollectionValidator.validateUnordered(
             ::ProtectionRelaySystem,
             ::ProtectionRelayScheme,

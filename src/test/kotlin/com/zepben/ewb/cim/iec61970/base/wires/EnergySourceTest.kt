@@ -115,6 +115,11 @@ internal class EnergySourceTest {
 
     @Test
     internal fun energySourcePhases() {
+        PrivateCollectionValidator.validateArcCollection(
+            ::EnergySource,
+            ::EnergySourcePhase,
+            EnergySource::phases,
+        )
         PrivateCollectionValidator.validateUnordered(
             ::EnergySource,
             ::EnergySourcePhase,

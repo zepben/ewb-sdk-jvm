@@ -48,6 +48,11 @@ internal class RelayInfoTest {
 
     @Test
     internal fun recloseDelays() {
+        PrivateCollectionValidator.validateUnidentifiedArcCollection(
+            ::RelayInfo,
+            { it.toDouble() },
+            RelayInfo::recloseDelays,
+        )
         PrivateCollectionValidator.validateOrdered(
             ::RelayInfo,
             { it.toDouble() },

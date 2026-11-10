@@ -31,6 +31,11 @@ internal class OperationalRestrictionTest {
 
     @Test
     internal fun equipment() {
+        PrivateCollectionValidator.validateArcCollection(
+            ::OperationalRestriction,
+            { id -> object : Equipment(id) {} },
+            OperationalRestriction::equipment,
+        )
         PrivateCollectionValidator.validateUnordered(
             ::OperationalRestriction,
             { id -> object : Equipment(id) {} },

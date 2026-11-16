@@ -69,6 +69,7 @@ class Feeder(mRID: String) : EquipmentContainer(mRID) {
     /**
      * The LV feeders that are normally energized by the feeder. The returned collection is read only.
      */
+    @ZBEX
     val normalEnergizedLvFeeders: Collection<LvFeeder> get() = _normalEnergizedLvFeedersById?.values.asUnmodifiable()
 
     /**

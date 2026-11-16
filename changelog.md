@@ -4,7 +4,10 @@
 * None.
 
 ### New Features
-* None.
+* Added an experimental `customerDiagramService` to `Services`, available via a new `@ZepbenExperimental` primary constructor.
+* Added `Services.whichAll` to find the services containing a given mRID.
+* The `fillFields` test data helpers and `SchemaServices` are now included in the main SDK (`com.zepben.ewb.services.*.testdata`) so they can be
+  used by downstream projects.
 
 ### Enhancements
 * None.

@@ -94,7 +94,7 @@ internal class NetworkTranslatorTest : TranslatorTestBase<NetworkService>(
         // # Extensions IEC61968 Asset Info #
         // ##################################
 
-        ValidationInfo(::RelayInfo, { fillFields(it) }, { addFromPb(it.toPb()) }),
+        ValidationInfo(::RelayInfo, { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
 
         // ################################
         // # Extensions IEC61968 Metering #

@@ -8,17 +8,28 @@
 
 package com.zepben.ewb.services.variant.translator
 
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectCreation
 import com.zepben.protobuf.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProject
 import com.zepben.protobuf.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectComponent
-import com.zepben.protobuf.cim.iec61970.infiec61970.infpart303.networkmodelprojects.AnnotatedProjectDependency
 import com.zepben.protobuf.cim.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStage
 import com.zepben.protobuf.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
 import com.zepben.protobuf.cim.iec61970.infiec61970.part303.genericdataset.ChangeSetMember
 
+// ###################################################################
+// # Extensions IEC61970 InfIEC61970 InfPart303 NetworkModelProjects #
+// ###################################################################
+
 fun NetworkModelProject.mRID(): String = nmpc.mRID()
-fun NetworkModelProjectStage.mRID(): String = nmpc.mRID()
 fun NetworkModelProjectComponent.mRID(): String = io.mrid
-fun ChangeSetMember.mRID(): String = "${changeSetMRID}_$targetObjectMRID"
+
+// ########################################################
+// # IEC61970 InfIEC61970 InfPart303 NetworkModelProjects #
+// ########################################################
+
+fun NetworkModelProjectStage.mRID(): String = nmpc.mRID()
+
+// ###############################################
+// # IEC61970 InfIEC61970 Part303 GenericDataSet #
+// ###############################################
 
 fun ChangeSet.mRID(): String = dataset.mrid
+fun ChangeSetMember.mRID(): String = "${changeSetMRID}_$targetObjectMRID"

@@ -16,8 +16,8 @@ import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.N
 import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.*
 import com.zepben.ewb.services.common.Resolvers
 import com.zepben.ewb.services.common.translator.*
-import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.variant.VariantService
+import com.zepben.protobuf.nc.NetworkIdentifiable
 import com.zepben.protobuf.vc.VariantObject
 import com.zepben.protobuf.vc.VariantObject.ObjectCase.*
 import com.zepben.protobuf.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProject as PBNetworkModelProject
@@ -32,6 +32,13 @@ import com.zepben.protobuf.cim.iec61970.infiec61970.part303.genericdataset.Objec
 import com.zepben.protobuf.cim.iec61970.infiec61970.part303.genericdataset.ObjectDeletion as PBObjectDeletion
 import com.zepben.protobuf.cim.iec61970.infiec61970.part303.genericdataset.ObjectModification as PBObjectModification
 
+/**
+ * An extension to add a converted copy of the protobuf [NetworkIdentifiable] to the [VariantService].
+ *
+ * @receiver The [VariantService] to add the converted [pb] into.
+ * @param pb The [NetworkIdentifiable] to add to the [VariantService].
+ * @return The result of trying to add the item to the service.
+ */
 fun VariantService.addFromPb(pb: VariantObject): AddFromPbResult =
     when (pb.objectCase) {
         NETWORKMODELPROJECT -> getOrAddFromPb(pb.networkModelProject.mRID()) { addFromPb(pb.networkModelProject) }
@@ -42,37 +49,92 @@ fun VariantService.addFromPb(pb: VariantObject): AddFromPbResult =
         OBJECTDELETION -> getOrAddFromPb(pb.objectDeletion.csm.mRID()) { addFromPb(pb.objectDeletion) }
         OBJECTMODIFICATION -> getOrAddFromPb(pb.objectModification.csm.mRID()) { addFromPb(pb.objectModification) }
         OTHER, OBJECT_NOT_SET, null -> throw UnsupportedOperationException(
-            "Object type ${pb.objectCase} is not supported by the variant service"
+            "Object type ${pb.objectCase} is not supported by the variant service",
         )
 
     }
+
+// ###################################################################
+// # Extensions IEC61970 InfIEC61970 InfPart303 NetworkModelProjects #
+// ###################################################################
 
 /**
  * Convert the protobuf [PBNetworkModelProject] into its CIM counterpart.
  *
  * @param pb The protobuf [PBNetworkModelProject] to convert.
- * @param networkService The [VariantService] the converted CIM object will be added too.
+ * @param variantService The [VariantService] the converted CIM object will be added too.
  * @return The converted [pb] as a CIM [NetworkModelProject].
  */
-fun toCim(pb: PBNetworkModelProject, networkService: VariantService): NetworkModelProject =
+fun toCim(pb: PBNetworkModelProject, variantService: VariantService): NetworkModelProject =
     NetworkModelProject(pb.mRID()).apply {
         externalStatus = pb.externalStatusSet.takeUnless { pb.hasExternalStatusNull() }
         forecastCommissionDate = pb.forecastCommissionDateSet.takeUnless { pb.hasForecastCommissionDateNull() }?.toInstant()
         externalDriver = pb.externalDriverSet.takeUnless { pb.hasExternalDriverNull() }
         pb.childrenMRIDsList.forEach { child ->
-            networkService.resolveOrDeferReference(Resolvers.networkModelProjectComponents(this), child)
+            variantService.resolveOrDeferReference(Resolvers.networkModelProjectComponents(this), child)
         }
-        toCim(pb.nmpc, this, networkService)
+        toCim(pb.nmpc, this, variantService)
+    }
+
+/**
+ * Convert the protobuf [PBNetworkModelProjectComponent] into its CIM counterpart.
+ *
+ * @param pb The protobuf [PBNetworkModelProjectComponent] to convert.
+ * @param cim The CIM [NetworkModelProjectComponent] to populate.
+ * @param variantService The [VariantService] the converted CIM object will be added too.
+ * @return The converted [pb] as a CIM [NetworkModelProjectComponent].
+ */
+fun toCim(pb: PBNetworkModelProjectComponent, cim: NetworkModelProjectComponent, variantService: VariantService): NetworkModelProjectComponent =
+    cim.apply {
+        created = pb.createdSet.takeUnless { pb.hasCreatedNull() }?.toInstant()
+        updated = pb.updatedSet.takeUnless { pb.hasUpdatedNull() }?.toInstant()
+        closed = pb.closedSet.takeUnless { pb.hasClosedNull() }?.toInstant()
+
+        variantService.resolveOrDeferReference(Resolvers.networkModelProjects(this), pb.parentMRID)
+
+        toCim(pb.io, this, variantService)
+    }
+
+/**
+ * An extension to add a converted copy of the protobuf [PBNetworkModelProject] to the [VariantService].
+ */
+fun VariantService.addFromPb(pb: PBNetworkModelProject): NetworkModelProject? = tryAddOrNull(toCim(pb, this))
+
+// ######################
+// # IEC61970 Base Core #
+// ######################
+
+/**
+ * An extension to add a converted copy of the protobuf [PBNameType] to the [VariantService].
+ */
+fun VariantService.addFromPb(pb: PBNameType): NameType = toCim(pb, this)
+
+// ########################################################
+// # IEC61970 InfIEC61970 InfPart303 NetworkModelProjects #
+// ########################################################
+
+/**
+ * Convert the protobuf [PBAnnotatedProjectDependency] into its CIM counterpart.
+ *
+ * @param pb The protobuf [PBAnnotatedProjectDependency] to convert.
+ * @param variantService The [VariantService] the converted CIM object will be added too.
+ * @return The converted [pb] as a CIM [AnnotatedProjectDependency].
+ */
+fun toCim(pb: PBAnnotatedProjectDependency, variantService: VariantService): AnnotatedProjectDependency =
+    AnnotatedProjectDependency(pb.mrid).apply {
+        dependencyType = mapDependencyKind.toCim(pb.dependencyType)
+        variantService.resolveOrDeferReference(Resolvers.dependentOnStage(this), pb.dependencyDependentOnStageMRID)
+        variantService.resolveOrDeferReference(Resolvers.dependingStage(this), pb.dependencyDependingStageMRID)
     }
 
 /**
  * Convert the protobuf [PBNetworkModelProjectStage] into its CIM counterpart.
  *
  * @param pb The protobuf [PBNetworkModelProjectStage] to convert.
- * @param networkService The [VariantService] the converted CIM object will be added too.
+ * @param variantService The [VariantService] the converted CIM object will be added too.
  * @return The converted [pb] as a CIM [NetworkModelProjectStage].
  */
-fun toCim(pb: PBNetworkModelProjectStage, networkService: VariantService): NetworkModelProjectStage =
+fun toCim(pb: PBNetworkModelProjectStage, variantService: VariantService): NetworkModelProjectStage =
     NetworkModelProjectStage(pb.mRID()).apply {
         plannedCommissionedDate = pb.plannedCommissionedDateSet.takeUnless { pb.hasPlannedCommissionedDateNull() }?.toInstant()
         commissionedDate = pb.commissionedDateSet.takeUnless { pb.hasCommissionedDateNull() }?.toInstant()
@@ -81,53 +143,21 @@ fun toCim(pb: PBNetworkModelProjectStage, networkService: VariantService): Netwo
         lastConflictCheckedAt = pb.lastConflictCheckedAtSet.takeUnless { pb.hasLastConflictCheckedAtNull() }?.toInstant()
         userComments = pb.userCommentsSet.takeUnless { pb.hasUserCommentsNull() }
         pb.changeSetMRIDSet.takeUnless { pb.hasChangeSetMRIDNull() }?.let {
-            networkService.resolveOrDeferReference(Resolvers.changeSet(this), it)
+            variantService.resolveOrDeferReference(Resolvers.changeSet(this), it)
         }
 
         pb.dependingStageMRIDList.forEach {
-            networkService.resolveOrDeferReference(Resolvers.dependency(this), it)
+            variantService.resolveOrDeferReference(Resolvers.dependency(this), it)
         }
         // TODO: need to remove this MRID list
         pb.dependentOnStageMRIDList.forEach {
-            networkService.resolveOrDeferReference(Resolvers.dependency(this), it)
+            variantService.resolveOrDeferReference(Resolvers.dependency(this), it)
         }
         pb.equipmentContainerMRIDsList.forEach { ec ->
             addContainer(ec)
         }
 
-        toCim(pb.nmpc, this, networkService)
-    }
-
-/**
- * Convert the protobuf [PBNetworkModelProjectComponent] into its CIM counterpart.
- *
- * @param pb The protobuf [PBNetworkModelProjectComponent] to convert.
- * @param networkService The [VariantService] the converted CIM object will be added too.
- * @return The converted [pb] as a CIM [NetworkModelProjectComponent].
- */
-fun toCim(pb: PBNetworkModelProjectComponent, cim: NetworkModelProjectComponent, networkService: VariantService): NetworkModelProjectComponent =
-    cim.apply {
-        created = pb.createdSet.takeUnless { pb.hasCreatedNull() }?.toInstant()
-        updated = pb.updatedSet.takeUnless { pb.hasUpdatedNull() }?.toInstant()
-        closed = pb.closedSet.takeUnless { pb.hasClosedNull() }?.toInstant()
-
-        networkService.resolveOrDeferReference(Resolvers.networkModelProjects(this), pb.parentMRID)
-
-        toCim(pb.io, this, networkService)
-    }
-
-/**
- * Convert the protobuf [PBAnnotatedProjectDependency] into its CIM counterpart.
- *
- * @param pb The protobuf [PBAnnotatedProjectDependency] to convert.
- * @param networkService The [VariantService] the converted CIM object will be added too.
- * @return The converted [pb] as a CIM [AnnotatedProjectDependency].
- */
-fun toCim(pb: PBAnnotatedProjectDependency, networkService: VariantService): AnnotatedProjectDependency =
-    AnnotatedProjectDependency(pb.mrid).apply {
-        dependencyType = mapDependencyKind.toCim(pb.dependencyType)
-        networkService.resolveOrDeferReference(Resolvers.dependentOnStage(this), pb.dependencyDependentOnStageMRID)
-        networkService.resolveOrDeferReference(Resolvers.dependingStage(this), pb.dependencyDependingStageMRID)
+        toCim(pb.nmpc, this, variantService)
     }
 
 /**
@@ -136,36 +166,27 @@ fun toCim(pb: PBAnnotatedProjectDependency, networkService: VariantService): Ann
 fun VariantService.addFromPb(pb: PBAnnotatedProjectDependency): AnnotatedProjectDependency? = tryAddOrNull(toCim(pb, this))
 
 /**
- * Convert the protobuf [PBDataSet] into its CIM counterpart.
- *
- * @param pb The protobuf [PBDataSet] to convert.
- * @param networkService The [VariantService] the converted CIM object will be added too.
- * @return The converted [pb] as a CIM [DataSet].
+ * An extension to add a converted copy of the protobuf [PBNetworkModelProjectStage] to the [VariantService].
  */
-fun toCim(pb: PBDataSet, cim: DataSet): DataSet =
-    cim.apply {
-        description = pb.descriptionSet.takeUnless { pb.hasDescriptionNull() }
-        name = pb.nameSet.takeUnless { pb.hasNameNull() }
-    }
+fun VariantService.addFromPb(pb: PBNetworkModelProjectStage): NetworkModelProjectStage? = tryAddOrNull(toCim(pb, this))
 
-/**
- * An extension to add a converted copy of the protobuf [PBNameType] to the [NetworkService].
- */
-fun VariantService.addFromPb(pb: PBNameType): NameType = toCim(pb, this) // Special case
+// ###############################################
+// # IEC61970 InfIEC61970 Part303 GenericDataSet #
+// ###############################################
 
 /**
  * Convert the protobuf [PBChangeSet] into its CIM counterpart.
  *
  * @param pb The protobuf [PBChangeSet] to convert.
- * @param networkService The [VariantService] the converted CIM object will be added too.
+ * @param variantService The [VariantService] the converted CIM object will be added too.
  * @return The converted [pb] as a CIM [ChangeSet].
  */
-fun toCim(pb: PBChangeSet, networkService: VariantService): ChangeSet =
+fun toCim(pb: PBChangeSet, variantService: VariantService): ChangeSet =
     ChangeSet(pb.mRID()).apply {
-        networkService.resolveOrDeferReference(Resolvers.stage(this), pb.networkModelProjectStageMRID)
+        variantService.resolveOrDeferReference(Resolvers.stage(this), pb.networkModelProjectStageMRID)
 
         pb.changeSetMemberMRIDsList.forEach {
-            networkService.resolveOrDeferReference(Resolvers.member(this), it)
+            variantService.resolveOrDeferReference(Resolvers.member(this), it)
         }
         toCim(pb.dataset, this)
     }
@@ -185,62 +206,63 @@ fun toCim(pb: PBChangeSetMember, cim: ChangeSetMember, service: VariantService):
     }
 
 /**
+ * Convert the protobuf [PBDataSet] into its CIM counterpart.
+ *
+ * @param pb The protobuf [PBDataSet] to convert.
+ * @param cim The CIM [DataSet] to populate.
+ * @return The converted [pb] as a CIM [DataSet].
+ */
+fun toCim(pb: PBDataSet, cim: DataSet): DataSet =
+    cim.apply {
+        description = pb.descriptionSet.takeUnless { pb.hasDescriptionNull() }
+        name = pb.nameSet.takeUnless { pb.hasNameNull() }
+    }
+
+/**
  * Convert the protobuf [PBObjectCreation] into its CIM counterpart.
  *
  * @param pb The protobuf [PBObjectCreation] to convert.
- * @param networkService The [VariantService] the converted CIM object will be added too.
+ * @param variantService The [VariantService] the converted CIM object will be added too.
  * @return The converted [pb] as a CIM [ObjectCreation].
  */
-fun toCim(pb: PBObjectCreation, networkService: VariantService): ObjectCreation =
+fun toCim(pb: PBObjectCreation, variantService: VariantService): ObjectCreation =
     ObjectCreation().apply {
-        toCim(pb.csm, this, networkService)
+        toCim(pb.csm, this, variantService)
     }
 
 /**
  * Convert the protobuf [PBObjectDeletion] into its CIM counterpart.
  *
  * @param pb The protobuf [PBObjectDeletion] to convert.
- * @param networkService The [VariantService] the converted CIM object will be added too.
+ * @param variantService The [VariantService] the converted CIM object will be added too.
  * @return The converted [pb] as a CIM [ObjectDeletion].
  */
-fun toCim(pb: PBObjectDeletion, networkService: VariantService): ObjectDeletion =
+fun toCim(pb: PBObjectDeletion, variantService: VariantService): ObjectDeletion =
     ObjectDeletion().apply {
-        toCim(pb.csm, this, networkService)
+        toCim(pb.csm, this, variantService)
     }
 
 /**
  * Convert the protobuf [PBObjectModification] into its CIM counterpart.
  *
  * @param pb The protobuf [PBObjectModification] to convert.
- * @param networkService The [VariantService] the converted CIM object will be added too.
+ * @param variantService The [VariantService] the converted CIM object will be added too.
  * @return The converted [pb] as a CIM [ObjectModification].
  */
-fun toCim(pb: PBObjectModification, networkService: VariantService): ObjectModification =
+fun toCim(pb: PBObjectModification, variantService: VariantService): ObjectModification =
     ObjectModification().apply {
-        toCim(pb.csm, this, networkService)
+        toCim(pb.csm, this, variantService)
     }
-
-/**
- * An extension to add a converted copy of the protobuf [PBNetworkModelProject] to the [VariantService].
- */
-fun VariantService.addFromPb(pb: PBNetworkModelProject): NetworkModelProject? = tryAddOrNull(toCim(pb, this))
-
-/**
- * An extension to add a converted copy of the protobuf [PBNetworkModelProjectStage] to the [VariantService].
- */
-fun VariantService.addFromPb(pb: PBNetworkModelProjectStage): NetworkModelProjectStage? = tryAddOrNull(toCim(pb, this))
 
 /**
  * An extension to add a converted copy of the protobuf [PBChangeSet] to the [VariantService].
  */
 fun VariantService.addFromPb(pb: PBChangeSet): ChangeSet? = tryAddOrNull(toCim(pb, this))
 
-
 /**
  * An extension to add a converted copy of the protobuf [PBObjectCreation] to the [VariantService].
  */
 fun VariantService.addFromPb(pb: PBObjectCreation): ObjectCreation? = tryAddOrNull(toCim(pb, this))
-
 
 /**
  * An extension to add a converted copy of the protobuf [PBObjectDeletion] to the [VariantService].
@@ -263,14 +285,9 @@ fun VariantService.addFromPb(pb: PBObjectModification): ObjectModification? = tr
  */
 class VariantProtoToCim(val variantService: VariantService) : BaseProtoToCim() {
 
-    /**
-     * Add a converted copy of the protobuf [PBAnnotatedProjectDependency] to the [VariantService].
-     *
-     * @param pb The [PBAnnotatedProjectDependency] to convert.
-     * @return The converted [AnnotatedProjectDependency]
-     */
-    fun addFromPb(pb: PBAnnotatedProjectDependency): AnnotatedProjectDependency? = variantService.addFromPb(pb)
-
+    // ###################################################################
+    // # Extensions IEC61970 InfIEC61970 InfPart303 NetworkModelProjects #
+    // ###################################################################
 
     /**
      * Add a converted copy of the protobuf [PBNetworkModelProject] to the [VariantService].
@@ -280,6 +297,17 @@ class VariantProtoToCim(val variantService: VariantService) : BaseProtoToCim() {
      */
     fun addFromPb(pb: PBNetworkModelProject): NetworkModelProject? = variantService.addFromPb(pb)
 
+    // ########################################################
+    // # IEC61970 InfIEC61970 InfPart303 NetworkModelProjects #
+    // ########################################################
+    /**
+     * Add a converted copy of the protobuf [PBAnnotatedProjectDependency] to the [VariantService].
+     *
+     * @param pb The [PBAnnotatedProjectDependency] to convert.
+     * @return The converted [AnnotatedProjectDependency]
+     */
+    fun addFromPb(pb: PBAnnotatedProjectDependency): AnnotatedProjectDependency? = variantService.addFromPb(pb)
+
     /**
      * Add a converted copy of the protobuf [PBNetworkModelProjectStage] to the [VariantService].
      *
@@ -287,6 +315,10 @@ class VariantProtoToCim(val variantService: VariantService) : BaseProtoToCim() {
      * @return The converted [NetworkModelProjectStage]
      */
     fun addFromPb(pb: PBNetworkModelProjectStage): NetworkModelProjectStage? = variantService.addFromPb(pb)
+
+    // ###############################################
+    // # IEC61970 InfIEC61970 Part303 GenericDataSet #
+    // ###############################################
 
     /**
      * Add a converted copy of the protobuf [PBChangeSet] to the [VariantService].

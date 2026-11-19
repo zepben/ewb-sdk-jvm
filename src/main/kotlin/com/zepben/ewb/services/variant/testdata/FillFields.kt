@@ -38,10 +38,12 @@ fun NetworkModelProject.fillFields(service: VariantService, includeRuntime: Bool
     @Suppress("unused")
     if (includeRuntime) {
         for (i in 0..1) {
-            addChild(NetworkModelProjectStage("$mRID-child-$i").also {
-                it.parent = this
-                service.add(it)
-            })
+            addChild(
+                NetworkModelProjectStage("$mRID-child-$i").also {
+                    it.parent = this
+                    service.add(it)
+                },
+            )
         }
     }
 
@@ -94,16 +96,20 @@ fun NetworkModelProjectStage.fillFields(service: VariantService, includeRuntime:
 
     val dependingStage = NetworkModelProjectStage(generateId()).also { service.add(it) }
     val dependentStage = NetworkModelProjectStage(generateId()).also { service.add(it) }
-    addDependency(AnnotatedProjectDependency(generateId()).also {
-        it.dependencyDependingStage = this
-        it.dependencyDependentOnStage = dependentStage
-        dependentStage.addDependency(it)
-    })
-    addDependency(AnnotatedProjectDependency(generateId()).also {
-        it.dependencyDependentOnStage = this
-        it.dependencyDependingStage = dependingStage
-        dependingStage.addDependency(it)
-    })
+    addDependency(
+        AnnotatedProjectDependency(generateId()).also {
+            it.dependencyDependingStage = this
+            it.dependencyDependentOnStage = dependentStage
+            dependentStage.addDependency(it)
+        },
+    )
+    addDependency(
+        AnnotatedProjectDependency(generateId()).also {
+            it.dependencyDependentOnStage = this
+            it.dependencyDependingStage = dependingStage
+            dependingStage.addDependency(it)
+        },
+    )
 
     addContainer(generateId())
 
@@ -126,14 +132,6 @@ fun ChangeSet.fillFields(service: VariantService, includeRuntime: Boolean = true
     return this
 }
 
-@Suppress("UNUSED_PARAMETER")
-fun DataSet.fillFields(service: VariantService, includeRuntime: Boolean = true): DataSet {
-    name = "1"
-    description = "the description"
-
-    return this
-}
-
 fun ChangeSetMember.fillFields(service: VariantService, includeRuntime: Boolean): ChangeSetMember {
     (this as Identifiable).fillFieldsCommon(service, includeRuntime)
     val cs = ChangeSet(generateId()).also { service.add(it) }
@@ -144,12 +142,18 @@ fun ChangeSetMember.fillFields(service: VariantService, includeRuntime: Boolean)
     return this
 }
 
+@Suppress("UNUSED_PARAMETER")
+fun DataSet.fillFields(service: VariantService, includeRuntime: Boolean = true): DataSet {
+    name = "1"
+    description = "the description"
+
+    return this
+}
 
 fun ObjectCreation.fillFields(service: VariantService, includeRuntime: Boolean = true): ObjectCreation {
     (this as ChangeSetMember).fillFields(service, includeRuntime)
     return this
 }
-
 
 fun ObjectDeletion.fillFields(service: VariantService, includeRuntime: Boolean = true): ObjectDeletion {
     (this as ChangeSetMember).fillFields(service, includeRuntime)

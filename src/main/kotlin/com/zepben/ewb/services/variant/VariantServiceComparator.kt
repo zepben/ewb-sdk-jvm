@@ -26,6 +26,24 @@ import com.zepben.ewb.services.common.ObjectDifference
 @Suppress("unused")
 class VariantServiceComparator : BaseServiceComparator() {
 
+    // ###################################################################
+    // # Extensions IEC61970 InfIEC61970 InfPart303 NetworkModelProjects #
+    // ###################################################################
+
+    private fun compareNetworkModelProject(source: NetworkModelProject, target: NetworkModelProject): ObjectDifference<NetworkModelProject> =
+        ObjectDifference(source, target).apply {
+            compareNetworkModelProjectComponent()
+            compareValues(
+                NetworkModelProject::externalStatus,
+                NetworkModelProject::forecastCommissionDate,
+                NetworkModelProject::externalDriver,
+            )
+            compareIdReferenceCollections(
+                NetworkModelProject::children,
+            )
+
+        }
+
     private fun ObjectDifference<out NetworkModelProjectComponent>.compareNetworkModelProjectComponent(): ObjectDifference<out NetworkModelProjectComponent> =
         ObjectDifference(source, target).apply {
             compareIdentifiedObject()
@@ -37,21 +55,30 @@ class VariantServiceComparator : BaseServiceComparator() {
             compareIdReferences(NetworkModelProjectComponent::parent)
         }
 
-    fun compareNetworkModelProject(source: NetworkModelProject, target: NetworkModelProject): ObjectDifference<NetworkModelProject> =
+    // ############################################
+    // # IEC61970 InfPart303 NetworkModelProjects #
+    // ############################################
+
+    private fun compareAnnotatedProjectDependencies(
+        source: AnnotatedProjectDependency,
+        target: AnnotatedProjectDependency,
+    ): ObjectDifference<AnnotatedProjectDependency> =
         ObjectDifference(source, target).apply {
-            compareNetworkModelProjectComponent()
+            compareIdentifiable()
             compareValues(
-                NetworkModelProject::externalStatus,
-                NetworkModelProject::forecastCommissionDate,
-                NetworkModelProject::externalDriver,
+                AnnotatedProjectDependency::dependencyType,
             )
-            compareIdReferenceCollections(
-                NetworkModelProject::children
+            compareIdReferences(
+                AnnotatedProjectDependency::dependencyDependentOnStage,
+                AnnotatedProjectDependency::dependencyDependingStage,
             )
 
         }
 
-    fun compareNetworkModelProjectStage(source: NetworkModelProjectStage, target: NetworkModelProjectStage): ObjectDifference<NetworkModelProjectStage> =
+    private fun compareNetworkModelProjectStage(
+        source: NetworkModelProjectStage,
+        target: NetworkModelProjectStage,
+    ): ObjectDifference<NetworkModelProjectStage> =
         ObjectDifference(source, target).apply {
             compareNetworkModelProjectComponent()
             compareValues(
@@ -70,26 +97,11 @@ class VariantServiceComparator : BaseServiceComparator() {
 
         }
 
-    fun compareAnnotatedProjectDependencies(source: AnnotatedProjectDependency, target: AnnotatedProjectDependency): ObjectDifference<AnnotatedProjectDependency> =
-        ObjectDifference(source, target).apply {
-            compareIdentifiable()
-            compareValues(
-                AnnotatedProjectDependency::dependencyType,
-            )
-            compareIdReferences(
-                AnnotatedProjectDependency::dependencyDependentOnStage,
-                AnnotatedProjectDependency::dependencyDependingStage,
-            )
+    // ###################################
+    // # IEC61970 Part303 GenericDataSet #
+    // ###################################
 
-        }
-
-    private fun ObjectDifference<out DataSet>.compareDataSet(): ObjectDifference<out DataSet> =
-        ObjectDifference(source, target).apply {
-            compareIdentifiable()
-            compareValues(DataSet::name, DataSet::description)
-        }
-
-    fun compareChangeSets(source: ChangeSet, target: ChangeSet): ObjectDifference<ChangeSet> =
+    private fun compareChangeSets(source: ChangeSet, target: ChangeSet): ObjectDifference<ChangeSet> =
         ObjectDifference(source, target).apply {
             compareDataSet()
             compareIdReferenceCollections(ChangeSet::members)
@@ -103,17 +115,23 @@ class VariantServiceComparator : BaseServiceComparator() {
             compareIdReferences(ChangeSetMember::changeSet)
         }
 
-    fun compareObjectCreation(source: ObjectCreation, target: ObjectCreation): ObjectDifference<ObjectCreation> =
+    private fun ObjectDifference<out DataSet>.compareDataSet(): ObjectDifference<out DataSet> =
+        ObjectDifference(source, target).apply {
+            compareIdentifiable()
+            compareValues(DataSet::name, DataSet::description)
+        }
+
+    private fun compareObjectCreation(source: ObjectCreation, target: ObjectCreation): ObjectDifference<ObjectCreation> =
         ObjectDifference(source, target).apply {
             compareChangeSetMember()
         }
 
-    fun compareObjectDeletion(source: ObjectDeletion, target: ObjectDeletion): ObjectDifference<ObjectDeletion> =
+    private fun compareObjectDeletion(source: ObjectDeletion, target: ObjectDeletion): ObjectDifference<ObjectDeletion> =
         ObjectDifference(source, target).apply {
             compareChangeSetMember()
         }
 
-    fun compareObjectModification(source: ObjectModification, target: ObjectModification): ObjectDifference<ObjectModification> =
+    private fun compareObjectModification(source: ObjectModification, target: ObjectModification): ObjectDifference<ObjectModification> =
         ObjectDifference(source, target).apply {
             compareChangeSetMember()
         }

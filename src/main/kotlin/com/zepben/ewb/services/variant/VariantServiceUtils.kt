@@ -38,9 +38,7 @@ inline fun <R> whenVariantIdentifiedObject(
     isObjectCreation: (ObjectCreation) -> R,
     isObjectDeletion: (ObjectDeletion) -> R,
     isObjectModification: (ObjectModification) -> R,
-    isOther: (Any) -> R = { obj: Any ->
-        throw IllegalArgumentException("Identified object type ${obj::class} is not supported by the network model project service")
-    }
+    isOther: (Identifiable) -> R = { throw IllegalArgumentException("Identifiable type ${it::class} is not supported by the variant service") },
 ): R = when (identifiable) {
     is NetworkModelProject -> isNetworkModelProject(identifiable)
     is NetworkModelProjectStage -> isNetworkModelProjectStage(identifiable)

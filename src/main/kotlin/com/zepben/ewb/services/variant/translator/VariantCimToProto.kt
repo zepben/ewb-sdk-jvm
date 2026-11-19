@@ -32,12 +32,14 @@ import com.zepben.protobuf.cim.iec61970.infiec61970.part303.genericdataset.Objec
 import com.zepben.protobuf.cim.iec61970.infiec61970.part303.genericdataset.ObjectModification as PBObjectModification
 
 /**
- * Convert the [variantObject] to a [VariantObject] representation.
+ * Convert the [identifiable] to a [VariantObject] representation.
+ *
+ * @param identifiable The [Identifiable] to convert.
  */
-fun variantObject(identified: Identifiable): VariantObject =
+fun variantObject(identifiable: Identifiable): VariantObject =
     VariantObject.newBuilder().apply {
         whenVariantIdentifiedObject(
-            identified,
+            identifiable,
             isNetworkModelProject = { networkModelProject = it.toPb() },
             isNetworkModelProjectStage = { networkModelProjectStage = it.toPb() },
             isAnnotatedProjectDependency = { annotatedProjectDependency = it.toPb() },
@@ -93,7 +95,6 @@ fun toPb(cim: NetworkModelProjectComponent, pb: PBNetworkModelProjectComponent.B
  * An extension for converting any [NetworkModelProject] into its protobuf counterpart.
  */
 fun NetworkModelProject.toPb(): PBNetworkModelProject = toPb(this, PBNetworkModelProject.newBuilder()).build()
-
 
 // ########################################################
 // # IEC61970 InfIEC61970 InfPart303 NetworkModelProjects #
@@ -157,20 +158,6 @@ fun NetworkModelProjectStage.toPb(): PBNetworkModelProjectStage = toPb(this, PBN
 // ###############################################
 
 /**
- * Convert the [DataSet] into its protobuf counterpart.
- *
- * @param cim The [DataSet] to convert.
- * @param pb The protobuf builder to populate.
- * @return [pb] for fluent use.
- */
-fun toPb(cim: DataSet, pb: PBDataSet.Builder): PBDataSet.Builder =
-    pb.apply {
-        mrid = cim.mRID
-        cim.name?.also { nameSet = it } ?: run { nameNull = NullValue.NULL_VALUE }
-        cim.description?.also { descriptionSet = it } ?: run { descriptionNull = NullValue.NULL_VALUE }
-    }
-
-/**
  * Convert the [ChangeSet] into its protobuf counterpart.
  *
  * @param cim The [ChangeSet] to convert.
@@ -197,6 +184,20 @@ fun toPb(cim: ChangeSetMember, pb: PBChangeSetMember.Builder): PBChangeSetMember
     pb.apply {
         changeSetMRID = cim.changeSet.mRID
         targetObjectMRID = cim.targetObjectMRID
+    }
+
+/**
+ * Convert the [DataSet] into its protobuf counterpart.
+ *
+ * @param cim The [DataSet] to convert.
+ * @param pb The protobuf builder to populate.
+ * @return [pb] for fluent use.
+ */
+fun toPb(cim: DataSet, pb: PBDataSet.Builder): PBDataSet.Builder =
+    pb.apply {
+        mrid = cim.mRID
+        cim.name?.also { nameSet = it } ?: run { nameNull = NullValue.NULL_VALUE }
+        cim.description?.also { descriptionSet = it } ?: run { descriptionNull = NullValue.NULL_VALUE }
     }
 
 /**
@@ -263,7 +264,11 @@ fun ObjectModification.toPb(): PBObjectModification = toPb(this, PBObjectModific
 /**
  * A helper class for Java friendly convertion from CIM objects to their protobuf counterparts.
  */
-class VariantServiceCimToProto: BaseCimToProto() {
+class VariantServiceCimToProto : BaseCimToProto() {
+
+    // ###################################################################
+    // # Extensions IEC61970 InfIEC61970 InfPart303 NetworkModelProjects #
+    // ###################################################################
 
     /**
      * Convert the [NetworkModelProject] into its protobuf counterpart.
@@ -272,6 +277,10 @@ class VariantServiceCimToProto: BaseCimToProto() {
      * @return the protobuf form of [cim]
      */
     fun toPb(cim: NetworkModelProject): PBNetworkModelProject = cim.toPb()
+
+    // ########################################################
+    // # IEC61970 InfIEC61970 InfPart303 NetworkModelProjects #
+    // ########################################################
 
     /**
      * Convert the [AnnotatedProjectDependency] into its protobuf counterpart.
@@ -288,6 +297,10 @@ class VariantServiceCimToProto: BaseCimToProto() {
      * @return the protobuf form of [cim]
      */
     fun toPb(cim: NetworkModelProjectStage): PBNetworkModelProjectStage = cim.toPb()
+
+    // ###############################################
+    // # IEC61970 InfIEC61970 Part303 GenericDataSet #
+    // ###############################################
 
     /**
      * Convert the [ChangeSet] into its protobuf counterpart.

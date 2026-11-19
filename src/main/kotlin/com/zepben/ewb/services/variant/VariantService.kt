@@ -12,7 +12,10 @@ import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmode
 import com.zepben.ewb.cim.extensions.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectComponent
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.AnnotatedProjectDependency
 import com.zepben.ewb.cim.iec61970.infiec61970.infpart303.networkmodelprojects.NetworkModelProjectStage
-import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.*
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ChangeSet
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectCreation
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectDeletion
+import com.zepben.ewb.cim.iec61970.infiec61970.part303.genericdataset.ObjectModification
 import com.zepben.ewb.services.common.BaseService
 import com.zepben.ewb.services.common.meta.MetadataCollection
 import java.time.Instant
@@ -82,14 +85,13 @@ class VariantService(name: String = "variants", metadata: MetadataCollection = M
     // # IEC61970 Part303 GenericDataSet #
     // ###################################
 
-
     /**
      * Add the [changeSet] to this service.
      *
      * @param changeSet The [ChangeSet] to add.
      * @return `true` if the item was added to the service, otherwise false.
      */
-    fun add(changeSet: ChangeSet): Boolean  = super.add(changeSet)
+    fun add(changeSet: ChangeSet): Boolean = super.add(changeSet)
 
     /**
      * Remove the [changeSet] from this service.

@@ -47,7 +47,7 @@ class QueryNetworkStateClient(
     @JvmOverloads
     constructor(channel: Channel, networkStateIssues: NetworkStateIssues, callCredentials: CallCredentials? = null) :
         this(
-            QueryNetworkStateServiceGrpc.newStub(channel).withExecutor(Executors.newSingleThreadExecutor()).apply {
+            QueryNetworkStateServiceGrpc.newStub(channel).withExecutor(GrpcExecutorFactory.create("query-network-state")).apply {
                 callCredentials?.let { withCallCredentials(it) }
             },
             networkStateIssues,

@@ -8,6 +8,9 @@
 * Added `Services.whichAll` to find the services containing a given mRID.
 * The `fillFields` test data helpers and `SchemaServices` are now included in the main SDK (`com.zepben.ewb.services.*.testdata`) so they can be
   used by downstream projects.
+* Added `TiePointCollector`, a `NetworkTrace` step action that calculates the tie points of a trace once it completes. A tie point is any open `Switch`
+  in the trace results, where at least one connected piece of `ConductingEquipment` is outside the trace results. `TiePointCollector.calculateTiePoints`
+  can also be used to calculate the tie points of existing trace results.
 
 ### Enhancements
 * Threads created by this library now follow the convention `ewb-sdk-X`.

@@ -1,0 +1,22 @@
+{
+  "someSidebar": [
+    "sdk-overview",
+    "sdk-data-model",
+    "sdk-services",
+    "sdk-phases",
+    "sdk-tracing",
+    "sdk-consumer",
+    "sdk-protection",
+    "sdk-metrics",
+    {
+      "type": "category",
+      "label": "Network State",
+      "items": [
+        "query-network-state-client",
+        "query-network-state-service",
+        "update-network-state-client",
+        "update-network-state-service"
+      ]
+    }
+  ]
+}

@@ -2,6 +2,7 @@
 
 | Version         | Released            |
 |-----------------|---------------------|
+|[1.16.0](#1160)| `23 November 2026` |
 |[1.15.0](#1150)| `21 September 2026` |
 |[1.14.0](#1140)| `02 September 2026` |
 |[1.13.0](#1130)| `04 August 2026` |
@@ -55,6 +56,31 @@
 ---
 
 NOTE: This library is not yet stable, and breaking changes should be expected until a 1.0.0 release.
+
+---
+
+## [1.16.0]
+
+### Breaking Changes
+* None.
+
+### New Features
+* Added an experimental `customerDiagramService` to `Services`, available via a new `@ZepbenExperimental` primary constructor.
+* Added `Services.whichAll` to find the services containing a given mRID.
+* The `fillFields` test data helpers and `SchemaServices` are now included in the main SDK (`com.zepben.ewb.services.*.testdata`) so they can be
+  used by downstream projects.
+* Added `TiePointCollector`, a `NetworkTrace` step action that calculates the tie points of a trace once it completes. A tie point is any open `Switch`
+  in the trace results, where at least one connected piece of `ConductingEquipment` is outside the trace results. `TiePointCollector.calculateTiePoints`
+  can also be used to calculate the tie points of existing trace results.
+
+### Enhancements
+* Threads created by this library now follow the convention `ewb-sdk-X`.
+
+### Fixes
+* Fixed `EquipmentTreeBuilder` leaf calculation so nodes that later gain children are no longer reported as leaves.
+
+### Notes
+* None.
 
 ---
 

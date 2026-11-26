@@ -31,6 +31,11 @@ internal class SensorTest {
 
     @Test
     internal fun relayFunctions() {
+        PrivateCollectionValidator.validateArcCollection(
+            { id -> object : Sensor(id) {} },
+            { id -> object : ProtectionRelayFunction(id) {} },
+            Sensor::relayFunctions,
+        )
         PrivateCollectionValidator.validateUnordered(
             { id -> object : Sensor(id) {} },
             { id -> object : ProtectionRelayFunction(id) {} },

@@ -25,6 +25,11 @@ internal class LoopTest {
 
     @Test
     internal fun circuitAssociations() {
+        PrivateCollectionValidator.validateArcCollection(
+            ::Loop,
+            ::Circuit,
+            Loop::circuits,
+        )
         PrivateCollectionValidator.validateUnordered(
             ::Loop,
             ::Circuit,
@@ -39,6 +44,11 @@ internal class LoopTest {
 
     @Test
     internal fun substationAssociations() {
+        PrivateCollectionValidator.validateArcCollection(
+            ::Loop,
+            ::Substation,
+            Loop::substations,
+        )
         PrivateCollectionValidator.validateUnordered(
             ::Loop,
             ::Substation,
@@ -53,6 +63,11 @@ internal class LoopTest {
 
     @Test
     internal fun energizingSubstationAssociations() {
+        PrivateCollectionValidator.validateArcCollection(
+            ::Loop,
+            ::Substation,
+            Loop::energizingSubstations,
+        )
         PrivateCollectionValidator.validateUnordered(
             ::Loop,
             ::Substation,

@@ -46,6 +46,11 @@ internal class ProtectedSwitchTest {
 
     @Test
     internal fun relayFunctions() {
+        PrivateCollectionValidator.validateArcCollection(
+            { id -> object : ProtectedSwitch(id) {} },
+            { id -> object : ProtectionRelayFunction(id) {} },
+            ProtectedSwitch::relayFunctions,
+        )
         PrivateCollectionValidator.validateUnordered(
             { id -> object : ProtectedSwitch(id) {} },
             { id -> object : ProtectionRelayFunction(id) {} },

@@ -8,12 +8,13 @@
 
 package com.zepben.ewb.cim.extensions.iec61968.common
 
+import com.zepben.ewb.boilerplate.collections.LazyList
+import com.zepben.ewb.boilerplate.collections.interfaces.ArcList
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.iec61968.common.ElectronicAddress
 import com.zepben.ewb.cim.iec61968.common.StreetAddress
 import com.zepben.ewb.cim.iec61968.common.TelephoneNumber
 import com.zepben.ewb.cim.iec61970.base.core.Identifiable
-import com.zepben.ewb.services.common.extensions.asUnmodifiable
 
 /**
  * The details required to contact a person or company.
@@ -68,9 +69,16 @@ class ContactDetails(
     @ZBEX
     private var _electronicAddresses: MutableList<ElectronicAddress>? = null
 
-    val phoneNumbers: Collection<TelephoneNumber> get() = _phoneNumbers.asUnmodifiable()
+    val phoneNumbers: ArcList<TelephoneNumber>
+        get() = LazyList(
+        getter = { _phoneNumbers },
+        setter = { _phoneNumbers = it },
+    )
 
-    val electronicAddresses: Collection<ElectronicAddress> get() = _electronicAddresses.asUnmodifiable()
+    val electronicAddresses: ArcList<ElectronicAddress> get() = LazyList(
+        getter = { _electronicAddresses },
+        setter = { _electronicAddresses = it },
+    )
 
     override fun equals(other: Any?): Boolean {
         //
@@ -115,9 +123,22 @@ class ContactDetails(
 
     override fun nameAndMRID(): String = mRID
 
+    // region deprecated list boilerplate
+    //
+    // ("region/endregion" is an IntelliJ feature letting you hide the entire thing)
+    // This boilerplate exists solely to enable backwards compatibility.
+    // It will be removed eventually.
+    // Every single method simply forwards the call to the corresponding list.
+
+    // region phoneNumbers boilerplate
+
     /**
      * Get the number of entries in the [TelephoneNumber] collection.
      */
+    @Deprecated(
+        message = "Use phoneNumbers.size instead.",
+        replaceWith = ReplaceWith("phoneNumbers.size")
+    )
     fun numPhoneNumbers(): Int = _phoneNumbers?.size ?: 0
 
     /**
@@ -126,6 +147,10 @@ class ContactDetails(
      * @param phoneNumber The [TelephoneNumber] to add.
      * @return This [ContactDetails] for fluent use.
      */
+    @Deprecated(
+        message = "Use phoneNumbers.add(phoneNumber) instead.",
+        replaceWith = ReplaceWith("also { it.phoneNumbers.add(phoneNumber) }")
+    )
     fun addPhoneNumber(phoneNumber: TelephoneNumber): ContactDetails {
         _phoneNumbers = _phoneNumbers ?: mutableListOf()
         _phoneNumbers!!.add(phoneNumber)
@@ -139,6 +164,10 @@ class ContactDetails(
      * @param phoneNumber The [TelephoneNumber] to remove.
      * @return true if the [TelephoneNumber] was removed.
      */
+    @Deprecated(
+        message = "Use phoneNumbers.remove(phoneNumber) instead.",
+        replaceWith = ReplaceWith("phoneNumbers.remove(phoneNumber)")
+    )
     fun removePhoneNumber(phoneNumber: TelephoneNumber): Boolean {
         val ret = _phoneNumbers?.remove(phoneNumber) == true
         if (_phoneNumbers.isNullOrEmpty()) _phoneNumbers = null
@@ -150,14 +179,26 @@ class ContactDetails(
      *
      * @return This [ContactDetails] for fluent use.
      */
+    @Deprecated(
+        message = "Use phoneNumbers.clear() instead.",
+        replaceWith = ReplaceWith("phoneNumbers.clear()")
+    )
     fun clearPhoneNumbers(): ContactDetails {
         _phoneNumbers = null
         return this
     }
 
+    // endregion
+
+    // region electronicAddresses boilerplate
+
     /**
      * Get the number of entries in the [ElectronicAddress] collection.
      */
+    @Deprecated(
+        message = "Use electronicAddresses.size instead.",
+        replaceWith = ReplaceWith("electronicAddresses.size")
+    )
     fun numElectronicAddresses(): Int = _electronicAddresses?.size ?: 0
 
     /**
@@ -166,6 +207,10 @@ class ContactDetails(
      * @param electronicAddress The [ElectronicAddress] to add.
      * @return This [ContactDetails] for fluent use.
      */
+    @Deprecated(
+        message = "Use electronicAddresses.add(electronicAddress) instead.",
+        replaceWith = ReplaceWith("also { it.electronicAddresses.add(electronicAddress) }")
+    )
     fun addElectronicAddress(electronicAddress: ElectronicAddress): ContactDetails {
         _electronicAddresses = _electronicAddresses ?: mutableListOf()
         _electronicAddresses!!.add(electronicAddress)
@@ -179,6 +224,10 @@ class ContactDetails(
      * @param electronicAddress The [ElectronicAddress] to remove.
      * @return true if the [ElectronicAddress] was removed.
      */
+    @Deprecated(
+        message = "Use electronicAddresses.remove(electronicAddress) instead.",
+        replaceWith = ReplaceWith("electronicAddresses.remove(electronicAddress)")
+    )
     fun removeElectronicAddress(electronicAddress: ElectronicAddress): Boolean {
         val ret = _electronicAddresses?.remove(electronicAddress) == true
         if (_electronicAddresses.isNullOrEmpty()) _electronicAddresses = null
@@ -190,8 +239,17 @@ class ContactDetails(
      *
      * @return This [ContactDetails] for fluent use.
      */
+    @Deprecated(
+        message = "Use electronicAddresses.clear() instead.",
+        replaceWith = ReplaceWith("electronicAddresses.clear()")
+    )
     fun clearElectronicAddresses(): ContactDetails {
         _electronicAddresses = null
         return this
     }
+
+    // endregion
+
+    // endregion
+
 }

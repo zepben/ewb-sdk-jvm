@@ -60,6 +60,11 @@ internal class ProtectionRelayFunctionTest {
 
     @Test
     internal fun timeLimits() {
+        PrivateCollectionValidator.validateUnidentifiedArcCollection(
+            { id -> object : ProtectionRelayFunction(id) {} },
+            { it.toDouble() },
+            ProtectionRelayFunction::timeLimits,
+        )
         PrivateCollectionValidator.validateOrdered(
             { id -> object : ProtectionRelayFunction(id) {} },
             { it.toDouble() },
@@ -82,6 +87,11 @@ internal class ProtectionRelayFunctionTest {
 
     @Test
     internal fun thresholds() {
+        PrivateCollectionValidator.validateUnidentifiedArcCollection(
+            { id -> object : ProtectionRelayFunction(id) {} },
+            { RelaySetting(UnitSymbol.W, it.toDouble()) },
+            ProtectionRelayFunction::thresholds,
+        )
         PrivateCollectionValidator.validateOrdered(
             { id -> object : ProtectionRelayFunction(id) {} },
             { RelaySetting(UnitSymbol.W, it.toDouble()) },
@@ -99,6 +109,11 @@ internal class ProtectionRelayFunctionTest {
 
     @Test
     internal fun protectedSwitches() {
+        PrivateCollectionValidator.validateArcCollection(
+            { id -> object : ProtectionRelayFunction(id) {} },
+            { id -> object : ProtectedSwitch(id) {} },
+            ProtectionRelayFunction::protectedSwitches,
+        )
         PrivateCollectionValidator.validateUnordered(
             { id -> object : ProtectionRelayFunction(id) {} },
             { id -> object : ProtectedSwitch(id) {} },
@@ -113,6 +128,11 @@ internal class ProtectionRelayFunctionTest {
 
     @Test
     internal fun sensors() {
+        PrivateCollectionValidator.validateArcCollection(
+            { id -> object : ProtectionRelayFunction(id) {} },
+            { id -> object : Sensor(id) {} },
+            ProtectionRelayFunction::sensors,
+        )
         PrivateCollectionValidator.validateUnordered(
             { id -> object : ProtectionRelayFunction(id) {} },
             { id -> object : Sensor(id) {} },
@@ -127,6 +147,11 @@ internal class ProtectionRelayFunctionTest {
 
     @Test
     internal fun schemes() {
+        PrivateCollectionValidator.validateArcCollection(
+            { id -> object : ProtectionRelayFunction(id) {} },
+            ::ProtectionRelayScheme,
+            ProtectionRelayFunction::schemes,
+        )
         PrivateCollectionValidator.validateUnordered(
             { id -> object : ProtectionRelayFunction(id) {} },
             ::ProtectionRelayScheme,

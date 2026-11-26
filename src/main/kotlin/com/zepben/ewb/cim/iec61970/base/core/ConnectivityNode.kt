@@ -8,7 +8,8 @@
 
 package com.zepben.ewb.cim.iec61970.base.core
 
-import com.zepben.ewb.services.common.extensions.asUnmodifiable
+import com.zepben.ewb.boilerplate.collections.BackedMridList
+import com.zepben.ewb.boilerplate.collections.interfaces.MridCollection
 import com.zepben.ewb.services.common.extensions.getByMRID
 import com.zepben.ewb.services.common.extensions.validateReference
 
@@ -22,12 +23,28 @@ class ConnectivityNode(mRID: String) : IdentifiedObject(mRID) {
     /**
      * The terminals for this connectivity node. The collection is read only
      */
-    val terminals: Collection<Terminal>
-        get() = _terminals.asUnmodifiable()
+    val terminals: MridCollection<Terminal> get() = BackedMridList(
+        _terminals,
+        owner = this,
+        elementDescription = "A Terminal"
+    )
+
+    // region deprecated list boilerplate
+    //
+    // ("region/endregion" is an IntelliJ feature letting you hide the entire thing)
+    // This boilerplate exists solely to enable backwards compatibility.
+    // It will be removed eventually.
+    // Every single method simply forwards the call to the corresponding list.
+
+    // region terminals boilerplate
 
     /**
      * Get the number of entries in the [Terminal] collection.
      */
+    @Deprecated(
+        message = "Use terminals.size instead.",
+        replaceWith = ReplaceWith("terminals.size")
+    )
     fun numTerminals(): Int = _terminals.size
 
     /**
@@ -36,6 +53,10 @@ class ConnectivityNode(mRID: String) : IdentifiedObject(mRID) {
      * @param mRID the mRID of the required [Terminal]
      * @return The [Terminal] with the specified [mRID] if it exists, otherwise null
      */
+    @Deprecated(
+        message = "Use terminals.getByMRID(mRID) instead.",
+        replaceWith = ReplaceWith("terminals.getByMRID(mRID)")
+    )
     fun getTerminal(mRID: String): Terminal? = _terminals.getByMRID(mRID)
 
     /**
@@ -43,6 +64,10 @@ class ConnectivityNode(mRID: String) : IdentifiedObject(mRID) {
      * @param terminal The [Terminal] to add
      * @return this [ConnectivityNode]
      */
+    @Deprecated(
+        message = "Use terminals.add(terminal) instead.",
+        replaceWith = ReplaceWith("also { it.terminals.add(terminal) }")
+    )
     fun addTerminal(terminal: Terminal): ConnectivityNode {
         if (validateReference(terminal, ::getTerminal, "A Terminal"))
             return this
@@ -57,14 +82,27 @@ class ConnectivityNode(mRID: String) : IdentifiedObject(mRID) {
      * @param terminal The [Terminal] to remove
      * @return true if [terminal] is removed from the collection
      */
+    @Deprecated(
+        message = "Use terminals.remove(terminal) instead.",
+        replaceWith = ReplaceWith("terminals.remove(terminal)")
+    )
     fun removeTerminal(terminal: Terminal): Boolean = _terminals.remove(terminal)
 
     /**
      * Clear all [Terminal]'s from this [ConnectivityNode}
      * @return this [ConnectivityNode]
      */
+    @Deprecated(
+        message = "Use terminals.clear() instead.",
+        replaceWith = ReplaceWith("terminals.clear()")
+    )
     fun clearTerminals(): ConnectivityNode {
         _terminals.clear()
         return this
     }
+
+    // endregion
+
+    // endregion
+
 }

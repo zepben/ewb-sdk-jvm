@@ -8,11 +8,12 @@
 
 package com.zepben.ewb.cim.iec61970.base.wires
 
+import com.zepben.ewb.boilerplate.collections.LazyMridList
+import com.zepben.ewb.boilerplate.collections.interfaces.MridList
 import com.zepben.ewb.cim.extensions.ZBEX
 import com.zepben.ewb.cim.iec61970.base.core.PhaseCode
 import com.zepben.ewb.cim.iec61970.base.core.PowerSystemResource
 import com.zepben.ewb.cim.iec61970.base.core.Terminal
-import com.zepben.ewb.services.common.extensions.asUnmodifiable
 import com.zepben.ewb.services.common.extensions.getByMRID
 import com.zepben.ewb.services.common.extensions.validateReference
 
@@ -87,11 +88,29 @@ abstract class RegulatingControl(mRID: String) : PowerSystemResource(mRID) {
 
     private var _regulatingCondEqs: MutableList<RegulatingCondEq>? = null
 
-    val regulatingCondEqs: List<RegulatingCondEq> get() = _regulatingCondEqs.asUnmodifiable()
+    val regulatingCondEqs: MridList<RegulatingCondEq> get() = LazyMridList(
+        getter = { _regulatingCondEqs },
+        setter = { _regulatingCondEqs = it },
+        owner = this,
+        elementDescription = "A RegulatingCondEq"
+    )
+
+    // region deprecated list boilerplate
+    //
+    // ("region/endregion" is an IntelliJ feature letting you hide the entire thing)
+    // This boilerplate exists solely to enable backwards compatibility.
+    // It will be removed eventually.
+    // Every single method simply forwards the call to the corresponding list.
+
+    // region regulatingCondEqs boilerplate
 
     /**
      * Get the number of entries in the [RegulatingCondEq] collection.
      */
+    @Deprecated(
+        message = "Use regulatingCondEqs.size instead.",
+        replaceWith = ReplaceWith("regulatingCondEqs.size")
+    )
     fun numRegulatingCondEqs(): Int = _regulatingCondEqs?.size ?: 0
 
     /**
@@ -100,6 +119,10 @@ abstract class RegulatingControl(mRID: String) : PowerSystemResource(mRID) {
      * @param mRID the mRID of the required [RegulatingCondEq]
      * @return The [RegulatingCondEq] with the specified [mRID] if it exists, otherwise null
      */
+    @Deprecated(
+        message = "Use regulatingCondEqs.getByMRID(mRID) instead.",
+        replaceWith = ReplaceWith("regulatingCondEqs.getByMRID(mRID)")
+    )
     fun getRegulatingCondEq(mRID: String): RegulatingCondEq? = _regulatingCondEqs.getByMRID(mRID)
 
     /**
@@ -107,6 +130,10 @@ abstract class RegulatingControl(mRID: String) : PowerSystemResource(mRID) {
      * @return true if the regulating conducting equipment is associated.
      * @return A reference to this [RegulatingControl] to allow fluent use.
      */
+    @Deprecated(
+        message = "Use regulatingCondEqs.add(regulatingCondEq) instead.",
+        replaceWith = ReplaceWith("also { it.regulatingCondEqs.add(regulatingCondEq) }")
+    )
     fun addRegulatingCondEq(regulatingCondEq: RegulatingCondEq): RegulatingControl {
         if (validateReference(regulatingCondEq, ::getRegulatingCondEq, "A RegulatingCondEq"))
             return this
@@ -121,6 +148,10 @@ abstract class RegulatingControl(mRID: String) : PowerSystemResource(mRID) {
      * @param regulatingCondEq the regulating conducting equipment to disassociate from this [RegulatingControl].
      * @return this [RegulatingControl]
      */
+    @Deprecated(
+        message = "Use regulatingCondEqs.remove(regulatingCondEq) instead.",
+        replaceWith = ReplaceWith("regulatingCondEqs.remove(regulatingCondEq)")
+    )
     fun removeRegulatingCondEq(regulatingCondEq: RegulatingCondEq): Boolean {
         val ret = _regulatingCondEqs?.remove(regulatingCondEq) == true
         if (_regulatingCondEqs.isNullOrEmpty()) _regulatingCondEqs = null
@@ -131,8 +162,16 @@ abstract class RegulatingControl(mRID: String) : PowerSystemResource(mRID) {
      * Clear this [RegulatingControl]'s associated [RegulatingCondEq]'s
      * @return this [RegulatingControl]
      */
+    @Deprecated(
+        message = "Use regulatingCondEqs.clear() instead.",
+        replaceWith = ReplaceWith("regulatingCondEqs.clear()")
+    )
     fun clearRegulatingCondEqs(): RegulatingControl {
         _regulatingCondEqs = null
         return this
     }
+
+    // endregion
+
+    // endregion
 }

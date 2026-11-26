@@ -187,6 +187,21 @@ internal class PowerTransformerEndTest {
     @Test
     internal fun sRatings() {
         val coolingTypes = TransformerCoolingType.entries
+        PrivateCollectionValidator.validateUnidentifiedArcCollection(
+            ::PowerTransformerEnd,
+            { TransformerEndRatedS(coolingTypes[it], it) },
+            PowerTransformerEnd::sRatings,
+        )
+        PrivateCollectionValidator.validateCollectionValidation(
+            { PowerTransformerEnd("collection-validation").sRatings },
+            { TransformerEndRatedS(TransformerCoolingType.KFWF, 10) },
+            { it.copy(ratedS = 20) },
+        )
+        PrivateCollectionValidator.validateCollectionSorting(
+            { PowerTransformerEnd("collection-sorting").sRatings },
+            { TransformerEndRatedS(coolingTypes[it], it) },
+            { -it.ratedS },
+        )
         PrivateCollectionValidator.validateUnordered(
             ::PowerTransformerEnd,
             { TransformerEndRatedS(coolingTypes[it], it) },

@@ -46,6 +46,11 @@ internal class CircuitTest {
 
     @Test
     internal fun endTerminalAssociations() {
+        PrivateCollectionValidator.validateArcCollection(
+            ::Circuit,
+            ::Terminal,
+            Circuit::endTerminals,
+        )
         PrivateCollectionValidator.validateUnordered(
             ::Circuit,
             ::Terminal,
@@ -60,6 +65,11 @@ internal class CircuitTest {
 
     @Test
     internal fun endSubstationAssociations() {
+        PrivateCollectionValidator.validateArcCollection(
+            ::Circuit,
+            ::Substation,
+            Circuit::endSubstations,
+        )
         PrivateCollectionValidator.validateUnordered(
             ::Circuit,
             ::Substation,
